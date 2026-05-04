@@ -1,14 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
+import JSZip from "jszip";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone, formatBytes } from "@/components/drop-zone";
+import { HowToUse } from "@/components/how-to-use";
+import { downloadBlob } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/image-converter")({
   head: () => ({
     meta: [
-      { title: "Image Converter — PNG, JPG, WebP, AVIF · Skycally" },
-      { name: "description", content: "Convert images between PNG, JPG, WebP and AVIF — right in your browser." },
+      { title: "Image Converter — PNG, JPG, WebP · Skycally" },
+      { name: "description", content: "Convert images between PNG, JPG and WebP — instantly in your browser." },
       { property: "og:title", content: "Image Converter · Skycally" },
       { property: "og:description", content: "Convert images between popular formats instantly." },
     ],
@@ -17,62 +20,114 @@ export const Route = createFileRoute("/tools/image-converter")({
 });
 
 const formats = ["image/png", "image/jpeg", "image/webp"] as const;
+type Fmt = typeof formats[number];
+
+interface Item {
+  file: File;
+  out?: { blob: Blob; size: number; name: string };
+}
+
+async function convertOne(file: File, target: Fmt): Promise<Blob> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error("Cannot read image"));
+      i.src = url;
+    });
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d")!;
+    if (target === "image/jpeg") {
+      ctx.fillStyle = "#ffffff";
+      ctx.fillRect(0, 0, canvas.width, canvas.height);
+    }
+    ctx.drawImage(img, 0, 0);
+    return await new Promise<Blob>((res, rej) =>
+      canvas.toBlob((b) => (b ? res(b) : rej(new Error("Conversion failed"))), target, 0.92),
+    );
+  } finally {
+    URL.revokeObjectURL(url);
+  }
+}
 
 function ImageConverter() {
-  const [file, setFile] = useState<File | null>(null);
-  const [target, setTarget] = useState<typeof formats[number]>("image/webp");
-  const [out, setOut] = useState<{ url: string; size: number; name: string } | null>(null);
+  const [items, setItems] = useState<Item[]>([]);
+  const [target, setTarget] = useState<Fmt>("image/webp");
   const [busy, setBusy] = useState(false);
 
-  const convert = async () => {
-    if (!file) return;
+  const ext = target.split("/")[1].replace("jpeg", "jpg");
+
+  const add = (files: File[]) => setItems((p) => [...p, ...files.map((f) => ({ file: f }))]);
+
+  const convertAll = async () => {
     setBusy(true);
     try {
-      const img = await createImageBitmap(file);
-      const canvas = document.createElement("canvas");
-      canvas.width = img.width; canvas.height = img.height;
-      canvas.getContext("2d")!.drawImage(img, 0, 0);
-      const blob: Blob = await new Promise((res) => canvas.toBlob((b) => res(b!), target, 0.92));
-      const ext = target.split("/")[1].replace("jpeg", "jpg");
-      const name = file.name.replace(/\.[^.]+$/, "") + "." + ext;
-      setOut({ url: URL.createObjectURL(blob), size: blob.size, name });
+      const updated = await Promise.all(items.map(async (it) => {
+        try {
+          const blob = await convertOne(it.file, target);
+          const name = it.file.name.replace(/\.[^.]+$/, "") + "." + ext;
+          return { ...it, out: { blob, size: blob.size, name } };
+        } catch {
+          return it;
+        }
+      }));
+      setItems(updated);
       toast.success("Converted!");
     } catch (e: any) {
-      toast.error("Conversion failed");
-    } finally { setBusy(false); }
+      toast.error("This format is not supported");
+    } finally {
+      setBusy(false);
+    }
   };
 
+  const downloadAllZip = async () => {
+    const zip = new JSZip();
+    items.forEach((it) => { if (it.out) zip.file(it.out.name, it.out.blob); });
+    const blob = await zip.generateAsync({ type: "blob" });
+    downloadBlob(blob, "converted.zip");
+  };
+
+  const ready = items.some((i) => i.out);
+
   return (
-    <ToolPageShell title="Image Converter" description="Convert PNG, JPG, WebP and AVIF — entirely in your browser.">
-      {!file ? (
-        <DropZone accept="image/*" onFiles={(f) => { setFile(f[0]); setOut(null); }} label="Drop an image" hint="PNG, JPG, WebP supported" />
-      ) : (
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold">{file.name}</p>
-              <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
-            </div>
-            <button onClick={() => { setFile(null); setOut(null); }} className="text-sm text-muted-foreground hover:text-foreground">Change</button>
-          </div>
-          <div className="flex flex-wrap items-center gap-3">
+    <ToolPageShell title="Image Converter" description="Convert PNG, JPG and WebP — entirely in your browser.">
+      <DropZone multiple accept="image/*" onFiles={add} label="Drop images" hint="PNG, JPG, WebP, BMP, GIF supported" />
+
+      {items.length > 0 && (
+        <div className="mt-8 space-y-5">
+          <div className="rounded-2xl border border-border bg-card p-5 flex flex-wrap items-center gap-3">
             <label className="text-sm font-medium">Convert to:</label>
-            <select value={target} onChange={(e) => setTarget(e.target.value as any)} className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
+            <select value={target} onChange={(e) => setTarget(e.target.value as Fmt)} className="rounded-lg border border-border bg-background px-3 py-2 text-sm">
               {formats.map((f) => <option key={f} value={f}>{f.split("/")[1].toUpperCase()}</option>)}
             </select>
-            <button onClick={convert} disabled={busy} className="ml-auto rounded-lg bg-foreground text-background font-medium px-5 py-2 disabled:opacity-50">{busy ? "Converting..." : "Convert"}</button>
-          </div>
-          {out && (
-            <div className="rounded-xl border border-border p-4 flex items-center justify-between">
-              <div>
-                <p className="font-semibold text-sm">{out.name}</p>
-                <p className="text-xs text-muted-foreground">{formatBytes(out.size)}</p>
-              </div>
-              <a href={out.url} download={out.name} className="rounded-lg bg-foreground text-background text-sm font-medium px-4 py-2">Download</a>
+            <div className="ml-auto flex gap-2">
+              {ready && <button onClick={downloadAllZip} className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-secondary">Download all (ZIP)</button>}
+              <button onClick={convertAll} disabled={busy} className="rounded-lg bg-foreground text-background font-medium px-5 py-2 disabled:opacity-50">{busy ? "Converting..." : "Convert all"}</button>
             </div>
-          )}
+          </div>
+          <div className="grid gap-3">
+            {items.map((it, i) => (
+              <div key={i} className="rounded-xl border border-border bg-card p-4 flex flex-wrap items-center gap-4">
+                <p className="font-medium text-sm flex-1 min-w-40 truncate">{it.file.name}</p>
+                <div className="text-xs text-muted-foreground">
+                  {formatBytes(it.file.size)} {it.out && <>→ <span className="text-foreground font-semibold">{formatBytes(it.out.size)}</span></>}
+                </div>
+                {it.out && <button onClick={() => downloadBlob(it.out!.blob, it.out!.name)} className="rounded-lg bg-foreground text-background text-sm font-medium px-4 py-2">Download</button>}
+                <button onClick={() => setItems((p) => p.filter((_, j) => j !== i))} className="text-xs text-muted-foreground hover:text-foreground">Remove</button>
+              </div>
+            ))}
+          </div>
         </div>
       )}
+
+      <HowToUse steps={[
+        "Drop one or more images into the box above.",
+        "Pick the format you want — JPG, PNG or WebP.",
+        "Click Convert all, then download files individually or as a ZIP.",
+      ]} />
     </ToolPageShell>
   );
 }

@@ -66,7 +66,6 @@ function WordToPdf() {
         ignoreFonts: false,
         breakPages: true,
         useBase64URL: true,
-        useMathMLPolyfill: false,
       });
 
       // wait for fonts/images

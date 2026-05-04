@@ -1,93 +1,68 @@
-# Make Skycally tools fully functional
+## Goal
 
-## Important security note (read first)
-
-You shared three API keys in chat. I will treat them as compromised after this is done — please **rotate them** at RapidAPI, remove.bg, and pdf.co once we've stored fresh ones.
-
-Also, your prompt asked for `VITE_*` env variables. Anything prefixed with `VITE_` is **shipped to every visitor's browser**, so anyone can open DevTools, copy your keys, and burn through your quotas in minutes. Since you specifically asked for "no backend server", the right middle-ground on this stack is:
-
-- **Browser-only tools** (image converter, image compressor, merge PDF, word-to-PDF) — pure client, no key needed.
-- **API-backed tools** (video downloader, remove.bg, pdf-to-word) — call a tiny **TanStack server function** (already supported by your stack, runs on Cloudflare Workers, no separate server to manage). The function holds the API key as a server-side secret and proxies the request.
-
-This is still serverless, still one-click deploy, and your keys stay private. I'll proceed this way unless you tell me otherwise.
+Fix the 3 broken tools. Keep API keys in server functions (`process.env`) — do NOT switch to `VITE_*` env vars, since those would ship the keys to every visitor's browser.
 
 ---
 
-## Plan
+## Fix 1 — Video Downloader (real RapidAPI response parsing)
 
-### 1. Secrets (Lovable Cloud runtime secrets, not `.env`)
-Store as project secrets so server functions can read them via `process.env`:
-- `RAPIDAPI_KEY`
-- `REMOVEBG_KEY`
-- `PDFCO_KEY`
+The server function already calls RapidAPI, but the response parser is wrong, so it silently returns no formats and the UI looks "mock-ish" / empty.
 
-I'll request these via the secrets tool when in build mode (you'll paste fresh rotated keys).
+In `src/server/video.functions.ts`:
+- Check `json.success` (RapidAPI returns `{ success, title, picture, links: [...] }`).
+- Map links using the actual fields: `link.quality`, `link.link`, `link.type`, `link.size`.
+- Throw clearer errors: `VIDEO_NOT_FOUND` when `success === false` or `links` empty; `RATE_LIMITED` on 429; `API_REQUEST_FAILED` otherwise.
 
-### 2. Dependencies to install
-- `browser-image-compression` — image compressor
-- `jszip` — bulk ZIP downloads
-- `pdf-lib` — merge PDF
-- `@dnd-kit/core` `@dnd-kit/sortable` `@dnd-kit/utilities` — drag-to-reorder
-- `docx-preview` `jspdf` `html2canvas` — Word → PDF in browser
-- `zod` — server-fn input validation
+In `src/routes/tools.video-downloader.tsx`:
+- Map error codes to friendly messages ("Video not found or is private", "Server busy, try again", etc.).
+- Show file size next to quality when present.
 
-### 3. Server functions (new files under `src/server/`)
-Each is a thin proxy that reads its key from `process.env` and forwards the request:
-- `src/server/video.functions.ts` — `getVideo({ url })` → calls Social Media Video Downloader on RapidAPI, normalizes response into `{ title, thumbnail, formats[] }`.
-- `src/server/removebg.functions.ts` — `removeBg({ imageBase64 })` → posts to `api.remove.bg/v1.0/removebg`, returns base64 PNG.
-- `src/server/pdfco.functions.ts` — `pdfToWord({ fileBase64, name })` → uploads to pdf.co, requests DOCX conversion, returns result URL.
-
-### 4. Tool rewrites
-
-**Video Downloader** (`src/routes/tools.video-downloader.tsx` + rewrite `src/services/videoApi.ts`)
-- Replace mock with `getVideo` server fn.
-- Render returned formats; download button uses `<a href={url} download target="_blank">` + toast.
-- Expand platform chips to: TikTok, Instagram, YouTube, Twitter/X, Facebook, Snapchat, Pinterest, Vimeo, Dailymotion.
-- Friendly errors ("This video may be private or unsupported").
-
-**Image Converter** (`src/routes/tools.image-converter.tsx`)
-- Already canvas-based; extend to **batch** (multi-file), add AVIF/BMP/GIF inputs, JPG white-fill fix, before/after sizes, per-file Download + "Download all (ZIP)".
-
-**Image Compressor** (`src/routes/tools.image-compressor.tsx`)
-- Swap manual canvas for `browser-image-compression` for better quality + EXIF preservation.
-- Quality slider 10–95 (default 80), per-file saved % badge, "Download all as ZIP" via `jszip`.
-
-**Remove Background** (`src/routes/tools.remove-bg.tsx`)
-- Replace fake delay with `removeBg` server fn (file → base64 → server → base64 PNG → blob URL).
-- Side-by-side original vs result on checkerboard, "Download PNG", quota note "Free plan: 50 images/month".
-
-**Merge PDF** (`src/routes/tools.merge-pdf.tsx`)
-- Real merge via `pdf-lib`.
-- Replace ▲▼ buttons with `@dnd-kit` sortable list, show page count per file and total.
-- Download `merged.pdf`.
-
-**Word → PDF** (`src/routes/tools.word-to-pdf.tsx`)
-- Replace `MockConvert` with real flow: render `.docx` into hidden div via `docx-preview`, snapshot with `html2canvas`, build multi-page A4 PDF via `jsPDF`, auto-download.
-- Show in-page preview after upload; progress indicator while converting.
-
-**PDF → Word** (`src/routes/tools.pdf-to-word.tsx`)
-- Replace `MockConvert` with real flow: send file to `pdfToWord` server fn, then `window.open(resultUrl)` to download `.docx`.
-- Quota note "Free plan: 100 pages/month".
-
-### 5. Cross-cutting polish
-- Toasts via existing `sonner` for success/error on every tool.
-- Standard error mapping: missing key → "Service not configured", >10MB → "File too large", network → "Connection error, please try again". Never expose raw errors.
-- Per-tool "How to use" 3-step mini-guide added inside `ToolPageShell`.
-- Verify mobile layout for each tool route at 375px.
-- Update `README.md` with the three required secrets and where to get them.
-
-### 6. Out of scope (flagging)
-- I will **not** ship `VITE_*` keys to the client — see security note above.
-- No Cloudflare Worker file system writes; all conversions stream through memory.
-- The RapidAPI free tier is rate-limited; under load expect 429s — handled with friendly error.
+`src/services/videoApi.ts` keeps re-exporting from the server function (no change to public surface).
 
 ---
 
-## Technical notes
+## Fix 2 — PDF → Word (correct pdf.co endpoint + simpler upload)
 
-- **Server function shape**: `createServerFn({ method: "POST" }).inputValidator(z…).handler(async ({ data }) => { const key = process.env.RAPIDAPI_KEY!; … })` — env reads live inside `.handler()` per stack rules.
-- **File transport**: client converts `File → ArrayBuffer → base64` before invoking server fn (server fns are JSON-RPC, not multipart). For remove.bg the server rebuilds a `Blob` and `FormData` before forwarding.
-- **PDF rendering**: `html2canvas` + `jsPDF` slice canvas into A4 pages (`pageHeight = canvas.width * 297/210`) to support multi-page docs.
-- **dnd-kit**: `DndContext` + `SortableContext` (vertical strategy) wrapping the file list; `arrayMove` on `onDragEnd`.
+Root cause: endpoint `/v1/pdf/convert/to/docx` does not exist on pdf.co. Correct endpoint is `/v1/pdf/convert/to/doc` (it produces a `.docx`).
 
-Reply **approve** to proceed and I'll request the three secrets and start implementing.
+Rewrite `src/server/pdfco.functions.ts`:
+- Accept `{ fileBase64, name }` (already does).
+- Upload via the simpler `POST /v1/file/upload` multipart endpoint instead of presigned URL (one request instead of two, avoids the PUT step entirely).
+- Convert via `POST /v1/pdf/convert/to/doc` with `{ url, async: false, name }`.
+- Return `{ url }` of the result.
+- Surface pdf.co's `message` field in thrown errors.
+
+`src/routes/tools.pdf-to-word.tsx`: improve toast messages for upload vs. convert failures. No structural changes.
+
+---
+
+## Fix 3 — Word → PDF (proper page slicing, RTL/Arabic support)
+
+Root cause: the current code uses `pdf.addImage(imgData, ..., 0, position, imgW, imgH)` with a negative `position` to paginate. This re-encodes the entire tall image on every page and frequently produces blank pages on Cloudflare/Workers-bundled jsPDF builds. Also, the off-screen container has no explicit color/`dir`, so docx-preview output sometimes renders with transparent text.
+
+Rewrite `src/routes/tools.word-to-pdf.tsx`:
+- Off-screen container: `width: 794px`, `padding: 60px 72px`, `background: white`, `color: black`, `direction` left as document default (docx-preview emits `dir="rtl"` per paragraph from the .docx itself, so Arabic works automatically).
+- After `renderAsync`, wait ~600ms for fonts/images.
+- Capture once with `html2canvas({ scale: 2, useCORS: true, backgroundColor: "#fff", windowWidth: 794 })`.
+- **Slice the tall canvas into per-page sub-canvases** (draw segments into a fresh canvas sized to one A4 page, then add as JPEG to jsPDF). This is the bit that fixes the failure.
+- Add a progress callback so the UI shows: "Reading document…" → "Rendering…" → "Building PDF…" → "Done".
+- On error, toast: "Conversion failed. Try saving the file as .docx (not .doc) and retry."
+- Add a small note under the button: "Arabic and RTL text are fully supported."
+
+Use shadcn `Progress` for the bar.
+
+---
+
+## Files touched
+
+- `src/server/video.functions.ts` — fix response parsing + error codes
+- `src/server/pdfco.functions.ts` — switch to multipart upload + correct convert endpoint
+- `src/routes/tools.video-downloader.tsx` — friendly error mapping, optional size display
+- `src/routes/tools.pdf-to-word.tsx` — better error toasts
+- `src/routes/tools.word-to-pdf.tsx` — proper page slicing + progress bar + RTL note
+
+No new dependencies (html2canvas, jspdf, docx-preview already installed).
+
+## Why not use `VITE_RAPIDAPI_KEY` / `VITE_PDFCO_KEY` as the prompt suggests?
+
+Anything prefixed `VITE_` is **inlined into the JS bundle** sent to every browser. Anyone visiting skycally.com could open DevTools and steal the keys, then burn through your RapidAPI / pdf.co quota. The current server-function setup keeps the keys on the Cloudflare Worker and is the correct pattern. The fixes above are applied inside those server functions.

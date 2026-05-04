@@ -7,6 +7,7 @@ export interface VideoFormat {
   quality: string;
   url: string;
   ext: string;
+  size?: string;
 }
 export interface VideoResult {
   title: string;
@@ -29,20 +30,31 @@ export const getVideo = createServerFn({ method: "POST" })
         },
       });
     } catch {
-      throw new Error("Connection error. Please try again.");
+      throw new Error("API_REQUEST_FAILED");
     }
-    if (res.status === 429) throw new Error("Rate limit reached. Try again in a minute.");
-    if (!res.ok) throw new Error("This video may be private or unsupported");
-    const json: any = await res.json();
+    if (res.status === 429) throw new Error("RATE_LIMITED");
+    if (!res.ok) throw new Error("API_REQUEST_FAILED");
+
+    let json: any;
+    try { json = await res.json(); } catch { throw new Error("API_REQUEST_FAILED"); }
+
+    if (json?.success === false) throw new Error("VIDEO_NOT_FOUND");
+
     const links: any[] = Array.isArray(json?.links) ? json.links : [];
-    if (!links.length) throw new Error("No downloadable formats found for this video");
+    const formats = links
+      .map((l) => ({
+        quality: l.quality || l.render_quality || l.resolution || l.type || "Default",
+        url: l.link || l.url,
+        ext: String(l.type || "mp4").toLowerCase(),
+        size: l.size || undefined,
+      }))
+      .filter((f) => f.url);
+
+    if (!formats.length) throw new Error("VIDEO_NOT_FOUND");
+
     return {
       title: json.title || "Video",
       thumbnail: json.picture || json.thumbnail || "",
-      formats: links.map((l) => ({
-        quality: l.quality || l.resolution || l.type || "Default",
-        url: l.link || l.url,
-        ext: (l.type || "mp4").toLowerCase(),
-      })).filter((f) => f.url),
+      formats,
     };
   });

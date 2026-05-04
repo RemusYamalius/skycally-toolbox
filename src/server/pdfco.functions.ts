@@ -12,33 +12,33 @@ export const pdfToWord = createServerFn({ method: "POST" })
     const key = process.env.PDFCO_KEY;
     if (!key) throw new Error("Service not configured");
 
-    // Step 1: get presigned upload URL
-    const presignRes = await fetch(
-      `https://api.pdf.co/v1/file/upload/get-presigned-url?name=${encodeURIComponent(data.name)}&contenttype=application/pdf`,
-      { headers: { "x-api-key": key } },
-    );
-    if (!presignRes.ok) throw new Error("Upload failed");
-    const presign: any = await presignRes.json();
-    if (presign.error) throw new Error(presign.message || "Upload failed");
-
-    // Step 2: PUT bytes
+    // Step 1: upload via multipart
     const bin = Uint8Array.from(atob(data.fileBase64), (c) => c.charCodeAt(0));
-    const putRes = await fetch(presign.presignedUrl, {
-      method: "PUT",
-      headers: { "Content-Type": "application/pdf" },
-      body: bin,
-    });
-    if (!putRes.ok) throw new Error("Upload failed");
+    const blob = new Blob([bin], { type: "application/pdf" });
+    const form = new FormData();
+    form.append("file", blob, data.name);
 
-    // Step 3: convert
-    const convertRes = await fetch("https://api.pdf.co/v1/pdf/convert/to/docx", {
+    const uploadRes = await fetch("https://api.pdf.co/v1/file/upload", {
+      method: "POST",
+      headers: { "x-api-key": key },
+      body: form,
+    });
+    if (!uploadRes.ok) throw new Error("UPLOAD_FAILED");
+    const upload: any = await uploadRes.json();
+    if (upload?.error) throw new Error(upload.message || "UPLOAD_FAILED");
+    const fileUrl = upload.url;
+    if (!fileUrl) throw new Error("UPLOAD_FAILED");
+
+    // Step 2: convert PDF -> DOCX (correct endpoint is /to/doc, output is .docx)
+    const outName = data.name.replace(/\.pdf$/i, ".docx");
+    const convertRes = await fetch("https://api.pdf.co/v1/pdf/convert/to/doc", {
       method: "POST",
       headers: { "x-api-key": key, "Content-Type": "application/json" },
-      body: JSON.stringify({ url: presign.url, async: false }),
+      body: JSON.stringify({ url: fileUrl, async: false, inline: false, name: outName }),
     });
+    if (!convertRes.ok) throw new Error("CONVERT_REQUEST_FAILED");
     const convert: any = await convertRes.json();
-    if (!convertRes.ok || convert.error) {
-      throw new Error(convert?.message || "Conversion failed");
-    }
+    if (convert?.error) throw new Error(convert.message || "CONVERT_REQUEST_FAILED");
+    if (!convert?.url) throw new Error("CONVERT_REQUEST_FAILED");
     return { url: convert.url };
   });

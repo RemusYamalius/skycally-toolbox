@@ -36,7 +36,13 @@ function VideoDownloader() {
       setResult(r);
       toast.success("Video found!");
     } catch (e: any) {
-      toast.error(e?.message || "Failed to fetch video");
+      const code = e?.message || "";
+      const map: Record<string, string> = {
+        VIDEO_NOT_FOUND: "Video not found or is private.",
+        RATE_LIMITED: "Server busy. Please try again in a minute.",
+        API_REQUEST_FAILED: "Server error. Please try again.",
+      };
+      toast.error(map[code] || "Could not process this URL. Make sure it's a valid video link.");
     } finally {
       setLoading(false);
     }
@@ -112,7 +118,7 @@ function VideoDownloader() {
                   </div>
                   <div>
                     <div className="font-semibold text-sm">{f.quality}</div>
-                    <div className="text-xs text-muted-foreground">{f.ext.toUpperCase()}</div>
+                    <div className="text-xs text-muted-foreground">{f.ext.toUpperCase()}{f.size ? ` · ${f.size}` : ""}</div>
                   </div>
                 </div>
                 <a

@@ -85,7 +85,8 @@ function MergePdf() {
         pages.forEach((p) => merged.addPage(p));
       }
       const bytes = await merged.save();
-      downloadBlob(new Blob([bytes], { type: "application/pdf" }), "merged.pdf");
+      const ab = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+      downloadBlob(new Blob([ab], { type: "application/pdf" }), "merged.pdf");
       toast.success("Merged PDF ready!");
     } catch (e: any) {
       toast.error("Could not merge these PDFs");

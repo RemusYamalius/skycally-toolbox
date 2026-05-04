@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 
-export const Route = createFileRoute("/tools")({
+export const Route = createFileRoute("/tools/")({
   head: () => ({
     meta: [
       { title: "All Tools — Skycally" },

@@ -5,13 +5,14 @@ import { ClipboardPaste, X, Download as DownloadIcon, Loader2, Music } from "luc
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { AdZone } from "@/components/ad-zone";
-import { fetchVideo, type VideoResult } from "@/services/videoApi";
+import { HowToUse } from "@/components/how-to-use";
+import { getVideo, type VideoResult } from "@/server/video.functions";
 
 export const Route = createFileRoute("/tools/video-downloader")({
   head: () => ({
     meta: [
       { title: "Video Downloader — TikTok, Instagram, YouTube · Skycally" },
-      { name: "description", content: "Download videos from TikTok, Instagram, YouTube, Twitter and Facebook in HD. Free, fast, no watermarks." },
+      { name: "description", content: "Download videos from TikTok, Instagram, YouTube, Twitter, Facebook and more in HD. Free, fast, no signup." },
       { property: "og:title", content: "Video Downloader · Skycally" },
       { property: "og:description", content: "Download videos from any major platform in HD." },
     ],
@@ -19,22 +20,23 @@ export const Route = createFileRoute("/tools/video-downloader")({
   component: VideoDownloader,
 });
 
-const platforms = ["TikTok", "Instagram", "YouTube", "Twitter", "Facebook"];
+const platforms = ["TikTok", "Instagram", "YouTube", "Twitter/X", "Facebook", "Snapchat", "Pinterest", "Vimeo", "Dailymotion"];
 
 function VideoDownloader() {
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
   const [result, setResult] = useState<VideoResult | null>(null);
 
-  const handleDownload = async () => {
+  const handleFetch = async () => {
+    if (!/^https?:\/\//i.test(url)) { toast.error("Please paste a valid video URL"); return; }
     setLoading(true);
     setResult(null);
     try {
-      const r = await fetchVideo(url);
+      const r = await getVideo({ data: { url } });
       setResult(r);
       toast.success("Video found!");
     } catch (e: any) {
-      toast.error(e.message || "Failed to fetch video");
+      toast.error(e?.message || "Failed to fetch video");
     } finally {
       setLoading(false);
     }
@@ -71,15 +73,14 @@ function VideoDownloader() {
         </div>
 
         <button
-          onClick={handleDownload}
+          onClick={handleFetch}
           disabled={loading || !url}
           className="mt-4 w-full rounded-xl bg-foreground text-background font-semibold py-4 text-base transition disabled:opacity-50 hover:opacity-90 inline-flex items-center justify-center gap-2"
         >
-          {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Fetching...</> : <>Download</>}
+          {loading ? <><Loader2 className="w-5 h-5 animate-spin" /> Fetching...</> : <>Fetch video</>}
         </button>
       </div>
 
-      {/* ADSENSE_ZONE: video-tool-above-button 300x250 */}
       <AdZone id="video-tool-above-button" size="300x250" />
 
       {loading && (
@@ -96,32 +97,46 @@ function VideoDownloader() {
       {result && (
         <motion.section initial={{ opacity: 0, y: 12 }} animate={{ opacity: 1, y: 0 }} className="mt-10">
           <div className="flex flex-col sm:flex-row gap-6 mb-6">
-            <img src={result.thumbnail} alt={result.title} className="w-full sm:w-72 aspect-video object-cover rounded-xl border border-border" />
+            {result.thumbnail && <img src={result.thumbnail} alt={result.title} className="w-full sm:w-72 aspect-video object-cover rounded-xl border border-border" />}
             <div>
               <h2 className="font-display text-2xl font-bold">{result.title}</h2>
               <p className="text-sm text-muted-foreground mt-1">Choose a quality below to download.</p>
             </div>
           </div>
           <div className="grid gap-3 sm:grid-cols-2">
-            {result.formats.map((f) => (
-              <div key={f.quality} className="flex items-center justify-between rounded-xl border border-border bg-card p-4">
+            {result.formats.map((f, i) => (
+              <div key={i} className="flex items-center justify-between rounded-xl border border-border bg-card p-4">
                 <div className="flex items-center gap-3">
                   <div className="w-10 h-10 rounded-lg flex items-center justify-center" style={{ background: "color-mix(in oklab, var(--cyan-brand) 15%, transparent)", color: "var(--cyan-brand)" }}>
                     {f.ext === "mp3" ? <Music className="w-5 h-5" /> : <DownloadIcon className="w-5 h-5" />}
                   </div>
                   <div>
                     <div className="font-semibold text-sm">{f.quality}</div>
-                    <div className="text-xs text-muted-foreground">{f.ext.toUpperCase()} · {f.size}</div>
+                    <div className="text-xs text-muted-foreground">{f.ext.toUpperCase()}</div>
                   </div>
                 </div>
-                <button className="rounded-lg bg-foreground text-background text-sm font-medium px-4 py-2 hover:opacity-90">Download</button>
+                <a
+                  href={f.url}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  download
+                  onClick={() => toast.success("Your download is starting...")}
+                  className="rounded-lg bg-foreground text-background text-sm font-medium px-4 py-2 hover:opacity-90"
+                >
+                  Download
+                </a>
               </div>
             ))}
           </div>
         </motion.section>
       )}
 
-      {/* ADSENSE_ZONE: video-tool-below-results 728x90 */}
+      <HowToUse steps={[
+        "Copy the link of the video you want to download.",
+        "Paste it in the box above and click Fetch video.",
+        "Pick your preferred quality — your download starts instantly.",
+      ]} />
+
       <AdZone id="video-tool-below-results" size="728x90" />
     </ToolPageShell>
   );

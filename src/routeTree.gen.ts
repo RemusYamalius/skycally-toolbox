@@ -9,9 +9,34 @@
 // Additionally, you should also exclude this file from your linter and/or formatter to prevent it from being checked or modified.
 
 import { Route as rootRouteImport } from './routes/__root'
+import { Route as TermsRouteImport } from './routes/terms'
+import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
+import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
+import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
+import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
+import { Route as ToolsPdfToWordRouteImport } from './routes/tools.pdf-to-word'
+import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
+import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
+import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 
+const TermsRoute = TermsRouteImport.update({
+  id: '/terms',
+  path: '/terms',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const PrivacyRoute = PrivacyRouteImport.update({
+  id: '/privacy',
+  path: '/privacy',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const AboutRoute = AboutRouteImport.update({
+  id: '/about',
+  path: '/about',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const IndexRoute = IndexRouteImport.update({
   id: '/',
   path: '/',
@@ -22,35 +47,168 @@ const ToolsIndexRoute = ToolsIndexRouteImport.update({
   path: '/tools/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsWordToPdfRoute = ToolsWordToPdfRouteImport.update({
+  id: '/tools/word-to-pdf',
+  path: '/tools/word-to-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsVideoDownloaderRoute = ToolsVideoDownloaderRouteImport.update({
+  id: '/tools/video-downloader',
+  path: '/tools/video-downloader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
+  id: '/tools/remove-bg',
+  path: '/tools/remove-bg',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPdfToWordRoute = ToolsPdfToWordRouteImport.update({
+  id: '/tools/pdf-to-word',
+  path: '/tools/pdf-to-word',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
+  id: '/tools/merge-pdf',
+  path: '/tools/merge-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsImageConverterRoute = ToolsImageConverterRouteImport.update({
+  id: '/tools/image-converter',
+  path: '/tools/image-converter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsImageCompressorRoute = ToolsImageCompressorRouteImport.update({
+  id: '/tools/image-compressor',
+  path: '/tools/image-compressor',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
+  '/tools/image-compressor': typeof ToolsImageCompressorRoute
+  '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
+  '/tools/image-compressor': typeof ToolsImageCompressorRoute
+  '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools': typeof ToolsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
+  '/about': typeof AboutRoute
+  '/privacy': typeof PrivacyRoute
+  '/terms': typeof TermsRoute
+  '/tools/image-compressor': typeof ToolsImageCompressorRoute
+  '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
 }
 export interface FileRouteTypes {
   fileRoutesByFullPath: FileRoutesByFullPath
-  fullPaths: '/' | '/tools/'
+  fullPaths:
+    | '/'
+    | '/about'
+    | '/privacy'
+    | '/terms'
+    | '/tools/image-compressor'
+    | '/tools/image-converter'
+    | '/tools/merge-pdf'
+    | '/tools/pdf-to-word'
+    | '/tools/remove-bg'
+    | '/tools/video-downloader'
+    | '/tools/word-to-pdf'
+    | '/tools/'
   fileRoutesByTo: FileRoutesByTo
-  to: '/' | '/tools'
-  id: '__root__' | '/' | '/tools/'
+  to:
+    | '/'
+    | '/about'
+    | '/privacy'
+    | '/terms'
+    | '/tools/image-compressor'
+    | '/tools/image-converter'
+    | '/tools/merge-pdf'
+    | '/tools/pdf-to-word'
+    | '/tools/remove-bg'
+    | '/tools/video-downloader'
+    | '/tools/word-to-pdf'
+    | '/tools'
+  id:
+    | '__root__'
+    | '/'
+    | '/about'
+    | '/privacy'
+    | '/terms'
+    | '/tools/image-compressor'
+    | '/tools/image-converter'
+    | '/tools/merge-pdf'
+    | '/tools/pdf-to-word'
+    | '/tools/remove-bg'
+    | '/tools/video-downloader'
+    | '/tools/word-to-pdf'
+    | '/tools/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
+  AboutRoute: typeof AboutRoute
+  PrivacyRoute: typeof PrivacyRoute
+  TermsRoute: typeof TermsRoute
+  ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
+  ToolsImageConverterRoute: typeof ToolsImageConverterRoute
+  ToolsMergePdfRoute: typeof ToolsMergePdfRoute
+  ToolsPdfToWordRoute: typeof ToolsPdfToWordRoute
+  ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
+  ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
+  ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
 
 declare module '@tanstack/react-router' {
   interface FileRoutesByPath {
+    '/terms': {
+      id: '/terms'
+      path: '/terms'
+      fullPath: '/terms'
+      preLoaderRoute: typeof TermsRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/privacy': {
+      id: '/privacy'
+      path: '/privacy'
+      fullPath: '/privacy'
+      preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/about': {
+      id: '/about'
+      path: '/about'
+      fullPath: '/about'
+      preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/': {
       id: '/'
       path: '/'
@@ -65,22 +223,72 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/word-to-pdf': {
+      id: '/tools/word-to-pdf'
+      path: '/tools/word-to-pdf'
+      fullPath: '/tools/word-to-pdf'
+      preLoaderRoute: typeof ToolsWordToPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/video-downloader': {
+      id: '/tools/video-downloader'
+      path: '/tools/video-downloader'
+      fullPath: '/tools/video-downloader'
+      preLoaderRoute: typeof ToolsVideoDownloaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/remove-bg': {
+      id: '/tools/remove-bg'
+      path: '/tools/remove-bg'
+      fullPath: '/tools/remove-bg'
+      preLoaderRoute: typeof ToolsRemoveBgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/pdf-to-word': {
+      id: '/tools/pdf-to-word'
+      path: '/tools/pdf-to-word'
+      fullPath: '/tools/pdf-to-word'
+      preLoaderRoute: typeof ToolsPdfToWordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/merge-pdf': {
+      id: '/tools/merge-pdf'
+      path: '/tools/merge-pdf'
+      fullPath: '/tools/merge-pdf'
+      preLoaderRoute: typeof ToolsMergePdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/image-converter': {
+      id: '/tools/image-converter'
+      path: '/tools/image-converter'
+      fullPath: '/tools/image-converter'
+      preLoaderRoute: typeof ToolsImageConverterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/image-compressor': {
+      id: '/tools/image-compressor'
+      path: '/tools/image-compressor'
+      fullPath: '/tools/image-compressor'
+      preLoaderRoute: typeof ToolsImageCompressorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
+  AboutRoute: AboutRoute,
+  PrivacyRoute: PrivacyRoute,
+  TermsRoute: TermsRoute,
+  ToolsImageCompressorRoute: ToolsImageCompressorRoute,
+  ToolsImageConverterRoute: ToolsImageConverterRoute,
+  ToolsMergePdfRoute: ToolsMergePdfRoute,
+  ToolsPdfToWordRoute: ToolsPdfToWordRoute,
+  ToolsRemoveBgRoute: ToolsRemoveBgRoute,
+  ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
+  ToolsWordToPdfRoute: ToolsWordToPdfRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

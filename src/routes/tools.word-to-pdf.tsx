@@ -1,6 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { ToolPageShell } from "@/components/tool-page-shell";
-import { MockConvert } from "./tools.pdf-to-word";
+import { MockConvert } from "@/components/mock-convert";
 
 export const Route = createFileRoute("/tools/word-to-pdf")({
   head: () => ({

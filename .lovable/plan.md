@@ -1,16 +1,13 @@
-## Replace logo file with new uploaded image
+## Update logo file and sizes
 
-The header and footer already render `/logo.png` at the right sizes (36px / 28px). The issue is the current `public/logo.png` file doesn't display as the intended image. Replace it with the new upload.
-
-### Changes
-
-1. **Copy** `user-uploads://Skycally_LOGO.png` → `public/logo.png` (overwrite).
-2. **Verify** `src/components/site-header.tsx` keeps:
+1. **Replace** `public/logo.png` with the newly uploaded `user-uploads://Skycally.png` (2048x356, transparent).
+2. **`src/components/site-header.tsx`** — change height from `36px` to `38px`:
    ```tsx
-   <img src="/logo.png" alt="Skycally" style={{ height: "36px", width: "auto" }} />
+   <img src="/logo.png" alt="Skycally" style={{ height: "38px", width: "auto" }} />
    ```
-3. **Verify** `src/components/site-footer.tsx` keeps:
+3. **`src/components/site-footer.tsx`** — change height from `28px` to `30px`:
    ```tsx
-   <img src="/logo.png" alt="Skycally" style={{ height: "28px", width: "auto" }} />
+   <img src="/logo.png" alt="Skycally" style={{ height: "30px", width: "auto" }} />
    ```
-4. No other code changes needed — favicon (`/logo.png`) will pick up the new file automatically.
+4. **Favicon** — already wired in `src/routes/__root.tsx` via `{ rel: "icon", type: "image/png", href: "/logo.png" }`. No `index.html` exists in this TanStack Start project; the root route head() handles it. Will pick up the new file automatically.
+5. No background containers exist behind the logos — the `<Link>` wrappers have no bg classes. Nothing to remove.

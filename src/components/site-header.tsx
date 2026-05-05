@@ -17,7 +17,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-background/70 border-b border-border">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
         <Link to="/" className="flex items-center">
-          <img src="/logo.png" alt="Skycally" style={{ height: "36px", width: "auto" }} />
+          <img src="/logo.png" alt="Skycally" style={{ height: "38px", width: "auto" }} />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">

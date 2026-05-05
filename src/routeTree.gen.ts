@@ -17,7 +17,7 @@ import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
-import { Route as ToolsPdfToWordRouteImport } from './routes/tools.pdf-to-word'
+import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
@@ -62,9 +62,9 @@ const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
   path: '/tools/remove-bg',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsPdfToWordRoute = ToolsPdfToWordRouteImport.update({
-  id: '/tools/pdf-to-word',
-  path: '/tools/pdf-to-word',
+const ToolsPdfTextExtractorRoute = ToolsPdfTextExtractorRouteImport.update({
+  id: '/tools/pdf-text-extractor',
+  path: '/tools/pdf-text-extractor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
@@ -91,7 +91,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
-  '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -105,7 +105,7 @@ export interface FileRoutesByTo {
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
-  '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -120,7 +120,7 @@ export interface FileRoutesById {
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
-  '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -136,7 +136,7 @@ export interface FileRouteTypes {
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/merge-pdf'
-    | '/tools/pdf-to-word'
+    | '/tools/pdf-text-extractor'
     | '/tools/remove-bg'
     | '/tools/video-downloader'
     | '/tools/word-to-pdf'
@@ -150,7 +150,7 @@ export interface FileRouteTypes {
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/merge-pdf'
-    | '/tools/pdf-to-word'
+    | '/tools/pdf-text-extractor'
     | '/tools/remove-bg'
     | '/tools/video-downloader'
     | '/tools/word-to-pdf'
@@ -164,7 +164,7 @@ export interface FileRouteTypes {
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/merge-pdf'
-    | '/tools/pdf-to-word'
+    | '/tools/pdf-text-extractor'
     | '/tools/remove-bg'
     | '/tools/video-downloader'
     | '/tools/word-to-pdf'
@@ -179,7 +179,7 @@ export interface RootRouteChildren {
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
-  ToolsPdfToWordRoute: typeof ToolsPdfToWordRoute
+  ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
@@ -244,11 +244,11 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsRemoveBgRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/pdf-to-word': {
-      id: '/tools/pdf-to-word'
-      path: '/tools/pdf-to-word'
-      fullPath: '/tools/pdf-to-word'
-      preLoaderRoute: typeof ToolsPdfToWordRouteImport
+    '/tools/pdf-text-extractor': {
+      id: '/tools/pdf-text-extractor'
+      path: '/tools/pdf-text-extractor'
+      fullPath: '/tools/pdf-text-extractor'
+      preLoaderRoute: typeof ToolsPdfTextExtractorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/merge-pdf': {
@@ -283,7 +283,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
-  ToolsPdfToWordRoute: ToolsPdfToWordRoute,
+  ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,

@@ -16,7 +16,7 @@ export const Route = createFileRoute("/tools/")({
   component: ToolsPage,
 });
 
-const cats: ("all" | ToolCategory)[] = ["all", "video", "image", "pdf", "text"];
+const cats: ("all" | ToolCategory)[] = ["all", "video", "image", "audio", "pdf", "text"];
 
 function ToolsPage() {
   const [cat, setCat] = useState<"all" | ToolCategory>("all");

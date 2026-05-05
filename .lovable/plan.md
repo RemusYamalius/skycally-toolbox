@@ -1,13 +1,8 @@
-## Update logo file and sizes
+## Replace favicon with the uploaded square logo
 
-1. **Replace** `public/logo.png` with the newly uploaded `user-uploads://Skycally.png` (2048x356, transparent).
-2. **`src/components/site-header.tsx`** — change height from `36px` to `38px`:
+1. **Copy** `user-uploads://Skycally_favicon.png` → `public/favicon.png` (square icon, suitable for browser tab).
+2. **`src/routes/__root.tsx`** — update the favicon link from `/logo.png` to `/favicon.png`:
    ```tsx
-   <img src="/logo.png" alt="Skycally" style={{ height: "38px", width: "auto" }} />
+   { rel: "icon", type: "image/png", href: "/favicon.png" },
    ```
-3. **`src/components/site-footer.tsx`** — change height from `28px` to `30px`:
-   ```tsx
-   <img src="/logo.png" alt="Skycally" style={{ height: "30px", width: "auto" }} />
-   ```
-4. **Favicon** — already wired in `src/routes/__root.tsx` via `{ rel: "icon", type: "image/png", href: "/logo.png" }`. No `index.html` exists in this TanStack Start project; the root route head() handles it. Will pick up the new file automatically.
-5. No background containers exist behind the logos — the `<Link>` wrappers have no bg classes. Nothing to remove.
+3. Leave `public/logo.png` untouched — the navbar/footer continue using the wide horizontal logo.

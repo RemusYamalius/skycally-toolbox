@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Sparkle } from "lucide-react";
+
 import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
 
 export function SiteFooter() {
@@ -8,8 +8,8 @@ export function SiteFooter() {
     <footer className="mt-24 border-t border-border bg-secondary/30">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid gap-10 md:grid-cols-3">
         <div>
-          <Link to="/" className="flex items-center gap-1.5 font-display font-bold text-xl">
-            Sky<Sparkle className="w-4 h-4" style={{ color: "var(--cyan-brand)" }} fill="currentColor" />cally
+          <Link to="/" className="flex items-center">
+            <img src="/logo.png" alt="Skycally" className="h-8 w-auto" />
           </Link>
           <p className="mt-3 text-sm text-muted-foreground max-w-xs">Every tool you need, one place. Fast, free, and private — no registration required.</p>
         </div>

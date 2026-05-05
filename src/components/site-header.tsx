@@ -1,5 +1,5 @@
 import { Link } from "@tanstack/react-router";
-import { Moon, Sun, Menu, X, Sparkle } from "lucide-react";
+import { Moon, Sun, Menu, X } from "lucide-react";
 import { useState } from "react";
 import { useTheme } from "./theme-provider";
 
@@ -16,10 +16,8 @@ export function SiteHeader() {
   return (
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-background/70 border-b border-border">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
-        <Link to="/" className="flex items-center gap-1.5 font-display font-bold text-xl">
-          <span>Sky</span>
-          <Sparkle className="w-4 h-4" style={{ color: "var(--cyan-brand)" }} fill="currentColor" />
-          <span>cally</span>
+        <Link to="/" className="flex items-center">
+          <img src="/logo.png" alt="Skycally" className="h-8 w-auto" />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">

@@ -1,24 +1,34 @@
-## Route Download button through backend proxy
+## Replace text logo with PNG across header, footer, and favicon
 
-Update `src/routes/tools.video-downloader.tsx` so the per-format Download button no longer links directly to the upstream CDN URL (which often 403s due to referer/cookies). Instead, hit our Railway proxy endpoint.
+### 1. Add the logo asset
+- Create `public/` folder and copy the uploaded `Skycally_LOGO-nobg.png` to `public/logo.png` so it's served at `/logo.png` at runtime.
 
-### Changes
+### 2. Header (`src/components/site-header.tsx`)
+Replace the current text+icon logo:
+```tsx
+<Link to="/" className="flex items-center gap-1.5 font-display font-bold text-xl">
+  <span>Sky</span>
+  <Sparkle ... />
+  <span>cally</span>
+</Link>
+```
+with:
+```tsx
+<Link to="/" className="flex items-center">
+  <img src="/logo.png" alt="Skycally" className="h-8 w-auto" />
+</Link>
+```
+Remove the now-unused `Sparkle` import.
 
-**`src/routes/tools.video-downloader.tsx`**
-- Keep the pasted `url` in scope (already in state). Replace the `<a href={f.url} download>` element with a `<button>` that builds:
-  ```ts
-  const API_URL = import.meta.env.VITE_API_URL || "https://skycally-api-production.up.railway.app";
-  const downloadUrl = `${API_URL}/api/download?url=${encodeURIComponent(url)}&video_url=${encodeURIComponent(f.url)}`;
-  const a = document.createElement("a");
-  a.href = downloadUrl;
-  a.download = `video.${f.ext || "mp4"}`;
-  document.body.appendChild(a);
-  a.click();
-  a.remove();
-  toast.success("Your download is starting...");
-  ```
-- Style the button identically to the previous anchor so the UI doesn't shift.
+### 3. Footer (`src/components/site-footer.tsx`)
+Replace the same text+`Sparkle` logo block at the top of the footer with the same `<img src="/logo.png" alt="Skycally" className="h-8 w-auto" />` inside the existing `<Link to="/">`. Remove the unused `Sparkle` import.
 
-### Out of scope
-- No changes to `src/services/videoApi.ts` (proxy URL is built inline at click time, matching the snippet you provided).
-- Backend `/api/download` endpoint is assumed to exist on Railway already.
+### 4. Favicon (`src/routes/__root.tsx`)
+This project has no `index.html` (TanStack Start manages `<head>` via the root route). Add a favicon entry to the `links` array in `Route.head()`:
+```ts
+{ rel: "icon", type: "image/png", href: "/logo.png" },
+```
+
+### Notes
+- Files in `public/` are served from the site root, so `/logo.png` works in both dev and production.
+- `h-8` keeps logo height consistent with the previous text logo's visual weight; the navbar's `h-16` provides ample padding.

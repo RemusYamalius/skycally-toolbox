@@ -20,7 +20,7 @@ export const Route = createFileRoute("/tools/video-downloader")({
   component: VideoDownloader,
 });
 
-const platforms = ["TikTok", "Instagram", "YouTube", "Twitter/X", "Facebook", "Snapchat", "Pinterest", "Vimeo", "Dailymotion"];
+const platforms = ["TikTok", "Instagram", "Twitter/X", "Facebook", "Snapchat", "Pinterest", "Vimeo", "Dailymotion"];
 
 function VideoDownloader() {
   const [url, setUrl] = useState("");
@@ -54,11 +54,12 @@ function VideoDownloader() {
 
   return (
     <ToolPageShell title="Video Downloader" description="Paste a link from any major platform — get your video in seconds.">
-      <div className="flex flex-wrap gap-2 mb-8">
+      <div className="flex flex-wrap gap-2 mb-3">
         {platforms.map((p) => (
           <span key={p} className="rounded-full border border-border bg-secondary/50 px-3 py-1 text-xs font-medium">{p}</span>
         ))}
       </div>
+      <p className="text-xs text-muted-foreground mb-8">YouTube not supported due to platform restrictions</p>
 
       <div className="rounded-2xl border border-border bg-card p-6 sm:p-8">
         <div className="relative">

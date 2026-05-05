@@ -6,7 +6,7 @@ import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { AdZone } from "@/components/ad-zone";
 import { HowToUse } from "@/components/how-to-use";
-import { getVideo, type VideoResult } from "@/server/video.functions";
+import { fetchVideo, type VideoResult } from "@/services/videoApi";
 
 export const Route = createFileRoute("/tools/video-downloader")({
   head: () => ({
@@ -32,7 +32,7 @@ function VideoDownloader() {
     setLoading(true);
     setResult(null);
     try {
-      const r = await getVideo({ data: { url } });
+      const r = await fetchVideo({ url });
       setResult(r);
       toast.success("Video found!");
     } catch (e: any) {

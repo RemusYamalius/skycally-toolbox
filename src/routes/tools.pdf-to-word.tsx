@@ -5,8 +5,8 @@ import { Loader2 } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
-import { pdfToWord } from "@/server/pdfco.functions";
-import { fileToBase64, checkSize } from "@/lib/file-utils";
+import { convertPdfToWord } from "@/services/pdfToWord";
+import { checkSize } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/pdf-to-word")({
   head: () => ({
@@ -35,9 +35,7 @@ function PdfToWordPage() {
     if (!file) return;
     setBusy(true);
     try {
-      const fileBase64 = await fileToBase64(file);
-      const { url } = await pdfToWord({ data: { fileBase64, name: file.name } });
-      window.open(url, "_blank");
+      await convertPdfToWord(file);
       toast.success("Conversion complete!");
     } catch (e: any) {
       toast.error(e?.message || "Conversion failed");
@@ -60,14 +58,13 @@ function PdfToWordPage() {
           <button onClick={convert} disabled={busy} className="w-full rounded-xl bg-foreground text-background font-semibold py-3 disabled:opacity-50 inline-flex items-center justify-center gap-2">
             {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Converting...</> : "Convert to Word"}
           </button>
-          <p className="text-xs text-center text-muted-foreground">Powered by pdf.co — free plan: 100 pages/month.</p>
         </div>
       )}
 
       <HowToUse steps={[
         "Drop a PDF file (up to 10MB).",
-        "Click Convert to Word — we'll process it server-side.",
-        "Your editable .docx opens in a new tab — save it to your device.",
+        "Click Convert to Word — we process it server-side.",
+        "Your editable .docx is downloaded automatically.",
       ]} />
     </ToolPageShell>
   );

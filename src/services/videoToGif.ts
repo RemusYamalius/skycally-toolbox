@@ -37,6 +37,7 @@ export async function convertToGif(
     "output.gif",
   ]);
 
-  const data = await ffmpeg.readFile("output.gif");
-  return new Blob([data as Uint8Array], { type: "image/gif" });
+  const data = (await ffmpeg.readFile("output.gif")) as Uint8Array;
+  const buf = new Uint8Array(data);
+  return new Blob([buf.buffer as ArrayBuffer], { type: "image/gif" });
 }

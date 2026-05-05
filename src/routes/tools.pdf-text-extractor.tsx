@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { Textarea } from "@/components/ui/textarea";
+import { AdZone } from "@/components/ad-zone";
 import { checkSize, downloadBlob } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/pdf-text-extractor")({

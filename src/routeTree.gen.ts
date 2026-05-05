@@ -15,12 +15,16 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
+import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
+import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
+import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
+import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
@@ -55,9 +59,24 @@ const ToolsWordToPdfRoute = ToolsWordToPdfRouteImport.update({
   path: '/tools/word-to-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsVideoToGifRoute = ToolsVideoToGifRouteImport.update({
+  id: '/tools/video-to-gif',
+  path: '/tools/video-to-gif',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsVideoDownloaderRoute = ToolsVideoDownloaderRouteImport.update({
   id: '/tools/video-downloader',
   path: '/tools/video-downloader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
+  id: '/tools/text-to-speech',
+  path: '/tools/text-to-speech',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
+  id: '/tools/speech-to-text',
+  path: '/tools/speech-to-text',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
@@ -85,6 +104,11 @@ const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
   path: '/tools/merge-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsImageUpscalerRoute = ToolsImageUpscalerRouteImport.update({
+  id: '/tools/image-upscaler',
+  path: '/tools/image-upscaler',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsImageToTextRoute = ToolsImageToTextRouteImport.update({
   id: '/tools/image-to-text',
   path: '/tools/image-to-text',
@@ -109,12 +133,16 @@ export interface FileRoutesByFullPath {
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
+  '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -126,12 +154,16 @@ export interface FileRoutesByTo {
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
+  '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools': typeof ToolsIndexRoute
 }
@@ -144,12 +176,16 @@ export interface FileRoutesById {
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
+  '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -163,12 +199,16 @@ export interface FileRouteTypes {
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-to-text'
+    | '/tools/image-upscaler'
     | '/tools/merge-pdf'
     | '/tools/pdf-text-extractor'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/speech-to-text'
+    | '/tools/text-to-speech'
     | '/tools/video-downloader'
+    | '/tools/video-to-gif'
     | '/tools/word-to-pdf'
     | '/tools/'
   fileRoutesByTo: FileRoutesByTo
@@ -180,12 +220,16 @@ export interface FileRouteTypes {
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-to-text'
+    | '/tools/image-upscaler'
     | '/tools/merge-pdf'
     | '/tools/pdf-text-extractor'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/speech-to-text'
+    | '/tools/text-to-speech'
     | '/tools/video-downloader'
+    | '/tools/video-to-gif'
     | '/tools/word-to-pdf'
     | '/tools'
   id:
@@ -197,12 +241,16 @@ export interface FileRouteTypes {
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-to-text'
+    | '/tools/image-upscaler'
     | '/tools/merge-pdf'
     | '/tools/pdf-text-extractor'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/speech-to-text'
+    | '/tools/text-to-speech'
     | '/tools/video-downloader'
+    | '/tools/video-to-gif'
     | '/tools/word-to-pdf'
     | '/tools/'
   fileRoutesById: FileRoutesById
@@ -215,12 +263,16 @@ export interface RootRouteChildren {
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
+  ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
+  ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
+  ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
+  ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
@@ -269,11 +321,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsWordToPdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/video-to-gif': {
+      id: '/tools/video-to-gif'
+      path: '/tools/video-to-gif'
+      fullPath: '/tools/video-to-gif'
+      preLoaderRoute: typeof ToolsVideoToGifRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/video-downloader': {
       id: '/tools/video-downloader'
       path: '/tools/video-downloader'
       fullPath: '/tools/video-downloader'
       preLoaderRoute: typeof ToolsVideoDownloaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/text-to-speech': {
+      id: '/tools/text-to-speech'
+      path: '/tools/text-to-speech'
+      fullPath: '/tools/text-to-speech'
+      preLoaderRoute: typeof ToolsTextToSpeechRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/speech-to-text': {
+      id: '/tools/speech-to-text'
+      path: '/tools/speech-to-text'
+      fullPath: '/tools/speech-to-text'
+      preLoaderRoute: typeof ToolsSpeechToTextRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/remove-bg': {
@@ -311,6 +384,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMergePdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/image-upscaler': {
+      id: '/tools/image-upscaler'
+      path: '/tools/image-upscaler'
+      fullPath: '/tools/image-upscaler'
+      preLoaderRoute: typeof ToolsImageUpscalerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/image-to-text': {
       id: '/tools/image-to-text'
       path: '/tools/image-to-text'
@@ -343,12 +423,16 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
   ToolsImageToTextRoute: ToolsImageToTextRoute,
+  ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
+  ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
+  ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
+  ToolsVideoToGifRoute: ToolsVideoToGifRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }

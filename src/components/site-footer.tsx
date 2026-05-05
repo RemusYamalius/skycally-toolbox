@@ -9,7 +9,7 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid gap-10 md:grid-cols-3">
         <div>
           <Link to="/" className="flex items-center">
-            <img src="/logo.png" alt="Skycally" className="h-8 w-auto" style={{ filter: "brightness(1.2)" }} />
+            <img src="/logo.png" alt="Skycally" style={{ height: "28px", width: "auto" }} />
           </Link>
           <p className="mt-3 text-sm text-muted-foreground max-w-xs">Every tool you need, one place. Fast, free, and private — no registration required.</p>
         </div>

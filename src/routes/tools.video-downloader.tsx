@@ -124,13 +124,7 @@ function VideoDownloader() {
                 <button
                   onClick={() => {
                     const API_URL = import.meta.env.VITE_API_URL || "https://skycally-api-production.up.railway.app";
-                    const downloadUrl = `${API_URL}/api/download?url=${encodeURIComponent(url)}&video_url=${encodeURIComponent(f.url)}`;
-                    const a = document.createElement("a");
-                    a.href = downloadUrl;
-                    a.download = `video.${f.ext || "mp4"}`;
-                    document.body.appendChild(a);
-                    a.click();
-                    a.remove();
+                    window.location.href = `${API_URL}/api/download?url=${encodeURIComponent(url)}&quality=${encodeURIComponent(f.quality)}`;
                     toast.success("Your download is starting...");
                   }}
                   className="rounded-lg bg-foreground text-background text-sm font-medium px-4 py-2 hover:opacity-90"

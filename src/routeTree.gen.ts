@@ -17,8 +17,11 @@ import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
+import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
+import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
+import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 
@@ -62,6 +65,16 @@ const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
   path: '/tools/remove-bg',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsQrReaderRoute = ToolsQrReaderRouteImport.update({
+  id: '/tools/qr-reader',
+  path: '/tools/qr-reader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsQrGeneratorRoute = ToolsQrGeneratorRouteImport.update({
+  id: '/tools/qr-generator',
+  path: '/tools/qr-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsPdfTextExtractorRoute = ToolsPdfTextExtractorRouteImport.update({
   id: '/tools/pdf-text-extractor',
   path: '/tools/pdf-text-extractor',
@@ -70,6 +83,11 @@ const ToolsPdfTextExtractorRoute = ToolsPdfTextExtractorRouteImport.update({
 const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
   id: '/tools/merge-pdf',
   path: '/tools/merge-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsImageToTextRoute = ToolsImageToTextRouteImport.update({
+  id: '/tools/image-to-text',
+  path: '/tools/image-to-text',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsImageConverterRoute = ToolsImageConverterRouteImport.update({
@@ -90,8 +108,11 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
+  '/tools/qr-generator': typeof ToolsQrGeneratorRoute
+  '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -104,8 +125,11 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
+  '/tools/qr-generator': typeof ToolsQrGeneratorRoute
+  '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -119,8 +143,11 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
+  '/tools/qr-generator': typeof ToolsQrGeneratorRoute
+  '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -135,8 +162,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tools/image-compressor'
     | '/tools/image-converter'
+    | '/tools/image-to-text'
     | '/tools/merge-pdf'
     | '/tools/pdf-text-extractor'
+    | '/tools/qr-generator'
+    | '/tools/qr-reader'
     | '/tools/remove-bg'
     | '/tools/video-downloader'
     | '/tools/word-to-pdf'
@@ -149,8 +179,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tools/image-compressor'
     | '/tools/image-converter'
+    | '/tools/image-to-text'
     | '/tools/merge-pdf'
     | '/tools/pdf-text-extractor'
+    | '/tools/qr-generator'
+    | '/tools/qr-reader'
     | '/tools/remove-bg'
     | '/tools/video-downloader'
     | '/tools/word-to-pdf'
@@ -163,8 +196,11 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tools/image-compressor'
     | '/tools/image-converter'
+    | '/tools/image-to-text'
     | '/tools/merge-pdf'
     | '/tools/pdf-text-extractor'
+    | '/tools/qr-generator'
+    | '/tools/qr-reader'
     | '/tools/remove-bg'
     | '/tools/video-downloader'
     | '/tools/word-to-pdf'
@@ -178,8 +214,11 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
+  ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
+  ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
+  ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
@@ -244,6 +283,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsRemoveBgRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/qr-reader': {
+      id: '/tools/qr-reader'
+      path: '/tools/qr-reader'
+      fullPath: '/tools/qr-reader'
+      preLoaderRoute: typeof ToolsQrReaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/qr-generator': {
+      id: '/tools/qr-generator'
+      path: '/tools/qr-generator'
+      fullPath: '/tools/qr-generator'
+      preLoaderRoute: typeof ToolsQrGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/pdf-text-extractor': {
       id: '/tools/pdf-text-extractor'
       path: '/tools/pdf-text-extractor'
@@ -256,6 +309,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/merge-pdf'
       fullPath: '/tools/merge-pdf'
       preLoaderRoute: typeof ToolsMergePdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/image-to-text': {
+      id: '/tools/image-to-text'
+      path: '/tools/image-to-text'
+      fullPath: '/tools/image-to-text'
+      preLoaderRoute: typeof ToolsImageToTextRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/image-converter': {
@@ -282,8 +342,11 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
+  ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,
+  ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
+  ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
@@ -292,12 +355,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text";
 
@@ -26,4 +26,7 @@ export const tools: Tool[] = [
   { slug: "word-to-pdf", name: "Word to PDF", description: "Turn Word documents into polished PDFs.", category: "pdf", icon: FileType, path: "/tools/word-to-pdf" },
   { slug: "merge-pdf", name: "Merge PDF", description: "Combine multiple PDFs into a single file.", category: "pdf", icon: Combine, path: "/tools/merge-pdf" },
   { slug: "remove-bg", name: "Remove Background", description: "Erase image backgrounds with one click.", category: "image", icon: Scissors, path: "/tools/remove-bg" },
+  { slug: "qr-generator", name: "QR Code Generator", description: "Create custom QR codes from any URL or text.", category: "text", icon: QrCode, path: "/tools/qr-generator" },
+  { slug: "qr-reader", name: "QR Code Reader", description: "Decode QR codes from images or your camera.", category: "text", icon: ScanLine, path: "/tools/qr-reader" },
+  { slug: "image-to-text", name: "Image to Text (OCR)", description: "Extract text from images in multiple languages.", category: "image", icon: ScanText, path: "/tools/image-to-text" },
 ];

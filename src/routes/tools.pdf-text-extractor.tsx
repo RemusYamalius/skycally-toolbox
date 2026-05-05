@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { Textarea } from "@/components/ui/textarea";
+import { AdZone } from "@/components/ad-zone";
 import { checkSize, downloadBlob } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/pdf-text-extractor")({
@@ -104,18 +105,24 @@ function PdfTextExtractorPage() {
                 className="min-h-[360px] font-mono text-sm"
                 placeholder="Extracted text will appear here..."
               />
-              <div className="flex flex-wrap gap-3">
-                <button onClick={copy} disabled={!text} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-4 py-2.5 disabled:opacity-50">
-                  <Copy className="w-4 h-4" /> Copy
-                </button>
-                <button onClick={download} disabled={!text} className="inline-flex items-center gap-2 rounded-xl border border-border font-semibold px-4 py-2.5 disabled:opacity-50 hover:bg-secondary">
-                  <Download className="w-4 h-4" /> Download .txt
-                </button>
+              <div className="flex items-center justify-between flex-wrap gap-3">
+                <p className="text-xs text-muted-foreground">{text.length.toLocaleString()} characters</p>
+                <div className="flex gap-3">
+                  <button onClick={copy} disabled={!text} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-4 py-2.5 disabled:opacity-50">
+                    <Copy className="w-4 h-4" /> Copy All Text
+                  </button>
+                  <button onClick={download} disabled={!text} className="inline-flex items-center gap-2 rounded-xl border border-border font-semibold px-4 py-2.5 disabled:opacity-50 hover:bg-secondary">
+                    <Download className="w-4 h-4" /> Download .txt
+                  </button>
+                </div>
               </div>
             </>
           )}
         </div>
       )}
+
+      {/* ADSENSE_ZONE: pdf-text-extractor-bottom 728x90 */}
+      <AdZone id="pdf-text-extractor-bottom" size="728x90" />
 
       <HowToUse steps={[
         "Drop your PDF file (up to 10MB).",

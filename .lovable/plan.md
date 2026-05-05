@@ -1,45 +1,48 @@
 ## Goal
-Replace the existing "PDF to Word" tool with a fully client-side "PDF Text Extractor" that uses pdfjs-dist to extract text from any PDF (Arabic + all languages supported).
+Add 3 new browser-only tools (QR Generator, QR Reader, Image-to-Text OCR). PDF Text Extractor already exists from previous turn — keep it. Wire all four into the homepage grid, /tools page, and footer.
 
-## Changes
+## Packages (already installed)
+- `pdfjs-dist`, `qrcode` (+ `@types/qrcode`), `jsqr`, `tesseract.js`
 
-### 1. New route: `src/routes/tools.pdf-text-extractor.tsx`
-- Path: `/tools/pdf-text-extractor`
-- Title meta: "Extract Text from PDF — Skycally"
-- UI built with `ToolPageShell`:
-  - `DropZone` accepting `application/pdf`
-  - On file selected: load pdfjs-dist, iterate pages, concatenate `textContent.items` into a single string (page separators)
-  - Show extracted text in a `<Textarea>` (large, RTL-friendly, `dir="auto"`)
-  - Two buttons:
-    - **Copy** — `navigator.clipboard.writeText(...)` + toast
-    - **Download .txt** — Blob download as `<originalName>.txt`
-  - Loading spinner while extracting
-- Add `<HowToUse>` steps
+## File changes
 
-### 2. Install pdfjs-dist
-- `bun add pdfjs-dist`
-- Import via ESM: `import * as pdfjsLib from "pdfjs-dist"` and set worker:
-  ```ts
-  import workerSrc from "pdfjs-dist/build/pdf.worker.min.mjs?url";
-  pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
-  ```
-- Dynamic import inside the extract handler so SSR isn't affected.
+### 1. `src/lib/tools.ts` — register 3 new tools
+Add icons `QrCode, ScanLine, ScanText` from lucide-react. Append entries:
+- `qr-generator` → category `text`, icon `QrCode`, path `/tools/qr-generator`
+- `qr-reader` → category `text`, icon `ScanLine`, path `/tools/qr-reader`
+- `image-to-text` → category `image`, icon `ScanText`, path `/tools/image-to-text`
 
-### 3. Update tool registry: `src/lib/tools.ts`
-- Replace the `pdf-to-word` entry with:
-  ```ts
-  { slug: "pdf-text-extractor", name: "Extract Text from PDF",
-    description: "Extract all text from any PDF instantly.",
-    category: "pdf", icon: FileText, path: "/tools/pdf-text-extractor" }
-  ```
+### 2. New route: `src/routes/tools.qr-generator.tsx`
+- Inputs: text/URL textarea, size selector (Small 200 / Medium 400 / Large 800), color + background color pickers
+- Live preview using `qrcode.toCanvas` (re-render on changes via useEffect)
+- Buttons: Download PNG (canvas → blob), Download SVG (`qrcode.toString` type:'svg')
+- Wrapped in `ToolPageShell` + `<HowToUse>` + `<AdZone>` comment
 
-### 4. Delete old files
-- `src/routes/tools.pdf-to-word.tsx`
-- `src/services/pdfToWord.ts`
+### 3. New route: `src/routes/tools.qr-reader.tsx`
+- `DropZone` for PNG/JPG/GIF → draw onto canvas → `jsQR(imageData.data, w, h)`
+- "Scan from Camera" button: `navigator.mediaDevices.getUserMedia({video})`, run jsQR in a requestAnimationFrame loop until decoded, then stop tracks
+- Result card with decoded text + Copy button. If `/^https?:\/\//` test passes, show "Open Link"
+- Error: "No QR code found in this image"
 
-The auto-generated `routeTree.gen.ts` will refresh on dev/build — no manual edit.
+### 4. New route: `src/routes/tools.image-to-text.tsx`
+- `DropZone` for image (PNG/JPG/WEBP)
+- Language `<select>`: English (eng), Arabic (ara), French (fra), Spanish (spa)
+- Extract Text button → dynamic `import("tesseract.js")`, `createWorker(lang, 1, { logger })`
+- Progress bar driven by logger `m.progress`
+- Result textarea (`dir="auto"`), Copy + Download .txt buttons, character count
+
+### 5. `src/components/site-footer.tsx`
+- Categories list already maps over all categories — it auto-includes new tools (slice 3). No code change needed; verify it shows the new ones.
+
+### 6. Homepage `src/routes/index.tsx`
+- Grid already maps `tools` → new ones appear automatically. No change needed.
+
+## Common UI patterns
+Each new tool route includes:
+- `ToolPageShell` (provides "No files stored on our servers" badge automatically)
+- `<HowToUse>` 3-step guide
+- `{/* ADSENSE_ZONE: <slug>-bottom 728x90 */}` comment + `<AdZone>` rendered below the tool
 
 ## Notes
-- 100% browser-based; no server function or external API used.
-- `dir="auto"` on the textarea ensures Arabic renders RTL correctly.
-- pdfjs-dist worker is bundled by Vite via `?url` import (works in dev + Cloudflare Worker SSR since extraction runs client-side only).
+- All processing happens client-side. tesseract.js + pdfjs-dist + jsqr are dynamically imported inside handlers to avoid SSR issues on Cloudflare Workers.
+- Mobile responsive via existing Tailwind utility classes.

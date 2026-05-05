@@ -1,19 +1,16 @@
-## Update logo sizing in Navbar and Footer
+## Replace logo file with new uploaded image
 
-Replace the existing logo `<img>` tags with the exact markup specified, removing the Tailwind size classes and brightness filter in favor of inline pixel heights.
+The header and footer already render `/logo.png` at the right sizes (36px / 28px). The issue is the current `public/logo.png` file doesn't display as the intended image. Replace it with the new upload.
 
 ### Changes
 
-**`src/components/site-header.tsx`** (line 20)
-- Replace current `<img>` with:
-  ```tsx
-  <img src="/logo.png" alt="Skycally" style={{ height: "36px", width: "auto" }} />
-  ```
-
-**`src/components/site-footer.tsx`** (line 12)
-- Replace current `<img>` with:
-  ```tsx
-  <img src="/logo.png" alt="Skycally" style={{ height: "28px", width: "auto" }} />
-  ```
-
-No text logos or placeholders remain to remove (already replaced previously). The uploaded `logo.png` is already in `public/`.
+1. **Copy** `user-uploads://Skycally_LOGO.png` → `public/logo.png` (overwrite).
+2. **Verify** `src/components/site-header.tsx` keeps:
+   ```tsx
+   <img src="/logo.png" alt="Skycally" style={{ height: "36px", width: "auto" }} />
+   ```
+3. **Verify** `src/components/site-footer.tsx` keeps:
+   ```tsx
+   <img src="/logo.png" alt="Skycally" style={{ height: "28px", width: "auto" }} />
+   ```
+4. No other code changes needed — favicon (`/logo.png`) will pick up the new file automatically.

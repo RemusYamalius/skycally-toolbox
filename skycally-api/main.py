@@ -7,6 +7,7 @@ import tempfile
 import shutil
 import os
 import uuid
+from rembg import remove
 import ipaddress
 import socket
 import logging
@@ -235,5 +236,24 @@ async def pdf_to_word(file: UploadFile = File(...)):
         )
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+# ─── REMOVE BACKGROUND ───────────────────────────────────────
+@app.post("/api/remove-bg")
+async def remove_bg(file: UploadFile = File(...)):
+    if not (file.content_type or "").startswith("image/"):
+        raise HTTPException(status_code=400, detail="Only image files allowed")
+    data = await _read_upload_limited(file)
+    try:
+        output = remove(data)
+    except Exception as e:
+        logger.exception("remove-bg failed: %s", e)
+        raise HTTPException(status_code=500, detail="Background removal failed")
+    return Response(
+        content=output,
+        media_type="image/png",
+        headers={"Content-Disposition": 'attachment; filename="nobg.png"'},
+    )
+
 
 

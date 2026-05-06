@@ -2,3 +2,6 @@ fastapi
 uvicorn[standard]
 yt-dlp
 python-multipart
+rembg[cpu]
+onnxruntime
+pillow

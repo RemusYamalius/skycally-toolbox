@@ -1,34 +1,21 @@
-export const MAX_UPSCALE_BYTES = 5 * 1024 * 1024;
+import { Jimp, JimpMime, ResizeStrategy } from "jimp";
 
-const API_URL =
-  import.meta.env.VITE_API_URL || "https://skycally-api-production.up.railway.app";
+export const MAX_UPSCALE_BYTES = 5 * 1024 * 1024;
 
 export const upscaleImage = async (
   file: File,
   scale: number,
   onProgress: (msg: string) => void
 ): Promise<string> => {
-  onProgress("Uploading image...");
+  onProgress("Reading image...");
+  const arrayBuffer = await file.arrayBuffer();
 
-  const formData = new FormData();
-  formData.append("file", file);
-  formData.append("scale", String(scale));
+  onProgress("Upscaling...");
+  const image = await Jimp.read(arrayBuffer);
+  const newWidth = image.bitmap.width * scale;
+  const newHeight = image.bitmap.height * scale;
+  image.resize({ w: newWidth, h: newHeight, mode: ResizeStrategy.BICUBIC });
 
-  const response = await fetch(`${API_URL}/api/upscale?scale=${scale}`, {
-    method: "POST",
-    body: formData,
-  });
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    if (err.detail === "REPLICATE_KEY_MISSING") {
-      throw new Error("API key not configured on server.");
-    }
-    throw new Error(err.detail || "Upscaling failed");
-  }
-
-  onProgress("Processing with AI...");
-  const data = await response.json();
-  onProgress("Almost done...");
-  return data.output;
+  onProgress("Finalizing...");
+  return await image.getBase64(JimpMime.png);
 };

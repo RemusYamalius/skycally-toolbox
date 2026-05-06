@@ -1,4 +1,4 @@
-from fastapi import FastAPI, UploadFile, File, HTTPException
+from fastapi import FastAPI, UploadFile, File, HTTPException, Request
 from fastapi.middleware.cors import CORSMiddleware
 from fastapi.responses import Response
 import yt_dlp
@@ -7,6 +7,68 @@ import tempfile
 import shutil
 import os
 import uuid
+import ipaddress
+import socket
+import logging
+from urllib.parse import urlparse
+
+logger = logging.getLogger("skycally-api")
+logging.basicConfig(level=logging.INFO)
+
+MAX_UPLOAD_BYTES = 20 * 1024 * 1024  # 20 MB
+
+ALLOWED_VIDEO_HOSTS = {
+    "youtube.com", "youtu.be", "m.youtube.com", "music.youtube.com",
+    "tiktok.com", "vm.tiktok.com", "vt.tiktok.com",
+    "instagram.com", "www.instagram.com",
+    "twitter.com", "x.com", "mobile.twitter.com",
+    "facebook.com", "www.facebook.com", "fb.watch", "m.facebook.com",
+    "vimeo.com", "www.vimeo.com",
+    "reddit.com", "www.reddit.com", "v.redd.it",
+    "twitch.tv", "www.twitch.tv", "clips.twitch.tv",
+    "dailymotion.com", "www.dailymotion.com",
+    "soundcloud.com", "www.soundcloud.com",
+    "snapchat.com", "www.snapchat.com",
+    "pinterest.com", "www.pinterest.com",
+    "linkedin.com", "www.linkedin.com",
+}
+
+
+def _validate_video_url(url: str) -> None:
+    try:
+        parsed = urlparse(url)
+    except Exception:
+        raise HTTPException(status_code=400, detail="Invalid URL")
+    if parsed.scheme not in ("http", "https"):
+        raise HTTPException(status_code=400, detail="Only http(s) URLs are allowed")
+    host = (parsed.hostname or "").lower()
+    if not host:
+        raise HTTPException(status_code=400, detail="Invalid URL")
+    # Allowlist host or any subdomain of allowlisted host
+    if not any(host == h or host.endswith("." + h) for h in ALLOWED_VIDEO_HOSTS):
+        raise HTTPException(status_code=400, detail="Unsupported platform")
+    # Reject private/reserved IPs (defense in depth)
+    try:
+        for info in socket.getaddrinfo(host, None):
+            ip = ipaddress.ip_address(info[4][0])
+            if ip.is_private or ip.is_loopback or ip.is_link_local or ip.is_reserved or ip.is_multicast:
+                raise HTTPException(status_code=400, detail="Disallowed host")
+    except socket.gaierror:
+        raise HTTPException(status_code=400, detail="Could not resolve host")
+
+
+async def _read_upload_limited(file: UploadFile) -> bytes:
+    chunks = []
+    total = 0
+    while True:
+        chunk = await file.read(1024 * 1024)
+        if not chunk:
+            break
+        total += len(chunk)
+        if total > MAX_UPLOAD_BYTES:
+            raise HTTPException(status_code=413, detail=f"File exceeds {MAX_UPLOAD_BYTES // (1024*1024)}MB limit")
+        chunks.append(chunk)
+    return b"".join(chunks)
 
 app = FastAPI(title="skycally-api")
 
@@ -34,6 +96,7 @@ def root():
 # ─── VIDEO DOWNLOADER ────────────────────────────────────────
 @app.get("/api/video-info")
 async def video_info(url: str):
+    _validate_video_url(url)
     ydl_opts = {
         "quiet": True,
         "no_warnings": True,
@@ -68,8 +131,16 @@ async def video_info(url: str):
                 "thumbnail": info.get("thumbnail", ""),
                 "formats": formats[-8:],
             }
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.exception("video_info failed: %s", e)
+        msg = str(e).lower()
+        if "unsupported" in msg or "private" in msg:
+            raise HTTPException(status_code=400, detail="Unsupported platform or private video")
+        if "network" in msg or "timed out" in msg or "connection" in msg:
+            raise HTTPException(status_code=502, detail="Could not reach the video platform")
+        raise HTTPException(status_code=400, detail="Video info unavailable")
 
 
 def _libreoffice_convert(input_path: str, out_dir: str, target: str):
@@ -91,9 +162,10 @@ def _libreoffice_convert(input_path: str, out_dir: str, target: str):
             timeout=120,
         )
         if result.returncode != 0:
+            logger.error("LibreOffice failed: %s", result.stderr.decode(errors='ignore')[:1000])
             raise HTTPException(
                 status_code=500,
-                detail=f"LibreOffice failed: {result.stderr.decode(errors='ignore')[:500]}",
+                detail="Document conversion failed. Please check your file and try again.",
             )
     finally:
         shutil.rmtree(profile_dir, ignore_errors=True)
@@ -109,9 +181,9 @@ async def word_to_pdf(file: UploadFile = File(...)):
     try:
         safe_name = f"{uuid.uuid4().hex}_{os.path.basename(file.filename)}"
         input_path = os.path.join(tmp_dir, safe_name)
+        data = await _read_upload_limited(file)
         with open(input_path, "wb") as f:
-            f.write(await file.read())
-
+            f.write(data)
         _libreoffice_convert(input_path, tmp_dir, "pdf")
 
         pdf_filename = os.path.splitext(safe_name)[0] + ".pdf"
@@ -142,9 +214,9 @@ async def pdf_to_word(file: UploadFile = File(...)):
     try:
         safe_name = f"{uuid.uuid4().hex}_{os.path.basename(file.filename)}"
         input_path = os.path.join(tmp_dir, safe_name)
+        data = await _read_upload_limited(file)
         with open(input_path, "wb") as f:
-            f.write(await file.read())
-
+            f.write(data)
         _libreoffice_convert(input_path, tmp_dir, "docx")
 
         docx_filename = os.path.splitext(safe_name)[0] + ".docx"

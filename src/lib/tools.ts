@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio";
 
@@ -34,4 +34,5 @@ export const tools: Tool[] = [
   { slug: "image-to-text", name: "Image to Text (OCR)", description: "Extract text from images in multiple languages.", category: "image", icon: ScanText, path: "/tools/image-to-text" },
   { slug: "text-to-speech", name: "Text to Speech", description: "Convert text to natural speech in multiple languages.", category: "audio", icon: Volume2, path: "/tools/text-to-speech" },
   { slug: "speech-to-text", name: "Speech to Text", description: "Transcribe your voice to text in real-time.", category: "audio", icon: Mic, path: "/tools/speech-to-text" },
+  { slug: "password-generator", name: "Password Generator", description: "Generate strong, secure passwords instantly.", category: "text", icon: Lock, path: "/tools/password-generator" },
 ];

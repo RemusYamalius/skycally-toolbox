@@ -1,91 +1,45 @@
-## Plan: Switch Remove Background to self-hosted backend
+## Add Password Generator tool
 
-### Frontend changes
+### Heads-up on the pasted code
+The component code you pasted has its JSX stripped (only text and attributes remain — all `<div>`, `<button>`, `<input>` tags are gone), so it won't compile as-is. I'll keep the **logic exactly as you specified** (charsets, `getStrength`, `crypto.getRandomValues`, length state, options state, copy behavior) and reconstruct the JSX to match the intent and the rest of the Skycally tool pages.
 
-1. **Create `src/services/removeBg.ts`** with the requested function:
-   ```ts
-   export const removeBackground = async (file: File): Promise<Blob> => {
-     const formData = new FormData();
-     formData.append("file", file);
-     const response = await fetch(
-       `${import.meta.env.VITE_API_URL}/api/remove-bg`,
-       { method: "POST", body: formData }
-     );
-     if (!response.ok) {
-       const err = await response.json().catch(() => ({}));
-       throw new Error(err.detail || "Background removal failed");
-     }
-     return await response.blob();
-   };
-   ```
+Also, the project doesn't use `src/pages/` — it uses TanStack Start file-based routing under `src/routes/`. I'll place the page there to stay consistent (and so the router actually picks it up).
 
-2. **Update `src/routes/tools.remove-bg.tsx`**:
-   - Replace `import { removeBg } from "@/server/removebg.functions"` with `import { removeBackground } from "@/services/removeBg"`.
-   - Replace the base64 round-trip in `run()` with a direct `removeBackground(file)` call returning a `Blob`.
-   - Drop unused `fileToBase64` / `base64ToBlob` imports.
-   - Remove the "Powered by remove.bg" footer line.
+### Changes
 
-3. **Delete `src/server/removebg.functions.ts`** (no longer used; eliminates the `REMOVEBG_KEY` reference in code).
+1. **Create `src/routes/tools.password-generator.tsx`**
+   - TanStack `createFileRoute("/tools/password-generator")` with `head()` meta (title, description, og tags), matching other tool routes.
+   - Wraps content in `<ToolPageShell title="Password Generator" description="Generate strong, secure passwords instantly.">`.
+   - Implements your exact logic:
+     - `CHARSETS` constant
+     - `getStrength()` helper (Weak/Fair/Strong with the same colors and widths)
+     - `length` (default 16), `options` (uppercase/lowercase/numbers/symbols, symbols off), `password`, `copied` state
+     - `generate()` using `crypto.getRandomValues(new Uint32Array(length))`
+     - `copy()` using `navigator.clipboard.writeText` with 2s reset
+   - UI (rebuilt JSX, styled with project tokens — `border`, `bg-card`, `text-foreground`, `text-muted-foreground`, brand cyan accent — to match other tools rather than hard-coded `#1e2d4a`):
+     - Password display card with monospace text + copy button (Check icon when copied, Copy icon otherwise, from `lucide-react`)
+     - Strength bar (hidden until a password exists)
+     - Length slider (range 4–64, value badge, tick labels 4 / 64)
+     - Four toggle option pills (Uppercase, Lowercase, Numbers, Symbols)
+     - "Generate Password" primary button (disabled when no charset selected)
 
-4. **Secrets**: remove `REMOVEBG_KEY` from project secrets (no `VITE_REMOVEBG_KEY` exists in this repo — already clean).
+2. **Register the tool in `src/lib/tools.ts`**
+   - Import `Lock` from `lucide-react`.
+   - Append:
+     ```ts
+     { slug: "password-generator", name: "Password Generator",
+       description: "Generate strong, secure passwords instantly.",
+       category: "text", icon: Lock, path: "/tools/password-generator" }
+     ```
+   - This automatically makes it appear on `/tools` (the grid maps over `tools`) and in the homepage tool listings.
 
-### Backend changes (`skycally-api/main.py`)
+3. **Add `/tools/password-generator` to `src/routes/sitemap[.]xml.tsx`**
+   - Insert the new path into the `ROUTES` array (alphabetically, before `/tools/pdf-text-extractor`) so it ships in the sitemap for Google Search Console.
 
-Add a new endpoint that performs background removal server-side using **rembg** (ONNX-based, free, runs locally in the container):
-
-```python
-from rembg import remove
-
-@app.post("/api/remove-bg")
-async def remove_bg(file: UploadFile = File(...)):
-    if not (file.content_type or "").startswith("image/"):
-        raise HTTPException(400, "Only image files allowed")
-    data = await _read_upload_limited(file)
-    try:
-        output = remove(data)
-    except Exception as e:
-        logger.exception("remove-bg failed: %s", e)
-        raise HTTPException(500, "Background removal failed")
-    return Response(
-        content=output,
-        media_type="image/png",
-        headers={"Content-Disposition": 'attachment; filename="nobg.png"'},
-    )
-```
-
-Reuses the existing `_read_upload_limited` (20 MB cap) for DoS protection.
-
-### `skycally-api/requirements.txt`
-
-Add:
-```
-rembg[cpu]
-onnxruntime
-pillow
-```
-
-### `skycally-api/Dockerfile`
-
-The `rembg` model (~170 MB u2net.onnx) downloads on first request by default. To avoid cold-start latency and outbound network at request time, pre-download during build:
-
-```dockerfile
-RUN python -c "from rembg import new_session; new_session('u2net')"
-```
-
-(Add after `pip install` step.)
-
-### Notes / trade-offs
-
-- **Container size & memory**: rembg + onnxruntime + u2net model adds ~500 MB to the image and needs ~1 GB RAM at runtime. Confirm the Railway plan can host it; if not, we can fall back to the lighter `u2netp` model (~5 MB, lower quality) by passing `model_name="u2netp"`.
-- **Cold start**: first request after a deploy/restart will be slower (model load into memory, ~3–5 s). Subsequent requests are fast (~1–3 s for typical photos on CPU).
-- **CORS**: already covered by the existing `CORSMiddleware` config.
-- **No auth / rate limit**: same posture as the other endpoints — deferred until proper infra.
+### Routing
+No manual router edits needed — TanStack Router's Vite plugin auto-generates `routeTree.gen.ts` from the new file in `src/routes/`.
 
 ### Files touched
-
-- create `src/services/removeBg.ts`
-- edit `src/routes/tools.remove-bg.tsx`
-- delete `src/server/removebg.functions.ts`
-- edit `skycally-api/main.py`
-- edit `skycally-api/requirements.txt`
-- edit `skycally-api/Dockerfile`
+- new: `src/routes/tools.password-generator.tsx`
+- edit: `src/lib/tools.ts`
+- edit: `src/routes/sitemap[.]xml.tsx`

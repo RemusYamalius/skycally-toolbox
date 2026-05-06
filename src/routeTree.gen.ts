@@ -32,6 +32,7 @@ import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-ups
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
+import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 
 const TermsRoute = TermsRouteImport.update({
@@ -149,6 +150,11 @@ const ToolsImageCompressorRoute = ToolsImageCompressorRouteImport.update({
   path: '/tools/image-compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsColorPaletteRoute = ToolsColorPaletteRouteImport.update({
+  id: '/tools/color-palette',
+  path: '/tools/color-palette',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsBase64Route = ToolsBase64RouteImport.update({
   id: '/tools/base64',
   path: '/tools/base64',
@@ -162,6 +168,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
@@ -215,6 +223,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
@@ -243,6 +252,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/tools/base64'
+    | '/tools/color-palette'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-to-text'
@@ -269,6 +279,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/tools/base64'
+    | '/tools/color-palette'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-to-text'
@@ -295,6 +306,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/tools/base64'
+    | '/tools/color-palette'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-to-text'
@@ -322,6 +334,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   ToolsBase64Route: typeof ToolsBase64Route
+  ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
@@ -505,6 +518,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsImageCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/color-palette': {
+      id: '/tools/color-palette'
+      path: '/tools/color-palette'
+      fullPath: '/tools/color-palette'
+      preLoaderRoute: typeof ToolsColorPaletteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/base64': {
       id: '/tools/base64'
       path: '/tools/base64'
@@ -522,6 +542,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   ToolsBase64Route: ToolsBase64Route,
+  ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
   ToolsImageToTextRoute: ToolsImageToTextRoute,

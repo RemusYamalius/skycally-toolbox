@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
+import { ToolPageShell } from "@/components/tool-page-shell";
+import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/image-filters")({
   head: () => ({
@@ -151,6 +153,11 @@ function ImageFilters() {
           </button>
         )}
       </div>
-    </div>
+      <HowToUse steps={[
+        "Drop an image or click to upload one.",
+        "Pick a filter from the row of previews.",
+        "Click Download to save the filtered image as PNG.",
+      ]} />
+    </ToolPageShell>
   );
 }

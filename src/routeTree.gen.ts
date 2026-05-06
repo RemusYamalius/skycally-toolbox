@@ -35,6 +35,7 @@ import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-co
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
+import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -166,6 +167,11 @@ const ToolsBase64Route = ToolsBase64RouteImport.update({
   path: '/tools/base64',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAddWatermarkRoute = ToolsAddWatermarkRouteImport.update({
+  id: '/tools/add-watermark',
+  path: '/tools/add-watermark',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -173,6 +179,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
@@ -201,6 +208,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
@@ -230,6 +238,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
@@ -260,6 +269,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-watermark'
     | '/tools/base64'
     | '/tools/color-palette'
     | '/tools/image-compressor'
@@ -288,6 +298,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-watermark'
     | '/tools/base64'
     | '/tools/color-palette'
     | '/tools/image-compressor'
@@ -316,6 +327,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-watermark'
     | '/tools/base64'
     | '/tools/color-palette'
     | '/tools/image-compressor'
@@ -345,6 +357,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
@@ -552,6 +565,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsBase64RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/add-watermark': {
+      id: '/tools/add-watermark'
+      path: '/tools/add-watermark'
+      fullPath: '/tools/add-watermark'
+      preLoaderRoute: typeof ToolsAddWatermarkRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -561,6 +581,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsBase64Route: ToolsBase64Route,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,

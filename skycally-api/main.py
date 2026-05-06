@@ -181,9 +181,9 @@ async def word_to_pdf(file: UploadFile = File(...)):
     try:
         safe_name = f"{uuid.uuid4().hex}_{os.path.basename(file.filename)}"
         input_path = os.path.join(tmp_dir, safe_name)
+        data = await _read_upload_limited(file)
         with open(input_path, "wb") as f:
-            f.write(await file.read())
-
+            f.write(data)
         _libreoffice_convert(input_path, tmp_dir, "pdf")
 
         pdf_filename = os.path.splitext(safe_name)[0] + ".pdf"

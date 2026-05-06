@@ -24,6 +24,7 @@ import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
+import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
@@ -105,6 +106,11 @@ const ToolsPdfTextExtractorRoute = ToolsPdfTextExtractorRouteImport.update({
   path: '/tools/pdf-text-extractor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsPasswordGeneratorRoute = ToolsPasswordGeneratorRouteImport.update({
+  id: '/tools/password-generator',
+  path: '/tools/password-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
   id: '/tools/merge-pdf',
   path: '/tools/merge-pdf',
@@ -142,6 +148,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -164,6 +171,7 @@ export interface FileRoutesByTo {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -187,6 +195,7 @@ export interface FileRoutesById {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -211,6 +220,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/merge-pdf'
+    | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -233,6 +243,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/merge-pdf'
+    | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -255,6 +266,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/merge-pdf'
+    | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -278,6 +290,7 @@ export interface RootRouteChildren {
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
+  ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
@@ -397,6 +410,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsPdfTextExtractorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/password-generator': {
+      id: '/tools/password-generator'
+      path: '/tools/password-generator'
+      fullPath: '/tools/password-generator'
+      preLoaderRoute: typeof ToolsPasswordGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/merge-pdf': {
       id: '/tools/merge-pdf'
       path: '/tools/merge-pdf'
@@ -446,6 +466,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
+  ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,

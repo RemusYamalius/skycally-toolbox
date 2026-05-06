@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Sparkles, Download, Loader2, AlertTriangle } from "lucide-react";
+import { Sparkles, Download, Loader2 } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
-import { upscaleImage, MAX_UPSCALE_BYTES, hasReplicateKey } from "@/services/imageUpscaler";
+import { upscaleImage, MAX_UPSCALE_BYTES } from "@/services/imageUpscaler";
 
 export const Route = createFileRoute("/tools/image-upscaler")({
   head: () => ({
@@ -20,14 +20,11 @@ export const Route = createFileRoute("/tools/image-upscaler")({
   component: Page,
 });
 
-const STEPS = ["Analyzing image...", "Upscaling...", "Finalizing..."];
-
 function Page() {
-  const keyAvailable = hasReplicateKey();
   const [file, setFile] = useState<File | null>(null);
   const [scale, setScale] = useState<2 | 4>(2);
   const [busy, setBusy] = useState(false);
-  const [step, setStep] = useState(0);
+  const [progressMsg, setProgressMsg] = useState("");
   const [output, setOutput] = useState<string | null>(null);
   const [slider, setSlider] = useState(50);
   const inputUrl = file ? URL.createObjectURL(file) : null;
@@ -43,33 +40,21 @@ function Page() {
   const run = async () => {
     if (!file) return;
     setBusy(true);
-    setStep(0);
-    const i1 = setTimeout(() => setStep(1), 1500);
-    const i2 = setTimeout(() => setStep(2), 4000);
+    setProgressMsg("Uploading image...");
     try {
-      const url = await upscaleImage(file, scale);
+      const url = await upscaleImage(file, scale, (msg) => setProgressMsg(msg));
       setOutput(url);
       toast.success("Image upscaled!");
     } catch (e: any) {
       toast.error(e.message || "Failed to upscale");
     } finally {
-      clearTimeout(i1);
-      clearTimeout(i2);
       setBusy(false);
+      setProgressMsg("");
     }
   };
 
   return (
     <ToolPageShell title="AI Image Upscaler" description="Enlarge images 2x or 4x without losing quality, powered by Real-ESRGAN.">
-      {!keyAvailable && (
-        <div className="rounded-2xl border border-yellow-500/40 bg-yellow-500/10 text-yellow-900 dark:text-yellow-200 p-5 flex gap-3 items-start">
-          <AlertTriangle className="w-5 h-5 flex-shrink-0 mt-0.5" />
-          <div className="text-sm">
-            <p className="font-semibold mb-1">⚙️ Setup required</p>
-            <p>Add your free Replicate API key in the project settings to enable this tool. <a href="https://replicate.com" target="_blank" rel="noreferrer" className="underline font-semibold">Get a free key at replicate.com →</a></p>
-          </div>
-        </div>
-      )}
       {!file && <DropZone accept="image/png,image/jpeg,image/webp" onFiles={onPick} label="Drop your image" hint="PNG, JPG, or WEBP · max 5MB" />}
 
       {file && (
@@ -89,8 +74,8 @@ function Page() {
                 <button key={s} onClick={() => setScale(s as 2 | 4)} className={`flex-1 rounded-xl px-4 py-2.5 text-sm font-semibold border transition ${scale === s ? "bg-foreground text-background border-foreground" : "border-border hover:bg-secondary"}`}>{s}x</button>
               ))}
             </div>
-            <button onClick={run} disabled={busy || !keyAvailable} className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-foreground text-background font-semibold px-4 py-3 disabled:opacity-50 disabled:cursor-not-allowed">
-              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />} {busy ? STEPS[step] : "Upscale Image"}
+            <button onClick={run} disabled={busy} className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-foreground text-background font-semibold px-4 py-3 disabled:opacity-50 disabled:cursor-not-allowed">
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Sparkles className="w-4 h-4" />} {busy ? progressMsg : "Upscale Image"}
             </button>
           </div>
 

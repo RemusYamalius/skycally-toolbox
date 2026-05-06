@@ -5,8 +5,8 @@ import { Loader2 } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
-import { removeBg } from "@/server/removebg.functions";
-import { fileToBase64, base64ToBlob, downloadBlob, checkSize } from "@/lib/file-utils";
+import { removeBackground } from "@/services/removeBg";
+import { downloadBlob, checkSize } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/remove-bg")({
   head: () => ({
@@ -37,9 +37,7 @@ function RemoveBgPage() {
     if (!file) return;
     setBusy(true); setResultUrl(null);
     try {
-      const imageBase64 = await fileToBase64(file);
-      const { pngBase64 } = await removeBg({ data: { imageBase64, mime: file.type || "image/png" } });
-      const blob = base64ToBlob(pngBase64, "image/png");
+      const blob = await removeBackground(file);
       setResultBlob(blob);
       setResultUrl(URL.createObjectURL(blob));
       toast.success("Background removed!");
@@ -76,7 +74,6 @@ function RemoveBgPage() {
             <button onClick={() => downloadBlob(resultBlob!, file.name.replace(/\.[^.]+$/, "") + "-nobg.png")} className="w-full rounded-xl bg-foreground text-background font-semibold py-3">Download PNG</button>
           )}
           <button onClick={reset} className="block mx-auto text-sm text-muted-foreground hover:text-foreground">Use a different image</button>
-          <p className="text-xs text-center text-muted-foreground">Powered by remove.bg — free plan: 50 images/month.</p>
         </div>
       )}
 

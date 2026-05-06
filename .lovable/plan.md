@@ -1,15 +1,9 @@
 ## Goal
-Replace the current site logo with the uploaded `Skycally_LOGO-2.png` while keeping the existing header placement and dimensions (height 38px, auto width).
+Replace `public/favicon.png` with the uploaded `Skycally_favicon-2.png`.
 
 ## Changes
-
-### 1. Copy the uploaded image into the public folder
-- `code--copy user-uploads://Skycally_LOGO-2.png public/logo.png` (overwrite)
-- This replaces the file already referenced by `<img src="/logo.png">` in `src/components/site-header.tsx`, so no code change is required.
-
-### 2. No edits to `site-header.tsx`
-- Existing markup stays the same — same `height: 38px`, same position, same link to `/`.
+1. `code--copy user-uploads://Skycally_favicon-2.png public/favicon.png` (overwrite).
+2. No code changes — `src/routes/__root.tsx` already references `/favicon.png`.
 
 ## Notes
-- Browsers may cache `/logo.png`; a hard refresh shows the new logo immediately.
-- Favicon (`/favicon.png`) is a separate file and is left untouched. If you want the favicon updated too, say the word and I'll regenerate it from the same image.
+- A hard refresh may be required to bust browser cache.

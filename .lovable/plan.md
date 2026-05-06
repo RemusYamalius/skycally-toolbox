@@ -1,60 +1,71 @@
-## Fix dark-mode dropdowns + Image Upscaler
+## Move Image Upscaler to backend proxy
 
-### Issue 1 — Global dark-mode fix for selects/dropdowns
+### Backend (`skycally-api/main.py`)
+Add a new `/api/upscale` endpoint that proxies to Replicate using a server-side `REPLICATE_API_TOKEN` env var:
 
-Edit `src/styles.css` and append global rules so every native `<select>` (and its `<option>` popup, which the OS renders outside our React tree and therefore ignores Tailwind classes) is readable in both themes:
+- Accept `multipart/form-data` with `file` (image) + `scale` (2 or 4).
+- If `os.environ.get("REPLICATE_API_TOKEN")` is missing → return `400 {"detail": "REPLICATE_KEY_MISSING"}`.
+- Validate file type (png/jpg/webp) and size (≤ 5MB) → 400 with descriptive `detail`.
+- Read file bytes, base64-encode into a `data:` URL.
+- POST to `https://api.replicate.com/v1/models/nightmareai/real-esrgan/predictions` with `Authorization: Token …` and `{ "input": { "image": <dataURL>, "scale": scale, "face_enhance": false } }`.
+- Poll `GET /v1/predictions/{id}` every 2s up to 30 attempts.
+  - On `succeeded` → return `{"output": url}` (handle list-or-string).
+  - On `failed`/`canceled` → 500 `{"detail": "Upscaling failed"}`.
+  - On timeout → 504 `{"detail": "Processing took too long. Try a smaller image."}`.
+  - Map upstream 401 → 500 `{"detail": "REPLICATE_KEY_MISSING"}`, 429 → 429 `{"detail": "Rate limit reached. Try again in a few minutes."}`.
+- Add `httpx` to `skycally-api/requirements.txt` (async HTTP) — or use `urllib`/`requests` if already present. Will check and pick what's there.
 
-```css
-select {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-  border: 1px solid var(--color-border);
-}
-select option {
-  background-color: var(--color-background);
-  color: var(--color-foreground);
-}
-.dark select {
-  background-color: #1e293b;
-  color: #f1f5f9;
-  border-color: #334155;
-}
-.dark select option {
-  background-color: #1e293b;
-  color: #f1f5f9;
-}
+Add `REPLICATE_API_TOKEN=r8_bjHdOzp9LSkyChv85dZLwJCBHcUVO8q1cO4LX` documented in the API README so it's set on Railway. (User must set the env var in Railway dashboard — we cannot push secrets there from here.)
+
+### Frontend
+
+**`src/services/imageUpscaler.ts`** — full rewrite:
+```ts
+export const MAX_UPSCALE_BYTES = 5 * 1024 * 1024;
+
+export const upscaleImage = async (
+  file: File,
+  scale: number,
+  onProgress: (msg: string) => void
+): Promise<string> => {
+  onProgress("Uploading image...");
+  const formData = new FormData();
+  formData.append("file", file);
+  formData.append("scale", String(scale));
+
+  const response = await fetch(
+    `${import.meta.env.VITE_API_URL}/api/upscale?scale=${scale}`,
+    { method: "POST", body: formData }
+  );
+  if (!response.ok) {
+    const err = await response.json().catch(() => ({}));
+    if (err.detail === "REPLICATE_KEY_MISSING") {
+      throw new Error("API key not configured on server.");
+    }
+    throw new Error(err.detail || "Upscaling failed");
+  }
+  onProgress("Processing with AI...");
+  const data = await response.json();
+  onProgress("Almost done...");
+  return data.output;
+};
 ```
+Removes `hasReplicateKey`, `mapHttpError`, and all `VITE_REPLICATE_KEY` references.
 
-Audit tool pages that use native `<select>` and ensure they also have `bg-background text-foreground border-border` classes (covers the trigger styling before the OS dropdown opens):
-- `src/routes/tools.text-to-speech.tsx` (voice selector)
-- `src/routes/tools.image-converter.tsx` (format)
-- `src/routes/tools.speech-to-text.tsx` (language)
-- `src/routes/tools.video-to-gif.tsx` (settings)
-- Any other `<select>` discovered via `rg "<select"` in `src/routes`
+**`src/routes/tools.image-upscaler.tsx`**:
+- Drop the `hasReplicateKey` import + warning banner + key-disabled state (server now owns the key; if missing, error toast says "API key not configured on server.").
+- Drop the manual `STEPS`/`step` timer; replace with a `progressMsg` state set by the new `onProgress` callback. Button label shows `progressMsg` when busy, else "Upscale Image".
+- Pass `(msg) => setProgressMsg(msg)` to `upscaleImage`.
 
-For Radix-based components (`src/components/ui/select.tsx`, dropdown-menu, popover) — already use `bg-popover text-popover-foreground`, which resolves correctly in dark mode. No change needed unless audit finds a hardcoded `bg-white`.
-
-### Issue 2 — Image Upscaler robustness
-
-**Add secret**: store `VITE_REPLICATE_KEY = r8_bjHdOzp9LSkyChv85dZLwJCBHcUVO8q1cO4LX` via the secrets tool so it's exposed to the Vite client build.
-
-**Update `src/services/imageUpscaler.ts`**:
-- Switch endpoint to `https://api.replicate.com/v1/models/nightmareai/real-esrgan/predictions` (no `version` field needed — uses latest).
-- Keep base64 data-URL upload.
-- Poll every 2s, max 30 attempts (60s).
-- Map errors: 401 → "Invalid API key. Check your Replicate key.", 429 → "Rate limit reached. Try again in a few minutes.", timeout → "Processing took too long. Try a smaller image.", else → "Upscaling failed. Please try again."
-- Export `hasReplicateKey()` helper that returns `Boolean(import.meta.env.VITE_REPLICATE_KEY)`.
-
-**Update `src/routes/tools.image-upscaler.tsx`**:
-- On mount, check `hasReplicateKey()`. If missing, render a yellow warning card above the dropzone:
-  > ⚙️ Setup required: Add your free Replicate API key in the project settings to enable this tool. [Get a free key at replicate.com →](https://replicate.com)
-- Disable the "Upscale Image" button while key is missing.
-- Replace toast-only error path with mapped messages from the service.
-- Keep existing before/after slider, plus add explicit "Original" and "Upscaled ✨" labels and ensure download button uses the result URL.
+**`.env`**: remove `VITE_REPLICATE_KEY`. Add/confirm `VITE_API_URL` points at the deployed FastAPI base URL (will check current `.env` to know the value).
 
 ### Files touched
-- `src/styles.css` (append select rules)
-- `src/services/imageUpscaler.ts` (rewrite per spec)
-- `src/routes/tools.image-upscaler.tsx` (setup banner, labels, error mapping)
-- Minor className tweaks on tool pages with native `<select>` if missing base classes
-- New secret: `VITE_REPLICATE_KEY`
+- `skycally-api/main.py` (new endpoint)
+- `skycally-api/requirements.txt` (httpx if needed)
+- `skycally-api/README.md` (note new env var)
+- `src/services/imageUpscaler.ts` (rewrite)
+- `src/routes/tools.image-upscaler.tsx` (banner + progress refactor)
+- `.env` (drop `VITE_REPLICATE_KEY`)
+
+### Note for the user
+The Replicate key must be set in the Railway/host environment as `REPLICATE_API_TOKEN`. I'll remove it from the client `.env`. Also recommend rotating the key since it was shared in chat.

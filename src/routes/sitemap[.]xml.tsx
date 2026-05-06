@@ -9,6 +9,7 @@ const ROUTES = [
   "/terms",
   "/tools",
   "/tools/base64",
+  "/tools/color-palette",
   "/tools/image-compressor",
   "/tools/image-converter",
   "/tools/image-to-text",

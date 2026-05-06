@@ -27,6 +27,7 @@ import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generato
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
+import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
@@ -123,6 +124,11 @@ const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
   path: '/tools/merge-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsJsonFormatterRoute = ToolsJsonFormatterRouteImport.update({
+  id: '/tools/json-formatter',
+  path: '/tools/json-formatter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsImageUpscalerRoute = ToolsImageUpscalerRouteImport.update({
   id: '/tools/image-upscaler',
   path: '/tools/image-upscaler',
@@ -160,6 +166,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
@@ -185,6 +192,7 @@ export interface FileRoutesByTo {
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
@@ -211,6 +219,7 @@ export interface FileRoutesById {
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
@@ -238,6 +247,7 @@ export interface FileRouteTypes {
     | '/tools/image-converter'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/json-formatter'
     | '/tools/merge-pdf'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/tools/image-converter'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/json-formatter'
     | '/tools/merge-pdf'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
@@ -288,6 +299,7 @@ export interface FileRouteTypes {
     | '/tools/image-converter'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/json-formatter'
     | '/tools/merge-pdf'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
@@ -314,6 +326,7 @@ export interface RootRouteChildren {
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
+  ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
@@ -457,6 +470,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMergePdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/json-formatter': {
+      id: '/tools/json-formatter'
+      path: '/tools/json-formatter'
+      fullPath: '/tools/json-formatter'
+      preLoaderRoute: typeof ToolsJsonFormatterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/image-upscaler': {
       id: '/tools/image-upscaler'
       path: '/tools/image-upscaler'
@@ -506,6 +526,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageConverterRoute: ToolsImageConverterRoute,
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
+  ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,

@@ -8,6 +8,7 @@ const ROUTES = [
   "/privacy",
   "/terms",
   "/tools",
+  "/tools/base64",
   "/tools/image-compressor",
   "/tools/image-converter",
   "/tools/image-to-text",

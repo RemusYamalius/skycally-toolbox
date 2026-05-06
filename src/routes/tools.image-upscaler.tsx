@@ -1,12 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { Sparkles, Download, Loader2 } from "lucide-react";
+import { Sparkles, Download, Loader2, AlertTriangle } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
-import { upscaleImage, MAX_UPSCALE_BYTES } from "@/services/imageUpscaler";
+import { upscaleImage, MAX_UPSCALE_BYTES, hasReplicateKey } from "@/services/imageUpscaler";
 
 export const Route = createFileRoute("/tools/image-upscaler")({
   head: () => ({
@@ -23,6 +23,7 @@ export const Route = createFileRoute("/tools/image-upscaler")({
 const STEPS = ["Analyzing image...", "Upscaling...", "Finalizing..."];
 
 function Page() {
+  const keyAvailable = hasReplicateKey();
   const [file, setFile] = useState<File | null>(null);
   const [scale, setScale] = useState<2 | 4>(2);
   const [busy, setBusy] = useState(false);

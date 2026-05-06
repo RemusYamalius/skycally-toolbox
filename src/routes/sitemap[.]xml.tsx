@@ -5,10 +5,10 @@ const SITE = "https://skycally.com";
 const ROUTES = [
   "/",
   "/about",
-  "/tools/add-watermark",
   "/privacy",
   "/terms",
   "/tools",
+  "/tools/add-watermark",
   "/tools/base64",
   "/tools/color-palette",
   "/tools/image-compressor",

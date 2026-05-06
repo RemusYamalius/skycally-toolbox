@@ -214,9 +214,9 @@ async def pdf_to_word(file: UploadFile = File(...)):
     try:
         safe_name = f"{uuid.uuid4().hex}_{os.path.basename(file.filename)}"
         input_path = os.path.join(tmp_dir, safe_name)
+        data = await _read_upload_limited(file)
         with open(input_path, "wb") as f:
-            f.write(await file.read())
-
+            f.write(data)
         _libreoffice_convert(input_path, tmp_dir, "docx")
 
         docx_filename = os.path.splitext(safe_name)[0] + ".docx"

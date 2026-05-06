@@ -96,6 +96,7 @@ def root():
 # ─── VIDEO DOWNLOADER ────────────────────────────────────────
 @app.get("/api/video-info")
 async def video_info(url: str):
+    _validate_video_url(url)
     ydl_opts = {
         "quiet": True,
         "no_warnings": True,
@@ -130,8 +131,16 @@ async def video_info(url: str):
                 "thumbnail": info.get("thumbnail", ""),
                 "formats": formats[-8:],
             }
+    except HTTPException:
+        raise
     except Exception as e:
-        raise HTTPException(status_code=400, detail=str(e))
+        logger.exception("video_info failed: %s", e)
+        msg = str(e).lower()
+        if "unsupported" in msg or "private" in msg:
+            raise HTTPException(status_code=400, detail="Unsupported platform or private video")
+        if "network" in msg or "timed out" in msg or "connection" in msg:
+            raise HTTPException(status_code=502, detail="Could not reach the video platform")
+        raise HTTPException(status_code=400, detail="Video info unavailable")
 
 
 def _libreoffice_convert(input_path: str, out_dir: str, target: str):

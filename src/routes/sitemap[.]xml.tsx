@@ -13,6 +13,7 @@ const ROUTES = [
   "/tools/image-converter",
   "/tools/image-to-text",
   "/tools/image-upscaler",
+  "/tools/json-formatter",
   "/tools/merge-pdf",
   "/tools/password-generator",
   "/tools/pdf-text-extractor",

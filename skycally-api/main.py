@@ -7,6 +7,7 @@ import tempfile
 import shutil
 import os
 import uuid
+from rembg import remove
 import ipaddress
 import socket
 import logging

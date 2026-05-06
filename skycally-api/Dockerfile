@@ -16,6 +16,9 @@ WORKDIR /app
 COPY requirements.txt .
 RUN pip install --no-cache-dir -r requirements.txt
 
+# Pre-download rembg u2net model to avoid cold-start network fetch
+RUN python -c "from rembg import new_session; new_session('u2net')"
+
 COPY . .
 
 # Railway provides $PORT — fall back to 8000 for local dev

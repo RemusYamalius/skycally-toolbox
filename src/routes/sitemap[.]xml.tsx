@@ -5,6 +5,7 @@ const SITE = "https://skycally.com";
 const ROUTES = [
   "/",
   "/about",
+  "/tools/add-watermark",
   "/privacy",
   "/terms",
   "/tools",

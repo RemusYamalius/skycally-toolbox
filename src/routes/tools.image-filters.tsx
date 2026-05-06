@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
+import { ToolPageShell } from "@/components/tool-page-shell";
+import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/image-filters")({
   head: () => ({
@@ -64,8 +66,8 @@ function ImageFilters() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white p-6 flex items-center justify-center">
-      <div className="w-full max-w-2xl space-y-5">
+    <ToolPageShell title="Image Filters" description="Apply beautiful filters to your images instantly in the browser.">
+      <div className="w-full space-y-5">
         {/* Upload Zone */}
         <div
           onDrop={onDrop}
@@ -151,6 +153,11 @@ function ImageFilters() {
           </button>
         )}
       </div>
-    </div>
+      <HowToUse steps={[
+        "Drop an image or click to upload one.",
+        "Pick a filter from the row of previews.",
+        "Click Download to save the filtered image as PNG.",
+      ]} />
+    </ToolPageShell>
   );
 }

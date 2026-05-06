@@ -23,6 +23,7 @@ const ROUTES = [
   "/tools/text-to-speech",
   "/tools/video-downloader",
   "/tools/video-to-gif",
+  "/tools/word-counter",
   "/tools/word-to-pdf",
 ];
 

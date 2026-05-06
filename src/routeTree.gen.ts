@@ -30,6 +30,7 @@ import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
+import { Route as ToolsImageFiltersRouteImport } from './routes/tools.image-filters'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
@@ -140,6 +141,11 @@ const ToolsImageToTextRoute = ToolsImageToTextRouteImport.update({
   path: '/tools/image-to-text',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsImageFiltersRoute = ToolsImageFiltersRouteImport.update({
+  id: '/tools/image-filters',
+  path: '/tools/image-filters',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsImageConverterRoute = ToolsImageConverterRouteImport.update({
   id: '/tools/image-converter',
   path: '/tools/image-converter',
@@ -171,6 +177,7 @@ export interface FileRoutesByFullPath {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/image-filters': typeof ToolsImageFiltersRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
@@ -198,6 +205,7 @@ export interface FileRoutesByTo {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/image-filters': typeof ToolsImageFiltersRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
@@ -226,6 +234,7 @@ export interface FileRoutesById {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/image-filters': typeof ToolsImageFiltersRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
@@ -255,6 +264,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/image-compressor'
     | '/tools/image-converter'
+    | '/tools/image-filters'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
@@ -282,6 +292,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/image-compressor'
     | '/tools/image-converter'
+    | '/tools/image-filters'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
@@ -309,6 +320,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/image-compressor'
     | '/tools/image-converter'
+    | '/tools/image-filters'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
@@ -337,6 +349,7 @@ export interface RootRouteChildren {
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
+  ToolsImageFiltersRoute: typeof ToolsImageFiltersRoute
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
@@ -504,6 +517,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsImageToTextRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/image-filters': {
+      id: '/tools/image-filters'
+      path: '/tools/image-filters'
+      fullPath: '/tools/image-filters'
+      preLoaderRoute: typeof ToolsImageFiltersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/image-converter': {
       id: '/tools/image-converter'
       path: '/tools/image-converter'
@@ -545,6 +565,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
+  ToolsImageFiltersRoute: ToolsImageFiltersRoute,
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
@@ -565,3 +586,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

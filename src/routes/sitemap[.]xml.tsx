@@ -12,6 +12,7 @@ const ROUTES = [
   "/tools/color-palette",
   "/tools/image-compressor",
   "/tools/image-converter",
+  "/tools/image-filters",
   "/tools/image-to-text",
   "/tools/image-upscaler",
   "/tools/json-formatter",

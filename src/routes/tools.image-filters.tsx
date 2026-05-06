@@ -66,8 +66,8 @@ function ImageFilters() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white p-6 flex items-center justify-center">
-      <div className="w-full max-w-2xl space-y-5">
+    <ToolPageShell title="Image Filters" description="Apply beautiful filters to your images instantly in the browser.">
+      <div className="w-full space-y-5">
         {/* Upload Zone */}
         <div
           onDrop={onDrop}

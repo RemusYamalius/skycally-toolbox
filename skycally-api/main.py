@@ -162,9 +162,10 @@ def _libreoffice_convert(input_path: str, out_dir: str, target: str):
             timeout=120,
         )
         if result.returncode != 0:
+            logger.error("LibreOffice failed: %s", result.stderr.decode(errors='ignore')[:1000])
             raise HTTPException(
                 status_code=500,
-                detail=f"LibreOffice failed: {result.stderr.decode(errors='ignore')[:500]}",
+                detail="Document conversion failed. Please check your file and try again.",
             )
     finally:
         shutil.rmtree(profile_dir, ignore_errors=True)

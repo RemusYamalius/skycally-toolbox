@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio";
 
@@ -38,4 +38,5 @@ export const tools: Tool[] = [
   { slug: "base64", name: "Base64 Encoder / Decoder", description: "Encode plain text to Base64 or decode Base64 strings instantly.", category: "text", icon: Code2, path: "/tools/base64" },
   { slug: "word-counter", name: "Word Counter", description: "Count words, characters, sentences and estimate reading time.", category: "text", icon: Type, path: "/tools/word-counter" },
   { slug: "json-formatter", name: "JSON Formatter", description: "Format, prettify and minify JSON instantly.", category: "text", icon: Braces, path: "/tools/json-formatter" },
+  { slug: "color-palette", name: "Color Palette Extractor", description: "Extract the dominant colors from any image instantly.", category: "image", icon: Palette, path: "/tools/color-palette" },
 ];

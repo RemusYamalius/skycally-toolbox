@@ -16,6 +16,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
+import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
@@ -65,6 +66,11 @@ const ToolsIndexRoute = ToolsIndexRouteImport.update({
 const ToolsWordToPdfRoute = ToolsWordToPdfRouteImport.update({
   id: '/tools/word-to-pdf',
   path: '/tools/word-to-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsWordCounterRoute = ToolsWordCounterRouteImport.update({
+  id: '/tools/word-counter',
+  path: '/tools/word-counter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsVideoToGifRoute = ToolsVideoToGifRouteImport.update({
@@ -164,6 +170,7 @@ export interface FileRoutesByFullPath {
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
+  '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -188,6 +195,7 @@ export interface FileRoutesByTo {
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
+  '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools': typeof ToolsIndexRoute
 }
@@ -213,6 +221,7 @@ export interface FileRoutesById {
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
+  '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -239,6 +248,7 @@ export interface FileRouteTypes {
     | '/tools/text-to-speech'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
+    | '/tools/word-counter'
     | '/tools/word-to-pdf'
     | '/tools/'
   fileRoutesByTo: FileRoutesByTo
@@ -263,6 +273,7 @@ export interface FileRouteTypes {
     | '/tools/text-to-speech'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
+    | '/tools/word-counter'
     | '/tools/word-to-pdf'
     | '/tools'
   id:
@@ -287,6 +298,7 @@ export interface FileRouteTypes {
     | '/tools/text-to-speech'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
+    | '/tools/word-counter'
     | '/tools/word-to-pdf'
     | '/tools/'
   fileRoutesById: FileRoutesById
@@ -312,6 +324,7 @@ export interface RootRouteChildren {
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
+  ToolsWordCounterRoute: typeof ToolsWordCounterRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
@@ -365,6 +378,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/word-to-pdf'
       fullPath: '/tools/word-to-pdf'
       preLoaderRoute: typeof ToolsWordToPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/word-counter': {
+      id: '/tools/word-counter'
+      path: '/tools/word-counter'
+      fullPath: '/tools/word-counter'
+      preLoaderRoute: typeof ToolsWordCounterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/video-to-gif': {
@@ -496,6 +516,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
+  ToolsWordCounterRoute: ToolsWordCounterRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }

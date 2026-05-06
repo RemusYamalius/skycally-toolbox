@@ -1,17 +1,20 @@
-## Replace AI Image Upscaler with browser-side Jimp
+## Replace Jimp with Canvas-based upscaler
 
-Move upscaling fully into the browser using `jimp`. Remove the FastAPI proxy path and all server calls for this tool.
+Drop the `jimp` dependency entirely and use a native `<canvas>` for upscaling. Smaller bundle, no SSR/Rollup issues, faster on large images.
 
-### 1. Install dependency
-- `bun add jimp` (modern Jimp v1 ships ESM and works in browsers via Vite).
-
-### 2. Rewrite `src/services/imageUpscaler.ts`
-Replace the fetch-to-backend implementation with a pure-client function:
+### 1. `src/services/imageUpscaler.ts` — full rewrite
 
 ```ts
-import { Jimp, JimpMime, ResizeStrategy } from "jimp";
-
 export const MAX_UPSCALE_BYTES = 5 * 1024 * 1024;
+
+const loadImage = (file: File): Promise<HTMLImageElement> =>
+  new Promise((resolve, reject) => {
+    const url = URL.createObjectURL(file);
+    const img = new Image();
+    img.onload = () => { URL.revokeObjectURL(url); resolve(img); };
+    img.onerror = (e) => { URL.revokeObjectURL(url); reject(e); };
+    img.src = url;
+  });
 
 export const upscaleImage = async (
   file: File,
@@ -19,38 +22,47 @@ export const upscaleImage = async (
   onProgress: (msg: string) => void
 ): Promise<string> => {
   onProgress("Reading image...");
-  const arrayBuffer = await file.arrayBuffer();
+  const img = await loadImage(file);
 
   onProgress("Upscaling...");
-  const image = await Jimp.read(arrayBuffer);
-  const newWidth = image.bitmap.width * scale;
-  const newHeight = image.bitmap.height * scale;
-  image.resize({ w: newWidth, h: newHeight, mode: ResizeStrategy.BICUBIC });
+  const sw = img.naturalWidth;
+  const sh = img.naturalHeight;
+  const dw = sw * scale;
+  const dh = sh * scale;
+
+  const canvas = document.createElement("canvas");
+  canvas.width = dw;
+  canvas.height = dh;
+  const ctx = canvas.getContext("2d")!;
+  ctx.imageSmoothingEnabled = true;
+  ctx.imageSmoothingQuality = "high";
+
+  // Stepped upscale for 3x/4x produces smoother results than a single draw
+  if (scale >= 3) {
+    const mid = document.createElement("canvas");
+    mid.width = sw * 2;
+    mid.height = sh * 2;
+    const mctx = mid.getContext("2d")!;
+    mctx.imageSmoothingEnabled = true;
+    mctx.imageSmoothingQuality = "high";
+    mctx.drawImage(img, 0, 0, mid.width, mid.height);
+    ctx.drawImage(mid, 0, 0, dw, dh);
+  } else {
+    ctx.drawImage(img, 0, 0, dw, dh);
+  }
 
   onProgress("Finalizing...");
-  return await image.getBase64(JimpMime.png); // returns "data:image/png;base64,..."
+  return canvas.toDataURL("image/png");
 };
 ```
 
-Note: the spec uses the older `Jimp.RESIZE_BICUBIC` / `getBase64Async` API. Jimp v1 renamed these to `ResizeStrategy.BICUBIC` and `getBase64`. Behavior is identical (bicubic interpolation, PNG data URL). If the user prefers the legacy API we can pin `jimp@0.22`, but v1 is recommended.
+### 2. Remove `jimp` dependency
+- `bun remove jimp`
 
-### 3. Update `src/routes/tools.image-upscaler.tsx`
-- Keep current UI: drop zone, scale 2x/4x toggle, before/after slider, download button, `progressMsg` driven by `onProgress`.
-- Update the bottom caption from "Powered by Real-ESRGAN AI" to: **"Uses bicubic interpolation — best for photos and general images. Runs entirely in your browser."**
-- Update page `<title>` / description to drop "AI" wording (now "Image Upscaler — bicubic, in-browser").
-- Update `HowToUse` step 2 to remove "AI" wording.
+### 3. `src/routes/tools.image-upscaler.tsx`
+No changes required — it already imports `upscaleImage` and `MAX_UPSCALE_BYTES` from the same module and the function signature is unchanged. The existing 2x/4x toggle works as-is (4x will use the stepped path).
 
-### 4. Cleanup
-- `skycally-api/main.py`: remove the `/api/upscale` endpoint and any helpers/imports only used by it (keep `httpx` only if still used elsewhere — will check and trim `requirements.txt` accordingly).
-- `.env`: nothing to remove (no `VITE_REPLICATE_KEY` left); `VITE_API_URL` stays for other tools.
-- Recommend rotating the previously-shared Replicate token; it's no longer referenced anywhere in the project after this change.
-
-### Files touched
-- `package.json` (+ `jimp`)
-- `src/services/imageUpscaler.ts` (full rewrite)
-- `src/routes/tools.image-upscaler.tsx` (caption + meta tweaks)
-- `skycally-api/main.py`, `skycally-api/requirements.txt` (remove upscale route)
-
-### Caveats
-- 4x upscaling on large images is CPU-heavy on the main thread and may briefly freeze the UI. If this becomes a problem we can move it into a Web Worker in a follow-up.
-- Bicubic resize is a quality enlarger, not an AI super-resolution model — output won't match Real-ESRGAN's detail reconstruction. The new caption makes this honest.
+### Notes
+- Same browser-only behavior, identical PNG data-URL output → before/after slider and download still work.
+- Fixes the Rollup `jimp` build error by eliminating the dependency.
+- Caption ("bicubic interpolation, in your browser") stays accurate — `imageSmoothingQuality: "high"` uses the browser's high-quality resampler (bicubic/Lanczos depending on engine).

@@ -163,3 +163,82 @@ async def pdf_to_word(file: UploadFile = File(...)):
         )
     finally:
         shutil.rmtree(tmp_dir, ignore_errors=True)
+
+
+# ─── IMAGE UPSCALER (Replicate proxy) ────────────────────────
+import base64
+import asyncio
+import httpx
+
+REPLICATE_URL = "https://api.replicate.com/v1/models/nightmareai/real-esrgan/predictions"
+ALLOWED_IMAGE_TYPES = {"image/png", "image/jpeg", "image/jpg", "image/webp"}
+MAX_UPSCALE_BYTES = 5 * 1024 * 1024
+
+
+@app.post("/api/upscale")
+async def upscale(file: UploadFile = File(...), scale: int = 2):
+    token = os.environ.get("REPLICATE_API_TOKEN")
+    if not token:
+        raise HTTPException(status_code=400, detail="REPLICATE_KEY_MISSING")
+
+    if scale not in (2, 4):
+        raise HTTPException(status_code=400, detail="Scale must be 2 or 4")
+
+    if file.content_type not in ALLOWED_IMAGE_TYPES:
+        raise HTTPException(status_code=400, detail="Only PNG, JPG, or WEBP allowed")
+
+    data = await file.read()
+    if len(data) > MAX_UPSCALE_BYTES:
+        raise HTTPException(status_code=400, detail="Max file size is 5MB")
+
+    b64 = base64.b64encode(data).decode("ascii")
+    data_url = f"data:{file.content_type};base64,{b64}"
+
+    headers = {
+        "Authorization": f"Token {token}",
+        "Content-Type": "application/json",
+    }
+    payload = {
+        "input": {"image": data_url, "scale": scale, "face_enhance": False}
+    }
+
+    async with httpx.AsyncClient(timeout=30.0) as client:
+        try:
+            create = await client.post(REPLICATE_URL, headers=headers, json=payload)
+        except httpx.HTTPError:
+            raise HTTPException(status_code=502, detail="Upscaling failed")
+
+        if create.status_code == 401:
+            raise HTTPException(status_code=500, detail="REPLICATE_KEY_MISSING")
+        if create.status_code == 429:
+            raise HTTPException(status_code=429, detail="Rate limit reached. Try again in a few minutes.")
+        if create.status_code >= 400:
+            raise HTTPException(status_code=500, detail="Upscaling failed")
+
+        prediction = create.json()
+        pred_id = prediction.get("id")
+        if not pred_id:
+            raise HTTPException(status_code=500, detail="Upscaling failed")
+
+        poll_url = f"https://api.replicate.com/v1/predictions/{pred_id}"
+        for _ in range(30):
+            await asyncio.sleep(2)
+            try:
+                poll = await client.get(poll_url, headers=headers)
+            except httpx.HTTPError:
+                continue
+            if poll.status_code >= 400:
+                raise HTTPException(status_code=500, detail="Upscaling failed")
+            result = poll.json()
+            status = result.get("status")
+            if status == "succeeded":
+                output = result.get("output")
+                if isinstance(output, list):
+                    output = output[0] if output else None
+                if not output:
+                    raise HTTPException(status_code=500, detail="Upscaling failed")
+                return {"output": output}
+            if status in ("failed", "canceled"):
+                raise HTTPException(status_code=500, detail="Upscaling failed")
+
+    raise HTTPException(status_code=504, detail="Processing took too long. Try a smaller image.")

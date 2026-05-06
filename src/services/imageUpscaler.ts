@@ -1,8 +1,18 @@
 export const MAX_UPSCALE_BYTES = 5 * 1024 * 1024;
 
+export function hasReplicateKey(): boolean {
+  return Boolean(import.meta.env.VITE_REPLICATE_KEY);
+}
+
+function mapHttpError(status: number): string {
+  if (status === 401) return "Invalid API key. Check your Replicate key.";
+  if (status === 429) return "Rate limit reached. Try again in a few minutes.";
+  return "Upscaling failed. Please try again.";
+}
+
 export async function upscaleImage(file: File, scale: 2 | 4): Promise<string> {
   const apiKey = import.meta.env.VITE_REPLICATE_KEY as string | undefined;
-  if (!apiKey) throw new Error("Missing API key. Get a free key at replicate.com and add VITE_REPLICATE_KEY.");
+  if (!apiKey) throw new Error("API key missing");
   if (file.size > MAX_UPSCALE_BYTES) throw new Error("Max file size is 5MB");
 
   const base64 = await new Promise<string>((resolve, reject) => {
@@ -12,24 +22,30 @@ export async function upscaleImage(file: File, scale: 2 | 4): Promise<string> {
     r.readAsDataURL(file);
   });
 
-  const start = await fetch("https://api.replicate.com/v1/predictions", {
-    method: "POST",
-    headers: { Authorization: `Token ${apiKey}`, "Content-Type": "application/json" },
-    body: JSON.stringify({
-      version: "42fed1c4974146d4d2414e2be2c5277c7fcf05fcc3a73abf41610695738c1d7b",
-      input: { image: base64, scale, face_enhance: false },
-    }),
-  });
-  if (!start.ok) throw new Error(`Replicate error: ${start.status}`);
-  let result = await start.json();
+  const createRes = await fetch(
+    "https://api.replicate.com/v1/models/nightmareai/real-esrgan/predictions",
+    {
+      method: "POST",
+      headers: { Authorization: `Token ${apiKey}`, "Content-Type": "application/json" },
+      body: JSON.stringify({ input: { image: base64, scale, face_enhance: false } }),
+    }
+  );
+  if (!createRes.ok) throw new Error(mapHttpError(createRes.status));
+  const prediction = await createRes.json();
 
-  while (result.status !== "succeeded" && result.status !== "failed" && result.status !== "canceled") {
+  for (let i = 0; i < 30; i++) {
     await new Promise((r) => setTimeout(r, 2000));
-    const poll = await fetch(`https://api.replicate.com/v1/predictions/${result.id}`, {
+    const pollRes = await fetch(`https://api.replicate.com/v1/predictions/${prediction.id}`, {
       headers: { Authorization: `Token ${apiKey}` },
     });
-    result = await poll.json();
+    if (!pollRes.ok) throw new Error(mapHttpError(pollRes.status));
+    const result = await pollRes.json();
+    if (result.status === "succeeded") {
+      return Array.isArray(result.output) ? result.output[0] : result.output;
+    }
+    if (result.status === "failed" || result.status === "canceled") {
+      throw new Error("Upscaling failed. Please try again.");
+    }
   }
-  if (result.status !== "succeeded") throw new Error(result.error || "Upscaling failed");
-  return Array.isArray(result.output) ? result.output[0] : result.output;
+  throw new Error("Processing took too long. Try a smaller image.");
 }

@@ -12,9 +12,9 @@ export const Route = createFileRoute("/tools/image-upscaler")({
   head: () => ({
     meta: [
       { title: "Image Upscaler — Skycally" },
-      { name: "description", content: "Upscale images 2x or 4x with Real-ESRGAN AI. Free online image enhancer." },
-      { property: "og:title", content: "AI Image Upscaler · Skycally" },
-      { property: "og:description", content: "Enhance image resolution with AI." },
+      { name: "description", content: "Upscale images 2x or 4x in your browser with bicubic interpolation. Free online image enlarger." },
+      { property: "og:title", content: "Image Upscaler · Skycally" },
+      { property: "og:description", content: "Enlarge images in your browser — no upload required." },
     ],
   }),
   component: Page,
@@ -54,7 +54,7 @@ function Page() {
   };
 
   return (
-    <ToolPageShell title="AI Image Upscaler" description="Enlarge images 2x or 4x without losing quality, powered by Real-ESRGAN.">
+    <ToolPageShell title="Image Upscaler" description="Enlarge images 2x or 4x in your browser. Uses bicubic interpolation — best for photos and general images.">
       {!file && <DropZone accept="image/png,image/jpeg,image/webp" onFiles={onPick} label="Drop your image" hint="PNG, JPG, or WEBP · max 5MB" />}
 
       {file && (
@@ -98,7 +98,7 @@ function Page() {
             </div>
           )}
 
-          <p className="text-xs text-muted-foreground text-center">Powered by Real-ESRGAN AI</p>
+          <p className="text-xs text-muted-foreground text-center">Uses bicubic interpolation — best for photos and general images. Runs entirely in your browser.</p>
         </div>
       )}
 
@@ -107,7 +107,7 @@ function Page() {
 
       <HowToUse steps={[
         "Upload a PNG, JPG, or WEBP (up to 5MB).",
-        "Choose 2x or 4x and click Upscale.",
+        "Choose 2x or 4x and click Upscale — runs in your browser.",
         "Compare with the slider, then download the result.",
       ]} />
     </ToolPageShell>

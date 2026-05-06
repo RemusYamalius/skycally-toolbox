@@ -159,3 +159,23 @@
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
 }
+
+/* Native select dark-mode legibility (OS-rendered <option> ignores Tailwind classes) */
+select {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+  border: 1px solid var(--color-border);
+}
+select option {
+  background-color: var(--color-background);
+  color: var(--color-foreground);
+}
+.dark select {
+  background-color: #1e293b;
+  color: #f1f5f9;
+  border-color: #334155;
+}
+.dark select option {
+  background-color: #1e293b;
+  color: #f1f5f9;
+}

@@ -20,6 +20,7 @@ import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counte
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
+import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
@@ -93,6 +94,11 @@ const ToolsVideoDownloaderRoute = ToolsVideoDownloaderRouteImport.update({
 const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
   id: '/tools/text-to-speech',
   path: '/tools/text-to-speech',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSplitPdfRoute = ToolsSplitPdfRouteImport.update({
+  id: '/tools/split-pdf',
+  path: '/tools/split-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
@@ -216,6 +222,7 @@ export interface FileRoutesByFullPath {
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
@@ -248,6 +255,7 @@ export interface FileRoutesByTo {
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
@@ -281,6 +289,7 @@ export interface FileRoutesById {
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
@@ -315,6 +324,7 @@ export interface FileRouteTypes {
     | '/tools/remove-bg'
     | '/tools/screen-recorder'
     | '/tools/speech-to-text'
+    | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
@@ -347,6 +357,7 @@ export interface FileRouteTypes {
     | '/tools/remove-bg'
     | '/tools/screen-recorder'
     | '/tools/speech-to-text'
+    | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
@@ -379,6 +390,7 @@ export interface FileRouteTypes {
     | '/tools/remove-bg'
     | '/tools/screen-recorder'
     | '/tools/speech-to-text'
+    | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
@@ -412,6 +424,7 @@ export interface RootRouteChildren {
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
+  ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
@@ -497,6 +510,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/text-to-speech'
       fullPath: '/tools/text-to-speech'
       preLoaderRoute: typeof ToolsTextToSpeechRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/split-pdf': {
+      id: '/tools/split-pdf'
+      path: '/tools/split-pdf'
+      fullPath: '/tools/split-pdf'
+      preLoaderRoute: typeof ToolsSplitPdfRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/speech-to-text': {
@@ -660,6 +680,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
+  ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,

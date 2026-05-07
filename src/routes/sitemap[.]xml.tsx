@@ -27,6 +27,7 @@ const ROUTES = [
   "/tools/remove-bg",
   "/tools/screen-recorder",
   "/tools/speech-to-text",
+  "/tools/split-pdf",
   "/tools/text-to-speech",
   "/tools/video-downloader",
   "/tools/video-to-gif",

@@ -25,6 +25,7 @@ const ROUTES = [
   "/tools/qr-generator",
   "/tools/qr-reader",
   "/tools/remove-bg",
+  "/tools/screen-recorder",
   "/tools/speech-to-text",
   "/tools/text-to-speech",
   "/tools/video-downloader",

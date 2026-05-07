@@ -39,6 +39,7 @@ import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-co
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
+import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 
 const TermsRoute = TermsRouteImport.update({
@@ -191,6 +192,11 @@ const ToolsBase64Route = ToolsBase64RouteImport.update({
   path: '/tools/base64',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAudioConverterRoute = ToolsAudioConverterRouteImport.update({
+  id: '/tools/audio-converter',
+  path: '/tools/audio-converter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsAddWatermarkRoute = ToolsAddWatermarkRouteImport.update({
   id: '/tools/add-watermark',
   path: '/tools/add-watermark',
@@ -204,6 +210,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
+  '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
@@ -237,6 +244,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
+  '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
@@ -271,6 +279,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
+  '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
@@ -306,6 +315,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/tools/add-watermark'
+    | '/tools/audio-converter'
     | '/tools/base64'
     | '/tools/color-palette'
     | '/tools/image-compressor'
@@ -339,6 +349,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/tools/add-watermark'
+    | '/tools/audio-converter'
     | '/tools/base64'
     | '/tools/color-palette'
     | '/tools/image-compressor'
@@ -372,6 +383,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/tools/add-watermark'
+    | '/tools/audio-converter'
     | '/tools/base64'
     | '/tools/color-palette'
     | '/tools/image-compressor'
@@ -406,6 +418,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
+  ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
@@ -645,6 +658,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsBase64RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/audio-converter': {
+      id: '/tools/audio-converter'
+      path: '/tools/audio-converter'
+      fullPath: '/tools/audio-converter'
+      preLoaderRoute: typeof ToolsAudioConverterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/add-watermark': {
       id: '/tools/add-watermark'
       path: '/tools/add-watermark'
@@ -662,6 +682,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
+  ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBase64Route: ToolsBase64Route,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,

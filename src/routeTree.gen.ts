@@ -27,6 +27,7 @@ import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generato
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
+import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
@@ -128,6 +129,11 @@ const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
   path: '/tools/merge-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMarkdownToHtmlRoute = ToolsMarkdownToHtmlRouteImport.update({
+  id: '/tools/markdown-to-html',
+  path: '/tools/markdown-to-html',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsJsonFormatterRoute = ToolsJsonFormatterRouteImport.update({
   id: '/tools/json-formatter',
   path: '/tools/json-formatter',
@@ -195,6 +201,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
@@ -225,6 +232,7 @@ export interface FileRoutesByTo {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
@@ -256,6 +264,7 @@ export interface FileRoutesById {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
@@ -288,6 +297,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
+    | '/tools/markdown-to-html'
     | '/tools/merge-pdf'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
@@ -318,6 +328,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
+    | '/tools/markdown-to-html'
     | '/tools/merge-pdf'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
@@ -348,6 +359,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
+    | '/tools/markdown-to-html'
     | '/tools/merge-pdf'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
@@ -379,6 +391,7 @@ export interface RootRouteChildren {
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
+  ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
@@ -522,6 +535,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMergePdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/markdown-to-html': {
+      id: '/tools/markdown-to-html'
+      path: '/tools/markdown-to-html'
+      fullPath: '/tools/markdown-to-html'
+      preLoaderRoute: typeof ToolsMarkdownToHtmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/json-formatter': {
       id: '/tools/json-formatter'
       path: '/tools/json-formatter'
@@ -611,6 +631,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
+  ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,

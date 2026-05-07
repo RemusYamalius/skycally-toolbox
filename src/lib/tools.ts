@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio";
 
@@ -41,4 +41,5 @@ export const tools: Tool[] = [
   { slug: "color-palette", name: "Color Palette Extractor", description: "Extract the dominant colors from any image instantly.", category: "image", icon: Palette, path: "/tools/color-palette" },
   { slug: "image-filters", name: "Image Filters", description: "Apply beautiful filters to your images instantly in the browser.", category: "image", icon: Wand2, path: "/tools/image-filters" },
   { slug: "add-watermark", name: "Add Watermark", description: "Add custom text watermarks to your images in seconds.", category: "image", icon: Stamp, path: "/tools/add-watermark" },
+  { slug: "image-to-sketch", name: "Image to Sketch", description: "Transform any photo into a pencil or charcoal sketch instantly.", category: "image", icon: Pencil, path: "/tools/image-to-sketch" },
 ];

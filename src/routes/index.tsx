@@ -25,6 +25,14 @@ const quickAccess = [
   { icon: Scissors, label: "Remove Background", to: "/tools/remove-bg", color: "var(--green-brand)" },
 ] as const;
 
+const categoryTaglines: Record<ToolCategory, string> = {
+  video: "Download, convert, compress and record videos in seconds.",
+  image: "Convert, compress, upscale and edit images instantly.",
+  audio: "Convert, transcribe and synthesize audio fast.",
+  pdf: "Merge, split, convert and extract from PDFs.",
+  text: "Generate, format, encode and analyze text effortlessly.",
+};
+
 function HomePage() {
   const [q, setQ] = useState("");
   const filtered = useMemo(
@@ -97,17 +105,49 @@ function HomePage() {
         {/* ADSENSE_ZONE: homepage-top-banner 728x90 */}
         <AdZone id="homepage-top-banner" size="728x90" />
 
-        {/* Tools grid */}
+        {/* Tools by category */}
         <section className="py-16">
           <div className="flex items-end justify-between mb-10">
             <div>
               <h2 className="font-display text-3xl sm:text-4xl font-bold">Browse All Tools</h2>
-              <p className="mt-2 text-muted-foreground">Pick a tool and get going — no account, no friction.</p>
+              <p className="mt-2 text-muted-foreground">Organized by category — pick a tool and get going.</p>
             </div>
             <Link to="/tools" className="hidden sm:inline-flex text-sm font-medium text-muted-foreground hover:text-foreground">View all →</Link>
           </div>
-          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {tools.map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
+
+          <div className="space-y-14">
+            {(["video", "image", "audio", "pdf", "text"] as ToolCategory[]).map((cat) => {
+              const list = tools.filter((t) => t.category === cat);
+              if (list.length === 0) return null;
+              const meta = categoryMeta[cat];
+              return (
+                <div key={cat} className="border-t border-border/60 pt-10">
+                  <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
+                    <div className="flex items-center gap-3">
+                      <div
+                        className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                        style={{ background: `color-mix(in oklab, ${meta.color} 18%, transparent)`, color: meta.color }}
+                      >
+                        <span aria-hidden>{meta.icon}</span>
+                      </div>
+                      <div>
+                        <h3 className="font-display text-2xl font-bold">{meta.label}</h3>
+                        <p className="text-sm text-muted-foreground">{categoryTaglines[cat]}</p>
+                      </div>
+                    </div>
+                    <span
+                      className="text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full"
+                      style={{ background: `color-mix(in oklab, ${meta.color} 12%, transparent)`, color: meta.color }}
+                    >
+                      {list.length} {list.length === 1 ? "tool" : "tools"}
+                    </span>
+                  </div>
+                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                    {list.map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
+                  </div>
+                </div>
+              );
+            })}
           </div>
         </section>
 

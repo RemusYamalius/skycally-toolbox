@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Download, Image as ImageIcon, FileText, Scissors, Upload, Wand2, ArrowDown } from "lucide-react";
+import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type } from "lucide-react";
 import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 import { AdZone } from "@/components/ad-zone";
@@ -19,11 +19,12 @@ export const Route = createFileRoute("/")({
 });
 
 const quickAccess = [
-  { icon: Download, label: "Video Downloader", to: "/tools/video-downloader", color: "var(--cyan-brand)" },
-  { icon: ImageIcon, label: "Image Converter", to: "/tools/image-converter", color: "var(--violet-brand)" },
-  { icon: FileText, label: "PDF Tools", to: "/tools/merge-pdf", color: "var(--orange-brand)" },
-  { icon: Scissors, label: "Remove Background", to: "/tools/remove-bg", color: "var(--green-brand)" },
-] as const;
+  { icon: Video, label: "Video Tools", cat: "video" as const, color: categoryMeta.video.color },
+  { icon: ImageIcon, label: "Image Tools", cat: "image" as const, color: categoryMeta.image.color },
+  { icon: Music, label: "Audio Tools", cat: "audio" as const, color: categoryMeta.audio.color },
+  { icon: FileText, label: "PDF & Documents", cat: "pdf" as const, color: categoryMeta.pdf.color },
+  { icon: Type, label: "Text Tools", cat: "text" as const, color: categoryMeta.text.color },
+];
 
 const categoryTaglines: Record<ToolCategory, string> = {
   video: "Download, convert, compress and record videos in seconds.",
@@ -90,7 +91,8 @@ function HomePage() {
             {quickAccess.map((q) => (
               <Link
                 key={q.label}
-                to={q.to}
+                to="/tools"
+                search={{ cat: q.cat }}
                 className="group inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-2.5 text-sm font-medium backdrop-blur transition hover:bg-white/10"
               >
                 <q.icon className="w-4 h-4" style={{ color: q.color }} />

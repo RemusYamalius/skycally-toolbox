@@ -1,10 +1,20 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { useMemo, useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 
+const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text"] as const;
+type CatParam = (typeof VALID_CATS)[number];
+
 export const Route = createFileRoute("/tools/")({
+  validateSearch: (search: Record<string, unknown>): { cat?: CatParam } => {
+    const cat = search.cat;
+    if (typeof cat === "string" && (VALID_CATS as readonly string[]).includes(cat)) {
+      return { cat: cat as CatParam };
+    }
+    return {};
+  },
   head: () => ({
     meta: [
       { title: "All Tools — Skycally" },
@@ -19,8 +29,19 @@ export const Route = createFileRoute("/tools/")({
 const cats: ("all" | ToolCategory)[] = ["all", "video", "image", "audio", "pdf", "text"];
 
 function ToolsPage() {
-  const [cat, setCat] = useState<"all" | ToolCategory>("all");
+  const search = Route.useSearch();
+  const navigate = useNavigate({ from: "/tools" });
+  const [cat, setCat] = useState<"all" | ToolCategory>(search.cat ?? "all");
   const [q, setQ] = useState("");
+
+  useEffect(() => {
+    setCat(search.cat ?? "all");
+  }, [search.cat]);
+
+  const onPickCat = (c: "all" | ToolCategory) => {
+    setCat(c);
+    navigate({ search: c === "all" ? {} : { cat: c }, replace: true });
+  };
 
   const list = useMemo(() => tools.filter((t) => (cat === "all" || t.category === cat) && (t.name + t.description).toLowerCase().includes(q.toLowerCase())), [cat, q]);
 
@@ -40,7 +61,7 @@ function ToolsPage() {
           {cats.map((c) => (
             <button
               key={c}
-              onClick={() => setCat(c)}
+              onClick={() => onPickCat(c)}
               className={`rounded-full px-4 py-2 text-xs font-semibold transition border ${cat === c ? "bg-foreground text-background border-foreground" : "border-border hover:bg-secondary"}`}
             >
               {c === "all" ? "All" : categoryMeta[c].label}

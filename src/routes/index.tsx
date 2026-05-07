@@ -25,6 +25,14 @@ const quickAccess = [
   { icon: Scissors, label: "Remove Background", to: "/tools/remove-bg", color: "var(--green-brand)" },
 ] as const;
 
+const categoryTaglines: Record<ToolCategory, string> = {
+  video: "Download, convert, compress and record videos in seconds.",
+  image: "Convert, compress, upscale and edit images instantly.",
+  audio: "Convert, transcribe and synthesize audio fast.",
+  pdf: "Merge, split, convert and extract from PDFs.",
+  text: "Generate, format, encode and analyze text effortlessly.",
+};
+
 function HomePage() {
   const [q, setQ] = useState("");
   const filtered = useMemo(

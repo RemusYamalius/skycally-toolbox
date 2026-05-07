@@ -21,6 +21,7 @@ import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
+import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
@@ -97,6 +98,11 @@ const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
 const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
   id: '/tools/speech-to-text',
   path: '/tools/speech-to-text',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsScreenRecorderRoute = ToolsScreenRecorderRouteImport.update({
+  id: '/tools/screen-recorder',
+  path: '/tools/screen-recorder',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
@@ -208,6 +214,7 @@ export interface FileRoutesByFullPath {
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
@@ -239,6 +246,7 @@ export interface FileRoutesByTo {
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
@@ -271,6 +279,7 @@ export interface FileRoutesById {
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
@@ -304,6 +313,7 @@ export interface FileRouteTypes {
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/screen-recorder'
     | '/tools/speech-to-text'
     | '/tools/text-to-speech'
     | '/tools/video-downloader'
@@ -335,6 +345,7 @@ export interface FileRouteTypes {
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/screen-recorder'
     | '/tools/speech-to-text'
     | '/tools/text-to-speech'
     | '/tools/video-downloader'
@@ -366,6 +377,7 @@ export interface FileRouteTypes {
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/screen-recorder'
     | '/tools/speech-to-text'
     | '/tools/text-to-speech'
     | '/tools/video-downloader'
@@ -398,6 +410,7 @@ export interface RootRouteChildren {
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
+  ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
@@ -491,6 +504,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/speech-to-text'
       fullPath: '/tools/speech-to-text'
       preLoaderRoute: typeof ToolsSpeechToTextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/screen-recorder': {
+      id: '/tools/screen-recorder'
+      path: '/tools/screen-recorder'
+      fullPath: '/tools/screen-recorder'
+      preLoaderRoute: typeof ToolsScreenRecorderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/remove-bg': {
@@ -638,6 +658,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
+  ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
@@ -649,3 +670,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

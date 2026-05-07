@@ -11,6 +11,7 @@ const ROUTES = [
   "/tools/add-watermark",
   "/tools/audio-converter",
   "/tools/base64",
+  "/tools/extract-audio",
   "/tools/color-palette",
   "/tools/image-compressor",
   "/tools/image-converter",

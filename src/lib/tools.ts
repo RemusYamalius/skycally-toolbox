@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio";
 
@@ -47,4 +47,5 @@ export const tools: Tool[] = [
   { slug: "split-pdf", name: "Split PDF", description: "Extract specific pages from any PDF file instantly.", category: "pdf", icon: Scissors, path: "/tools/split-pdf" },
   { slug: "audio-converter", name: "Audio Converter", description: "Convert audio files between MP3, WAV, OGG, AAC and FLAC instantly.", category: "audio", icon: Music, path: "/tools/audio-converter" },
   { slug: "video-compressor", name: "Video Compressor", description: "Reduce video file size without losing quality.", category: "video", icon: Video, path: "/tools/video-compressor" },
+  { slug: "extract-audio", name: "Extract Audio from Video", description: "Extract MP3, AAC or WAV audio from any video file.", category: "video", icon: AudioLines, path: "/tools/extract-audio" },
 ];

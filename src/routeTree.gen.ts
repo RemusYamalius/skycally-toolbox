@@ -38,6 +38,7 @@ import { Route as ToolsImageToSketchRouteImport } from './routes/tools.image-to-
 import { Route as ToolsImageFiltersRouteImport } from './routes/tools.image-filters'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
+import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
@@ -188,6 +189,11 @@ const ToolsImageCompressorRoute = ToolsImageCompressorRouteImport.update({
   path: '/tools/image-compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsExtractAudioRoute = ToolsExtractAudioRouteImport.update({
+  id: '/tools/extract-audio',
+  path: '/tools/extract-audio',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsColorPaletteRoute = ToolsColorPaletteRouteImport.update({
   id: '/tools/color-palette',
   path: '/tools/color-palette',
@@ -219,6 +225,7 @@ export interface FileRoutesByFullPath {
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-filters': typeof ToolsImageFiltersRoute
@@ -254,6 +261,7 @@ export interface FileRoutesByTo {
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-filters': typeof ToolsImageFiltersRoute
@@ -290,6 +298,7 @@ export interface FileRoutesById {
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-filters': typeof ToolsImageFiltersRoute
@@ -327,6 +336,7 @@ export interface FileRouteTypes {
     | '/tools/audio-converter'
     | '/tools/base64'
     | '/tools/color-palette'
+    | '/tools/extract-audio'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-filters'
@@ -362,6 +372,7 @@ export interface FileRouteTypes {
     | '/tools/audio-converter'
     | '/tools/base64'
     | '/tools/color-palette'
+    | '/tools/extract-audio'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-filters'
@@ -397,6 +408,7 @@ export interface FileRouteTypes {
     | '/tools/audio-converter'
     | '/tools/base64'
     | '/tools/color-palette'
+    | '/tools/extract-audio'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-filters'
@@ -433,6 +445,7 @@ export interface RootRouteChildren {
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
+  ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
   ToolsImageFiltersRoute: typeof ToolsImageFiltersRoute
@@ -664,6 +677,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsImageCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/extract-audio': {
+      id: '/tools/extract-audio'
+      path: '/tools/extract-audio'
+      fullPath: '/tools/extract-audio'
+      preLoaderRoute: typeof ToolsExtractAudioRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/color-palette': {
       id: '/tools/color-palette'
       path: '/tools/color-palette'
@@ -705,6 +725,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBase64Route: ToolsBase64Route,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
+  ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
   ToolsImageFiltersRoute: ToolsImageFiltersRoute,
@@ -733,3 +754,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

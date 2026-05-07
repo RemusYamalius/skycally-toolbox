@@ -1,23 +1,29 @@
-## Update favicon to new Skycally logo
+## Add Google Analytics (gtag.js) — G-WHRM5Z08KR
 
-### Steps
+Inject the Google tag site-wide via the root route in `src/routes/__root.tsx` so it loads on every page (SSR-safe, appears in `<head>` once).
 
-1. **Copy the uploaded logo** to `public/`:
-   - `public/favicon.png` (overwrite the old one) — main favicon
-   - `public/apple-touch-icon.png` — same image, used by iOS/macOS
+### Changes
 
-2. **Update `src/routes/__root.tsx` head links** to declare a complete favicon set and bust browser/Google caches with a version query:
-   ```ts
-   { rel: "icon", type: "image/png", href: "/favicon.png?v=2" },
-   { rel: "shortcut icon", type: "image/png", href: "/favicon.png?v=2" },
-   { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png?v=2" },
-   ```
+**`src/routes/__root.tsx`** — add two entries to the `head()` `scripts` array:
 
-3. **Publish** so the new favicon is live at `skycally.com`.
+```ts
+scripts: [
+  {
+    src: "https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR",
+    async: true,
+  },
+  {
+    children: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-WHRM5Z08KR');`,
+  },
+],
+```
 
-4. **Request re-indexing** (manual, on the user side) in Google Search Console → URL Inspection → `https://skycally.com/` → Request Indexing. Google's favicon refresh typically takes from a few days up to several weeks; there is no way to force it instantly.
+TanStack's `HeadContent` renders these into `<head>` on every route automatically — no need to touch individual route files. Single instance per page (no duplication).
 
 ### Notes
-- No tool routes, components, or logic are touched.
-- The `?v=2` query forces browsers (and Google's crawler) to re-fetch the file instead of using a cached old version.
-- The uploaded image is already square (~512×512) and works fine as both favicon and apple-touch-icon.
+
+- After publish, verify in Google Analytics → Realtime that hits arrive from `skycally.com`.
+- GDPR/cookie consent isn't added here. If you later need consent gating, we can wrap the tag in a consent check — let me know.

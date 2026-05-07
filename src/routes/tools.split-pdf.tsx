@@ -197,6 +197,11 @@ function SplitPdf() {
           </button>
         )}
       </div>
-    </div>
+      <HowToUse steps={[
+        "Upload your PDF file by dropping it or clicking to browse.",
+        "Type the pages you want to extract (e.g. 1-3,5,7-9).",
+        "Click Split PDF to download the extracted pages instantly.",
+      ]} />
+    </ToolPageShell>
   );
 }

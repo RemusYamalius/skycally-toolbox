@@ -49,9 +49,43 @@ function ToolsPage() {
         </div>
       </div>
 
-      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-        {list.map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
-      </div>
+      {cat === "all" ? (
+        <div className="space-y-14">
+          {(["video", "image", "audio", "pdf", "text"] as ToolCategory[]).map((c) => {
+            const groupList = list.filter((t) => t.category === c);
+            if (groupList.length === 0) return null;
+            const meta = categoryMeta[c];
+            return (
+              <section key={c} className="border-t border-border/60 pt-10 first:border-t-0 first:pt-0">
+                <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
+                  <div className="flex items-center gap-3">
+                    <div
+                      className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                      style={{ background: `color-mix(in oklab, ${meta.color} 18%, transparent)`, color: meta.color }}
+                    >
+                      <span aria-hidden>{meta.icon}</span>
+                    </div>
+                    <h2 className="font-display text-2xl font-bold">{meta.label}</h2>
+                  </div>
+                  <span
+                    className="text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full"
+                    style={{ background: `color-mix(in oklab, ${meta.color} 12%, transparent)`, color: meta.color }}
+                  >
+                    {groupList.length} {groupList.length === 1 ? "tool" : "tools"}
+                  </span>
+                </div>
+                <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  {groupList.map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
+                </div>
+              </section>
+            );
+          })}
+        </div>
+      ) : (
+        <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+          {list.map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
+        </div>
+      )}
       {list.length === 0 && <p className="text-center py-20 text-muted-foreground">No tools match your search.</p>}
     </div>
   );

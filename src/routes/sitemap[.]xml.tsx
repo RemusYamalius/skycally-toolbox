@@ -30,6 +30,7 @@ const ROUTES = [
   "/tools/speech-to-text",
   "/tools/split-pdf",
   "/tools/text-to-speech",
+  "/tools/video-compressor",
   "/tools/video-downloader",
   "/tools/video-to-gif",
   "/tools/word-counter",

@@ -19,6 +19,7 @@ import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
+import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
@@ -90,6 +91,11 @@ const ToolsVideoToGifRoute = ToolsVideoToGifRouteImport.update({
 const ToolsVideoDownloaderRoute = ToolsVideoDownloaderRouteImport.update({
   id: '/tools/video-downloader',
   path: '/tools/video-downloader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsVideoCompressorRoute = ToolsVideoCompressorRouteImport.update({
+  id: '/tools/video-compressor',
+  path: '/tools/video-compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
@@ -231,6 +237,7 @@ export interface FileRoutesByFullPath {
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
@@ -265,6 +272,7 @@ export interface FileRoutesByTo {
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
@@ -300,6 +308,7 @@ export interface FileRoutesById {
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
@@ -336,6 +345,7 @@ export interface FileRouteTypes {
     | '/tools/speech-to-text'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
     | '/tools/word-counter'
@@ -370,6 +380,7 @@ export interface FileRouteTypes {
     | '/tools/speech-to-text'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
     | '/tools/word-counter'
@@ -404,6 +415,7 @@ export interface FileRouteTypes {
     | '/tools/speech-to-text'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
     | '/tools/word-counter'
@@ -439,6 +451,7 @@ export interface RootRouteChildren {
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
+  ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
@@ -516,6 +529,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/video-downloader'
       fullPath: '/tools/video-downloader'
       preLoaderRoute: typeof ToolsVideoDownloaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/video-compressor': {
+      id: '/tools/video-compressor'
+      path: '/tools/video-compressor'
+      fullPath: '/tools/video-compressor'
+      preLoaderRoute: typeof ToolsVideoCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/text-to-speech': {
@@ -703,6 +723,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
+  ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,

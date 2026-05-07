@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Scissors as ScissorsIcon } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio";
 
@@ -44,4 +44,5 @@ export const tools: Tool[] = [
   { slug: "image-to-sketch", name: "Image to Sketch", description: "Transform any photo into a pencil or charcoal sketch instantly.", category: "image", icon: Pencil, path: "/tools/image-to-sketch" },
   { slug: "markdown-to-html", name: "Markdown to HTML", description: "Convert Markdown to clean HTML with live preview instantly.", category: "text", icon: FileCode, path: "/tools/markdown-to-html" },
   { slug: "screen-recorder", name: "Screen Recorder", description: "Record your screen with audio directly in the browser — no installs needed.", category: "video", icon: Monitor, path: "/tools/screen-recorder" },
+  { slug: "split-pdf", name: "Split PDF", description: "Extract specific pages from any PDF file instantly.", category: "pdf", icon: Scissors, path: "/tools/split-pdf" },
 ];

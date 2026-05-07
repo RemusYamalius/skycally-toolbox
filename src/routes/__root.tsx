@@ -43,6 +43,15 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" },
     ],
+    scripts: [
+      { src: "https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR", async: true },
+      {
+        children: `window.dataLayer = window.dataLayer || [];
+function gtag(){dataLayer.push(arguments);}
+gtag('js', new Date());
+gtag('config', 'G-WHRM5Z08KR');`,
+      },
+    ],
   }),
   shellComponent: RootShell,
   component: RootComponent,

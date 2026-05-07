@@ -1,5 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
+import { ToolPageShell } from "@/components/tool-page-shell";
+import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/split-pdf")({
   head: () => ({
@@ -89,8 +91,8 @@ function SplitPdf() {
   };
 
   return (
-    <div className="min-h-screen bg-[#0a0f1e] text-white p-6 flex items-center justify-center">
-      <div className="w-full max-w-xl space-y-5">
+    <ToolPageShell title="Split PDF" description="Extract specific pages or page ranges from any PDF file instantly.">
+      <div className="w-full max-w-xl mx-auto space-y-5">
         <div
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}

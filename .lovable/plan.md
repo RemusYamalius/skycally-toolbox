@@ -1,23 +1,22 @@
-## Add Base64 Encoder / Decoder tool
+## Fix Split PDF page — add title and tool info
 
-### Changes
+The `/tools/split-pdf` page renders only the drop zone with no header, breaking consistency with all other tool pages.
 
-1. **Create `src/routes/tools.base64.tsx`** — TanStack route at `/tools/base64`, wrapped in `ToolPageShell`. Preserves the exact logic from the pasted component (mode toggle, `btoa`/`atob` with UTF-8 safe escape/unescape, copy, swap, clear, error handling). UI is adapted to use project tokens (`bg-card`, `border-border`, `text-muted-foreground`, `text-foreground`) instead of hard-coded `#0a0f1e`/`#0d1526`/`#1e2d4a`, while keeping the cyan→blue gradient accent. Adds a `HowToUse` block at the bottom for consistency. Uses TanStack `head()` meta (title, description, og tags). Note: the project uses `src/routes/`, not `src/pages/`.
+### Changes to `src/routes/tools.split-pdf.tsx`
 
-2. **Edit `src/lib/tools.ts`** — Import `Code2` from `lucide-react`, append:
-   ```ts
-   { slug: "base64", name: "Base64 Encoder / Decoder",
-     description: "Encode plain text to Base64 or decode Base64 strings instantly.",
-     category: "text", icon: Code2, path: "/tools/base64" }
-   ```
-   This auto-lists it on `/tools` and the homepage grid.
+1. Import `ToolPageShell` from `@/components/tool-page-shell` and `HowToUse` from `@/components/how-to-use`.
+2. Wrap the existing component JSX in `<ToolPageShell title="Split PDF" description="Extract specific pages or page ranges from any PDF file instantly.">`.
+3. Remove the hard-coded full-screen `bg-[#0a0f1e]` wrapper (the shell handles layout). Keep the inner card markup unchanged.
+4. Append a `<HowToUse>` block with three steps:
+   - "Upload your PDF file by dropping it or clicking to browse."
+   - "Type the pages you want to extract (e.g. 1-3,5,7-9)."
+   - "Click Split PDF to download the extracted pages instantly."
 
-3. **Edit `src/routes/sitemap[.]xml.tsx`** — Insert `/tools/base64` into the `ROUTES` array (alphabetically, right after `/tools`).
+### Memory
 
-### Routing
-TanStack's Vite plugin auto-regenerates `routeTree.gen.ts` from the new file — no manual router edits needed.
+Save a Core rule to `mem://index.md` so future tool pages always include title + description + HowToUse via `ToolPageShell`:
+- "Every new tool route must wrap its UI in ToolPageShell (title + description) and end with a HowToUse block — matches all existing tool pages."
 
 ### Files touched
-- new: `src/routes/tools.base64.tsx`
-- edit: `src/lib/tools.ts`
-- edit: `src/routes/sitemap[.]xml.tsx`
+- edit: `src/routes/tools.split-pdf.tsx`
+- edit: `mem://index.md`

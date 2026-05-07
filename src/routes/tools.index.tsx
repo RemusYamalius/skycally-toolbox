@@ -61,7 +61,7 @@ function ToolsPage() {
           {cats.map((c) => (
             <button
               key={c}
-              onClick={() => setCat(c)}
+              onClick={() => onPickCat(c)}
               className={`rounded-full px-4 py-2 text-xs font-semibold transition border ${cat === c ? "bg-foreground text-background border-foreground" : "border-border hover:bg-secondary"}`}
             >
               {c === "all" ? "All" : categoryMeta[c].label}

@@ -376,7 +376,6 @@ function QrGeneratorPage() {
   const previewRef = useRef<HTMLCanvasElement>(null);
   const offscreenRef = useRef<HTMLCanvasElement | null>(null);
   const finalRef = useRef<HTMLCanvasElement | null>(null);
-  const [renderKey, setRenderKey] = useState(0);
 
   const content = useMemo(() => formatQRContent(type, forms[type]), [type, forms]);
   const updateForm = (patch: any) => setForms((f) => ({ ...f, [type]: { ...f[type], ...patch } }));
@@ -388,6 +387,7 @@ function QrGeneratorPage() {
   }, [logo]);
 
   const render = useCallback(async () => {
+    if (!previewRef.current) return;
     if (!content) return;
     if (typeof document === "undefined") return;
     if (!offscreenRef.current) offscreenRef.current = document.createElement("canvas");
@@ -421,7 +421,6 @@ function QrGeneratorPage() {
       ctx.clearRect(0, 0, preview.width, preview.height);
       ctx.drawImage(final, 0, 0, preview.width, preview.height);
     }
-    setRenderKey((k) => k + 1);
   }, [content, dotStyle, colorMode, color1, color2, gradientType, angle, bg, logo, logoSrc, logoSize, frameStyle, cta, frameColor, frameTextColor]);
 
   useEffect(() => {
@@ -750,12 +749,13 @@ function QrGeneratorPage() {
                 </div>
               )}
               <div className="rounded-xl p-3" style={{ background: bg }}>
-                <canvas
-                  key={renderKey}
-                  ref={previewRef}
-                  className="max-w-full h-auto animate-in fade-in duration-200"
-                  style={{ maxWidth: 300 }}
-                />
+                <div key={content} className="animate-in fade-in duration-200">
+                  <canvas
+                    ref={previewRef}
+                    className="max-w-full h-auto"
+                    style={{ maxWidth: 300 }}
+                  />
+                </div>
               </div>
               {!content && (
                 <p className="text-xs text-muted-foreground">Enter content to generate your QR code.</p>

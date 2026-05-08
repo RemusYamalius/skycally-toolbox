@@ -29,7 +29,8 @@ async function getPipeline(onProgress: (msg: string) => void): Promise<any> {
   if (pipelinePromise) return pipelinePromise;
   onProgress("Loading AI model (~60MB, first time only)...");
   pipelinePromise = (async () => {
-    const mod: any = await import(/* @vite-ignore */ "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1/dist/transformers.min.js");
+    const url = "https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1/dist/transformers.min.js";
+    const mod: any = await import(/* @vite-ignore */ url);
     return await mod.pipeline("sentiment-analysis", "Xenova/distilbert-base-uncased-finetuned-sst-2-english");
   })();
   return pipelinePromise;

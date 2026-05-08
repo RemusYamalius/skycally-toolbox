@@ -23,12 +23,14 @@ import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-c
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
+import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
+import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
@@ -38,9 +40,12 @@ import { Route as ToolsImageToSketchRouteImport } from './routes/tools.image-to-
 import { Route as ToolsImageFiltersRouteImport } from './routes/tools.image-filters'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
+import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
+import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
+import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 
@@ -114,6 +119,11 @@ const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
   path: '/tools/speech-to-text',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsSentimentAnalysisRoute = ToolsSentimentAnalysisRouteImport.update({
+  id: '/tools/sentiment-analysis',
+  path: '/tools/sentiment-analysis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsScreenRecorderRoute = ToolsScreenRecorderRouteImport.update({
   id: '/tools/screen-recorder',
   path: '/tools/screen-recorder',
@@ -142,6 +152,11 @@ const ToolsPdfTextExtractorRoute = ToolsPdfTextExtractorRouteImport.update({
 const ToolsPasswordGeneratorRoute = ToolsPasswordGeneratorRouteImport.update({
   id: '/tools/password-generator',
   path: '/tools/password-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsObjectDetectionRoute = ToolsObjectDetectionRouteImport.update({
+  id: '/tools/object-detection',
+  path: '/tools/object-detection',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
@@ -189,6 +204,16 @@ const ToolsImageCompressorRoute = ToolsImageCompressorRouteImport.update({
   path: '/tools/image-compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsHandGestureRoute = ToolsHandGestureRouteImport.update({
+  id: '/tools/hand-gesture',
+  path: '/tools/hand-gesture',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsFaceLandmarksRoute = ToolsFaceLandmarksRouteImport.update({
+  id: '/tools/face-landmarks',
+  path: '/tools/face-landmarks',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsExtractAudioRoute = ToolsExtractAudioRouteImport.update({
   id: '/tools/extract-audio',
   path: '/tools/extract-audio',
@@ -202,6 +227,11 @@ const ToolsColorPaletteRoute = ToolsColorPaletteRouteImport.update({
 const ToolsBase64Route = ToolsBase64RouteImport.update({
   id: '/tools/base64',
   path: '/tools/base64',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsBackgroundBlurRoute = ToolsBackgroundBlurRouteImport.update({
+  id: '/tools/background-blur',
+  path: '/tools/background-blur',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsAudioConverterRoute = ToolsAudioConverterRouteImport.update({
@@ -223,9 +253,12 @@ export interface FileRoutesByFullPath {
   '/terms': typeof TermsRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
+  '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
+  '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-filters': typeof ToolsImageFiltersRoute
@@ -235,12 +268,14 @@ export interface FileRoutesByFullPath {
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
+  '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
@@ -259,9 +294,12 @@ export interface FileRoutesByTo {
   '/terms': typeof TermsRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
+  '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
+  '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-filters': typeof ToolsImageFiltersRoute
@@ -271,12 +309,14 @@ export interface FileRoutesByTo {
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
+  '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
@@ -296,9 +336,12 @@ export interface FileRoutesById {
   '/terms': typeof TermsRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
+  '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
+  '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-filters': typeof ToolsImageFiltersRoute
@@ -308,12 +351,14 @@ export interface FileRoutesById {
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
+  '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
@@ -334,9 +379,12 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
+    | '/tools/background-blur'
     | '/tools/base64'
     | '/tools/color-palette'
     | '/tools/extract-audio'
+    | '/tools/face-landmarks'
+    | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-filters'
@@ -346,12 +394,14 @@ export interface FileRouteTypes {
     | '/tools/json-formatter'
     | '/tools/markdown-to-html'
     | '/tools/merge-pdf'
+    | '/tools/object-detection'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
     | '/tools/screen-recorder'
+    | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
@@ -370,9 +420,12 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
+    | '/tools/background-blur'
     | '/tools/base64'
     | '/tools/color-palette'
     | '/tools/extract-audio'
+    | '/tools/face-landmarks'
+    | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-filters'
@@ -382,12 +435,14 @@ export interface FileRouteTypes {
     | '/tools/json-formatter'
     | '/tools/markdown-to-html'
     | '/tools/merge-pdf'
+    | '/tools/object-detection'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
     | '/tools/screen-recorder'
+    | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
@@ -406,9 +461,12 @@ export interface FileRouteTypes {
     | '/terms'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
+    | '/tools/background-blur'
     | '/tools/base64'
     | '/tools/color-palette'
     | '/tools/extract-audio'
+    | '/tools/face-landmarks'
+    | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-filters'
@@ -418,12 +476,14 @@ export interface FileRouteTypes {
     | '/tools/json-formatter'
     | '/tools/markdown-to-html'
     | '/tools/merge-pdf'
+    | '/tools/object-detection'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
     | '/tools/screen-recorder'
+    | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
@@ -443,9 +503,12 @@ export interface RootRouteChildren {
   TermsRoute: typeof TermsRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
+  ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
+  ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
+  ToolsHandGestureRoute: typeof ToolsHandGestureRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
   ToolsImageFiltersRoute: typeof ToolsImageFiltersRoute
@@ -455,12 +518,14 @@ export interface RootRouteChildren {
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
+  ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
+  ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
@@ -572,6 +637,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsSpeechToTextRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/sentiment-analysis': {
+      id: '/tools/sentiment-analysis'
+      path: '/tools/sentiment-analysis'
+      fullPath: '/tools/sentiment-analysis'
+      preLoaderRoute: typeof ToolsSentimentAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/screen-recorder': {
       id: '/tools/screen-recorder'
       path: '/tools/screen-recorder'
@@ -612,6 +684,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/password-generator'
       fullPath: '/tools/password-generator'
       preLoaderRoute: typeof ToolsPasswordGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/object-detection': {
+      id: '/tools/object-detection'
+      path: '/tools/object-detection'
+      fullPath: '/tools/object-detection'
+      preLoaderRoute: typeof ToolsObjectDetectionRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/merge-pdf': {
@@ -677,6 +756,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsImageCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/hand-gesture': {
+      id: '/tools/hand-gesture'
+      path: '/tools/hand-gesture'
+      fullPath: '/tools/hand-gesture'
+      preLoaderRoute: typeof ToolsHandGestureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/face-landmarks': {
+      id: '/tools/face-landmarks'
+      path: '/tools/face-landmarks'
+      fullPath: '/tools/face-landmarks'
+      preLoaderRoute: typeof ToolsFaceLandmarksRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/extract-audio': {
       id: '/tools/extract-audio'
       path: '/tools/extract-audio'
@@ -696,6 +789,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/base64'
       fullPath: '/tools/base64'
       preLoaderRoute: typeof ToolsBase64RouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/background-blur': {
+      id: '/tools/background-blur'
+      path: '/tools/background-blur'
+      fullPath: '/tools/background-blur'
+      preLoaderRoute: typeof ToolsBackgroundBlurRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/audio-converter': {
@@ -723,9 +823,12 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
+  ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBase64Route: ToolsBase64Route,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
+  ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
+  ToolsHandGestureRoute: ToolsHandGestureRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
   ToolsImageFiltersRoute: ToolsImageFiltersRoute,
@@ -735,12 +838,14 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
+  ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
+  ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,

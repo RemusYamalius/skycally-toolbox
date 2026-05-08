@@ -1,6 +1,6 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain } from "lucide-react";
 
-export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio";
+export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai";
 
 export const categoryMeta: Record<ToolCategory, { label: string; color: string; icon: string }> = {
   video: { label: "Video Tools", color: "var(--cyan-brand)", icon: "🎬" },
@@ -8,6 +8,7 @@ export const categoryMeta: Record<ToolCategory, { label: string; color: string; 
   audio: { label: "Audio Tools", color: "var(--violet-brand)", icon: "🎙️" },
   pdf: { label: "PDF & Documents", color: "var(--orange-brand)", icon: "📄" },
   text: { label: "Text Tools", color: "var(--green-brand)", icon: "✍️" },
+  ai: { label: "AI Tools", color: "var(--violet-brand)", icon: "🤖" },
 };
 
 export interface Tool {
@@ -48,4 +49,9 @@ export const tools: Tool[] = [
   { slug: "audio-converter", name: "Audio Converter", description: "Convert audio files between MP3, WAV, OGG, AAC and FLAC instantly.", category: "audio", icon: Music, path: "/tools/audio-converter" },
   { slug: "video-compressor", name: "Video Compressor", description: "Reduce video file size without losing quality.", category: "video", icon: Video, path: "/tools/video-compressor" },
   { slug: "extract-audio", name: "Extract Audio from Video", description: "Extract MP3, AAC or WAV audio from any video file.", category: "video", icon: AudioLines, path: "/tools/extract-audio" },
+  { slug: "background-blur", name: "AI Background Blur", description: "Blur photo or webcam backgrounds in real time with AI.", category: "ai", icon: Aperture, path: "/tools/background-blur" },
+  { slug: "face-landmarks", name: "Face Landmarks", description: "Detect 468 facial landmarks on photos or live camera.", category: "ai", icon: ScanFace, path: "/tools/face-landmarks" },
+  { slug: "hand-gesture", name: "Hand Gesture Recognition", description: "Recognize hand gestures in real time from your webcam.", category: "ai", icon: Hand, path: "/tools/hand-gesture" },
+  { slug: "object-detection", name: "Object Detection", description: "Detect 80+ object classes in images or live video with COCO-SSD.", category: "ai", icon: Boxes, path: "/tools/object-detection" },
+  { slug: "sentiment-analysis", name: "AI Sentiment Analysis", description: "Analyze the sentiment of any text — positive, negative or neutral.", category: "ai", icon: Brain, path: "/tools/sentiment-analysis" },
 ];

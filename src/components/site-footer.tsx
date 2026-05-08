@@ -2,7 +2,7 @@ import { Link } from "@tanstack/react-router";
 
 import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
 
-const categoryOrder: ToolCategory[] = ["video", "image", "audio", "pdf", "text"];
+const categoryOrder: ToolCategory[] = ["ai", "video", "image", "audio", "pdf", "text"];
 
 export function SiteFooter() {
   return (

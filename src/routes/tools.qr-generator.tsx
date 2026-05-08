@@ -653,7 +653,7 @@ function QrGeneratorPage() {
                   <Upload className="w-4 h-4" /> Upload
                   <input
                     type="file"
-                    accept="image/png,image/jpeg,image/svg+xml"
+                    accept="image/*"
                     className="hidden"
                     onChange={(e) => e.target.files?.[0] && onUploadLogo(e.target.files[0])}
                   />

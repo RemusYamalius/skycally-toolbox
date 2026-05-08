@@ -178,6 +178,19 @@ function applyDotStyle(
   }
 }
 
+function luminance(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const toLinear = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
+  return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
+}
+function contrastRatio(hex1: string, hex2: string): number {
+  const l1 = luminance(hex1);
+  const l2 = luminance(hex2);
+  return (Math.max(l1, l2) + 0.05) / (Math.min(l1, l2) + 0.05);
+}
+
 function applyColorFill(
   canvas: HTMLCanvasElement,
   mode: ColorMode,
@@ -394,6 +407,13 @@ function QrGeneratorPage() {
     if (logo.kind === "upload") return logo.dataUrl;
     return "";
   }, [logo]);
+
+  const lowContrast = useMemo(() => {
+    const c1 = contrastRatio(color1, bg);
+    if (colorMode === "solid") return c1 < 3;
+    const c2 = contrastRatio(color2, bg);
+    return Math.min(c1, c2) < 3;
+  }, [color1, color2, bg, colorMode]);
 
   const render = useCallback(async () => {
     const canvas = previewRef.current;
@@ -631,6 +651,9 @@ function QrGeneratorPage() {
                       </div>
                     </div>
                   )}
+                  <p className="text-[11px] text-muted-foreground">
+                    💡 Tip: Keep contrast between QR color and background above 4:1 for reliable scanning.
+                  </p>
                 </div>
               )}
             </Section>
@@ -757,6 +780,11 @@ function QrGeneratorPage() {
                   />
                 </div>
               </div>
+              {content && lowContrast && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 text-center max-w-[300px]">
+                  ⚠️ Low contrast detected — QR code may not scan correctly. Try darker colors.
+                </p>
+              )}
               {!content && (
                 <p className="text-xs text-muted-foreground">Enter content to generate your QR code.</p>
               )}

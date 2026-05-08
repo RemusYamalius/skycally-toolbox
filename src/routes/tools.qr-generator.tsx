@@ -374,8 +374,8 @@ function QrGeneratorPage() {
   const [cta, setCta] = useState("SCAN ME");
 
   const previewRef = useRef<HTMLCanvasElement>(null);
-  const offscreenRef = useRef<HTMLCanvasElement>(document.createElement("canvas"));
-  const finalRef = useRef<HTMLCanvasElement>(document.createElement("canvas"));
+  const offscreenRef = useRef<HTMLCanvasElement | null>(null);
+  const finalRef = useRef<HTMLCanvasElement | null>(null);
   const [renderKey, setRenderKey] = useState(0);
 
   const content = useMemo(() => formatQRContent(type, forms[type]), [type, forms]);

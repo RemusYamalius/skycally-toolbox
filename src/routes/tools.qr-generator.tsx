@@ -104,69 +104,65 @@ function formatQRContent(type: QRType, d: any): string {
   }
 }
 
-function detectModuleSize(imageData: ImageData, size: number): number {
-  const data = imageData.data;
-  // Scan a row inside the top-left finder pattern
-  for (let y = 1; y < size; y++) {
-    let firstDark = -1;
-    for (let x = 0; x < size; x++) {
-      const idx = (y * size + x) * 4;
-      if (data[idx] < 128) {
-        firstDark = x;
-        break;
-      }
-    }
-    if (firstDark < 0) continue;
-    let count = 0;
-    for (let i = firstDark; i < size; i++) {
-      const idx = (y * size + i) * 4;
-      if (data[idx] < 128) count++;
-      else break;
-    }
-    // finder pattern outer dark band is 1 module wide on a corner
-    if (count >= 3) return Math.max(Math.round(count / 1), 4);
-  }
-  return 10;
+function hexToRgb(hex: string) {
+  const clean = hex.replace("#", "").slice(0, 6);
+  const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean.padEnd(6, "0");
+  const value = Number.parseInt(full, 16);
+  return { r: (value >> 16) & 255, g: (value >> 8) & 255, b: value & 255 };
 }
 
-function applyDotStyle(canvas: HTMLCanvasElement, style: DotStyle, fg: string, bg: string) {
+function applyDotStyle(
+  canvas: HTMLCanvasElement,
+  content: string,
+  style: DotStyle,
+  fg: string,
+  bg: string,
+  errorCorrectionLevel: "M" | "H",
+) {
   const ctx = canvas.getContext("2d")!;
   const size = canvas.width;
-  const imageData = ctx.getImageData(0, 0, size, size);
-  const data = imageData.data;
-  const moduleSize = detectModuleSize(imageData, size);
+  ctx.getImageData(0, 0, size, canvas.height);
+  const qr = QRCode.create(content, { errorCorrectionLevel });
+  const moduleCount = qr.modules.size;
+  const margin = 2;
+  const moduleSize = size / (moduleCount + margin * 2);
 
-  ctx.clearRect(0, 0, size, size);
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, size, size);
   ctx.fillStyle = fg;
 
-  // Sample at module centers to avoid edge bleed
-  const half = moduleSize / 2;
-  for (let y = 0; y < size; y += moduleSize) {
-    for (let x = 0; x < size; x += moduleSize) {
-      const sx = Math.min(size - 1, Math.floor(x + half));
-      const sy = Math.min(size - 1, Math.floor(y + half));
-      const idx = (sy * size + sx) * 4;
-      const isDark = data[idx] < 128;
-      if (!isDark) continue;
-      const cx = x + half;
-      const cy = y + half;
-      const r = half - 1;
+  for (let row = 0; row < moduleCount; row++) {
+    for (let col = 0; col < moduleCount; col++) {
+      if (!qr.modules.get(row, col)) continue;
+      const x = (col + margin) * moduleSize;
+      const y = (row + margin) * moduleSize;
+      const inset = style === "square" || style === "rounded" ? 0 : moduleSize * 0.12;
+      const w = moduleSize - inset * 2;
+      const h = moduleSize - inset * 2;
+      const px = x + inset;
+      const py = y + inset;
+      const radius = moduleSize * 0.35;
       ctx.beginPath();
       switch (style) {
         case "square":
-          ctx.rect(x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1);
+          ctx.rect(x, y, moduleSize + 0.2, moduleSize + 0.2);
           break;
         case "rounded":
-          (ctx as any).roundRect(x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1, r * 0.4);
+          ctx.roundRect(x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1, radius);
           break;
         case "dots":
-          ctx.arc(cx, cy, r * 0.85, 0, Math.PI * 2);
+          ctx.arc(x + moduleSize / 2, y + moduleSize / 2, moduleSize * 0.4, 0, Math.PI * 2);
           break;
         case "classy":
-          ctx.rect(x + 1, y + 1, moduleSize - 2, moduleSize - 2);
+          ctx.moveTo(px, py);
+          ctx.lineTo(px + w - radius, py);
+          ctx.quadraticCurveTo(px + w, py, px + w, py + radius);
+          ctx.lineTo(px + w, py + h);
+          ctx.lineTo(px, py + h);
+          ctx.closePath();
           break;
         case "classy-rounded":
-          (ctx as any).roundRect(x + 1, y + 1, moduleSize - 2, moduleSize - 2, r * 0.6);
+          ctx.roundRect(px, py, w, h, moduleSize * 0.18);
           break;
       }
       ctx.fill();

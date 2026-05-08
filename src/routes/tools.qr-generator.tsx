@@ -780,6 +780,11 @@ function QrGeneratorPage() {
                   />
                 </div>
               </div>
+              {content && lowContrast && (
+                <p className="text-xs text-amber-600 dark:text-amber-400 text-center max-w-[300px]">
+                  ⚠️ Low contrast detected — QR code may not scan correctly. Try darker colors.
+                </p>
+              )}
               {!content && (
                 <p className="text-xs text-muted-foreground">Enter content to generate your QR code.</p>
               )}

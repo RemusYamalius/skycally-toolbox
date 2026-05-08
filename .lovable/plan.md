@@ -1,101 +1,85 @@
-# Add 5 AI-Powered Tools (Browser-Only)
+# Add 6 Browser-Based Image Tools
 
-All 5 tools run 100% client-side via CDN-loaded models. No backend changes, no new dependencies in package.json — scripts are injected at runtime.
+All run client-side. Three tools need npm packages; three use only Canvas API.
 
-## 1. New "AI Tools" category
+## 1. Dependencies (one install)
 
-**`src/lib/tools.ts`**
-- Add `"ai"` to `ToolCategory` union.
-- Add `categoryMeta.ai` → `{ label: "AI Tools", color: "var(--violet-brand)", icon: "🤖" }`.
-- Append 5 tool entries:
-  - `background-blur` → `/tools/background-blur` (icon: `Aperture`)
-  - `face-landmarks` → `/tools/face-landmarks` (icon: `ScanFace`)
-  - `hand-gesture` → `/tools/hand-gesture` (icon: `Hand`)
-  - `object-detection` → `/tools/object-detection` (icon: `Boxes`)
-  - `sentiment-analysis` → `/tools/sentiment-analysis` (icon: `Brain`)
+```
+bun add cropperjs react-cropper fabric jspdf
+```
 
-**`src/routes/tools.index.tsx`** — add `"ai"` to `VALID_CATS`, the cats list, and the "all" view category order.
+## 2. Tool registry & navigation
 
-**`src/components/site-footer.tsx`** — add `"ai"` to `categoryOrder`.
+**`src/lib/tools.ts`** — append 6 entries to `tools[]`, all `category: "image"`:
+- `image-resizer` (Maximize2) → `/tools/image-resizer`
+- `image-cropper` (Crop) → `/tools/image-cropper`
+- `add-text-to-image` (Type) → `/tools/add-text-to-image`
+- `image-to-pdf` (FileImage) → `/tools/image-to-pdf`
+- `collage-maker` (LayoutGrid) → `/tools/collage-maker`
+- `meme-generator` (Laugh) → `/tools/meme-generator`
 
-## 2. Shared helpers
+No changes needed in `tools.index.tsx` or `site-footer.tsx` — both already iterate the `image` category from `tools[]`. Homepage grid (`src/routes/index.tsx`) likewise pulls from `tools.ts`, so the new entries appear automatically.
 
-**`src/lib/cdnScript.ts`** (new) — `loadScript(src: string): Promise<void>` that injects a `<script>` tag once, dedupes by src, resolves on `onload`. Used by all MediaPipe / TF.js tools.
+## 3. Route files (each follows existing pattern)
 
-**`src/components/ai-badges.tsx`** (new) — small components:
-- `<PoweredBy name="MediaPipe" />` — footer pill
-- `<BrowserOnlyBadge />` — "Works entirely in your browser — your data never leaves your device"
-- `<ModelLoadingSkeleton label="Loading AI model..." />`
-- `<CameraPermissionError />` — friendly denied-message card with retry
+Each route uses `createFileRoute` + `head()` meta + `<ToolPageShell>` + `<HowToUse>` 3-step block + `<AdZone>` comment marker `{/* ADSENSE_ZONE: image-tool-below-result 300x250 */}`. Toasts use `sonner`. Downloads use the `<a download>` pattern. TanStack auto code-splits each route — no manual `React.lazy` needed.
 
-## 3. The 5 route files
+### `tools.image-resizer.tsx`
+- Tabs/segmented control: "By Pixels" / "By Percentage".
+- Inputs: width/height with lock-aspect toggle; percentage slider 10–200%.
+- Format select (JPG/PNG/WEBP), quality slider (hidden for PNG).
+- Preset buttons: HD, Full HD, 4K, IG Square, IG Story, Twitter Header, FB Cover.
+- Live "before/after" size estimate via temp `canvas.toBlob`.
+- `resizeImage()` exactly per spec.
 
-Each follows the existing pattern: `createFileRoute` + `head()` meta + `ToolPageShell` wrapper + `HowToUse` 3-step block + an `AdZone` comment marker `{/* ADSENSE_ZONE: ai-tool-below-result 300x250 */}` + `<PoweredBy>` + `<BrowserOnlyBadge>`. Models load lazily inside `useEffect` on mount (per-route bundle is already split by TanStack auto code-splitting).
+### `tools.image-cropper.tsx`
+- `react-cropper` with theme overrides injected via `<style>` tag (cyan-brand outline).
+- Aspect-ratio buttons: Free / 1:1 / 4:3 / 16:9 / 3:4 / 9:16.
+- Rotate ±90°, flip H/V via cropper instance methods.
+- Live crop dims via `crop` event → `getData()`.
+- Format select; download via `getCroppedCanvas().toBlob()`.
 
-### `src/routes/tools.background-blur.tsx`
-- `Tabs`: "Upload Image" | "Live Camera".
-- Loads `selfie_segmentation.js` via `loadScript`.
-- Blur slider 5–30 (default 15).
-- Upload: drop image → run once → show canvas + Download PNG button.
-- Camera: `getUserMedia({ video: true })` → `Camera` utility from MediaPipe (also CDN: `camera_utils.js`) → continuous `send({image: video})`.
-- Compositing exactly as in the spec (destination-over blur, destination-in mask).
+### `tools.add-text-to-image.tsx`
+- Fabric.js canvas inside a sized container; image scales canvas to its dims.
+- Right sidebar: text input, font family select (Arial/Georgia/Impact/Courier/Verdana/Comic Sans/Roboto/Montserrat), size slider 12–200, fill color, bg color + opacity, B/I/U toggles, alignment, shadow toggle, stroke (color + width).
+- "Add Text" → `fabric.IText` with originX/Y center.
+- Layer list (sidebar) with delete button; sync on `selection:created/updated/cleared`.
+- Download via `canvas.toDataURL({ format: 'png' })`.
+- Lazy-import `fabric` inside `useEffect` to keep initial bundle slim.
 
-### `src/routes/tools.face-landmarks.tsx`
-- Loads `face_mesh.js` (+ `drawing_utils.js` for connections).
-- Image upload + camera tabs.
-- Toggles: show landmark dots / show connections (FACEMESH_TESSELATION) / show mesh overlay.
-- Info cards: face count, "468 landmarks" stat.
-- Download annotated PNG.
+### `tools.image-to-pdf.tsx`
+- Multi-file drop zone; thumbnail list with HTML5 drag handles to reorder (no extra lib — native `draggable`).
+- Page size (A4/A3/Letter/Custom with mm inputs), orientation, margin slider 0–30mm, fit mode (fit/fill/original), filename input.
+- "Convert to PDF" runs `imagesToPdf()` per spec; show page-count preview = file count.
 
-### `src/routes/tools.hand-gesture.tsx`
-- Camera-only.
-- Loads `hands.js` + `drawing_utils.js`.
-- Draw skeleton (HAND_CONNECTIONS) + dots.
-- `detectGesture(landmarks)` exactly as in spec → large badge with emoji + label.
-- Show hand count and FPS counter (rolling avg of last 30 frames).
+### `tools.collage-maker.tsx`
+- Upload zone (2–9 images).
+- Layout selector — visual SVG grid previews per count (2/3/4/6/9 with the variants in the spec). Each layout = array of `{x,y,w,h}` fractional cells.
+- Canvas-size preset buttons (Square 1080 / Landscape 1920×1080 / Portrait 1080×1920).
+- Sliders: gap 0–30, border radius 0–30; bg color picker.
+- Drag-to-cell reordering of uploaded photos.
+- `generateCollage()` per spec → PNG download.
 
-### `src/routes/tools.object-detection.tsx`
-- Loads `tf.min.js` then `coco-ssd.min.js`.
-- Tabs: Upload | Camera.
-- `model.detect()` → draw color-coded boxes (hash class name → HSL).
-- Sidebar list: each detection with confidence bar.
-- Stats: total detections, unique classes.
-- Loading copy: "Loading COCO-SSD model (~5MB)..."
+### `tools.meme-generator.tsx`
+- Step 1: 12 imgflip template thumbnails grid + "Upload your own" tile.
+- Step 2: top/bottom inputs, font-size slider 24–80, text color, outline color, outline width 1–8, ALL CAPS toggle (default on), font select (Impact/Arial/Oswald).
+- Step 3: live `<canvas>` preview re-renders on every change; Download PNG; Share button shown only when `navigator.share` exists.
+- All `<img>` use `crossOrigin="anonymous"` for clean canvas export. If imgflip blocks CORS at runtime, fall back to a friendly toast suggesting "Upload your own image".
 
-### `src/routes/tools.sentiment-analysis.tsx`
-- Uses Transformers.js loaded via dynamic ESM import:
-  `await import(/* @vite-ignore */ 'https://cdn.jsdelivr.net/npm/@xenova/transformers@2.17.1/dist/transformers.min.js')`
-  cached in a module-level promise.
-- Textarea (max 1000 chars, live counter), Analyze button.
-- Result card: emoji + label + animated progress bar, color-coded (green/red/gray).
-- Batch mode: textarea, one text per line → list of results.
-- History: last 5 analyses kept in component state.
-- One-time notice: "⚡ First analysis takes ~15 seconds to load the AI model. Subsequent analyses are instant."
+## 4. Shared bits already present
+- `<ToolPageShell>`, `<HowToUse>`, `<AdZone>`, `<DropZone>`, `sonner` toast — reuse as-is.
+- "No files stored" badge already inside `ToolPageShell`.
 
-## 4. Mobile / responsive
+## 5. Files
 
-Camera-tab layouts use `aspect-[3/4] sm:aspect-video` so phones get portrait framing. Controls stack vertically below `sm`.
+**Created (6):** `src/routes/tools.image-resizer.tsx`, `tools.image-cropper.tsx`, `tools.add-text-to-image.tsx`, `tools.image-to-pdf.tsx`, `tools.collage-maker.tsx`, `tools.meme-generator.tsx`.
 
-## 5. Window typings
+**Edited (1):** `src/lib/tools.ts` (append 6 entries + 6 lucide icon imports).
 
-Add `src/types/global.d.ts` (new) declaring `interface Window { SelfieSegmentation: any; FaceMesh: any; Hands: any; Camera: any; cocoSsd: any; tf: any; drawConnectors: any; drawLandmarks: any; FACEMESH_TESSELATION: any; HAND_CONNECTIONS: any; }` to keep TS happy without pulling npm packages.
+**Auto-regenerated:** `src/routeTree.gen.ts`.
 
-## Files created
-- `src/lib/cdnScript.ts`
-- `src/components/ai-badges.tsx`
-- `src/types/global.d.ts`
-- `src/routes/tools.background-blur.tsx`
-- `src/routes/tools.face-landmarks.tsx`
-- `src/routes/tools.hand-gesture.tsx`
-- `src/routes/tools.object-detection.tsx`
-- `src/routes/tools.sentiment-analysis.tsx`
-
-## Files edited
-- `src/lib/tools.ts` (add category + 5 tools)
-- `src/routes/tools.index.tsx` (add "ai" to filter)
-- `src/components/site-footer.tsx` (add "ai" to footer column order)
-
-## Notes / caveats
-- No npm installs — everything via CDN. Offline preview won't load models.
-- TanStack Start auto code-splits route components, so React.lazy isn't needed; each tool's heavy logic only loads when the user visits its route.
-- CDN scripts run only in the browser (inside `useEffect`), so SSR won't try to evaluate them.
+## Notes
+- `fabric` and `jspdf` work in browsers fine; only loaded inside the route components, so SSR is unaffected.
+- `cropperjs` CSS imported at the top of the cropper route — Vite handles it.
+- All 6 tools are mobile-responsive: control panels stack below `md` via Tailwind grid.
+- No backend, no env vars, no Cloud changes.

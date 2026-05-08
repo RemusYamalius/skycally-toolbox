@@ -469,7 +469,7 @@ function QrGeneratorPage() {
 
   const copyImage = () => {
     const c = finalRef.current;
-    if (!c.width) return;
+    if (!c || !c.width) return;
     c.toBlob(async (blob) => {
       if (!blob) return;
       try {

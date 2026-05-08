@@ -121,7 +121,9 @@ function applyDotStyle(
 ) {
   const ctx = canvas.getContext("2d")!;
   const size = canvas.width;
-  ctx.getImageData(0, 0, size, canvas.height);
+  const imageData = ctx.getImageData(0, 0, size, canvas.height);
+  const data = imageData.data;
+  const bgRgb = hexToRgb(bg);
   const qr = QRCode.create(content, { errorCorrectionLevel });
   const moduleCount = qr.modules.size;
   const margin = 2;
@@ -133,9 +135,15 @@ function applyDotStyle(
 
   for (let row = 0; row < moduleCount; row++) {
     for (let col = 0; col < moduleCount; col++) {
-      if (!qr.modules.get(row, col)) continue;
       const x = (col + margin) * moduleSize;
       const y = (row + margin) * moduleSize;
+      const sx = Math.min(size - 1, Math.floor(x + moduleSize / 2));
+      const sy = Math.min(size - 1, Math.floor(y + moduleSize / 2));
+      const idx = (sy * size + sx) * 4;
+      const isDark =
+        data[idx + 3] > 0 &&
+        Math.abs(data[idx] - bgRgb.r) + Math.abs(data[idx + 1] - bgRgb.g) + Math.abs(data[idx + 2] - bgRgb.b) > 24;
+      if (!isDark) continue;
       const inset = style === "square" || style === "rounded" ? 0 : moduleSize * 0.12;
       const w = moduleSize - inset * 2;
       const h = moduleSize - inset * 2;

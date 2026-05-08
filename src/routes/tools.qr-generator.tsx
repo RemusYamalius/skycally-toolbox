@@ -456,6 +456,7 @@ function QrGeneratorPage() {
         downloadBlob(new Blob([svg], { type: "image/svg+xml" }), "qrcode.svg");
       } else {
         const c = finalRef.current;
+        if (!c) return;
         const dataUrl = c.toDataURL("image/png");
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${c.width}" height="${c.height}" viewBox="0 0 ${c.width} ${c.height}"><image href="${dataUrl}" width="${c.width}" height="${c.height}"/></svg>`;
         downloadBlob(new Blob([svg], { type: "image/svg+xml" }), "qrcode.svg");

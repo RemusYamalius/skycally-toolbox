@@ -395,18 +395,30 @@ function QrGeneratorPage() {
   const render = useCallback(async () => {
     const canvas = previewRef.current;
     if (!canvas || !content) return;
+    const errorCorrectionLevel = logo.kind !== "none" ? "H" : "M";
     try {
       await QRCode.toCanvas(canvas, content, {
         width: 300,
         margin: 2,
-        errorCorrectionLevel: logo.kind !== "none" ? "H" : "M",
+        errorCorrectionLevel,
         color: { dark: color1, light: bg },
       });
+      applyDotStyle(canvas, content, dotStyle, color1, bg, errorCorrectionLevel);
+      applyColorFill(canvas, colorMode, color1, color2, gradientType, angle, bg);
+      if (logoSrc) {
+        await drawLogo(canvas, logoSrc, logoSize);
+      }
+      const framed = drawFrame(canvas, frameStyle, cta, frameColor, frameTextColor, bg);
+      if (framed !== canvas) {
+        canvas.width = framed.width;
+        canvas.height = framed.height;
+        canvas.getContext("2d")?.drawImage(framed, 0, 0);
+      }
       finalRef.current = canvas;
     } catch (err) {
       console.error(err);
     }
-  }, [content, color1, bg, logo.kind]);
+  }, [content, logo.kind, color1, bg, dotStyle, colorMode, color2, gradientType, angle, logoSrc, logoSize, frameStyle, cta, frameColor, frameTextColor]);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {

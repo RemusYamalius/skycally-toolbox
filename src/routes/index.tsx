@@ -19,6 +19,7 @@ export const Route = createFileRoute("/")({
 });
 
 const quickAccess = [
+  { icon: Sparkles, label: "AI Tools", cat: "ai" as const, color: categoryMeta.ai.color },
   { icon: Video, label: "Video Tools", cat: "video" as const, color: categoryMeta.video.color },
   { icon: ImageIcon, label: "Image Tools", cat: "image" as const, color: categoryMeta.image.color },
   { icon: Music, label: "Audio Tools", cat: "audio" as const, color: categoryMeta.audio.color },
@@ -27,6 +28,7 @@ const quickAccess = [
 ];
 
 const categoryTaglines: Record<ToolCategory, string> = {
+  ai: "Run AI models — background blur, face mesh, object detection — in your browser.",
   video: "Download, convert, compress and record videos in seconds.",
   image: "Convert, compress, upscale and edit images instantly.",
   audio: "Convert, transcribe and synthesize audio fast.",

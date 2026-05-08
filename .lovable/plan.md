@@ -1,85 +1,31 @@
-# Add 6 Browser-Based Image Tools
+## Fix: Add Text to Image — replace Fabric.js with pure Canvas API
 
-All run client-side. Three tools need npm packages; three use only Canvas API.
+The current Fabric.js v7 implementation fails to render the canvas after upload. Replace it with a pure Canvas API approach (no external library) that supports draggable text layers, selection, and PNG export.
 
-## 1. Dependencies (one install)
+### Single file change
 
-```
-bun add cropperjs react-cropper fabric jspdf
-```
+**`src/routes/tools.add-text-to-image.tsx`** — full rewrite, keeping the project's route conventions (do not paste the user's standalone component verbatim, since it duplicates back-link, page title, and uses raw Tailwind hex classes that bypass the design system).
 
-## 2. Tool registry & navigation
+Adapt the user's pure-Canvas component as follows:
 
-**`src/lib/tools.ts`** — append 6 entries to `tools[]`, all `category: "image"`:
-- `image-resizer` (Maximize2) → `/tools/image-resizer`
-- `image-cropper` (Crop) → `/tools/image-cropper`
-- `add-text-to-image` (Type) → `/tools/add-text-to-image`
-- `image-to-pdf` (FileImage) → `/tools/image-to-pdf`
-- `collage-maker` (LayoutGrid) → `/tools/collage-maker`
-- `meme-generator` (Laugh) → `/tools/meme-generator`
+- Keep `createFileRoute("/tools/add-text-to-image")` + existing `head()` meta block.
+- Wrap content in `<ToolPageShell title="Add Text to Image" description="…">` (provides back-link, H1, "no files stored" badge — so drop the user's manual versions of those).
+- Use the existing `<DropZone accept="image/*" onFiles={…} label="Drop an image to start" hint="PNG, JPG or WEBP" />` for the empty state instead of the raw drop div.
+- Keep `<AdZone id="image-tool-below-result" size="300x250" />` and `<HowToUse steps={[…]} />` at the bottom.
+- Replace hard-coded hex colors (`#0a0f1e`, `#0d1526`, `#1e2d4a`, `cyan-500`, `from-cyan-500 to-blue-600`) with semantic tokens already used elsewhere: `bg-card`, `border-border`, `bg-background`, `text-muted-foreground`, `bg-[var(--cyan-brand)] text-background` for the primary action, `bg-foreground text-background` for the download button — matching the existing add-text-to-image and other tool routes.
+- Use `toast.success("✅ Download started!")` from `sonner` on download (matches plan convention).
+- Use `<a download>` pattern for export (already in the snippet).
 
-No changes needed in `tools.index.tsx` or `site-footer.tsx` — both already iterate the `image` category from `tools[]`. Homepage grid (`src/routes/index.tsx`) likewise pulls from `tools.ts`, so the new entries appear automatically.
+### Logic preserved from the user's snippet
 
-## 3. Route files (each follows existing pattern)
+- `TextLayer` interface and state (text, x, y, font, color, bold/italic, shadow, outline + width).
+- `draw()` redraws image + each layer with shadow/outline/fill, plus dashed cyan selection rect.
+- Mouse handlers: `onMouseDown` hit-tests via `ctx.measureText`, starts drag with offset; `onMouseMove` updates layer position; `onMouseUp` clears dragging.
+- `getCanvasCoords` accounts for CSS-vs-canvas scale (`canvas.width / rect.width`), so dragging stays accurate when the canvas is rendered at `width: 100%`.
+- "Add Text Layer" creates a new layer centered on canvas; "Edit Selected" panel updates the active layer; "Delete" removes it; layer list lets users reselect.
+- Download uses `canvas.toDataURL("image/png")`.
 
-Each route uses `createFileRoute` + `head()` meta + `<ToolPageShell>` + `<HowToUse>` 3-step block + `<AdZone>` comment marker `{/* ADSENSE_ZONE: image-tool-below-result 300x250 */}`. Toasts use `sonner`. Downloads use the `<a download>` pattern. TanStack auto code-splits each route — no manual `React.lazy` needed.
+### Notes
 
-### `tools.image-resizer.tsx`
-- Tabs/segmented control: "By Pixels" / "By Percentage".
-- Inputs: width/height with lock-aspect toggle; percentage slider 10–200%.
-- Format select (JPG/PNG/WEBP), quality slider (hidden for PNG).
-- Preset buttons: HD, Full HD, 4K, IG Square, IG Story, Twitter Header, FB Cover.
-- Live "before/after" size estimate via temp `canvas.toBlob`.
-- `resizeImage()` exactly per spec.
-
-### `tools.image-cropper.tsx`
-- `react-cropper` with theme overrides injected via `<style>` tag (cyan-brand outline).
-- Aspect-ratio buttons: Free / 1:1 / 4:3 / 16:9 / 3:4 / 9:16.
-- Rotate ±90°, flip H/V via cropper instance methods.
-- Live crop dims via `crop` event → `getData()`.
-- Format select; download via `getCroppedCanvas().toBlob()`.
-
-### `tools.add-text-to-image.tsx`
-- Fabric.js canvas inside a sized container; image scales canvas to its dims.
-- Right sidebar: text input, font family select (Arial/Georgia/Impact/Courier/Verdana/Comic Sans/Roboto/Montserrat), size slider 12–200, fill color, bg color + opacity, B/I/U toggles, alignment, shadow toggle, stroke (color + width).
-- "Add Text" → `fabric.IText` with originX/Y center.
-- Layer list (sidebar) with delete button; sync on `selection:created/updated/cleared`.
-- Download via `canvas.toDataURL({ format: 'png' })`.
-- Lazy-import `fabric` inside `useEffect` to keep initial bundle slim.
-
-### `tools.image-to-pdf.tsx`
-- Multi-file drop zone; thumbnail list with HTML5 drag handles to reorder (no extra lib — native `draggable`).
-- Page size (A4/A3/Letter/Custom with mm inputs), orientation, margin slider 0–30mm, fit mode (fit/fill/original), filename input.
-- "Convert to PDF" runs `imagesToPdf()` per spec; show page-count preview = file count.
-
-### `tools.collage-maker.tsx`
-- Upload zone (2–9 images).
-- Layout selector — visual SVG grid previews per count (2/3/4/6/9 with the variants in the spec). Each layout = array of `{x,y,w,h}` fractional cells.
-- Canvas-size preset buttons (Square 1080 / Landscape 1920×1080 / Portrait 1080×1920).
-- Sliders: gap 0–30, border radius 0–30; bg color picker.
-- Drag-to-cell reordering of uploaded photos.
-- `generateCollage()` per spec → PNG download.
-
-### `tools.meme-generator.tsx`
-- Step 1: 12 imgflip template thumbnails grid + "Upload your own" tile.
-- Step 2: top/bottom inputs, font-size slider 24–80, text color, outline color, outline width 1–8, ALL CAPS toggle (default on), font select (Impact/Arial/Oswald).
-- Step 3: live `<canvas>` preview re-renders on every change; Download PNG; Share button shown only when `navigator.share` exists.
-- All `<img>` use `crossOrigin="anonymous"` for clean canvas export. If imgflip blocks CORS at runtime, fall back to a friendly toast suggesting "Upload your own image".
-
-## 4. Shared bits already present
-- `<ToolPageShell>`, `<HowToUse>`, `<AdZone>`, `<DropZone>`, `sonner` toast — reuse as-is.
-- "No files stored" badge already inside `ToolPageShell`.
-
-## 5. Files
-
-**Created (6):** `src/routes/tools.image-resizer.tsx`, `tools.image-cropper.tsx`, `tools.add-text-to-image.tsx`, `tools.image-to-pdf.tsx`, `tools.collage-maker.tsx`, `tools.meme-generator.tsx`.
-
-**Edited (1):** `src/lib/tools.ts` (append 6 entries + 6 lucide icon imports).
-
-**Auto-regenerated:** `src/routeTree.gen.ts`.
-
-## Notes
-- `fabric` and `jspdf` work in browsers fine; only loaded inside the route components, so SSR is unaffected.
-- `cropperjs` CSS imported at the top of the cropper route — Vite handles it.
-- All 6 tools are mobile-responsive: control panels stack below `md` via Tailwind grid.
-- No backend, no env vars, no Cloud changes.
+- Removes runtime dependency on `fabric` for this route. The package stays in `package.json` (no other route uses it currently, but leaving it avoids a separate uninstall step — can be removed later if desired).
+- No new files, no new deps, no backend changes.

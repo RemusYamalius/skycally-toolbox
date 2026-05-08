@@ -1,13 +1,34 @@
+import { useEffect, useRef } from "react";
 import { Link } from "@tanstack/react-router";
+import QRCode from "qrcode";
 
 import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
 
 const categoryOrder: ToolCategory[] = ["ai", "video", "image", "audio", "pdf", "text"];
 
+function FooterQR() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+
+  useEffect(() => {
+    if (canvasRef.current) {
+      QRCode.toCanvas(canvasRef.current, "https://skycally.com", {
+        width: 100,
+        margin: 1,
+        color: {
+          dark: "#22d3ee",
+          light: "#0a0f1e",
+        },
+      });
+    }
+  }, []);
+
+  return <canvas ref={canvasRef} className="rounded-lg" />;
+}
+
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border bg-secondary/30">
-      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid gap-10 md:grid-cols-3">
+      <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid gap-10 md:grid-cols-4">
         <div>
           <Link to="/" className="flex items-center">
             <img src="/logo.png" alt="Skycally" style={{ height: "30px", width: "auto" }} />

@@ -651,6 +651,9 @@ function QrGeneratorPage() {
                       </div>
                     </div>
                   )}
+                  <p className="text-[11px] text-muted-foreground">
+                    💡 Tip: Keep contrast between QR color and background above 4:1 for reliable scanning.
+                  </p>
                 </div>
               )}
             </Section>

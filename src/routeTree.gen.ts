@@ -32,22 +32,28 @@ import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-te
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
+import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
 import { Route as ToolsImageToSketchRouteImport } from './routes/tools.image-to-sketch'
+import { Route as ToolsImageToPdfRouteImport } from './routes/tools.image-to-pdf'
+import { Route as ToolsImageResizerRouteImport } from './routes/tools.image-resizer'
 import { Route as ToolsImageFiltersRouteImport } from './routes/tools.image-filters'
+import { Route as ToolsImageCropperRouteImport } from './routes/tools.image-cropper'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
+import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
+import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text-to-image'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -164,6 +170,11 @@ const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
   path: '/tools/merge-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMemeGeneratorRoute = ToolsMemeGeneratorRouteImport.update({
+  id: '/tools/meme-generator',
+  path: '/tools/meme-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsMarkdownToHtmlRoute = ToolsMarkdownToHtmlRouteImport.update({
   id: '/tools/markdown-to-html',
   path: '/tools/markdown-to-html',
@@ -189,9 +200,24 @@ const ToolsImageToSketchRoute = ToolsImageToSketchRouteImport.update({
   path: '/tools/image-to-sketch',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsImageToPdfRoute = ToolsImageToPdfRouteImport.update({
+  id: '/tools/image-to-pdf',
+  path: '/tools/image-to-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsImageResizerRoute = ToolsImageResizerRouteImport.update({
+  id: '/tools/image-resizer',
+  path: '/tools/image-resizer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsImageFiltersRoute = ToolsImageFiltersRouteImport.update({
   id: '/tools/image-filters',
   path: '/tools/image-filters',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsImageCropperRoute = ToolsImageCropperRouteImport.update({
+  id: '/tools/image-cropper',
+  path: '/tools/image-cropper',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsImageConverterRoute = ToolsImageConverterRouteImport.update({
@@ -224,6 +250,11 @@ const ToolsColorPaletteRoute = ToolsColorPaletteRouteImport.update({
   path: '/tools/color-palette',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsCollageMakerRoute = ToolsCollageMakerRouteImport.update({
+  id: '/tools/collage-maker',
+  path: '/tools/collage-maker',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsBase64Route = ToolsBase64RouteImport.update({
   id: '/tools/base64',
   path: '/tools/base64',
@@ -244,6 +275,11 @@ const ToolsAddWatermarkRoute = ToolsAddWatermarkRouteImport.update({
   path: '/tools/add-watermark',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAddTextToImageRoute = ToolsAddTextToImageRouteImport.update({
+  id: '/tools/add-text-to-image',
+  path: '/tools/add-text-to-image',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -251,22 +287,28 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/image-cropper': typeof ToolsImageCropperRoute
   '/tools/image-filters': typeof ToolsImageFiltersRoute
+  '/tools/image-resizer': typeof ToolsImageResizerRoute
+  '/tools/image-to-pdf': typeof ToolsImageToPdfRoute
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
+  '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -292,22 +334,28 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/image-cropper': typeof ToolsImageCropperRoute
   '/tools/image-filters': typeof ToolsImageFiltersRoute
+  '/tools/image-resizer': typeof ToolsImageResizerRoute
+  '/tools/image-to-pdf': typeof ToolsImageToPdfRoute
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
+  '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -334,22 +382,28 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
+  '/tools/image-cropper': typeof ToolsImageCropperRoute
   '/tools/image-filters': typeof ToolsImageFiltersRoute
+  '/tools/image-resizer': typeof ToolsImageResizerRoute
+  '/tools/image-to-pdf': typeof ToolsImageToPdfRoute
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
+  '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -377,22 +431,28 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
+    | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
+    | '/tools/image-cropper'
     | '/tools/image-filters'
+    | '/tools/image-resizer'
+    | '/tools/image-to-pdf'
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
     | '/tools/markdown-to-html'
+    | '/tools/meme-generator'
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
@@ -418,22 +478,28 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
+    | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
+    | '/tools/image-cropper'
     | '/tools/image-filters'
+    | '/tools/image-resizer'
+    | '/tools/image-to-pdf'
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
     | '/tools/markdown-to-html'
+    | '/tools/meme-generator'
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
@@ -459,22 +525,28 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
+    | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
+    | '/tools/image-cropper'
     | '/tools/image-filters'
+    | '/tools/image-resizer'
+    | '/tools/image-to-pdf'
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
     | '/tools/markdown-to-html'
+    | '/tools/meme-generator'
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
@@ -501,22 +573,28 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBase64Route: typeof ToolsBase64Route
+  ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
+  ToolsImageCropperRoute: typeof ToolsImageCropperRoute
   ToolsImageFiltersRoute: typeof ToolsImageFiltersRoute
+  ToolsImageResizerRoute: typeof ToolsImageResizerRoute
+  ToolsImageToPdfRoute: typeof ToolsImageToPdfRoute
   ToolsImageToSketchRoute: typeof ToolsImageToSketchRoute
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
+  ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
@@ -700,6 +778,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMergePdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/meme-generator': {
+      id: '/tools/meme-generator'
+      path: '/tools/meme-generator'
+      fullPath: '/tools/meme-generator'
+      preLoaderRoute: typeof ToolsMemeGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/markdown-to-html': {
       id: '/tools/markdown-to-html'
       path: '/tools/markdown-to-html'
@@ -735,11 +820,32 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsImageToSketchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/image-to-pdf': {
+      id: '/tools/image-to-pdf'
+      path: '/tools/image-to-pdf'
+      fullPath: '/tools/image-to-pdf'
+      preLoaderRoute: typeof ToolsImageToPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/image-resizer': {
+      id: '/tools/image-resizer'
+      path: '/tools/image-resizer'
+      fullPath: '/tools/image-resizer'
+      preLoaderRoute: typeof ToolsImageResizerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/image-filters': {
       id: '/tools/image-filters'
       path: '/tools/image-filters'
       fullPath: '/tools/image-filters'
       preLoaderRoute: typeof ToolsImageFiltersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/image-cropper': {
+      id: '/tools/image-cropper'
+      path: '/tools/image-cropper'
+      fullPath: '/tools/image-cropper'
+      preLoaderRoute: typeof ToolsImageCropperRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/image-converter': {
@@ -784,6 +890,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsColorPaletteRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/collage-maker': {
+      id: '/tools/collage-maker'
+      path: '/tools/collage-maker'
+      fullPath: '/tools/collage-maker'
+      preLoaderRoute: typeof ToolsCollageMakerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/base64': {
       id: '/tools/base64'
       path: '/tools/base64'
@@ -812,6 +925,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAddWatermarkRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/add-text-to-image': {
+      id: '/tools/add-text-to-image'
+      path: '/tools/add-text-to-image'
+      fullPath: '/tools/add-text-to-image'
+      preLoaderRoute: typeof ToolsAddTextToImageRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -821,22 +941,28 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBase64Route: ToolsBase64Route,
+  ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
+  ToolsImageCropperRoute: ToolsImageCropperRoute,
   ToolsImageFiltersRoute: ToolsImageFiltersRoute,
+  ToolsImageResizerRoute: ToolsImageResizerRoute,
+  ToolsImageToPdfRoute: ToolsImageToPdfRoute,
   ToolsImageToSketchRoute: ToolsImageToSketchRoute,
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
+  ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,

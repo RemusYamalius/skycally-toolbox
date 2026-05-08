@@ -65,14 +65,14 @@ function AddTextToImage() {
       canvas.on("selection:cleared", () => setActiveId(null));
       setReady(true);
     })();
-    return () => { canceled = true; fabricRef.current?.canvas?.dispose(); };
+    return () => { canceled = true; try { fabricRef.current?.canvas?.dispose(); } catch {/* ignore */} };
   }, []);
 
   const onFiles = (files: File[]) => {
     const f = files[0];
     if (!f || !f.type.startsWith("image/") || !fabricRef.current) return;
     const url = URL.createObjectURL(f);
-    const img = new Image();
+    const img = new window.Image();
     img.onload = () => {
       const { fabric, canvas } = fabricRef.current;
       const maxW = 900;
@@ -81,7 +81,7 @@ function AddTextToImage() {
       const h = img.naturalHeight * scale;
       canvas.setWidth(w);
       canvas.setHeight(h);
-      const fImg = new fabric.Image(img, { selectable: false, evented: false, scaleX: scale, scaleY: scale });
+      const fImg = new fabric.FabricImage(img, { selectable: false, evented: false, scaleX: scale, scaleY: scale });
       canvas.backgroundImage = fImg;
       canvas.renderAll();
       setHasImage(true);

@@ -433,7 +433,7 @@ function QrGeneratorPage() {
 
   const downloadPng = () => {
     const c = finalRef.current;
-    if (!c.width) return;
+    if (!c || !c.width) return;
     c.toBlob((blob) => {
       if (blob) {
         downloadBlob(blob, "qrcode.png");

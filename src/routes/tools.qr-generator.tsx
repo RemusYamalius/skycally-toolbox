@@ -191,59 +191,54 @@ function applyColorFill(
   const size = canvas.width;
   if (mode === "solid") return;
 
-  const maskCanvas = document.createElement("canvas");
-  maskCanvas.width = size;
-  maskCanvas.height = size;
-  const mctx = maskCanvas.getContext("2d")!;
-  const pixels = ctx.getImageData(0, 0, size, size);
-  const mask = mctx.createImageData(size, size);
+  // Build gradient
+  let grad: CanvasGradient;
+  if (gType === "radial") {
+    grad = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
+  } else {
+    const a = (angleDeg * Math.PI) / 180;
+    const cx = size / 2;
+    const cy = size / 2;
+    const x1 = cx - (Math.cos(a) * size) / 2;
+    const y1 = cy - (Math.sin(a) * size) / 2;
+    const x2 = cx + (Math.cos(a) * size) / 2;
+    const y2 = cy + (Math.sin(a) * size) / 2;
+    grad = ctx.createLinearGradient(x1, y1, x2, y2);
+  }
+  grad.addColorStop(0, color1);
+  grad.addColorStop(1, color2);
+
+  // Temp canvas: copy current QR, then mask gradient to dark modules only
+  const tempCanvas = document.createElement("canvas");
+  tempCanvas.width = size;
+  tempCanvas.height = size;
+  const tempCtx = tempCanvas.getContext("2d")!;
+  tempCtx.drawImage(canvas, 0, 0);
+
+  // Replace dark/light pixels: keep only dark modules as opaque mask
+  const imgData = tempCtx.getImageData(0, 0, size, size);
   const bgRgb = hexToRgb(bg);
-  for (let i = 0; i < pixels.data.length; i += 4) {
-    const dr = Math.abs(pixels.data[i] - bgRgb.r);
-    const dg = Math.abs(pixels.data[i + 1] - bgRgb.g);
-    const db = Math.abs(pixels.data[i + 2] - bgRgb.b);
-    const alpha = pixels.data[i + 3];
-    if (alpha > 0 && dr + dg + db > 24) {
-      mask.data[i] = 0;
-      mask.data[i + 1] = 0;
-      mask.data[i + 2] = 0;
-      mask.data[i + 3] = alpha;
+  for (let i = 0; i < imgData.data.length; i += 4) {
+    const dr = Math.abs(imgData.data[i] - bgRgb.r);
+    const dg = Math.abs(imgData.data[i + 1] - bgRgb.g);
+    const db = Math.abs(imgData.data[i + 2] - bgRgb.b);
+    const alpha = imgData.data[i + 3];
+    if (!(alpha > 0 && dr + dg + db > 24)) {
+      imgData.data[i + 3] = 0;
     }
   }
-  mctx.putImageData(mask, 0, 0);
+  tempCtx.putImageData(imgData, 0, 0);
 
+  // Paint gradient only where mask is opaque
+  tempCtx.globalCompositeOperation = "source-in";
+  tempCtx.fillStyle = grad;
+  tempCtx.fillRect(0, 0, size, size);
+
+  // Redraw: bg + gradient-colored modules
+  ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, size, size);
-
-  let fill: string | CanvasGradient;
-  if (gType === "linear") {
-    const a = (angleDeg * Math.PI) / 180;
-    const cx = size / 2,
-      cy = size / 2;
-    const g = ctx.createLinearGradient(
-      cx - (Math.cos(a) * size) / 2,
-      cy - (Math.sin(a) * size) / 2,
-      cx + (Math.cos(a) * size) / 2,
-      cy + (Math.sin(a) * size) / 2,
-    );
-    g.addColorStop(0, color1);
-    g.addColorStop(1, color2);
-    fill = g;
-  } else {
-    const g = ctx.createRadialGradient(size / 2, size / 2, 0, size / 2, size / 2, size / 2);
-    g.addColorStop(0, color1);
-    g.addColorStop(1, color2);
-    fill = g;
-  }
-
-  ctx.drawImage(maskCanvas, 0, 0);
-  ctx.globalCompositeOperation = "source-in";
-  ctx.fillStyle = fill;
-  ctx.fillRect(0, 0, size, size);
-  ctx.globalCompositeOperation = "destination-over";
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, size, size);
-  ctx.globalCompositeOperation = "source-over";
+  ctx.drawImage(tempCanvas, 0, 0);
 }
 
 async function drawLogo(canvas: HTMLCanvasElement, src: string, sizeRatio: number) {

@@ -145,7 +145,8 @@ function AddTextToImage() {
           <DropZone accept="image/*" onFiles={onFiles} label="Drop an image to start" hint="PNG, JPG or WEBP" />
         </div>
       )}
-      <div className="grid gap-6 lg:grid-cols-[1fr_320px]" style={{ display: hasImage ? undefined : (ready ? "none" : "none") }}>
+      <div className="grid gap-6 lg:grid-cols-[1fr_320px]" style={{ display: hasImage ? undefined : "none" }} aria-hidden={!hasImage}>
+        {!ready && hasImage && <p className="text-sm text-muted-foreground">Loading editor…</p>}
         <div className="rounded-2xl border border-border bg-card p-3 overflow-auto">
           <canvas ref={canvasElRef} />
         </div>

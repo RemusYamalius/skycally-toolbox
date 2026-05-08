@@ -1,72 +1,36 @@
-## Pro upgrade for QR Code Generator (`/tools/qr-generator`)
+## Bug
 
-Single-file rewrite of `src/routes/tools.qr-generator.tsx`. No new deps — `qrcode` is already installed and supports rendering at high error-correction with a margin, which is all we need; everything else (dot styles, gradient, logo, frame) is post-processed on a 1000×1000 offscreen canvas and downscaled to a 300×300 preview.
+In `src/routes/tools.qr-generator.tsx`, the dot-style → color-fill pipeline destroys the QR pattern:
 
-### New top-level layout
+1. `applyDotStyle` repaints the full canvas with the background color, then draws the dark modules on top (opaque background everywhere).
+2. `applyColorFill` then uses the resulting canvas as a mask with `globalCompositeOperation = "source-in"`. But `source-in` keys off **alpha**, not color — and every pixel is opaque. So the whole 1000×1000 square gets filled with the solid color or gradient, hiding the QR code entirely.
 
-```
-[ URL | Text | Email | Phone | WiFi | vCard ]   ← type tabs
-[ dynamic content inputs ]
-▾ Style & Colors          (Collapsible, open by default)
-▾ Center Logo             (Collapsible)
-▾ Frame                   (Collapsible)
-[ live preview 300×300 ]  [ PNG ] [ SVG ] [ Copy Image ]
-```
+Result:
+- Solid black (image 2): color1=#000 floods the whole square.
+- White→blue gradient (image 1): gradient floods the whole square; preview shows a near-white box.
+- Live preview also affected because it's just a downscale of the broken canvas.
 
-Use existing `Collapsible`, `ToggleGroup`, `Slider`, `Input`, `Button`, `Tooltip` from `src/components/ui/`. Keep `ToolPageShell`, `AdZone`, `HowToUse` wrappers and the route's `head()` block unchanged.
+## Fix (single file: `src/routes/tools.qr-generator.tsx`)
 
-### State shape
+Make the dot-style pass produce a **transparent background with only the dark modules drawn**, so the mask correctly represents only the QR foreground. Then `applyColorFill` can paint color/gradient inside the modules and `destination-over` paints the background underneath.
 
-```ts
-type QRType = 'url'|'text'|'email'|'phone'|'wifi'|'vcard';
-type DotStyle = 'square'|'rounded'|'dots'|'classy'|'classy-rounded';
-type ColorMode = 'solid'|'gradient';
-type GradientType = 'linear'|'radial';
-type FrameStyle = 'none'|'simple'|'rounded'|'badge';
-type LogoChoice = { kind: 'none' } | { kind: 'builtin'; id: string } | { kind: 'upload'; dataUrl: string };
-```
+Concrete changes inside `applyDotStyle` (lines ~132–176):
 
-Per-type form data is held in one object keyed by type, e.g. `wifi: { ssid, password, security: 'WPA'|'WEP'|'nopass' }`, `vcard: { name, phone, email, website }`, `email: { address, subject }`. `formatQRContent(type, data)` returns the string fed to `qrcode`.
+- Replace the initial `ctx.fillStyle = bg; ctx.fillRect(...)` with `ctx.clearRect(0, 0, size, size)` so the canvas is transparent before drawing modules.
+- Drop the `ctx.fillStyle = fg` then `ctx.fill()` chain unchanged — modules are now the only opaque pixels (alpha = 255 on transparent), which is exactly the mask `applyColorFill` needs.
+- Sample the **original** image data (already captured into `imageData` before clearing) to decide which cells are dark — current code already does this, just keep the `getImageData` call before `clearRect`.
 
-### Render pipeline (runs in a `useEffect` debounced via `requestAnimationFrame`)
+No changes needed in `applyColorFill`: its existing `source-in` + `destination-over` sequence already does the right thing once the input mask only covers the modules.
 
-1. Build content string from active type + form data; bail if empty.
-2. Decide error correction: `'H'` if logo selected, else `'M'`.
-3. `QRCode.toCanvas(offscreen, content, { width: 1000, margin: 2, errorCorrectionLevel, color: { dark:'#000', light: bg } })` into an offscreen 1000×1000 canvas — render in pure black so we can re-color it.
-4. `applyDotStyle(offscreen, style, '#000', bg)` — rebuild modules with `detectModuleSize` + per-style path drawing (square/rounded/dots/classy/classy-rounded) per the snippet.
-5. Apply color: render dark modules as black, then a separate "fill" pass via `globalCompositeOperation = 'source-in'` filling either solid `color1` or a `CanvasGradient` (linear with angle dial or radial).
-6. If logo selected, draw white rounded background + logo image at the configured size (15–35%, default 22%) in the center.
-7. If frame ≠ `none`, copy the QR onto a slightly larger canvas with stroke/rounded stroke, or onto a taller canvas with a colored badge below containing the CTA text.
-8. Downscale the final canvas into the visible 300×300 `<canvas>` via `drawImage` for the live preview, with a CSS `opacity` fade-in transition keyed by a render counter.
+Optional polish (same edit, low risk):
+- In `QRCode.toCanvas` options keep `color.light: bg` (harmless) — `applyDotStyle` immediately clears it.
+- Re-enable a tiny `imageSmoothingEnabled = false` before `applyDotStyle` reads pixels to avoid sub-pixel sampling drift on high-DPR canvases (set on the offscreen 2D context once at the top of `render`).
 
-The full-resolution offscreen canvas is kept in a ref so PNG download / clipboard copy use the high-quality version.
+## Verification
 
-### Built-in logo set
+After the fix, with the inputs from the screenshots:
+- vCard + classy dots + white→#0EA5E9 linear gradient (45°) → preview shows a recognizable QR with gradient-tinted modules over white background.
+- vCard + square dots + solid black + builtin logo + simple frame → preview shows black QR with white logo card and black frame stroke.
+- PNG / SVG / Copy Image downloads use the same `finalRef`, so they're fixed by the same change.
 
-Inline SVG data-URLs generated at module scope — colored circle + monogram for each: WiFi, Link, Email, Phone, Location, Instagram, Facebook, Twitter/X, WhatsApp, YouTube, TikTok, LinkedIn. Brand colors hard-coded. Upload accepts PNG/JPG/SVG, validates ≤200KB via `checkSize`-style guard, stores as data-URL in state.
-
-When a logo is active, show a small badge above the preview: "⚡ High error correction enabled for logo compatibility".
-
-### Downloads
-
-- **PNG** — `offscreenRef.current.toBlob` → `downloadBlob(blob, 'qrcode.png')` (existing helper).
-- **SVG** — keep `QRCode.toString({ type:'svg' })` for the basic case; when dot-style/gradient/logo/frame are active, SVG export falls back to a rasterized PNG inside an `<svg><image/></svg>` wrapper so users still get an `.svg` file. Surface a small note ("SVG embeds raster when styled") via tooltip.
-- **Copy Image** — `canvas.toBlob` → `navigator.clipboard.write([new ClipboardItem({'image/png': blob})])`, with `toast.success('QR code copied to clipboard!')` and a graceful fallback toast for unsupported browsers (Safari < 16).
-
-### UI details
-
-- Dot style: 5 buttons in a `ToggleGroup` with mini glyph previews and `Tooltip` describing each.
-- Color mode: segmented toggle Solid / Gradient. Gradient reveals second color picker, Linear/Radial toggle, and 4 direction preset buttons (0/45/90/135°) plus a numeric angle input.
-- Frame: style toggle + frame color picker; CTA fields appear only for `badge`. CTA presets ("SCAN ME", "Visit Website", "Follow Us", "Get Offer") as quick-fill chips, free-text input still available.
-- All controls cause the pipeline above to re-run; preview fades in via a `key`-bumped wrapper class.
-- Mobile: switch the two-column desktop grid to a single column and keep the preview sticky above downloads.
-
-### Things explicitly preserved
-
-- Route path, `head()` meta, page shell, ad zone, how-to-use steps.
-- Existing PNG and SVG download buttons + sonner toasts.
-- Existing size presets (Small/Medium/Large) become the *preview* sizing only; download is always 1000×1000 at H quality.
-
-### Files touched
-
-- `src/routes/tools.qr-generator.tsx` — full rewrite per above. No other files change. No new npm packages.
+No new dependencies. No other files touched.

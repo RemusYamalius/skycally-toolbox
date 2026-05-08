@@ -136,8 +136,7 @@ function applyDotStyle(canvas: HTMLCanvasElement, style: DotStyle, fg: string, b
   const data = imageData.data;
   const moduleSize = detectModuleSize(imageData, size);
 
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, size, size);
+  ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = fg;
 
   // Sample at module centers to avoid edge bleed

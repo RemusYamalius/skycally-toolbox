@@ -31,8 +31,7 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <h4 className="text-sm font-semibold mb-3">Scan to visit</h4>
-          <FooterQR />
+          <img src={qrCodeImage} alt="QR code linking to skycally.com" className="rounded-lg w-[100px] h-[100px]" />
         </div>
       </div>
 

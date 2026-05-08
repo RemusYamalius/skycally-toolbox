@@ -408,6 +408,13 @@ function QrGeneratorPage() {
     return "";
   }, [logo]);
 
+  const lowContrast = useMemo(() => {
+    const c1 = contrastRatio(color1, bg);
+    if (colorMode === "solid") return c1 < 3;
+    const c2 = contrastRatio(color2, bg);
+    return Math.min(c1, c2) < 3;
+  }, [color1, color2, bg, colorMode]);
+
   const render = useCallback(async () => {
     const canvas = previewRef.current;
     if (!canvas || !content) return;

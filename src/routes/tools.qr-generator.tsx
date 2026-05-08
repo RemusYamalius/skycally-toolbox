@@ -389,6 +389,8 @@ function QrGeneratorPage() {
 
   const render = useCallback(async () => {
     if (!content) return;
+    if (typeof document === "undefined") return;
+    if (!offscreenRef.current) offscreenRef.current = document.createElement("canvas");
     const off = offscreenRef.current;
     off.width = 1000;
     off.height = 1000;

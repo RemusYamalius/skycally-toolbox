@@ -50,6 +50,10 @@ export function SiteFooter() {
             <li><Link to="/terms" className="hover:text-foreground transition">Terms</Link></li>
           </ul>
         </div>
+        <div>
+          <h4 className="text-sm font-semibold mb-3">Scan to visit</h4>
+          <FooterQR />
+        </div>
       </div>
 
       <div className="border-t border-border/60">

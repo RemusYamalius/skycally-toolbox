@@ -1,9 +1,11 @@
 interface Props {
   id: string;
   size: string; // e.g. "728x90"
+  hasAd?: boolean;
 }
 
-export function AdZone({ id, size }: Props) {
+export function AdZone({ id, size, hasAd = false }: Props) {
+  if (!hasAd) return null;
   const [w, h] = size.split("x").map(Number);
   return (
     /* ADSENSE_ZONE: {id} {size} */

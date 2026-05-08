@@ -44,9 +44,18 @@ function decodeImage(file: File): Promise<string | null> {
 function QrReaderPage() {
   const [result, setResult] = useState<string | null>(null);
   const [scanning, setScanning] = useState(false);
+  const [cameraSupported, setCameraSupported] = useState(false);
   const videoRef = useRef<HTMLVideoElement>(null);
   const streamRef = useRef<MediaStream | null>(null);
   const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    setCameraSupported(
+      typeof navigator !== "undefined" &&
+        !!navigator.mediaDevices &&
+        typeof navigator.mediaDevices.getUserMedia === "function"
+    );
+  }, []);
 
   const stopCamera = () => {
     setScanning(false);
@@ -98,8 +107,15 @@ function QrReaderPage() {
         rafRef.current = requestAnimationFrame(tick);
       };
       rafRef.current = requestAnimationFrame(tick);
-    } catch {
-      toast.error("Could not access camera");
+    } catch (err: any) {
+      const name = err?.name;
+      if (name === "NotAllowedError" || name === "PermissionDeniedError") {
+        toast.error("Camera access denied. Please allow camera permission in your browser settings.");
+      } else if (name === "NotFoundError" || name === "DevicesNotFoundError") {
+        toast.error("No camera found on this device.");
+      } else {
+        toast.error("Could not access camera. Try uploading an image instead.");
+      }
     }
   };
 
@@ -119,11 +135,13 @@ function QrReaderPage() {
         )}
 
         {!scanning ? (
-          <div className="text-center">
-            <button onClick={startCamera} className="inline-flex items-center gap-2 rounded-xl border border-border font-semibold px-5 py-2.5 hover:bg-secondary">
-              <Camera className="w-4 h-4" /> Scan from Camera
-            </button>
-          </div>
+          cameraSupported && (
+            <div className="text-center">
+              <button onClick={startCamera} className="inline-flex items-center gap-2 rounded-xl border border-border font-semibold px-5 py-2.5 hover:bg-secondary">
+                <Camera className="w-4 h-4" /> Scan from Camera
+              </button>
+            </div>
+          )
         ) : (
           <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
             <div className="relative rounded-xl overflow-hidden bg-black aspect-video max-w-2xl mx-auto">

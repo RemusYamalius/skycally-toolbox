@@ -1,45 +1,24 @@
-## QR Generator — Contrast Safeguards
+## Fix 1 — QR Reader camera access on mobile
 
-**File:** `src/routes/tools.qr-generator.tsx`
+File: `src/routes/tools.qr-reader.tsx`
 
-### 1. Add contrast helpers (module scope, near other utilities ~line 180)
+- Already requests `{ video: { facingMode: "environment" } }` ✓ (keep as-is)
+- Replace the generic `catch { toast.error("Could not access camera") }` with a typed catch that maps:
+  - `NotAllowedError` / `PermissionDeniedError` → "Camera access denied. Please allow camera permission in your browser settings."
+  - `NotFoundError` / `DevicesNotFoundError` → "No camera found on this device."
+  - anything else → "Could not access camera. Try uploading an image instead."
+- Guard the "Scan from Camera" button: only render when `navigator.mediaDevices?.getUserMedia` exists. Use a small `useState(false)` set in a `useEffect` to avoid SSR `navigator is not defined` errors.
 
-```ts
-function luminance(hex: string): number { ... }
-function contrastRatio(hex1: string, hex2: string): number { ... }
-```
-(exact implementations from the user's spec)
+## Fix 2 — Hide empty ad placeholders site-wide
 
-### 2. Compute contrast warning in component (~after color1/color2/bg state, ~line 385)
+File: `src/components/ad-zone.tsx` (single component used by every tool route via `<AdZone id=… size=… />`)
 
-```ts
-const lowContrast = useMemo(() => {
-  const c1 = contrastRatio(color1, bg);
-  if (colorMode === "solid") return c1 < 3;
-  const c2 = contrastRatio(color2, bg);
-  return Math.min(c1, c2) < 3; // weakest stop drives warning
-}, [color1, color2, bg, colorMode]);
-```
+- Add an "is there an ad to show" check inside `AdZone`. Since this project has no real ad network wired up yet, the placeholder is *always* empty — so the component should `return null` by default.
+- Implementation: add an optional `hasAd?: boolean` prop (default `false`). When `false`, return `null`. Keep the existing placeholder markup for the `hasAd` case so the `ADSENSE_ZONE` comment marker stays intact for future wiring.
+- No call sites need to change — they will simply stop rendering the dashed grey box. When AdSense is later integrated, the integration code can pass `hasAd` (or the component can detect a filled slot internally).
 
-### 3. Warning UI under preview (line ~759, after the canvas wrapper, before the empty-state message)
+## Out of scope
 
-```tsx
-{content && lowContrast && (
-  <p className="text-xs text-amber-600 dark:text-amber-400 text-center">
-    ⚠️ Low contrast detected — QR code may not scan correctly. Try darker colors.
-  </p>
-)}
-```
-
-### 4. Tip under gradient pickers (inside the `colorMode === "gradient"` block at line 600, appended at the end of its `space-y-3` div)
-
-```tsx
-<p className="text-[11px] text-muted-foreground">
-  💡 Tip: Keep contrast between QR color and background above 4:1 for reliable scanning.
-</p>
-```
-
-### Notes / scope
-
-- No changes to the actual gradient rendering pipeline (`applyColorFill`). The user's step 2 ("minimum contrast enforcement on gradient stops") is implemented as the reactive contrast check that drives the warning; we are intentionally **not** mutating user-picked colors mid-render, since that would silently override their input. The warning + tip together fulfill the safeguard intent without breaking the "do not change other functionality" rule.
-- All other UI, state, and rendering remain untouched.
+- No design/UI changes beyond removing the empty boxes.
+- No changes to ad logic, ad loading, or AdSense integration.
+- No changes to other tool routes.

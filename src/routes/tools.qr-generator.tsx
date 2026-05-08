@@ -387,41 +387,20 @@ function QrGeneratorPage() {
   }, [logo]);
 
   const render = useCallback(async () => {
-    if (!previewRef.current) return;
-    if (!content) return;
-    if (typeof document === "undefined") return;
-    if (!offscreenRef.current) offscreenRef.current = document.createElement("canvas");
-    const off = offscreenRef.current;
-    off.width = 1000;
-    off.height = 1000;
+    const canvas = previewRef.current;
+    if (!canvas || !content) return;
     try {
-      await QRCode.toCanvas(off, content, {
-        width: 1000,
+      await QRCode.toCanvas(canvas, content, {
+        width: 300,
         margin: 2,
         errorCorrectionLevel: logo.kind !== "none" ? "H" : "M",
-        color: { dark: "#000000", light: bg },
+        color: { dark: color1, light: bg },
       });
-    } catch {
-      return;
+      finalRef.current = canvas;
+    } catch (err) {
+      console.error(err);
     }
-    applyDotStyle(off, dotStyle, "#000000", bg);
-    applyColorFill(off, colorMode, color1, color2, gradientType, angle, bg);
-    if (logoSrc) await drawLogo(off, logoSrc, logoSize);
-
-    const final = drawFrame(off, frameStyle, cta, frameColor, frameTextColor, bg);
-    finalRef.current = final;
-
-    const preview = previewRef.current;
-    if (preview) {
-      const ctx = preview.getContext("2d")!;
-      preview.width = 300;
-      preview.height = Math.round((300 * final.height) / final.width);
-      ctx.imageSmoothingEnabled = true;
-      ctx.imageSmoothingQuality = "high";
-      ctx.clearRect(0, 0, preview.width, preview.height);
-      ctx.drawImage(final, 0, 0, preview.width, preview.height);
-    }
-  }, [content, dotStyle, colorMode, color1, color2, gradientType, angle, bg, logo, logoSrc, logoSize, frameStyle, cta, frameColor, frameTextColor]);
+  }, [content, color1, bg, logo.kind]);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {

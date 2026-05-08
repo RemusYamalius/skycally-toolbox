@@ -181,23 +181,34 @@ function applyColorFill(
 ) {
   const ctx = canvas.getContext("2d")!;
   const size = canvas.width;
+  if (mode === "solid") return;
 
-  // Build foreground-only mask by reading current canvas
   const maskCanvas = document.createElement("canvas");
   maskCanvas.width = size;
   maskCanvas.height = size;
   const mctx = maskCanvas.getContext("2d")!;
-  mctx.drawImage(canvas, 0, 0);
+  const pixels = ctx.getImageData(0, 0, size, size);
+  const mask = mctx.createImageData(size, size);
+  const bgRgb = hexToRgb(bg);
+  for (let i = 0; i < pixels.data.length; i += 4) {
+    const dr = Math.abs(pixels.data[i] - bgRgb.r);
+    const dg = Math.abs(pixels.data[i + 1] - bgRgb.g);
+    const db = Math.abs(pixels.data[i + 2] - bgRgb.b);
+    const alpha = pixels.data[i + 3];
+    if (alpha > 0 && dr + dg + db > 24) {
+      mask.data[i] = 0;
+      mask.data[i + 1] = 0;
+      mask.data[i + 2] = 0;
+      mask.data[i + 3] = alpha;
+    }
+  }
+  mctx.putImageData(mask, 0, 0);
 
-  // Repaint background
   ctx.fillStyle = bg;
   ctx.fillRect(0, 0, size, size);
 
-  // Prepare fill (solid or gradient)
   let fill: string | CanvasGradient;
-  if (mode === "solid") {
-    fill = color1;
-  } else if (gType === "linear") {
+  if (gType === "linear") {
     const a = (angleDeg * Math.PI) / 180;
     const cx = size / 2,
       cy = size / 2;
@@ -217,7 +228,6 @@ function applyColorFill(
     fill = g;
   }
 
-  // Draw mask, then fill with composite
   ctx.drawImage(maskCanvas, 0, 0);
   ctx.globalCompositeOperation = "source-in";
   ctx.fillStyle = fill;

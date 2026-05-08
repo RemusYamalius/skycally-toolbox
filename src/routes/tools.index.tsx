@@ -4,7 +4,7 @@ import { Search } from "lucide-react";
 import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 
-const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text"] as const;
+const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text", "ai"] as const;
 type CatParam = (typeof VALID_CATS)[number];
 
 export const Route = createFileRoute("/tools/")({
@@ -26,7 +26,7 @@ export const Route = createFileRoute("/tools/")({
   component: ToolsPage,
 });
 
-const cats: ("all" | ToolCategory)[] = ["all", "video", "image", "audio", "pdf", "text"];
+const cats: ("all" | ToolCategory)[] = ["all", "ai", "video", "image", "audio", "pdf", "text"];
 
 function ToolsPage() {
   const search = Route.useSearch();
@@ -72,7 +72,7 @@ function ToolsPage() {
 
       {cat === "all" ? (
         <div className="space-y-14">
-          {(["video", "image", "audio", "pdf", "text"] as ToolCategory[]).map((c) => {
+          {(["ai", "video", "image", "audio", "pdf", "text"] as ToolCategory[]).map((c) => {
             const groupList = list.filter((t) => t.category === c);
             if (groupList.length === 0) return null;
             const meta = categoryMeta[c];

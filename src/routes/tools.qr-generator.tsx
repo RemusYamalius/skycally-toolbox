@@ -136,8 +136,7 @@ function applyDotStyle(canvas: HTMLCanvasElement, style: DotStyle, fg: string, b
   const data = imageData.data;
   const moduleSize = detectModuleSize(imageData, size);
 
-  ctx.fillStyle = bg;
-  ctx.fillRect(0, 0, size, size);
+  ctx.clearRect(0, 0, size, size);
   ctx.fillStyle = fg;
 
   // Sample at module centers to avoid edge bleed
@@ -375,8 +374,8 @@ function QrGeneratorPage() {
   const [cta, setCta] = useState("SCAN ME");
 
   const previewRef = useRef<HTMLCanvasElement>(null);
-  const offscreenRef = useRef<HTMLCanvasElement>(document.createElement("canvas"));
-  const finalRef = useRef<HTMLCanvasElement>(document.createElement("canvas"));
+  const offscreenRef = useRef<HTMLCanvasElement | null>(null);
+  const finalRef = useRef<HTMLCanvasElement | null>(null);
   const [renderKey, setRenderKey] = useState(0);
 
   const content = useMemo(() => formatQRContent(type, forms[type]), [type, forms]);
@@ -390,6 +389,8 @@ function QrGeneratorPage() {
 
   const render = useCallback(async () => {
     if (!content) return;
+    if (typeof document === "undefined") return;
+    if (!offscreenRef.current) offscreenRef.current = document.createElement("canvas");
     const off = offscreenRef.current;
     off.width = 1000;
     off.height = 1000;
@@ -432,7 +433,7 @@ function QrGeneratorPage() {
 
   const downloadPng = () => {
     const c = finalRef.current;
-    if (!c.width) return;
+    if (!c || !c.width) return;
     c.toBlob((blob) => {
       if (blob) {
         downloadBlob(blob, "qrcode.png");
@@ -455,6 +456,7 @@ function QrGeneratorPage() {
         downloadBlob(new Blob([svg], { type: "image/svg+xml" }), "qrcode.svg");
       } else {
         const c = finalRef.current;
+        if (!c) return;
         const dataUrl = c.toDataURL("image/png");
         const svg = `<svg xmlns="http://www.w3.org/2000/svg" width="${c.width}" height="${c.height}" viewBox="0 0 ${c.width} ${c.height}"><image href="${dataUrl}" width="${c.width}" height="${c.height}"/></svg>`;
         downloadBlob(new Blob([svg], { type: "image/svg+xml" }), "qrcode.svg");
@@ -467,7 +469,7 @@ function QrGeneratorPage() {
 
   const copyImage = () => {
     const c = finalRef.current;
-    if (!c.width) return;
+    if (!c || !c.width) return;
     c.toBlob(async (blob) => {
       if (!blob) return;
       try {

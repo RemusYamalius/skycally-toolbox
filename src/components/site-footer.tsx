@@ -1,6 +1,6 @@
 import { Link } from "@tanstack/react-router";
 
-import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
+import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 import qrCodeImage from "@/assets/skycally-qrcode.png";
 
 const categoryOrder: ToolCategory[] = ["ai", "video", "image", "audio", "pdf", "text"];
@@ -41,7 +41,7 @@ export function SiteFooter() {
           <div className="grid gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
             {categoryOrder.map((c) => {
               const meta = categoryMeta[c];
-              const list = tools.filter((t) => t.category === c);
+              const list = tools.filter((t) => toolInCategory(t, c));
               return (
                 <div key={c}>
                   <h5

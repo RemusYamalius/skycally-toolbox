@@ -8,6 +8,7 @@ import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
+import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 
 export const Route = createFileRoute("/tools/video-trimmer")({
   head: () => ({

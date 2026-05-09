@@ -49,6 +49,7 @@ import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-land
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
+import { Route as ToolsBusinessCardGeneratorRouteImport } from './routes/tools.business-card-generator'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
@@ -255,6 +256,12 @@ const ToolsCollageMakerRoute = ToolsCollageMakerRouteImport.update({
   path: '/tools/collage-maker',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsBusinessCardGeneratorRoute =
+  ToolsBusinessCardGeneratorRouteImport.update({
+    id: '/tools/business-card-generator',
+    path: '/tools/business-card-generator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsBase64Route = ToolsBase64RouteImport.update({
   id: '/tools/base64',
   path: '/tools/base64',
@@ -292,6 +299,7 @@ export interface FileRoutesByFullPath {
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
@@ -339,6 +347,7 @@ export interface FileRoutesByTo {
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
@@ -387,6 +396,7 @@ export interface FileRoutesById {
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
@@ -436,6 +446,7 @@ export interface FileRouteTypes {
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
+    | '/tools/business-card-generator'
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/extract-audio'
@@ -483,6 +494,7 @@ export interface FileRouteTypes {
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
+    | '/tools/business-card-generator'
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/extract-audio'
@@ -530,6 +542,7 @@ export interface FileRouteTypes {
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
+    | '/tools/business-card-generator'
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/extract-audio'
@@ -578,6 +591,7 @@ export interface RootRouteChildren {
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBase64Route: typeof ToolsBase64Route
+  ToolsBusinessCardGeneratorRoute: typeof ToolsBusinessCardGeneratorRoute
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
@@ -897,6 +911,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsCollageMakerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/business-card-generator': {
+      id: '/tools/business-card-generator'
+      path: '/tools/business-card-generator'
+      fullPath: '/tools/business-card-generator'
+      preLoaderRoute: typeof ToolsBusinessCardGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/base64': {
       id: '/tools/base64'
       path: '/tools/base64'
@@ -946,6 +967,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBase64Route: ToolsBase64Route,
+  ToolsBusinessCardGeneratorRoute: ToolsBusinessCardGeneratorRoute,
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
@@ -985,12 +1007,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

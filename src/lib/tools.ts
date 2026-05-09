@@ -23,6 +23,9 @@ export interface Tool {
 export const tools: Tool[] = [
   { slug: "video-downloader", name: "Video Downloader", description: "Download videos from TikTok, Instagram, YouTube and more.", category: "video", icon: Download, path: "/tools/video-downloader" },
   { slug: "video-to-gif", name: "Video to GIF", description: "Convert any video clip to a high-quality animated GIF.", category: "video", icon: Film, path: "/tools/video-to-gif" },
+  { slug: "video-trimmer", name: "Video Trimmer", description: "Cut and trim video clips instantly in your browser.", category: "video", icon: Scissors, path: "/tools/video-trimmer" },
+  { slug: "video-merger", name: "Video Merger", description: "Combine multiple videos into one — no uploads needed.", category: "video", icon: Combine, path: "/tools/video-merger" },
+  { slug: "add-subtitles", name: "Add Subtitles to Video", description: "Burn subtitles into any video right in your browser.", category: "video", icon: Captions, path: "/tools/add-subtitles" },
   { slug: "image-converter", name: "Image Converter", description: "Convert PNG, JPG, WebP and AVIF in seconds.", category: "image", icon: FileImage, path: "/tools/image-converter" },
   { slug: "image-compressor", name: "Image Compressor", description: "Shrink images without losing quality.", category: "image", icon: Minimize2, path: "/tools/image-compressor" },
   { slug: "image-upscaler", name: "Image Upscaler", description: "Upscale images 2x or 4x with Real-ESRGAN AI.", category: "image", icon: Sparkles, path: "/tools/image-upscaler" },

@@ -7,7 +7,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
-import { FFmpegBanner, PoweredByNote } from "./tools.video-trimmer";
+import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 
 export const Route = createFileRoute("/tools/video-merger")({
   head: () => ({

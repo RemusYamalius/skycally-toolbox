@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { Search } from "lucide-react";
-import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
+import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 
 const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text", "ai"] as const;
@@ -43,7 +43,7 @@ function ToolsPage() {
     navigate({ search: c === "all" ? {} : { cat: c }, replace: true });
   };
 
-  const list = useMemo(() => tools.filter((t) => (cat === "all" || t.category === cat) && (t.name + t.description).toLowerCase().includes(q.toLowerCase())), [cat, q]);
+  const list = useMemo(() => tools.filter((t) => (cat === "all" || toolInCategory(t, cat)) && (t.name + t.description).toLowerCase().includes(q.toLowerCase())), [cat, q]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -73,7 +73,7 @@ function ToolsPage() {
       {cat === "all" ? (
         <div className="space-y-14">
           {(["ai", "video", "image", "audio", "pdf", "text"] as ToolCategory[]).map((c) => {
-            const groupList = list.filter((t) => t.category === c);
+            const groupList = list.filter((t) => toolInCategory(t, c));
             if (groupList.length === 0) return null;
             const meta = categoryMeta[c];
             return (

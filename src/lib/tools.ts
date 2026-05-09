@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai";
 
@@ -16,9 +16,13 @@ export interface Tool {
   name: string;
   description: string;
   category: ToolCategory;
+  categories?: ToolCategory[];
   icon: typeof Download;
   path: string;
 }
+
+export const toolInCategory = (t: Tool, c: ToolCategory) =>
+  t.category === c || (t.categories?.includes(c) ?? false);
 
 export const tools: Tool[] = [
   { slug: "video-downloader", name: "Video Downloader", description: "Download videos from TikTok, Instagram, YouTube and more.", category: "video", icon: Download, path: "/tools/video-downloader" },
@@ -60,8 +64,11 @@ export const tools: Tool[] = [
   { slug: "image-resizer", name: "Image Resizer", description: "Resize images by pixels or percentage with quality control.", category: "image", icon: Maximize2, path: "/tools/image-resizer" },
   { slug: "image-cropper", name: "Image Cropper", description: "Crop, rotate and flip images with aspect-ratio presets.", category: "image", icon: Crop, path: "/tools/image-cropper" },
   { slug: "add-text-to-image", name: "Add Text to Image", description: "Add custom, draggable text layers to any image.", category: "image", icon: Type, path: "/tools/add-text-to-image" },
-  { slug: "image-to-pdf", name: "Image to PDF", description: "Convert one or many images into a single PDF document.", category: "image", icon: FileImage, path: "/tools/image-to-pdf" },
+  { slug: "image-to-pdf", name: "Image to PDF", description: "Convert one or many images into a single PDF document.", category: "image", categories: ["image", "pdf"], icon: FileImage, path: "/tools/image-to-pdf" },
   { slug: "collage-maker", name: "Photo Collage Maker", description: "Combine 2–9 photos into a beautiful grid collage.", category: "image", icon: LayoutGrid, path: "/tools/collage-maker" },
   { slug: "meme-generator", name: "Meme Generator", description: "Create classic memes from popular templates or your own image.", category: "image", icon: Laugh, path: "/tools/meme-generator" },
   { slug: "business-card-generator", name: "Business Card Generator", description: "Design print-ready business cards with QR codes.", category: "image", icon: CreditCard, path: "/tools/business-card-generator" },
+  { slug: "compress-pdf", name: "Compress PDF", description: "Reduce PDF file size while keeping quality.", category: "pdf", icon: FileMinus, path: "/tools/compress-pdf" },
+  { slug: "pdf-to-images", name: "PDF to Images", description: "Convert every PDF page into a high-quality PNG image.", category: "pdf", icon: Layers, path: "/tools/pdf-to-images" },
+  { slug: "rotate-pdf", name: "Rotate PDF", description: "Rotate one or all pages in your PDF to the correct orientation.", category: "pdf", icon: RotateCw, path: "/tools/rotate-pdf" },
 ];

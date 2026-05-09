@@ -57,6 +57,7 @@ import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.backgrou
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text-to-image'
+import { Route as ToolsAddSubtitlesRouteImport } from './routes/tools.add-subtitles'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -299,6 +300,11 @@ const ToolsAddTextToImageRoute = ToolsAddTextToImageRouteImport.update({
   path: '/tools/add-text-to-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAddSubtitlesRoute = ToolsAddSubtitlesRouteImport.update({
+  id: '/tools/add-subtitles',
+  path: '/tools/add-subtitles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -306,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
@@ -356,6 +363,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
@@ -407,6 +415,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
@@ -459,6 +468,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
@@ -509,6 +519,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
@@ -559,6 +570,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
@@ -610,6 +622,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
   ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
@@ -993,6 +1006,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAddTextToImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/add-subtitles': {
+      id: '/tools/add-subtitles'
+      path: '/tools/add-subtitles'
+      fullPath: '/tools/add-subtitles'
+      preLoaderRoute: typeof ToolsAddSubtitlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -1002,6 +1022,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ToolsAddSubtitlesRoute: ToolsAddSubtitlesRoute,
   ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,

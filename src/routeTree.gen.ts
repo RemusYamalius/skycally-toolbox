@@ -19,6 +19,7 @@ import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
 import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
+import { Route as ToolsVideoMergerRouteImport } from './routes/tools.video-merger'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
@@ -105,6 +106,11 @@ const ToolsVideoTrimmerRoute = ToolsVideoTrimmerRouteImport.update({
 const ToolsVideoToGifRoute = ToolsVideoToGifRouteImport.update({
   id: '/tools/video-to-gif',
   path: '/tools/video-to-gif',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsVideoMergerRoute = ToolsVideoMergerRouteImport.update({
+  id: '/tools/video-merger',
+  path: '/tools/video-merger',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsVideoDownloaderRoute = ToolsVideoDownloaderRouteImport.update({
@@ -337,6 +343,7 @@ export interface FileRoutesByFullPath {
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
@@ -386,6 +393,7 @@ export interface FileRoutesByTo {
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
@@ -436,6 +444,7 @@ export interface FileRoutesById {
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
@@ -487,6 +496,7 @@ export interface FileRouteTypes {
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
+    | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
     | '/tools/word-counter'
@@ -536,6 +546,7 @@ export interface FileRouteTypes {
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
+    | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
     | '/tools/word-counter'
@@ -585,6 +596,7 @@ export interface FileRouteTypes {
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
+    | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
     | '/tools/word-counter'
@@ -635,6 +647,7 @@ export interface RootRouteChildren {
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
+  ToolsVideoMergerRoute: typeof ToolsVideoMergerRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
   ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
@@ -712,6 +725,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/video-to-gif'
       fullPath: '/tools/video-to-gif'
       preLoaderRoute: typeof ToolsVideoToGifRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/video-merger': {
+      id: '/tools/video-merger'
+      path: '/tools/video-merger'
+      fullPath: '/tools/video-merger'
+      preLoaderRoute: typeof ToolsVideoMergerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/video-downloader': {
@@ -1019,6 +1039,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
+  ToolsVideoMergerRoute: ToolsVideoMergerRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
   ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,

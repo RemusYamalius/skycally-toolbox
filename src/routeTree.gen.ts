@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
+import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
@@ -94,6 +95,11 @@ const ToolsWordToPdfRoute = ToolsWordToPdfRouteImport.update({
 const ToolsWordCounterRoute = ToolsWordCounterRouteImport.update({
   id: '/tools/word-counter',
   path: '/tools/word-counter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsVideoTrimmerRoute = ToolsVideoTrimmerRouteImport.update({
+  id: '/tools/video-trimmer',
+  path: '/tools/video-trimmer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsVideoToGifRoute = ToolsVideoToGifRouteImport.update({
@@ -332,6 +338,7 @@ export interface FileRoutesByFullPath {
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
+  '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
@@ -380,6 +387,7 @@ export interface FileRoutesByTo {
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
+  '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools': typeof ToolsIndexRoute
@@ -429,6 +437,7 @@ export interface FileRoutesById {
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
+  '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
@@ -479,6 +488,7 @@ export interface FileRouteTypes {
     | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
+    | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
     | '/tools/'
@@ -527,6 +537,7 @@ export interface FileRouteTypes {
     | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
+    | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
     | '/tools'
@@ -575,6 +586,7 @@ export interface FileRouteTypes {
     | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-to-gif'
+    | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
     | '/tools/'
@@ -624,6 +636,7 @@ export interface RootRouteChildren {
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
+  ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
@@ -685,6 +698,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/word-counter'
       fullPath: '/tools/word-counter'
       preLoaderRoute: typeof ToolsWordCounterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/video-trimmer': {
+      id: '/tools/video-trimmer'
+      path: '/tools/video-trimmer'
+      fullPath: '/tools/video-trimmer'
+      preLoaderRoute: typeof ToolsVideoTrimmerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/video-to-gif': {
@@ -1000,6 +1020,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
+  ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
   ToolsIndexRoute: ToolsIndexRoute,

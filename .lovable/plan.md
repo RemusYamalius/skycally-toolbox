@@ -1,66 +1,56 @@
-## Business Card Generator — Implementation Plan
+## Goal
 
-Build a new client-side tool at `/tools/business-card-generator` using Canvas API + the existing `qrcode` library. No backend.
+Add 3 new browser-based video tools (Trimmer, Merger, Subtitles) and refactor the existing Video to GIF tool to use a shared FFmpeg loader. All processing runs locally via `@ffmpeg/ffmpeg` + WASM — no backend.
 
-### Files to create / edit
+The user-supplied snippets use raw Tailwind hex colors and `src/pages/...` paths. I will adapt them to match this project's conventions:
+- Routes live under `src/routes/tools.<slug>.tsx` (TanStack Router)
+- All tools wrap UI in `ToolPageShell` + end with `HowToUse` (per project memory rule)
+- Use semantic design tokens (`bg-card`, `border-border`, `text-muted-foreground`, `var(--cyan-brand)`) instead of hardcoded `#0a0f1e` / `#1e2d4a`
+- Reuse existing `DropZone`, `Progress`, `AdZone`, and `downloadBlob` helpers
+- Register tools in `src/lib/tools.ts` so they auto-appear on home, `/tools`, and footer
 
-1. **`src/routes/tools.business-card-generator.tsx`** (new)
-   - Wrap in `ToolPageShell` (title + description per memory rule).
-   - 3-step wizard with state `step: 1 | 2 | 3` and a step indicator bar `[1 Template] → [2 Info] → [3 Design]`.
-   - End with `<HowToUse steps={[...]} />` (per memory rule).
-   - Include `<AdZone id="business-card-below-download" size="300x250" />` below download buttons.
+## Files
 
-2. **`src/lib/tools.ts`** (edit)
-   - Add new entry `business-card-generator` under category `image`, icon `CreditCard` (lucide), so it appears on `/tools`, homepage, and footer automatically.
+### New
+1. **`src/utils/ffmpegLoader.ts`** — singleton `getFFmpeg(onProgress?)` that loads core from `unpkg.com/@ffmpeg/core@0.12.6` once, attaches a progress listener, and returns the cached instance.
+2. **`src/routes/tools.video-trimmer.tsx`** — upload → preview `<video>` → start/end range sliders → trim with `-c copy` → preview + download.
+3. **`src/routes/tools.video-merger.tsx`** — multi-upload list with up/down/remove reordering → write all + `concat.txt` → `-f concat -safe 0 -c copy` merge.
+4. **`src/routes/tools.add-subtitles.tsx`** — video upload + two modes (manual SRT editor with start/end/text rows, or `.srt` upload) + style controls (font size 14–48, color white/yellow/blue) → burn via `subtitles=` filter with `force_style`.
 
-### Step 1 — Template picker
-- Hardcoded `TEMPLATES` array (8 entries, exactly as specified).
-- Grid: `grid-cols-2 md:grid-cols-4`.
-- Each card shows a small static SVG/CSS mock preview using template colors + name + description.
-- Click → set selected template, advance to step 2.
+### Edited
+5. **`src/services/videoToGif.ts`** — refactor to use the shared loader (delete duplicate FFmpeg bootstrap; keep two-pass palettegen→paletteuse pipeline currently used).
+6. **`src/lib/tools.ts`** — add 3 new entries under `video` category with icons from lucide-react: `Scissors` (trimmer), `Combine` (merger), `Captions` (subtitles).
+7. **`.lovable/plan.md`** — update.
 
-### Step 2 — Info form
-- Controlled form with `CardInfo` shape exactly as specified.
-- Two-column on `md:`, single on mobile.
-- Char limits: name 30, title 40 (use `maxLength`).
-- QR section: `Switch` (showQR) + Input (qrContent, auto-filled from website on change when untouched).
-- Logo upload: `DropZone`-style small box with image preview, stored as object URL → loaded into `HTMLImageElement`.
-- "Back" + "Preview Card" buttons.
+The route tree (`src/routeTree.gen.ts`) auto-regenerates.
 
-### Step 3 — Customize & download
-- Split layout: `lg:grid-cols-[1fr_360px]`.
-- **Left preview pane:**
-  - Two `<canvas>` refs (front + back), only one visible at a time, toggle button "Show Back / Show Front".
-  - Canvas displayed scaled (CSS `max-width: 100%`) at 1050×600 (or rotated 600×1050 for vertical).
-  - Re-renders via a single `useEffect` watching all relevant state.
-- **Right customization panel** (stacked sections, scrollable):
-  - **Colors**: 3 native `<input type="color">` (bg, accent, text) + 6 quick preset swatches (apply trio).
-  - **Typography**: font `Select` (Inter, Playfair Display, Montserrat, Roboto, Georgia, Oswald), name size `Slider` 24-48, info size `Slider` 11-16. Load Google Fonts via injected `<link>` once on mount.
-  - **Layout**: QR position (Bottom-Left / Bottom-Right / None) as toggle group, QR size (S/M/L), Logo position (TL/TC/TR), divider line show/hide + color.
-  - **Orientation**: Horizontal / Vertical toggle.
-- **Download buttons**: Front PNG, Back PNG, Both (combined). Use the exact code from the spec.
-- Print spec note below buttons.
+## Tool route shape (consistent across all 3 new tools)
 
-### Canvas drawing
-- `drawCard` and `drawCardBack` implemented per the provided spec, parameterized to honor:
-  - custom colors, font, name/info sizes, orientation, QR position+size, logo position, divider toggle+color.
-- QR generation: `QRCode.toCanvas(offscreen, content, { width: 300, margin: 1, errorCorrectionLevel: 'H' })`. Auto-content = website, fallback to vCard built from name + phone.
-- Logo: read uploaded file → `new Image()` → set `src` → on `onload` trigger redraw.
-- All drawing happens inside a single effect that depends on every state input; QR + logo loads use async helpers that set state once ready.
+```tsx
+<ToolPageShell title="..." description="...">
+  {/* one-time info banner about ~30MB FFmpeg download */}
+  {/* DropZone or upload card */}
+  {/* Tool-specific controls */}
+  {/* Progress bar (Progress component) when busy */}
+  {/* Result preview + Download button */}
+  {/* AdZone id="<slug>-bottom" size="728x90" */}
+  <HowToUse steps={[...]} />
+</ToolPageShell>
+```
 
-### How to use steps
-1. "Choose a template that fits your style"
-2. "Fill in your contact information"
-3. "Customize colors and download print-ready PNG"
+All buttons/cards use design tokens, not raw hex. The "first-use ~30MB" banner is a small dismissable note shown until the FFmpeg cache is warmed (tracked in localStorage).
 
-### Site integration (via `tools.ts` edit)
-- Adding the entry automatically populates: homepage tools grid, `/tools` Image Tools section, and the footer "Image Tools" column. No separate edits needed.
-- The `head()` block on the new route sets title/description/og tags.
+## Technical notes
 
-### Notes / constraints honored
-- Pure frontend, no backend, no new deps (`qrcode` already installed).
-- No design-token violations: colors used in form UI come from semantic tokens; the user-picked card colors are intentional raw values stored in state and only painted onto the canvas.
-- Conforms to project memory: `ToolPageShell` wrapper + `HowToUse` block.
-- `AdZone` left with `hasAd={false}` default → renders nothing until wired.
+- `@ffmpeg/ffmpeg` and `@ffmpeg/util` are already installed (used by current `videoToGif.ts`) — no `bun add` needed.
+- FFmpeg loader is client-only; never import from server code (already the case, but worth noting for SSR safety — guard with dynamic import inside handlers).
+- `-c copy` keyframe trimming is fast but cuts only at keyframes; acceptable trade-off for a browser tool.
+- Subtitles filter requires the SRT file to exist in FFmpeg's virtual FS; written via `writeFile('subs.srt', …)` before `exec`.
+- Merger requires same codec/container across inputs for `-c copy`; if the user mixes formats it will fail — surface the FFmpeg error via `toast.error`.
+- Each tool registers a unique AdZone id matching the existing `ADSENSE_ZONE` comment pattern.
 
-Ready to implement on approval.
+## Out of scope
+
+- No backend changes.
+- No changes to the existing footer/home grids (they auto-pick up new entries from `tools.ts`).
+- No changes to other tools.

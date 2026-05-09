@@ -11,18 +11,11 @@ export async function convertToGif(
 ): Promise<Blob> {
   if (file.size > MAX_VIDEO_BYTES) throw new Error("Max video size is 50MB");
 
+  const { fetchFile } = await import("@ffmpeg/util");
+  const { getFFmpeg } = await import("@/utils/ffmpegLoader");
+
   onStatus?.("Loading converter...");
-  const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-  const { fetchFile, toBlobURL } = await import("@ffmpeg/util");
-  const ffmpeg = new FFmpeg();
-
-  const baseURL = "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd";
-  await ffmpeg.load({
-    coreURL: await toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"),
-    wasmURL: await toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"),
-  });
-
-  ffmpeg.on("progress", ({ progress }) => onProgress(Math.min(100, Math.round(progress * 100))));
+  const ffmpeg = await getFFmpeg(onProgress);
 
   onStatus?.("Processing video...");
   await ffmpeg.writeFile("input", await fetchFile(file));

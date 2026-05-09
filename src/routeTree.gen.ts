@@ -17,7 +17,9 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
+import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
+import { Route as ToolsVideoMergerRouteImport } from './routes/tools.video-merger'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
@@ -55,6 +57,7 @@ import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.backgrou
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text-to-image'
+import { Route as ToolsAddSubtitlesRouteImport } from './routes/tools.add-subtitles'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -96,9 +99,19 @@ const ToolsWordCounterRoute = ToolsWordCounterRouteImport.update({
   path: '/tools/word-counter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsVideoTrimmerRoute = ToolsVideoTrimmerRouteImport.update({
+  id: '/tools/video-trimmer',
+  path: '/tools/video-trimmer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsVideoToGifRoute = ToolsVideoToGifRouteImport.update({
   id: '/tools/video-to-gif',
   path: '/tools/video-to-gif',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsVideoMergerRoute = ToolsVideoMergerRouteImport.update({
+  id: '/tools/video-merger',
+  path: '/tools/video-merger',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsVideoDownloaderRoute = ToolsVideoDownloaderRouteImport.update({
@@ -287,6 +300,11 @@ const ToolsAddTextToImageRoute = ToolsAddTextToImageRouteImport.update({
   path: '/tools/add-text-to-image',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAddSubtitlesRoute = ToolsAddSubtitlesRouteImport.update({
+  id: '/tools/add-subtitles',
+  path: '/tools/add-subtitles',
+  getParentRoute: () => rootRouteImport,
+} as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
@@ -294,6 +312,7 @@ export interface FileRoutesByFullPath {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
@@ -331,7 +350,9 @@ export interface FileRoutesByFullPath {
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
+  '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
@@ -342,6 +363,7 @@ export interface FileRoutesByTo {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
@@ -379,7 +401,9 @@ export interface FileRoutesByTo {
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
+  '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools': typeof ToolsIndexRoute
@@ -391,6 +415,7 @@ export interface FileRoutesById {
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
@@ -428,7 +453,9 @@ export interface FileRoutesById {
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
+  '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
+  '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/': typeof ToolsIndexRoute
@@ -441,6 +468,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
@@ -478,7 +506,9 @@ export interface FileRouteTypes {
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
+    | '/tools/video-merger'
     | '/tools/video-to-gif'
+    | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
     | '/tools/'
@@ -489,6 +519,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
@@ -526,7 +557,9 @@ export interface FileRouteTypes {
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
+    | '/tools/video-merger'
     | '/tools/video-to-gif'
+    | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
     | '/tools'
@@ -537,6 +570,7 @@ export interface FileRouteTypes {
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/audio-converter'
@@ -574,7 +608,9 @@ export interface FileRouteTypes {
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
+    | '/tools/video-merger'
     | '/tools/video-to-gif'
+    | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
     | '/tools/'
@@ -586,6 +622,7 @@ export interface RootRouteChildren {
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
   ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
@@ -623,7 +660,9 @@ export interface RootRouteChildren {
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
+  ToolsVideoMergerRoute: typeof ToolsVideoMergerRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
+  ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
@@ -687,11 +726,25 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsWordCounterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/video-trimmer': {
+      id: '/tools/video-trimmer'
+      path: '/tools/video-trimmer'
+      fullPath: '/tools/video-trimmer'
+      preLoaderRoute: typeof ToolsVideoTrimmerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/video-to-gif': {
       id: '/tools/video-to-gif'
       path: '/tools/video-to-gif'
       fullPath: '/tools/video-to-gif'
       preLoaderRoute: typeof ToolsVideoToGifRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/video-merger': {
+      id: '/tools/video-merger'
+      path: '/tools/video-merger'
+      fullPath: '/tools/video-merger'
+      preLoaderRoute: typeof ToolsVideoMergerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/video-downloader': {
@@ -953,6 +1006,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAddTextToImageRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/add-subtitles': {
+      id: '/tools/add-subtitles'
+      path: '/tools/add-subtitles'
+      fullPath: '/tools/add-subtitles'
+      preLoaderRoute: typeof ToolsAddSubtitlesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
   }
 }
 
@@ -962,6 +1022,7 @@ const rootRouteChildren: RootRouteChildren = {
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  ToolsAddSubtitlesRoute: ToolsAddSubtitlesRoute,
   ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
@@ -999,7 +1060,9 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
+  ToolsVideoMergerRoute: ToolsVideoMergerRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
+  ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
   ToolsIndexRoute: ToolsIndexRoute,
@@ -1007,12 +1070,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

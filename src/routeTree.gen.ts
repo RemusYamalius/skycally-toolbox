@@ -27,9 +27,11 @@ import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
+import { Route as ToolsRotatePdfRouteImport } from './routes/tools.rotate-pdf'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
+import { Route as ToolsPdfToImagesRouteImport } from './routes/tools.pdf-to-images'
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
@@ -49,6 +51,7 @@ import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-c
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
+import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
 import { Route as ToolsBusinessCardGeneratorRouteImport } from './routes/tools.business-card-generator'
@@ -149,6 +152,11 @@ const ToolsScreenRecorderRoute = ToolsScreenRecorderRouteImport.update({
   path: '/tools/screen-recorder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsRotatePdfRoute = ToolsRotatePdfRouteImport.update({
+  id: '/tools/rotate-pdf',
+  path: '/tools/rotate-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
   id: '/tools/remove-bg',
   path: '/tools/remove-bg',
@@ -162,6 +170,11 @@ const ToolsQrReaderRoute = ToolsQrReaderRouteImport.update({
 const ToolsQrGeneratorRoute = ToolsQrGeneratorRouteImport.update({
   id: '/tools/qr-generator',
   path: '/tools/qr-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPdfToImagesRoute = ToolsPdfToImagesRouteImport.update({
+  id: '/tools/pdf-to-images',
+  path: '/tools/pdf-to-images',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsPdfTextExtractorRoute = ToolsPdfTextExtractorRouteImport.update({
@@ -259,6 +272,11 @@ const ToolsExtractAudioRoute = ToolsExtractAudioRouteImport.update({
   path: '/tools/extract-audio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsCompressPdfRoute = ToolsCompressPdfRouteImport.update({
+  id: '/tools/compress-pdf',
+  path: '/tools/compress-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsColorPaletteRoute = ToolsColorPaletteRouteImport.update({
   id: '/tools/color-palette',
   path: '/tools/color-palette',
@@ -321,6 +339,7 @@ export interface FileRoutesByFullPath {
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
@@ -340,9 +359,11 @@ export interface FileRoutesByFullPath {
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
+  '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
@@ -372,6 +393,7 @@ export interface FileRoutesByTo {
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
@@ -391,9 +413,11 @@ export interface FileRoutesByTo {
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
+  '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
@@ -424,6 +448,7 @@ export interface FileRoutesById {
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
@@ -443,9 +468,11 @@ export interface FileRoutesById {
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
+  '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
@@ -477,6 +504,7 @@ export interface FileRouteTypes {
     | '/tools/business-card-generator'
     | '/tools/collage-maker'
     | '/tools/color-palette'
+    | '/tools/compress-pdf'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/hand-gesture'
@@ -496,9 +524,11 @@ export interface FileRouteTypes {
     | '/tools/object-detection'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
+    | '/tools/pdf-to-images'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/rotate-pdf'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
@@ -528,6 +558,7 @@ export interface FileRouteTypes {
     | '/tools/business-card-generator'
     | '/tools/collage-maker'
     | '/tools/color-palette'
+    | '/tools/compress-pdf'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/hand-gesture'
@@ -547,9 +578,11 @@ export interface FileRouteTypes {
     | '/tools/object-detection'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
+    | '/tools/pdf-to-images'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/rotate-pdf'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
@@ -579,6 +612,7 @@ export interface FileRouteTypes {
     | '/tools/business-card-generator'
     | '/tools/collage-maker'
     | '/tools/color-palette'
+    | '/tools/compress-pdf'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/hand-gesture'
@@ -598,9 +632,11 @@ export interface FileRouteTypes {
     | '/tools/object-detection'
     | '/tools/password-generator'
     | '/tools/pdf-text-extractor'
+    | '/tools/pdf-to-images'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/rotate-pdf'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
@@ -631,6 +667,7 @@ export interface RootRouteChildren {
   ToolsBusinessCardGeneratorRoute: typeof ToolsBusinessCardGeneratorRoute
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
+  ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
@@ -650,9 +687,11 @@ export interface RootRouteChildren {
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
+  ToolsPdfToImagesRoute: typeof ToolsPdfToImagesRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
+  ToolsRotatePdfRoute: typeof ToolsRotatePdfRoute
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
@@ -796,6 +835,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsScreenRecorderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/rotate-pdf': {
+      id: '/tools/rotate-pdf'
+      path: '/tools/rotate-pdf'
+      fullPath: '/tools/rotate-pdf'
+      preLoaderRoute: typeof ToolsRotatePdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/remove-bg': {
       id: '/tools/remove-bg'
       path: '/tools/remove-bg'
@@ -815,6 +861,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/qr-generator'
       fullPath: '/tools/qr-generator'
       preLoaderRoute: typeof ToolsQrGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/pdf-to-images': {
+      id: '/tools/pdf-to-images'
+      path: '/tools/pdf-to-images'
+      fullPath: '/tools/pdf-to-images'
+      preLoaderRoute: typeof ToolsPdfToImagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/pdf-text-extractor': {
@@ -950,6 +1003,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsExtractAudioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/compress-pdf': {
+      id: '/tools/compress-pdf'
+      path: '/tools/compress-pdf'
+      fullPath: '/tools/compress-pdf'
+      preLoaderRoute: typeof ToolsCompressPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/color-palette': {
       id: '/tools/color-palette'
       path: '/tools/color-palette'
@@ -1031,6 +1091,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsBusinessCardGeneratorRoute: ToolsBusinessCardGeneratorRoute,
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
+  ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
@@ -1050,9 +1111,11 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,
+  ToolsPdfToImagesRoute: ToolsPdfToImagesRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
+  ToolsRotatePdfRoute: ToolsRotatePdfRoute,
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,

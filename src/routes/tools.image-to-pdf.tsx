@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-to-pdf")({
   head: () => ({
@@ -166,6 +167,20 @@ function ImageToPdf() {
         "Pick page size, orientation, fit and margin.",
         "Click Convert to PDF to download your document.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Convert Images to PDF Online — JPG to PDF Free"}
+        description={"Convert one or multiple images to a PDF document for free. Supports JPG, PNG and WEBP. Choose page size, orientation and margins. Works in your browser."}
+        body={[
+        "Upload multiple images and arrange them in your preferred order — each image becomes a page in your PDF. Choose from A4, A3 or Letter page size, set portrait or landscape orientation, and adjust margins to your preference.",
+        "The conversion uses jsPDF library running entirely in your browser. Your images are never uploaded to any server, making this the most private way to create PDFs from images online.",
+      ]}
+        faqs={[
+        { question: "How many images can I convert to one PDF?", answer: "There is no limit. Upload as many images as needed — each becomes a separate page in the final PDF." },
+        { question: "Can I reorder images before converting?", answer: "Yes. After uploading, drag the image thumbnails to arrange them in the desired page order before clicking Convert." },
+        { question: "What page sizes are available?", answer: "We support A4 (most common globally), A3 (double the A4 size), and US Letter (standard in North America)." },
+        { question: "Will the image quality be maintained in the PDF?", answer: "Yes. We use 95% JPEG quality when embedding images in the PDF, preserving virtually all of the original image detail." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

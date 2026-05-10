@@ -8,6 +8,7 @@ import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { AdZone } from "@/components/ad-zone";
 import { PoweredBy, BrowserOnlyBadge, ModelLoadingSkeleton, CameraPermissionError } from "@/components/ai-badges";
 import { loadScript } from "@/lib/cdnScript";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/object-detection")({
   head: () => ({
@@ -233,6 +234,20 @@ function ObjectDetectionTool() {
         "Wait for the model to detect objects.",
         "See bounding boxes and a sidebar list of confidences.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"AI Object Detection Online — Real-time Detection Free"}
+        description={"Detect and identify objects in images or live video using AI. Powered by TensorFlow.js COCO-SSD. Recognizes 80 object categories. Works in your browser."}
+        body={[
+        "Upload an image or enable your camera for real-time object detection. The AI draws bounding boxes around detected objects and labels them with confidence percentages. Detected objects are also listed in a sidebar for easy reference.",
+        "The COCO-SSD model can recognize 80 common object categories including people, vehicles, animals, furniture, food and everyday items. The model runs entirely in your browser using TensorFlow.js — no images are sent to any server.",
+      ]}
+        faqs={[
+        { question: "What objects can the AI detect?", answer: "The model recognizes 80 object categories from the COCO dataset including person, car, bicycle, dog, cat, chair, bottle, laptop, phone and many more common objects." },
+        { question: "How accurate is the detection?", answer: "Accuracy varies by object and image quality. Well-lit, clear images of common objects typically achieve 70-95% confidence. The model works best with objects clearly visible and not overlapping." },
+        { question: "Does real-time camera detection affect privacy?", answer: "No. All processing happens locally in your browser using TensorFlow.js. Camera frames are never sent to Skycally's servers." },
+        { question: "Why does the model take time to load?", answer: "The COCO-SSD model is approximately 25MB and loads once when you first visit the page. Subsequent uses within the same session are instant." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

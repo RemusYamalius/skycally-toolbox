@@ -9,6 +9,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { Progress } from "@/components/ui/progress";
 import { convertToGif, MAX_VIDEO_BYTES } from "@/services/videoToGif";
 import { downloadBlob } from "@/lib/file-utils";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-to-gif")({
   head: () => ({
@@ -129,6 +130,20 @@ function Page() {
         "Pick start time, duration, width, and FPS.",
         "Click Convert and download your GIF.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Convert Video to GIF Online — Free & Fast"}
+        description={"Turn any video clip into a high-quality animated GIF using Skycally's free converter. Customize frame rate, size and duration for the perfect GIF."}
+        body={[
+        "Select your video clip, set the start time and duration (up to 10 seconds), choose your preferred width and frame rate, and convert to GIF in seconds. The tool uses FFmpeg WebAssembly running entirely in your browser.",
+        "Our two-pass palette generation ensures your GIF has vibrant, accurate colors rather than the washed-out look common with basic converters. Perfect for social media, messaging apps and presentations.",
+      ]}
+        faqs={[
+        { question: "Why is my GIF file so large?", answer: "GIFs are inherently large format. Reduce the width (try 320px), lower the FPS to 10, or shorten the duration to get a smaller file." },
+        { question: "What is the maximum clip duration for GIF?", answer: "We limit GIF conversion to 10 seconds to keep file sizes manageable. For longer animations, consider using the Video Compressor instead." },
+        { question: "Does the conversion happen in my browser?", answer: "Yes! We use FFmpeg WebAssembly which runs entirely in your browser. Your video never leaves your device." },
+        { question: "Can I convert YouTube videos to GIF?", answer: "You need to have the video file on your device first. Use our Video Downloader to save the clip, then convert it to GIF." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

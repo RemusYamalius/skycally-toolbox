@@ -11,6 +11,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
+import ToolSeoContent from "@/components/tool-seo-content";
 import {
   Select,
   SelectContent,
@@ -656,7 +657,21 @@ function BusinessCardGeneratorPage() {
           "Customize colors and download print-ready PNG",
         ]}
       />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Business Card Generator — Design & Download Online"}
+        description={"Design professional business cards online for free. 8 templates, QR code integration, custom colors. Download print-ready PNG at 300 DPI. No signup needed."}
+        body={[
+        "Choose from 8 professionally designed templates ranging from clean minimal white to premium dark and gold. Fill in your contact details, upload your logo, and customize colors to match your brand identity.",
+        "Every business card automatically includes a QR code generated from your website URL, making it easy for contacts to find you online. Download the front and back separately or combined in a single file ready for printing at standard business card size (3.5\" × 2\").",
+      ]}
+        faqs={[
+        { question: "Are the business cards print-ready?", answer: "Yes. Cards are generated at 1050×600px which equals 300 DPI at standard business card size (3.5\"×2\"). Add 3mm bleed when sending to professional printers." },
+        { question: "Can I add my company logo?", answer: "Yes. Upload any PNG or JPG logo and it will be placed on your card. Transparent PNG logos work best for a professional look." },
+        { question: "Is the QR code on the business card scannable?", answer: "Yes. The QR code is generated at high error correction level ensuring it remains scannable even at small print sizes." },
+        { question: "Can I download both sides of the business card?", answer: "Yes. Download the front, back, or both sides combined in a single image file for easy printing." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }
 

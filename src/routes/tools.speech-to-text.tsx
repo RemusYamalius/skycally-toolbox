@@ -8,6 +8,7 @@ import { AdZone } from "@/components/ad-zone";
 import { Textarea } from "@/components/ui/textarea";
 import { startRecognition, type RecognitionHandle } from "@/services/speechToText";
 import { downloadBlob } from "@/lib/file-utils";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/speech-to-text")({
   head: () => ({
@@ -132,6 +133,20 @@ function Page() {
         "Click the microphone and start speaking.",
         "Copy or download your transcript when done.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Speech to Text — Voice to Text Converter Online"}
+        description={"Convert speech to text in real-time for free. Supports Arabic, English, French and Spanish. Uses your microphone directly in the browser. No app needed."}
+        body={[
+        "Click the microphone button, allow microphone access, and start speaking. Your words appear as text in real-time as you speak. Choose your language from the selector for accurate recognition.",
+        "The speech recognition uses the Web Speech API built into modern browsers — no data is sent to Skycally's servers. Note that this feature works best in Google Chrome for the most accurate recognition.",
+      ]}
+        faqs={[
+        { question: "Which browser works best for speech to text?", answer: "Google Chrome provides the best speech recognition accuracy. The feature also works in Edge and Safari, but may have reduced accuracy." },
+        { question: "Is my voice data stored anywhere?", answer: "No. The Web Speech API sends audio to your browser provider (Google for Chrome) for processing, but Skycally never receives or stores your audio." },
+        { question: "Can I use speech to text for Arabic?", answer: "Yes. Select Arabic from the language dropdown. We support multiple Arabic variants including Modern Standard Arabic and regional dialects." },
+        { question: "What is the maximum recording length?", answer: "There is no strict limit. The tool uses continuous recognition mode, so you can speak as long as needed. Click Stop when finished." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

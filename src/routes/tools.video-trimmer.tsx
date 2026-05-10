@@ -9,6 +9,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
 import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-trimmer")({
   head: () => ({
@@ -191,6 +192,20 @@ function Page() {
       ]} />
 
       <PoweredByNote />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Video Trimmer — Cut and Trim Videos Online"}
+        description={"Cut your videos to the exact length you need with Skycally's free online video trimmer. No installation required — works directly in your browser."}
+        body={[
+        "Upload your video, set the start and end points using the intuitive sliders, and download your trimmed clip in seconds. The tool supports MP4, MOV, AVI, MKV and WEBM formats.",
+        "Video trimming uses stream copying which means no re-encoding — your video quality is preserved exactly and processing is nearly instant regardless of file size.",
+      ]}
+        faqs={[
+        { question: "Does trimming affect video quality?", answer: "No. We use stream copy mode which cuts the video without re-encoding, preserving the original quality perfectly." },
+        { question: "What is the maximum video length I can trim?", answer: "There is no length limit. You can trim videos of any duration — from short clips to full-length movies." },
+        { question: "Can I trim multiple sections from one video?", answer: "Currently the tool supports one trim operation per video. For multiple cuts, download each trimmed section separately." },
+        { question: "Does the trimmer work on mobile?", answer: "Yes, the video trimmer is fully responsive and works on smartphones and tablets." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

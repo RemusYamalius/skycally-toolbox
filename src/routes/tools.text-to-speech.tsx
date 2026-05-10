@@ -8,6 +8,7 @@ import { AdZone } from "@/components/ad-zone";
 import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { speak, stop, downloadAudio } from "@/services/textToSpeech";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/text-to-speech")({
   head: () => ({
@@ -119,6 +120,20 @@ function Page() {
         "Pick a voice, speed, and pitch.",
         "Press Play to listen, or Download to save the audio.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Text to Speech — Convert Text to Audio Online"}
+        description={"Convert any text to natural-sounding speech for free. 50+ voices in Arabic, English, French and Spanish. Adjust speed and pitch. Download as audio."}
+        body={[
+        "Type or paste your text, select a voice from our library of 50+ options across multiple languages, adjust the speaking speed and pitch, then click Play or Download. The tool uses your browser's built-in speech synthesis engine for instant, private conversion.",
+        "Arabic voices are fully supported with natural-sounding pronunciation. Select from regional Arabic variants including Moroccan, Egyptian, Saudi and Gulf Arabic dialects depending on your browser's installed voices.",
+      ]}
+        faqs={[
+        { question: "Is text to speech completely free?", answer: "Yes, completely free with no character limits, no signup and no watermarks on downloaded audio." },
+        { question: "What languages are supported?", answer: "The available voices depend on your browser and operating system. Common supported languages include English, Arabic, French, Spanish, German, Italian, Portuguese and many more." },
+        { question: "Can I download the audio as MP3?", answer: "Yes. Click the Download button to save the generated speech as an audio file to your device." },
+        { question: "Why do I hear different voices on different devices?", answer: "The voice library comes from your operating system and browser. Windows, Mac, iOS and Android each have different built-in voices." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

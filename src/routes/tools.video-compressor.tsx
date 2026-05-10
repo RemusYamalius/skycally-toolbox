@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-compressor")({
   head: () => ({
@@ -209,6 +210,20 @@ function VideoCompressor() {
         "Choose a compression quality: Low, Medium or High.",
         "Click Compress Video to download the smaller file instantly.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Video Compressor — Reduce Video File Size Online"}
+        description={"Reduce your video file size without losing quality using Skycally's free video compressor. Perfect for sharing on social media, email, or saving storage space."}
+        body={[
+        "Choose from three compression levels: Low for maximum compression, Medium for a balanced result, and High for the best quality. Our tool uses the H.264 codec to ensure maximum compatibility across all devices and platforms.",
+        "The compression happens on our secure server using FFmpeg, one of the most trusted video processing tools available. Your files are processed and immediately deleted after download.",
+      ]}
+        faqs={[
+        { question: "How much can I reduce my video file size?", answer: "Depending on the original video and quality setting, you can typically reduce file size by 30-70% without noticeable quality loss." },
+        { question: "What video formats are supported?", answer: "You can upload MP4, MOV, AVI, MKV and WEBM files. The compressed output is always in MP4 format for maximum compatibility." },
+        { question: "Is there a file size limit?", answer: "We support files up to 500MB. For larger files, we recommend using the High quality setting to minimize processing time." },
+        { question: "Will the video dimensions change after compression?", answer: "No. The video resolution stays the same — only the bitrate is reduced to achieve a smaller file size." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

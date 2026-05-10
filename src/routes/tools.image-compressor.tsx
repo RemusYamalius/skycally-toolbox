@@ -7,6 +7,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { downloadBlob } from "@/lib/file-utils";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-compressor")({
   head: () => ({
@@ -102,6 +103,20 @@ function Compressor() {
         "Drag the quality slider — lower means smaller files.",
         "Hit Compress all, then download each file or grab the ZIP.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Image Compressor — Reduce Image Size Without Quality Loss"}
+        description={"Compress PNG, JPG and WEBP images by up to 80% while maintaining excellent visual quality. Batch compress multiple images and download as ZIP."}
+        body={[
+        "Adjust the quality slider to find the perfect balance between file size and image quality. The before/after size comparison lets you see exactly how much space you're saving before downloading.",
+        "Image compression runs entirely in your browser using WebAssembly technology — no uploads, no waiting, and complete privacy. Compress sensitive documents and images without any security concerns.",
+      ]}
+        faqs={[
+        { question: "How much can I reduce image file size?", answer: "At 80% quality, most images can be reduced by 50-70% with virtually no visible quality difference. Higher compression ratios are possible at lower quality settings." },
+        { question: "What is the maximum number of images I can compress?", answer: "There is no strict limit, but we recommend batches of 20 or fewer images for the best performance on most devices." },
+        { question: "Can I compress PNG files?", answer: "Yes. PNG compression is lossless by nature, so we optimize the file structure to reduce size without any quality loss." },
+        { question: "Why should I compress images for my website?", answer: "Smaller images load faster, improve Google PageSpeed scores, reduce bandwidth costs and provide a better user experience — all of which positively impact SEO rankings." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

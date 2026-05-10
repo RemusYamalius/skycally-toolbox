@@ -8,6 +8,7 @@ import { AdZone } from "@/components/ad-zone";
 import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
 import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/add-subtitles")({
   head: () => ({
@@ -218,6 +219,20 @@ function Page() {
       ]} />
 
       <PoweredByNote />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Add Subtitles to Video Online — Free Subtitle Burner"}
+        description={"Burn subtitles permanently into your video using Skycally's free online subtitle tool. Write subtitles manually or upload an SRT file — no software needed."}
+        body={[
+        "Choose between writing your own subtitles with precise timing control or uploading an existing SRT subtitle file. Customize the font size and color to match your video style.",
+        "Subtitles are burned directly into the video frames, making them visible on all devices and platforms without needing a separate subtitle file. Perfect for social media videos, educational content and presentations.",
+      ]}
+        faqs={[
+        { question: "What subtitle file formats are supported?", answer: "We support SRT (SubRip) format for file uploads, which is the most widely used subtitle format compatible with all major video players." },
+        { question: "Can I add subtitles in Arabic or other RTL languages?", answer: "Yes, our subtitle tool supports all languages including Arabic, Hebrew and other right-to-left languages." },
+        { question: "Are the subtitles permanent or removable?", answer: "Subtitles are burned (hardcoded) into the video, meaning they are permanent and visible on all devices without needing a subtitle player." },
+        { question: "What is SRT format?", answer: "SRT (SubRip Subtitle) is a plain text file containing subtitle text with start and end timestamps. You can create one with any text editor." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

@@ -6,6 +6,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { PoweredBy, BrowserOnlyBadge, ModelLoadingSkeleton, CameraPermissionError } from "@/components/ai-badges";
 import { loadScript } from "@/lib/cdnScript";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/hand-gesture")({
   head: () => ({
@@ -193,6 +194,20 @@ function HandGestureTool() {
         "Hold your hand in front of the camera.",
         "Try fist, peace, pointing, open hand, thumbs up.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Hand Gesture Recognition — Real-time Detection Free | Skycally"}
+        description={"Detect hand gestures in real-time using AI and your camera. Recognizes thumbs up, peace sign, pointing and more. Powered by MediaPipe Hands. Free."}
+        body={[
+        "Enable your camera and the AI will track your hand movements and recognize common gestures in real-time. The tool overlays a colored skeleton showing all 21 hand landmarks and displays the detected gesture name.",
+        "Hand gesture recognition uses MediaPipe Hands running in your browser. Applications include sign language recognition, touchless interfaces, gaming controls and accessibility technology. The tool supports up to 2 hands simultaneously.",
+      ]}
+        faqs={[
+        { question: "What gestures can be recognized?", answer: "The tool recognizes Open Hand, Fist, Thumbs Up, Thumbs Down, Pointing (index finger), Peace/Victory sign, and general hand detection." },
+        { question: "How many hands can be tracked at once?", answer: "The tool tracks up to 2 hands simultaneously with individual gesture recognition for each hand." },
+        { question: "Why is gesture recognition sometimes inaccurate?", answer: "Accuracy depends on lighting, background contrast and hand positioning. Ensure good lighting and position your hand clearly in front of the camera for best results." },
+        { question: "Is camera access required?", answer: "Yes, hand gesture recognition requires camera access as it analyzes live video frames. No camera data is sent to any server." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

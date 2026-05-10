@@ -10,6 +10,7 @@ import { AdZone } from "@/components/ad-zone";
 import { PoweredBy, BrowserOnlyBadge, ModelLoadingSkeleton, CameraPermissionError } from "@/components/ai-badges";
 import { loadScript } from "@/lib/cdnScript";
 import { downloadBlob } from "@/lib/file-utils";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/background-blur")({
   head: () => ({
@@ -204,6 +205,20 @@ function BackgroundBlurTool() {
         "Adjust the blur intensity slider to taste.",
         "Download the result, or just enjoy the live preview.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"AI Background Blur — Blur Photo Background Free Online"}
+        description={"Automatically blur image backgrounds using AI. Works with photos or live camera. Adjust blur intensity. Powered by MediaPipe. No signup needed."}
+        body={[
+        "Upload a photo or enable your camera for real-time background blurring. The AI detects the subject (person) and applies a customizable blur effect to the background — similar to the portrait mode on modern smartphones.",
+        "Background blurring uses MediaPipe Selfie Segmentation running in your browser. The AI model processes each frame locally without sending any data to external servers. Adjust the blur intensity from subtle to strong using the slider.",
+      ]}
+        faqs={[
+        { question: "Does background blur work for group photos?", answer: "Yes, the AI can detect multiple people in a photo and keep all of them in focus while blurring the background." },
+        { question: "Can I use this for video calls?", answer: "Our tool works with your camera in real-time but cannot integrate directly with video call applications. It works great for creating blurred background images to use as virtual backgrounds." },
+        { question: "What blur strength should I use?", answer: "For a natural portrait look, use 10-15px blur. For a strong studio effect, try 20-25px. Maximum blur (30px) creates a heavily defocused background." },
+        { question: "Does it work with non-human subjects?", answer: "The model is optimized for human subjects. Results for objects, animals or non-person subjects may vary." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

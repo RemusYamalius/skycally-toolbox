@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/split-pdf")({
   head: () => ({
@@ -204,6 +205,20 @@ function SplitPdf() {
         "Type the pages you want to extract (e.g. 1-3,5,7-9).",
         "Click Split PDF to download the extracted pages instantly.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Split PDF Online Free — Extract Pages from PDF"}
+        description={"Split PDF files and extract specific pages for free. Enter page numbers or ranges, download as a new PDF. 100% browser-based and private."}
+        body={[
+        "Enter the page numbers you want to extract — use commas for individual pages (1,3,5), hyphens for ranges (2-6), or combine both (1,3-5,8). The selected pages are extracted and combined into a new PDF document.",
+        "PDF splitting uses pdf-lib running in your browser. Your document is never uploaded to any server, making this ideal for extracting pages from sensitive or confidential documents.",
+      ]}
+        faqs={[
+        { question: "Can I extract non-consecutive pages?", answer: "Yes. Enter pages separated by commas for non-consecutive pages, for example: 1,5,8,12 to extract only those specific pages." },
+        { question: "Can I split a PDF into multiple separate files?", answer: "Currently the tool extracts selected pages into one new PDF. To create multiple separate files, run the tool multiple times with different page selections." },
+        { question: "How do I know how many pages my PDF has?", answer: "After uploading, the tool displays the total page count of your document so you can plan your page selection." },
+        { question: "Will the extracted pages maintain their original quality?", answer: "Yes. Page extraction is completely lossless — all content, formatting and images are preserved exactly as in the original PDF." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

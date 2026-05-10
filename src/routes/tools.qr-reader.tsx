@@ -7,6 +7,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/qr-reader")({
   head: () => ({
@@ -181,6 +182,20 @@ function QrReaderPage() {
         "We decode it instantly in your browser.",
         "Copy the result or open the link if it's a URL.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free QR Code Reader — Scan QR Codes Online"}
+        description={"Read and decode QR codes from images or your camera for free. Supports all QR code types. Works entirely in your browser — no app needed."}
+        body={[
+        "Upload an image containing a QR code or use your device camera to scan in real-time. The decoded content is displayed instantly — whether it's a URL, text, WiFi credentials, contact information or any other data.",
+        "The QR reader uses jsQR running entirely in your browser. No images are uploaded to any server, making it completely private. If a URL is detected, an 'Open Link' button appears for one-click access.",
+      ]}
+        faqs={[
+        { question: "What types of QR codes can I read?", answer: "We can read all standard QR code types including URL, text, email, phone number, WiFi credentials, vCard contacts and more." },
+        { question: "Why is my QR code not being detected?", answer: "Ensure the QR code is clearly visible, not blurry, and fills a good portion of the image. Try increasing image brightness or contrast if detection fails." },
+        { question: "Can I scan QR codes from screenshots?", answer: "Yes. Upload any image file containing a QR code — screenshots, photos, PDFs screenshots — and the tool will detect and decode it." },
+        { question: "Is camera scanning available on mobile?", answer: "Yes. The camera scanner works on smartphones and tablets. Allow camera permission when prompted for real-time QR scanning." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

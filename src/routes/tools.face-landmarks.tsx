@@ -9,6 +9,7 @@ import { AdZone } from "@/components/ad-zone";
 import { PoweredBy, BrowserOnlyBadge, ModelLoadingSkeleton, CameraPermissionError } from "@/components/ai-badges";
 import { loadScript } from "@/lib/cdnScript";
 import { downloadBlob } from "@/lib/file-utils";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/face-landmarks")({
   head: () => ({
@@ -218,6 +219,20 @@ function FaceLandmarksTool() {
         "Toggle dots and mesh overlays as desired.",
         "Download the annotated image (image mode).",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Face Landmark Detection — 468 Points Real-time | Skycally"}
+        description={"Detect and visualize 468 facial landmarks in real-time using MediaPipe Face Mesh. Works with photos or live camera. Free, browser-based, no signup."}
+        body={[
+        "Upload a photo or use your camera to detect detailed facial landmarks in real-time. The AI maps 468 precise points across the face including eyes, eyebrows, nose, lips, jaw and cheekbones.",
+        "Face landmark detection is used in augmented reality, facial analysis, emotion recognition and 3D face modeling. Our tool uses MediaPipe Face Mesh running in your browser — no facial data is stored or transmitted.",
+      ]}
+        faqs={[
+        { question: "How many faces can be detected at once?", answer: "The tool can detect and map landmarks on up to 4 faces simultaneously in a single image or camera frame." },
+        { question: "Is my facial data stored?", answer: "No. All processing happens locally in your browser. No facial data, images or landmarks are ever sent to Skycally's servers." },
+        { question: "What are facial landmarks used for?", answer: "Facial landmarks are used in augmented reality filters, face swap apps, emotion detection, beauty apps, accessibility tools and medical facial analysis." },
+        { question: "Can I toggle the landmark display?", answer: "Yes. Use the toggle buttons to show/hide individual landmark dots and the mesh connection lines independently." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

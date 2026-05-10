@@ -1,56 +1,64 @@
 ## Goal
+Add a Contact page, wire up Formspree, expand SEO metadata across pages, refresh sitemap/robots, and add JSON-LD on the homepage.
 
-Add 3 new browser-based video tools (Trimmer, Merger, Subtitles) and refactor the existing Video to GIF tool to use a shared FFmpeg loader. All processing runs locally via `@ffmpeg/ffmpeg` + WASM — no backend.
+## Important notes on stack adaptation
+- The project is **TanStack Start**, not CRA/Vite-React. We already manage `<head>` via each route's `head()` (see `src/routes/__root.tsx`, `src/routes/tools.json-formatter.tsx`). **We will NOT install `react-helmet-async`** — it duplicates and conflicts with TanStack's `HeadContent`. All `<Helmet>` blocks in your spec will be translated 1:1 into `head: () => ({ meta, links, scripts })`.
+- The sitemap is already a **dynamic route** at `src/routes/sitemap[.]xml.tsx`, not a static `public/sitemap.xml`. We'll update that route's `ROUTES` list to match your new spec. `public/robots.txt` already exists and already points to the sitemap — no changes needed there.
+- Formspree form ID: I'll use a placeholder constant `FORMSPREE_ID` at the top of the contact page so you only edit one line after signing up.
 
-The user-supplied snippets use raw Tailwind hex colors and `src/pages/...` paths. I will adapt them to match this project's conventions:
-- Routes live under `src/routes/tools.<slug>.tsx` (TanStack Router)
-- All tools wrap UI in `ToolPageShell` + end with `HowToUse` (per project memory rule)
-- Use semantic design tokens (`bg-card`, `border-border`, `text-muted-foreground`, `var(--cyan-brand)`) instead of hardcoded `#0a0f1e` / `#1e2d4a`
-- Reuse existing `DropZone`, `Progress`, `AdZone`, and `downloadBlob` helpers
-- Register tools in `src/lib/tools.ts` so they auto-appear on home, `/tools`, and footer
+## Part 1 — Contact page (`/contact`)
+Create `src/routes/contact.tsx`:
+- `head()` with title/description/og/canonical for `/contact`.
+- Hero: "Get in Touch" + subtitle.
+- **Form** (controlled React state, `fetch` POST to `https://formspree.io/f/${FORMSPREE_ID}` with `Accept: application/json`):
+  - Name, Email, Subject (Select with the 5 options), Message (Textarea rows=5).
+  - Zod validation client-side (name 1–100, email valid + ≤255, message 1–2000, subject enum). Errors shown inline.
+  - States: idle / submitting / success / error → toast + inline message exactly as specified.
+  - Reset form on success.
+- **3 info cards** (Email / Quick Response / Follow Us) using the existing card styling pattern (`bg-card border border-border rounded-2xl`).
+- **FAQ section** using the existing `Accordion` component from `@/components/ui/accordion` for the 5 Q&As.
+- Dark theme + cyan→blue gradient submit button matching site tokens.
 
-## Files
+## Part 2 — Navigation
+- `src/components/site-header.tsx`: add `{ to: "/contact", label: "Contact" }` to `links` (between About and theme toggle area).
+- `src/components/site-footer.tsx`: add Contact to Quick Links and to the bottom legal bar.
 
-### New
-1. **`src/utils/ffmpegLoader.ts`** — singleton `getFFmpeg(onProgress?)` that loads core from `unpkg.com/@ffmpeg/core@0.12.6` once, attaches a progress listener, and returns the cached instance.
-2. **`src/routes/tools.video-trimmer.tsx`** — upload → preview `<video>` → start/end range sliders → trim with `-c copy` → preview + download.
-3. **`src/routes/tools.video-merger.tsx`** — multi-upload list with up/down/remove reordering → write all + `concat.txt` → `-f concat -safe 0 -c copy` merge.
-4. **`src/routes/tools.add-subtitles.tsx`** — video upload + two modes (manual SRT editor with start/end/text rows, or `.srt` upload) + style controls (font size 14–48, color white/yellow/blue) → burn via `subtitles=` filter with `force_style`.
+## Part 3 — Per-page SEO (`head()` upgrades)
+For each route below, ensure `head()` includes title, description, og:title, og:description, og:url, twitter equivalents, and `<link rel="canonical">` via `links: [{ rel: "canonical", href: "https://skycally.com/..." }]`. Use the exact copy from your spec.
 
-### Edited
-5. **`src/services/videoToGif.ts`** — refactor to use the shared loader (delete duplicate FFmpeg bootstrap; keep two-pass palettegen→paletteuse pipeline currently used).
-6. **`src/lib/tools.ts`** — add 3 new entries under `video` category with icons from lucide-react: `Scissors` (trimmer), `Combine` (merger), `Captions` (subtitles).
-7. **`.lovable/plan.md`** — update.
+Routes to update:
+- `src/routes/index.tsx` — homepage copy + JSON-LD WebSite schema (added via `scripts: [{ type: "application/ld+json", children: JSON.stringify(...) }]`).
+- `src/routes/tools.video-downloader.tsx`
+- `src/routes/tools.qr-generator.tsx`
+- `src/routes/tools.remove-bg.tsx`
+- `src/routes/tools.image-converter.tsx`
+- `src/routes/tools.image-compressor.tsx`
+- `src/routes/tools.image-resizer.tsx`
+- `src/routes/tools.image-cropper.tsx`
+- `src/routes/tools.merge-pdf.tsx`
+- `src/routes/tools.word-to-pdf.tsx`
+- `src/routes/tools.split-pdf.tsx`
+- `src/routes/tools.business-card-generator.tsx`
+- `src/routes/tools.text-to-speech.tsx`
+- `src/routes/tools.object-detection.tsx`
+- `src/routes/tools.sentiment-analysis.tsx`
 
-The route tree (`src/routeTree.gen.ts`) auto-regenerates.
+We will only change `head()` on these — no UI/business-logic changes.
 
-## Tool route shape (consistent across all 3 new tools)
+## Part 4 — Sitemap
+Update `src/routes/sitemap[.]xml.tsx` `ROUTES` to match your full list (adds `/contact`, `/tools/business-card-generator`, the new video tools, AI tools, `image-resizer`, `image-cropper`, `add-text-to-image`, `image-to-pdf`, `collage-maker`, `meme-generator`, `background-blur`, `face-landmarks`, `hand-gesture`, etc.). Priorities mirror your spec.
 
-```tsx
-<ToolPageShell title="..." description="...">
-  {/* one-time info banner about ~30MB FFmpeg download */}
-  {/* DropZone or upload card */}
-  {/* Tool-specific controls */}
-  {/* Progress bar (Progress component) when busy */}
-  {/* Result preview + Download button */}
-  {/* AdZone id="<slug>-bottom" size="728x90" */}
-  <HowToUse steps={[...]} />
-</ToolPageShell>
-```
+`public/robots.txt` already correct — no change.
 
-All buttons/cards use design tokens, not raw hex. The "first-use ~30MB" banner is a small dismissable note shown until the FFmpeg cache is warmed (tracked in localStorage).
+## Part 5 — JSON-LD
+Added on homepage via the `scripts` array in `head()` (TanStack-native, see Part 3).
 
-## Technical notes
+## Files touched
+**Created:** `src/routes/contact.tsx`
+**Edited:** `src/components/site-header.tsx`, `src/components/site-footer.tsx`, `src/routes/sitemap[.]xml.tsx`, `src/routes/index.tsx`, plus the 14 tool route files listed above (only their `head()` blocks).
+**Auto-regenerated:** `src/routeTree.gen.ts` (TanStack plugin handles it).
 
-- `@ffmpeg/ffmpeg` and `@ffmpeg/util` are already installed (used by current `videoToGif.ts`) — no `bun add` needed.
-- FFmpeg loader is client-only; never import from server code (already the case, but worth noting for SSR safety — guard with dynamic import inside handlers).
-- `-c copy` keyframe trimming is fast but cuts only at keyframes; acceptable trade-off for a browser tool.
-- Subtitles filter requires the SRT file to exist in FFmpeg's virtual FS; written via `writeFile('subs.srt', …)` before `exec`.
-- Merger requires same codec/container across inputs for `-c copy`; if the user mixes formats it will fail — surface the FFmpeg error via `toast.error`.
-- Each tool registers a unique AdZone id matching the existing `ADSENSE_ZONE` comment pattern.
-
-## Out of scope
-
-- No backend changes.
-- No changes to the existing footer/home grids (they auto-pick up new entries from `tools.ts`).
-- No changes to other tools.
+## After implementation
+You'll need to:
+1. Sign up at formspree.io, grab the form ID, and replace `FORMSPREE_ID` at the top of `src/routes/contact.tsx`.
+2. Optionally provide a real `og-image.png` at `/og-image.png` (homepage references it).

@@ -21,6 +21,7 @@ export function SiteFooter() {
             <li><Link to="/" className="hover:text-foreground transition">Home</Link></li>
             <li><Link to="/tools" className="hover:text-foreground transition">All Tools</Link></li>
             <li><Link to="/about" className="hover:text-foreground transition">About</Link></li>
+            <li><Link to="/contact" className="hover:text-foreground transition">Contact</Link></li>
           </ul>
         </div>
         <div>
@@ -66,7 +67,7 @@ export function SiteFooter() {
 
       <div className="border-t border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
-          <p>© 2025 Skycally.com · <Link to="/privacy" className="hover:text-foreground">Privacy</Link> · <Link to="/terms" className="hover:text-foreground">Terms</Link></p>
+          <p>© 2025 Skycally.com · <Link to="/privacy" className="hover:text-foreground">Privacy</Link> · <Link to="/terms" className="hover:text-foreground">Terms</Link> · <Link to="/contact" className="hover:text-foreground">Contact</Link></p>
           <p>Free online tools — no registration required</p>
         </div>
       </div>

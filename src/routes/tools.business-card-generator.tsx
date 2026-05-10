@@ -22,18 +22,13 @@ import {
 export const Route = createFileRoute("/tools/business-card-generator")({
   head: () => ({
     meta: [
-      { title: "Business Card Generator — Skycally" },
-      {
-        name: "description",
-        content:
-          "Design professional business cards online — free, instant, print-ready PNG with QR code support.",
-      },
-      { property: "og:title", content: "Business Card Generator · Skycally" },
-      {
-        property: "og:description",
-        content: "Pick a template, fill your info and download a print-ready business card.",
-      },
+      { title: "Free Business Card Generator — Print Ready PNG | Skycally" },
+      { name: "description", content: "Design professional business cards online for free. Choose from 8 templates, add your QR code, customize colors and download print-ready PNG at 300 DPI." },
+      { property: "og:title", content: "Free Business Card Generator | Skycally" },
+      { property: "og:description", content: "Pick a template, fill your info and download a print-ready business card." },
+      { property: "og:url", content: "https://skycally.com/tools/business-card-generator" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/business-card-generator" }],
   }),
   component: BusinessCardGeneratorPage,
 });

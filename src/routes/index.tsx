@@ -9,10 +9,34 @@ import { AdZone } from "@/components/ad-zone";
 export const Route = createFileRoute("/")({
   head: () => ({
     meta: [
-      { title: "Skycally — Every tool you need, one place" },
-      { name: "description", content: "Download videos, convert files, compress images, edit PDFs — all free, all fast, all in one place." },
-      { property: "og:title", content: "Skycally — Every tool you need, one place" },
-      { property: "og:description", content: "Free online tools — no registration required." },
+      { title: "Skycally — Free Online Tools: Video Downloader, PDF, Image & More" },
+      { name: "description", content: "Free online tools for everyone. Download videos from TikTok, Instagram & YouTube. Convert images, compress PDFs, remove backgrounds, generate QR codes and 20+ more tools. No signup required." },
+      { name: "keywords", content: "free online tools, video downloader, pdf converter, image compressor, qr code generator, remove background" },
+      { property: "og:title", content: "Skycally — Every Tool You Need, Free" },
+      { property: "og:description", content: "20+ free online tools. Download videos, convert files, compress images — all free, all fast, no signup." },
+      { property: "og:url", content: "https://skycally.com" },
+      { property: "og:type", content: "website" },
+      { name: "twitter:card", content: "summary_large_image" },
+      { name: "twitter:title", content: "Skycally — Free Online Tools" },
+      { name: "twitter:description", content: "20+ free online tools. No signup required." },
+    ],
+    links: [{ rel: "canonical", href: "https://skycally.com" }],
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "WebSite",
+          name: "Skycally",
+          url: "https://skycally.com",
+          description: "Free online tools — video downloader, image converter, PDF tools, QR code generator and more.",
+          potentialAction: {
+            "@type": "SearchAction",
+            target: "https://skycally.com/tools?q={search_term_string}",
+            "query-input": "required name=search_term_string",
+          },
+        }),
+      },
     ],
   }),
   component: HomePage,

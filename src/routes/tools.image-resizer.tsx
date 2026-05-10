@@ -9,11 +9,13 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 export const Route = createFileRoute("/tools/image-resizer")({
   head: () => ({
     meta: [
-      { title: "Image Resizer — Resize images by pixels or percentage · Skycally" },
-      { name: "description", content: "Resize PNG, JPG and WEBP images by pixels or percentage with quality control. Free, fast, in your browser." },
-      { property: "og:title", content: "Image Resizer · Skycally" },
+      { title: "Free Image Resizer — Resize PNG, JPG Online | Skycally" },
+      { name: "description", content: "Resize images online for free. Set custom dimensions or use presets for Instagram, Twitter, Facebook and more. No signup, works in browser." },
+      { property: "og:title", content: "Free Image Resizer | Skycally" },
       { property: "og:description", content: "Resize images by pixels or percentage with quality control." },
+      { property: "og:url", content: "https://skycally.com/tools/image-resizer" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-resizer" }],
   }),
   component: ImageResizer,
 });

@@ -12,11 +12,13 @@ import { speak, stop, downloadAudio } from "@/services/textToSpeech";
 export const Route = createFileRoute("/tools/text-to-speech")({
   head: () => ({
     meta: [
-      { title: "Text to Speech — Skycally" },
-      { name: "description", content: "Convert text to natural speech in Arabic, English, French, Spanish and more. Free." },
-      { property: "og:title", content: "Text to Speech · Skycally" },
+      { title: "Free Text to Speech — Convert Text to Audio Online | Skycally" },
+      { name: "description", content: "Convert text to speech for free. 50+ voices in Arabic, English, French and Spanish. Download as MP3. Works entirely in your browser." },
+      { property: "og:title", content: "Free Text to Speech | Skycally" },
       { property: "og:description", content: "Free browser-based TTS in multiple languages." },
+      { property: "og:url", content: "https://skycally.com/tools/text-to-speech" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/text-to-speech" }],
   }),
   component: Page,
 });

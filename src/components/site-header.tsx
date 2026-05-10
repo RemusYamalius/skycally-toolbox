@@ -11,6 +11,7 @@ export function SiteHeader() {
     { to: "/", label: "Home" },
     { to: "/tools", label: "Tools" },
     { to: "/about", label: "About" },
+    { to: "/contact", label: "Contact" },
   ] as const;
 
   return (

@@ -12,11 +12,13 @@ import { loadScript } from "@/lib/cdnScript";
 export const Route = createFileRoute("/tools/object-detection")({
   head: () => ({
     meta: [
-      { title: "Object Detection — COCO-SSD Online · Skycally" },
-      { name: "description", content: "Detect 80+ object classes in images or live video — runs in your browser with TensorFlow.js." },
-      { property: "og:title", content: "Object Detection · Skycally" },
+      { title: "AI Object Detection — Real-time Detection Online Free | Skycally" },
+      { name: "description", content: "Detect objects in images and video in real-time using AI. Powered by TensorFlow.js COCO-SSD. Works entirely in your browser for free." },
+      { property: "og:title", content: "AI Object Detection | Skycally" },
       { property: "og:description", content: "Real-time object detection with COCO-SSD." },
+      { property: "og:url", content: "https://skycally.com/tools/object-detection" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/object-detection" }],
   }),
   component: ObjectDetectionTool,
 });

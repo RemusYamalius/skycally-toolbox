@@ -11,11 +11,13 @@ import { DropZone } from "@/components/drop-zone";
 export const Route = createFileRoute("/tools/image-cropper")({
   head: () => ({
     meta: [
-      { title: "Image Cropper — Crop, rotate and flip images · Skycally" },
-      { name: "description", content: "Crop images with aspect-ratio presets, rotate and flip — entirely in your browser. Free and fast." },
-      { property: "og:title", content: "Image Cropper · Skycally" },
+      { title: "Free Image Cropper — Crop Photos Online | Skycally" },
+      { name: "description", content: "Crop images online with custom aspect ratios. Supports 1:1, 16:9, 4:3 and free crop. Rotate and flip options included." },
+      { property: "og:title", content: "Free Image Cropper | Skycally" },
       { property: "og:description", content: "Crop, rotate and flip images with aspect-ratio presets." },
+      { property: "og:url", content: "https://skycally.com/tools/image-cropper" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-cropper" }],
   }),
   component: ImageCropper,
 });

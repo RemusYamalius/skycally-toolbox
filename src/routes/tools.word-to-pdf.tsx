@@ -7,6 +7,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { checkSize } from "@/lib/file-utils";
 import { convertWordToPdf } from "@/services/wordToPdf";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/word-to-pdf")({
   head: () => ({
@@ -71,6 +72,20 @@ function WordToPdf() {
         "Click Convert to PDF — we process it server-side.",
         "Your PDF is downloaded automatically.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Word to PDF Converter Free — Convert DOCX to PDF Online"}
+        description={"Convert Word documents to PDF format for free. Supports DOC and DOCX files. Preserves formatting, fonts and layout. Arabic and RTL text fully supported."}
+        body={[
+        "Upload your Word document and receive a perfectly formatted PDF within seconds. Our converter uses LibreOffice on the server side to ensure accurate conversion that preserves tables, images, headers, footers and all formatting elements.",
+        "Arabic, French, Spanish and all other languages are fully supported including right-to-left text direction. The converter handles complex layouts including multi-column documents and embedded graphics.",
+      ]}
+        faqs={[
+        { question: "Does the converter support Arabic text?", answer: "Yes, Arabic and all RTL (right-to-left) languages are fully supported with correct text direction preserved in the output PDF." },
+        { question: "What Word formats are supported?", answer: "We support both DOC (older Word format) and DOCX (modern Word format, recommended for best results)." },
+        { question: "Is my document kept private?", answer: "Your document is processed on our secure server and immediately deleted after the PDF is generated. We never store or share your documents." },
+        { question: "Will my document formatting be preserved?", answer: "Yes. Tables, images, headers, footers, fonts and page layout are all preserved accurately in the output PDF." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

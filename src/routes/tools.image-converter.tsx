@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { downloadBlob } from "@/lib/file-utils";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-converter")({
   head: () => ({
@@ -130,6 +131,20 @@ function ImageConverter() {
         "Pick the format you want — JPG, PNG or WebP.",
         "Click Convert all, then download files individually or as a ZIP.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Image Converter — Convert PNG, JPG, WEBP Online"}
+        description={"Convert images between PNG, JPG, WEBP and other formats instantly in your browser. No upload required — your files never leave your device."}
+        body={[
+        "Convert single images or batch convert multiple files at once. Choose your output format and download immediately. The conversion uses the Canvas API running entirely in your browser for maximum privacy.",
+        "WEBP format is recommended for web use as it offers 25-35% smaller file sizes than JPG at the same visual quality. PNG is best for images requiring transparency. JPG is ideal for photographs.",
+      ]}
+        faqs={[
+        { question: "What formats can I convert between?", answer: "You can convert between PNG, JPG/JPEG, WEBP and AVIF formats. BMP and GIF are supported as input formats." },
+        { question: "Does conversion happen in my browser?", answer: "Yes, completely. We use the Canvas API to convert images client-side. Your files never leave your device." },
+        { question: "Will I lose quality when converting to JPG?", answer: "JPG uses lossy compression, so some quality is lost. We use 92% quality setting which provides an excellent balance between file size and visual quality." },
+        { question: "Can I convert multiple images at once?", answer: "Yes! Our batch conversion feature lets you convert multiple images simultaneously and download them all at once." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

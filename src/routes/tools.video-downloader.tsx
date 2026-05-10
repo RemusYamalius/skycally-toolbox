@@ -7,6 +7,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { AdZone } from "@/components/ad-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { fetchVideo, type VideoResult } from "@/services/videoApi";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-downloader")({
   head: () => ({
@@ -147,6 +148,20 @@ function VideoDownloader() {
       ]} />
 
       <AdZone id="video-tool-below-results" size="728x90" />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Video Downloader — TikTok, Instagram, Facebook & More"}
+        description={"Skycally's video downloader lets you save videos from the most popular social media platforms in HD quality — completely free with no watermark and no signup required."}
+        body={[
+        "Paste any video URL from TikTok, Instagram, Facebook, Twitter/X, Snapchat, Pinterest, Vimeo or Dailymotion and choose your preferred quality. Our tool fetches the highest available resolution so you always get the best version of the video.",
+        "All downloads are processed securely and your browsing history is never stored. The tool works on all devices including smartphones, tablets and desktop computers.",
+      ]}
+        faqs={[
+        { question: "How do I download a TikTok video without watermark?", answer: "Paste the TikTok video URL into the input field, click Fetch Video, then select your preferred quality and click Download. The video saves without any watermark." },
+        { question: "Is the video downloader completely free?", answer: "Yes, completely free with no hidden fees, no signup and no watermarks added to your downloads." },
+        { question: "Why can't I download YouTube videos?", answer: "YouTube has strict terms of service that prevent third-party downloading. We respect these policies and focus on platforms that allow content downloading." },
+        { question: "What video qualities are available?", answer: "Available qualities depend on the original video. Most videos offer 480p, 720p HD and 1080p Full HD options, plus MP3 audio extraction." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

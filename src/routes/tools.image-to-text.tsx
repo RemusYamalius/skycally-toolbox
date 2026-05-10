@@ -8,6 +8,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { Textarea } from "@/components/ui/textarea";
 import { checkSize, downloadBlob } from "@/lib/file-utils";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-to-text")({
   head: () => ({
@@ -138,6 +139,20 @@ function ImageToTextPage() {
         "Pick the language and click Extract Text.",
         "Copy the result or download as a .txt file.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Image to Text — Free Online OCR Tool"}
+        description={"Extract text from images using OCR technology. Supports English, Arabic, French and Spanish. Works in your browser with Tesseract.js. No upload needed."}
+        body={[
+        "Upload any image containing text — photos of documents, screenshots, scanned pages or handwritten notes — and our OCR engine will extract the readable text content. Select your language for the most accurate results.",
+        "Text extraction uses Tesseract.js, an industry-standard open-source OCR engine running in your browser. Processing may take 10-30 seconds depending on image size and complexity. Your images never leave your device.",
+      ]}
+        faqs={[
+        { question: "What languages does the OCR support?", answer: "We currently support English, Arabic, French and Spanish. Select the language of your image text for the most accurate extraction." },
+        { question: "Does it work with handwritten text?", answer: "OCR works best with printed text. Handwriting recognition is possible but accuracy varies significantly based on writing clarity." },
+        { question: "Why is text extraction slow?", answer: "Tesseract.js downloads a language model (2-5MB) on first use and processes images locally. This takes 15-30 seconds. Subsequent extractions are faster." },
+        { question: "What image quality gives the best results?", answer: "High contrast images with clear, sharp text give the best results. Minimum 300 DPI for scanned documents. Avoid blurry, skewed or very small text." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

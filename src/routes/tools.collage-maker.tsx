@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/collage-maker")({
   head: () => ({
@@ -205,6 +206,20 @@ function CollageMaker() {
         "Pick a layout, canvas size, gap and background.",
         "Click Generate & Download to save your collage as PNG.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Photo Collage Maker — Create Collages Online"}
+        description={"Create beautiful photo collages online with multiple layout options. Choose from grid layouts for 2-9 photos. Customize spacing, colors and download as PNG."}
+        body={[
+        "Select from a variety of grid layouts designed for 2, 3, 4, 6 or 9 photos. Choose your canvas size — square for Instagram, landscape for desktop wallpapers, or portrait for phone screens.",
+        "Customize the gap between photos, background color visible in the gaps, and corner rounding for each photo cell. The collage is generated in high resolution (up to 1920px wide) for print-quality results.",
+      ]}
+        faqs={[
+        { question: "What layouts are available?", answer: "We offer layouts for 2 photos (side by side or stacked), 3 photos (three columns or T-shape), 4 photos (2×2 grid), 6 photos (2×3 grid) and 9 photos (3×3 grid)." },
+        { question: "What size collage should I create for Instagram?", answer: "Use the Square 1080px preset for Instagram feed posts, or Portrait for Stories. Both work perfectly with Instagram's recommended dimensions." },
+        { question: "Can I use photos of different sizes?", answer: "Yes. Each photo is automatically cropped and scaled to fill its cell while maintaining its center. You can rearrange which photo goes in each cell." },
+        { question: "What format is the downloaded collage?", answer: "Collages are downloaded as high-resolution PNG files suitable for both digital sharing and printing." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

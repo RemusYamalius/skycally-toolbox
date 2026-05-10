@@ -4,6 +4,7 @@ import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/meme-generator")({
   head: () => ({
@@ -179,6 +180,20 @@ function MemeGenerator() {
         "Type your top and bottom text and tweak font, size and outline.",
         "Click Download Meme to save your masterpiece as PNG.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Meme Generator — Create Custom Memes Online"}
+        description={"Create memes from popular templates or upload your own image. Add top and bottom text with classic Impact font. Customize colors, size and outline. Download instantly."}
+        body={[
+        "Choose from 12 iconic meme templates including Drake, Distracted Boyfriend, Two Buttons, This is Fine and more — or upload your own custom image. Add your text in the classic Impact font with bold outline for maximum readability.",
+        "All customization happens in real-time — see your meme update as you type. Download as PNG when you're happy with the result and share anywhere.",
+      ]}
+        faqs={[
+        { question: "Can I use my own image for a meme?", answer: "Yes! Click 'Upload Your Own' to use any image from your device as the meme background." },
+        { question: "Why does meme text use Impact font?", answer: "Impact is the traditional meme font — its bold, condensed style with white fill and black outline is instantly recognizable and highly readable on any image background." },
+        { question: "Can I save my meme and edit it later?", answer: "Currently memes are generated fresh each session. We recommend downloading immediately after creation." },
+        { question: "Are the meme templates copyright free?", answer: "Meme templates are widely used for parody and commentary purposes under fair use. However, always check local copyright laws before commercial use." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

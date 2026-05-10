@@ -8,6 +8,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { Textarea } from "@/components/ui/textarea";
 import { AdZone } from "@/components/ad-zone";
 import { checkSize, downloadBlob } from "@/lib/file-utils";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/pdf-text-extractor")({
   head: () => ({
@@ -129,6 +130,20 @@ function PdfTextExtractorPage() {
         "We extract the text instantly in your browser.",
         "Copy the result or download it as a .txt file.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Extract Text from PDF Free — Online PDF Text Extractor"}
+        description={"Extract all text content from any PDF file instantly. Copy or download as TXT. Supports all languages. Works entirely in your browser — no upload needed."}
+        body={[
+        "Upload any PDF and instantly extract all readable text content. The extracted text is displayed in a clean textarea where you can review, copy or download it as a text file. Page numbers are shown for easy navigation.",
+        "Text extraction uses PDF.js running in your browser — the same technology used by Mozilla Firefox to display PDFs. Your document never leaves your device.",
+      ]}
+        faqs={[
+        { question: "What types of PDFs can I extract text from?", answer: "Text extraction works with digitally created PDFs (Word exports, generated PDFs). Scanned PDFs (images of text) require OCR — try our Image to Text tool instead." },
+        { question: "Does it support Arabic and other languages?", answer: "Yes, text extraction supports all languages including Arabic, Chinese, Japanese and any other language present in the PDF." },
+        { question: "Will the formatting be preserved?", answer: "Plain text is extracted without formatting. Tables may appear as space-separated columns, and some layout elements may not translate perfectly to plain text." },
+        { question: "Can I extract text from a password-protected PDF?", answer: "No. You need to remove password protection first before extracting text." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

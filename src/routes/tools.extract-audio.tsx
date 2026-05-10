@@ -2,6 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/extract-audio")({
   head: () => ({
@@ -207,6 +208,20 @@ function ExtractAudio() {
         "Choose your output format: MP3, AAC or WAV.",
         "Click Extract to download the audio file instantly.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Extract Audio from Video — Free MP3, AAC & WAV Converter"}
+        description={"Extract the audio track from any video file and download it as MP3, AAC or WAV for free. Perfect for creating podcasts, music files or audio samples."}
+        body={[
+        "Upload any video file in MP4, MOV, AVI, MKV or WEBM format and extract the audio in your preferred format. MP3 works on all devices, AAC offers better quality at the same file size, and WAV provides uncompressed lossless audio.",
+        "The extraction process uses FFmpeg on our secure server, ensuring high-quality audio output. Your video file is immediately deleted after the audio is extracted and downloaded.",
+      ]}
+        faqs={[
+        { question: "Will the audio quality be affected?", answer: "For MP3 and AAC we use high quality settings (192kbps equivalent). WAV is completely lossless. The output quality matches the original audio in the video." },
+        { question: "Can I extract audio from any video format?", answer: "Yes, we support all major video formats including MP4, MOV, AVI, MKV, WEBM and more." },
+        { question: "How long does extraction take?", answer: "Audio extraction is very fast — typically a few seconds for most videos regardless of length, since no video re-encoding is required." },
+        { question: "What is the difference between MP3, AAC and WAV?", answer: "MP3 is universal and works everywhere. AAC offers better quality at smaller file sizes and is preferred by Apple devices. WAV is uncompressed lossless audio with the largest file size." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

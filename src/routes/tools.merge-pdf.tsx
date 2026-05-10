@@ -15,6 +15,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { downloadBlob } from "@/lib/file-utils";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/merge-pdf")({
   head: () => ({
@@ -120,6 +121,20 @@ function MergePdf() {
         "Drag the rows to set the order you want.",
         "Click Merge — your single combined PDF downloads instantly.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Merge PDF Files Online Free — Combine PDFs Instantly"}
+        description={"Combine multiple PDF files into one document for free. Drag and drop to reorder pages. 100% browser-based — your files never leave your device."}
+        body={[
+        "Upload two or more PDF files, arrange them in your preferred order by dragging the thumbnails, and merge them into a single PDF with one click. The merged file downloads automatically to your device.",
+        "PDF merging uses pdf-lib — a JavaScript library that runs entirely in your browser. Your sensitive documents are never uploaded to any server, making this the most private PDF merger available online.",
+      ]}
+        faqs={[
+        { question: "How many PDFs can I merge at once?", answer: "There is no limit. Upload as many PDF files as needed and arrange them in any order." },
+        { question: "Will the merged PDF lose quality?", answer: "No. PDF merging is completely lossless — all text, images, links, fonts and formatting are preserved exactly as in the original files." },
+        { question: "Is there a file size limit?", answer: "Since merging happens in your browser, the limit depends on your device's memory. Files up to 50MB each work well on most computers." },
+        { question: "Can I merge password-protected PDFs?", answer: "No. You need to remove the password protection first before merging. Most PDF readers allow you to save a copy without password." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

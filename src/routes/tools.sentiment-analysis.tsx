@@ -8,6 +8,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AdZone } from "@/components/ad-zone";
 import { PoweredBy, BrowserOnlyBadge } from "@/components/ai-badges";
 import { Loader2, Sparkles } from "lucide-react";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/sentiment-analysis")({
   head: () => ({
@@ -206,6 +207,20 @@ function SentimentTool() {
         "Click Analyze and wait for the result.",
         "Read the sentiment label and confidence score.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"AI Sentiment Analysis — Analyze Text Emotion Free Online"}
+        description={"Detect positive, negative or neutral sentiment in any text using AI. Powered by Transformers.js. Shows confidence score. Works entirely in your browser."}
+        body={[
+        "Enter any text — a product review, social media post, customer feedback or any written content — and the AI will analyze its emotional tone. Results show the sentiment label (Positive, Negative or Neutral) along with a confidence percentage.",
+        "The sentiment analysis model runs locally in your browser using Transformers.js and a DistilBERT model fine-tuned for sentiment classification. The first analysis takes 15-30 seconds to load the model — subsequent analyses are instant.",
+      ]}
+        faqs={[
+        { question: "What languages does sentiment analysis support?", answer: "The current model is optimized for English text. Results for other languages may be less accurate as the model was trained primarily on English data." },
+        { question: "How is the confidence score calculated?", answer: "The model outputs a probability score for each sentiment class. The displayed percentage represents how confident the AI is in its classification." },
+        { question: "Can I analyze multiple texts at once?", answer: "Yes. Use batch mode by entering multiple texts separated by new lines. Each text is analyzed independently." },
+        { question: "Is sentiment analysis useful for businesses?", answer: "Yes. Common uses include analyzing customer reviews, monitoring brand mentions, evaluating survey responses and understanding audience reactions to content." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

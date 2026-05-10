@@ -8,6 +8,7 @@ import { AdZone } from "@/components/ad-zone";
 import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
 import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-merger")({
   head: () => ({
@@ -154,6 +155,20 @@ function Page() {
       ]} />
 
       <PoweredByNote />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Merge Videos Online Free — Combine Multiple Videos"}
+        description={"Combine two or more video files into one seamless video with Skycally's free online video merger. Reorder clips, then download the merged result instantly."}
+        body={[
+        "Upload multiple video files, arrange them in the desired order using the up/down controls, and merge them into a single MP4 file. The tool supports MP4, MOV, AVI and WEBM input formats.",
+        "Video merging uses stream concatenation — no re-encoding means your original video quality is fully preserved and processing is fast even for large files.",
+      ]}
+        faqs={[
+        { question: "Do the videos need to be the same resolution?", answer: "For best results, videos should have the same resolution and frame rate. Merging videos with different specs may cause playback issues." },
+        { question: "How many videos can I merge at once?", answer: "You can merge unlimited videos in a single session. Simply upload all files and arrange them in the desired order." },
+        { question: "Will there be a gap between merged clips?", answer: "No. The merger joins clips seamlessly with no gaps, transitions or black frames between them." },
+        { question: "Is there a file size limit per video?", answer: "Since processing happens in your browser, the limit depends on your device's available memory. Files up to 500MB per clip work well on most devices." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

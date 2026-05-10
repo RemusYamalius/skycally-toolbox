@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/add-text-to-image")({
   head: () => ({
@@ -371,6 +372,20 @@ function AddTextToImage() {
         "Customize your text and click Add Text Layer — drag it anywhere on the image.",
         "Click Download Image to save the merged result as a PNG.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Add Text to Image Online — Free Photo Text Editor"}
+        description={"Add custom text, captions and watermarks to any image. Multiple fonts, colors, shadows and outlines. Drag to reposition text layers. Download as PNG."}
+        body={[
+        "Upload any image and add unlimited text layers with full customization. Choose from multiple font families, adjust size and color, enable text shadow for depth, and add outline strokes for visibility on any background.",
+        "Text layers are fully interactive — click any text on the canvas to select and edit it, drag to reposition anywhere on the image. All processing happens in your browser for complete privacy.",
+      ]}
+        faqs={[
+        { question: "Can I add multiple text layers?", answer: "Yes, you can add unlimited text layers. Each layer is independently editable and draggable on the canvas." },
+        { question: "How do I move text on the image?", answer: "Click on any text in the canvas to select it, then drag it to your desired position. A blue dashed outline shows the selected text layer." },
+        { question: "What fonts are available?", answer: "We offer Impact, Arial, Georgia, Courier New, Verdana, Comic Sans MS and Times New Roman. Impact is the classic choice for memes and bold captions." },
+        { question: "Can I add a watermark to my photos?", answer: "Yes. Add your brand name or logo text, reduce opacity using the color picker's alpha channel, and position it anywhere on the image." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

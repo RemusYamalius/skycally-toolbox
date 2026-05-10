@@ -7,6 +7,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-cropper")({
   head: () => ({
@@ -143,6 +144,20 @@ function ImageCropper() {
         "Pick an aspect ratio, then drag the box to frame your crop.",
         "Click Crop & Download to save the result.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Image Cropper — Crop Photos Online with Aspect Ratio"}
+        description={"Crop images online with precision. Choose from preset aspect ratios or crop freely. Rotate and flip options included. Download in JPG, PNG or WEBP."}
+        body={[
+        "Use the intuitive crop interface to select exactly the area you want to keep. Drag the handles to resize the crop area and drag inside to reposition it. Switch between preset aspect ratios for social media sizes or use Free mode for custom crops.",
+        "Additional editing options include 90-degree rotation in both directions and horizontal/vertical flipping — useful for correcting mirror-image selfies or adjusting landscape photos.",
+      ]}
+        faqs={[
+        { question: "What aspect ratios are available?", answer: "We offer Free crop, 1:1 Square, 4:3 Standard, 16:9 Widescreen, 3:4 Portrait and 9:16 Story/Reel presets." },
+        { question: "Can I crop to exact pixel dimensions?", answer: "The cropper shows real-time pixel dimensions of your selection. Set the desired aspect ratio and resize to match your target dimensions." },
+        { question: "Will cropping reduce image quality?", answer: "No. Cropping only removes areas outside the selection — the remaining image retains its original quality at 92% compression." },
+        { question: "Can I undo a crop?", answer: "Yes, you can adjust the crop area at any time before clicking Crop & Download. The original image is preserved until you download." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

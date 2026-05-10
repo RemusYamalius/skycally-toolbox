@@ -5,6 +5,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
+import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-resizer")({
   head: () => ({
@@ -207,6 +208,20 @@ function ImageResizer() {
         "Choose pixels or percentage, then set your target size and format.",
         "Click Resize & Download to save the new image.",
       ]} />
-    </ToolPageShell>
+          <ToolSeoContent
+        title={"Free Image Resizer — Resize Images Online to Any Size"}
+        description={"Resize images to exact pixel dimensions or percentage scale. Includes presets for Instagram, Twitter, Facebook and other platforms. Works in your browser."}
+        body={[
+        "Enter custom dimensions or choose from our platform presets including Instagram Square (1080×1080), Instagram Story (1080×1920), Twitter Header (1500×500) and Facebook Cover (820×312). Lock the aspect ratio to prevent distortion.",
+        "Choose your output format (JPG, PNG or WEBP) and quality level. The resized image is processed entirely in your browser using the Canvas API — your original image is never uploaded anywhere.",
+      ]}
+        faqs={[
+        { question: "Can I resize without distorting the image?", answer: "Yes. Enable the Lock Aspect Ratio toggle and adjusting one dimension will automatically update the other to maintain proportions." },
+        { question: "What is the maximum resolution I can resize to?", answer: "There is no maximum — you can upscale images to any resolution. However, upscaling beyond 2x the original size may result in visible quality loss." },
+        { question: "Which preset should I use for Instagram?", answer: "Use 1080×1080 for square feed posts, 1080×1350 for portrait posts, and 1080×1920 for Stories and Reels." },
+        { question: "Can I resize multiple images at once?", answer: "Currently the tool resizes one image at a time. For batch resizing, use our Image Compressor tool which processes multiple files simultaneously." },
+      ]}
+      />
+      </ToolPageShell>
   );
 }

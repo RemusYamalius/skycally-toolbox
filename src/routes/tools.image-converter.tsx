@@ -10,11 +10,13 @@ import { downloadBlob } from "@/lib/file-utils";
 export const Route = createFileRoute("/tools/image-converter")({
   head: () => ({
     meta: [
-      { title: "Image Converter — PNG, JPG, WebP · Skycally" },
-      { name: "description", content: "Convert images between PNG, JPG and WebP — instantly in your browser." },
-      { property: "og:title", content: "Image Converter · Skycally" },
-      { property: "og:description", content: "Convert images between popular formats instantly." },
+      { title: "Free Image Converter — PNG to JPG, WEBP & More | Skycally" },
+      { name: "description", content: "Convert images between PNG, JPG, WEBP and AVIF formats for free. Batch conversion supported. Works entirely in your browser — no upload needed." },
+      { property: "og:title", content: "Free Image Converter | Skycally" },
+      { property: "og:description", content: "Convert images between PNG, JPG, WEBP — instantly in-browser." },
+      { property: "og:url", content: "https://skycally.com/tools/image-converter" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-converter" }],
   }),
   component: ImageConverter,
 });

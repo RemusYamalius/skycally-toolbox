@@ -19,11 +19,13 @@ import { downloadBlob } from "@/lib/file-utils";
 export const Route = createFileRoute("/tools/merge-pdf")({
   head: () => ({
     meta: [
-      { title: "Merge PDF — Combine PDFs into one · Skycally" },
-      { name: "description", content: "Merge multiple PDF files into a single document. Drag to reorder." },
-      { property: "og:title", content: "Merge PDF · Skycally" },
+      { title: "Merge PDF Files Free Online | Skycally" },
+      { name: "description", content: "Combine multiple PDF files into one for free. Drag and drop to reorder pages. Works entirely in your browser — no upload to servers." },
+      { property: "og:title", content: "Merge PDF | Skycally" },
       { property: "og:description", content: "Combine PDFs into a single file." },
+      { property: "og:url", content: "https://skycally.com/tools/merge-pdf" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/merge-pdf" }],
   }),
   component: MergePdf,
 });

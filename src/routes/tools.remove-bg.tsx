@@ -11,11 +11,13 @@ import { downloadBlob, checkSize } from "@/lib/file-utils";
 export const Route = createFileRoute("/tools/remove-bg")({
   head: () => ({
     meta: [
-      { title: "Remove Background — One-click background eraser · Skycally" },
-      { name: "description", content: "Erase image backgrounds in one click. Free, fast, no signup." },
-      { property: "og:title", content: "Remove Background · Skycally" },
-      { property: "og:description", content: "One-click background removal." },
+      { title: "Remove Image Background Free — AI Powered | Skycally" },
+      { name: "description", content: "Remove image background automatically with AI. Free, fast and accurate. Supports PNG, JPG and WEBP. Download transparent PNG instantly." },
+      { property: "og:title", content: "Remove Image Background | Skycally" },
+      { property: "og:description", content: "AI-powered one-click background removal." },
+      { property: "og:url", content: "https://skycally.com/tools/remove-bg" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/remove-bg" }],
   }),
   component: RemoveBgPage,
 });

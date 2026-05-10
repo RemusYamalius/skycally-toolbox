@@ -11,11 +11,13 @@ import { downloadBlob } from "@/lib/file-utils";
 export const Route = createFileRoute("/tools/image-compressor")({
   head: () => ({
     meta: [
-      { title: "Image Compressor — Shrink images instantly · Skycally" },
-      { name: "description", content: "Compress JPG, PNG and WebP images. See before/after sizes and download in one click." },
-      { property: "og:title", content: "Image Compressor · Skycally" },
+      { title: "Free Image Compressor — Reduce Image Size Online | Skycally" },
+      { name: "description", content: "Compress images without losing quality. Reduce PNG, JPG and WEBP file size online for free. Batch compression with ZIP download." },
+      { property: "og:title", content: "Free Image Compressor | Skycally" },
       { property: "og:description", content: "Drop images, set quality, save bytes." },
+      { property: "og:url", content: "https://skycally.com/tools/image-compressor" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-compressor" }],
   }),
   component: Compressor,
 });

@@ -12,11 +12,13 @@ import { Loader2, Sparkles } from "lucide-react";
 export const Route = createFileRoute("/tools/sentiment-analysis")({
   head: () => ({
     meta: [
-      { title: "AI Sentiment Analysis — Free Online · Skycally" },
-      { name: "description", content: "Analyze the sentiment of any text — positive, negative or neutral — entirely in your browser." },
-      { property: "og:title", content: "AI Sentiment Analysis · Skycally" },
+      { title: "AI Sentiment Analysis — Analyze Text Emotion Free | Skycally" },
+      { name: "description", content: "Analyze the sentiment of any text with AI. Detect positive, negative or neutral emotions instantly. Powered by Transformers.js, runs in your browser." },
+      { property: "og:title", content: "AI Sentiment Analysis | Skycally" },
       { property: "og:description", content: "Browser-based sentiment analysis powered by Transformers.js." },
+      { property: "og:url", content: "https://skycally.com/tools/sentiment-analysis" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/sentiment-analysis" }],
   }),
   component: SentimentTool,
 });

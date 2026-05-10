@@ -6,11 +6,13 @@ import { HowToUse } from "@/components/how-to-use";
 export const Route = createFileRoute("/tools/split-pdf")({
   head: () => ({
     meta: [
-      { title: "Split PDF — Extract pages from a PDF · Skycally" },
-      { name: "description", content: "Extract specific pages or page ranges from any PDF file instantly." },
-      { property: "og:title", content: "Split PDF · Skycally" },
+      { title: "Split PDF — Extract Pages from PDF Free | Skycally" },
+      { name: "description", content: "Split PDF files and extract specific pages for free. Select page ranges or individual pages. Download as a new PDF instantly." },
+      { property: "og:title", content: "Split PDF | Skycally" },
       { property: "og:description", content: "Extract specific pages from any PDF file instantly." },
+      { property: "og:url", content: "https://skycally.com/tools/split-pdf" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/split-pdf" }],
   }),
   component: SplitPdf,
 });

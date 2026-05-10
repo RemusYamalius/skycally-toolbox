@@ -16,11 +16,13 @@ import { downloadBlob } from "@/lib/file-utils";
 export const Route = createFileRoute("/tools/qr-generator")({
   head: () => ({
     meta: [
-      { title: "QR Code Generator — Skycally" },
-      { name: "description", content: "Create custom QR codes with logos, gradients, dot styles & frames. Free, instant, browser-based." },
-      { property: "og:title", content: "QR Code Generator · Skycally" },
+      { title: "Free QR Code Generator with Logo — Custom Colors | Skycally" },
+      { name: "description", content: "Create custom QR codes with logo, colors and different styles for free. Download as PNG or SVG. No signup required. Perfect for business cards and marketing." },
+      { property: "og:title", content: "Free QR Code Generator | Skycally" },
       { property: "og:description", content: "Generate pro-grade QR codes with custom colors, logos, and styles." },
+      { property: "og:url", content: "https://skycally.com/tools/qr-generator" },
     ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/qr-generator" }],
   }),
   component: QrGeneratorPage,
 });

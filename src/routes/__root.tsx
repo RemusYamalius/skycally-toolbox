@@ -70,12 +70,32 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <noscript>
+          <link rel="stylesheet" href={FONTS_HREF} />
+        </noscript>
       </head>
       <body>
         {children}
         <Scripts />
       </body>
     </html>
+  );
+}
+
+function RootComponent() {
+  return (
+    <ThemeProvider>
+      <div className="min-h-screen flex flex-col">
+        <SiteHeader />
+        <main className="flex-1">
+          <Outlet />
+        </main>
+        <SiteFooter />
+      </div>
+      <Suspense fallback={null}>
+        <Toaster position="top-center" richColors />
+      </Suspense>
+    </ThemeProvider>
   );
 }
 

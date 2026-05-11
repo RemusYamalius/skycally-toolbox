@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { RotateCw } from "lucide-react";
-import { PDFDocument, degrees } from "pdf-lib";
+
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { DropZone } from "@/components/drop-zone";

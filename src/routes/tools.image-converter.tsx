@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import JSZip from "jszip";
+
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import type { PDFDocument as PDFDocumentType } from "pdf-lib";
+
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { DropZone, formatBytes } from "@/components/drop-zone";
@@ -41,6 +41,7 @@ function CompressPdf() {
     if (!file) return;
     setBusy(true);
     try {
+      const { PDFDocument } = await import("pdf-lib");
       const buf = await file.arrayBuffer();
       const src = await PDFDocument.load(buf, { ignoreEncryption: true });
       const out = await PDFDocument.create();

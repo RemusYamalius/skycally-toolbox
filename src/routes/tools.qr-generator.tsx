@@ -2,10 +2,10 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { Download, FileCode, Copy, ChevronDown, Upload, X } from "lucide-react";
-type QRCodeModule = typeof import("qrcode")["default"];
+type QRCodeModule = typeof import("qrcode");
 let QRCode: QRCodeModule | null = null;
 let qrcodePromise: Promise<QRCodeModule> | null = null;
-const loadQRCode = () => (qrcodePromise ??= import("qrcode").then((m) => (QRCode = m.default)));
+const loadQRCode = () => (qrcodePromise ??= import("qrcode").then((m) => (QRCode = m)));
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
@@ -129,7 +129,7 @@ function applyDotStyle(
   const imageData = ctx.getImageData(0, 0, size, canvas.height);
   const data = imageData.data;
   const bgRgb = hexToRgb(bg);
-  const qr = QRCode.create(content, { errorCorrectionLevel });
+  const qr = QRCode!.create(content, { errorCorrectionLevel });
   const moduleCount = qr.modules.size;
   const margin = 2;
   const moduleSize = size / (moduleCount + margin * 2);
@@ -425,7 +425,8 @@ function QrGeneratorPage() {
     if (!canvas || !content) return;
     const errorCorrectionLevel = logo.kind !== "none" ? "H" : "M";
     try {
-      await QRCode.toCanvas(canvas, content, {
+      await loadQRCode();
+      await QRCode!.toCanvas(canvas, content, {
         width: 300,
         margin: 2,
         errorCorrectionLevel,
@@ -470,7 +471,8 @@ function QrGeneratorPage() {
     const styled = dotStyle !== "square" || colorMode !== "solid" || logo.kind !== "none" || frameStyle !== "none";
     try {
       if (!styled) {
-        const svg = await QRCode.toString(content, {
+        await loadQRCode();
+        const svg = await QRCode!.toString(content, {
           type: "svg",
           width: 1000,
           margin: 2,

@@ -47,7 +47,8 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "preconnect", href: "https://skycally-api-production.up.railway.app" },
       { rel: "dns-prefetch", href: "https://skycally-api-production.up.railway.app" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" },
+      { rel: "preload", as: "style", href: FONTS_HREF },
+      { rel: "stylesheet", href: FONTS_HREF, media: "print", onLoad: "this.media='all'" } as any,
     ],
     scripts: [
       { src: "https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR", async: true },

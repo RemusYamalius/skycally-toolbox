@@ -48,9 +48,11 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://skycally-api-production.up.railway.app" },
       { rel: "dns-prefetch", href: "https://skycally-api-production.up.railway.app" },
       { rel: "preload", as: "style", href: FONTS_HREF },
-      { rel: "stylesheet", href: FONTS_HREF, media: "print", onLoad: "this.media='all'" } as any,
     ],
     scripts: [
+      {
+        children: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(FONTS_HREF)};l.media='print';l.onload=function(){l.media='all'};document.head.appendChild(l);})();`,
+      },
       { src: "https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR", async: true },
       {
         children: `window.dataLayer = window.dataLayer || [];

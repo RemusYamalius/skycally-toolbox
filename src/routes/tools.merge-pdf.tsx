@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { GripVertical, X } from "lucide-react";
-import { PDFDocument } from "pdf-lib";
+
 import {
   DndContext, closestCenter, PointerSensor, useSensor, useSensors,
   type DragEndEvent,
@@ -58,6 +58,7 @@ function MergePdf() {
   useEffect(() => {
     items.filter((i) => i.pages == null).forEach(async (i) => {
       try {
+        const { PDFDocument } = await import("pdf-lib");
         const buf = await i.file.arrayBuffer();
         const pdf = await PDFDocument.load(buf, { ignoreEncryption: true });
         setItems((prev) => prev.map((it) => it.id === i.id ? { ...it, pages: pdf.getPageCount() } : it));
@@ -80,6 +81,7 @@ function MergePdf() {
   const merge = async () => {
     setBusy(true);
     try {
+      const { PDFDocument } = await import("pdf-lib");
       const merged = await PDFDocument.create();
       for (const it of items) {
         const buf = await it.file.arrayBuffer();

@@ -32,7 +32,7 @@ export function SiteFooter() {
           </ul>
         </div>
         <div>
-          <img src={qrCodeImage} alt="QR code linking to skycally.com" className="rounded-lg w-[100px] h-[100px]" />
+          <img src={qrCodeImage} alt="QR code linking to skycally.com" loading="lazy" decoding="async" width="100" height="100" className="rounded-lg w-[100px] h-[100px]" />
         </div>
       </div>
 

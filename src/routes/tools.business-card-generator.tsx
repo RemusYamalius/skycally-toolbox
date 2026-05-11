@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
-import QRCode from "qrcode";
+
 import { Upload, X, Download, ArrowLeft, ArrowRight, RotateCw } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
@@ -173,16 +173,18 @@ function BusinessCardGeneratorPage() {
       return;
     }
     const c = document.createElement("canvas");
-    QRCode.toCanvas(c, info.qrContent || "https://skycally.com", {
-      width: 300,
-      margin: 1,
-      errorCorrectionLevel: "H",
-      color: { dark: "#000000", light: "#ffffff" },
-    })
-      .then(() => {
-        if (!cancelled) setQrCanvas(c);
+    import("qrcode").then((QRCode) =>
+      QRCode.toCanvas(c, info.qrContent || "https://skycally.com", {
+        width: 300,
+        margin: 1,
+        errorCorrectionLevel: "H",
+        color: { dark: "#000000", light: "#ffffff" },
       })
-      .catch(() => {});
+        .then(() => {
+          if (!cancelled) setQrCanvas(c);
+        })
+        .catch(() => {})
+    );
     return () => {
       cancelled = true;
     };

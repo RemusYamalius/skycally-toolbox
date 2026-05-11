@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
 import { RotateCw } from "lucide-react";
-import { PDFDocument, degrees } from "pdf-lib";
+
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { DropZone } from "@/components/drop-zone";
@@ -78,6 +78,7 @@ function RotatePdf() {
     if (!file) return;
     setBusy(true);
     try {
+      const { PDFDocument, degrees } = await import("pdf-lib");
       const buf = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
       const pages = pdfDoc.getPages();

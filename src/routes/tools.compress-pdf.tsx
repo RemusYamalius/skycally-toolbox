@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useState } from "react";
 import { toast } from "sonner";
-import { PDFDocument } from "pdf-lib";
+import type { PDFDocument as PDFDocumentType } from "pdf-lib";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { DropZone, formatBytes } from "@/components/drop-zone";

@@ -59,6 +59,7 @@ function Compressor() {
   };
 
   const downloadZip = async () => {
+    const { default: JSZip } = await import("jszip");
     const zip = new JSZip();
     items.forEach((it) => { if (it.out) zip.file(it.out.name, it.out.blob); });
     const blob = await zip.generateAsync({ type: "blob" });

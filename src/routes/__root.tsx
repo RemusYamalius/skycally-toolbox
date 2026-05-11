@@ -1,9 +1,13 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { Toaster } from "sonner";
+import { lazy, Suspense } from "react";
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+
+const Toaster = lazy(() => import("sonner").then((m) => ({ default: m.Toaster })));
+
+const FONTS_HREF = "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap";
 
 function NotFoundComponent() {
   return (
@@ -43,9 +47,12 @@ export const Route = createRootRoute({
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "preconnect", href: "https://skycally-api-production.up.railway.app" },
       { rel: "dns-prefetch", href: "https://skycally-api-production.up.railway.app" },
-      { rel: "stylesheet", href: "https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&family=Plus+Jakarta+Sans:wght@600;700;800&display=swap" },
+      { rel: "preload", as: "style", href: FONTS_HREF },
     ],
     scripts: [
+      {
+        children: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(FONTS_HREF)};l.media='print';l.onload=function(){l.media='all'};document.head.appendChild(l);})();`,
+      },
       { src: "https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR", async: true },
       {
         children: `window.dataLayer = window.dataLayer || [];
@@ -65,6 +72,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
         <HeadContent />
+        <noscript>
+          <link rel="stylesheet" href={FONTS_HREF} />
+        </noscript>
       </head>
       <body>
         {children}
@@ -84,7 +94,9 @@ function RootComponent() {
         </main>
         <SiteFooter />
       </div>
-      <Toaster position="top-center" richColors />
+      <Suspense fallback={null}>
+        <Toaster position="top-center" richColors />
+      </Suspense>
     </ThemeProvider>
   );
 }

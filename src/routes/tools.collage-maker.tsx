@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { X } from "lucide-react";
@@ -11,7 +9,28 @@ import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/collage-maker")({
-  head: () => buildToolMeta(toolBySlug("collage-maker", tools)), / 3, y: Math.floor(i / 3) / 2, w: 1 / 3, h: 1 / 2 })) },
+  head: () => ({
+    meta: [
+      { title: "Photo Collage Maker — Combine 2–9 photos · Skycally" },
+      { name: "description", content: "Make a beautiful photo collage from 2 to 9 images. Pick a layout, gap, background and download as PNG." },
+      { property: "og:title", content: "Photo Collage Maker · Skycally" },
+      { property: "og:description", content: "Combine 2–9 photos into a stylish grid collage." },
+    ],
+  }),
+  component: CollageMaker,
+});
+
+type Cell = { x: number; y: number; w: number; h: number };
+type Layout = { id: string; name: string; count: number; cells: Cell[] };
+
+const LAYOUTS: Layout[] = [
+  { id: "2-h", name: "2 ▍▍", count: 2, cells: [{ x: 0, y: 0, w: 0.5, h: 1 }, { x: 0.5, y: 0, w: 0.5, h: 1 }] },
+  { id: "2-v", name: "2 ═", count: 2, cells: [{ x: 0, y: 0, w: 1, h: 0.5 }, { x: 0, y: 0.5, w: 1, h: 0.5 }] },
+  { id: "3-h", name: "3 cols", count: 3, cells: [{ x: 0, y: 0, w: 1 / 3, h: 1 }, { x: 1 / 3, y: 0, w: 1 / 3, h: 1 }, { x: 2 / 3, y: 0, w: 1 / 3, h: 1 }] },
+  { id: "3-t", name: "3 T-shape", count: 3, cells: [{ x: 0, y: 0, w: 1, h: 0.5 }, { x: 0, y: 0.5, w: 0.5, h: 0.5 }, { x: 0.5, y: 0.5, w: 0.5, h: 0.5 }] },
+  { id: "4-grid", name: "4 grid", count: 4, cells: [{ x: 0, y: 0, w: 0.5, h: 0.5 }, { x: 0.5, y: 0, w: 0.5, h: 0.5 }, { x: 0, y: 0.5, w: 0.5, h: 0.5 }, { x: 0.5, y: 0.5, w: 0.5, h: 0.5 }] },
+  { id: "4-cols", name: "4 cols", count: 4, cells: [0, 1, 2, 3].map((i) => ({ x: i / 4, y: 0, w: 1 / 4, h: 1 })) },
+  { id: "6-grid", name: "6 (3×2)", count: 6, cells: Array.from({ length: 6 }, (_, i) => ({ x: (i % 3) / 3, y: Math.floor(i / 3) / 2, w: 1 / 3, h: 1 / 2 })) },
   { id: "9-grid", name: "9 (3×3)", count: 9, cells: Array.from({ length: 9 }, (_, i) => ({ x: (i % 3) / 3, y: Math.floor(i / 3) / 3, w: 1 / 3, h: 1 / 3 })) },
 ];
 

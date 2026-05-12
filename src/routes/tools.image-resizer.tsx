@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -10,7 +8,43 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-resizer")({
-  head: () => buildToolMeta(toolBySlug("image-resizer", tools)), => { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error("encode failed")); }, mime, quality / 100);
+  head: () => ({
+    meta: [
+      { title: "Free Image Resizer — Resize PNG, JPG Online | Skycally" },
+      { name: "description", content: "Resize images online for free. Set custom dimensions or use presets for Instagram, Twitter, Facebook and more. No signup, works in browser." },
+      { property: "og:title", content: "Free Image Resizer | Skycally" },
+      { property: "og:description", content: "Resize images by pixels or percentage with quality control." },
+      { property: "og:url", content: "https://skycally.com/tools/image-resizer" },
+    ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-resizer" }],
+  }),
+  component: ImageResizer,
+});
+
+const PRESETS: { name: string; w: number; h: number }[] = [
+  { name: "HD", w: 1280, h: 720 },
+  { name: "Full HD", w: 1920, h: 1080 },
+  { name: "4K", w: 3840, h: 2160 },
+  { name: "IG Square", w: 1080, h: 1080 },
+  { name: "IG Story", w: 1080, h: 1920 },
+  { name: "Twitter Header", w: 1500, h: 500 },
+  { name: "Facebook Cover", w: 820, h: 312 },
+];
+
+function resizeImage(file: File, targetWidth: number, targetHeight: number, format: string, quality: number): Promise<Blob> {
+  return new Promise((resolve, reject) => {
+    const img = new Image();
+    const url = URL.createObjectURL(file);
+    img.onload = () => {
+      const canvas = document.createElement("canvas");
+      canvas.width = targetWidth;
+      canvas.height = targetHeight;
+      const ctx = canvas.getContext("2d")!;
+      ctx.imageSmoothingEnabled = true;
+      ctx.imageSmoothingQuality = "high";
+      ctx.drawImage(img, 0, 0, targetWidth, targetHeight);
+      const mime = format === "jpg" ? "image/jpeg" : format === "webp" ? "image/webp" : "image/png";
+      canvas.toBlob((b) => { URL.revokeObjectURL(url); b ? resolve(b) : reject(new Error("encode failed")); }, mime, quality / 100);
     };
     img.onerror = () => { URL.revokeObjectURL(url); reject(new Error("load failed")); };
     img.src = url;

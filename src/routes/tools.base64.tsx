@@ -1,12 +1,35 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/base64")({
-  head: () => buildToolMeta(toolBySlug("base64", tools)),));
+  head: () => ({
+    meta: [
+      { title: "Base64 Encoder / Decoder · Skycally" },
+      { name: "description", content: "Encode plain text to Base64 or decode Base64 strings instantly. Free, fast, no signup." },
+      { property: "og:title", content: "Base64 Encoder / Decoder · Skycally" },
+      { property: "og:description", content: "Encode and decode Base64 instantly in your browser." },
+    ],
+  }),
+  component: Base64Tool,
+});
+
+type Mode = "encode" | "decode";
+
+function Base64Tool() {
+  const [mode, setMode] = useState<Mode>("encode");
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const process = () => {
+    setError("");
+    if (!input.trim()) return;
+    try {
+      if (mode === "encode") {
+        setOutput(btoa(unescape(encodeURIComponent(input))));
       } else {
         setOutput(decodeURIComponent(escape(atob(input.trim()))));
       }

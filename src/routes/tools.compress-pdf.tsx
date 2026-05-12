@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -10,7 +8,72 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/compress-pdf")({
-  head: () => buildToolMeta(toolBySlug("compress-pdf", tools)), * 100)) : 0;
+  head: () => ({
+    meta: [
+      { title: "Compress PDF — Reduce file size · Skycally" },
+      { name: "description", content: "Shrink PDF file size in your browser while keeping quality. No uploads." },
+      { property: "og:title", content: "Compress PDF · Skycally" },
+      { property: "og:description", content: "Reduce PDF file size while keeping quality." },
+    ],
+  }),
+  component: CompressPdf,
+});
+
+type Level = "low" | "medium" | "high";
+
+function CompressPdf() {
+  const [file, setFile] = useState<File | null>(null);
+  const [level, setLevel] = useState<Level>("medium");
+  const [busy, setBusy] = useState(false);
+  const [result, setResult] = useState<{ original: number; compressed: number; blob: Blob } | null>(null);
+
+  const onFiles = (files: File[]) => {
+    const f = files[0];
+    if (!f || !f.name.toLowerCase().endsWith(".pdf")) {
+      toast.error("Please upload a PDF file");
+      return;
+    }
+    setFile(f);
+    setResult(null);
+  };
+
+  const compress = async () => {
+    if (!file) return;
+    setBusy(true);
+    try {
+      const { PDFDocument } = await import("pdf-lib");
+      const buf = await file.arrayBuffer();
+      const src = await PDFDocument.load(buf, { ignoreEncryption: true });
+      const out = await PDFDocument.create();
+      const pages = await out.copyPages(src, src.getPageIndices());
+      pages.forEach((p) => out.addPage(p));
+      out.setTitle("");
+      out.setAuthor("");
+      out.setSubject("");
+      out.setKeywords([]);
+      out.setProducer("");
+      out.setCreator("");
+      const objectStreams = level !== "low";
+      const objectsPerTick = level === "high" ? 200 : level === "medium" ? 100 : 50;
+      const bytes = await out.save({ useObjectStreams: objectStreams, addDefaultPage: false, objectsPerTick });
+      const ab = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
+      const blob = new Blob([ab], { type: "application/pdf" });
+      setResult({ original: file.size, compressed: blob.size, blob });
+      toast.success("PDF compressed!");
+    } catch {
+      toast.error("Could not compress this PDF");
+    } finally {
+      setBusy(false);
+    }
+  };
+
+  const download = () => {
+    if (!result || !file) return;
+    const name = file.name.replace(/\.pdf$/i, "") + "-compressed.pdf";
+    downloadBlob(result.blob, name);
+  };
+
+  const savings = result ? Math.max(0, Math.round((1 - result.compressed / result.original) * 100)) : 0;
 
   return (
     <ToolPageShell title="Compress PDF" description="Reduce PDF file size in your browser. Files never leave your device.">

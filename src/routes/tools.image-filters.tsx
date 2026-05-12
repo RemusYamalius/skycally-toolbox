@@ -1,12 +1,98 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/image-filters")({
-  head: () => buildToolMeta(toolBySlug("image-filters", tools)), => { e.stopPropagation(); inputRef.current?.click(); }}
+  head: () => ({
+    meta: [
+      { title: "Image Filters — Apply filters to images instantly · Skycally" },
+      { name: "description", content: "Apply beautiful filters to your images instantly in the browser. Free, fast, no signup." },
+      { property: "og:title", content: "Image Filters · Skycally" },
+      { property: "og:description", content: "Apply beautiful filters to your images instantly in the browser." },
+    ],
+  }),
+  component: ImageFilters,
+});
+
+const FILTERS = [
+  { name: "Original", style: "none" },
+  { name: "Grayscale", style: "grayscale(100%)" },
+  { name: "Sepia", style: "sepia(100%)" },
+  { name: "Invert", style: "invert(100%)" },
+  { name: "Vintage", style: "sepia(60%) contrast(85%) brightness(90%)" },
+  { name: "Cold", style: "hue-rotate(180deg) saturate(120%)" },
+  { name: "Warm", style: "hue-rotate(330deg) saturate(150%) brightness(105%)" },
+  { name: "High Contrast", style: "contrast(180%) saturate(120%)" },
+  { name: "Blur", style: "blur(2px)" },
+  { name: "Bright", style: "brightness(150%) saturate(110%)" },
+];
+
+function ImageFilters() {
+  const [preview, setPreview] = useState<string>("");
+  const [selected, setSelected] = useState(0);
+  const [downloading, setDownloading] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+
+  const onFile = (file: File) => {
+    if (!file.type.startsWith("image/")) return;
+    const url = URL.createObjectURL(file);
+    setPreview(url);
+    setSelected(0);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const file = e.dataTransfer.files[0];
+    if (file) onFile(file);
+  };
+
+  const download = async () => {
+    if (!preview || !imgRef.current) return;
+    setDownloading(true);
+    const img = imgRef.current;
+    const canvas = document.createElement("canvas");
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d")!;
+    ctx.filter = FILTERS[selected].style === "none" ? "" : FILTERS[selected].style;
+    ctx.drawImage(img, 0, 0);
+    const link = document.createElement("a");
+    link.download = `filtered-${FILTERS[selected].name.toLowerCase()}.png`;
+    link.href = canvas.toDataURL("image/png");
+    link.click();
+    setDownloading(false);
+  };
+
+  return (
+    <ToolPageShell title="Image Filters" description="Apply beautiful filters to your images instantly in the browser.">
+      <div className="w-full space-y-5">
+        {/* Upload Zone */}
+        <div
+          onDrop={onDrop}
+          onDragOver={(e) => e.preventDefault()}
+          onClick={() => !preview && inputRef.current?.click()}
+          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-6 text-center cursor-pointer transition-all"
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => { if (e.target.files?.[0]) onFile(e.target.files[0]); }}
+          />
+          {preview ? (
+            <div className="space-y-3">
+              <img
+                ref={imgRef}
+                src={preview}
+                alt="Preview"
+                className="max-h-64 mx-auto rounded-xl object-contain transition-all duration-300"
+                style={{ filter: FILTERS[selected].style === "none" ? undefined : FILTERS[selected].style }}
+              />
+              <button
+                onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
                 className="text-xs text-gray-600 hover:text-cyan-400 transition-colors"
               >
                 Change image

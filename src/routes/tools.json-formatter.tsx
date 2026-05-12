@@ -1,12 +1,67 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/json-formatter")({
-  head: () => buildToolMeta(toolBySlug("json-formatter", tools)), => (
+  head: () => ({
+    meta: [
+      { title: "JSON Formatter — Prettify & Minify · Skycally" },
+      { name: "description", content: "Format, prettify and minify JSON instantly. Free, fast, no signup." },
+      { property: "og:title", content: "JSON Formatter · Skycally" },
+      { property: "og:description", content: "Prettify and minify JSON instantly in your browser." },
+    ],
+  }),
+  component: JsonFormatter,
+});
+
+function JsonFormatter() {
+  const [input, setInput] = useState("");
+  const [output, setOutput] = useState("");
+  const [error, setError] = useState("");
+  const [copied, setCopied] = useState(false);
+  const [indent, setIndent] = useState(2);
+
+  const format = () => {
+    setError(""); setOutput("");
+    if (!input.trim()) return;
+    try {
+      const parsed = JSON.parse(input);
+      setOutput(JSON.stringify(parsed, null, indent));
+    } catch (e: any) {
+      setError(e.message);
+    }
+  };
+
+  const minify = () => {
+    setError(""); setOutput("");
+    if (!input.trim()) return;
+    try {
+      const parsed = JSON.parse(input);
+      setOutput(JSON.stringify(parsed));
+    } catch (e: any) {
+      setError(e.message);
+    }
+  };
+
+  const copy = () => {
+    if (!output) return;
+    navigator.clipboard.writeText(output);
+    setCopied(true);
+    setTimeout(() => setCopied(false), 2000);
+  };
+
+  const clear = () => { setInput(""); setOutput(""); setError(""); };
+
+  const lineCount = output ? output.split("\n").length : 0;
+
+  return (
+    <ToolPageShell title="JSON Formatter" description="Format, prettify and minify JSON instantly.">
+      <div className="space-y-5">
+        <div className="flex flex-wrap gap-3 items-center">
+          <div className="flex items-center gap-2 bg-card border border-border rounded-xl px-4 py-2">
+            <span className="text-xs text-muted-foreground">Indent</span>
+            {[2, 4].map((n) => (
               <button
                 key={n}
                 onClick={() => setIndent(n)}

@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import Cropper, { type ReactCropperElement } from "react-cropper";
@@ -12,7 +10,85 @@ import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-cropper")({
-  head: () => buildToolMeta(toolBySlug("image-cropper", tools)), ? undefined : ratio}
+  head: () => ({
+    meta: [
+      { title: "Free Image Cropper — Crop Photos Online | Skycally" },
+      { name: "description", content: "Crop images online with custom aspect ratios. Supports 1:1, 16:9, 4:3 and free crop. Rotate and flip options included." },
+      { property: "og:title", content: "Free Image Cropper | Skycally" },
+      { property: "og:description", content: "Crop, rotate and flip images with aspect-ratio presets." },
+      { property: "og:url", content: "https://skycally.com/tools/image-cropper" },
+    ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-cropper" }],
+  }),
+  component: ImageCropper,
+});
+
+const RATIOS: { label: string; value: number | undefined }[] = [
+  { label: "Free ✂️", value: NaN },
+  { label: "1:1", value: 1 },
+  { label: "4:3", value: 4 / 3 },
+  { label: "16:9", value: 16 / 9 },
+  { label: "3:4", value: 3 / 4 },
+  { label: "9:16", value: 9 / 16 },
+];
+
+const cropperStyles = `
+  .cropper-container { border-radius: 12px; }
+  .cropper-view-box { outline-color: var(--cyan-brand); outline: 1px solid var(--cyan-brand); }
+  .cropper-point { background-color: var(--cyan-brand); }
+  .cropper-line { background-color: var(--cyan-brand); }
+`;
+
+function ImageCropper() {
+  const cropperRef = useRef<ReactCropperElement>(null);
+  const [src, setSrc] = useState<string>("");
+  const [ratio, setRatio] = useState<number>(NaN);
+  const [dims, setDims] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+  const [format, setFormat] = useState<"jpg" | "png" | "webp">("jpg");
+  const [busy, setBusy] = useState(false);
+
+  const onFiles = (files: File[]) => {
+    const f = files[0];
+    if (!f || !f.type.startsWith("image/")) return;
+    const reader = new FileReader();
+    reader.onload = () => setSrc(reader.result as string);
+    reader.readAsDataURL(f);
+  };
+
+  const cropper = () => cropperRef.current?.cropper;
+
+  const handleCrop = () => {
+    const c = cropper();
+    if (!c) return;
+    setBusy(true);
+    const canvas = c.getCroppedCanvas();
+    const mime = format === "jpg" ? "image/jpeg" : format === "webp" ? "image/webp" : "image/png";
+    canvas.toBlob((blob) => {
+      if (!blob) { setBusy(false); toast.error("❌ Something went wrong. Please try again."); return; }
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `cropped.${format}`;
+      a.click();
+      URL.revokeObjectURL(url);
+      toast.success("✅ Download started!");
+      setBusy(false);
+    }, mime, 0.92);
+  };
+
+  return (
+    <ToolPageShell title="Image Cropper" description="Crop images with aspect-ratio presets. Rotate, flip and download.">
+      <style>{cropperStyles}</style>
+      {!src ? (
+        <DropZone accept="image/*" onFiles={onFiles} label="Drop an image to crop" hint="PNG, JPG or WEBP" />
+      ) : (
+        <div className="grid gap-6 lg:grid-cols-[1fr_280px]">
+          <div className="rounded-2xl border border-border bg-card p-3">
+            <Cropper
+              ref={cropperRef}
+              src={src}
+              style={{ height: 440, width: "100%" }}
+              aspectRatio={isNaN(ratio) ? undefined : ratio}
               guides
               viewMode={1}
               dragMode="move"

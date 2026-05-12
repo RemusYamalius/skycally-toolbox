@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Play, Square, Download } from "lucide-react";
@@ -13,7 +11,36 @@ import { speak, stop, downloadAudio } from "@/services/textToSpeech";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/text-to-speech")({
-  head: () => buildToolMeta(toolBySlug("text-to-speech", tools)), => ALLOWED.some((p) => v.lang.toLowerCase().startsWith(p)));
+  head: () => ({
+    meta: [
+      { title: "Free Text to Speech — Convert Text to Audio Online | Skycally" },
+      { name: "description", content: "Convert text to speech for free. 50+ voices in Arabic, English, French and Spanish. Download as MP3. Works entirely in your browser." },
+      { property: "og:title", content: "Free Text to Speech | Skycally" },
+      { property: "og:description", content: "Free browser-based TTS in multiple languages." },
+      { property: "og:url", content: "https://skycally.com/tools/text-to-speech" },
+    ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/text-to-speech" }],
+  }),
+  component: Page,
+});
+
+const FLAGS: Record<string, string> = { ar: "🇸🇦", en: "🇬🇧", fr: "🇫🇷", es: "🇪🇸" };
+const ALLOWED = ["ar", "en", "fr", "es"];
+const MAX = 5000;
+
+function Page() {
+  const [text, setText] = useState("Hello! Welcome to Skycally text to speech.");
+  const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
+  const [voiceURI, setVoiceURI] = useState("");
+  const [rate, setRate] = useState(1);
+  const [pitch, setPitch] = useState(1);
+  const [playing, setPlaying] = useState(false);
+
+  useEffect(() => {
+    if (typeof window === "undefined" || !window.speechSynthesis) return;
+    const load = () => {
+      const all = window.speechSynthesis.getVoices();
+      const filtered = all.filter((v) => ALLOWED.some((p) => v.lang.toLowerCase().startsWith(p)));
       setVoices(filtered);
       if (filtered.length && !voiceURI) setVoiceURI(filtered[0].voiceURI);
     };

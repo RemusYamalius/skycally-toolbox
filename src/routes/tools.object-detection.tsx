@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -13,7 +11,54 @@ import { loadScript } from "@/lib/cdnScript";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/object-detection")({
-  head: () => buildToolMeta(toolBySlug("object-detection", tools)), => {
+  head: () => ({
+    meta: [
+      { title: "AI Object Detection — Real-time Detection Online Free | Skycally" },
+      { name: "description", content: "Detect objects in images and video in real-time using AI. Powered by TensorFlow.js COCO-SSD. Works entirely in your browser for free." },
+      { property: "og:title", content: "AI Object Detection | Skycally" },
+      { property: "og:description", content: "Real-time object detection with COCO-SSD." },
+      { property: "og:url", content: "https://skycally.com/tools/object-detection" },
+    ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/object-detection" }],
+  }),
+  component: ObjectDetectionTool,
+});
+
+const TFJS = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.0.0/dist/tf.min.js";
+const COCO = "https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js";
+
+interface Pred { class: string; score: number; bbox: [number, number, number, number]; }
+
+function colorFor(cls: string) {
+  let h = 0;
+  for (let i = 0; i < cls.length; i++) h = (h * 31 + cls.charCodeAt(i)) % 360;
+  return `hsl(${h}, 80%, 55%)`;
+}
+
+const EMOJI: Record<string, string> = {
+  person: "🧑", car: "🚗", truck: "🚚", bicycle: "🚲", motorcycle: "🏍️",
+  bus: "🚌", dog: "🐶", cat: "🐱", bird: "🐦", "cell phone": "📱",
+  laptop: "💻", book: "📖", chair: "🪑", "dining table": "🍽️", cup: "🥤",
+  bottle: "🍶", "tv": "📺", remote: "🎮", keyboard: "⌨️", mouse: "🖱️",
+};
+
+function ObjectDetectionTool() {
+  const [ready, setReady] = useState(false);
+  const [model, setModel] = useState<any>(null);
+  const [preds, setPreds] = useState<Pred[]>([]);
+  const [imgFile, setImgFile] = useState<File | null>(null);
+  const [camOn, setCamOn] = useState(false);
+  const [camDenied, setCamDenied] = useState(false);
+
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const camCanvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => {
+    let alive = true;
+    (async () => {
       try {
         await loadScript(TFJS);
         await loadScript(COCO);

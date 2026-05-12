@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -11,7 +9,34 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-converter")({
-  head: () => buildToolMeta(toolBySlug("image-converter", tools)),);
+  head: () => ({
+    meta: [
+      { title: "Free Image Converter — PNG to JPG, WEBP & More | Skycally" },
+      { name: "description", content: "Convert images between PNG, JPG, WEBP and AVIF formats for free. Batch conversion supported. Works entirely in your browser — no upload needed." },
+      { property: "og:title", content: "Free Image Converter | Skycally" },
+      { property: "og:description", content: "Convert images between PNG, JPG, WEBP — instantly in-browser." },
+      { property: "og:url", content: "https://skycally.com/tools/image-converter" },
+    ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-converter" }],
+  }),
+  component: ImageConverter,
+});
+
+const formats = ["image/png", "image/jpeg", "image/webp"] as const;
+type Fmt = typeof formats[number];
+
+interface Item {
+  file: File;
+  out?: { blob: Blob; size: number; name: string };
+}
+
+async function convertOne(file: File, target: Fmt): Promise<Blob> {
+  const url = URL.createObjectURL(file);
+  try {
+    const img = await new Promise<HTMLImageElement>((res, rej) => {
+      const i = new Image();
+      i.onload = () => res(i);
+      i.onerror = () => rej(new Error("Cannot read image"));
       i.src = url;
     });
     const canvas = document.createElement("canvas");

@@ -1,13 +1,121 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/split-pdf")({
-  head: () => buildToolMeta(toolBySlug("split-pdf", tools)),.toFixed(2)} MB
+  head: () => ({
+    meta: [
+      { title: "Split PDF — Extract Pages from PDF Free | Skycally" },
+      { name: "description", content: "Split PDF files and extract specific pages for free. Select page ranges or individual pages. Download as a new PDF instantly." },
+      { property: "og:title", content: "Split PDF | Skycally" },
+      { property: "og:description", content: "Extract specific pages from any PDF file instantly." },
+      { property: "og:url", content: "https://skycally.com/tools/split-pdf" },
+    ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/split-pdf" }],
+  }),
+  component: SplitPdf,
+});
+
+const API = "https://skycally-api-production.up.railway.app";
+
+function SplitPdf() {
+  const [file, setFile] = useState<File | null>(null);
+  const [pages, setPages] = useState("");
+  const [totalPages, setTotalPages] = useState<number | null>(null);
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const onFile = async (f: File) => {
+    if (!f.name.toLowerCase().endsWith(".pdf")) {
+      setError("Only PDF files are allowed");
+      return;
+    }
+    setFile(f);
+    setError("");
+    setDone(false);
+    setPages("");
+    try {
+      const buffer = await f.arrayBuffer();
+      const text = new TextDecoder("latin1").decode(buffer);
+      const match = text.match(/\/Type\s*\/Page[^s]/g);
+      setTotalPages(match ? match.length : null);
+    } catch {
+      setTotalPages(null);
+    }
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f) onFile(f);
+  };
+
+  const split = async () => {
+    if (!file || !pages.trim()) return;
+    setLoading(true);
+    setError("");
+    setDone(false);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("pages", pages.trim());
+      const res = await fetch(`${API}/api/split-pdf`, {
+        method: "POST",
+        body: form,
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Split failed");
+      }
+      const blob = await res.blob();
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "split.pdf";
+      a.click();
+      setDone(true);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const reset = () => {
+    setFile(null);
+    setPages("");
+    setError("");
+    setDone(false);
+    setTotalPages(null);
+  };
+
+  return (
+    <ToolPageShell title="Split PDF" description="Extract specific pages or page ranges from any PDF file instantly.">
+      <div className="w-full max-w-xl mx-auto space-y-5">
+        <div
+          onDrop={onDrop}
+          onDragOver={(e) => e.preventDefault()}
+          onClick={() => !file && inputRef.current?.click()}
+          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
+        >
+          <input
+            ref={inputRef} type="file" accept=".pdf" className="hidden"
+            onChange={(e) => { if (e.target.files?.[0]) onFile(e.target.files[0]); }}
+          />
+          {file ? (
+            <div className="space-y-2">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center">
+                <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                </svg>
+              </div>
+              <p className="text-gray-200 font-medium text-sm">{file.name}</p>
+              <p className="text-gray-500 text-xs">
+                {(file.size / 1024 / 1024).toFixed(2)} MB
                 {totalPages && ` • ${totalPages} pages`}
               </p>
               <button

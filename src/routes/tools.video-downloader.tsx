@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ClipboardPaste, X, Download as DownloadIcon, Loader2, Music } from "lucide-react";
@@ -12,7 +10,55 @@ import { fetchVideo, type VideoResult } from "@/services/videoApi";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-downloader")({
-  head: () => buildToolMeta(toolBySlug("video-downloader", tools)), => (
+  head: () => ({
+    meta: [
+      { title: "Free Video Downloader — TikTok, Instagram, Facebook | Skycally" },
+      { name: "description", content: "Download videos from TikTok, Instagram, Facebook, Twitter and more for free. No watermark, no signup, HD quality. Works on all devices." },
+      { property: "og:title", content: "Free Video Downloader | Skycally" },
+      { property: "og:description", content: "Download TikTok, Instagram & Facebook videos free. No watermark, HD quality." },
+      { property: "og:url", content: "https://skycally.com/tools/video-downloader" },
+    ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/video-downloader" }],
+  }),
+  component: VideoDownloader,
+});
+
+const platforms = ["TikTok", "Instagram", "Twitter/X", "Facebook", "Snapchat", "Pinterest", "Vimeo", "Dailymotion"];
+
+function VideoDownloader() {
+  const [url, setUrl] = useState("");
+  const [loading, setLoading] = useState(false);
+  const [result, setResult] = useState<VideoResult | null>(null);
+
+  const handleFetch = async () => {
+    if (!/^https?:\/\//i.test(url)) { toast.error("Please paste a valid video URL"); return; }
+    setLoading(true);
+    setResult(null);
+    try {
+      const r = await fetchVideo({ url });
+      setResult(r);
+      toast.success("Video found!");
+    } catch (e: any) {
+      const code = e?.message || "";
+      const map: Record<string, string> = {
+        VIDEO_NOT_FOUND: "Video not found or is private.",
+        RATE_LIMITED: "Server busy. Please try again in a minute.",
+        API_REQUEST_FAILED: "Server error. Please try again.",
+      };
+      toast.error(map[code] || "Could not process this URL. Make sure it's a valid video link.");
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  const paste = async () => {
+    try { setUrl(await navigator.clipboard.readText()); } catch { toast.error("Clipboard unavailable"); }
+  };
+
+  return (
+    <ToolPageShell title="Video Downloader" description="Paste a link from any major platform — get your video in seconds.">
+      <div className="flex flex-wrap gap-2 mb-3">
+        {platforms.map((p) => (
           <span key={p} className="rounded-full border border-border bg-secondary/50 px-3 py-1 text-xs font-medium">{p}</span>
         ))}
       </div>

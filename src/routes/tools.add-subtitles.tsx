@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Captions, Download, Loader2, Plus, X } from "lucide-react";
@@ -13,7 +11,54 @@ import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/add-subtitles")({
-  head: () => buildToolMeta(toolBySlug("add-subtitles", tools)), => (s.id === id ? { ...s, ...patch } : s)));
+  head: () => ({
+    meta: [
+      { title: "Add Subtitles to Video — Skycally" },
+      { name: "description", content: "Burn subtitles into any video — entirely in your browser, no uploads." },
+      { property: "og:title", content: "Add Subtitles · Skycally" },
+      { property: "og:description", content: "Free browser-based subtitle burner powered by FFmpeg WebAssembly." },
+    ],
+  }),
+  component: Page,
+});
+
+interface Sub { id: string; start: string; end: string; text: string; }
+
+const toSRT = (subs: Sub[]) =>
+  subs.map((s, i) => `${i + 1}\n${s.start} --> ${s.end}\n${s.text}\n`).join("\n");
+
+const COLOR_MAP: Record<string, string> = {
+  white: "FFFFFF",
+  yellow: "00FFFF", // BGR for ASS
+  cyan: "FFFF00",
+};
+
+function Page() {
+  const [videoFile, setVideoFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [srtFile, setSrtFile] = useState<File | null>(null);
+  const [mode, setMode] = useState<"manual" | "upload">("manual");
+  const [subs, setSubs] = useState<Sub[]>([
+    { id: crypto.randomUUID(), start: "00:00:01,000", end: "00:00:04,000", text: "First subtitle" },
+    { id: crypto.randomUUID(), start: "00:00:05,000", end: "00:00:08,000", text: "Second subtitle" },
+  ]);
+  const [fontSize, setFontSize] = useState(24);
+  const [color, setColor] = useState<keyof typeof COLOR_MAP>("white");
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState("");
+  const [result, setResult] = useState<{ url: string; blob: Blob } | null>(null);
+  const vidRef = useRef<HTMLInputElement>(null);
+  const srtRef = useRef<HTMLInputElement>(null);
+
+  const pickVideo = (f: File) => {
+    setVideoFile(f);
+    setVideoUrl(URL.createObjectURL(f));
+    setResult(null);
+  };
+
+  const updateSub = (id: string, patch: Partial<Sub>) =>
+    setSubs((p) => p.map((s) => (s.id === id ? { ...s, ...patch } : s)));
 
   const run = async () => {
     if (!videoFile) return;

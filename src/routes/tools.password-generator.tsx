@@ -1,13 +1,62 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState, useCallback } from "react";
 import { Copy, Check } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/password-generator")({
-  head: () => buildToolMeta(toolBySlug("password-generator", tools)),.join(""));
+  head: () => ({
+    meta: [
+      { title: "Password Generator — Strong, secure passwords · Skycally" },
+      { name: "description", content: "Generate strong, secure passwords instantly. Free, fast, no signup." },
+      { property: "og:title", content: "Password Generator · Skycally" },
+      { property: "og:description", content: "Generate strong, secure passwords instantly." },
+    ],
+  }),
+  component: PasswordGeneratorPage,
+});
+
+const CHARSETS = {
+  uppercase: "ABCDEFGHIJKLMNOPQRSTUVWXYZ",
+  lowercase: "abcdefghijklmnopqrstuvwxyz",
+  numbers: "0123456789",
+  symbols: "!@#$%^&*()_+-=[]{}|;:,.<>?",
+};
+
+function getStrength(password: string): { label: string; color: string; width: string } {
+  let score = 0;
+  if (password.length >= 8) score++;
+  if (password.length >= 14) score++;
+  if (/[A-Z]/.test(password)) score++;
+  if (/[0-9]/.test(password)) score++;
+  if (/[^A-Za-z0-9]/.test(password)) score++;
+  if (score <= 2) return { label: "Weak", color: "#ef4444", width: "33%" };
+  if (score <= 3) return { label: "Fair", color: "#f59e0b", width: "60%" };
+  return { label: "Strong", color: "#22d3ee", width: "100%" };
+}
+
+function PasswordGeneratorPage() {
+  const [length, setLength] = useState(16);
+  const [options, setOptions] = useState({
+    uppercase: true,
+    lowercase: true,
+    numbers: true,
+    symbols: false,
+  });
+  const [password, setPassword] = useState("");
+  const [copied, setCopied] = useState(false);
+
+  const generate = useCallback(() => {
+    let charset = "";
+    if (options.uppercase) charset += CHARSETS.uppercase;
+    if (options.lowercase) charset += CHARSETS.lowercase;
+    if (options.numbers) charset += CHARSETS.numbers;
+    if (options.symbols) charset += CHARSETS.symbols;
+    if (!charset) return;
+
+    const array = new Uint32Array(length);
+    crypto.getRandomValues(array);
+    setPassword(Array.from(array, (x) => charset[x % charset.length]).join(""));
     setCopied(false);
   }, [length, options]);
 

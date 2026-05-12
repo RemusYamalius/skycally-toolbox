@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Scissors, Download, Loader2 } from "lucide-react";
@@ -14,7 +12,57 @@ import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-trimmer")({
-  head: () => buildToolMeta(toolBySlug("video-trimmer", tools)), 30));
+  head: () => ({
+    meta: [
+      { title: "Video Trimmer — Skycally" },
+      { name: "description", content: "Cut and trim any video — entirely in your browser, no upload required." },
+      { property: "og:title", content: "Video Trimmer · Skycally" },
+      { property: "og:description", content: "Free browser-based video trimmer powered by FFmpeg WebAssembly." },
+    ],
+  }),
+  component: Page,
+});
+
+const MAX_BYTES = 200 * 1024 * 1024;
+
+const formatTime = (s: number) => {
+  const m = Math.floor(s / 60);
+  const sec = Math.floor(s % 60);
+  return `${m}:${sec.toString().padStart(2, "0")}`;
+};
+
+function Page() {
+  const [file, setFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState("");
+  const [duration, setDuration] = useState(0);
+  const [start, setStart] = useState(0);
+  const [end, setEnd] = useState(10);
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState("");
+  const [result, setResult] = useState<{ url: string; blob: Blob } | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const onPick = (files: File[]) => {
+    const f = files[0];
+    if (!f) return;
+    if (f.size > MAX_BYTES) return toast.error("Max video size is 200MB");
+    setFile(f);
+    setVideoUrl(URL.createObjectURL(f));
+    setResult(null);
+  };
+
+  useEffect(() => {
+    return () => {
+      if (videoUrl) URL.revokeObjectURL(videoUrl);
+    };
+  }, [videoUrl]);
+
+  const onMeta = () => {
+    const d = videoRef.current?.duration ?? 0;
+    if (!isFinite(d)) return;
+    setDuration(Math.floor(d));
+    setEnd(Math.min(Math.floor(d), 30));
     setStart(0);
   };
 

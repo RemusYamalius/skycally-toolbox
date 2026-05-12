@@ -1,12 +1,65 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/screen-recorder")({
-  head: () => buildToolMeta(toolBySlug("screen-recorder", tools)), => d + 1), 1000);
+  head: () => ({
+    meta: [
+      { title: "Screen Recorder — Record screen + audio in browser · Skycally" },
+      { name: "description", content: "Record your screen with audio directly in the browser — no installs needed. Free, fast, private." },
+      { property: "og:title", content: "Screen Recorder · Skycally" },
+      { property: "og:description", content: "Record your screen with audio directly in the browser." },
+    ],
+  }),
+  component: ScreenRecorder,
+});
+
+type RecordingState = "idle" | "recording" | "stopped";
+
+function ScreenRecorder() {
+  const [state, setState] = useState<RecordingState>("idle");
+  const [videoUrl, setVideoUrl] = useState<string>("");
+  const [duration, setDuration] = useState(0);
+  const [error, setError] = useState("");
+  const mediaRecorder = useRef<MediaRecorder | null>(null);
+  const chunks = useRef<Blob[]>([]);
+  const timer = useRef<ReturnType<typeof setInterval> | null>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+
+  const start = async () => {
+    setError("");
+    setVideoUrl("");
+    setDuration(0);
+    try {
+      const stream = await navigator.mediaDevices.getDisplayMedia({
+        video: { frameRate: 30 },
+        audio: true,
+      });
+      chunks.current = [];
+      const recorder = new MediaRecorder(stream, {
+        mimeType: MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+          ? "video/webm;codecs=vp9"
+          : "video/webm",
+      });
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.current.push(e.data);
+      };
+      recorder.onstop = () => {
+        stream.getTracks().forEach((t) => t.stop());
+        const blob = new Blob(chunks.current, { type: "video/webm" });
+        const url = URL.createObjectURL(blob);
+        setVideoUrl(url);
+        setState("stopped");
+        if (timer.current) clearInterval(timer.current);
+      };
+      stream.getVideoTracks()[0].onended = () => {
+        if (recorder.state !== "inactive") recorder.stop();
+      };
+      recorder.start(1000);
+      mediaRecorder.current = recorder;
+      setState("recording");
+      timer.current = setInterval(() => setDuration((d) => d + 1), 1000);
     } catch (err: any) {
       if (err.name !== "NotAllowedError") {
         setError("Could not start recording. Please try again.");

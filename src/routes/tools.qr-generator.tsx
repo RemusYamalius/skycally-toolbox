@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { Download, FileCode, Copy, ChevronDown, Upload, X } from "lucide-react";
@@ -19,7 +17,177 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { downloadBlob } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/qr-generator")({
-  head: () => buildToolMeta(toolBySlug("qr-generator", tools)), / 1.055, 2.4));
+  head: () => ({
+    meta: [
+      { title: "Free QR Code Generator with Logo — Custom Colors | Skycally" },
+      { name: "description", content: "Create custom QR codes with logo, colors and different styles for free. Download as PNG or SVG. No signup required. Perfect for business cards and marketing." },
+      { property: "og:title", content: "Free QR Code Generator | Skycally" },
+      { property: "og:description", content: "Generate pro-grade QR codes with custom colors, logos, and styles." },
+      { property: "og:url", content: "https://skycally.com/tools/qr-generator" },
+    ],
+    links: [{ rel: "canonical", href: "https://skycally.com/tools/qr-generator" }],
+  }),
+  component: QrGeneratorPage,
+});
+
+type QRType = "url" | "text" | "email" | "phone" | "wifi" | "vcard";
+type DotStyle = "square" | "rounded" | "dots" | "classy" | "classy-rounded";
+type ColorMode = "solid" | "gradient";
+type GradientType = "linear" | "radial";
+type FrameStyle = "none" | "simple" | "rounded" | "badge";
+type LogoChoice =
+  | { kind: "none" }
+  | { kind: "builtin"; id: string }
+  | { kind: "upload"; dataUrl: string };
+
+const QR_TYPES: { id: QRType; label: string; icon: string }[] = [
+  { id: "url", label: "URL", icon: "🔗" },
+  { id: "text", label: "Text", icon: "📝" },
+  { id: "email", label: "Email", icon: "✉️" },
+  { id: "phone", label: "Phone", icon: "📞" },
+  { id: "wifi", label: "WiFi", icon: "📶" },
+  { id: "vcard", label: "vCard", icon: "👤" },
+];
+
+const DOT_STYLES: { id: DotStyle; label: string; glyph: string; tip: string }[] = [
+  { id: "square", label: "Square", glyph: "■", tip: "Classic sharp squares — most universal" },
+  { id: "rounded", label: "Rounded", glyph: "▢", tip: "Slightly softened corners" },
+  { id: "dots", label: "Dots", glyph: "●", tip: "Full circular dots — modern look" },
+  { id: "classy", label: "Classy", glyph: "▪", tip: "Tight squares with extra gaps" },
+  { id: "classy-rounded", label: "Classy Rounded", glyph: "◉", tip: "Soft squares with extra spacing" },
+];
+
+const FRAMES: { id: FrameStyle; label: string }[] = [
+  { id: "none", label: "None" },
+  { id: "simple", label: "Simple" },
+  { id: "rounded", label: "Rounded" },
+  { id: "badge", label: "Badge" },
+];
+
+const CTA_PRESETS = ["SCAN ME", "Visit Website", "Follow Us", "Get Offer"];
+
+// Built-in logos: colored circle + monogram
+const BUILTIN_LOGOS: { id: string; label: string; bg: string; fg: string; text: string }[] = [
+  { id: "wifi", label: "WiFi", bg: "#0EA5E9", fg: "#fff", text: "📶" },
+  { id: "link", label: "Link", bg: "#64748B", fg: "#fff", text: "🔗" },
+  { id: "email", label: "Email", bg: "#EF4444", fg: "#fff", text: "✉" },
+  { id: "phone", label: "Phone", bg: "#22C55E", fg: "#fff", text: "📞" },
+  { id: "location", label: "Location", bg: "#F97316", fg: "#fff", text: "📍" },
+  { id: "instagram", label: "Instagram", bg: "#E1306C", fg: "#fff", text: "IG" },
+  { id: "facebook", label: "Facebook", bg: "#1877F2", fg: "#fff", text: "f" },
+  { id: "twitter", label: "X", bg: "#000000", fg: "#fff", text: "𝕏" },
+  { id: "whatsapp", label: "WhatsApp", bg: "#25D366", fg: "#fff", text: "W" },
+  { id: "youtube", label: "YouTube", bg: "#FF0000", fg: "#fff", text: "▶" },
+  { id: "tiktok", label: "TikTok", bg: "#010101", fg: "#fff", text: "♪" },
+  { id: "linkedin", label: "LinkedIn", bg: "#0A66C2", fg: "#fff", text: "in" },
+];
+
+function builtinLogoDataUrl(id: string): string {
+  const meta = BUILTIN_LOGOS.find((l) => l.id === id);
+  if (!meta) return "";
+  const svg = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><circle cx="50" cy="50" r="50" fill="${meta.bg}"/><text x="50" y="50" font-family="Arial, sans-serif" font-size="48" font-weight="bold" fill="${meta.fg}" text-anchor="middle" dominant-baseline="central">${meta.text}</text></svg>`;
+  return `data:image/svg+xml;utf8,${encodeURIComponent(svg)}`;
+}
+
+function formatQRContent(type: QRType, d: any): string {
+  switch (type) {
+    case "url":
+      return d.url ? (d.url.match(/^[a-z]+:\/\//i) ? d.url : `https://${d.url}`) : "";
+    case "text":
+      return d.text || "";
+    case "email":
+      if (!d.address) return "";
+      return `mailto:${d.address}${d.subject ? `?subject=${encodeURIComponent(d.subject)}` : ""}`;
+    case "phone":
+      return d.phone ? `tel:${d.phone}` : "";
+    case "wifi":
+      if (!d.ssid) return "";
+      return `WIFI:T:${d.security || "WPA"};S:${d.ssid};P:${d.password || ""};;`;
+    case "vcard":
+      if (!d.name) return "";
+      return `BEGIN:VCARD\nVERSION:3.0\nFN:${d.name}\nTEL:${d.phone || ""}\nEMAIL:${d.email || ""}\nURL:${d.website || ""}\nEND:VCARD`;
+  }
+}
+
+function hexToRgb(hex: string) {
+  const clean = hex.replace("#", "").slice(0, 6);
+  const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean.padEnd(6, "0");
+  const value = Number.parseInt(full, 16);
+  return { r: (value >> 16) & 255, g: (value >> 8) & 255, b: value & 255 };
+}
+
+function applyDotStyle(
+  canvas: HTMLCanvasElement,
+  content: string,
+  style: DotStyle,
+  fg: string,
+  bg: string,
+  errorCorrectionLevel: "M" | "H",
+) {
+  const ctx = canvas.getContext("2d")!;
+  const size = canvas.width;
+  const imageData = ctx.getImageData(0, 0, size, canvas.height);
+  const data = imageData.data;
+  const bgRgb = hexToRgb(bg);
+  const qr = QRCode!.create(content, { errorCorrectionLevel });
+  const moduleCount = qr.modules.size;
+  const margin = 2;
+  const moduleSize = size / (moduleCount + margin * 2);
+
+  ctx.fillStyle = bg;
+  ctx.fillRect(0, 0, size, size);
+  ctx.fillStyle = fg;
+
+  for (let row = 0; row < moduleCount; row++) {
+    for (let col = 0; col < moduleCount; col++) {
+      const x = (col + margin) * moduleSize;
+      const y = (row + margin) * moduleSize;
+      const sx = Math.min(size - 1, Math.floor(x + moduleSize / 2));
+      const sy = Math.min(size - 1, Math.floor(y + moduleSize / 2));
+      const idx = (sy * size + sx) * 4;
+      const isDark =
+        data[idx + 3] > 0 &&
+        Math.abs(data[idx] - bgRgb.r) + Math.abs(data[idx + 1] - bgRgb.g) + Math.abs(data[idx + 2] - bgRgb.b) > 24;
+      if (!isDark) continue;
+      const inset = style === "square" || style === "rounded" ? 0 : moduleSize * 0.12;
+      const w = moduleSize - inset * 2;
+      const h = moduleSize - inset * 2;
+      const px = x + inset;
+      const py = y + inset;
+      const radius = moduleSize * 0.35;
+      ctx.beginPath();
+      switch (style) {
+        case "square":
+          ctx.rect(x, y, moduleSize + 0.2, moduleSize + 0.2);
+          break;
+        case "rounded":
+          ctx.roundRect(x + 0.5, y + 0.5, moduleSize - 1, moduleSize - 1, radius);
+          break;
+        case "dots":
+          ctx.arc(x + moduleSize / 2, y + moduleSize / 2, moduleSize * 0.4, 0, Math.PI * 2);
+          break;
+        case "classy":
+          ctx.moveTo(px, py);
+          ctx.lineTo(px + w - radius, py);
+          ctx.quadraticCurveTo(px + w, py, px + w, py + radius);
+          ctx.lineTo(px + w, py + h);
+          ctx.lineTo(px, py + h);
+          ctx.closePath();
+          break;
+        case "classy-rounded":
+          ctx.roundRect(px, py, w, h, moduleSize * 0.18);
+          break;
+      }
+      ctx.fill();
+    }
+  }
+}
+
+function luminance(hex: string): number {
+  const r = parseInt(hex.slice(1, 3), 16) / 255;
+  const g = parseInt(hex.slice(3, 5), 16) / 255;
+  const b = parseInt(hex.slice(5, 7), 16) / 255;
+  const toLinear = (c: number) => (c <= 0.03928 ? c / 12.92 : Math.pow((c + 0.055) / 1.055, 2.4));
   return 0.2126 * toLinear(r) + 0.7152 * toLinear(g) + 0.0722 * toLinear(b);
 }
 function contrastRatio(hex1: string, hex2: string): number {

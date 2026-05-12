@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Film, Download, Loader2 } from "lucide-react";
@@ -14,7 +12,63 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-to-gif")({
-  head: () => buildToolMeta(toolBySlug("video-to-gif", tools)),}</p>
+  head: () => ({
+    meta: [
+      { title: "Video to GIF — Skycally" },
+      { name: "description", content: "Convert MP4, MOV, or WEBM videos to high-quality animated GIFs in your browser." },
+      { property: "og:title", content: "Video to GIF · Skycally" },
+      { property: "og:description", content: "Free browser-based video to GIF converter." },
+    ],
+  }),
+  component: Page,
+});
+
+function Page() {
+  const [file, setFile] = useState<File | null>(null);
+  const [start, setStart] = useState(0);
+  const [duration, setDuration] = useState(3);
+  const [width, setWidth] = useState(480);
+  const [fps, setFps] = useState(15);
+  const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
+  const [status, setStatus] = useState("");
+  const [gif, setGif] = useState<{ url: string; blob: Blob } | null>(null);
+
+  const onPick = (files: File[]) => {
+    const f = files[0];
+    if (!f) return;
+    if (f.size > MAX_VIDEO_BYTES) return toast.error("Max video size is 50MB");
+    setFile(f);
+    setGif(null);
+  };
+
+  const run = async () => {
+    if (!file) return;
+    setBusy(true);
+    setProgress(0);
+    setGif(null);
+    try {
+      const blob = await convertToGif(file, start, Math.min(duration, 10), width, fps, setProgress, setStatus);
+      setGif({ url: URL.createObjectURL(blob), blob });
+      toast.success("GIF ready!");
+    } catch (e: any) {
+      toast.error(e.message || "Conversion failed");
+    } finally {
+      setBusy(false);
+      setStatus("");
+    }
+  };
+
+  return (
+    <ToolPageShell title="Video to GIF" description="Trim a clip from any video and turn it into a shareable GIF — all in your browser.">
+      {!file && <DropZone accept="video/mp4,video/quicktime,video/webm" onFiles={onPick} label="Drop your video" hint="MP4, MOV, or WEBM · max 50MB" />}
+
+      {file && (
+        <div className="space-y-6">
+          <div className="rounded-2xl border border-border bg-card p-5 flex items-center justify-between gap-3 flex-wrap">
+            <div className="text-sm">
+              <p className="font-semibold">{file.name}</p>
+              <p className="text-muted-foreground">{formatBytes(file.size)}</p>
             </div>
             <button onClick={() => { setFile(null); setGif(null); }} className="text-sm text-muted-foreground hover:text-foreground">Change</button>
           </div>

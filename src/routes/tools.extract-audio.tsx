@@ -1,13 +1,116 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/extract-audio")({
-  head: () => buildToolMeta(toolBySlug("extract-audio", tools)),}</p>
+  head: () => ({
+    meta: [
+      { title: "Extract Audio from Video — Skycally" },
+      { name: "description", content: "Extract MP3, AAC or WAV audio from any video file." },
+      { property: "og:title", content: "Extract Audio from Video · Skycally" },
+      { property: "og:description", content: "Extract MP3, AAC or WAV audio from any video file." },
+    ],
+  }),
+  component: ExtractAudio,
+});
+
+const API = import.meta.env.VITE_API_URL;
+
+type Format = "mp3" | "aac" | "wav";
+
+const FORMAT_INFO: Record<Format, { label: string; desc: string; color: string }> = {
+  mp3: { label: "MP3", desc: "Most compatible", color: "text-cyan-400" },
+  aac: { label: "AAC", desc: "Better quality", color: "text-purple-400" },
+  wav: { label: "WAV", desc: "Lossless audio", color: "text-green-400" },
+};
+
+function formatSize(bytes: number): string {
+  if (bytes < 1024 * 1024) return (bytes / 1024).toFixed(1) + " KB";
+  return (bytes / 1024 / 1024).toFixed(2) + " MB";
+}
+
+function ExtractAudio() {
+  const [file, setFile] = useState<File | null>(null);
+  const [format, setFormat] = useState<Format>("mp3");
+  const [loading, setLoading] = useState(false);
+  const [error, setError] = useState("");
+  const [done, setDone] = useState(false);
+  const [audioSize, setAudioSize] = useState<number | null>(null);
+  const inputRef = useRef<HTMLInputElement>(null);
+
+  const onFile = (f: File) => {
+    setFile(f);
+    setError("");
+    setDone(false);
+    setAudioSize(null);
+  };
+
+  const onDrop = (e: React.DragEvent) => {
+    e.preventDefault();
+    const f = e.dataTransfer.files[0];
+    if (f) onFile(f);
+  };
+
+  const extract = async () => {
+    if (!file) return;
+    setLoading(true);
+    setError("");
+    setDone(false);
+    setAudioSize(null);
+    try {
+      const form = new FormData();
+      form.append("file", file);
+      form.append("format", format);
+      const res = await fetch(`${API}/api/extract-audio`, {
+        method: "POST",
+        body: form,
+      });
+      if (!res.ok) {
+        const err = await res.json();
+        throw new Error(err.detail || "Extraction failed");
+      }
+      const blob = await res.blob();
+      setAudioSize(blob.size);
+      const url = URL.createObjectURL(blob);
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = `${file.name.split(".")[0]}_audio.${format}`;
+      a.click();
+      setDone(true);
+    } catch (err: any) {
+      setError(err.message);
+    } finally {
+      setLoading(false);
+    }
+  };
+
+  return (
+    <ToolPageShell title="Extract Audio from Video" description="Extract MP3, AAC or WAV audio from any video file.">
+      <div className="w-full max-w-xl mx-auto space-y-5">
+        <div
+          onDrop={onDrop}
+          onDragOver={(e) => e.preventDefault()}
+          onClick={() => !file && inputRef.current?.click()}
+          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
+        >
+          <input
+            ref={inputRef}
+            type="file"
+            accept="video/*"
+            className="hidden"
+            onChange={(e) => { if (e.target.files?.[0]) onFile(e.target.files[0]); }}
+          />
+          {file ? (
+            <div className="space-y-2">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
+                <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                </svg>
+              </div>
+              <p className="text-gray-200 font-medium text-sm">{file.name}</p>
+              <p className="text-gray-500 text-xs">{formatSize(file.size)}</p>
               <button
                 onClick={(e) => {
                   e.stopPropagation();

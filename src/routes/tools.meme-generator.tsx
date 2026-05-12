@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -9,7 +7,113 @@ import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/meme-generator")({
-  head: () => buildToolMeta(toolBySlug("meme-generator", tools)),) {
+  head: () => ({
+    meta: [
+      { title: "Meme Generator — Create memes from popular templates · Skycally" },
+      { name: "description", content: "Make classic memes from popular templates or your own image. Fast, free and entirely in your browser." },
+      { property: "og:title", content: "Meme Generator · Skycally" },
+      { property: "og:description", content: "Create memes from popular templates or upload your own image." },
+    ],
+  }),
+  component: MemeGenerator,
+});
+
+const MEME_TEMPLATES = [
+  { id: "drake", name: "Drake", url: "https://i.imgflip.com/30b1gx.jpg" },
+  { id: "distracted", name: "Distracted BF", url: "https://i.imgflip.com/1ur9b0.jpg" },
+  { id: "buttons", name: "Two Buttons", url: "https://i.imgflip.com/1g8my4.jpg" },
+  { id: "change", name: "Change My Mind", url: "https://i.imgflip.com/24y43o.jpg" },
+  { id: "onedoes", name: "One Does Not Simply", url: "https://i.imgflip.com/1bij.jpg" },
+  { id: "fine", name: "This is Fine", url: "https://i.imgflip.com/wxica.jpg" },
+  { id: "pikachu", name: "Surprised Pikachu", url: "https://i.imgflip.com/2kbn1e.jpg" },
+  { id: "woman-cat", name: "Woman Yelling at Cat", url: "https://i.imgflip.com/345v97.jpg" },
+  { id: "bernie", name: "Bernie Sanders", url: "https://i.imgflip.com/4eku0j.jpg" },
+  { id: "brain", name: "Expanding Brain", url: "https://i.imgflip.com/1jwhww.jpg" },
+  { id: "exit", name: "Left Exit 12", url: "https://i.imgflip.com/22bdq6.jpg" },
+  { id: "gru", name: "Gru's Plan", url: "https://i.imgflip.com/26am.jpg" },
+];
+
+function MemeGenerator() {
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const imgRef = useRef<HTMLImageElement | null>(null);
+  const [imgSrc, setImgSrc] = useState<string>("");
+  const [topText, setTopText] = useState("Top text");
+  const [bottomText, setBottomText] = useState("Bottom text");
+  const [fontSize, setFontSize] = useState(40);
+  const [textColor, setTextColor] = useState("#ffffff");
+  const [outlineColor, setOutlineColor] = useState("#000000");
+  const [outlineWidth, setOutlineWidth] = useState(3);
+  const [allCaps, setAllCaps] = useState(true);
+  const [font, setFont] = useState("Impact");
+
+  const onUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
+    const f = e.target.files?.[0];
+    if (!f) return;
+    const r = new FileReader();
+    r.onload = () => setImgSrc(r.result as string);
+    r.readAsDataURL(f);
+  };
+
+  useEffect(() => {
+    if (!imgSrc) return;
+    const img = new Image();
+    img.crossOrigin = "anonymous";
+    img.onload = () => { imgRef.current = img; render(); };
+    img.onerror = () => toast.error("❌ Failed to load template. Try uploading your own image.");
+    img.src = imgSrc;
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [imgSrc]);
+
+  const render = () => {
+    const canvas = canvasRef.current;
+    const img = imgRef.current;
+    if (!canvas || !img) return;
+    canvas.width = img.naturalWidth;
+    canvas.height = img.naturalHeight;
+    const ctx = canvas.getContext("2d")!;
+    ctx.drawImage(img, 0, 0);
+    ctx.font = `bold ${fontSize}px ${font}`;
+    ctx.textAlign = "center";
+    ctx.fillStyle = textColor;
+    ctx.strokeStyle = outlineColor;
+    ctx.lineWidth = outlineWidth;
+    ctx.lineJoin = "round";
+    const tx = (s: string) => allCaps ? s.toUpperCase() : s;
+    if (topText) {
+      ctx.strokeText(tx(topText), canvas.width / 2, fontSize + 10);
+      ctx.fillText(tx(topText), canvas.width / 2, fontSize + 10);
+    }
+    if (bottomText) {
+      ctx.strokeText(tx(bottomText), canvas.width / 2, canvas.height - 15);
+      ctx.fillText(tx(bottomText), canvas.width / 2, canvas.height - 15);
+    }
+  };
+
+  useEffect(() => { render(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [topText, bottomText, fontSize, textColor, outlineColor, outlineWidth, allCaps, font]);
+
+  const download = () => {
+    const canvas = canvasRef.current;
+    if (!canvas || !imgRef.current) return;
+    try {
+      const url = canvas.toDataURL("image/png");
+      const a = document.createElement("a");
+      a.href = url;
+      a.download = "meme.png";
+      a.click();
+      toast.success("✅ Download started!");
+    } catch {
+      toast.error("❌ This template blocked export. Try uploading your own image.");
+    }
+  };
+
+  const share = async () => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    canvas.toBlob(async (blob) => {
+      if (!blob) return;
+      try {
+        const file = new File([blob], "meme.png", { type: "image/png" });
+        if (navigator.canShare?.({ files: [file] })) {
           await navigator.share({ files: [file], title: "My meme" });
         } else {
           await navigator.share({ title: "My meme", url: location.href });

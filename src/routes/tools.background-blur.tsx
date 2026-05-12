@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -15,7 +13,38 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/background-blur")({
-  head: () => buildToolMeta(toolBySlug("background-blur", tools)), => {
+  head: () => ({
+    meta: [
+      { title: "AI Background Blur — Free Online · Skycally" },
+      { name: "description", content: "Blur photo or webcam backgrounds in real time using on-device AI." },
+      { property: "og:title", content: "AI Background Blur · Skycally" },
+      { property: "og:description", content: "Real-time background blur powered by MediaPipe — runs in your browser." },
+    ],
+  }),
+  component: BackgroundBlurTool,
+});
+
+const SCRIPT = "https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/selfie_segmentation.js";
+
+function BackgroundBlurTool() {
+  const [ready, setReady] = useState(false);
+  const [blur, setBlur] = useState(15);
+  const blurRef = useRef(15);
+  const segRef = useRef<any>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
+  const camCanvasRef = useRef<HTMLCanvasElement>(null);
+  const videoRef = useRef<HTMLVideoElement>(null);
+  const [imageFile, setImageFile] = useState<File | null>(null);
+  const [camOn, setCamOn] = useState(false);
+  const [camDenied, setCamDenied] = useState(false);
+  const rafRef = useRef<number | null>(null);
+
+  useEffect(() => { blurRef.current = blur; }, [blur]);
+
+  useEffect(() => {
+    let mounted = true;
+    loadScript(SCRIPT)
+      .then(() => {
         if (!mounted) return;
         const seg = new window.SelfieSegmentation({
           locateFile: (f: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/selfie_segmentation@0.1/${f}`,

@@ -1,6 +1,4 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { tools } from "@/lib/tools";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { toast } from "sonner";
 import { RotateCw } from "lucide-react";
@@ -11,7 +9,53 @@ import { DropZone } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/rotate-pdf")({
-  head: () => buildToolMeta(toolBySlug("rotate-pdf", tools)), => res(b!), "image/png"));
+  head: () => ({
+    meta: [
+      { title: "Rotate PDF — Fix page orientation · Skycally" },
+      { name: "description", content: "Rotate one or all pages in your PDF to the correct orientation. Runs in your browser." },
+      { property: "og:title", content: "Rotate PDF · Skycally" },
+      { property: "og:description", content: "Rotate PDF pages 90, 180 or 270 degrees." },
+    ],
+  }),
+  component: RotatePdf,
+});
+
+interface Thumb { num: number; url: string }
+type Rot = 0 | 90 | 180 | 270;
+
+function RotatePdf() {
+  const [file, setFile] = useState<File | null>(null);
+  const [thumbs, setThumbs] = useState<Thumb[]>([]);
+  const [rotations, setRotations] = useState<Rot[]>([]);
+  const [busy, setBusy] = useState(false);
+  const [loading, setLoading] = useState(false);
+
+  const onFiles = async (files: File[]) => {
+    const f = files[0];
+    if (!f || !f.name.toLowerCase().endsWith(".pdf")) {
+      toast.error("Please upload a PDF file");
+      return;
+    }
+    setFile(f);
+    thumbs.forEach((t) => URL.revokeObjectURL(t.url));
+    setThumbs([]);
+    setRotations([]);
+    setLoading(true);
+    try {
+      const pdfjsLib: any = await import("pdfjs-dist");
+      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+      const buf = await f.arrayBuffer();
+      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
+      const out: Thumb[] = [];
+      for (let i = 1; i <= pdf.numPages; i++) {
+        const page = await pdf.getPage(i);
+        const viewport = page.getViewport({ scale: 0.5 });
+        const canvas = document.createElement("canvas");
+        canvas.width = viewport.width;
+        canvas.height = viewport.height;
+        const ctx = canvas.getContext("2d")!;
+        await page.render({ canvasContext: ctx, viewport, canvas }).promise;
+        const blob: Blob = await new Promise((res) => canvas.toBlob((b) => res(b!), "image/png"));
         out.push({ num: i, url: URL.createObjectURL(blob) });
       }
       setThumbs(out);

@@ -1,13 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildPageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/about")({
-  head: () => ({
-    meta: [
-      { title: "About — Skycally" },
-      { name: "description", content: "Skycally brings every essential online tool into one fast, free, no-signup platform." },
-      { property: "og:title", content: "About Skycally" },
-      { property: "og:description", content: "Every tool you need, one place." },
-    ],
+  head: () => buildPageMeta({
+    title: "About Skycally — Free Browser Tools for Everyone",
+    description: "Learn about Skycally, the free online toolkit with 40+ tools that run entirely in your browser with no signup required.",
+    path: "/about",
   }),
   component: () => (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">

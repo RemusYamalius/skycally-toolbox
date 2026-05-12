@@ -7,24 +7,16 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
+import { buildPageMeta } from "@/lib/seo";
 
 // 🔧 Replace with your real Formspree form ID after signing up at https://formspree.io
 const FORMSPREE_ID = "mbdwpooo";
 
 export const Route = createFileRoute("/contact")({
-  head: () => ({
-    meta: [
-      { title: "Contact Skycally — Questions, Bug Reports & Feedback" },
-      { name: "description", content: "Get in touch with the Skycally team. Ask a question, report a bug, request a feature or send a business inquiry. We reply within 24 hours." },
-      { property: "og:title", content: "Contact Skycally" },
-      { property: "og:description", content: "Have a question, suggestion, or found a bug? We'd love to hear from you." },
-      { property: "og:url", content: "https://skycally.com/contact" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Contact Skycally" },
-      { name: "twitter:description", content: "Questions, bug reports and feature requests welcome." },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/contact" }],
+  head: () => buildPageMeta({
+    title: "Contact Skycally — We'd Love to Hear From You",
+    description: "Get in touch with the Skycally team. We welcome feedback, suggestions, and partnership inquiries.",
+    path: "/contact",
   }),
   component: ContactPage,
 });

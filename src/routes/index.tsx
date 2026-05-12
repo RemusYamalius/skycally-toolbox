@@ -55,8 +55,11 @@ const categoryTaglines: Record<ToolCategory, string> = {
   text: "Generate, format, encode and analyze text effortlessly.",
 };
 
+const INITIAL_PER_CAT = 6;
+
 function HomePage() {
   const [q, setQ] = useState("");
+  const [expanded, setExpanded] = useState<Record<string, boolean>>({});
   const filtered = useMemo(
     () => tools.filter((t) => (t.name + t.description).toLowerCase().includes(q.toLowerCase())),
     [q]

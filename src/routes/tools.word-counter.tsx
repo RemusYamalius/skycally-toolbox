@@ -1,28 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState, useMemo } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/word-counter")({
-  head: () => ({
-    meta: [
-      { title: "Word Counter — Count words, characters & reading time · Skycally" },
-      { name: "description", content: "Count words, characters, sentences and estimate reading time. Free, fast, no signup." },
-      { property: "og:title", content: "Word Counter · Skycally" },
-      { property: "og:description", content: "Count words, characters, sentences and estimate reading time." },
-    ],
-  }),
-  component: WordCounter,
-});
-
-function WordCounter() {
-  const [text, setText] = useState("");
-
-  const stats = useMemo(() => {
-    const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
-    const chars = text.length;
-    const charsNoSpaces = text.replace(/\s/g, "").length;
-    const sentences = text.trim() === "" ? 0 : text.split(/[.!?]+/).filter((s) => s.trim()).length;
+  head: () => buildToolMeta(toolBySlug("word-counter", tools)), => s.trim()).length;
     const paragraphs = text.trim() === "" ? 0 : text.split(/\n+/).filter((p) => p.trim()).length;
     const readingTime = Math.ceil(words / 200);
     return { words, chars, charsNoSpaces, sentences, paragraphs, readingTime };

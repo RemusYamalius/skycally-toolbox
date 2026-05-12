@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { toast } from "sonner";
 import { GripVertical, X } from "lucide-react";
@@ -9,31 +11,7 @@ import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-to-pdf")({
-  head: () => ({
-    meta: [
-      { title: "Image to PDF — Combine images into a PDF · Skycally" },
-      { name: "description", content: "Convert one or many images into a single PDF document with custom page size, orientation and margins." },
-      { property: "og:title", content: "Image to PDF · Skycally" },
-      { property: "og:description", content: "Convert images into a single PDF in your browser." },
-    ],
-  }),
-  component: ImageToPdf,
-});
-
-interface Item { id: string; file: File; url: string; }
-
-function ImageToPdf() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [pageSize, setPageSize] = useState<"a4" | "a3" | "letter">("a4");
-  const [orientation, setOrientation] = useState<"portrait" | "landscape">("portrait");
-  const [margin, setMargin] = useState(10);
-  const [fit, setFit] = useState<"fit" | "fill" | "original">("fit");
-  const [filename, setFilename] = useState("images.pdf");
-  const [busy, setBusy] = useState(false);
-  const [dragId, setDragId] = useState<string | null>(null);
-
-  const onFiles = (files: File[]) => {
-    const next = files.filter((f) => f.type.startsWith("image/")).map((f) => ({ id: `${f.name}_${Date.now()}_${Math.random()}`, file: f, url: URL.createObjectURL(f) }));
+  head: () => buildToolMeta(toolBySlug("image-to-pdf", tools)),}_${Math.random()}`, file: f, url: URL.createObjectURL(f) }));
     setItems((curr) => [...curr, ...next]);
   };
 

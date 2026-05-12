@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { toast } from "sonner";
 import imageCompression from "browser-image-compression";
@@ -10,27 +12,7 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-compressor")({
-  head: () => ({
-    meta: [
-      { title: "Free Image Compressor — Reduce Image Size Online | Skycally" },
-      { name: "description", content: "Compress images without losing quality. Reduce PNG, JPG and WEBP file size online for free. Batch compression with ZIP download." },
-      { property: "og:title", content: "Free Image Compressor | Skycally" },
-      { property: "og:description", content: "Drop images, set quality, save bytes." },
-      { property: "og:url", content: "https://skycally.com/tools/image-compressor" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-compressor" }],
-  }),
-  component: Compressor,
-});
-
-interface Item { file: File; out?: { blob: Blob; size: number; name: string } }
-
-function Compressor() {
-  const [items, setItems] = useState<Item[]>([]);
-  const [quality, setQuality] = useState(80);
-  const [busy, setBusy] = useState(false);
-
-  const add = (files: File[]) => setItems((p) => [...p, ...files.map((f) => ({ file: f }))]);
+  head: () => buildToolMeta(toolBySlug("image-compressor", tools)), => ({ file: f }))]);
 
   const run = async () => {
     setBusy(true);

@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Sparkles, Download, Loader2 } from "lucide-react";
@@ -9,60 +11,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { upscaleImage, MAX_UPSCALE_BYTES } from "@/services/imageUpscaler";
 
 export const Route = createFileRoute("/tools/image-upscaler")({
-  head: () => ({
-    meta: [
-      { title: "Image Upscaler — Skycally" },
-      { name: "description", content: "Upscale images 2x or 4x in your browser with bicubic interpolation. Free online image enlarger." },
-      { property: "og:title", content: "Image Upscaler · Skycally" },
-      { property: "og:description", content: "Enlarge images in your browser — no upload required." },
-    ],
-  }),
-  component: Page,
-});
-
-function Page() {
-  const [file, setFile] = useState<File | null>(null);
-  const [scale, setScale] = useState<2 | 4>(2);
-  const [busy, setBusy] = useState(false);
-  const [progressMsg, setProgressMsg] = useState("");
-  const [output, setOutput] = useState<string | null>(null);
-  const [slider, setSlider] = useState(50);
-  const inputUrl = file ? URL.createObjectURL(file) : null;
-
-  const onPick = (files: File[]) => {
-    const f = files[0];
-    if (!f) return;
-    if (f.size > MAX_UPSCALE_BYTES) return toast.error("Max file size is 5MB");
-    setFile(f);
-    setOutput(null);
-  };
-
-  const run = async () => {
-    if (!file) return;
-    setBusy(true);
-    setProgressMsg("Uploading image...");
-    try {
-      const url = await upscaleImage(file, scale, (msg) => setProgressMsg(msg));
-      setOutput(url);
-      toast.success("Image upscaled!");
-    } catch (e: any) {
-      toast.error(e.message || "Failed to upscale");
-    } finally {
-      setBusy(false);
-      setProgressMsg("");
-    }
-  };
-
-  return (
-    <ToolPageShell title="Image Upscaler" description="Enlarge images 2x or 4x in your browser. Uses bicubic interpolation — best for photos and general images.">
-      {!file && <DropZone accept="image/png,image/jpeg,image/webp" onFiles={onPick} label="Drop your image" hint="PNG, JPG, or WEBP · max 5MB" />}
-
-      {file && (
-        <div className="space-y-6">
-          <div className="rounded-2xl border border-border bg-card p-5 flex items-center justify-between gap-3 flex-wrap">
-            <div className="text-sm">
-              <p className="font-semibold">{file.name}</p>
-              <p className="text-muted-foreground">{formatBytes(file.size)}</p>
+  head: () => buildToolMeta(toolBySlug("image-upscaler", tools)),}</p>
             </div>
             <button onClick={() => { setFile(null); setOutput(null); }} className="text-sm text-muted-foreground hover:text-foreground">Change</button>
           </div>

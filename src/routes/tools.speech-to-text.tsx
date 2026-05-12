@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Mic, Square, Copy, Download, Trash2 } from "lucide-react";
@@ -11,42 +13,7 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/speech-to-text")({
-  head: () => ({
-    meta: [
-      { title: "Speech to Text — Skycally" },
-      { name: "description", content: "Free real-time speech-to-text transcription in Arabic, English, French, and Spanish." },
-      { property: "og:title", content: "Speech to Text · Skycally" },
-      { property: "og:description", content: "Transcribe your voice instantly in your browser." },
-    ],
-  }),
-  component: Page,
-});
-
-const LANGS = [
-  { code: "ar-MA", label: "Arabic (Morocco)" },
-  { code: "ar-SA", label: "Arabic (Saudi Arabia)" },
-  { code: "ar-EG", label: "Arabic (Egypt)" },
-  { code: "en-US", label: "English (US)" },
-  { code: "en-GB", label: "English (UK)" },
-  { code: "fr-FR", label: "French" },
-  { code: "es-ES", label: "Spanish" },
-];
-
-function Page() {
-  const [lang, setLang] = useState("en-US");
-  const [recording, setRecording] = useState(false);
-  const [finalText, setFinalText] = useState("");
-  const [interim, setInterim] = useState("");
-  const handleRef = useRef<RecognitionHandle | null>(null);
-
-  useEffect(() => () => handleRef.current?.stop(), []);
-
-  const start = () => {
-    setRecording(true);
-    setInterim("");
-    handleRef.current = startRecognition(lang, (txt, isFinal) => {
-      if (isFinal) {
-        setFinalText((prev) => prev + txt);
+  head: () => buildToolMeta(toolBySlug("speech-to-text", tools)), => prev + txt);
         setInterim("");
       } else {
         setInterim(txt);

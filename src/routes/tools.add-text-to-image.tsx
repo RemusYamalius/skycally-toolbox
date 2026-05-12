@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
@@ -9,64 +11,7 @@ import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/add-text-to-image")({
-  head: () => ({
-    meta: [
-      { title: "Add Text to Image — Free online text editor · Skycally" },
-      { name: "description", content: "Add custom, draggable text layers to your image with fonts, colors, shadow and outline. Free, in-browser." },
-      { property: "og:title", content: "Add Text to Image · Skycally" },
-      { property: "og:description", content: "Add custom, draggable text layers to any image." },
-    ],
-  }),
-  component: AddTextToImage,
-});
-
-const FONTS = ["Impact", "Arial", "Georgia", "Courier New", "Verdana", "Comic Sans MS", "Times New Roman"];
-
-interface TextLayer {
-  id: string;
-  text: string;
-  x: number;
-  y: number;
-  fontSize: number;
-  color: string;
-  fontFamily: string;
-  bold: boolean;
-  italic: boolean;
-  shadow: boolean;
-  outline: boolean;
-  outlineColor: string;
-  outlineWidth: number;
-}
-
-function AddTextToImage() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const [image, setImage] = useState<HTMLImageElement | null>(null);
-  const [layers, setLayers] = useState<TextLayer[]>([]);
-  const [selected, setSelected] = useState<string | null>(null);
-  const [dragging, setDragging] = useState<string | null>(null);
-  const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
-
-  // New-layer controls
-  const [text, setText] = useState("Your text here");
-  const [fontSize, setFontSize] = useState(40);
-  const [color, setColor] = useState("#ffffff");
-  const [fontFamily, setFontFamily] = useState("Impact");
-  const [bold, setBold] = useState(false);
-  const [italic, setItalic] = useState(false);
-  const [shadow, setShadow] = useState(true);
-  const [outline, setOutline] = useState(true);
-  const [outlineColor, setOutlineColor] = useState("#000000");
-  const [outlineWidth, setOutlineWidth] = useState(3);
-
-  const draw = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas || !image) return;
-    const ctx = canvas.getContext("2d")!;
-    canvas.width = image.naturalWidth;
-    canvas.height = image.naturalHeight;
-    ctx.drawImage(image, 0, 0);
-
-    layers.forEach((layer) => {
+  head: () => buildToolMeta(toolBySlug("add-text-to-image", tools)), => {
       ctx.font = `${layer.italic ? "italic " : ""}${layer.bold ? "bold " : ""}${layer.fontSize}px ${layer.fontFamily}`;
       ctx.textAlign = "left";
       ctx.textBaseline = "top";

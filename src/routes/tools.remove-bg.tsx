@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -9,57 +11,7 @@ import { removeBackground } from "@/services/removeBg";
 import { downloadBlob, checkSize } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/remove-bg")({
-  head: () => ({
-    meta: [
-      { title: "Remove Image Background Free — AI Powered | Skycally" },
-      { name: "description", content: "Remove image background automatically with AI. Free, fast and accurate. Supports PNG, JPG and WEBP. Download transparent PNG instantly." },
-      { property: "og:title", content: "Remove Image Background | Skycally" },
-      { property: "og:description", content: "AI-powered one-click background removal." },
-      { property: "og:url", content: "https://skycally.com/tools/remove-bg" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/remove-bg" }],
-  }),
-  component: RemoveBgPage,
-});
-
-function RemoveBgPage() {
-  const [file, setFile] = useState<File | null>(null);
-  const [busy, setBusy] = useState(false);
-  const [resultUrl, setResultUrl] = useState<string | null>(null);
-  const [resultBlob, setResultBlob] = useState<Blob | null>(null);
-
-  const onFile = (files: File[]) => {
-    const f = files[0];
-    const err = checkSize(f);
-    if (err) { toast.error(err); return; }
-    setFile(f); setResultUrl(null); setResultBlob(null);
-  };
-
-  const run = async () => {
-    if (!file) return;
-    setBusy(true); setResultUrl(null);
-    try {
-      const blob = await removeBackground(file);
-      setResultBlob(blob);
-      setResultUrl(URL.createObjectURL(blob));
-      toast.success("Background removed!");
-    } catch (e: any) {
-      toast.error(e?.message || "Background removal failed");
-    } finally { setBusy(false); }
-  };
-
-  const reset = () => { setFile(null); setResultUrl(null); setResultBlob(null); };
-
-  return (
-    <ToolPageShell title="Remove Background" description="Upload an image and we'll erase the background — perfectly.">
-      {!file ? (
-        <DropZone accept="image/*" onFiles={onFile} />
-      ) : (
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
-          <div className="grid gap-4 sm:grid-cols-2">
-            <div>
-              <p className="text-xs font-semibold text-muted-foreground mb-2">ORIGINAL</p>
-              <img src={URL.createObjectURL(file)} alt="" className="rounded-xl border border-border w-full" />
+  head: () => buildToolMeta(toolBySlug("remove-bg", tools)),} alt="" className="rounded-xl border border-border w-full" />
             </div>
             <div>
               <p className="text-xs font-semibold text-muted-foreground mb-2">RESULT</p>

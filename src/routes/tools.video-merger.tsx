@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Combine, Download, Loader2, ArrowUp, ArrowDown, X } from "lucide-react";
@@ -11,30 +13,7 @@ import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-merger")({
-  head: () => ({
-    meta: [
-      { title: "Video Merger — Skycally" },
-      { name: "description", content: "Combine multiple videos into one — entirely in your browser, no uploads." },
-      { property: "og:title", content: "Video Merger · Skycally" },
-      { property: "og:description", content: "Free browser-based video merger powered by FFmpeg WebAssembly." },
-    ],
-  }),
-  component: Page,
-});
-
-interface Item { id: string; file: File; url: string; }
-
-function Page() {
-  const [videos, setVideos] = useState<Item[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState("");
-  const [result, setResult] = useState<{ url: string; blob: Blob } | null>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const add = (files: FileList | null) => {
-    if (!files) return;
-    const items = Array.from(files).map((f) => ({ id: crypto.randomUUID(), file: f, url: URL.createObjectURL(f) }));
+  head: () => buildToolMeta(toolBySlug("video-merger", tools)), file: f, url: URL.createObjectURL(f) }));
     setVideos((p) => [...p, ...items]);
     setResult(null);
   };

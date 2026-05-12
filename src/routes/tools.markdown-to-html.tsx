@@ -1,34 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/markdown-to-html")({
-  head: () => ({
-    meta: [
-      { title: "Markdown to HTML — Live preview converter · Skycally" },
-      { name: "description", content: "Convert Markdown to clean HTML with live preview instantly. Free, fast, no signup." },
-      { property: "og:title", content: "Markdown to HTML · Skycally" },
-      { property: "og:description", content: "Convert Markdown to clean HTML with live preview instantly." },
-    ],
-  }),
-  component: MarkdownToHtml,
-});
-
-function parseMarkdown(md: string): string {
-  let html = md
-    .replace(/^### (.+)$/gm, "<h3>$1</h3>")
-    .replace(/^## (.+)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.+)$/gm, "<h1>$1</h1>")
-    .replace(/\*\*\*(.+?)\*\*\*/g, "<strong><em>$1</em></strong>")
-    .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
-    .replace(/\*(.+?)\*/g, "<em>$1</em>")
-    .replace(/`(.+?)`/g, "<code>$1</code>")
-    .replace(/^> (.+)$/gm, "<blockquote>$1</blockquote>")
-    .replace(/^\- (.+)$/gm, "<li>$1</li>")
-    .replace(/^\d+\. (.+)$/gm, "<li>$1</li>")
-    .replace(/^---$/gm, "<hr>")
-    .replace(/\[(.+?)\]\((.+?)\)/g, '<a href="$2">$1</a>')
+  head: () => buildToolMeta(toolBySlug("markdown-to-html", tools)),\)/g, '<a href="$2">$1</a>')
     .replace(/!\[(.+?)\]\((.+?)\)/g, '<img alt="$1" src="$2">')
     .replace(/\n\n/g, "</p><p>")
     .replace(/\n/g, "<br>");

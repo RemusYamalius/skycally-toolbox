@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -21,127 +23,7 @@ import {
 } from "@/components/ui/select";
 
 export const Route = createFileRoute("/tools/business-card-generator")({
-  head: () => ({
-    meta: [
-      { title: "Free Business Card Generator — Print Ready PNG | Skycally" },
-      { name: "description", content: "Design professional business cards online for free. Choose from 8 templates, add your QR code, customize colors and download print-ready PNG at 300 DPI." },
-      { property: "og:title", content: "Free Business Card Generator | Skycally" },
-      { property: "og:description", content: "Pick a template, fill your info and download a print-ready business card." },
-      { property: "og:url", content: "https://skycally.com/tools/business-card-generator" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/business-card-generator" }],
-  }),
-  component: BusinessCardGeneratorPage,
-});
-
-// ── Types ───────────────────────────────────────────────
-interface TemplateColors {
-  bg: string;
-  accent: string;
-  text: string;
-}
-interface Template {
-  id: string;
-  name: string;
-  description: string;
-  colors: TemplateColors;
-}
-interface CardInfo {
-  fullName: string;
-  jobTitle: string;
-  company: string;
-  phone: string;
-  email: string;
-  website: string;
-  address: string;
-  linkedin: string;
-  instagram: string;
-  twitter: string;
-  qrContent: string;
-  showQR: boolean;
-  logoUrl: string | null;
-}
-
-const TEMPLATES: Template[] = [
-  { id: "classic-white", name: "Classic White", description: "Clean minimal design", colors: { bg: "#ffffff", accent: "#1e293b", text: "#1e293b" } },
-  { id: "dark-elegant", name: "Dark Elegant", description: "Premium black & gold", colors: { bg: "#0a0a0a", accent: "#d4af37", text: "#ffffff" } },
-  { id: "navy-professional", name: "Navy Professional", description: "Corporate navy blue", colors: { bg: "#0f172a", accent: "#38bdf8", text: "#ffffff" } },
-  { id: "red-bold", name: "Red Bold", description: "Bold red accent", colors: { bg: "#ffffff", accent: "#dc2626", text: "#1e293b" } },
-  { id: "green-modern", name: "Green Modern", description: "Fresh modern green", colors: { bg: "#ffffff", accent: "#16a34a", text: "#1e293b" } },
-  { id: "orange-creative", name: "Orange Creative", description: "Creative orange style", colors: { bg: "#1c1c1c", accent: "#f97316", text: "#ffffff" } },
-  { id: "purple-luxury", name: "Purple Luxury", description: "Luxury purple gradient", colors: { bg: "#1e1b4b", accent: "#a78bfa", text: "#ffffff" } },
-  { id: "minimal-gray", name: "Minimal Gray", description: "Ultra minimal gray", colors: { bg: "#f8fafc", accent: "#64748b", text: "#1e293b" } },
-];
-
-const FONTS = [
-  { value: "Inter", label: "Inter" },
-  { value: "Playfair Display", label: "Playfair Display" },
-  { value: "Montserrat", label: "Montserrat" },
-  { value: "Roboto", label: "Roboto" },
-  { value: "Georgia", label: "Georgia" },
-  { value: "Oswald", label: "Oswald" },
-];
-
-const PRESETS: TemplateColors[] = [
-  { bg: "#ffffff", accent: "#1e293b", text: "#1e293b" },
-  { bg: "#0a0a0a", accent: "#d4af37", text: "#ffffff" },
-  { bg: "#0f172a", accent: "#38bdf8", text: "#ffffff" },
-  { bg: "#ffffff", accent: "#dc2626", text: "#1e293b" },
-  { bg: "#1e1b4b", accent: "#a78bfa", text: "#ffffff" },
-  { bg: "#f8fafc", accent: "#64748b", text: "#1e293b" },
-];
-
-const CARD_W = 1050;
-const CARD_H = 600;
-
-const EMPTY_INFO: CardInfo = {
-  fullName: "",
-  jobTitle: "",
-  company: "",
-  phone: "",
-  email: "",
-  website: "",
-  address: "",
-  linkedin: "",
-  instagram: "",
-  twitter: "",
-  qrContent: "",
-  showQR: true,
-  logoUrl: null,
-};
-
-type QrPos = "bottom-left" | "bottom-right" | "none";
-type LogoPos = "top-left" | "top-center" | "top-right";
-type Orientation = "horizontal" | "vertical";
-
-function BusinessCardGeneratorPage() {
-  const [step, setStep] = useState<1 | 2 | 3>(1);
-  const [template, setTemplate] = useState<Template>(TEMPLATES[0]);
-  const [info, setInfo] = useState<CardInfo>(EMPTY_INFO);
-  const [qrTouched, setQrTouched] = useState(false);
-
-  // Step-3 customization
-  const [colors, setColors] = useState<TemplateColors>(TEMPLATES[0].colors);
-  const [font, setFont] = useState("Inter");
-  const [nameSize, setNameSize] = useState(36);
-  const [infoSize, setInfoSize] = useState(13);
-  const [qrPos, setQrPos] = useState<QrPos>("bottom-right");
-  const [qrSize, setQrSize] = useState<"S" | "M" | "L">("M");
-  const [logoPos, setLogoPos] = useState<LogoPos>("top-right");
-  const [showDivider, setShowDivider] = useState(true);
-  const [dividerColor, setDividerColor] = useState("");
-  const [orientation, setOrientation] = useState<Orientation>("horizontal");
-  const [side, setSide] = useState<"front" | "back">("front");
-
-  const frontRef = useRef<HTMLCanvasElement | null>(null);
-  const backRef = useRef<HTMLCanvasElement | null>(null);
-  const [logoImg, setLogoImg] = useState<HTMLImageElement | null>(null);
-  const [qrCanvas, setQrCanvas] = useState<HTMLCanvasElement | null>(null);
-
-  // Inject Google Fonts once
-  useEffect(() => {
-    const id = "bcg-google-fonts";
-    if (document.getElementById(id)) return;
+  head: () => buildToolMeta(toolBySlug("business-card-generator", tools)),) return;
     const link = document.createElement("link");
     link.id = id;
     link.rel = "stylesheet";

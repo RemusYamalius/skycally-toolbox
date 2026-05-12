@@ -1,127 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState, useRef, useCallback } from "react";
 import { ImageIcon } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/color-palette")({
-  head: () => ({
-    meta: [
-      { title: "Color Palette Extractor — Dominant colors from images · Skycally" },
-      { name: "description", content: "Extract the dominant colors from any image instantly. Free, fast, no signup." },
-      { property: "og:title", content: "Color Palette Extractor · Skycally" },
-      { property: "og:description", content: "Extract the dominant colors from any image instantly." },
-    ],
-  }),
-  component: ColorPaletteExtractor,
-});
-
-interface Color {
-  hex: string;
-  rgb: string;
-  count: number;
-}
-
-function rgbToHex(r: number, g: number, b: number): string {
-  return "#" + [r, g, b].map((x) => x.toString(16).padStart(2, "0")).join("");
-}
-
-function quantize(data: Uint8ClampedArray, count: number): Color[] {
-  const colorMap: Record<string, number> = {};
-  for (let i = 0; i < data.length; i += 4) {
-    const r = Math.round(data[i] / 32) * 32;
-    const g = Math.round(data[i + 1] / 32) * 32;
-    const b = Math.round(data[i + 2] / 32) * 32;
-    const a = data[i + 3];
-    if (a < 128) continue;
-    const key = `${r},${g},${b}`;
-    colorMap[key] = (colorMap[key] || 0) + 1;
-  }
-  return Object.entries(colorMap)
-    .sort((a, b) => b[1] - a[1])
-    .slice(0, count)
-    .map(([key, cnt]) => {
-      const [r, g, b] = key.split(",").map(Number);
-      return { hex: rgbToHex(r, g, b), rgb: `rgb(${r}, ${g}, ${b})`, count: cnt };
-    });
-}
-
-function ColorPaletteExtractor() {
-  const [colors, setColors] = useState<Color[]>([]);
-  const [preview, setPreview] = useState<string>("");
-  const [loading, setLoading] = useState(false);
-  const [copied, setCopied] = useState<string>("");
-  const [colorCount, setColorCount] = useState(6);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const inputRef = useRef<HTMLInputElement>(null);
-
-  const extractColors = useCallback((file: File) => {
-    setLoading(true);
-    const url = URL.createObjectURL(file);
-    setPreview(url);
-    const img = new Image();
-    img.onload = () => {
-      const canvas = canvasRef.current!;
-      const ctx = canvas.getContext("2d")!;
-      canvas.width = 200;
-      canvas.height = 200;
-      ctx.drawImage(img, 0, 0, 200, 200);
-      const { data } = ctx.getImageData(0, 0, 200, 200);
-      const palette = quantize(data, colorCount);
-      setColors(palette);
-      setLoading(false);
-    };
-    img.src = url;
-  }, [colorCount]);
-
-  const onDrop = (e: React.DragEvent) => {
-    e.preventDefault();
-    const file = e.dataTransfer.files[0];
-    if (file?.type.startsWith("image/")) extractColors(file);
-  };
-
-  const copy = (text: string) => {
-    navigator.clipboard.writeText(text);
-    setCopied(text);
-    setTimeout(() => setCopied(""), 2000);
-  };
-
-  const allHex = colors.map((c) => c.hex).join(", ");
-
-  return (
-    <ToolPageShell title="Color Palette Extractor" description="Extract the dominant colors from any image instantly.">
-      <canvas ref={canvasRef} className="hidden" />
-      <div className="space-y-5">
-        <div
-          onDrop={onDrop}
-          onDragOver={(e) => e.preventDefault()}
-          onClick={() => inputRef.current?.click()}
-          className="border-2 border-dashed border-border hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all group"
-        >
-          <input
-            ref={inputRef}
-            type="file"
-            accept="image/*"
-            className="hidden"
-            onChange={(e) => { if (e.target.files?.[0]) extractColors(e.target.files[0]); }}
-          />
-          {preview ? (
-            <img src={preview} alt="Preview" className="max-h-48 mx-auto rounded-xl object-contain" />
-          ) : (
-            <div className="space-y-2">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-card border border-border flex items-center justify-center group-hover:border-cyan-500/50 transition-all">
-                <ImageIcon className="w-6 h-6 text-muted-foreground" />
-              </div>
-              <p className="text-muted-foreground text-sm">Drop an image or click to browse</p>
-            </div>
-          )}
-        </div>
-
-        <div className="bg-card border border-border rounded-2xl p-4 flex items-center gap-4">
-          <span className="text-sm text-muted-foreground shrink-0">Colors to extract</span>
-          <input
-            type="range" min={3} max={12} value={colorCount}
-            onChange={(e) => setColorCount(Number(e.target.value))}
+  head: () => buildToolMeta(toolBySlug("color-palette", tools)),)}
             className="flex-1 accent-cyan-400"
           />
           <span className="text-cyan-400 font-mono font-bold w-6 text-center">{colorCount}</span>

@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Camera, Copy, ExternalLink, X } from "lucide-react";
@@ -10,27 +12,7 @@ import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/qr-reader")({
-  head: () => ({
-    meta: [
-      { title: "QR Code Reader — Skycally" },
-      { name: "description", content: "Decode QR codes from images or your camera, instantly in your browser." },
-      { property: "og:title", content: "QR Code Reader · Skycally" },
-      { property: "og:description", content: "Scan QR codes from photos or live camera." },
-    ],
-  }),
-  component: QrReaderPage,
-});
-
-function decodeImage(file: File): Promise<string | null> {
-  return new Promise((resolve, reject) => {
-    const url = URL.createObjectURL(file);
-    const img = new Image();
-    img.onload = () => {
-      const canvas = document.createElement("canvas");
-      canvas.width = img.naturalWidth;
-      canvas.height = img.naturalHeight;
-      const ctx = canvas.getContext("2d");
-      if (!ctx) { URL.revokeObjectURL(url); return reject(new Error("Canvas error")); }
+  head: () => buildToolMeta(toolBySlug("qr-reader", tools)),); }
       ctx.drawImage(img, 0, 0);
       const data = ctx.getImageData(0, 0, canvas.width, canvas.height);
       const code = jsQR(data.data, data.width, data.height);

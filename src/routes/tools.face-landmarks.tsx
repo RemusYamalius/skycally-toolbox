@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -12,43 +14,7 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/face-landmarks")({
-  head: () => ({
-    meta: [
-      { title: "Face Landmarks Detector — 468 Points · Skycally" },
-      { name: "description", content: "Detect 468 facial landmarks on photos or live camera with MediaPipe Face Mesh." },
-      { property: "og:title", content: "Face Landmarks · Skycally" },
-      { property: "og:description", content: "AI face mesh in your browser — 468 landmarks per face." },
-    ],
-  }),
-  component: FaceLandmarksTool,
-});
-
-const FACE_MESH = "https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/face_mesh.js";
-const DRAW = "https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js";
-
-function FaceLandmarksTool() {
-  const [ready, setReady] = useState(false);
-  const [showDots, setShowDots] = useState(true);
-  const [showMesh, setShowMesh] = useState(false);
-  const [faceCount, setFaceCount] = useState(0);
-  const [camDenied, setCamDenied] = useState(false);
-  const [camOn, setCamOn] = useState(false);
-  const [imgFile, setImgFile] = useState<File | null>(null);
-
-  const meshRef = useRef<any>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const camCanvasRef = useRef<HTMLCanvasElement>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const rafRef = useRef<number | null>(null);
-
-  const showDotsRef = useRef(true);
-  const showMeshRef = useRef(false);
-  useEffect(() => { showDotsRef.current = showDots; }, [showDots]);
-  useEffect(() => { showMeshRef.current = showMesh; }, [showMesh]);
-
-  useEffect(() => {
-    let alive = true;
-    Promise.all([loadScript(FACE_MESH), loadScript(DRAW)])
+  head: () => buildToolMeta(toolBySlug("face-landmarks", tools)), loadScript(DRAW)])
       .then(() => {
         if (!alive) return;
         const m = new window.FaceMesh({ locateFile: (f: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${f}` });

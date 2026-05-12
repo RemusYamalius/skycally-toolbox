@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -9,57 +11,7 @@ import { loadScript } from "@/lib/cdnScript";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/hand-gesture")({
-  head: () => ({
-    meta: [
-      { title: "Hand Gesture Recognition — Live · Skycally" },
-      { name: "description", content: "Recognize hand gestures from your webcam in real time using MediaPipe Hands." },
-      { property: "og:title", content: "Hand Gesture Recognition · Skycally" },
-      { property: "og:description", content: "Real-time hand tracking and gesture recognition in your browser." },
-    ],
-  }),
-  component: HandGestureTool,
-});
-
-const HANDS = "https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/hands.js";
-const DRAW = "https://cdn.jsdelivr.net/npm/@mediapipe/drawing_utils@0.3/drawing_utils.js";
-
-function detectGesture(landmarks: any[]): string {
-  const thumbTip = landmarks[4];
-  const indexTip = landmarks[8];
-  const middleTip = landmarks[12];
-  const ringTip = landmarks[16];
-  const pinkyTip = landmarks[20];
-  const fingerUp = (tip: any, base: any) => tip.y < base.y;
-  const thumb = thumbTip.x < landmarks[3].x;
-  const index = fingerUp(indexTip, landmarks[6]);
-  const middle = fingerUp(middleTip, landmarks[10]);
-  const ring = fingerUp(ringTip, landmarks[14]);
-  const pinky = fingerUp(pinkyTip, landmarks[18]);
-  if (index && middle && !ring && !pinky) return "✌️ Peace";
-  if (index && !middle && !ring && !pinky) return "☝️ Pointing";
-  if (!index && !middle && !ring && !pinky) return "✊ Fist";
-  if (index && middle && ring && pinky) return "✋ Open Hand";
-  if (thumb && !index && !middle && !ring && !pinky) return "👍 Thumbs Up";
-  return "🤙 Hand Detected";
-}
-
-function HandGestureTool() {
-  const [ready, setReady] = useState(false);
-  const [camDenied, setCamDenied] = useState(false);
-  const [camOn, setCamOn] = useState(false);
-  const [gesture, setGesture] = useState<string>("—");
-  const [handCount, setHandCount] = useState(0);
-  const [fps, setFps] = useState(0);
-
-  const handsRef = useRef<any>(null);
-  const videoRef = useRef<HTMLVideoElement>(null);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
-  const rafRef = useRef<number | null>(null);
-  const frameTimes = useRef<number[]>([]);
-
-  useEffect(() => {
-    let alive = true;
-    Promise.all([loadScript(HANDS), loadScript(DRAW)])
+  head: () => buildToolMeta(toolBySlug("hand-gesture", tools)), loadScript(DRAW)])
       .then(() => {
         if (!alive) return;
         const h = new window.Hands({ locateFile: (f: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/hands@0.4/${f}` });

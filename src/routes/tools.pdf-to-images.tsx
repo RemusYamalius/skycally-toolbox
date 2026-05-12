@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { tools } from "@/lib/tools";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
@@ -7,51 +9,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { DropZone } from "@/components/drop-zone";
 
 export const Route = createFileRoute("/tools/pdf-to-images")({
-  head: () => ({
-    meta: [
-      { title: "PDF to Images — Convert PDF pages to PNG · Skycally" },
-      { name: "description", content: "Convert every PDF page into a high-quality PNG image. Runs in your browser." },
-      { property: "og:title", content: "PDF to Images · Skycally" },
-      { property: "og:description", content: "Convert every PDF page into a PNG image." },
-    ],
-  }),
-  component: PdfToImages,
-});
-
-interface Page { num: number; url: string; blob: Blob }
-
-function PdfToImages() {
-  const [file, setFile] = useState<File | null>(null);
-  const [pages, setPages] = useState<Page[]>([]);
-  const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState(0);
-
-  const onFiles = async (files: File[]) => {
-    const f = files[0];
-    if (!f || !f.name.toLowerCase().endsWith(".pdf")) {
-      toast.error("Please upload a PDF file");
-      return;
-    }
-    setFile(f);
-    pages.forEach((p) => URL.revokeObjectURL(p.url));
-    setPages([]);
-    setBusy(true);
-    setProgress(0);
-    try {
-      const pdfjsLib: any = await import("pdfjs-dist");
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
-      const buf = await f.arrayBuffer();
-      const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
-      const out: Page[] = [];
-      for (let i = 1; i <= pdf.numPages; i++) {
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale: 2 });
-        const canvas = document.createElement("canvas");
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        const ctx = canvas.getContext("2d")!;
-        await page.render({ canvasContext: ctx, viewport, canvas }).promise;
-        const blob: Blob = await new Promise((res) => canvas.toBlob((b) => res(b!), "image/png"));
+  head: () => buildToolMeta(toolBySlug("pdf-to-images", tools)), => res(b!), "image/png"));
         out.push({ num: i, url: URL.createObjectURL(blob), blob });
         setProgress(Math.round((i / pdf.numPages) * 100));
       }

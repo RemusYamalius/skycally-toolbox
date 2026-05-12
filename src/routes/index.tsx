@@ -169,8 +169,18 @@ function HomePage() {
                     </span>
                   </div>
                   <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                    {list.map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
+                    {(expanded[cat] ? list : list.slice(0, INITIAL_PER_CAT)).map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
                   </div>
+                  {list.length > INITIAL_PER_CAT && !expanded[cat] && (
+                    <div className="mt-6 text-center">
+                      <button
+                        onClick={() => setExpanded((p) => ({ ...p, [cat]: true }))}
+                        className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium hover:bg-secondary transition"
+                      >
+                        Show {list.length - INITIAL_PER_CAT} more {meta.label.toLowerCase()} →
+                      </button>
+                    </div>
+                  )}
                 </div>
               );
             })}

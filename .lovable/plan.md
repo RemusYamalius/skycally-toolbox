@@ -1,64 +1,64 @@
-## Goal
-Add a Contact page, wire up Formspree, expand SEO metadata across pages, refresh sitemap/robots, and add JSON-LD on the homepage.
+# Plan: Mobile perf (unused JS) + SEO meta overhaul
 
-## Important notes on stack adaptation
-- The project is **TanStack Start**, not CRA/Vite-React. We already manage `<head>` via each route's `head()` (see `src/routes/__root.tsx`, `src/routes/tools.json-formatter.tsx`). **We will NOT install `react-helmet-async`** — it duplicates and conflicts with TanStack's `HeadContent`. All `<Helmet>` blocks in your spec will be translated 1:1 into `head: () => ({ meta, links, scripts })`.
-- The sitemap is already a **dynamic route** at `src/routes/sitemap[.]xml.tsx`, not a static `public/sitemap.xml`. We'll update that route's `ROUTES` list to match your new spec. `public/robots.txt` already exists and already points to the sitemap — no changes needed there.
-- Formspree form ID: I'll use a placeholder constant `FORMSPREE_ID` at the top of the contact page so you only edit one line after signing up.
+## Part A — Reduce unused JavaScript on homepage
 
-## Part 1 — Contact page (`/contact`)
-Create `src/routes/contact.tsx`:
-- `head()` with title/description/og/canonical for `/contact`.
-- Hero: "Get in Touch" + subtitle.
-- **Form** (controlled React state, `fetch` POST to `https://formspree.io/f/${FORMSPREE_ID}` with `Accept: application/json`):
-  - Name, Email, Subject (Select with the 5 options), Message (Textarea rows=5).
-  - Zod validation client-side (name 1–100, email valid + ≤255, message 1–2000, subject enum). Errors shown inline.
-  - States: idle / submitting / success / error → toast + inline message exactly as specified.
-  - Reset form on success.
-- **3 info cards** (Email / Quick Response / Follow Us) using the existing card styling pattern (`bg-card border border-border rounded-2xl`).
-- **FAQ section** using the existing `Accordion` component from `@/components/ui/accordion` for the 5 Q&As.
-- Dark theme + cyan→blue gradient submit button matching site tokens.
+**Fix 1 — Icon imports**
+Audit shows `lucide-react` is already imported by name everywhere (e.g. `index.tsx` uses `import { Search, Upload, ... } from "lucide-react"`, `tools.ts` uses named imports). Tree-shaking is already correct — no changes needed here. I'll do a quick `rg` sweep to confirm no `import * as` patterns slipped in elsewhere.
 
-## Part 2 — Navigation
-- `src/components/site-header.tsx`: add `{ to: "/contact", label: "Contact" }` to `links` (between About and theme toggle area).
-- `src/components/site-footer.tsx`: add Contact to Quick Links and to the bottom legal bar.
+**Fix 2 — Defer the full tools grid (biggest win)**
+The homepage currently renders **all 47 tool cards** across 5 categories on first paint. Each `ToolCard` ships its lucide icon + framer-motion animation. That's the bulk of the unused JS for users above the fold.
 
-## Part 3 — Per-page SEO (`head()` upgrades)
-For each route below, ensure `head()` includes title, description, og:title, og:description, og:url, twitter equivalents, and `<link rel="canonical">` via `links: [{ rel: "canonical", href: "https://skycally.com/..." }]`. Use the exact copy from your spec.
+Approach: render the **first 6 tools per category by default**, with a "Show all N tools" button that reveals the rest. Per-category, client-side, no extra deps (avoids adding `@tanstack/react-virtual` ~7KB).
 
-Routes to update:
-- `src/routes/index.tsx` — homepage copy + JSON-LD WebSite schema (added via `scripts: [{ type: "application/ld+json", children: JSON.stringify(...) }]`).
-- `src/routes/tools.video-downloader.tsx`
-- `src/routes/tools.qr-generator.tsx`
-- `src/routes/tools.remove-bg.tsx`
-- `src/routes/tools.image-converter.tsx`
-- `src/routes/tools.image-compressor.tsx`
-- `src/routes/tools.image-resizer.tsx`
-- `src/routes/tools.image-cropper.tsx`
-- `src/routes/tools.merge-pdf.tsx`
-- `src/routes/tools.word-to-pdf.tsx`
-- `src/routes/tools.split-pdf.tsx`
-- `src/routes/tools.business-card-generator.tsx`
-- `src/routes/tools.text-to-speech.tsx`
-- `src/routes/tools.object-detection.tsx`
-- `src/routes/tools.sentiment-analysis.tsx`
+- Add `useState<Record<ToolCategory, boolean>>` in `HomePage` for expanded categories.
+- Slice `list.slice(0, expanded[cat] ? list.length : 6)` when rendering grid.
+- Show "Show N more →" button when there are hidden items.
+- Keeps all SEO/SSR HTML for crawlers if we render all server-side… but to actually reduce client JS work and DOM nodes we render the truncated list on both server and client (consistent SSR). Crawlers still find the full inventory via the `/tools` page (already linked in nav + sitemap).
 
-We will only change `head()` on these — no UI/business-logic changes.
+**Fix 3 — Cache headers** (deferred)
+TanStack Start on Cloudflare Workers serves static assets through Vite's hashed filenames; long cache headers are a wrangler/`assets` config concern, but our `wrangler.jsonc` doesn't define an `assets` block — defaults from the framework apply. I will skip code changes for this fix and note it for the user (requires Cloudflare dashboard config or a custom asset handler, outside scope of a UI/code change).
 
-## Part 4 — Sitemap
-Update `src/routes/sitemap[.]xml.tsx` `ROUTES` to match your full list (adds `/contact`, `/tools/business-card-generator`, the new video tools, AI tools, `image-resizer`, `image-cropper`, `add-text-to-image`, `image-to-pdf`, `collage-maker`, `meme-generator`, `background-blur`, `face-landmarks`, `hand-gesture`, etc.). Priorities mirror your spec.
+**Fix 4 — LCP**
+The hero `<h1>` is text and is already at the top of SSR HTML — no late-loading element. The decorative blurred div + `motion.div` opacity animation does not block paint. No change needed.
 
-`public/robots.txt` already correct — no change.
+## Part B — SEO meta tags across all pages
 
-## Part 5 — JSON-LD
-Added on homepage via the `scripts` array in `head()` (TanStack-native, see Part 3).
+**Goal:** Every page gets consistent title, description, robots, canonical, og:title, og:description, og:url, og:image — generated from a central helper.
 
-## Files touched
-**Created:** `src/routes/contact.tsx`
-**Edited:** `src/components/site-header.tsx`, `src/components/site-footer.tsx`, `src/routes/sitemap[.]xml.tsx`, `src/routes/index.tsx`, plus the 14 tool route files listed above (only their `head()` blocks).
-**Auto-regenerated:** `src/routeTree.gen.ts` (TanStack plugin handles it).
+**1. Create `src/lib/seo.ts`** with:
+- `SITE_URL = "https://skycally.com"`
+- `OG_IMAGE = "https://skycally.com/og-image.png"`
+- `buildToolMeta(tool: Tool)` → returns the `head()` payload with:
+  - title: `Free {tool.name} Online — No Signup | Skycally` (truncated to 60)
+  - description: `{tool.description} Free, private, works in your browser.` (truncated to 160)
+  - robots, canonical, full og:* set
+- `buildPageMeta({ title, description, path })` → static-page variant with the same structure.
 
-## After implementation
-You'll need to:
-1. Sign up at formspree.io, grab the form ID, and replace `FORMSPREE_ID` at the top of `src/routes/contact.tsx`.
-2. Optionally provide a real `og-image.png` at `/og-image.png` (homepage references it).
+**2. Update each tool route** (47 files) to replace the existing `head: () => ({ ... })` with `head: () => buildToolMeta(toolBySlug("video-downloader"))` (or pass the tool object directly). I'll do this with a script that:
+- Imports `buildToolMeta` and the matching tool from `@/lib/tools`.
+- Replaces the `head: () => ({ meta: [...], links: [...] })` block.
+- Preserves any route-specific JSON-LD `scripts` blocks if present.
+
+**3. Update static pages** (`index.tsx`, `tools.index.tsx`, `about.tsx`, `contact.tsx`) with the exact title/description strings the user specified. `privacy.tsx` and `terms.tsx` keep their existing meta but get robots + canonical + og:image added via `buildPageMeta`.
+
+**4. Root route** (`__root.tsx`) keeps fallback meta but adds `<meta name="robots" content="index, follow">` so child routes inherit it (and individual pages can still override).
+
+## Files
+
+```text
+new   src/lib/seo.ts
+edit  src/routes/index.tsx               (homepage meta + truncated grid)
+edit  src/routes/tools.index.tsx         (meta)
+edit  src/routes/about.tsx               (meta)
+edit  src/routes/contact.tsx             (meta)
+edit  src/routes/privacy.tsx             (meta)
+edit  src/routes/terms.tsx               (meta)
+edit  src/routes/__root.tsx              (default robots meta)
+edit  src/routes/tools.*.tsx             (47 files via script)
+```
+
+## Out of scope / notes
+
+- Cloudflare cache-control headers: requires dashboard or wrangler `assets` config — flagged for the user.
+- `@tanstack/react-virtual` not added; per-category truncation is simpler and saves the dep weight.
+- No UI/visual changes beyond the new "Show more" button under each category section.

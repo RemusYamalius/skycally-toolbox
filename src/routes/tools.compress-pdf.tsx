@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -8,14 +10,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/compress-pdf")({
-  head: () => ({
-    meta: [
-      { title: "Compress PDF — Reduce file size · Skycally" },
-      { name: "description", content: "Shrink PDF file size in your browser while keeping quality. No uploads." },
-      { property: "og:title", content: "Compress PDF · Skycally" },
-      { property: "og:description", content: "Reduce PDF file size while keeping quality." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("compress-pdf", tools)),
   component: CompressPdf,
 });
 

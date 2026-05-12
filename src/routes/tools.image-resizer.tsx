@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -8,16 +10,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-resizer")({
-  head: () => ({
-    meta: [
-      { title: "Free Image Resizer — Resize PNG, JPG Online | Skycally" },
-      { name: "description", content: "Resize images online for free. Set custom dimensions or use presets for Instagram, Twitter, Facebook and more. No signup, works in browser." },
-      { property: "og:title", content: "Free Image Resizer | Skycally" },
-      { property: "og:description", content: "Resize images by pixels or percentage with quality control." },
-      { property: "og:url", content: "https://skycally.com/tools/image-resizer" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-resizer" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("image-resizer", tools)),
   component: ImageResizer,
 });
 

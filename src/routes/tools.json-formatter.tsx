@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/json-formatter")({
-  head: () => ({
-    meta: [
-      { title: "JSON Formatter — Prettify & Minify · Skycally" },
-      { name: "description", content: "Format, prettify and minify JSON instantly. Free, fast, no signup." },
-      { property: "og:title", content: "JSON Formatter · Skycally" },
-      { property: "og:description", content: "Prettify and minify JSON instantly in your browser." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("json-formatter", tools)),
   component: JsonFormatter,
 });
 

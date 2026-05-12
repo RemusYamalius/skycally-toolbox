@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/audio-converter")({
-  head: () => ({
-    meta: [
-      { title: "Audio Converter — MP3, WAV, OGG, AAC, FLAC · Skycally" },
-      { name: "description", content: "Convert audio files between MP3, WAV, OGG, AAC and FLAC instantly." },
-      { property: "og:title", content: "Audio Converter · Skycally" },
-      { property: "og:description", content: "Convert audio files between MP3, WAV, OGG, AAC and FLAC instantly." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("audio-converter", tools)),
   component: AudioConverter,
 });
 

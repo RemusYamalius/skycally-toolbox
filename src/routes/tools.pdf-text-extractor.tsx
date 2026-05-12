@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Copy, Download } from "lucide-react";
@@ -11,14 +13,7 @@ import { checkSize, downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/pdf-text-extractor")({
-  head: () => ({
-    meta: [
-      { title: "Extract Text from PDF — Skycally" },
-      { name: "description", content: "Extract all text from any PDF instantly. 100% browser-based, supports Arabic and all languages." },
-      { property: "og:title", content: "Extract Text from PDF · Skycally" },
-      { property: "og:description", content: "Extract all text from any PDF instantly." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("pdf-text-extractor", tools)),
   component: PdfTextExtractorPage,
 });
 

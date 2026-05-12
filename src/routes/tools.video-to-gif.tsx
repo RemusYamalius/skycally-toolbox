@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Film, Download, Loader2 } from "lucide-react";
@@ -12,14 +14,7 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-to-gif")({
-  head: () => ({
-    meta: [
-      { title: "Video to GIF — Skycally" },
-      { name: "description", content: "Convert MP4, MOV, or WEBM videos to high-quality animated GIFs in your browser." },
-      { property: "og:title", content: "Video to GIF · Skycally" },
-      { property: "og:description", content: "Free browser-based video to GIF converter." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("video-to-gif", tools)),
   component: Page,
 });
 

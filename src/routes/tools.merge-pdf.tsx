@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useState } from "react";
 import { toast } from "sonner";
 import { GripVertical, X } from "lucide-react";
@@ -18,16 +20,7 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/merge-pdf")({
-  head: () => ({
-    meta: [
-      { title: "Merge PDF Files Free Online | Skycally" },
-      { name: "description", content: "Combine multiple PDF files into one for free. Drag and drop to reorder pages. Works entirely in your browser — no upload to servers." },
-      { property: "og:title", content: "Merge PDF | Skycally" },
-      { property: "og:description", content: "Combine PDFs into a single file." },
-      { property: "og:url", content: "https://skycally.com/tools/merge-pdf" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/merge-pdf" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("merge-pdf", tools)),
   component: MergePdf,
 });
 

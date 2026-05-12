@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 import { X } from "lucide-react";
@@ -9,14 +11,7 @@ import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/collage-maker")({
-  head: () => ({
-    meta: [
-      { title: "Photo Collage Maker — Combine 2–9 photos · Skycally" },
-      { name: "description", content: "Make a beautiful photo collage from 2 to 9 images. Pick a layout, gap, background and download as PNG." },
-      { property: "og:title", content: "Photo Collage Maker · Skycally" },
-      { property: "og:description", content: "Combine 2–9 photos into a stylish grid collage." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("collage-maker", tools)),
   component: CollageMaker,
 });
 

@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -10,16 +12,7 @@ import { convertWordToPdf } from "@/services/wordToPdf";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/word-to-pdf")({
-  head: () => ({
-    meta: [
-      { title: "Word to PDF Converter Free Online | Skycally" },
-      { name: "description", content: "Convert Word documents to PDF for free. Supports DOC and DOCX files. Fast, accurate conversion with Arabic text support." },
-      { property: "og:title", content: "Word to PDF | Skycally" },
-      { property: "og:description", content: "Convert Word documents to PDF instantly." },
-      { property: "og:url", content: "https://skycally.com/tools/word-to-pdf" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/word-to-pdf" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("word-to-pdf", tools)),
   component: WordToPdf,
 });
 

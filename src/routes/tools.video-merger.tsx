@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Combine, Download, Loader2, ArrowUp, ArrowDown, X } from "lucide-react";
@@ -11,14 +13,7 @@ import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-merger")({
-  head: () => ({
-    meta: [
-      { title: "Video Merger — Skycally" },
-      { name: "description", content: "Combine multiple videos into one — entirely in your browser, no uploads." },
-      { property: "og:title", content: "Video Merger · Skycally" },
-      { property: "og:description", content: "Free browser-based video merger powered by FFmpeg WebAssembly." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("video-merger", tools)),
   component: Page,
 });
 

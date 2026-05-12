@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Captions, Download, Loader2, Plus, X } from "lucide-react";
@@ -11,14 +13,7 @@ import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/add-subtitles")({
-  head: () => ({
-    meta: [
-      { title: "Add Subtitles to Video — Skycally" },
-      { name: "description", content: "Burn subtitles into any video — entirely in your browser, no uploads." },
-      { property: "og:title", content: "Add Subtitles · Skycally" },
-      { property: "og:description", content: "Free browser-based subtitle burner powered by FFmpeg WebAssembly." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("add-subtitles", tools)),
   component: Page,
 });
 

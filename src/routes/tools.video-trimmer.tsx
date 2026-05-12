@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Scissors, Download, Loader2 } from "lucide-react";
@@ -12,14 +14,7 @@ import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-trimmer")({
-  head: () => ({
-    meta: [
-      { title: "Video Trimmer — Skycally" },
-      { name: "description", content: "Cut and trim any video — entirely in your browser, no upload required." },
-      { property: "og:title", content: "Video Trimmer · Skycally" },
-      { property: "og:description", content: "Free browser-based video trimmer powered by FFmpeg WebAssembly." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("video-trimmer", tools)),
   component: Page,
 });
 

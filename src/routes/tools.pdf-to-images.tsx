@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Download } from "lucide-react";
@@ -7,14 +9,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { DropZone } from "@/components/drop-zone";
 
 export const Route = createFileRoute("/tools/pdf-to-images")({
-  head: () => ({
-    meta: [
-      { title: "PDF to Images — Convert PDF pages to PNG · Skycally" },
-      { name: "description", content: "Convert every PDF page into a high-quality PNG image. Runs in your browser." },
-      { property: "og:title", content: "PDF to Images · Skycally" },
-      { property: "og:description", content: "Convert every PDF page into a PNG image." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("pdf-to-images", tools)),
   component: PdfToImages,
 });
 

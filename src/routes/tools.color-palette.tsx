@@ -1,18 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useRef, useCallback } from "react";
 import { ImageIcon } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/color-palette")({
-  head: () => ({
-    meta: [
-      { title: "Color Palette Extractor — Dominant colors from images · Skycally" },
-      { name: "description", content: "Extract the dominant colors from any image instantly. Free, fast, no signup." },
-      { property: "og:title", content: "Color Palette Extractor · Skycally" },
-      { property: "og:description", content: "Extract the dominant colors from any image instantly." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("color-palette", tools)),
   component: ColorPaletteExtractor,
 });
 

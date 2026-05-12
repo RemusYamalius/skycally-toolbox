@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/add-watermark")({
-  head: () => ({
-    meta: [
-      { title: "Add Watermark — Watermark images instantly · Skycally" },
-      { name: "description", content: "Add custom text watermarks to your images in seconds. Free, fast, no signup." },
-      { property: "og:title", content: "Add Watermark · Skycally" },
-      { property: "og:description", content: "Add custom text watermarks to your images in seconds." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("add-watermark", tools)),
   component: AddWatermark,
 });
 

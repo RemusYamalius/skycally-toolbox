@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/markdown-to-html")({
-  head: () => ({
-    meta: [
-      { title: "Markdown to HTML — Live preview converter · Skycally" },
-      { name: "description", content: "Convert Markdown to clean HTML with live preview instantly. Free, fast, no signup." },
-      { property: "og:title", content: "Markdown to HTML · Skycally" },
-      { property: "og:description", content: "Convert Markdown to clean HTML with live preview instantly." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("markdown-to-html", tools)),
   component: MarkdownToHtml,
 });
 

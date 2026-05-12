@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/image-to-sketch")({
-  head: () => ({
-    meta: [
-      { title: "Image to Sketch — Pencil & charcoal sketches · Skycally" },
-      { name: "description", content: "Transform any photo into a pencil or charcoal sketch instantly. Free, fast, no signup." },
-      { property: "og:title", content: "Image to Sketch · Skycally" },
-      { property: "og:description", content: "Transform any photo into a pencil or charcoal sketch instantly." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("image-to-sketch", tools)),
   component: ImageToSketch,
 });
 

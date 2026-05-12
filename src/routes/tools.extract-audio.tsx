@@ -1,18 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/extract-audio")({
-  head: () => ({
-    meta: [
-      { title: "Extract Audio from Video — Skycally" },
-      { name: "description", content: "Extract MP3, AAC or WAV audio from any video file." },
-      { property: "og:title", content: "Extract Audio from Video · Skycally" },
-      { property: "og:description", content: "Extract MP3, AAC or WAV audio from any video file." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("extract-audio", tools)),
   component: ExtractAudio,
 });
 

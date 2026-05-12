@@ -1,18 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-compressor")({
-  head: () => ({
-    meta: [
-      { title: "Video Compressor — Shrink videos · Skycally" },
-      { name: "description", content: "Reduce video file size without losing quality." },
-      { property: "og:title", content: "Video Compressor · Skycally" },
-      { property: "og:description", content: "Reduce video file size without losing quality." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("video-compressor", tools)),
   component: VideoCompressor,
 });
 

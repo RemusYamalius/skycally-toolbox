@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2 } from "lucide-react";
@@ -9,16 +11,7 @@ import { removeBackground } from "@/services/removeBg";
 import { downloadBlob, checkSize } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/remove-bg")({
-  head: () => ({
-    meta: [
-      { title: "Remove Image Background Free — AI Powered | Skycally" },
-      { name: "description", content: "Remove image background automatically with AI. Free, fast and accurate. Supports PNG, JPG and WEBP. Download transparent PNG instantly." },
-      { property: "og:title", content: "Remove Image Background | Skycally" },
-      { property: "og:description", content: "AI-powered one-click background removal." },
-      { property: "og:url", content: "https://skycally.com/tools/remove-bg" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/remove-bg" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("remove-bg", tools)),
   component: RemoveBgPage,
 });
 

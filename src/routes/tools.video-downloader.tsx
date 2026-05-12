@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { motion } from "framer-motion";
 import { ClipboardPaste, X, Download as DownloadIcon, Loader2, Music } from "lucide-react";
@@ -10,16 +12,7 @@ import { fetchVideo, type VideoResult } from "@/services/videoApi";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/video-downloader")({
-  head: () => ({
-    meta: [
-      { title: "Free Video Downloader — TikTok, Instagram, Facebook | Skycally" },
-      { name: "description", content: "Download videos from TikTok, Instagram, Facebook, Twitter and more for free. No watermark, no signup, HD quality. Works on all devices." },
-      { property: "og:title", content: "Free Video Downloader | Skycally" },
-      { property: "og:description", content: "Download TikTok, Instagram & Facebook videos free. No watermark, HD quality." },
-      { property: "og:url", content: "https://skycally.com/tools/video-downloader" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/video-downloader" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("video-downloader", tools)),
   component: VideoDownloader,
 });
 

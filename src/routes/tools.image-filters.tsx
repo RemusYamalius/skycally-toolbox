@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/image-filters")({
-  head: () => ({
-    meta: [
-      { title: "Image Filters — Apply filters to images instantly · Skycally" },
-      { name: "description", content: "Apply beautiful filters to your images instantly in the browser. Free, fast, no signup." },
-      { property: "og:title", content: "Image Filters · Skycally" },
-      { property: "og:description", content: "Apply beautiful filters to your images instantly in the browser." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("image-filters", tools)),
   component: ImageFilters,
 });
 

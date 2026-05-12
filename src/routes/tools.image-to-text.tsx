@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Loader2, Copy, Download } from "lucide-react";
@@ -11,14 +13,7 @@ import { checkSize, downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-to-text")({
-  head: () => ({
-    meta: [
-      { title: "Image to Text (OCR) — Skycally" },
-      { name: "description", content: "Extract text from images in English, Arabic, French and Spanish — fully in your browser." },
-      { property: "og:title", content: "Image to Text · Skycally" },
-      { property: "og:description", content: "Free OCR tool — extract text from any image." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("image-to-text", tools)),
   component: ImageToTextPage,
 });
 

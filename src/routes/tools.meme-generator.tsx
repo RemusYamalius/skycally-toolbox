@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -7,14 +9,7 @@ import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/meme-generator")({
-  head: () => ({
-    meta: [
-      { title: "Meme Generator — Create memes from popular templates · Skycally" },
-      { name: "description", content: "Make classic memes from popular templates or your own image. Fast, free and entirely in your browser." },
-      { property: "og:title", content: "Meme Generator · Skycally" },
-      { property: "og:description", content: "Create memes from popular templates or upload your own image." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("meme-generator", tools)),
   component: MemeGenerator,
 });
 

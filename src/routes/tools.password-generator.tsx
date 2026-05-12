@@ -1,18 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useCallback } from "react";
 import { Copy, Check } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/password-generator")({
-  head: () => ({
-    meta: [
-      { title: "Password Generator — Strong, secure passwords · Skycally" },
-      { name: "description", content: "Generate strong, secure passwords instantly. Free, fast, no signup." },
-      { property: "og:title", content: "Password Generator · Skycally" },
-      { property: "og:description", content: "Generate strong, secure passwords instantly." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("password-generator", tools)),
   component: PasswordGeneratorPage,
 });
 

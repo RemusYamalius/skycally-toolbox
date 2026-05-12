@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Trash2 } from "lucide-react";
@@ -9,14 +11,7 @@ import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/add-text-to-image")({
-  head: () => ({
-    meta: [
-      { title: "Add Text to Image — Free online text editor · Skycally" },
-      { name: "description", content: "Add custom, draggable text layers to your image with fonts, colors, shadow and outline. Free, in-browser." },
-      { property: "og:title", content: "Add Text to Image · Skycally" },
-      { property: "og:description", content: "Add custom, draggable text layers to any image." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("add-text-to-image", tools)),
   component: AddTextToImage,
 });
 

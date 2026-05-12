@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useMemo } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/word-counter")({
-  head: () => ({
-    meta: [
-      { title: "Word Counter — Count words, characters & reading time · Skycally" },
-      { name: "description", content: "Count words, characters, sentences and estimate reading time. Free, fast, no signup." },
-      { property: "og:title", content: "Word Counter · Skycally" },
-      { property: "og:description", content: "Count words, characters, sentences and estimate reading time." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("word-counter", tools)),
   component: WordCounter,
 });
 

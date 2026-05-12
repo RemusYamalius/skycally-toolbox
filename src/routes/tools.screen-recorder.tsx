@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/screen-recorder")({
-  head: () => ({
-    meta: [
-      { title: "Screen Recorder — Record screen + audio in browser · Skycally" },
-      { name: "description", content: "Record your screen with audio directly in the browser — no installs needed. Free, fast, private." },
-      { property: "og:title", content: "Screen Recorder · Skycally" },
-      { property: "og:description", content: "Record your screen with audio directly in the browser." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("screen-recorder", tools)),
   component: ScreenRecorder,
 });
 

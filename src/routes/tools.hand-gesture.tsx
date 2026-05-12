@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -9,14 +11,7 @@ import { loadScript } from "@/lib/cdnScript";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/hand-gesture")({
-  head: () => ({
-    meta: [
-      { title: "Hand Gesture Recognition — Live · Skycally" },
-      { name: "description", content: "Recognize hand gestures from your webcam in real time using MediaPipe Hands." },
-      { property: "og:title", content: "Hand Gesture Recognition · Skycally" },
-      { property: "og:description", content: "Real-time hand tracking and gesture recognition in your browser." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("hand-gesture", tools)),
   component: HandGestureTool,
 });
 

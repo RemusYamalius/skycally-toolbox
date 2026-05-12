@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -13,14 +15,7 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/background-blur")({
-  head: () => ({
-    meta: [
-      { title: "AI Background Blur — Free Online · Skycally" },
-      { name: "description", content: "Blur photo or webcam backgrounds in real time using on-device AI." },
-      { property: "og:title", content: "AI Background Blur · Skycally" },
-      { property: "og:description", content: "Real-time background blur powered by MediaPipe — runs in your browser." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("background-blur", tools)),
   component: BackgroundBlurTool,
 });
 

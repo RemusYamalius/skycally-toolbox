@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { Sparkles, Download, Loader2 } from "lucide-react";
@@ -9,14 +11,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { upscaleImage, MAX_UPSCALE_BYTES } from "@/services/imageUpscaler";
 
 export const Route = createFileRoute("/tools/image-upscaler")({
-  head: () => ({
-    meta: [
-      { title: "Image Upscaler — Skycally" },
-      { name: "description", content: "Upscale images 2x or 4x in your browser with bicubic interpolation. Free online image enlarger." },
-      { property: "og:title", content: "Image Upscaler · Skycally" },
-      { property: "og:description", content: "Enlarge images in your browser — no upload required." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("image-upscaler", tools)),
   component: Page,
 });
 

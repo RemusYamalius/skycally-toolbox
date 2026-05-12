@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Mic, Square, Copy, Download, Trash2 } from "lucide-react";
@@ -11,14 +13,7 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/speech-to-text")({
-  head: () => ({
-    meta: [
-      { title: "Speech to Text — Skycally" },
-      { name: "description", content: "Free real-time speech-to-text transcription in Arabic, English, French, and Spanish." },
-      { property: "og:title", content: "Speech to Text · Skycally" },
-      { property: "og:description", content: "Transcribe your voice instantly in your browser." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("speech-to-text", tools)),
   component: Page,
 });
 

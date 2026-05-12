@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -11,16 +13,7 @@ import { Loader2, Sparkles } from "lucide-react";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/sentiment-analysis")({
-  head: () => ({
-    meta: [
-      { title: "AI Sentiment Analysis — Analyze Text Emotion Free | Skycally" },
-      { name: "description", content: "Analyze the sentiment of any text with AI. Detect positive, negative or neutral emotions instantly. Powered by Transformers.js, runs in your browser." },
-      { property: "og:title", content: "AI Sentiment Analysis | Skycally" },
-      { property: "og:description", content: "Browser-based sentiment analysis powered by Transformers.js." },
-      { property: "og:url", content: "https://skycally.com/tools/sentiment-analysis" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/sentiment-analysis" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("sentiment-analysis", tools)),
   component: SentimentTool,
 });
 

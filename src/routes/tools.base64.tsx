@@ -1,17 +1,12 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 export const Route = createFileRoute("/tools/base64")({
-  head: () => ({
-    meta: [
-      { title: "Base64 Encoder / Decoder · Skycally" },
-      { name: "description", content: "Encode plain text to Base64 or decode Base64 strings instantly. Free, fast, no signup." },
-      { property: "og:title", content: "Base64 Encoder / Decoder · Skycally" },
-      { property: "og:description", content: "Encode and decode Base64 instantly in your browser." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("base64", tools)),
   component: Base64Tool,
 });
 

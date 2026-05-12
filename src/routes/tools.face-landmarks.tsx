@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -12,14 +14,7 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/face-landmarks")({
-  head: () => ({
-    meta: [
-      { title: "Face Landmarks Detector — 468 Points · Skycally" },
-      { name: "description", content: "Detect 468 facial landmarks on photos or live camera with MediaPipe Face Mesh." },
-      { property: "og:title", content: "Face Landmarks · Skycally" },
-      { property: "og:description", content: "AI face mesh in your browser — 468 landmarks per face." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("face-landmarks", tools)),
   component: FaceLandmarksTool,
 });
 

@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { toast } from "sonner";
 
@@ -21,16 +23,7 @@ import {
 } from "@/components/ui/select";
 
 export const Route = createFileRoute("/tools/business-card-generator")({
-  head: () => ({
-    meta: [
-      { title: "Free Business Card Generator — Print Ready PNG | Skycally" },
-      { name: "description", content: "Design professional business cards online for free. Choose from 8 templates, add your QR code, customize colors and download print-ready PNG at 300 DPI." },
-      { property: "og:title", content: "Free Business Card Generator | Skycally" },
-      { property: "og:description", content: "Pick a template, fill your info and download a print-ready business card." },
-      { property: "og:url", content: "https://skycally.com/tools/business-card-generator" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/business-card-generator" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("business-card-generator", tools)),
   component: BusinessCardGeneratorPage,
 });
 

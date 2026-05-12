@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 
@@ -9,16 +11,7 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-converter")({
-  head: () => ({
-    meta: [
-      { title: "Free Image Converter — PNG to JPG, WEBP & More | Skycally" },
-      { name: "description", content: "Convert images between PNG, JPG, WEBP and AVIF formats for free. Batch conversion supported. Works entirely in your browser — no upload needed." },
-      { property: "og:title", content: "Free Image Converter | Skycally" },
-      { property: "og:description", content: "Convert images between PNG, JPG, WEBP — instantly in-browser." },
-      { property: "og:url", content: "https://skycally.com/tools/image-converter" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-converter" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("image-converter", tools)),
   component: ImageConverter,
 });
 

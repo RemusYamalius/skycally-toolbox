@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
 import { toast } from "sonner";
 import { Download, FileCode, Copy, ChevronDown, Upload, X } from "lucide-react";
@@ -17,16 +19,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { downloadBlob } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/qr-generator")({
-  head: () => ({
-    meta: [
-      { title: "Free QR Code Generator with Logo — Custom Colors | Skycally" },
-      { name: "description", content: "Create custom QR codes with logo, colors and different styles for free. Download as PNG or SVG. No signup required. Perfect for business cards and marketing." },
-      { property: "og:title", content: "Free QR Code Generator | Skycally" },
-      { property: "og:description", content: "Generate pro-grade QR codes with custom colors, logos, and styles." },
-      { property: "og:url", content: "https://skycally.com/tools/qr-generator" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/qr-generator" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("qr-generator", tools)),
   component: QrGeneratorPage,
 });
 

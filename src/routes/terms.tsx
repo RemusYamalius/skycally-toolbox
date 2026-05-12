@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildPageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/terms")({
-  head: () => ({
-    meta: [
-      { title: "Terms of Service — Skycally" },
-      { name: "description", content: "Skycally terms of service." },
-    ],
+  head: () => buildPageMeta({
+    title: "Terms of Service — Skycally",
+    description: "Skycally terms of service. Use our free tools responsibly and only for content you have rights to.",
+    path: "/terms",
   }),
   component: () => (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16">

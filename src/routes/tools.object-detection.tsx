@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -11,16 +13,7 @@ import { loadScript } from "@/lib/cdnScript";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/object-detection")({
-  head: () => ({
-    meta: [
-      { title: "AI Object Detection — Real-time Detection Online Free | Skycally" },
-      { name: "description", content: "Detect objects in images and video in real-time using AI. Powered by TensorFlow.js COCO-SSD. Works entirely in your browser for free." },
-      { property: "og:title", content: "AI Object Detection | Skycally" },
-      { property: "og:description", content: "Real-time object detection with COCO-SSD." },
-      { property: "og:url", content: "https://skycally.com/tools/object-detection" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/object-detection" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("object-detection", tools)),
   component: ObjectDetectionTool,
 });
 

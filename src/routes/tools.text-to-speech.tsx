@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useMemo, useState } from "react";
 import { toast } from "sonner";
 import { Play, Square, Download } from "lucide-react";
@@ -11,16 +13,7 @@ import { speak, stop, downloadAudio } from "@/services/textToSpeech";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/text-to-speech")({
-  head: () => ({
-    meta: [
-      { title: "Free Text to Speech — Convert Text to Audio Online | Skycally" },
-      { name: "description", content: "Convert text to speech for free. 50+ voices in Arabic, English, French and Spanish. Download as MP3. Works entirely in your browser." },
-      { property: "og:title", content: "Free Text to Speech | Skycally" },
-      { property: "og:description", content: "Free browser-based TTS in multiple languages." },
-      { property: "og:url", content: "https://skycally.com/tools/text-to-speech" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/text-to-speech" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("text-to-speech", tools)),
   component: Page,
 });
 

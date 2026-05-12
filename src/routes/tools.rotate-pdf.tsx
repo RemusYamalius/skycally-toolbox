@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { RotateCw } from "lucide-react";
@@ -9,14 +11,7 @@ import { DropZone } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 
 export const Route = createFileRoute("/tools/rotate-pdf")({
-  head: () => ({
-    meta: [
-      { title: "Rotate PDF — Fix page orientation · Skycally" },
-      { name: "description", content: "Rotate one or all pages in your PDF to the correct orientation. Runs in your browser." },
-      { property: "og:title", content: "Rotate PDF · Skycally" },
-      { property: "og:description", content: "Rotate PDF pages 90, 180 or 270 degrees." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("rotate-pdf", tools)),
   component: RotatePdf,
 });
 

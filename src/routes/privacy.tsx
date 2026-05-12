@@ -1,11 +1,11 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildPageMeta } from "@/lib/seo";
 
 export const Route = createFileRoute("/privacy")({
-  head: () => ({
-    meta: [
-      { title: "Privacy Policy — Skycally" },
-      { name: "description", content: "Skycally privacy policy. We respect your data and don't store your files." },
-    ],
+  head: () => buildPageMeta({
+    title: "Privacy Policy — Skycally",
+    description: "Skycally privacy policy. We respect your data and don't store your files. Most tools run entirely in your browser.",
+    path: "/privacy",
   }),
   component: () => (
     <div className="max-w-3xl mx-auto px-4 sm:px-6 py-16 prose prose-sm dark:prose-invert">

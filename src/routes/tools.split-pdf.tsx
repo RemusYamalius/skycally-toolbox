@@ -1,20 +1,13 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/split-pdf")({
-  head: () => ({
-    meta: [
-      { title: "Split PDF — Extract Pages from PDF Free | Skycally" },
-      { name: "description", content: "Split PDF files and extract specific pages for free. Select page ranges or individual pages. Download as a new PDF instantly." },
-      { property: "og:title", content: "Split PDF | Skycally" },
-      { property: "og:description", content: "Extract specific pages from any PDF file instantly." },
-      { property: "og:url", content: "https://skycally.com/tools/split-pdf" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/split-pdf" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("split-pdf", tools)),
   component: SplitPdf,
 });
 

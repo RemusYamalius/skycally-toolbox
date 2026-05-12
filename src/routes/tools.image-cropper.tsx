@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useRef, useState } from "react";
 import { toast } from "sonner";
 import Cropper, { type ReactCropperElement } from "react-cropper";
@@ -10,16 +12,7 @@ import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-cropper")({
-  head: () => ({
-    meta: [
-      { title: "Free Image Cropper — Crop Photos Online | Skycally" },
-      { name: "description", content: "Crop images online with custom aspect ratios. Supports 1:1, 16:9, 4:3 and free crop. Rotate and flip options included." },
-      { property: "og:title", content: "Free Image Cropper | Skycally" },
-      { property: "og:description", content: "Crop, rotate and flip images with aspect-ratio presets." },
-      { property: "og:url", content: "https://skycally.com/tools/image-cropper" },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com/tools/image-cropper" }],
-  }),
+  head: () => buildToolMeta(toolBySlug("image-cropper", tools)),
   component: ImageCropper,
 });
 

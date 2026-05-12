@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
 import { Camera, Copy, ExternalLink, X } from "lucide-react";
@@ -10,14 +12,7 @@ import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/qr-reader")({
-  head: () => ({
-    meta: [
-      { title: "QR Code Reader — Skycally" },
-      { name: "description", content: "Decode QR codes from images or your camera, instantly in your browser." },
-      { property: "og:title", content: "QR Code Reader · Skycally" },
-      { property: "og:description", content: "Scan QR codes from photos or live camera." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("qr-reader", tools)),
   component: QrReaderPage,
 });
 

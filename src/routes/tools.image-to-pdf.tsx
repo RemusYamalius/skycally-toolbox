@@ -1,4 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
+import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
 import { GripVertical, X } from "lucide-react";
@@ -9,14 +11,7 @@ import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 
 export const Route = createFileRoute("/tools/image-to-pdf")({
-  head: () => ({
-    meta: [
-      { title: "Image to PDF — Combine images into a PDF · Skycally" },
-      { name: "description", content: "Convert one or many images into a single PDF document with custom page size, orientation and margins." },
-      { property: "og:title", content: "Image to PDF · Skycally" },
-      { property: "og:description", content: "Convert images into a single PDF in your browser." },
-    ],
-  }),
+  head: () => buildToolMeta(toolBySlug("image-to-pdf", tools)),
   component: ImageToPdf,
 });
 

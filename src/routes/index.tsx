@@ -5,22 +5,17 @@ import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, Fil
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 import { AdZone } from "@/components/ad-zone";
+import { buildPageMeta } from "@/lib/seo";
+
+const HOME_META = buildPageMeta({
+  title: "Skycally — Free Online Tools, No Signup Required",
+  description: "40+ free browser-based tools for images, videos, PDFs and more. No signup, no file uploads. Everything runs in your browser.",
+  path: "/",
+});
 
 export const Route = createFileRoute("/")({
   head: () => ({
-    meta: [
-      { title: "Skycally — Free Online Tools: Video Downloader, PDF, Image & More" },
-      { name: "description", content: "Free online tools for everyone. Download videos from TikTok, Instagram & YouTube. Convert images, compress PDFs, remove backgrounds, generate QR codes and 20+ more tools. No signup required." },
-      { name: "keywords", content: "free online tools, video downloader, pdf converter, image compressor, qr code generator, remove background" },
-      { property: "og:title", content: "Skycally — Every Tool You Need, Free" },
-      { property: "og:description", content: "20+ free online tools. Download videos, convert files, compress images — all free, all fast, no signup." },
-      { property: "og:url", content: "https://skycally.com" },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Skycally — Free Online Tools" },
-      { name: "twitter:description", content: "20+ free online tools. No signup required." },
-    ],
-    links: [{ rel: "canonical", href: "https://skycally.com" }],
+    ...HOME_META,
     scripts: [
       {
         type: "application/ld+json",

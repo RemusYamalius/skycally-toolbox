@@ -52,6 +52,7 @@ import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-c
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
+import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
@@ -278,6 +279,11 @@ const ToolsExtractAudioRoute = ToolsExtractAudioRouteImport.update({
   path: '/tools/extract-audio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsDocumentScannerRoute = ToolsDocumentScannerRouteImport.update({
+  id: '/tools/document-scanner',
+  path: '/tools/document-scanner',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsCompressPdfRoute = ToolsCompressPdfRouteImport.update({
   id: '/tools/compress-pdf',
   path: '/tools/compress-pdf',
@@ -347,6 +353,7 @@ export interface FileRoutesByFullPath {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
@@ -402,6 +409,7 @@ export interface FileRoutesByTo {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
@@ -458,6 +466,7 @@ export interface FileRoutesById {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
@@ -515,6 +524,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/hand-gesture'
@@ -570,6 +580,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/hand-gesture'
@@ -625,6 +636,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/hand-gesture'
@@ -681,6 +693,7 @@ export interface RootRouteChildren {
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
+  ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
@@ -1023,6 +1036,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsExtractAudioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/document-scanner': {
+      id: '/tools/document-scanner'
+      path: '/tools/document-scanner'
+      fullPath: '/tools/document-scanner'
+      preLoaderRoute: typeof ToolsDocumentScannerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/compress-pdf': {
       id: '/tools/compress-pdf'
       path: '/tools/compress-pdf'
@@ -1113,6 +1133,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
+  ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
@@ -1154,12 +1175,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

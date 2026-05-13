@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai";
 
@@ -71,4 +71,5 @@ export const tools: Tool[] = [
   { slug: "compress-pdf", name: "Compress PDF", description: "Reduce PDF file size while keeping quality.", category: "pdf", icon: FileMinus, path: "/tools/compress-pdf" },
   { slug: "pdf-to-images", name: "PDF to Images", description: "Convert every PDF page into a high-quality PNG image.", category: "pdf", icon: Layers, path: "/tools/pdf-to-images" },
   { slug: "rotate-pdf", name: "Rotate PDF", description: "Rotate one or all pages in your PDF to the correct orientation.", category: "pdf", icon: RotateCw, path: "/tools/rotate-pdf" },
+  { slug: "document-scanner", name: "Document Scanner", description: "Scan documents with camera, auto-crop, enhance and export to PDF.", category: "pdf", icon: ScanSearch, path: "/tools/document-scanner" },
 ];

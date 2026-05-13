@@ -10,6 +10,8 @@ import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { upscaleImage, MAX_UPSCALE_BYTES } from "@/services/imageUpscaler";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/image-upscaler")({
   head: () => buildToolMeta(toolBySlug("image-upscaler", tools)),
   component: Page,
@@ -105,6 +107,12 @@ function Page() {
         "Choose 2x or 4x and click Upscale — runs in your browser.",
         "Compare with the slider, then download the result.",
       ]} />
+          <ToolSeoContent
+        title="Free Image Upscaler — Enlarge Photos 2x or 4x"
+        description="Skycally's Image Upscaler enlarges your images 2x or 4x without losing quality. Using advanced upscaling technology, it reconstructs fine details that would normally be lost when resizing. It's perfect for improving low-resolution photos, product images, or social media graphics. The tool runs entirely in your browser with no file uploads required."
+        body={[]}
+        faqs={[{"question":"How much can I upscale an image?","answer":"You can upscale images 2x or 4x their original size."},{"question":"Will upscaling reduce image quality?","answer":"Our upscaler uses advanced algorithms to preserve and enhance details. Results are significantly better than simple resizing."},{"question":"What image formats are supported?","answer":"PNG, JPG, and WEBP formats are supported for both input and output."},{"question":"Is there a maximum image size?","answer":"For best performance, we recommend images under 10MB. Very large images may take longer to process."},{"question":"Is the tool free to use?","answer":"Yes, completely free with no signup required."}]}
+      />
     </ToolPageShell>
   );
 }

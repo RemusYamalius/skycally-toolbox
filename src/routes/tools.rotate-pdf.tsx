@@ -10,6 +10,8 @@ import { HowToUse } from "@/components/how-to-use";
 import { DropZone } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/rotate-pdf")({
   head: () => buildToolMeta(toolBySlug("rotate-pdf", tools)),
   component: RotatePdf,
@@ -150,6 +152,12 @@ function RotatePdf() {
         "Click any page to rotate 90°, or use the apply-to-all controls.",
         "Hit Apply rotations to download your fixed PDF.",
       ]} />
+          <ToolSeoContent
+        title="Free PDF Rotator — Rotate PDF Pages Online"
+        description="Skycally's PDF Rotator lets you rotate one or all pages of your PDF to the correct orientation. Choose 90°, 180°, or 270° rotation for each page individually, or apply the same rotation to all pages at once. Everything runs in your browser using pdf-lib — no uploads, no signup, completely free."
+        body={[]}
+        faqs={[{"question":"Can I rotate individual pages?","answer":"Yes, you can set a different rotation for each page independently."},{"question":"What rotation angles are supported?","answer":"You can rotate pages by 90°, 180°, or 270° clockwise."},{"question":"Does rotation affect PDF quality?","answer":"No. Rotation only changes orientation — all content remains at full quality."},{"question":"Is my PDF uploaded to a server?","answer":"No. All processing happens in your browser using pdf-lib."},{"question":"Can I rotate password-protected PDFs?","answer":"Password-protected PDFs are not currently supported."}]}
+      />
     </ToolPageShell>
   );
 }

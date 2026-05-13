@@ -5,6 +5,8 @@ import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/add-watermark")({
   head: () => buildToolMeta(toolBySlug("add-watermark", tools)),
   component: AddWatermark,
@@ -238,6 +240,12 @@ function AddWatermark() {
         "Customize text, font size, opacity, color and position.",
         "Click Apply Watermark, then download the result.",
       ]} />
+          <ToolSeoContent
+        title="Free Watermark Tool — Add Text Watermarks to Images"
+        description="Skycally's Watermark Tool lets you add custom text watermarks to your images in seconds. Control the text, font size, opacity, color, and position with a simple interface. The watermark is applied directly in your browser using Canvas API, so your images never leave your device. Perfect for photographers, content creators, and businesses."
+        body={[]}
+        faqs={[{"question":"Can I change the watermark position?","answer":"Yes, you can place the watermark in 9 positions: all four corners, all four edges, and the center."},{"question":"Can I control the watermark opacity?","answer":"Yes, use the opacity slider to set transparency from 10% to 100%."},{"question":"What image formats are supported?","answer":"PNG, JPG, and WEBP are all supported as input."},{"question":"Is the output image quality reduced?","answer":"No, the watermarked image is exported at full original quality as PNG."},{"question":"Is my image uploaded to a server?","answer":"No. Everything runs locally in your browser."}]}
+      />
     </ToolPageShell>
   );
 }

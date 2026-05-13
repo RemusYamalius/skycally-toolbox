@@ -5,6 +5,8 @@ import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/audio-converter")({
   head: () => buildToolMeta(toolBySlug("audio-converter", tools)),
   component: AudioConverter,
@@ -189,6 +191,12 @@ function AudioConverter() {
         "Pick the target format (MP3, WAV, OGG, AAC or FLAC).",
         "Click Convert to download the converted audio instantly.",
       ]} />
+          <ToolSeoContent
+        title="Free Audio Converter — MP3, WAV, OGG, AAC, FLAC"
+        description="Skycally's Audio Converter lets you convert audio files between the most popular formats: MP3, WAV, OGG, AAC, and FLAC. It supports a wide range of input formats including M4A and MP4. The conversion is handled securely on our server and the result is downloaded to your device automatically. Fast, free, and no signup required."
+        body={[]}
+        faqs={[{"question":"What formats can I convert to?","answer":"You can convert to MP3, WAV, OGG, AAC, and FLAC."},{"question":"What formats can I upload?","answer":"Most audio formats are supported including MP3, WAV, OGG, AAC, FLAC, M4A, and MP4."},{"question":"How long does conversion take?","answer":"Most conversions complete in under 30 seconds depending on file size."},{"question":"Is there a file size limit?","answer":"For best performance, we recommend files under 100MB."},{"question":"Is my audio file stored on your server?","answer":"No. Files are processed and deleted immediately after conversion."}]}
+      />
     </ToolPageShell>
   );
 }

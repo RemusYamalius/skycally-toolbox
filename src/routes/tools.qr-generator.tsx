@@ -18,6 +18,8 @@ import { Collapsible, CollapsibleTrigger, CollapsibleContent } from "@/component
 import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/components/ui/tooltip";
 import { downloadBlob } from "@/lib/file-utils";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/qr-generator")({
   head: () => buildToolMeta(toolBySlug("qr-generator", tools)),
   component: QrGeneratorPage,
@@ -813,6 +815,12 @@ function QrGeneratorPage() {
           "Customize dot style, colors, gradient, logo and frame — preview updates live.",
           "Download as PNG or SVG, or copy the image straight to your clipboard.",
         ]}
+      />
+          <ToolSeoContent
+        title="Free QR Code Generator — Custom QR Codes with Logo"
+        description="Skycally's QR Code Generator creates fully customized QR codes in seconds. Add your logo, choose dot styles, apply gradient colors, and add a frame — all from one simple interface. Supports URL, Text, Email, Phone, WiFi, and vCard formats. Download as PNG or SVG. 100% free, no signup required."
+        body={[]}
+        faqs={[{"question":"What types of QR codes can I generate?","answer":"URL, plain text, email address, phone number, WiFi credentials, and vCard contact cards."},{"question":"Can I add my logo to the QR code?","answer":"Yes, upload your own logo or choose from built-in icons to place in the center."},{"question":"What file formats can I download?","answer":"PNG and SVG formats are both available."},{"question":"Will a customized QR code still scan correctly?","answer":"Yes, as long as sufficient contrast is maintained. The tool warns you if contrast is too low."},{"question":"Is the QR code generated on a server?","answer":"No. QR codes are generated entirely in your browser."}]}
       />
     </ToolPageShell>
   );

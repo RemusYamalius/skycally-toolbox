@@ -5,6 +5,8 @@ import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/image-filters")({
   head: () => buildToolMeta(toolBySlug("image-filters", tools)),
   component: ImageFilters,
@@ -153,6 +155,12 @@ function ImageFilters() {
         "Pick a filter from the row of previews.",
         "Click Download to save the filtered image as PNG.",
       ]} />
+          <ToolSeoContent
+        title="Free Image Filters — Apply Photo Effects Online"
+        description="Skycally's Image Filters tool lets you apply beautiful photo effects to any image directly in your browser. Choose from 10 filters including Grayscale, Sepia, Vintage, Cold, Warm, High Contrast, and more. Preview filters in real-time and download your edited image as a PNG. No uploads, no signup — everything runs locally."
+        body={[]}
+        faqs={[{"question":"How many filters are available?","answer":"There are 10 filters available: Original, Grayscale, Sepia, Invert, Vintage, Cold, Warm, High Contrast, Blur, and Brightness."},{"question":"Can I preview filters before applying?","answer":"Yes, all filters are shown as live thumbnails so you can choose before downloading."},{"question":"What format is the output?","answer":"The filtered image is downloaded as a PNG file."},{"question":"Is my image uploaded to a server?","answer":"No. All filters are applied locally in your browser using Canvas API."},{"question":"Can I apply multiple filters at once?","answer":"Currently one filter can be applied at a time."}]}
+      />
     </ToolPageShell>
   );
 }

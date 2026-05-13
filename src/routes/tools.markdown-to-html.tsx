@@ -5,6 +5,8 @@ import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/markdown-to-html")({
   head: () => buildToolMeta(toolBySlug("markdown-to-html", tools)),
   component: MarkdownToHtml,
@@ -164,6 +166,12 @@ function MarkdownToHtml() {
         "See the live preview or switch to the HTML tab.",
         "Copy the HTML or download it as an .html file.",
       ]} />
+          <ToolSeoContent
+        title="Free Markdown to HTML Converter — Live Preview"
+        description="Skycally's Markdown to HTML converter transforms Markdown text into clean, valid HTML instantly. A live preview shows how your content will look, and you can switch to the raw HTML view at any time. Download the result as a complete HTML file. Perfect for developers, bloggers, and technical writers."
+        body={[]}
+        faqs={[{"question":"What Markdown syntax is supported?","answer":"Headings, bold, italic, links, images, lists, blockquotes, inline code, and horizontal rules."},{"question":"Can I preview the rendered HTML?","answer":"Yes, the Preview tab shows a live styled preview that updates as you type."},{"question":"Can I download the result?","answer":"Yes, download a complete HTML file with your converted content."},{"question":"Is there a character limit?","answer":"No limit — convert documents of any length."},{"question":"Is my content sent to a server?","answer":"No. Conversion runs entirely in your browser."}]}
+      />
     </ToolPageShell>
   );
 }

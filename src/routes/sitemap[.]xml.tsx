@@ -23,6 +23,7 @@ const ROUTES: [string, string, string][] = [
   ["/tools/split-pdf", "0.7", "monthly"],
   ["/tools/compress-pdf", "0.7", "monthly"],
   ["/tools/rotate-pdf", "0.7", "monthly"],
+  ["/tools/document-scanner", "0.8", "monthly"],
   ["/tools/pdf-to-images", "0.7", "monthly"],
   ["/tools/pdf-text-extractor", "0.7", "monthly"],
   ["/tools/text-to-speech", "0.7", "monthly"],

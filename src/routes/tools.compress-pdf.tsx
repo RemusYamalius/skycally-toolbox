@@ -9,6 +9,8 @@ import { HowToUse } from "@/components/how-to-use";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/compress-pdf")({
   head: () => buildToolMeta(toolBySlug("compress-pdf", tools)),
   component: CompressPdf,
@@ -131,6 +133,12 @@ function CompressPdf() {
         "Pick a compression level — low, medium or high.",
         "Download your smaller PDF instantly.",
       ]} />
+          <ToolSeoContent
+        title="Free PDF Compressor — Reduce PDF File Size Online"
+        description="Skycally's PDF Compressor reduces the file size of your PDF documents while maintaining acceptable quality. Choose from three compression levels: Low (best quality), Medium (balanced), or High (smallest size). The compression runs entirely in your browser using pdf-lib — your files never leave your device. Free, private, and instant."
+        body={[]}
+        faqs={[{"question":"How much can the file size be reduced?","answer":"Depending on the PDF content, you can reduce file size by 20% to 70%."},{"question":"Will compression affect text quality?","answer":"Text remains sharp at all compression levels. Only embedded images are compressed."},{"question":"What is the maximum file size supported?","answer":"For best performance, we recommend PDFs under 50MB."},{"question":"Is my PDF uploaded to a server?","answer":"No. Compression runs entirely in your browser using pdf-lib."},{"question":"Can I compress password-protected PDFs?","answer":"Password-protected PDFs are not currently supported."}]}
+      />
     </ToolPageShell>
   );
 }

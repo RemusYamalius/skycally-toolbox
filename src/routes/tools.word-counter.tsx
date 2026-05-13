@@ -5,6 +5,8 @@ import { useState, useMemo } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/word-counter")({
   head: () => buildToolMeta(toolBySlug("word-counter", tools)),
   component: WordCounter,
@@ -67,6 +69,12 @@ function WordCounter() {
         "Stats update live: words, characters, sentences, paragraphs and reading time.",
         "Use Copy or Clear to manage your text.",
       ]} />
+          <ToolSeoContent
+        title="Free Word Counter — Count Words, Characters & Reading Time"
+        description="Skycally's Word Counter gives you instant statistics about any text: word count, character count (with and without spaces), sentence count, paragraph count, and estimated reading time. It updates in real-time as you type or paste text. Perfect for writers, students, and content creators. Free, no signup required."
+        body={[]}
+        faqs={[{"question":"Does the counter update in real-time?","answer":"Yes, all statistics update instantly as you type or paste text."},{"question":"How is reading time calculated?","answer":"Reading time is estimated based on an average reading speed of 200 words per minute."},{"question":"Is there a character or word limit?","answer":"There is no limit — paste as much text as you need."},{"question":"Can I count words in languages other than English?","answer":"Yes, the word counter works with any language that uses spaces between words."},{"question":"Is my text stored or sent anywhere?","answer":"No. Everything runs locally in your browser."}]}
+      />
     </ToolPageShell>
   );
 }

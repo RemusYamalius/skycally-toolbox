@@ -5,6 +5,8 @@ import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/image-to-sketch")({
   head: () => buildToolMeta(toolBySlug("image-to-sketch", tools)),
   component: ImageToSketch,
@@ -254,6 +256,12 @@ function ImageToSketch() {
         "Pick a sketch style: pencil, charcoal, or edges.",
         "Click Convert and download your sketch as PNG.",
       ]} />
+          <ToolSeoContent
+        title="Free Image to Sketch — Turn Photos into Drawings"
+        description="Skycally's Image to Sketch tool transforms any photo into a hand-drawn sketch using advanced canvas processing. Choose from three styles: Pencil for soft lines, Charcoal for bold strokes, or Edges for sharp outlines. The conversion runs entirely in your browser — no uploads, no waiting, completely free."
+        body={[]}
+        faqs={[{"question":"What sketch styles are available?","answer":"Three styles are available: Pencil (soft), Charcoal (bold), and Edges (sharp outlines)."},{"question":"How long does conversion take?","answer":"Conversion is nearly instant for most images, typically under 2 seconds."},{"question":"What format is the sketch saved as?","answer":"The sketch is downloaded as a PNG file."},{"question":"Does it work on all types of photos?","answer":"It works on all photos, but portraits and landscapes with clear subjects give the best results."},{"question":"Is my image uploaded to a server?","answer":"No. All processing happens in your browser using Canvas API."}]}
+      />
     </ToolPageShell>
   );
 }

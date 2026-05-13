@@ -5,6 +5,8 @@ import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/json-formatter")({
   head: () => buildToolMeta(toolBySlug("json-formatter", tools)),
   component: JsonFormatter,
@@ -131,6 +133,12 @@ function JsonFormatter() {
         "Click Format to prettify with 2 or 4-space indent, or Minify to compact it.",
         "Copy the result with one click.",
       ]} />
+          <ToolSeoContent
+        title="Free JSON Formatter — Beautify & Minify JSON Online"
+        description="Skycally's JSON Formatter instantly beautifies or minifies any JSON string. Choose between 2 or 4 space indentation, and switch between formatted and raw views with one click. It clearly highlights syntax errors so you can fix them quickly. Everything runs in your browser — no data is sent anywhere."
+        body={[]}
+        faqs={[{"question":"What does the formatter do exactly?","answer":"It parses your JSON and outputs it with proper indentation and line breaks for easy reading."},{"question":"Can it detect JSON errors?","answer":"Yes, if the input is not valid JSON, a clear error message is displayed explaining the issue."},{"question":"What indentation options are available?","answer":"You can choose between 2-space and 4-space indentation."},{"question":"Can I minify JSON too?","answer":"Yes, use the Minify button to compress JSON into a single line."},{"question":"Is my JSON data sent to a server?","answer":"No. All processing happens locally in your browser."}]}
+      />
     </ToolPageShell>
   );
 }

@@ -6,6 +6,8 @@ import { ImageIcon } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/color-palette")({
   head: () => buildToolMeta(toolBySlug("color-palette", tools)),
   component: ColorPaletteExtractor,
@@ -187,6 +189,12 @@ function ColorPaletteExtractor() {
         "Adjust how many dominant colors you want (3–12).",
         "Click any swatch or HEX value to copy it.",
       ]} />
+          <ToolSeoContent
+        title="Free Color Palette Extractor — Get HEX & RGB from Any Image"
+        description="Skycally's Color Palette Extractor analyzes any image and identifies its dominant colors instantly. It returns HEX and RGB values for each color, making it perfect for designers, developers, and artists who want to match or recreate a color scheme. The tool runs entirely in your browser using Canvas API — no uploads, no waiting."
+        body={[]}
+        faqs={[{"question":"How many colors can I extract?","answer":"You can extract between 3 and 12 dominant colors using the slider."},{"question":"How accurate is the color extraction?","answer":"The tool uses color quantization to group similar colors and identify the most dominant ones with high accuracy."},{"question":"Can I copy the color values?","answer":"Yes, click any color swatch or HEX value to copy it to your clipboard instantly."},{"question":"What image formats are supported?","answer":"PNG, JPG, WEBP, and GIF are all supported."},{"question":"Is the tool free?","answer":"Yes, completely free with no signup required."}]}
+      />
     </ToolPageShell>
   );
 }

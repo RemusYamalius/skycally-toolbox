@@ -10,6 +10,8 @@ import { HowToUse } from "@/components/how-to-use";
 import { removeBackground } from "@/services/removeBg";
 import { downloadBlob, checkSize } from "@/lib/file-utils";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/remove-bg")({
   head: () => buildToolMeta(toolBySlug("remove-bg", tools)),
   component: RemoveBgPage,
@@ -77,6 +79,12 @@ function RemoveBgPage() {
         "Click Remove background and wait a few seconds.",
         "Download the transparent PNG, ready to use anywhere.",
       ]} />
+          <ToolSeoContent
+        title="Free Background Remover — AI-Powered Image Cutout"
+        description="Skycally's Background Remover uses AI to automatically detect and remove the background from any image in seconds. It's ideal for product photos, profile pictures, and creative projects. The result is a transparent PNG ready to use anywhere."
+        body={[]}
+        faqs={[{"question":"What types of images work best?","answer":"The tool works best with images where the subject is clearly distinct from the background, such as portraits and product photos."},{"question":"Does it work on complex backgrounds?","answer":"Yes, the AI handles most backgrounds including gradients, textures, and busy scenes."},{"question":"What format is the output?","answer":"The result is always a transparent PNG file."},{"question":"Is my image uploaded to a server?","answer":"Yes, processing is handled securely on our server and your file is deleted immediately after processing."},{"question":"Can I remove backgrounds from multiple images?","answer":"Currently the tool processes one image at a time."}]}
+      />
     </ToolPageShell>
   );
 }

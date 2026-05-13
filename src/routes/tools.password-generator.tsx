@@ -6,6 +6,8 @@ import { Copy, Check } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/password-generator")({
   head: () => buildToolMeta(toolBySlug("password-generator", tools)),
   component: PasswordGeneratorPage,
@@ -155,6 +157,12 @@ function PasswordGeneratorPage() {
         "Click Generate Password to create a cryptographically random password.",
         "Copy it with one click — nothing leaves your browser.",
       ]} />
+          <ToolSeoContent
+        title="Free Password Generator — Strong Secure Passwords"
+        description="Skycally's Password Generator creates strong, secure passwords instantly using your browser's built-in cryptographic API. Customize the length (4 to 64 characters) and choose which character types to include: uppercase, lowercase, numbers, and symbols. Your generated passwords are never stored or transmitted anywhere."
+        body={[]}
+        faqs={[{"question":"How secure are the generated passwords?","answer":"Passwords are generated using the Web Crypto API, which provides cryptographically secure randomness."},{"question":"Can I choose the password length?","answer":"Yes, you can set any length between 4 and 64 characters."},{"question":"Are my passwords stored anywhere?","answer":"No. Passwords are generated and displayed only in your browser and never transmitted."},{"question":"What does the strength indicator measure?","answer":"It evaluates length, use of uppercase, numbers, and symbols to estimate password strength."},{"question":"Can I generate multiple passwords at once?","answer":"Click Generate as many times as you like to get a new password each time."}]}
+      />
     </ToolPageShell>
   );
 }

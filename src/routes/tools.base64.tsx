@@ -5,6 +5,8 @@ import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/base64")({
   head: () => buildToolMeta(toolBySlug("base64", tools)),
   component: Base64Tool,
@@ -129,6 +131,12 @@ function Base64Tool() {
         "Paste your text or Base64 string and click the action button.",
         "Copy the result, or use Swap to round-trip back.",
       ]} />
+          <ToolSeoContent
+        title="Free Base64 Encoder & Decoder — Online Tool"
+        description="Skycally's Base64 tool lets you encode plain text to Base64 or decode Base64 strings back to readable text instantly. It supports full Unicode text including special characters and emojis. The Swap button lets you quickly reverse the operation. Everything runs in your browser — no data is sent to any server."
+        body={[]}
+        faqs={[{"question":"What is Base64 used for?","answer":"Base64 is commonly used to encode binary data for transmission in text-based formats like email, JSON, and HTML."},{"question":"Does it support Unicode and special characters?","answer":"Yes, full Unicode support including emojis and accented characters."},{"question":"What happens if I enter invalid Base64?","answer":"The tool displays a clear error message if the input is not valid Base64."},{"question":"Is there a character limit?","answer":"There is no hard limit, but very large inputs may slow down the browser."},{"question":"Is my data sent to a server?","answer":"No. All encoding and decoding happens in your browser."}]}
+      />
     </ToolPageShell>
   );
 }

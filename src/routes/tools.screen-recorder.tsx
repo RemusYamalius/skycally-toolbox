@@ -5,6 +5,8 @@ import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/screen-recorder")({
   head: () => buildToolMeta(toolBySlug("screen-recorder", tools)),
   component: ScreenRecorder,
@@ -213,6 +215,12 @@ function ScreenRecorder() {
         "Record your actions; click Stop when finished.",
         "Preview the result and download it as a .webm file.",
       ]} />
+          <ToolSeoContent
+        title="Free Screen Recorder — Capture Your Screen in Browser"
+        description="Skycally's Screen Recorder lets you capture your screen directly in your browser — no software installation required. Whether you're recording a tutorial, a presentation, or a bug report, everything is processed locally on your device. The recording includes both screen and audio, and you can download the result as a WebM file instantly."
+        body={[]}
+        faqs={[{"question":"Does screen recording work on mobile?","answer":"Screen recording via browser is currently supported on desktop browsers (Chrome, Edge). Mobile support is limited by browser permissions."},{"question":"Is my recording uploaded to any server?","answer":"No. Everything is processed locally in your browser. Your recording never leaves your device."},{"question":"What format is the recording saved in?","answer":"Recordings are saved as WebM files, which are widely supported. You can convert them to MP4 using our Video Converter tool."},{"question":"Is there a time limit for recordings?","answer":"There is no hard time limit, but very long recordings may use significant memory. We recommend keeping recordings under 30 minutes."},{"question":"Do I need to install any extension?","answer":"No installation needed. The tool works entirely in your browser using the built-in MediaRecorder API."}]}
+      />
     </ToolPageShell>
   );
 }

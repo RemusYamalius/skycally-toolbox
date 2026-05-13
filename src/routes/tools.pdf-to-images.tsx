@@ -8,6 +8,8 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { DropZone } from "@/components/drop-zone";
 
+import ToolSeoContent from "@/components/tool-seo-content";
+
 export const Route = createFileRoute("/tools/pdf-to-images")({
   head: () => buildToolMeta(toolBySlug("pdf-to-images", tools)),
   component: PdfToImages,
@@ -125,6 +127,12 @@ function PdfToImages() {
         "Wait while pages are rendered as PNG images in your browser.",
         "Download individual pages or all of them as a ZIP.",
       ]} />
+          <ToolSeoContent
+        title="Free PDF to Images — Convert PDF Pages to PNG"
+        description="Skycally's PDF to Images tool converts every page of your PDF into a high-quality PNG image. It uses PDF.js to render each page at 2x resolution directly in your browser. You can download individual pages or all pages as a ZIP file. No uploads, no signup, completely free."
+        body={[]}
+        faqs={[{"question":"What resolution are the exported images?","answer":"Pages are rendered at 2x scale for high-quality output, typically 1500-2000px wide."},{"question":"Can I download all pages at once?","answer":"Yes, use the 'Download All as ZIP' button to get all pages in one file."},{"question":"What format are the images saved as?","answer":"All pages are exported as PNG files."},{"question":"Is there a page limit?","answer":"The tool supports PDFs of any length, but very large files may take longer to process."},{"question":"Is my PDF uploaded to a server?","answer":"No. Everything runs in your browser using PDF.js."}]}
+      />
     </ToolPageShell>
   );
 }

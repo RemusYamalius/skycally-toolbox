@@ -11,6 +11,7 @@ import { removeBackground } from "@/services/removeBg";
 import { downloadBlob, checkSize } from "@/lib/file-utils";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/remove-bg")({
   head: () => buildToolMeta(toolBySlug("remove-bg", tools)),
@@ -79,6 +80,7 @@ function RemoveBgPage() {
         "Click Remove background and wait a few seconds.",
         "Download the transparent PNG, ready to use anywhere.",
       ]} />
+          <RelatedTools currentSlug="remove-bg" />
           <ToolSeoContent
         title="Free Background Remover — AI-Powered Image Cutout"
         description="Skycally's Background Remover uses AI to automatically detect and remove the background from any image in seconds. It's ideal for product photos, profile pictures, and creative projects. The result is a transparent PNG ready to use anywhere."

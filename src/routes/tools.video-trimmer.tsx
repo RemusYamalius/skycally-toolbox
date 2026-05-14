@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
 import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/video-trimmer")({
   head: () => buildToolMeta(toolBySlug("video-trimmer", tools)),
@@ -187,6 +188,7 @@ function Page() {
       ]} />
 
       <PoweredByNote />
+          <RelatedTools currentSlug="video-trimmer" />
           <ToolSeoContent
         title={"Free Video Trimmer — Cut and Trim Videos Online"}
         description={"Cut your videos to the exact length you need with Skycally's free online video trimmer. No installation required — works directly in your browser."}

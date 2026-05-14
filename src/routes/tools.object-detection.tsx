@@ -11,6 +11,7 @@ import { AdZone } from "@/components/ad-zone";
 import { PoweredBy, BrowserOnlyBadge, ModelLoadingSkeleton, CameraPermissionError } from "@/components/ai-badges";
 import { loadScript } from "@/lib/cdnScript";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/object-detection")({
   head: () => buildToolMeta(toolBySlug("object-detection", tools)),
@@ -227,6 +228,7 @@ function ObjectDetectionTool() {
         "Wait for the model to detect objects.",
         "See bounding boxes and a sidebar list of confidences.",
       ]} />
+          <RelatedTools currentSlug="object-detection" />
           <ToolSeoContent
         title={"AI Object Detection Online — Real-time Detection Free"}
         description={"Detect and identify objects in images or live video using AI. Powered by TensorFlow.js COCO-SSD. Recognizes 80 object categories. Works in your browser."}

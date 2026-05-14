@@ -19,6 +19,7 @@ import { Tooltip, TooltipContent, TooltipProvider, TooltipTrigger } from "@/comp
 import { downloadBlob } from "@/lib/file-utils";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/qr-generator")({
   head: () => buildToolMeta(toolBySlug("qr-generator", tools)),
@@ -816,6 +817,7 @@ function QrGeneratorPage() {
           "Download as PNG or SVG, or copy the image straight to your clipboard.",
         ]}
       />
+          <RelatedTools currentSlug="qr-generator" />
           <ToolSeoContent
         title="Free QR Code Generator — Custom QR Codes with Logo"
         description="Skycally's QR Code Generator creates fully customized QR codes in seconds. Add your logo, choose dot styles, apply gradient colors, and add a frame — all from one simple interface. Supports URL, Text, Email, Phone, WiFi, and vCard formats. Download as PNG or SVG. 100% free, no signup required."

@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { convertToGif, MAX_VIDEO_BYTES } from "@/services/videoToGif";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/video-to-gif")({
   head: () => buildToolMeta(toolBySlug("video-to-gif", tools)),
@@ -125,6 +126,7 @@ function Page() {
         "Pick start time, duration, width, and FPS.",
         "Click Convert and download your GIF.",
       ]} />
+          <RelatedTools currentSlug="video-to-gif" />
           <ToolSeoContent
         title={"Convert Video to GIF Online — Free & Fast"}
         description={"Turn any video clip into a high-quality animated GIF using Skycally's free converter. Customize frame rate, size and duration for the perfect GIF."}

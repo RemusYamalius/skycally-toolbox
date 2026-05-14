@@ -11,6 +11,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { upscaleImage, MAX_UPSCALE_BYTES } from "@/services/imageUpscaler";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/image-upscaler")({
   head: () => buildToolMeta(toolBySlug("image-upscaler", tools)),
@@ -107,6 +108,7 @@ function Page() {
         "Choose 2x or 4x and click Upscale — runs in your browser.",
         "Compare with the slider, then download the result.",
       ]} />
+          <RelatedTools currentSlug="image-upscaler" />
           <ToolSeoContent
         title="Free Image Upscaler — Enlarge Photos 2x or 4x"
         description="Skycally's Image Upscaler enlarges your images 2x or 4x without losing quality. Using advanced upscaling technology, it reconstructs fine details that would normally be lost when resizing. It's perfect for improving low-resolution photos, product images, or social media graphics. The tool runs entirely in your browser with no file uploads required."

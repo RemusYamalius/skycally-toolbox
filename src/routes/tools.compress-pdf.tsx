@@ -10,6 +10,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/compress-pdf")({
   head: () => buildToolMeta(toolBySlug("compress-pdf", tools)),
@@ -133,6 +134,7 @@ function CompressPdf() {
         "Pick a compression level — low, medium or high.",
         "Download your smaller PDF instantly.",
       ]} />
+          <RelatedTools currentSlug="compress-pdf" />
           <ToolSeoContent
         title="Free PDF Compressor — Reduce PDF File Size Online"
         description="Skycally's PDF Compressor reduces the file size of your PDF documents while maintaining acceptable quality. Choose from three compression levels: Low (best quality), Medium (balanced), or High (smallest size). The compression runs entirely in your browser using pdf-lib — your files never leave your device. Free, private, and instant."

@@ -9,6 +9,7 @@ import { AdZone } from "@/components/ad-zone";
 import { PoweredBy, BrowserOnlyBadge, ModelLoadingSkeleton, CameraPermissionError } from "@/components/ai-badges";
 import { loadScript } from "@/lib/cdnScript";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/hand-gesture")({
   head: () => buildToolMeta(toolBySlug("hand-gesture", tools)),
@@ -189,6 +190,7 @@ function HandGestureTool() {
         "Hold your hand in front of the camera.",
         "Try fist, peace, pointing, open hand, thumbs up.",
       ]} />
+          <RelatedTools currentSlug="hand-gesture" />
           <ToolSeoContent
         title={"Hand Gesture Recognition — Real-time Detection Free | Skycally"}
         description={"Detect hand gestures in real-time using AI and your camera. Recognizes thumbs up, peace sign, pointing and more. Powered by MediaPipe Hands. Free."}

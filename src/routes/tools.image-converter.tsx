@@ -9,6 +9,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/image-converter")({
   head: () => buildToolMeta(toolBySlug("image-converter", tools)),
@@ -125,6 +126,7 @@ function ImageConverter() {
         "Pick the format you want — JPG, PNG or WebP.",
         "Click Convert all, then download files individually or as a ZIP.",
       ]} />
+          <RelatedTools currentSlug="image-converter" />
           <ToolSeoContent
         title={"Free Image Converter — Convert PNG, JPG, WEBP Online"}
         description={"Convert images between PNG, JPG, WEBP and other formats instantly in your browser. No upload required — your files never leave your device."}

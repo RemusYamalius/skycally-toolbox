@@ -9,6 +9,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 import { loadOpenCV } from "@/utils/opencvLoader";
 import { detectDocumentCorners, fallbackCorners, type Point } from "@/utils/edgeDetection";
 
@@ -491,6 +492,8 @@ function DocumentScanner() {
           "Add more pages, then export as PDF, JPG or extract text with OCR.",
         ]}
       />
+
+      <RelatedTools currentSlug="document-scanner" />
 
       <ToolSeoContent
         title="Free Document Scanner — Scan to PDF Online"

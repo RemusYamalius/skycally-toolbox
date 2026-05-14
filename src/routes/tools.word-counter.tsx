@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/word-counter")({
   head: () => buildToolMeta(toolBySlug("word-counter", tools)),
@@ -69,6 +70,7 @@ function WordCounter() {
         "Stats update live: words, characters, sentences, paragraphs and reading time.",
         "Use Copy or Clear to manage your text.",
       ]} />
+          <RelatedTools currentSlug="word-counter" />
           <ToolSeoContent
         title="Free Word Counter — Count Words, Characters & Reading Time"
         description="Skycally's Word Counter gives you instant statistics about any text: word count, character count (with and without spaces), sentence count, paragraph count, and estimated reading time. It updates in real-time as you type or paste text. Perfect for writers, students, and content creators. Free, no signup required."

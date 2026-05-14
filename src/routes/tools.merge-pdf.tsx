@@ -18,6 +18,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/merge-pdf")({
   head: () => buildToolMeta(toolBySlug("merge-pdf", tools)),
@@ -116,6 +117,7 @@ function MergePdf() {
         "Drag the rows to set the order you want.",
         "Click Merge — your single combined PDF downloads instantly.",
       ]} />
+          <RelatedTools currentSlug="merge-pdf" />
           <ToolSeoContent
         title={"Merge PDF Files Online Free — Combine PDFs Instantly"}
         description={"Combine multiple PDF files into one document for free. Drag and drop to reorder pages. 100% browser-based — your files never leave your device."}

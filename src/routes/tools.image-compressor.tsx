@@ -10,6 +10,7 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/image-compressor")({
   head: () => buildToolMeta(toolBySlug("image-compressor", tools)),
@@ -97,6 +98,7 @@ function Compressor() {
         "Drag the quality slider — lower means smaller files.",
         "Hit Compress all, then download each file or grab the ZIP.",
       ]} />
+          <RelatedTools currentSlug="image-compressor" />
           <ToolSeoContent
         title={"Free Image Compressor — Reduce Image Size Without Quality Loss"}
         description={"Compress PNG, JPG and WEBP images by up to 80% while maintaining excellent visual quality. Batch compress multiple images and download as ZIP."}

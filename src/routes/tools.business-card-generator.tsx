@@ -14,6 +14,7 @@ import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 import {
   Select,
   SelectContent,
@@ -652,6 +653,7 @@ function BusinessCardGeneratorPage() {
           "Customize colors and download print-ready PNG",
         ]}
       />
+          <RelatedTools currentSlug="business-card-generator" />
           <ToolSeoContent
         title={"Free Business Card Generator — Design & Download Online"}
         description={"Design professional business cards online for free. 8 templates, QR code integration, custom colors. Download print-ready PNG at 300 DPI. No signup needed."}

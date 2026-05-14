@@ -11,6 +11,7 @@ import { AdZone } from "@/components/ad-zone";
 import { Textarea } from "@/components/ui/textarea";
 import { checkSize, downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/image-to-text")({
   head: () => buildToolMeta(toolBySlug("image-to-text", tools)),
@@ -134,6 +135,7 @@ function ImageToTextPage() {
         "Pick the language and click Extract Text.",
         "Copy the result or download as a .txt file.",
       ]} />
+          <RelatedTools currentSlug="image-to-text" />
           <ToolSeoContent
         title={"Image to Text — Free Online OCR Tool"}
         description={"Extract text from images using OCR technology. Supports English, Arabic, French and Spanish. Works in your browser with Tesseract.js. No upload needed."}

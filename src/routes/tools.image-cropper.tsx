@@ -10,6 +10,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/image-cropper")({
   head: () => buildToolMeta(toolBySlug("image-cropper", tools)),
@@ -137,6 +138,7 @@ function ImageCropper() {
         "Pick an aspect ratio, then drag the box to frame your crop.",
         "Click Crop & Download to save the result.",
       ]} />
+          <RelatedTools currentSlug="image-cropper" />
           <ToolSeoContent
         title={"Free Image Cropper — Crop Photos Online with Aspect Ratio"}
         description={"Crop images online with precision. Choose from preset aspect ratios or crop freely. Rotate and flip options included. Download in JPG, PNG or WEBP."}

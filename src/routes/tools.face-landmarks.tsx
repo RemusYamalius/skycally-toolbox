@@ -12,6 +12,7 @@ import { PoweredBy, BrowserOnlyBadge, ModelLoadingSkeleton, CameraPermissionErro
 import { loadScript } from "@/lib/cdnScript";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/face-landmarks")({
   head: () => buildToolMeta(toolBySlug("face-landmarks", tools)),
@@ -214,6 +215,7 @@ function FaceLandmarksTool() {
         "Toggle dots and mesh overlays as desired.",
         "Download the annotated image (image mode).",
       ]} />
+          <RelatedTools currentSlug="face-landmarks" />
           <ToolSeoContent
         title={"Face Landmark Detection — 468 Points Real-time | Skycally"}
         description={"Detect and visualize 468 facial landmarks in real-time using MediaPipe Face Mesh. Works with photos or live camera. Free, browser-based, no signup."}

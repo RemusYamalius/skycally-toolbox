@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/screen-recorder")({
   head: () => buildToolMeta(toolBySlug("screen-recorder", tools)),
@@ -215,6 +216,7 @@ function ScreenRecorder() {
         "Record your actions; click Stop when finished.",
         "Preview the result and download it as a .webm file.",
       ]} />
+          <RelatedTools currentSlug="screen-recorder" />
           <ToolSeoContent
         title="Free Screen Recorder — Capture Your Screen in Browser"
         description="Skycally's Screen Recorder lets you capture your screen directly in your browser — no software installation required. Whether you're recording a tutorial, a presentation, or a bug report, everything is processed locally on your device. The recording includes both screen and audio, and you can download the result as a WebM file instantly."

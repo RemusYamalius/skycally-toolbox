@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { AdZone } from "@/components/ad-zone";
 import { checkSize, downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/pdf-text-extractor")({
   head: () => buildToolMeta(toolBySlug("pdf-text-extractor", tools)),
@@ -125,6 +126,7 @@ function PdfTextExtractorPage() {
         "We extract the text instantly in your browser.",
         "Copy the result or download it as a .txt file.",
       ]} />
+          <RelatedTools currentSlug="pdf-text-extractor" />
           <ToolSeoContent
         title={"Extract Text from PDF Free — Online PDF Text Extractor"}
         description={"Extract all text content from any PDF file instantly. Copy or download as TXT. Supports all languages. Works entirely in your browser — no upload needed."}

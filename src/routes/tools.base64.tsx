@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/base64")({
   head: () => buildToolMeta(toolBySlug("base64", tools)),
@@ -131,6 +132,7 @@ function Base64Tool() {
         "Paste your text or Base64 string and click the action button.",
         "Copy the result, or use Swap to round-trip back.",
       ]} />
+          <RelatedTools currentSlug="base64" />
           <ToolSeoContent
         title="Free Base64 Encoder & Decoder — Online Tool"
         description="Skycally's Base64 tool lets you encode plain text to Base64 or decode Base64 strings back to readable text instantly. It supports full Unicode text including special characters and emojis. The Swap button lets you quickly reverse the operation. Everything runs in your browser — no data is sent to any server."

@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/video-compressor")({
   head: () => buildToolMeta(toolBySlug("video-compressor", tools)),
@@ -205,6 +206,7 @@ function VideoCompressor() {
         "Choose a compression quality: Low, Medium or High.",
         "Click Compress Video to download the smaller file instantly.",
       ]} />
+          <RelatedTools currentSlug="video-compressor" />
           <ToolSeoContent
         title={"Free Video Compressor — Reduce Video File Size Online"}
         description={"Reduce your video file size without losing quality using Skycally's free video compressor. Perfect for sharing on social media, email, or saving storage space."}

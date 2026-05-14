@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
 import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/video-merger")({
   head: () => buildToolMeta(toolBySlug("video-merger", tools)),
@@ -150,6 +151,7 @@ function Page() {
       ]} />
 
       <PoweredByNote />
+          <RelatedTools currentSlug="video-merger" />
           <ToolSeoContent
         title={"Merge Videos Online Free — Combine Multiple Videos"}
         description={"Combine two or more video files into one seamless video with Skycally's free online video merger. Reorder clips, then download the merged result instantly."}

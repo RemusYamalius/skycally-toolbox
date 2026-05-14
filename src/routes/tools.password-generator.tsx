@@ -7,6 +7,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/password-generator")({
   head: () => buildToolMeta(toolBySlug("password-generator", tools)),
@@ -157,6 +158,7 @@ function PasswordGeneratorPage() {
         "Click Generate Password to create a cryptographically random password.",
         "Copy it with one click — nothing leaves your browser.",
       ]} />
+          <RelatedTools currentSlug="password-generator" />
           <ToolSeoContent
         title="Free Password Generator — Strong Secure Passwords"
         description="Skycally's Password Generator creates strong, secure passwords instantly using your browser's built-in cryptographic API. Customize the length (4 to 64 characters) and choose which character types to include: uppercase, lowercase, numbers, and symbols. Your generated passwords are never stored or transmitted anywhere."

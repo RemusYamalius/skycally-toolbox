@@ -9,6 +9,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/collage-maker")({
   head: () => buildToolMeta(toolBySlug("collage-maker", tools)),
@@ -201,6 +202,7 @@ function CollageMaker() {
         "Pick a layout, canvas size, gap and background.",
         "Click Generate & Download to save your collage as PNG.",
       ]} />
+          <RelatedTools currentSlug="collage-maker" />
           <ToolSeoContent
         title={"Free Photo Collage Maker — Create Collages Online"}
         description={"Create beautiful photo collages online with multiple layout options. Choose from grid layouts for 2-9 photos. Customize spacing, colors and download as PNG."}

@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/split-pdf")({
   head: () => buildToolMeta(toolBySlug("split-pdf", tools)),
@@ -198,6 +199,7 @@ function SplitPdf() {
         "Type the pages you want to extract (e.g. 1-3,5,7-9).",
         "Click Split PDF to download the extracted pages instantly.",
       ]} />
+          <RelatedTools currentSlug="split-pdf" />
           <ToolSeoContent
         title={"Split PDF Online Free — Extract Pages from PDF"}
         description={"Split PDF files and extract specific pages for free. Enter page numbers or ranges, download as a new PDF. 100% browser-based and private."}

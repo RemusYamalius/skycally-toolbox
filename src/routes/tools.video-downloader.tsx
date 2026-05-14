@@ -10,6 +10,7 @@ import { AdZone } from "@/components/ad-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { fetchVideo, type VideoResult } from "@/services/videoApi";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/video-downloader")({
   head: () => buildToolMeta(toolBySlug("video-downloader", tools)),
@@ -141,6 +142,7 @@ function VideoDownloader() {
       ]} />
 
       <AdZone id="video-tool-below-results" size="728x90" />
+          <RelatedTools currentSlug="video-downloader" />
           <ToolSeoContent
         title={"Free Video Downloader — TikTok, Instagram, Facebook & More"}
         description={"Skycally's video downloader lets you save videos from the most popular social media platforms in HD quality — completely free with no watermark and no signup required."}

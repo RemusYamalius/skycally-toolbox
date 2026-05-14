@@ -179,3 +179,37 @@ select option {
   background-color: #1e293b;
   color: #f1f5f9;
 }
+
+/* GPU compositing helpers — prevent mobile tearing artifacts */
+.gpu-isolate {
+  isolation: isolate;
+  transform: translateZ(0);
+  -webkit-transform: translateZ(0);
+  backface-visibility: hidden;
+  -webkit-backface-visibility: hidden;
+}
+.contain-paint {
+  contain: layout paint;
+}
+
+html, body {
+  touch-action: pan-y;
+}
+
+/* Mobile: disable heavy compositing layers that cause GPU tearing on Android */
+@media (max-width: 768px) {
+  .animate-float {
+    animation: none !important;
+  }
+  .grid-overlay {
+    mask-image: none;
+    -webkit-mask-image: none;
+    opacity: 0.5;
+  }
+  /* Strip backdrop-filter on mobile — it's the main tearing trigger when stacked with sticky headers + animated layers */
+  .mobile-no-backdrop,
+  .mobile-no-backdrop * {
+    backdrop-filter: none !important;
+    -webkit-backdrop-filter: none !important;
+  }
+}

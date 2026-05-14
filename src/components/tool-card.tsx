@@ -2,23 +2,31 @@ import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
 import { motion } from "framer-motion";
 import { categoryMeta, type Tool } from "@/lib/tools";
+import { useIsMobile } from "@/hooks/use-mobile";
 
 export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
   const Icon = tool.icon;
   const color = categoryMeta[tool.category].color;
+  const isMobile = useIsMobile();
+
+  const motionProps = isMobile
+    ? {}
+    : {
+        initial: { opacity: 0, y: 16 },
+        whileInView: { opacity: 1, y: 0 },
+        viewport: { once: true, margin: "-50px" },
+        transition: { duration: 0.4, delay: index * 0.04 },
+      };
+
   return (
-    <motion.div
-      initial={{ opacity: 0, y: 16 }}
-      whileInView={{ opacity: 1, y: 0 }}
-      viewport={{ once: true, margin: "-50px" }}
-      transition={{ duration: 0.4, delay: index * 0.04 }}
-    >
+    <motion.div {...motionProps}>
       <Link
         to={tool.path}
-        className="group relative block rounded-2xl border border-border bg-card p-6 transition-all hover:-translate-y-1 hover:shadow-[var(--shadow-elevated)]"
+        className="group relative block rounded-2xl border border-border bg-card p-6 transition-all md:hover:-translate-y-1 md:hover:shadow-[var(--shadow-elevated)]"
+        style={{ transform: "translateZ(0)" }}
       >
         <div
-          className="absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition pointer-events-none"
+          className="hidden md:block absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition pointer-events-none"
           style={{ boxShadow: `0 0 60px -20px ${color}` }}
         />
         <div className="flex items-center justify-between mb-5">

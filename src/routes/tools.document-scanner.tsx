@@ -3,12 +3,14 @@ import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { Camera, Upload, X, FileDown, Image as ImageIcon, FileText, Copy, Plus, Loader2, Info } from "lucide-react";
+import { Camera, Upload, X, FileDown, Image as ImageIcon, FileText, Copy, Plus, Loader2, Info, ChevronDown, ChevronUp, CheckCircle2, AlertTriangle } from "lucide-react";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { loadOpenCV } from "@/utils/opencvLoader";
+import { detectDocumentCorners, fallbackCorners, type Point } from "@/utils/edgeDetection";
 
 export const Route = createFileRoute("/tools/document-scanner")({
   head: () => buildToolMeta(toolBySlug("document-scanner", tools)),
@@ -17,13 +19,7 @@ export const Route = createFileRoute("/tools/document-scanner")({
 
 type Mode = "camera" | "upload";
 type FilterMode = "original" | "magic" | "grayscale" | "bw" | "photo";
-
-interface CropBox {
-  x: number;
-  y: number;
-  w: number;
-  h: number;
-}
+type DetectionStatus = "idle" | "loading" | "detected" | "fallback";
 
 const FILTERS: { id: FilterMode; label: string }[] = [
   { id: "magic", label: "✨ Magic" },
@@ -77,6 +73,86 @@ function loadImage(src: string): Promise<HTMLImageElement> {
   });
 }
 
+function dist(a: Point, b: Point) {
+  return Math.hypot(a.x - b.x, a.y - b.y);
+}
+
+// Perspective-warp using OpenCV if available; falls back to bounding-box crop.
+async function warpToCanvas(img: HTMLImageElement, corners: Point[]): Promise<HTMLCanvasElement> {
+  const [tl, tr, br, bl] = corners;
+  const widthOut = Math.max(dist(tl, tr), dist(bl, br));
+  const heightOut = Math.max(dist(tl, bl), dist(tr, br));
+  const w = Math.max(1, Math.round(widthOut));
+  const h = Math.max(1, Math.round(heightOut));
+
+  const out = document.createElement("canvas");
+  out.width = w;
+  out.height = h;
+
+  const cv = (typeof window !== "undefined" ? (window as any).cv : null);
+  if (cv && cv.Mat) {
+    let src: any, dst: any, M: any, srcTri: any, dstTri: any;
+    try {
+      src = cv.imread(img);
+      dst = new cv.Mat();
+      srcTri = cv.matFromArray(4, 1, cv.CV_32FC2, [tl.x, tl.y, tr.x, tr.y, br.x, br.y, bl.x, bl.y]);
+      dstTri = cv.matFromArray(4, 1, cv.CV_32FC2, [0, 0, w, 0, w, h, 0, h]);
+      M = cv.getPerspectiveTransform(srcTri, dstTri);
+      cv.warpPerspective(src, dst, M, new cv.Size(w, h), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+      cv.imshow(out, dst);
+      return out;
+    } catch (e) {
+      console.warn("Perspective warp failed, using bounding box:", e);
+    } finally {
+      [src, dst, M, srcTri, dstTri].forEach((m) => {
+        try {
+          m?.delete?.();
+        } catch {
+          // ignore
+        }
+      });
+    }
+  }
+
+  // Fallback: bounding-box crop
+  const xs = corners.map((p) => p.x);
+  const ys = corners.map((p) => p.y);
+  const minX = Math.max(0, Math.min(...xs));
+  const minY = Math.max(0, Math.min(...ys));
+  const maxX = Math.min(img.width, Math.max(...xs));
+  const maxY = Math.min(img.height, Math.max(...ys));
+  const bw = Math.max(1, Math.round(maxX - minX));
+  const bh = Math.max(1, Math.round(maxY - minY));
+  out.width = bw;
+  out.height = bh;
+  out.getContext("2d")!.drawImage(img, minX, minY, bw, bh, 0, 0, bw, bh);
+  return out;
+}
+
+function ScanTips({ defaultOpen = false }: { defaultOpen?: boolean }) {
+  const [open, setOpen] = useState(defaultOpen);
+  return (
+    <div className="rounded-xl border border-border bg-secondary/40 mb-5 overflow-hidden">
+      <button
+        type="button"
+        onClick={() => setOpen((v) => !v)}
+        className="w-full flex items-center justify-between px-4 py-3 text-sm font-medium hover:bg-secondary/60"
+      >
+        <span>📸 Tips for best results</span>
+        {open ? <ChevronUp className="w-4 h-4" /> : <ChevronDown className="w-4 h-4" />}
+      </button>
+      {open && (
+        <ul className="px-5 pb-4 text-sm text-muted-foreground space-y-1.5 list-disc list-inside">
+          <li>Place document on a contrasting background (dark table for white paper).</li>
+          <li>Ensure good lighting — avoid shadows on the document.</li>
+          <li>Keep the camera parallel to the document, not at an angle.</li>
+          <li>Make sure all 4 corners are visible in the frame.</li>
+        </ul>
+      )}
+    </div>
+  );
+}
+
 function DocumentScanner() {
   const [mode, setMode] = useState<Mode>("upload");
   const [stream, setStream] = useState<MediaStream | null>(null);
@@ -84,16 +160,17 @@ function DocumentScanner() {
   const videoRef = useRef<HTMLVideoElement>(null);
 
   // Editing state
-  const [editing, setEditing] = useState<string | null>(null); // raw dataURL being edited
-  const [crop, setCrop] = useState<CropBox>({ x: 0.05, y: 0.05, w: 0.9, h: 0.9 });
+  const [editing, setEditing] = useState<string | null>(null);
+  const [editingSize, setEditingSize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
+  const [corners, setCorners] = useState<Point[]>([]);
   const [filter, setFilter] = useState<FilterMode>("magic");
+  const [detectionStatus, setDetectionStatus] = useState<DetectionStatus>("idle");
 
   // Multi-page
   const [pages, setPages] = useState<string[]>([]);
   const [busy, setBusy] = useState(false);
   const [busyMsg, setBusyMsg] = useState("");
 
-  // Camera lifecycle
   useEffect(() => {
     return () => stream?.getTracks().forEach((t) => t.stop());
   }, [stream]);
@@ -109,7 +186,7 @@ function DocumentScanner() {
         videoRef.current.srcObject = s;
         await videoRef.current.play().catch(() => {});
       }
-    } catch (e: any) {
+    } catch {
       toast.error("Camera access denied or unavailable");
     }
   };
@@ -125,20 +202,43 @@ function DocumentScanner() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [mode, facing]);
 
-  const captureFromCamera = () => {
+  // Run detection on a freshly-loaded image dataURL
+  const beginEditing = async (dataUrl: string) => {
+    const img = await loadImage(dataUrl);
+    setEditing(dataUrl);
+    setEditingSize({ w: img.width, h: img.height });
+    setCorners([
+      { x: img.width * 0.05, y: img.height * 0.05 },
+      { x: img.width * 0.95, y: img.height * 0.05 },
+      { x: img.width * 0.95, y: img.height * 0.95 },
+      { x: img.width * 0.05, y: img.height * 0.95 },
+    ]);
+    setDetectionStatus("loading");
+    try {
+      await loadOpenCV();
+      const result = await detectDocumentCorners(img, img.width, img.height);
+      setCorners([result.topLeft, result.topRight, result.bottomRight, result.bottomLeft]);
+      setDetectionStatus(result.detected ? "detected" : "fallback");
+    } catch (err) {
+      console.warn("OpenCV load failed:", err);
+      const fb = fallbackCorners(img.width, img.height);
+      setCorners([fb.topLeft, fb.topRight, fb.bottomRight, fb.bottomLeft]);
+      setDetectionStatus("fallback");
+    }
+  };
+
+  const captureFromCamera = async () => {
     const v = videoRef.current;
     if (!v) return;
     const c = document.createElement("canvas");
     c.width = v.videoWidth;
     c.height = v.videoHeight;
     c.getContext("2d")!.drawImage(v, 0, 0);
-    setEditing(c.toDataURL("image/jpeg", 0.95));
-    setCrop({ x: 0.05, y: 0.05, w: 0.9, h: 0.9 });
+    await beginEditing(c.toDataURL("image/jpeg", 0.95));
   };
 
   const onUpload = async (files: File[]) => {
     if (!files.length) return;
-    // Add all uploaded images: edit first, queue rest
     const reads = await Promise.all(
       files.map(
         (f) =>
@@ -150,35 +250,24 @@ function DocumentScanner() {
           }),
       ),
     );
-    setEditing(reads[0]);
-    setCrop({ x: 0.05, y: 0.05, w: 0.9, h: 0.9 });
-    if (reads.length > 1) {
-      // Queue extras as raw pages — user can re-edit later
-      setPages((p) => [...p, ...reads.slice(1)]);
-    }
+    await beginEditing(reads[0]);
+    if (reads.length > 1) setPages((p) => [...p, ...reads.slice(1)]);
   };
 
   const processPage = async () => {
-    if (!editing) return;
+    if (!editing || corners.length !== 4) return;
     const img = await loadImage(editing);
-    const sx = crop.x * img.width;
-    const sy = crop.y * img.height;
-    const sw = crop.w * img.width;
-    const sh = crop.h * img.height;
-    const c = document.createElement("canvas");
-    c.width = Math.max(1, Math.round(sw));
-    c.height = Math.max(1, Math.round(sh));
-    c.getContext("2d")!.drawImage(img, sx, sy, sw, sh, 0, 0, c.width, c.height);
+    const c = await warpToCanvas(img, corners);
     applyFilter(c, filter);
     const out = c.toDataURL("image/jpeg", 0.92);
     setPages((p) => [...p, out]);
     setEditing(null);
+    setDetectionStatus("idle");
     toast.success("Page added");
   };
 
   const removePage = (i: number) => setPages((p) => p.filter((_, idx) => idx !== i));
 
-  // EXPORTS
   const exportPDF = async () => {
     if (pages.length === 0) return;
     setBusy(true);
@@ -191,7 +280,6 @@ function DocumentScanner() {
       for (let i = 0; i < pages.length; i++) {
         if (i > 0) pdf.addPage();
         const img = await loadImage(pages[i]);
-        // Fit within A4 preserving aspect
         const ratio = Math.min(PAGE_W / (img.width / 4), PAGE_H / (img.height / 4));
         const w = (img.width / 4) * ratio;
         const h = (img.height / 4) * ratio;
@@ -201,7 +289,7 @@ function DocumentScanner() {
       }
       pdf.save("scanned-document.pdf");
       toast.success("PDF saved");
-    } catch (e) {
+    } catch {
       toast.error("PDF export failed");
     } finally {
       setBusy(false);
@@ -266,18 +354,18 @@ function DocumentScanner() {
     }
   };
 
-  // ----- UI -----
   return (
     <ToolPageShell
       title="Document Scanner"
       description="Scan documents with your camera or upload photos. Crop, enhance and export to PDF — entirely in your browser."
     >
-      <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground flex gap-2 items-start mb-6">
+      <div className="rounded-xl border border-border bg-secondary/40 px-4 py-3 text-sm text-muted-foreground flex gap-2 items-start mb-5">
         <Info className="w-4 h-4 mt-0.5 flex-shrink-0" />
         <p>For best results, use on mobile with your camera. Desktop users can upload existing document photos.</p>
       </div>
 
-      {/* Tabs */}
+      {!editing && <ScanTips />}
+
       {!editing && (
         <>
           <div className="flex gap-2 mb-5 p-1 rounded-xl bg-secondary/50 border border-border w-fit">
@@ -329,20 +417,23 @@ function DocumentScanner() {
         </>
       )}
 
-      {/* Editing view */}
       {editing && (
         <EditPanel
           src={editing}
-          crop={crop}
-          setCrop={setCrop}
+          imageSize={editingSize}
+          corners={corners}
+          setCorners={setCorners}
           filter={filter}
           setFilter={setFilter}
-          onCancel={() => setEditing(null)}
+          status={detectionStatus}
+          onCancel={() => {
+            setEditing(null);
+            setDetectionStatus("idle");
+          }}
           onApply={processPage}
         />
       )}
 
-      {/* Pages strip */}
       {pages.length > 0 && (
         <div className="mt-8">
           <div className="flex items-center justify-between mb-3">
@@ -396,132 +487,205 @@ function DocumentScanner() {
       <HowToUse
         steps={[
           "Take a photo or upload an image of your document.",
-          "Adjust the crop area and choose an enhancement filter.",
+          "Adjust the auto-detected corners and choose an enhancement filter.",
           "Add more pages, then export as PDF, JPG or extract text with OCR.",
         ]}
       />
 
       <ToolSeoContent
         title="Free Document Scanner — Scan to PDF Online"
-        description="Scan documents with your camera and convert to PDF instantly. Crop, enhance and OCR text extraction. Works on mobile and desktop, entirely in your browser."
+        description="Scan documents with your camera and convert to PDF instantly. Auto edge detection, perspective correction, OCR text extraction. Works on mobile and desktop, entirely in your browser."
         body={[
-          "Skycally's Document Scanner replicates the core of CamScanner-style apps — capture, enhance, multi-page assembly and PDF export — without installing anything. The whole flow runs in your browser, so your scanned documents never leave your device.",
-          "Use your phone's back camera to capture receipts, invoices, ID cards or notes, then apply the Magic, B&W, Grayscale or Photo filter to make text crisp and readable. Build multi-page PDFs and run OCR directly on the result to copy the text out.",
+          "Skycally's Document Scanner replicates the core of CamScanner-style apps — capture, automatic edge detection, perspective correction, multi-page assembly and PDF export — without installing anything. The whole flow runs in your browser, so your scanned documents never leave your device.",
+          "Use your phone's back camera to capture receipts, invoices, ID cards or notes. The scanner finds the document's four corners automatically using OpenCV and lets you fine-tune them by dragging. Apply the Magic, B&W, Grayscale or Photo filter to make text crisp and readable, then build multi-page PDFs and run OCR directly on the result.",
         ]}
         faqs={[
-          { question: "Do I need to install an app?", answer: "No. The scanner runs entirely in your browser using your device's camera and the Canvas API." },
-          { question: "Are my scans uploaded anywhere?", answer: "No. Capturing, cropping, filtering and PDF export all happen locally on your device." },
-          { question: "Can I scan multiple pages into one PDF?", answer: "Yes. Add as many pages as you need, reorder by removing and re-adding, then export them all as a single PDF." },
+          { question: "Do I need to install an app?", answer: "No. The scanner runs entirely in your browser using your device's camera, OpenCV.js and the Canvas API." },
+          { question: "Are my scans uploaded anywhere?", answer: "No. Capturing, edge detection, cropping, filtering and PDF export all happen locally on your device." },
+          { question: "What if auto-detection fails?", answer: "The scanner falls back to a default rectangle that you can drag to match your document. A status badge tells you which mode is active." },
+          { question: "Can I scan multiple pages into one PDF?", answer: "Yes. Add as many pages as you need, then export them all as a single PDF." },
           { question: "Does it extract text from scans?", answer: "Yes. The Extract Text button runs OCR locally with Tesseract and downloads a .txt file with the recognized content." },
-          { question: "Which devices work best?", answer: "Mobile devices give the best results because of the back camera. Desktop users can upload existing photos of documents instead." },
         ]}
       />
     </ToolPageShell>
   );
 }
 
-// ---- Editing panel with draggable crop box ----
+// ---- Editing panel: overlay canvas with draggable corner handles ----
 function EditPanel({
   src,
-  crop,
-  setCrop,
+  imageSize,
+  corners,
+  setCorners,
   filter,
   setFilter,
+  status,
   onCancel,
   onApply,
 }: {
   src: string;
-  crop: CropBox;
-  setCrop: (c: CropBox) => void;
+  imageSize: { w: number; h: number };
+  corners: Point[];
+  setCorners: (c: Point[]) => void;
   filter: FilterMode;
   setFilter: (f: FilterMode) => void;
+  status: DetectionStatus;
   onCancel: () => void;
   onApply: () => void;
 }) {
   const wrapRef = useRef<HTMLDivElement>(null);
-  const [drag, setDrag] = useState<null | { type: "move" | "tl" | "tr" | "bl" | "br"; startX: number; startY: number; orig: CropBox }>(null);
+  const imgRef = useRef<HTMLImageElement>(null);
+  const overlayRef = useRef<HTMLCanvasElement>(null);
+  const [dragIdx, setDragIdx] = useState<number | null>(null);
+  const [displaySize, setDisplaySize] = useState<{ w: number; h: number }>({ w: 0, h: 0 });
 
-  const onPointerDown = (type: "move" | "tl" | "tr" | "bl" | "br") => (e: React.PointerEvent) => {
-    e.preventDefault();
-    (e.target as HTMLElement).setPointerCapture(e.pointerId);
-    setDrag({ type, startX: e.clientX, startY: e.clientY, orig: crop });
+  // Sync overlay canvas to displayed image size
+  const syncSize = () => {
+    const img = imgRef.current;
+    if (!img) return;
+    const r = img.getBoundingClientRect();
+    setDisplaySize({ w: r.width, h: r.height });
+    const c = overlayRef.current;
+    if (c) {
+      c.width = r.width;
+      c.height = r.height;
+    }
+  };
+
+  useEffect(() => {
+    syncSize();
+    const onResize = () => syncSize();
+    window.addEventListener("resize", onResize);
+    return () => window.removeEventListener("resize", onResize);
+  }, [src]);
+
+  // Draw overlay
+  useEffect(() => {
+    const c = overlayRef.current;
+    if (!c || corners.length !== 4 || !imageSize.w || !imageSize.h) return;
+    const ctx = c.getContext("2d")!;
+    ctx.clearRect(0, 0, c.width, c.height);
+    const sx = c.width / imageSize.w;
+    const sy = c.height / imageSize.h;
+    const pts = corners.map((p) => ({ x: p.x * sx, y: p.y * sy }));
+
+    ctx.fillStyle = "rgba(0,0,0,0.5)";
+    ctx.fillRect(0, 0, c.width, c.height);
+    ctx.globalCompositeOperation = "destination-out";
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < 4; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.closePath();
+    ctx.fill();
+    ctx.globalCompositeOperation = "source-over";
+
+    ctx.strokeStyle = "#00D4FF";
+    ctx.lineWidth = 2;
+    ctx.setLineDash([8, 4]);
+    ctx.beginPath();
+    ctx.moveTo(pts[0].x, pts[0].y);
+    for (let i = 1; i < 4; i++) ctx.lineTo(pts[i].x, pts[i].y);
+    ctx.closePath();
+    ctx.stroke();
+    ctx.setLineDash([]);
+
+    pts.forEach((p) => {
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 18, 0, Math.PI * 2);
+      ctx.fillStyle = "rgba(0,212,255,0.3)";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 10, 0, Math.PI * 2);
+      ctx.fillStyle = "#00D4FF";
+      ctx.fill();
+      ctx.beginPath();
+      ctx.arc(p.x, p.y, 4, 0, Math.PI * 2);
+      ctx.fillStyle = "#ffffff";
+      ctx.fill();
+    });
+  }, [corners, displaySize, imageSize]);
+
+  const clientToImage = (clientX: number, clientY: number) => {
+    const c = overlayRef.current!;
+    const r = c.getBoundingClientRect();
+    const dx = clientX - r.left;
+    const dy = clientY - r.top;
+    return { x: (dx / r.width) * imageSize.w, y: (dy / r.height) * imageSize.h };
+  };
+
+  const onPointerDown = (e: React.PointerEvent) => {
+    if (corners.length !== 4 || !overlayRef.current) return;
+    const p = clientToImage(e.clientX, e.clientY);
+    let nearest = -1;
+    let nearestDist = Infinity;
+    corners.forEach((c, i) => {
+      const d = Math.hypot(c.x - p.x, c.y - p.y);
+      if (d < nearestDist) {
+        nearestDist = d;
+        nearest = i;
+      }
+    });
+    // 30px tolerance in image space, scaled to display
+    const tol = (30 / overlayRef.current.width) * imageSize.w;
+    if (nearestDist <= tol) {
+      setDragIdx(nearest);
+      (e.target as HTMLElement).setPointerCapture(e.pointerId);
+      e.preventDefault();
+    }
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
-    if (!drag || !wrapRef.current) return;
-    const rect = wrapRef.current.getBoundingClientRect();
-    const dx = (e.clientX - drag.startX) / rect.width;
-    const dy = (e.clientY - drag.startY) / rect.height;
-    let { x, y, w, h } = drag.orig;
-    const clamp = (v: number, min: number, max: number) => Math.max(min, Math.min(max, v));
-    if (drag.type === "move") {
-      x = clamp(x + dx, 0, 1 - w);
-      y = clamp(y + dy, 0, 1 - h);
-    } else if (drag.type === "tl") {
-      const nx = clamp(x + dx, 0, x + w - 0.05);
-      const ny = clamp(y + dy, 0, y + h - 0.05);
-      w = w + (x - nx);
-      h = h + (y - ny);
-      x = nx;
-      y = ny;
-    } else if (drag.type === "tr") {
-      const ny = clamp(y + dy, 0, y + h - 0.05);
-      h = h + (y - ny);
-      y = ny;
-      w = clamp(w + dx, 0.05, 1 - x);
-    } else if (drag.type === "bl") {
-      const nx = clamp(x + dx, 0, x + w - 0.05);
-      w = w + (x - nx);
-      x = nx;
-      h = clamp(h + dy, 0.05, 1 - y);
-    } else if (drag.type === "br") {
-      w = clamp(w + dx, 0.05, 1 - x);
-      h = clamp(h + dy, 0.05, 1 - y);
-    }
-    setCrop({ x, y, w, h });
+    if (dragIdx === null) return;
+    const p = clientToImage(e.clientX, e.clientY);
+    const next = corners.slice();
+    next[dragIdx] = {
+      x: Math.max(0, Math.min(imageSize.w, p.x)),
+      y: Math.max(0, Math.min(imageSize.h, p.y)),
+    };
+    setCorners(next);
   };
 
-  const onPointerUp = () => setDrag(null);
+  const onPointerUp = () => setDragIdx(null);
 
   return (
     <div className="rounded-2xl border border-border bg-card p-4">
-      <div
-        ref={wrapRef}
-        onPointerMove={onPointerMove}
-        onPointerUp={onPointerUp}
-        className="relative w-full select-none touch-none bg-black rounded-lg overflow-hidden"
-      >
-        <img src={src} alt="To scan" className="w-full max-h-[60vh] object-contain" draggable={false} />
-        {/* dim overlay outside crop */}
-        <div className="absolute inset-0 pointer-events-none" style={{ boxShadow: `inset 0 0 0 9999px rgba(0,0,0,0.5)`, clipPath: `polygon(0 0, 100% 0, 100% 100%, 0 100%, 0 ${crop.y * 100}%, ${crop.x * 100}% ${crop.y * 100}%, ${crop.x * 100}% ${(crop.y + crop.h) * 100}%, ${(crop.x + crop.w) * 100}% ${(crop.y + crop.h) * 100}%, ${(crop.x + crop.w) * 100}% ${crop.y * 100}%, 0 ${crop.y * 100}%)` }} />
-        {/* crop box */}
-        <div
-          onPointerDown={onPointerDown("move")}
-          className="absolute border-2 cursor-move"
-          style={{
-            left: `${crop.x * 100}%`,
-            top: `${crop.y * 100}%`,
-            width: `${crop.w * 100}%`,
-            height: `${crop.h * 100}%`,
-            borderColor: "var(--cyan-brand)",
-          }}
-        >
-          {(["tl", "tr", "bl", "br"] as const).map((corner) => (
-            <div
-              key={corner}
-              onPointerDown={onPointerDown(corner)}
-              className="absolute w-5 h-5 rounded-full border-2 border-white"
-              style={{
-                background: "var(--cyan-brand)",
-                top: corner.startsWith("t") ? -10 : "auto",
-                bottom: corner.startsWith("b") ? -10 : "auto",
-                left: corner.endsWith("l") ? -10 : "auto",
-                right: corner.endsWith("r") ? -10 : "auto",
-                cursor: corner === "tl" || corner === "br" ? "nwse-resize" : "nesw-resize",
-              }}
-            />
-          ))}
-        </div>
+      <div ref={wrapRef} className="relative w-full bg-black rounded-lg overflow-hidden select-none">
+        <img
+          ref={imgRef}
+          src={src}
+          alt="To scan"
+          className="w-full max-h-[60vh] object-contain block"
+          draggable={false}
+          onLoad={syncSize}
+        />
+        <canvas
+          ref={overlayRef}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerUp}
+          onPointerCancel={onPointerUp}
+          className="absolute inset-0 w-full h-full touch-none cursor-crosshair"
+          style={{ width: displaySize.w, height: displaySize.h, left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
+        />
+      </div>
+
+      {/* Status badge */}
+      <div className="mt-3 min-h-[28px]">
+        {status === "loading" && (
+          <span className="inline-flex items-center gap-2 rounded-full bg-secondary px-3 py-1 text-xs text-muted-foreground">
+            <Loader2 className="w-3.5 h-3.5 animate-spin" /> Detecting document edges...
+          </span>
+        )}
+        {status === "detected" && (
+          <span className="inline-flex items-center gap-2 rounded-full bg-emerald-500/15 text-emerald-600 dark:text-emerald-400 px-3 py-1 text-xs">
+            <CheckCircle2 className="w-3.5 h-3.5" /> Document detected — adjust corners if needed
+          </span>
+        )}
+        {status === "fallback" && (
+          <span className="inline-flex items-center gap-2 rounded-full bg-amber-500/15 text-amber-600 dark:text-amber-400 px-3 py-1 text-xs">
+            <AlertTriangle className="w-3.5 h-3.5" /> Could not auto-detect — drag the corners manually
+          </span>
+        )}
       </div>
 
       <div className="mt-4 flex flex-wrap gap-2">

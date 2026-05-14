@@ -10,7 +10,7 @@ export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
   const isMobile = useIsMobile();
 
   const motionProps = isMobile
-    ? {}
+    ? { initial: false, animate: { opacity: 1, y: 0 } }
     : {
         initial: { opacity: 0, y: 16 },
         whileInView: { opacity: 1, y: 0 },
@@ -19,7 +19,7 @@ export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
       };
 
   return (
-    <motion.div {...motionProps}>
+    <motion.div {...motionProps} style={{ opacity: 1 }}>
       <Link
         to={tool.path}
         className="group relative block rounded-2xl border border-border bg-card p-6 transition-all md:hover:-translate-y-1 md:hover:shadow-[var(--shadow-elevated)]"

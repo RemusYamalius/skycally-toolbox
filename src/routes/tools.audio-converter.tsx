@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/audio-converter")({
   head: () => buildToolMeta(toolBySlug("audio-converter", tools)),
@@ -191,6 +192,7 @@ function AudioConverter() {
         "Pick the target format (MP3, WAV, OGG, AAC or FLAC).",
         "Click Convert to download the converted audio instantly.",
       ]} />
+          <RelatedTools currentSlug="audio-converter" />
           <ToolSeoContent
         title="Free Audio Converter — MP3, WAV, OGG, AAC, FLAC"
         description="Skycally's Audio Converter lets you convert audio files between the most popular formats: MP3, WAV, OGG, AAC, and FLAC. It supports a wide range of input formats including M4A and MP4. The conversion is handled securely on our server and the result is downloaded to your device automatically. Fast, free, and no signup required."

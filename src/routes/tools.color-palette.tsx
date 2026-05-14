@@ -7,6 +7,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/color-palette")({
   head: () => buildToolMeta(toolBySlug("color-palette", tools)),
@@ -189,6 +190,7 @@ function ColorPaletteExtractor() {
         "Adjust how many dominant colors you want (3–12).",
         "Click any swatch or HEX value to copy it.",
       ]} />
+          <RelatedTools currentSlug="color-palette" />
           <ToolSeoContent
         title="Free Color Palette Extractor — Get HEX & RGB from Any Image"
         description="Skycally's Color Palette Extractor analyzes any image and identifies its dominant colors instantly. It returns HEX and RGB values for each color, making it perfect for designers, developers, and artists who want to match or recreate a color scheme. The tool runs entirely in your browser using Canvas API — no uploads, no waiting."

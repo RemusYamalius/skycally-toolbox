@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/image-filters")({
   head: () => buildToolMeta(toolBySlug("image-filters", tools)),
@@ -155,6 +156,7 @@ function ImageFilters() {
         "Pick a filter from the row of previews.",
         "Click Download to save the filtered image as PNG.",
       ]} />
+          <RelatedTools currentSlug="image-filters" />
           <ToolSeoContent
         title="Free Image Filters — Apply Photo Effects Online"
         description="Skycally's Image Filters tool lets you apply beautiful photo effects to any image directly in your browser. Choose from 10 filters including Grayscale, Sepia, Vintage, Cold, Warm, High Contrast, and more. Preview filters in real-time and download your edited image as a PNG. No uploads, no signup — everything runs locally."

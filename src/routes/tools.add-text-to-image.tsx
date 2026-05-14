@@ -9,6 +9,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/add-text-to-image")({
   head: () => buildToolMeta(toolBySlug("add-text-to-image", tools)),
@@ -367,6 +368,7 @@ function AddTextToImage() {
         "Customize your text and click Add Text Layer — drag it anywhere on the image.",
         "Click Download Image to save the merged result as a PNG.",
       ]} />
+          <RelatedTools currentSlug="add-text-to-image" />
           <ToolSeoContent
         title={"Add Text to Image Online — Free Photo Text Editor"}
         description={"Add custom text, captions and watermarks to any image. Multiple fonts, colors, shadows and outlines. Drag to reposition text layers. Download as PNG."}

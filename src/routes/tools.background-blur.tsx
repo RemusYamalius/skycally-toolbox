@@ -13,6 +13,7 @@ import { PoweredBy, BrowserOnlyBadge, ModelLoadingSkeleton, CameraPermissionErro
 import { loadScript } from "@/lib/cdnScript";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/background-blur")({
   head: () => buildToolMeta(toolBySlug("background-blur", tools)),
@@ -200,6 +201,7 @@ function BackgroundBlurTool() {
         "Adjust the blur intensity slider to taste.",
         "Download the result, or just enjoy the live preview.",
       ]} />
+          <RelatedTools currentSlug="background-blur" />
           <ToolSeoContent
         title={"AI Background Blur — Blur Photo Background Free Online"}
         description={"Automatically blur image backgrounds using AI. Works with photos or live camera. Adjust blur intensity. Powered by MediaPipe. No signup needed."}

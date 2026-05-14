@@ -8,6 +8,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/image-resizer")({
   head: () => buildToolMeta(toolBySlug("image-resizer", tools)),
@@ -201,6 +202,7 @@ function ImageResizer() {
         "Choose pixels or percentage, then set your target size and format.",
         "Click Resize & Download to save the new image.",
       ]} />
+          <RelatedTools currentSlug="image-resizer" />
           <ToolSeoContent
         title={"Free Image Resizer — Resize Images Online to Any Size"}
         description={"Resize images to exact pixel dimensions or percentage scale. Includes presets for Instagram, Twitter, Facebook and other platforms. Works in your browser."}

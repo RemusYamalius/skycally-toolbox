@@ -11,6 +11,7 @@ import { DropZone } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/rotate-pdf")({
   head: () => buildToolMeta(toolBySlug("rotate-pdf", tools)),
@@ -152,6 +153,7 @@ function RotatePdf() {
         "Click any page to rotate 90°, or use the apply-to-all controls.",
         "Hit Apply rotations to download your fixed PDF.",
       ]} />
+          <RelatedTools currentSlug="rotate-pdf" />
           <ToolSeoContent
         title="Free PDF Rotator — Rotate PDF Pages Online"
         description="Skycally's PDF Rotator lets you rotate one or all pages of your PDF to the correct orientation. Choose 90°, 180°, or 270° rotation for each page individually, or apply the same rotation to all pages at once. Everything runs in your browser using pdf-lib — no uploads, no signup, completely free."

@@ -5,6 +5,7 @@ import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/extract-audio")({
   head: () => buildToolMeta(toolBySlug("extract-audio", tools)),
@@ -203,6 +204,7 @@ function ExtractAudio() {
         "Choose your output format: MP3, AAC or WAV.",
         "Click Extract to download the audio file instantly.",
       ]} />
+          <RelatedTools currentSlug="extract-audio" />
           <ToolSeoContent
         title={"Extract Audio from Video — Free MP3, AAC & WAV Converter"}
         description={"Extract the audio track from any video file and download it as MP3, AAC or WAV for free. Perfect for creating podcasts, music files or audio samples."}

@@ -9,6 +9,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { DropZone } from "@/components/drop-zone";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/pdf-to-images")({
   head: () => buildToolMeta(toolBySlug("pdf-to-images", tools)),
@@ -127,6 +128,7 @@ function PdfToImages() {
         "Wait while pages are rendered as PNG images in your browser.",
         "Download individual pages or all of them as a ZIP.",
       ]} />
+          <RelatedTools currentSlug="pdf-to-images" />
           <ToolSeoContent
         title="Free PDF to Images — Convert PDF Pages to PNG"
         description="Skycally's PDF to Images tool converts every page of your PDF into a high-quality PNG image. It uses PDF.js to render each page at 2x resolution directly in your browser. You can download individual pages or all pages as a ZIP file. No uploads, no signup, completely free."

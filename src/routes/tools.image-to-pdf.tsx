@@ -9,6 +9,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/image-to-pdf")({
   head: () => buildToolMeta(toolBySlug("image-to-pdf", tools)),
@@ -162,6 +163,7 @@ function ImageToPdf() {
         "Pick page size, orientation, fit and margin.",
         "Click Convert to PDF to download your document.",
       ]} />
+          <RelatedTools currentSlug="image-to-pdf" />
           <ToolSeoContent
         title={"Convert Images to PDF Online — JPG to PDF Free"}
         description={"Convert one or multiple images to a PDF document for free. Supports JPG, PNG and WEBP. Choose page size, orientation and margins. Works in your browser."}

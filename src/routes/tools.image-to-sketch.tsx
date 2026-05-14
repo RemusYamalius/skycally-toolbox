@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/image-to-sketch")({
   head: () => buildToolMeta(toolBySlug("image-to-sketch", tools)),
@@ -256,6 +257,7 @@ function ImageToSketch() {
         "Pick a sketch style: pencil, charcoal, or edges.",
         "Click Convert and download your sketch as PNG.",
       ]} />
+          <RelatedTools currentSlug="image-to-sketch" />
           <ToolSeoContent
         title="Free Image to Sketch — Turn Photos into Drawings"
         description="Skycally's Image to Sketch tool transforms any photo into a hand-drawn sketch using advanced canvas processing. Choose from three styles: Pencil for soft lines, Charcoal for bold strokes, or Edges for sharp outlines. The conversion runs entirely in your browser — no uploads, no waiting, completely free."

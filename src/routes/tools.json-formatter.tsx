@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/json-formatter")({
   head: () => buildToolMeta(toolBySlug("json-formatter", tools)),
@@ -133,6 +134,7 @@ function JsonFormatter() {
         "Click Format to prettify with 2 or 4-space indent, or Minify to compact it.",
         "Copy the result with one click.",
       ]} />
+          <RelatedTools currentSlug="json-formatter" />
           <ToolSeoContent
         title="Free JSON Formatter — Beautify & Minify JSON Online"
         description="Skycally's JSON Formatter instantly beautifies or minifies any JSON string. Choose between 2 or 4 space indentation, and switch between formatted and raw views with one click. It clearly highlights syntax errors so you can fix them quickly. Everything runs in your browser — no data is sent anywhere."

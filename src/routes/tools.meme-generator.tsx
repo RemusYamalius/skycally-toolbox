@@ -7,6 +7,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/meme-generator")({
   head: () => buildToolMeta(toolBySlug("meme-generator", tools)),
@@ -175,6 +176,7 @@ function MemeGenerator() {
         "Type your top and bottom text and tweak font, size and outline.",
         "Click Download Meme to save your masterpiece as PNG.",
       ]} />
+          <RelatedTools currentSlug="meme-generator" />
           <ToolSeoContent
         title={"Free Meme Generator — Create Custom Memes Online"}
         description={"Create memes from popular templates or upload your own image. Add top and bottom text with classic Impact font. Customize colors, size and outline. Download instantly."}

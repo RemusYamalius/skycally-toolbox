@@ -11,6 +11,7 @@ import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
 import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/add-subtitles")({
   head: () => buildToolMeta(toolBySlug("add-subtitles", tools)),
@@ -214,6 +215,7 @@ function Page() {
       ]} />
 
       <PoweredByNote />
+          <RelatedTools currentSlug="add-subtitles" />
           <ToolSeoContent
         title={"Add Subtitles to Video Online — Free Subtitle Burner"}
         description={"Burn subtitles permanently into your video using Skycally's free online subtitle tool. Write subtitles manually or upload an SRT file — no software needed."}

@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/add-watermark")({
   head: () => buildToolMeta(toolBySlug("add-watermark", tools)),
@@ -240,6 +241,7 @@ function AddWatermark() {
         "Customize text, font size, opacity, color and position.",
         "Click Apply Watermark, then download the result.",
       ]} />
+          <RelatedTools currentSlug="add-watermark" />
           <ToolSeoContent
         title="Free Watermark Tool — Add Text Watermarks to Images"
         description="Skycally's Watermark Tool lets you add custom text watermarks to your images in seconds. Control the text, font size, opacity, color, and position with a simple interface. The watermark is applied directly in your browser using Canvas API, so your images never leave your device. Perfect for photographers, content creators, and businesses."

@@ -10,6 +10,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { checkSize } from "@/lib/file-utils";
 import { convertWordToPdf } from "@/services/wordToPdf";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/word-to-pdf")({
   head: () => buildToolMeta(toolBySlug("word-to-pdf", tools)),
@@ -65,6 +66,7 @@ function WordToPdf() {
         "Click Convert to PDF — we process it server-side.",
         "Your PDF is downloaded automatically.",
       ]} />
+          <RelatedTools currentSlug="word-to-pdf" />
           <ToolSeoContent
         title={"Word to PDF Converter Free — Convert DOCX to PDF Online"}
         description={"Convert Word documents to PDF format for free. Supports DOC and DOCX files. Preserves formatting, fonts and layout. Arabic and RTL text fully supported."}

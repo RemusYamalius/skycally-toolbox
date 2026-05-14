@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { Slider } from "@/components/ui/slider";
 import { speak, stop, downloadAudio } from "@/services/textToSpeech";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/text-to-speech")({
   head: () => buildToolMeta(toolBySlug("text-to-speech", tools)),
@@ -113,6 +114,7 @@ function Page() {
         "Pick a voice, speed, and pitch.",
         "Press Play to listen, or Download to save the audio.",
       ]} />
+          <RelatedTools currentSlug="text-to-speech" />
           <ToolSeoContent
         title={"Free Text to Speech — Convert Text to Audio Online"}
         description={"Convert any text to natural-sounding speech for free. 50+ voices in Arabic, English, French and Spanish. Adjust speed and pitch. Download as audio."}

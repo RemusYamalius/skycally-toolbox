@@ -10,6 +10,7 @@ import { DropZone } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/qr-reader")({
   head: () => buildToolMeta(toolBySlug("qr-reader", tools)),
@@ -177,6 +178,7 @@ function QrReaderPage() {
         "We decode it instantly in your browser.",
         "Copy the result or open the link if it's a URL.",
       ]} />
+          <RelatedTools currentSlug="qr-reader" />
           <ToolSeoContent
         title={"Free QR Code Reader — Scan QR Codes Online"}
         description={"Read and decode QR codes from images or your camera for free. Supports all QR code types. Works entirely in your browser — no app needed."}

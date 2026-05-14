@@ -6,6 +6,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/markdown-to-html")({
   head: () => buildToolMeta(toolBySlug("markdown-to-html", tools)),
@@ -166,6 +167,7 @@ function MarkdownToHtml() {
         "See the live preview or switch to the HTML tab.",
         "Copy the HTML or download it as an .html file.",
       ]} />
+          <RelatedTools currentSlug="markdown-to-html" />
           <ToolSeoContent
         title="Free Markdown to HTML Converter — Live Preview"
         description="Skycally's Markdown to HTML converter transforms Markdown text into clean, valid HTML instantly. A live preview shows how your content will look, and you can switch to the raw HTML view at any time. Download the result as a complete HTML file. Perfect for developers, bloggers, and technical writers."

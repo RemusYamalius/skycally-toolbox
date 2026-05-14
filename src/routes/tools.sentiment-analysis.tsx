@@ -11,6 +11,7 @@ import { AdZone } from "@/components/ad-zone";
 import { PoweredBy, BrowserOnlyBadge } from "@/components/ai-badges";
 import { Loader2, Sparkles } from "lucide-react";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/sentiment-analysis")({
   head: () => buildToolMeta(toolBySlug("sentiment-analysis", tools)),
@@ -200,6 +201,7 @@ function SentimentTool() {
         "Click Analyze and wait for the result.",
         "Read the sentiment label and confidence score.",
       ]} />
+          <RelatedTools currentSlug="sentiment-analysis" />
           <ToolSeoContent
         title={"AI Sentiment Analysis — Analyze Text Emotion Free Online"}
         description={"Detect positive, negative or neutral sentiment in any text using AI. Powered by Transformers.js. Shows confidence score. Works entirely in your browser."}

@@ -11,6 +11,7 @@ import { Textarea } from "@/components/ui/textarea";
 import { startRecognition, type RecognitionHandle } from "@/services/speechToText";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/speech-to-text")({
   head: () => buildToolMeta(toolBySlug("speech-to-text", tools)),
@@ -128,6 +129,7 @@ function Page() {
         "Click the microphone and start speaking.",
         "Copy or download your transcript when done.",
       ]} />
+          <RelatedTools currentSlug="speech-to-text" />
           <ToolSeoContent
         title={"Free Speech to Text — Voice to Text Converter Online"}
         description={"Convert speech to text in real-time for free. Supports Arabic, English, French and Spanish. Uses your microphone directly in the browser. No app needed."}

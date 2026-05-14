@@ -13,5 +13,6 @@ declare global {
     FACEMESH_TESSELATION: any;
     FACEMESH_CONTOURS: any;
     HAND_CONNECTIONS: any;
+    cv: any;
   }
 }

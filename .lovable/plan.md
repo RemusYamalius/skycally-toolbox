@@ -1,64 +1,33 @@
-# Plan: Mobile perf (unused JS) + SEO meta overhaul
+## Goal
 
-## Part A — Reduce unused JavaScript on homepage
-
-**Fix 1 — Icon imports**
-Audit shows `lucide-react` is already imported by name everywhere (e.g. `index.tsx` uses `import { Search, Upload, ... } from "lucide-react"`, `tools.ts` uses named imports). Tree-shaking is already correct — no changes needed here. I'll do a quick `rg` sweep to confirm no `import * as` patterns slipped in elsewhere.
-
-**Fix 2 — Defer the full tools grid (biggest win)**
-The homepage currently renders **all 47 tool cards** across 5 categories on first paint. Each `ToolCard` ships its lucide icon + framer-motion animation. That's the bulk of the unused JS for users above the fold.
-
-Approach: render the **first 6 tools per category by default**, with a "Show all N tools" button that reveals the rest. Per-category, client-side, no extra deps (avoids adding `@tanstack/react-virtual` ~7KB).
-
-- Add `useState<Record<ToolCategory, boolean>>` in `HomePage` for expanded categories.
-- Slice `list.slice(0, expanded[cat] ? list.length : 6)` when rendering grid.
-- Show "Show N more →" button when there are hidden items.
-- Keeps all SEO/SSR HTML for crawlers if we render all server-side… but to actually reduce client JS work and DOM nodes we render the truncated list on both server and client (consistent SSR). Crawlers still find the full inventory via the `/tools` page (already linked in nav + sitemap).
-
-**Fix 3 — Cache headers** (deferred)
-TanStack Start on Cloudflare Workers serves static assets through Vite's hashed filenames; long cache headers are a wrangler/`assets` config concern, but our `wrangler.jsonc` doesn't define an `assets` block — defaults from the framework apply. I will skip code changes for this fix and note it for the user (requires Cloudflare dashboard config or a custom asset handler, outside scope of a UI/code change).
-
-**Fix 4 — LCP**
-The hero `<h1>` is text and is already at the top of SSR HTML — no late-loading element. The decorative blurred div + `motion.div` opacity animation does not block paint. No change needed.
-
-## Part B — SEO meta tags across all pages
-
-**Goal:** Every page gets consistent title, description, robots, canonical, og:title, og:description, og:url, og:image — generated from a central helper.
-
-**1. Create `src/lib/seo.ts`** with:
-- `SITE_URL = "https://skycally.com"`
-- `OG_IMAGE = "https://skycally.com/og-image.png"`
-- `buildToolMeta(tool: Tool)` → returns the `head()` payload with:
-  - title: `Free {tool.name} Online — No Signup | Skycally` (truncated to 60)
-  - description: `{tool.description} Free, private, works in your browser.` (truncated to 160)
-  - robots, canonical, full og:* set
-- `buildPageMeta({ title, description, path })` → static-page variant with the same structure.
-
-**2. Update each tool route** (47 files) to replace the existing `head: () => ({ ... })` with `head: () => buildToolMeta(toolBySlug("video-downloader"))` (or pass the tool object directly). I'll do this with a script that:
-- Imports `buildToolMeta` and the matching tool from `@/lib/tools`.
-- Replaces the `head: () => ({ meta: [...], links: [...] })` block.
-- Preserves any route-specific JSON-LD `scripts` blocks if present.
-
-**3. Update static pages** (`index.tsx`, `tools.index.tsx`, `about.tsx`, `contact.tsx`) with the exact title/description strings the user specified. `privacy.tsx` and `terms.tsx` keep their existing meta but get robots + canonical + og:image added via `buildPageMeta`.
-
-**4. Root route** (`__root.tsx`) keeps fallback meta but adds `<meta name="robots" content="index, follow">` so child routes inherit it (and individual pages can still override).
+Add reliable automatic document edge detection to the Document Scanner tool. Currently the editor opens with a fixed 5%/95% rectangle and no auto-detection. Apply all 6 fixes from the brief.
 
 ## Files
 
-```text
-new   src/lib/seo.ts
-edit  src/routes/index.tsx               (homepage meta + truncated grid)
-edit  src/routes/tools.index.tsx         (meta)
-edit  src/routes/about.tsx               (meta)
-edit  src/routes/contact.tsx             (meta)
-edit  src/routes/privacy.tsx             (meta)
-edit  src/routes/terms.tsx               (meta)
-edit  src/routes/__root.tsx              (default robots meta)
-edit  src/routes/tools.*.tsx             (47 files via script)
-```
+**New**
+- `src/utils/opencvLoader.ts` — singleton loader for OpenCV.js from `https://docs.opencv.org/4.8.0/opencv.js`. Resolves once `window.cv.Mat` is ready. Reuses existing `<script id="opencv-script">` if already in DOM. 30s timeout.
+- `src/utils/edgeDetection.ts` — `detectDocumentCorners(img, w, h)` returning `{ topLeft, topRight, bottomRight, bottomLeft, detected }`. Uses resize → grayscale → blur → adaptive threshold + Canny → bitwise_or → dilate → findContours → approxPolyDP with multiple epsilons. Picks largest 4-point contour ≥10% image area. Always returns fallback (5%/95% box) on any failure. Includes `sortCorners` helper for TL/TR/BR/BL ordering.
 
-## Out of scope / notes
+**Modified**
+- `src/types/global.d.ts` — add `cv` to `Window` typing (loose `any` is fine).
+- `src/routes/tools.document-scanner.tsx`:
+  1. Replace fixed-fraction `crop: CropBox` model with a 4-point `corners: Point[]` model (image-pixel coordinates) so detected quadrilaterals — not just axis-aligned rectangles — can be represented and edited.
+  2. After capture (`captureFromCamera`) and after upload (`onUpload`, first image only), call new `processImage(imgEl)` which: sets `detectionStatus='loading'` → `await loadOpenCV()` → `detectDocumentCorners(...)` → sets corners + status (`detected`|`fallback`). Catches all errors and falls back to default corners.
+  3. Update `EditPanel` to render an **overlay canvas** (instead of CSS clip-path) that draws the dim mask, dashed cyan polygon outline, and 4 large draggable handles (outer 18px translucent ring, inner 10px solid, white 4px dot) per Fix 5. Implement `drawCornersOverlay`. Pointer events on the overlay convert client coords → image coords using the current display scale.
+  4. Replace 4 corner-resize logic with per-corner drag (each handle moves one Point freely; clamped to image bounds). The crop+filter pipeline in `processPage` becomes a perspective-warp using the 4 corners: compute output width/height as max side lengths, build `cv.getPerspectiveTransform` + `cv.warpPerspective` (uses OpenCV which is already loaded). Keep current `applyFilter` step on the warped canvas.
+  5. Add detection status badge below the editor (`loading` spinner / `detected` ✅ / `fallback` ⚠️) per Fix 4, themed with existing tokens.
+  6. Add a collapsible `ScanTips` block above camera/upload area per Fix 6.
 
-- Cloudflare cache-control headers: requires dashboard or wrangler `assets` config — flagged for the user.
-- `@tanstack/react-virtual` not added; per-category truncation is simpler and saves the dep weight.
-- No UI/visual changes beyond the new "Show more" button under each category section.
+## Technical notes
+
+- Loader script tag is added to `document.head` lazily (no SSR issue — only runs in `processImage` which fires after user interaction in the browser).
+- All OpenCV `Mat`s are deleted in a `finally`-style cleanup to avoid WASM heap leaks.
+- Fallback model still works without OpenCV (offline or CDN blocked) — user simply drags the default rectangle.
+- No changes to exports (PDF/JPG/OCR/Copy) — they consume the already-warped page in `pages[]`.
+- No changes to SEO content, route registration, or tool listing.
+
+## Out of scope
+
+- Live edge preview while the camera is streaming (only post-capture detection).
+- Auto-capture on stable detection.
+- Persisting OpenCV across navigations beyond the cached `<script>` tag.

@@ -212,4 +212,10 @@ html, body {
     backdrop-filter: none !important;
     -webkit-backdrop-filter: none !important;
   }
+  /* Safety net: ensure cards remain visible on mobile even if a motion library leaves them in a hidden state */
+  .contain-paint > *,
+  [class*="rounded-2xl"][class*="border"][class*="bg-card"] {
+    opacity: 1 !important;
+    visibility: visible !important;
+  }
 }

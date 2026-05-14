@@ -68,7 +68,7 @@ function HomePage() {
   return (
     <>
       {/* Hero */}
-      <section className="relative overflow-hidden bg-hero text-white">
+      <section className="relative overflow-hidden bg-hero text-white gpu-isolate mobile-no-backdrop">
         <div className="absolute inset-0 grid-overlay" />
         <div className="absolute -top-32 -left-20 w-96 h-96 rounded-full opacity-30 blur-3xl animate-float" style={{ background: "var(--violet-brand)" }} />
         <div className="absolute -bottom-32 -right-20 w-96 h-96 rounded-full opacity-30 blur-3xl animate-float" style={{ background: "var(--cyan-brand)", animationDelay: "2s" }} />
@@ -132,7 +132,7 @@ function HomePage() {
         <AdZone id="homepage-top-banner" size="728x90" />
 
         {/* Tools by category */}
-        <section className="py-16">
+        <section className="py-16 gpu-isolate overflow-hidden">
           <div className="flex items-end justify-between mb-10">
             <div>
               <h2 className="font-display text-3xl sm:text-4xl font-bold">Browse All Tools</h2>
@@ -168,7 +168,7 @@ function HomePage() {
                       {list.length} {list.length === 1 ? "tool" : "tools"}
                     </span>
                   </div>
-                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 contain-paint">
                     {(expanded[cat] ? list : list.slice(0, INITIAL_PER_CAT)).map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
                   </div>
                   {list.length > INITIAL_PER_CAT && !expanded[cat] && (

@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai";
 
@@ -77,4 +77,7 @@ export const tools: Tool[] = [
   { slug: "pdf-page-numbers", name: "Add Page Numbers to PDF", description: "Add page numbers to any PDF with custom position and style.", category: "pdf", icon: FilePen, path: "/tools/pdf-page-numbers" },
   { slug: "protect-pdf", name: "Protect PDF", description: "Add a password to your PDF to prevent unauthorized access.", category: "pdf", icon: Shield, path: "/tools/protect-pdf" },
   { slug: "pdf-reader", name: "PDF Reader", description: "View and read PDF files directly in your browser.", category: "pdf", icon: FileSearch, path: "/tools/pdf-reader" },
+  { slug: "spinning-wheel", name: "Spinning Wheel", description: "Spin a customizable wheel to make random decisions. Add your own options.", category: "text", icon: RotateCw, path: "/tools/spinning-wheel" },
+  { slug: "link-shortener", name: "Link Shortener", description: "Shorten any URL and generate a QR code for it instantly.", category: "text", icon: Link, path: "/tools/link-shortener" },
+  { slug: "free-time-fixer", name: "Free Time Fixer", description: "Tell us how many minutes you have free — we'll tell you exactly what to do.", category: "text", icon: Clock, path: "/tools/free-time-fixer" },
 ];

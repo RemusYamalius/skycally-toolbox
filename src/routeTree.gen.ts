@@ -26,6 +26,7 @@ import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-d
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
+import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
@@ -44,6 +45,7 @@ import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
+import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
@@ -55,6 +57,7 @@ import { Route as ToolsImageCropperRouteImport } from './routes/tools.image-crop
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
+import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time-fixer'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
@@ -156,6 +159,11 @@ const ToolsSplitPdfRoute = ToolsSplitPdfRouteImport.update({
   path: '/tools/split-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsSpinningWheelRoute = ToolsSpinningWheelRouteImport.update({
+  id: '/tools/spinning-wheel',
+  path: '/tools/spinning-wheel',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
   id: '/tools/speech-to-text',
   path: '/tools/speech-to-text',
@@ -246,6 +254,11 @@ const ToolsMarkdownToHtmlRoute = ToolsMarkdownToHtmlRouteImport.update({
   path: '/tools/markdown-to-html',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsLinkShortenerRoute = ToolsLinkShortenerRouteImport.update({
+  id: '/tools/link-shortener',
+  path: '/tools/link-shortener',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsJsonFormatterRoute = ToolsJsonFormatterRouteImport.update({
   id: '/tools/json-formatter',
   path: '/tools/json-formatter',
@@ -299,6 +312,11 @@ const ToolsImageCompressorRoute = ToolsImageCompressorRouteImport.update({
 const ToolsHandGestureRoute = ToolsHandGestureRouteImport.update({
   id: '/tools/hand-gesture',
   path: '/tools/hand-gesture',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsFreeTimeFixerRoute = ToolsFreeTimeFixerRouteImport.update({
+  id: '/tools/free-time-fixer',
+  path: '/tools/free-time-fixer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsFaceLandmarksRoute = ToolsFaceLandmarksRouteImport.update({
@@ -401,6 +419,7 @@ export interface FileRoutesByFullPath {
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -412,6 +431,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -430,6 +450,7 @@ export interface FileRoutesByFullPath {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -464,6 +485,7 @@ export interface FileRoutesByTo {
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -475,6 +497,7 @@ export interface FileRoutesByTo {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -493,6 +516,7 @@ export interface FileRoutesByTo {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -528,6 +552,7 @@ export interface FileRoutesById {
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -539,6 +564,7 @@ export interface FileRoutesById {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -557,6 +583,7 @@ export interface FileRoutesById {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -593,6 +620,7 @@ export interface FileRouteTypes {
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -604,6 +632,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
+    | '/tools/link-shortener'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/merge-pdf'
@@ -622,6 +651,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
+    | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
@@ -656,6 +686,7 @@ export interface FileRouteTypes {
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -667,6 +698,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
+    | '/tools/link-shortener'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/merge-pdf'
@@ -685,6 +717,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
+    | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
@@ -719,6 +752,7 @@ export interface FileRouteTypes {
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -730,6 +764,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
+    | '/tools/link-shortener'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/merge-pdf'
@@ -748,6 +783,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
+    | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
@@ -783,6 +819,7 @@ export interface RootRouteChildren {
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
+  ToolsFreeTimeFixerRoute: typeof ToolsFreeTimeFixerRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
@@ -794,6 +831,7 @@ export interface RootRouteChildren {
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
+  ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
   ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
@@ -812,6 +850,7 @@ export interface RootRouteChildren {
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
+  ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
@@ -946,6 +985,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsSplitPdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/spinning-wheel': {
+      id: '/tools/spinning-wheel'
+      path: '/tools/spinning-wheel'
+      fullPath: '/tools/spinning-wheel'
+      preLoaderRoute: typeof ToolsSpinningWheelRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/speech-to-text': {
       id: '/tools/speech-to-text'
       path: '/tools/speech-to-text'
@@ -1072,6 +1118,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMarkdownToHtmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/link-shortener': {
+      id: '/tools/link-shortener'
+      path: '/tools/link-shortener'
+      fullPath: '/tools/link-shortener'
+      preLoaderRoute: typeof ToolsLinkShortenerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/json-formatter': {
       id: '/tools/json-formatter'
       path: '/tools/json-formatter'
@@ -1147,6 +1200,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/hand-gesture'
       fullPath: '/tools/hand-gesture'
       preLoaderRoute: typeof ToolsHandGestureRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/free-time-fixer': {
+      id: '/tools/free-time-fixer'
+      path: '/tools/free-time-fixer'
+      fullPath: '/tools/free-time-fixer'
+      preLoaderRoute: typeof ToolsFreeTimeFixerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/face-landmarks': {
@@ -1279,6 +1339,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
+  ToolsFreeTimeFixerRoute: ToolsFreeTimeFixerRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
@@ -1290,6 +1351,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
+  ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
   ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
@@ -1308,6 +1370,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
+  ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,

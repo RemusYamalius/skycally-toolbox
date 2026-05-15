@@ -18,6 +18,14 @@ export const Route = createFileRoute("/tools/protect-pdf")({
   component: ProtectPdfPage,
 });
 
+function randomOwnerPassword() {
+  return Array.from({ length: 16 }, () =>
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"[
+      Math.floor(Math.random() * 72)
+    ]
+  ).join("");
+}
+
 function ProtectPdfPage() {
   const [file, setFile] = useState<File | null>(null);
   const [pw, setPw] = useState("");
@@ -46,7 +54,10 @@ function ProtectPdfPage() {
       pdfDoc.setProducer("Skycally — marked restricted");
       pdfDoc.setSubject("Restricted");
       pdfDoc.setKeywords(["protected", "restricted", "skycally"]);
-      const bytes = await pdfDoc.save();
+      const bytes = await pdfDoc.save({
+        userPassword: pw,
+        ownerPassword: randomOwnerPassword(),
+      } as any);
       const ab = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
       const blob = new Blob([ab], { type: "application/pdf" });
       const name = file.name.replace(/\.pdf$/i, "") + "-protected.pdf";

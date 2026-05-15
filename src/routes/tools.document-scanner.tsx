@@ -628,8 +628,8 @@ function EditPanel({
         nearest = i;
       }
     });
-    // 30px tolerance in image space, scaled to display
-    const tol = (30 / overlayRef.current.width) * imageSize.w;
+    // 50px tolerance in image space, scaled to display
+    const tol = (50 / overlayRef.current.width) * imageSize.w;
     if (nearestDist <= tol) {
       setDragIdx(nearest);
       (e.target as HTMLElement).setPointerCapture(e.pointerId);

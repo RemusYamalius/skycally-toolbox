@@ -94,21 +94,22 @@ export const detectDocumentCorners = async (
       const perimeter = cv.arcLength(contour, true);
       const approx = new cv.Mat();
 
-      for (const epsilon of [0.02, 0.03, 0.04, 0.05]) {
+      for (const epsilon of [0.01, 0.02, 0.03, 0.04, 0.05, 0.06]) {
         cv.approxPolyDP(contour, approx, epsilon * perimeter, true);
 
         if (approx.rows === 4 && area > maxArea) {
           const pts: Point[] = [];
           for (let j = 0; j < 4; j++) {
             pts.push({
-              x: approx.data32F[j * 2] / scale,
-              y: approx.data32F[j * 2 + 1] / scale,
+              x: approx.data32S[j * 2] / scale,
+              y: approx.data32S[j * 2 + 1] / scale,
             });
           }
           const sorted = sortCorners(pts);
           if (sorted) {
             maxArea = area;
             bestCorners = { ...sorted, detected: true };
+            if (area > imageArea * 0.5) earlyBreak = true;
           }
           break;
         }
@@ -123,7 +124,7 @@ export const detectDocumentCorners = async (
     console.warn("Edge detection failed:", error);
     return fallback;
   } finally {
-    [src, small, gray, blurred, thresh, edges, combined, kernel, dilated, contours, hierarchy].forEach(
+    [src, small, gray, blurred, edges, kernel, dilated, contours, hierarchy].forEach(
       (m) => {
         try {
           m?.delete?.();

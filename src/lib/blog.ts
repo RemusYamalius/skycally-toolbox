@@ -1,0 +1,29 @@
+export interface BlogPost {
+  slug: string;
+  path: string;
+  title: string;
+  description: string;
+  category: string;
+  date: string;
+  dateLabel: string;
+  author: string;
+  ctaToolSlug: string;
+}
+
+export const blogPosts: BlogPost[] = [
+  {
+    slug: "compress-pdf-online-free",
+    path: "/blog/compress-pdf-online-free",
+    title: "How to Compress a PDF Online for Free (No Signup Required)",
+    description:
+      "Shrink large PDF files in seconds — right in your browser. No installs, no accounts, no watermarks.",
+    category: "PDF & Documents",
+    date: "2026-05-16",
+    dateLabel: "May 16, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "compress-pdf",
+  },
+];
+
+export const getBlogPostBySlug = (slug: string) =>
+  blogPosts.find((p) => p.slug === slug);

@@ -13,6 +13,7 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ContactRouteImport } from './routes/contact'
+import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
@@ -63,6 +64,7 @@ import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-co
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text-to-image'
 import { Route as ToolsAddSubtitlesRouteImport } from './routes/tools.add-subtitles'
+import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
 
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
@@ -82,6 +84,11 @@ const PrivacyRoute = PrivacyRouteImport.update({
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogRoute = BlogRouteImport.update({
+  id: '/blog',
+  path: '/blog',
   getParentRoute: () => rootRouteImport,
 } as any)
 const AboutRoute = AboutRouteImport.update({
@@ -335,14 +342,22 @@ const ToolsAddSubtitlesRoute = ToolsAddSubtitlesRouteImport.update({
   path: '/tools/add-subtitles',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogCompressPdfOnlineFreeRoute =
+  BlogCompressPdfOnlineFreeRouteImport.update({
+    id: '/compress-pdf-online-free',
+    path: '/compress-pdf-online-free',
+    getParentRoute: () => BlogRoute,
+  } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
@@ -395,10 +410,12 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
@@ -452,10 +469,12 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
+  '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
@@ -510,10 +529,12 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/blog'
     | '/contact'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/blog/compress-pdf-online-free'
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
@@ -566,10 +587,12 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/blog'
     | '/contact'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/blog/compress-pdf-online-free'
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
@@ -622,10 +645,12 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/blog'
     | '/contact'
     | '/privacy'
     | '/sitemap.xml'
     | '/terms'
+    | '/blog/compress-pdf-online-free'
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
@@ -679,6 +704,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  BlogRoute: typeof BlogRouteWithChildren
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
@@ -761,6 +787,13 @@ declare module '@tanstack/react-router' {
       path: '/contact'
       fullPath: '/contact'
       preLoaderRoute: typeof ContactRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog': {
+      id: '/blog'
+      path: '/blog'
+      fullPath: '/blog'
+      preLoaderRoute: typeof BlogRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/about': {
@@ -1113,12 +1146,30 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAddSubtitlesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/compress-pdf-online-free': {
+      id: '/blog/compress-pdf-online-free'
+      path: '/compress-pdf-online-free'
+      fullPath: '/blog/compress-pdf-online-free'
+      preLoaderRoute: typeof BlogCompressPdfOnlineFreeRouteImport
+      parentRoute: typeof BlogRoute
+    }
   }
 }
+
+interface BlogRouteChildren {
+  BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
+}
+
+const BlogRouteChildren: BlogRouteChildren = {
+  BlogCompressPdfOnlineFreeRoute: BlogCompressPdfOnlineFreeRoute,
+}
+
+const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
 
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  BlogRoute: BlogRouteWithChildren,
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
@@ -1175,12 +1226,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

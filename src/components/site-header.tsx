@@ -10,6 +10,7 @@ export function SiteHeader() {
   const links = [
     { to: "/", label: "Home" },
     { to: "/tools", label: "Tools" },
+    { to: "/blog", label: "Blog" },
     { to: "/about", label: "About" },
     { to: "/contact", label: "Contact" },
   ] as const;

@@ -1,35 +1,71 @@
-## Goal
-Add a "You might also like" section showing exactly 3 related tool cards on every tool page, placed just above the FAQ block (which lives inside `ToolSeoContent`).
+# Blog Section Plan
 
-## Approach
+## Files to create
 
-### 1. New file: `src/lib/related-tools.ts`
-- Export `relatedToolsMap: Record<string, string[]>` keyed by tool slug, with the 3 related slugs from the user's mapping.
-- Normalize a few mapping names that don't have exact matches in `src/lib/tools.ts`:
-  - "Extract Text from PDF" → `pdf-text-extractor`
-  - "Image to Text (OCR)" → `image-to-text`
-  - "Images to PDF" (mentioned for Image to PDF) → fallback to `image-compressor` (closest existing) since there is no separate "Images to PDF" tool
-  - "PDF to Word" (mentioned for OCR / Word to PDF / Document Scanner) → fallback to `pdf-text-extractor` since no PDF-to-Word tool exists
-- Export `getRelatedTools(slug: string): Tool[]` that resolves slugs against `tools` and returns up to 3 valid `Tool` objects. If fewer than 3 resolve, top up with same-category tools (excluding self) so the section always shows exactly 3.
+### 1. `src/lib/blog.ts`
+Blog post registry and types.
+```ts
+export interface BlogPost {
+  slug: string;
+  title: string;
+  description: string;   // 2-line teaser for cards
+  category: string;      // e.g. "PDF & Documents"
+  date: string;          // ISO "2026-05-16"
+  dateLabel: string;     // "May 16, 2026"
+  author: string;        // "Skycally Team"
+  ctaToolSlug: string;   // related tool slug, e.g. "compress-pdf"
+  relatedToolSlugs: [string, string, string];
+}
+export const blogPosts: BlogPost[] = [ /* compress-pdf-online-free entry */ ];
+export const getPostBySlug = (slug: string) => blogPosts.find(p => p.slug === slug);
+```
 
-### 2. New component: `src/components/related-tools.tsx`
-- Props: `currentSlug: string`.
-- Renders a section with heading "You might also like" matching existing tool-page typography (`font-display text-2xl sm:text-3xl font-bold tracking-tight`, with a short muted subtitle).
-- Grid: `grid gap-5 sm:grid-cols-2 lg:grid-cols-3`.
-- Reuses the existing `<ToolCard>` component for visual consistency with the All Tools page (icon + name + description + "Try it →"), passing `index` for stagger.
-- Wrapper section uses `mt-16` for spacing and is hidden if no related tools resolve.
+### 2. `src/components/blog-card.tsx`
+Article card for the listing grid: thumbnail placeholder (gradient block with category color, no image asset needed), category badge, H3 title, 2-line description (`line-clamp-2`), date, "Read more →" link. Style mirrors `tool-card.tsx` (rounded-2xl, border, bg-card, hover lift on md+, mobile-safe motion props following the existing `useIsMobile` pattern).
 
-### 3. Insert into every tool page
-- For each `src/routes/tools.*.tsx` (47 pages), add `<RelatedTools currentSlug="<slug>" />` immediately BEFORE the existing `<ToolSeoContent ... />` block.
-- This places it under `HowToUse`, above the body+FAQ block — i.e. just above the FAQs as requested.
-- Add the import `import { RelatedTools } from "@/components/related-tools";` once per file.
-- No changes to `ToolSeoContent`, `ToolCard`, `ToolPageShell`, or any tool-specific UI/logic.
+### 3. `src/routes/blog.tsx` (listing)
+- `createFileRoute("/blog")` with `head()` providing title/description/canonical via `buildPageMeta` from `src/lib/seo.ts`.
+- Layout: max-w-7xl container, header ("Skycally Blog" + subtitle), 2-col grid on `md:` / 1-col on mobile, mapped from `blogPosts`.
+- Wrapped in same site shell (already provided by `__root.tsx`); no need to hardcode `bg-[#0a0f1e]` — the existing dark theme tokens already apply. (Note: I'll use semantic tokens instead of literal hex, per design rules. The site already renders the requested dark look.)
 
-### 4. Out of scope
-- No design tokens changed.
-- No changes to the All Tools page, home, or any tool's actual functionality.
-- No changes to `src/lib/tools.ts` (the existing tool registry is the source of truth).
+### 4. `src/routes/blog.$slug.tsx` (post template)
+- `createFileRoute("/blog/$slug")` with dynamic `head()` from the post (title, description, og:title, og:description, og:type=article, canonical).
+- 404 via `notFoundComponent` if slug not in registry.
+- Layout: `max-w-[800px] mx-auto px-4 sm:px-6 py-12`.
+- Article header: category badge (using existing `Badge`), H1 (`font-display`), date + "By Skycally Team" line.
+- `<article className="prose prose-invert ...">` body region — for the first post this contains `{/* ARTICLE CONTENT GOES HERE */}` and a placeholder paragraph.
+- CTA box at end: rounded-2xl bordered card with "Try it free →" linking to `/tools/{ctaToolSlug}` via `<Link>`.
+- Reuses existing `<RelatedTools currentSlug={ctaToolSlug} />` component to render the 3 related tool cards under "You might also like".
 
-## Files touched
-- New: `src/lib/related-tools.ts`, `src/components/related-tools.tsx`
-- Edited: all 47 `src/routes/tools.*.tsx` files (insert one import + one JSX line each)
+### 5. `src/routes/blog.compress-pdf-online-free.tsx`
+Wait — TanStack flat routing makes `blog.$slug.tsx` already serve `/blog/compress-pdf-online-free`. The user asked for a dedicated article page; I'll register the article in `blog.ts` so the dynamic route renders it. No separate file needed (cleaner, scales for future posts). The placeholder comment `{/* ARTICLE CONTENT GOES HERE */}` lives inside the dynamic template's article body, conditionally rendered for this slug — or simpler: store a `Body` React component reference per post in `blog.ts`. For the first article the Body component contains only the placeholder comment + a stub `<p>` so the user can paste content in.
+
+If the user prefers a separate per-article file, I'll instead create `src/routes/blog.compress-pdf-online-free.tsx` that imports a shared `<BlogPostLayout post={...}>` component and puts the placeholder comment directly in JSX. **I'll go with this approach** — matches the user's explicit request ("Create the first article page at /blog/compress-pdf-online-free") and makes it obvious where to paste content.
+
+So:
+- `src/components/blog-post-layout.tsx` — shared layout (header + children slot + CTA + RelatedTools).
+- `src/routes/blog.$slug.tsx` — fallback dynamic route that 404s for unknown slugs (covers future posts via registry, but for now only the first one has a dedicated file).
+- `src/routes/blog.compress-pdf-online-free.tsx` — concrete article file with the placeholder comment in body.
+
+Actually, to keep it simple and match the request exactly: **skip the dynamic route file**. Create only the concrete article file now. Future articles get their own files too. The listing page links to `/blog/compress-pdf-online-free` directly via the registry's `path` field.
+
+## Final file list
+- `src/lib/blog.ts` — post registry (slug, title, description, category, date, dateLabel, author, ctaToolSlug, path).
+- `src/components/blog-card.tsx` — listing card.
+- `src/components/blog-post-layout.tsx` — shared article shell (header, prose container for children, CTA box, RelatedTools).
+- `src/routes/blog.tsx` — `/blog` listing.
+- `src/routes/blog.compress-pdf-online-free.tsx` — first article, body = `{/* ARTICLE CONTENT GOES HERE */}`.
+
+## Files to edit
+- `src/components/site-header.tsx` — add `{ to: "/blog", label: "Blog" }` between Tools and About in the `links` array (covers desktop nav and mobile menu).
+- `src/components/site-footer.tsx` — add `<li><Link to="/blog">Blog</Link></li>` in Quick Links between Tools and About.
+- `src/routes/sitemap[.]xml.tsx` — append `["/blog", "0.7", "weekly"]` and `["/blog/compress-pdf-online-free", "0.6", "monthly"]` to `ROUTES`.
+
+## Out of scope
+- No tool page changes, no changes to existing tools, no business logic.
+- Using semantic design tokens (`bg-card`, `border-border`, `text-muted-foreground`, accent via category color) instead of literal `#0a0f1e`/`#0d1526` hex — the existing dark theme already produces the requested look and design rules forbid raw hex in components. Visual result matches user intent.
+
+## Notes
+- `routeTree.gen.ts` regenerates automatically — won't be hand-edited.
+- Dates use string literals; no `Date.parse` needed at render.
+- Article CTA and RelatedTools both reference `compress-pdf` slug for the first post.

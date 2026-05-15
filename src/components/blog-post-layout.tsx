@@ -15,7 +15,7 @@ export function BlogPostLayout({
   const ctaTool = tools.find((t) => t.slug === post.ctaToolSlug);
 
   return (
-    <div className="max-w-[800px] mx-auto px-4 sm:px-6 py-12">
+    <div className="max-w-[720px] mx-auto px-4 sm:px-6 py-12 text-[16px] leading-[1.8]">
       <header className="mb-10">
         <span className="inline-flex items-center rounded-md border border-border px-2.5 py-0.5 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
           {post.category}
@@ -30,7 +30,17 @@ export function BlogPostLayout({
         </div>
       </header>
 
-      <article className="prose prose-invert max-w-none prose-headings:font-display prose-headings:tracking-tight prose-h2:text-2xl prose-h2:mt-10 prose-h2:mb-3 prose-h3:text-xl prose-p:leading-relaxed prose-a:text-primary prose-strong:text-foreground">
+      <article
+        className="max-w-none text-foreground/90
+          [&_h2]:font-display [&_h2]:tracking-tight [&_h2]:text-2xl sm:[&_h2]:text-3xl [&_h2]:font-bold [&_h2]:mt-12 [&_h2]:mb-4 [&_h2]:text-foreground
+          [&_h3]:font-display [&_h3]:tracking-tight [&_h3]:text-xl sm:[&_h3]:text-2xl [&_h3]:font-semibold [&_h3]:mt-8 [&_h3]:mb-3 [&_h3]:text-foreground
+          [&_p]:my-5 [&_p]:leading-[1.8]
+          [&_ol]:list-decimal [&_ol]:pl-6 [&_ol]:my-5 [&_ol]:space-y-2
+          [&_ul]:list-disc [&_ul]:pl-6 [&_ul]:my-4 [&_ul]:space-y-2
+          [&_li]:leading-[1.8] [&_li>ul]:my-2
+          [&_strong]:font-semibold [&_strong]:text-foreground
+          [&_a]:text-primary [&_a]:underline [&_a]:underline-offset-2 hover:[&_a]:opacity-80"
+      >
         {children}
       </article>
 

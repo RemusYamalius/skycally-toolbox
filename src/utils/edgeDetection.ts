@@ -42,8 +42,8 @@ export const detectDocumentCorners = async (
   const cv = (typeof window !== "undefined" ? window.cv : null) as any;
   if (!cv || !cv.Mat) return fallback;
 
-  let src: any, small: any, gray: any, blurred: any, thresh: any, edges: any;
-  let combined: any, kernel: any, dilated: any, contours: any, hierarchy: any;
+  let src: any, small: any, gray: any, blurred: any, edges: any;
+  let kernel: any, dilated: any, contours: any, hierarchy: any;
 
   try {
     src = cv.imread(imageElement);
@@ -63,62 +63,53 @@ export const detectDocumentCorners = async (
     blurred = new cv.Mat();
     cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
 
-    thresh = new cv.Mat();
-    cv.adaptiveThreshold(
-      blurred,
-      thresh,
-      255,
-      cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-      cv.THRESH_BINARY_INV,
-      11,
-      2,
-    );
-
     edges = new cv.Mat();
     cv.Canny(blurred, edges, 30, 100);
 
-    combined = new cv.Mat();
-    cv.bitwise_or(thresh, edges, combined);
-
     kernel = cv.Mat.ones(5, 5, cv.CV_8U);
     dilated = new cv.Mat();
-    cv.dilate(combined, dilated, kernel, new cv.Point(-1, -1), 2);
+    cv.dilate(edges, dilated, kernel, new cv.Point(-1, -1), 2);
 
     contours = new cv.MatVector();
     hierarchy = new cv.Mat();
-    cv.findContours(dilated, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+    cv.findContours(dilated, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
     let bestCorners: DocumentCorners | null = null;
     let maxArea = 0;
     const imageArea = small.cols * small.rows;
 
+    const indexed: { contour: any; area: number }[] = [];
     for (let i = 0; i < contours.size(); i++) {
-      const contour = contours.get(i);
-      const area = cv.contourArea(contour);
+      const c = contours.get(i);
+      indexed.push({ contour: c, area: cv.contourArea(c) });
+    }
+    indexed.sort((a, b) => b.area - a.area);
+    const top = indexed.slice(0, 10);
 
-      if (area < imageArea * 0.1) {
-        contour.delete();
-        continue;
-      }
+    let earlyBreak = false;
+    for (const { contour, area } of top) {
+      if (earlyBreak) break;
+      if (area < imageArea * 0.1) continue;
 
       const perimeter = cv.arcLength(contour, true);
       const approx = new cv.Mat();
 
-      for (const epsilon of [0.02, 0.03, 0.04, 0.05]) {
+      for (const epsilon of [0.01, 0.02, 0.03, 0.04, 0.05, 0.06]) {
         cv.approxPolyDP(contour, approx, epsilon * perimeter, true);
 
         if (approx.rows === 4 && area > maxArea) {
           const pts: Point[] = [];
           for (let j = 0; j < 4; j++) {
             pts.push({
-              x: approx.data32F[j * 2] / scale,
-              y: approx.data32F[j * 2 + 1] / scale,
+              x: approx.data32S[j * 2] / scale,
+              y: approx.data32S[j * 2 + 1] / scale,
             });
           }
           const sorted = sortCorners(pts);
           if (sorted) {
             maxArea = area;
             bestCorners = { ...sorted, detected: true };
+            if (area > imageArea * 0.5) earlyBreak = true;
           }
           break;
         }
@@ -133,7 +124,7 @@ export const detectDocumentCorners = async (
     console.warn("Edge detection failed:", error);
     return fallback;
   } finally {
-    [src, small, gray, blurred, thresh, edges, combined, kernel, dilated, contours, hierarchy].forEach(
+    [src, small, gray, blurred, edges, kernel, dilated, contours, hierarchy].forEach(
       (m) => {
         try {
           m?.delete?.();

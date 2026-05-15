@@ -17,15 +17,14 @@ export const Route = createFileRoute("/tools/pdf-reader")({
 });
 
 function PdfReaderPage() {
-  const [data, setData] = useState<ArrayBuffer | null>(null);
+  const [, setData] = useState<ArrayBuffer | null>(null);
   const [pdf, setPdf] = useState<any>(null);
   const [numPages, setNumPages] = useState(0);
   const [current, setCurrent] = useState(1);
   const [scale, setScale] = useState(1);
   const [url, setUrl] = useState("");
   const [loading, setLoading] = useState(false);
-  const canvasRefs = useRef<(HTMLCanvasElement | null)[]>([]);
-  const containerRef = useRef<HTMLDivElement>(null);
+  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   const loadFromBuffer = async (buf: ArrayBuffer) => {
     setLoading(true);
@@ -68,31 +67,25 @@ function PdfReaderPage() {
     }
   };
 
-  // Render all pages whenever pdf or scale changes
   useEffect(() => {
-    if (!pdf) return;
+    if (!pdf || !canvasRef.current) return;
     let cancelled = false;
     (async () => {
-      for (let i = 1; i <= pdf.numPages; i++) {
-        if (cancelled) return;
-        const page = await pdf.getPage(i);
-        const viewport = page.getViewport({ scale });
-        const canvas = canvasRefs.current[i - 1];
-        if (!canvas) continue;
-        canvas.width = viewport.width;
-        canvas.height = viewport.height;
-        const ctx = canvas.getContext("2d")!;
-        await page.render({ canvasContext: ctx, viewport, canvas }).promise;
-      }
+      const page = await pdf.getPage(current);
+      const viewport = page.getViewport({ scale });
+      const canvas = canvasRef.current;
+      if (!canvas || cancelled) return;
+      canvas.width = viewport.width;
+      canvas.height = viewport.height;
+      const ctx = canvas.getContext("2d")!;
+      if (cancelled) return;
+      await page.render({ canvasContext: ctx, viewport }).promise;
     })();
     return () => { cancelled = true; };
-  }, [pdf, scale]);
+  }, [pdf, current, scale]);
 
   const goTo = (n: number) => {
-    const clamped = Math.max(1, Math.min(numPages, n));
-    setCurrent(clamped);
-    const el = canvasRefs.current[clamped - 1];
-    el?.scrollIntoView({ behavior: "smooth", block: "start" });
+    setCurrent(Math.max(1, Math.min(numPages, n)));
   };
 
   const reset = () => {
@@ -148,15 +141,8 @@ function PdfReaderPage() {
               </div>
             </div>
 
-            <div ref={containerRef} className="rounded-2xl border border-border bg-secondary/30 p-4 max-h-[80vh] overflow-auto space-y-4">
-              {Array.from({ length: numPages }, (_, i) => (
-                <div key={i} className="flex justify-center">
-                  <canvas
-                    ref={(el) => { canvasRefs.current[i] = el; }}
-                    className="bg-white shadow-lg rounded-md max-w-full h-auto"
-                  />
-                </div>
-              ))}
+            <div className="rounded-2xl border border-border bg-secondary/30 p-4 max-h-[80vh] overflow-auto flex justify-center">
+              <canvas ref={canvasRef} className="bg-white shadow-lg rounded-md max-w-full h-auto" />
             </div>
           </>
         )}

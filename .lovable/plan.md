@@ -1,48 +1,33 @@
-## Goal
-Add the 5 PDF tools described in the uploaded brief to Skycally, matching the exact patterns of existing tools (`tools.rotate-pdf.tsx`, `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`).
+## Fix 4 broken PDF tools
 
-## Changes
+Apply targeted fixes to four route files. Do not touch `tools.pdf-page-numbers.tsx` or `tools.rotate-pdf.tsx`.
 
-### 1. `src/lib/tools.ts`
-- Add `FileSearch`, `FilePen`, `FileX`, `Shield`, `FileOutput` to the `lucide-react` import.
-- Append the 5 new tool entries to the `tools` array (after `document-scanner`).
+### 1. `src/routes/tools.protect-pdf.tsx`
+- Replace `@cantoo/pdf-lib` import with `pdf-lib` (standard, installed).
+- Drop the `userPassword` / `ownerPassword` / `permissions` options — pdf-lib@1.17.1 doesn't support encryption.
+- Load the PDF, set metadata via `setProducer("Skycally — protected")` / `setSubject("Restricted")` / `setKeywords(["protected"])` to mark it as restricted, then save and download.
+- After download, show a toast: "Note: true password encryption requires a desktop PDF tool. We've prepared your file."
+- Update visible UI copy, `HowToUse` steps, and `ToolSeoContent` (description, body, FAQs) to honestly explain the browser limitation and recommend a desktop tool for real encryption. Keep password inputs only as informational fields (or remove them — prefer keeping them but disabled-styled with a clear note).
 
-### 2. New route files (one per tool)
+### 2. `src/routes/tools.delete-pdf-pages.tsx`
+- In every `page.render(...)` call, remove the `canvas` property. Final shape:
+  `await page.render({ canvasContext: ctx, viewport }).promise;`
+- No other changes.
 
-All follow the rotate-pdf shell: `ToolPageShell` → tool UI → `HowToUse` → `RelatedTools` → `ToolSeoContent`. Tailwind classes only, no `<form>`, all processing in-browser.
+### 3. `src/routes/tools.pdf-reader.tsx`
+- Remove the `canvasRefs` array and the multi-canvas scroll layout.
+- Use a single `canvasRef = useRef<HTMLCanvasElement>(null)`.
+- Replace the rendering `useEffect` so it depends on `[pdf, current, scale]` and renders only the `current` page onto the single canvas, with a `cancelled` cleanup flag. Render call: `await page.render({ canvasContext: ctx, viewport }).promise;` (no `canvas` prop).
+- Replace the scrolling page list in JSX with one centered `<canvas ref={canvasRef} className="bg-white shadow-lg rounded-md max-w-full h-auto" />`.
+- `goTo` simplifies to just `setCurrent(clamped)` (no scrollIntoView).
+- Keep DropZone, URL loader, Previous/Next, Zoom controls, Close button, sticky toolbar, `HowToUse`, `RelatedTools`, `ToolSeoContent` exactly as-is.
 
-**a. `src/routes/tools.pdf-to-word.tsx`**
-- DropZone (`accept="application/pdf"`).
-- Extract text per page with `pdfjs-dist` (`page.getTextContent()` joining items with spaces, page break between pages).
-- Build `.docx` with `docx` package: one `Paragraph` per text line.
-- `downloadBlob` the resulting `.docx`.
+### 4. `src/routes/tools.pdf-to-word.tsx`
+- Remove `PageBreak` from the `docx` import. Final import: `import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";`
+- Replace any `new Paragraph({ children: [new PageBreak()] })` usage. Page breaks are expressed by adding `pageBreakBefore: true` to the next page's heading paragraph:
+  - For `i > 1`: `new Paragraph({ heading: HeadingLevel.HEADING_2, pageBreakBefore: true, children: [new TextRun(`Page ${i}`)] })`
+  - For `i === 1`: `new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun(`Page ${i}`)] })`
 
-**b. `src/routes/tools.delete-pdf-pages.tsx`**
-- DropZone + page thumbnails rendered exactly like rotate-pdf (`pdfjs-dist`, scale 0.5, blob URLs).
-- Each thumbnail card has a checkbox; clicking the card toggles selection.
-- "Delete Selected" → `pdf-lib`: copy non-selected pages into a new `PDFDocument`, save, download.
-
-**c. `src/routes/tools.pdf-page-numbers.tsx`**
-- DropZone + controls: position (Bottom Center / Bottom Right / Bottom Left / Top Center), font size (small=10/medium=14/large=20), starting number (default 1).
-- `pdf-lib`: embed `StandardFonts.Helvetica`, iterate pages, compute x/y for chosen position with margin 24, `page.drawText(String(start + i), { x, y, size, font })`.
-- Download result.
-
-**d. `src/routes/tools.protect-pdf.tsx`**
-- DropZone + two password inputs (Set / Confirm) with eye toggle, validation (non-empty + matching + min 4 chars).
-- Encryption: `pdf-lib` does **not** support encryption out of the box. Plan: add `@cantoo/pdf-lib` (drop-in fork that supports `save({ userPassword, ownerPassword, permissions })`). Use it only in this file; rest of app keeps `pdf-lib`. Strong default owner password generated via `crypto.getRandomValues`.
-- Download protected PDF.
-
-**e. `src/routes/tools.pdf-reader.tsx`**
-- DropZone (PDF) **or** URL text input + Load button (fetch as `arrayBuffer`).
-- Render all pages on stacked `<canvas>` elements with `pdfjs-dist`, current scale state.
-- Toolbar: Previous / Next buttons, "Page X of Y" indicator (scrolls to that page's canvas via ref), Zoom -/+ buttons (range 0.5–2.5 step 0.25). Re-render pages on scale change.
-- No download.
-
-Each route uses `buildToolMeta(toolBySlug("<slug>", tools))`, the prescribed `HowToUse` steps tuple, and a `ToolSeoContent` block with the title from the brief, a 2-paragraph `body`, and 4 FAQs.
-
-### 3. Dependency
-- `bun add @cantoo/pdf-lib docx` (only `protect-pdf.tsx` imports `@cantoo/pdf-lib`; `docx` only used by `pdf-to-word.tsx`).
-
-## Out of scope
-- No changes to `tools.rotate-pdf.tsx`, shells, or unrelated files.
-- No backend changes — `routeTree.gen.ts` is auto-regenerated.
+### Out of scope
+- No dependency changes (all packages already installed).
+- No changes to `tools.pdf-page-numbers.tsx`, `tools.rotate-pdf.tsx`, shared components, or `routeTree.gen.ts`.

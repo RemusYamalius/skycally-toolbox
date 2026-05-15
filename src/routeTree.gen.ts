@@ -24,10 +24,12 @@ import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif
 import { Route as ToolsVideoMergerRouteImport } from './routes/tools.video-merger'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
+import { Route as ToolsTipCalculatorRouteImport } from './routes/tools.tip-calculator'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
+import { Route as ToolsSleepCalculatorRouteImport } from './routes/tools.sleep-calculator'
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
 import { Route as ToolsRotatePdfRouteImport } from './routes/tools.rotate-pdf'
@@ -66,9 +68,11 @@ import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pd
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
 import { Route as ToolsBusinessCardGeneratorRouteImport } from './routes/tools.business-card-generator'
+import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calculator'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
+import { Route as ToolsAgeCalculatorRouteImport } from './routes/tools.age-calculator'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text-to-image'
 import { Route as ToolsAddSubtitlesRouteImport } from './routes/tools.add-subtitles'
@@ -149,6 +153,11 @@ const ToolsVideoCompressorRoute = ToolsVideoCompressorRouteImport.update({
   path: '/tools/video-compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsTipCalculatorRoute = ToolsTipCalculatorRouteImport.update({
+  id: '/tools/tip-calculator',
+  path: '/tools/tip-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
   id: '/tools/text-to-speech',
   path: '/tools/text-to-speech',
@@ -167,6 +176,11 @@ const ToolsSpinningWheelRoute = ToolsSpinningWheelRouteImport.update({
 const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
   id: '/tools/speech-to-text',
   path: '/tools/speech-to-text',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSleepCalculatorRoute = ToolsSleepCalculatorRouteImport.update({
+  id: '/tools/sleep-calculator',
+  path: '/tools/sleep-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSentimentAnalysisRoute = ToolsSentimentAnalysisRouteImport.update({
@@ -360,6 +374,11 @@ const ToolsBusinessCardGeneratorRoute =
     path: '/tools/business-card-generator',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ToolsBmiCalculatorRoute = ToolsBmiCalculatorRouteImport.update({
+  id: '/tools/bmi-calculator',
+  path: '/tools/bmi-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsBase64Route = ToolsBase64RouteImport.update({
   id: '/tools/base64',
   path: '/tools/base64',
@@ -373,6 +392,11 @@ const ToolsBackgroundBlurRoute = ToolsBackgroundBlurRouteImport.update({
 const ToolsAudioConverterRoute = ToolsAudioConverterRouteImport.update({
   id: '/tools/audio-converter',
   path: '/tools/audio-converter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsAgeCalculatorRoute = ToolsAgeCalculatorRouteImport.update({
+  id: '/tools/age-calculator',
+  path: '/tools/age-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsAddWatermarkRoute = ToolsAddWatermarkRouteImport.update({
@@ -408,9 +432,11 @@ export interface FileRoutesByFullPath {
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
+  '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
@@ -449,10 +475,12 @@ export interface FileRoutesByFullPath {
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
+  '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-merger': typeof ToolsVideoMergerRoute
@@ -474,9 +502,11 @@ export interface FileRoutesByTo {
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
+  '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
@@ -515,10 +545,12 @@ export interface FileRoutesByTo {
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
+  '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-merger': typeof ToolsVideoMergerRoute
@@ -541,9 +573,11 @@ export interface FileRoutesById {
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
+  '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
@@ -582,10 +616,12 @@ export interface FileRoutesById {
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
+  '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-merger': typeof ToolsVideoMergerRoute
@@ -609,9 +645,11 @@ export interface FileRouteTypes {
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
+    | '/tools/age-calculator'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
+    | '/tools/bmi-calculator'
     | '/tools/business-card-generator'
     | '/tools/collage-maker'
     | '/tools/color-palette'
@@ -650,10 +688,12 @@ export interface FileRouteTypes {
     | '/tools/rotate-pdf'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
+    | '/tools/sleep-calculator'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/tip-calculator'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-merger'
@@ -675,9 +715,11 @@ export interface FileRouteTypes {
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
+    | '/tools/age-calculator'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
+    | '/tools/bmi-calculator'
     | '/tools/business-card-generator'
     | '/tools/collage-maker'
     | '/tools/color-palette'
@@ -716,10 +758,12 @@ export interface FileRouteTypes {
     | '/tools/rotate-pdf'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
+    | '/tools/sleep-calculator'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/tip-calculator'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-merger'
@@ -741,9 +785,11 @@ export interface FileRouteTypes {
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
+    | '/tools/age-calculator'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
+    | '/tools/bmi-calculator'
     | '/tools/business-card-generator'
     | '/tools/collage-maker'
     | '/tools/color-palette'
@@ -782,10 +828,12 @@ export interface FileRouteTypes {
     | '/tools/rotate-pdf'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
+    | '/tools/sleep-calculator'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/tip-calculator'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-merger'
@@ -808,9 +856,11 @@ export interface RootRouteChildren {
   ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
   ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
+  ToolsAgeCalculatorRoute: typeof ToolsAgeCalculatorRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBase64Route: typeof ToolsBase64Route
+  ToolsBmiCalculatorRoute: typeof ToolsBmiCalculatorRoute
   ToolsBusinessCardGeneratorRoute: typeof ToolsBusinessCardGeneratorRoute
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
@@ -849,10 +899,12 @@ export interface RootRouteChildren {
   ToolsRotatePdfRoute: typeof ToolsRotatePdfRoute
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
+  ToolsSleepCalculatorRoute: typeof ToolsSleepCalculatorRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
+  ToolsTipCalculatorRoute: typeof ToolsTipCalculatorRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
   ToolsVideoMergerRoute: typeof ToolsVideoMergerRoute
@@ -971,6 +1023,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsVideoCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/tip-calculator': {
+      id: '/tools/tip-calculator'
+      path: '/tools/tip-calculator'
+      fullPath: '/tools/tip-calculator'
+      preLoaderRoute: typeof ToolsTipCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/text-to-speech': {
       id: '/tools/text-to-speech'
       path: '/tools/text-to-speech'
@@ -997,6 +1056,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/speech-to-text'
       fullPath: '/tools/speech-to-text'
       preLoaderRoute: typeof ToolsSpeechToTextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/sleep-calculator': {
+      id: '/tools/sleep-calculator'
+      path: '/tools/sleep-calculator'
+      fullPath: '/tools/sleep-calculator'
+      preLoaderRoute: typeof ToolsSleepCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/sentiment-analysis': {
@@ -1265,6 +1331,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsBusinessCardGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/bmi-calculator': {
+      id: '/tools/bmi-calculator'
+      path: '/tools/bmi-calculator'
+      fullPath: '/tools/bmi-calculator'
+      preLoaderRoute: typeof ToolsBmiCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/base64': {
       id: '/tools/base64'
       path: '/tools/base64'
@@ -1284,6 +1357,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/audio-converter'
       fullPath: '/tools/audio-converter'
       preLoaderRoute: typeof ToolsAudioConverterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/age-calculator': {
+      id: '/tools/age-calculator'
+      path: '/tools/age-calculator'
+      fullPath: '/tools/age-calculator'
+      preLoaderRoute: typeof ToolsAgeCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/add-watermark': {
@@ -1328,9 +1408,11 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAddSubtitlesRoute: ToolsAddSubtitlesRoute,
   ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
+  ToolsAgeCalculatorRoute: ToolsAgeCalculatorRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBase64Route: ToolsBase64Route,
+  ToolsBmiCalculatorRoute: ToolsBmiCalculatorRoute,
   ToolsBusinessCardGeneratorRoute: ToolsBusinessCardGeneratorRoute,
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
@@ -1369,10 +1451,12 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsRotatePdfRoute: ToolsRotatePdfRoute,
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
+  ToolsSleepCalculatorRoute: ToolsSleepCalculatorRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
+  ToolsTipCalculatorRoute: ToolsTipCalculatorRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
   ToolsVideoMergerRoute: ToolsVideoMergerRoute,

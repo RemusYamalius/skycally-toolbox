@@ -1,10 +1,11 @@
+import { Link } from "@tanstack/react-router";
 import { ArrowRight, FileText } from "lucide-react";
 import type { BlogPost } from "@/lib/blog";
 
 export function BlogCard({ post }: { post: BlogPost }) {
   return (
-    <a
-      href={post.path}
+    <Link
+      to="/blog/compress-pdf-online-free"
       className="group block rounded-2xl border border-border bg-card overflow-hidden transition-all md:hover:-translate-y-1 md:hover:shadow-[var(--shadow-elevated)]"
     >
       <div
@@ -31,15 +32,11 @@ export function BlogCard({ post }: { post: BlogPost }) {
           <time className="text-xs text-muted-foreground" dateTime={post.date}>
             {post.dateLabel}
           </time>
-          <a
-            href={post.path}
-            className="inline-flex items-center gap-1.5 text-sm font-medium text-primary"
-            onClick={(e) => e.stopPropagation()}
-          >
+          <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
             Read more <ArrowRight className="w-4 h-4 transition group-hover:translate-x-1" />
-          </a>
+          </span>
         </div>
       </div>
-    </a>
+    </Link>
   );
 }

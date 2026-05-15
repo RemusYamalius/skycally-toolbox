@@ -30,7 +30,7 @@ function PdfReaderPage() {
     setLoading(true);
     try {
       const pdfjsLib: any = await import("pdfjs-dist");
-      pdfjsLib.GlobalWorkerOptions.workerSrc = `https://cdnjs.cloudflare.com/ajax/libs/pdf.js/${pdfjsLib.version}/pdf.worker.min.mjs`;
+      pdfjsLib.GlobalWorkerOptions.workerSrc = new URL("pdfjs-dist/build/pdf.worker.mjs", import.meta.url).toString();
       const doc = await pdfjsLib.getDocument({ data: buf.slice(0) }).promise;
       setData(buf);
       setPdf(doc);

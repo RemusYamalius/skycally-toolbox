@@ -53,6 +53,8 @@ const ROUTES: [string, string, string][] = [
   ["/tools/password-generator", "0.6", "monthly"],
   ["/tools/base64", "0.6", "monthly"],
   ["/tools/color-palette", "0.6", "monthly"],
+  ["/blog", "0.7", "weekly"],
+  ["/blog/compress-pdf-online-free", "0.6", "monthly"],
   ["/about", "0.5", "monthly"],
   ["/contact", "0.5", "monthly"],
   ["/privacy", "0.3", "yearly"],

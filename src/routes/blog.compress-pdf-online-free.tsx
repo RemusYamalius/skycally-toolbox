@@ -24,6 +24,7 @@ function ArticlePage() {
   return (
     <BlogPostLayout post={post}>
       {/* ARTICLE CONTENT GOES HERE */}
+      <p>Article content coming soon.</p>
     </BlogPostLayout>
   );
 }

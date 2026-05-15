@@ -13,10 +13,10 @@ import { Route as TermsRouteImport } from './routes/terms'
 import { Route as SitemapDotxmlRouteImport } from './routes/sitemap[.]xml'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as ContactRouteImport } from './routes/contact'
-import { Route as BlogRouteImport } from './routes/blog'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
+import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
 import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
@@ -86,11 +86,6 @@ const ContactRoute = ContactRouteImport.update({
   path: '/contact',
   getParentRoute: () => rootRouteImport,
 } as any)
-const BlogRoute = BlogRouteImport.update({
-  id: '/blog',
-  path: '/blog',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const AboutRoute = AboutRouteImport.update({
   id: '/about',
   path: '/about',
@@ -104,6 +99,11 @@ const IndexRoute = IndexRouteImport.update({
 const ToolsIndexRoute = ToolsIndexRouteImport.update({
   id: '/tools/',
   path: '/tools/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const BlogIndexRoute = BlogIndexRouteImport.update({
+  id: '/blog/',
+  path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsWordToPdfRoute = ToolsWordToPdfRouteImport.update({
@@ -344,15 +344,14 @@ const ToolsAddSubtitlesRoute = ToolsAddSubtitlesRouteImport.update({
 } as any)
 const BlogCompressPdfOnlineFreeRoute =
   BlogCompressPdfOnlineFreeRouteImport.update({
-    id: '/compress-pdf-online-free',
-    path: '/compress-pdf-online-free',
-    getParentRoute: () => BlogRoute,
+    id: '/blog/compress-pdf-online-free',
+    path: '/blog/compress-pdf-online-free',
+    getParentRoute: () => rootRouteImport,
   } as any)
 
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -405,12 +404,12 @@ export interface FileRoutesByFullPath {
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
+  '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
 }
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -463,13 +462,13 @@ export interface FileRoutesByTo {
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
+  '/blog': typeof BlogIndexRoute
   '/tools': typeof ToolsIndexRoute
 }
 export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/blog': typeof BlogRouteWithChildren
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/sitemap.xml': typeof SitemapDotxmlRoute
@@ -522,6 +521,7 @@ export interface FileRoutesById {
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
+  '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
 }
 export interface FileRouteTypes {
@@ -529,7 +529,6 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/blog'
     | '/contact'
     | '/privacy'
     | '/sitemap.xml'
@@ -582,12 +581,12 @@ export interface FileRouteTypes {
     | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
+    | '/blog/'
     | '/tools/'
   fileRoutesByTo: FileRoutesByTo
   to:
     | '/'
     | '/about'
-    | '/blog'
     | '/contact'
     | '/privacy'
     | '/sitemap.xml'
@@ -640,12 +639,12 @@ export interface FileRouteTypes {
     | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
+    | '/blog'
     | '/tools'
   id:
     | '__root__'
     | '/'
     | '/about'
-    | '/blog'
     | '/contact'
     | '/privacy'
     | '/sitemap.xml'
@@ -698,17 +697,18 @@ export interface FileRouteTypes {
     | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
+    | '/blog/'
     | '/tools/'
   fileRoutesById: FileRoutesById
 }
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  BlogRoute: typeof BlogRouteWithChildren
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
+  BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
   ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
   ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
@@ -756,6 +756,7 @@ export interface RootRouteChildren {
   ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
+  BlogIndexRoute: typeof BlogIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
 
@@ -789,13 +790,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ContactRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/blog': {
-      id: '/blog'
-      path: '/blog'
-      fullPath: '/blog'
-      preLoaderRoute: typeof BlogRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/about': {
       id: '/about'
       path: '/about'
@@ -815,6 +809,13 @@ declare module '@tanstack/react-router' {
       path: '/tools'
       fullPath: '/tools/'
       preLoaderRoute: typeof ToolsIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/': {
+      id: '/blog/'
+      path: '/blog'
+      fullPath: '/blog/'
+      preLoaderRoute: typeof BlogIndexRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/word-to-pdf': {
@@ -1148,32 +1149,22 @@ declare module '@tanstack/react-router' {
     }
     '/blog/compress-pdf-online-free': {
       id: '/blog/compress-pdf-online-free'
-      path: '/compress-pdf-online-free'
+      path: '/blog/compress-pdf-online-free'
       fullPath: '/blog/compress-pdf-online-free'
       preLoaderRoute: typeof BlogCompressPdfOnlineFreeRouteImport
-      parentRoute: typeof BlogRoute
+      parentRoute: typeof rootRouteImport
     }
   }
 }
 
-interface BlogRouteChildren {
-  BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
-}
-
-const BlogRouteChildren: BlogRouteChildren = {
-  BlogCompressPdfOnlineFreeRoute: BlogCompressPdfOnlineFreeRoute,
-}
-
-const BlogRouteWithChildren = BlogRoute._addFileChildren(BlogRouteChildren)
-
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  BlogRoute: BlogRouteWithChildren,
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
+  BlogCompressPdfOnlineFreeRoute: BlogCompressPdfOnlineFreeRoute,
   ToolsAddSubtitlesRoute: ToolsAddSubtitlesRoute,
   ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
@@ -1221,8 +1212,18 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
+  BlogIndexRoute: BlogIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

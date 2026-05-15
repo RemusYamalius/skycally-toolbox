@@ -57,6 +57,7 @@ import { Route as ToolsImageCropperRouteImport } from './routes/tools.image-crop
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
+import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time-fixer'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
@@ -313,6 +314,11 @@ const ToolsHandGestureRoute = ToolsHandGestureRouteImport.update({
   path: '/tools/hand-gesture',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsFreeTimeFixerRoute = ToolsFreeTimeFixerRouteImport.update({
+  id: '/tools/free-time-fixer',
+  path: '/tools/free-time-fixer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsFaceLandmarksRoute = ToolsFaceLandmarksRouteImport.update({
   id: '/tools/face-landmarks',
   path: '/tools/face-landmarks',
@@ -413,6 +419,7 @@ export interface FileRoutesByFullPath {
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -478,6 +485,7 @@ export interface FileRoutesByTo {
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -544,6 +552,7 @@ export interface FileRoutesById {
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -611,6 +620,7 @@ export interface FileRouteTypes {
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -676,6 +686,7 @@ export interface FileRouteTypes {
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -741,6 +752,7 @@ export interface FileRouteTypes {
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -807,6 +819,7 @@ export interface RootRouteChildren {
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
+  ToolsFreeTimeFixerRoute: typeof ToolsFreeTimeFixerRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
@@ -1189,6 +1202,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsHandGestureRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/free-time-fixer': {
+      id: '/tools/free-time-fixer'
+      path: '/tools/free-time-fixer'
+      fullPath: '/tools/free-time-fixer'
+      preLoaderRoute: typeof ToolsFreeTimeFixerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/face-landmarks': {
       id: '/tools/face-landmarks'
       path: '/tools/face-landmarks'
@@ -1319,6 +1339,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
+  ToolsFreeTimeFixerRoute: ToolsFreeTimeFixerRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,

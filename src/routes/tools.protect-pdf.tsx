@@ -8,7 +8,8 @@ import { Eye, EyeOff, Shield } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { DropZone } from "@/components/drop-zone";
-import { downloadBlob, formatBytes } from "@/components/drop-zone";
+import { downloadBlob } from "@/lib/file-utils";
+import { formatBytes } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 

@@ -8,7 +8,7 @@ import { Check, Trash2 } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { DropZone } from "@/components/drop-zone";
-import { downloadBlob } from "@/components/drop-zone";
+import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 

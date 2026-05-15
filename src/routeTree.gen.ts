@@ -33,8 +33,12 @@ import { Route as ToolsRotatePdfRouteImport } from './routes/tools.rotate-pdf'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
+import { Route as ToolsProtectPdfRouteImport } from './routes/tools.protect-pdf'
+import { Route as ToolsPdfToWordRouteImport } from './routes/tools.pdf-to-word'
 import { Route as ToolsPdfToImagesRouteImport } from './routes/tools.pdf-to-images'
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
+import { Route as ToolsPdfReaderRouteImport } from './routes/tools.pdf-reader'
+import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page-numbers'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
@@ -54,6 +58,7 @@ import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gestur
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
+import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
@@ -186,6 +191,16 @@ const ToolsQrGeneratorRoute = ToolsQrGeneratorRouteImport.update({
   path: '/tools/qr-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsProtectPdfRoute = ToolsProtectPdfRouteImport.update({
+  id: '/tools/protect-pdf',
+  path: '/tools/protect-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPdfToWordRoute = ToolsPdfToWordRouteImport.update({
+  id: '/tools/pdf-to-word',
+  path: '/tools/pdf-to-word',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsPdfToImagesRoute = ToolsPdfToImagesRouteImport.update({
   id: '/tools/pdf-to-images',
   path: '/tools/pdf-to-images',
@@ -194,6 +209,16 @@ const ToolsPdfToImagesRoute = ToolsPdfToImagesRouteImport.update({
 const ToolsPdfTextExtractorRoute = ToolsPdfTextExtractorRouteImport.update({
   id: '/tools/pdf-text-extractor',
   path: '/tools/pdf-text-extractor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPdfReaderRoute = ToolsPdfReaderRouteImport.update({
+  id: '/tools/pdf-reader',
+  path: '/tools/pdf-reader',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPdfPageNumbersRoute = ToolsPdfPageNumbersRouteImport.update({
+  id: '/tools/pdf-page-numbers',
+  path: '/tools/pdf-page-numbers',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsPasswordGeneratorRoute = ToolsPasswordGeneratorRouteImport.update({
@@ -291,6 +316,11 @@ const ToolsDocumentScannerRoute = ToolsDocumentScannerRouteImport.update({
   path: '/tools/document-scanner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsDeletePdfPagesRoute = ToolsDeletePdfPagesRouteImport.update({
+  id: '/tools/delete-pdf-pages',
+  path: '/tools/delete-pdf-pages',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsCompressPdfRoute = ToolsCompressPdfRouteImport.update({
   id: '/tools/compress-pdf',
   path: '/tools/compress-pdf',
@@ -367,6 +397,7 @@ export interface FileRoutesByFullPath {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -386,8 +417,12 @@ export interface FileRoutesByFullPath {
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
+  '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
+  '/tools/pdf-reader': typeof ToolsPdfReaderRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
+  '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
@@ -425,6 +460,7 @@ export interface FileRoutesByTo {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -444,8 +480,12 @@ export interface FileRoutesByTo {
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
+  '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
+  '/tools/pdf-reader': typeof ToolsPdfReaderRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
+  '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
@@ -484,6 +524,7 @@ export interface FileRoutesById {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -503,8 +544,12 @@ export interface FileRoutesById {
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
+  '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
+  '/tools/pdf-reader': typeof ToolsPdfReaderRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
+  '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
@@ -544,6 +589,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/delete-pdf-pages'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -563,8 +609,12 @@ export interface FileRouteTypes {
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
+    | '/tools/pdf-page-numbers'
+    | '/tools/pdf-reader'
     | '/tools/pdf-text-extractor'
     | '/tools/pdf-to-images'
+    | '/tools/pdf-to-word'
+    | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
@@ -602,6 +652,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/delete-pdf-pages'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -621,8 +672,12 @@ export interface FileRouteTypes {
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
+    | '/tools/pdf-page-numbers'
+    | '/tools/pdf-reader'
     | '/tools/pdf-text-extractor'
     | '/tools/pdf-to-images'
+    | '/tools/pdf-to-word'
+    | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
@@ -660,6 +715,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/delete-pdf-pages'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -679,8 +735,12 @@ export interface FileRouteTypes {
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
+    | '/tools/pdf-page-numbers'
+    | '/tools/pdf-reader'
     | '/tools/pdf-text-extractor'
     | '/tools/pdf-to-images'
+    | '/tools/pdf-to-word'
+    | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
@@ -719,6 +779,7 @@ export interface RootRouteChildren {
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
+  ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
@@ -738,8 +799,12 @@ export interface RootRouteChildren {
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
+  ToolsPdfPageNumbersRoute: typeof ToolsPdfPageNumbersRoute
+  ToolsPdfReaderRoute: typeof ToolsPdfReaderRoute
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
   ToolsPdfToImagesRoute: typeof ToolsPdfToImagesRoute
+  ToolsPdfToWordRoute: typeof ToolsPdfToWordRoute
+  ToolsProtectPdfRoute: typeof ToolsProtectPdfRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
@@ -930,6 +995,20 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsQrGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/protect-pdf': {
+      id: '/tools/protect-pdf'
+      path: '/tools/protect-pdf'
+      fullPath: '/tools/protect-pdf'
+      preLoaderRoute: typeof ToolsProtectPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/pdf-to-word': {
+      id: '/tools/pdf-to-word'
+      path: '/tools/pdf-to-word'
+      fullPath: '/tools/pdf-to-word'
+      preLoaderRoute: typeof ToolsPdfToWordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/pdf-to-images': {
       id: '/tools/pdf-to-images'
       path: '/tools/pdf-to-images'
@@ -942,6 +1021,20 @@ declare module '@tanstack/react-router' {
       path: '/tools/pdf-text-extractor'
       fullPath: '/tools/pdf-text-extractor'
       preLoaderRoute: typeof ToolsPdfTextExtractorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/pdf-reader': {
+      id: '/tools/pdf-reader'
+      path: '/tools/pdf-reader'
+      fullPath: '/tools/pdf-reader'
+      preLoaderRoute: typeof ToolsPdfReaderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/pdf-page-numbers': {
+      id: '/tools/pdf-page-numbers'
+      path: '/tools/pdf-page-numbers'
+      fullPath: '/tools/pdf-page-numbers'
+      preLoaderRoute: typeof ToolsPdfPageNumbersRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/password-generator': {
@@ -1077,6 +1170,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsDocumentScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/delete-pdf-pages': {
+      id: '/tools/delete-pdf-pages'
+      path: '/tools/delete-pdf-pages'
+      fullPath: '/tools/delete-pdf-pages'
+      preLoaderRoute: typeof ToolsDeletePdfPagesRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/compress-pdf': {
       id: '/tools/compress-pdf'
       path: '/tools/compress-pdf'
@@ -1175,6 +1275,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
+  ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
@@ -1194,8 +1295,12 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
+  ToolsPdfPageNumbersRoute: ToolsPdfPageNumbersRoute,
+  ToolsPdfReaderRoute: ToolsPdfReaderRoute,
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,
   ToolsPdfToImagesRoute: ToolsPdfToImagesRoute,
+  ToolsPdfToWordRoute: ToolsPdfToWordRoute,
+  ToolsProtectPdfRoute: ToolsProtectPdfRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,

@@ -40,7 +40,7 @@ export function SiteFooter() {
       <div className="border-t border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <h4 className="text-sm font-semibold mb-6 text-foreground/80">Explore all tools</h4>
-          <div className="grid gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-5">
+          <div className="grid gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
             {categoryOrder.map((c) => {
               const meta = categoryMeta[c];
               const list = tools.filter((t) => toolInCategory(t, c));

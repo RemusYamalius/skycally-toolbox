@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai";
 
@@ -72,4 +72,9 @@ export const tools: Tool[] = [
   { slug: "pdf-to-images", name: "PDF to Images", description: "Convert every PDF page into a high-quality PNG image.", category: "pdf", icon: Layers, path: "/tools/pdf-to-images" },
   { slug: "rotate-pdf", name: "Rotate PDF", description: "Rotate one or all pages in your PDF to the correct orientation.", category: "pdf", icon: RotateCw, path: "/tools/rotate-pdf" },
   { slug: "document-scanner", name: "Document Scanner", description: "Scan documents with camera, auto-crop, enhance and export to PDF.", category: "pdf", icon: ScanSearch, path: "/tools/document-scanner" },
+  { slug: "pdf-to-word", name: "PDF to Word", description: "Convert PDF files to editable Word documents instantly.", category: "pdf", icon: FileOutput, path: "/tools/pdf-to-word" },
+  { slug: "delete-pdf-pages", name: "Delete PDF Pages", description: "Remove unwanted pages from any PDF file.", category: "pdf", icon: FileX, path: "/tools/delete-pdf-pages" },
+  { slug: "pdf-page-numbers", name: "Add Page Numbers to PDF", description: "Add page numbers to any PDF with custom position and style.", category: "pdf", icon: FilePen, path: "/tools/pdf-page-numbers" },
+  { slug: "protect-pdf", name: "Protect PDF", description: "Add a password to your PDF to prevent unauthorized access.", category: "pdf", icon: Shield, path: "/tools/protect-pdf" },
+  { slug: "pdf-reader", name: "PDF Reader", description: "View and read PDF files directly in your browser.", category: "pdf", icon: FileSearch, path: "/tools/pdf-reader" },
 ];

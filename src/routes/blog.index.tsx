@@ -3,7 +3,7 @@ import { BlogCard } from "@/components/blog-card";
 import { blogPosts } from "@/lib/blog";
 import { buildPageMeta } from "@/lib/seo";
 
-export const Route = createFileRoute("/blog")({
+export const Route = createFileRoute("/blog/")({
   head: () => buildPageMeta({
     title: "Skycally Blog — Tips, Guides & Tutorials",
     description:

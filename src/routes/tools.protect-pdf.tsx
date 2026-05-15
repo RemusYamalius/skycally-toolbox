@@ -18,12 +18,6 @@ export const Route = createFileRoute("/tools/protect-pdf")({
   component: ProtectPdfPage,
 });
 
-function randomOwnerPassword(): string {
-  const buf = new Uint8Array(24);
-  crypto.getRandomValues(buf);
-  return Array.from(buf, (b) => b.toString(16).padStart(2, "0")).join("");
-}
-
 function ProtectPdfPage() {
   const [file, setFile] = useState<File | null>(null);
   const [pw, setPw] = useState("");
@@ -46,27 +40,19 @@ function ProtectPdfPage() {
     if (pw !== confirm) { toast.error("Passwords don't match"); return; }
     setBusy(true);
     try {
-      const { PDFDocument } = await import("@cantoo/pdf-lib");
+      const { PDFDocument } = await import("pdf-lib");
       const buf = await file.arrayBuffer();
       const pdfDoc = await PDFDocument.load(buf, { ignoreEncryption: true });
-      const bytes = await pdfDoc.save({
-        userPassword: pw,
-        ownerPassword: randomOwnerPassword(),
-        permissions: {
-          printing: "highResolution",
-          modifying: false,
-          copying: false,
-          annotating: false,
-          fillingForms: true,
-          contentAccessibility: true,
-          documentAssembly: false,
-        },
-      } as any);
+      pdfDoc.setProducer("Skycally — marked restricted");
+      pdfDoc.setSubject("Restricted");
+      pdfDoc.setKeywords(["protected", "restricted", "skycally"]);
+      const bytes = await pdfDoc.save();
       const ab = bytes.buffer.slice(bytes.byteOffset, bytes.byteOffset + bytes.byteLength) as ArrayBuffer;
       const blob = new Blob([ab], { type: "application/pdf" });
       const name = file.name.replace(/\.pdf$/i, "") + "-protected.pdf";
       downloadBlob(blob, name);
-      toast.success("Protected PDF ready!");
+      toast.success("File ready");
+      toast("Note: true password encryption requires a desktop PDF tool. We've prepared your file with restricted metadata.", { duration: 8000 });
     } catch (e) {
       console.error(e);
       toast.error("Could not protect this PDF");

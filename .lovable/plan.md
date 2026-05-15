@@ -1,33 +1,41 @@
-## Fix 4 broken PDF tools
+## Add 3 new tools to Skycally
 
-Apply targeted fixes to four route files. Do not touch `tools.pdf-page-numbers.tsx` or `tools.rotate-pdf.tsx`.
+Follow the existing tool patterns exactly (ToolPageShell + HowToUse + RelatedTools + ToolSeoContent, `buildToolMeta + toolBySlug` head, dark theme, Tailwind only).
 
-### 1. `src/routes/tools.protect-pdf.tsx`
-- Replace `@cantoo/pdf-lib` import with `pdf-lib` (standard, installed).
-- Drop the `userPassword` / `ownerPassword` / `permissions` options — pdf-lib@1.17.1 doesn't support encryption.
-- Load the PDF, set metadata via `setProducer("Skycally — protected")` / `setSubject("Restricted")` / `setKeywords(["protected"])` to mark it as restricted, then save and download.
-- After download, show a toast: "Note: true password encryption requires a desktop PDF tool. We've prepared your file."
-- Update visible UI copy, `HowToUse` steps, and `ToolSeoContent` (description, body, FAQs) to honestly explain the browser limitation and recommend a desktop tool for real encryption. Keep password inputs only as informational fields (or remove them — prefer keeping them but disabled-styled with a clear note).
+### 1. Update `src/lib/tools.ts`
+- Add `Link` and `Clock` to the `lucide-react` import (keep existing imports intact; `RotateCw` is already imported).
+- Append three entries to the `tools` array:
+  - `{ slug: "spinning-wheel", name: "Spinning Wheel", description: "Spin a customizable wheel to make random decisions. Add your own options.", category: "text", icon: RotateCw, path: "/tools/spinning-wheel" }`
+  - `{ slug: "link-shortener", name: "Link Shortener", description: "Shorten any URL and generate a QR code for it instantly.", category: "text", icon: Link, path: "/tools/link-shortener" }`
+  - `{ slug: "free-time-fixer", name: "Free Time Fixer", description: "Tell us how many minutes you have free — we'll tell you exactly what to do.", category: "text", icon: Clock, path: "/tools/free-time-fixer" }`
 
-### 2. `src/routes/tools.delete-pdf-pages.tsx`
-- In every `page.render(...)` call, remove the `canvas` property. Final shape:
-  `await page.render({ canvasContext: ctx, viewport }).promise;`
-- No other changes.
+### 2. Create `src/routes/tools.spinning-wheel.tsx`
+- Canvas-drawn wheel; segments derived from a `string[]` state (default 6 options).
+- 8-color cycling palette; segment angles = `2π / n`.
+- Spin: pick random target index, animate `rotation` over ~4s with easeOut (cubic), `requestAnimationFrame`. Disable Spin button while animating.
+- Pointer fixed at top; on end, compute winner from final rotation, show centered modal (Dialog) with winner + "Spin again" / "Close".
+- Editable list: input rows with remove button, "Add option" button. Min 2, max 16.
+- Big primary "Spin" button.
 
-### 3. `src/routes/tools.pdf-reader.tsx`
-- Remove the `canvasRefs` array and the multi-canvas scroll layout.
-- Use a single `canvasRef = useRef<HTMLCanvasElement>(null)`.
-- Replace the rendering `useEffect` so it depends on `[pdf, current, scale]` and renders only the `current` page onto the single canvas, with a `cancelled` cleanup flag. Render call: `await page.render({ canvasContext: ctx, viewport }).promise;` (no `canvas` prop).
-- Replace the scrolling page list in JSX with one centered `<canvas ref={canvasRef} className="bg-white shadow-lg rounded-md max-w-full h-auto" />`.
-- `goTo` simplifies to just `setCurrent(clamped)` (no scrollIntoView).
-- Keep DropZone, URL loader, Previous/Next, Zoom controls, Close button, sticky toolbar, `HowToUse`, `RelatedTools`, `ToolSeoContent` exactly as-is.
+### 3. Create `src/routes/tools.link-shortener.tsx`
+- URL input (validate `http(s)://`).
+- Fetch `https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`, get text. Handle errors with toast.
+- Result box with shortened URL + Copy button (`navigator.clipboard`, sonner toast).
+- Generate QR for short URL using existing `qrcode` package (already used by qr-generator) into a canvas. Download QR as PNG via `canvas.toDataURL` + anchor click.
+- Will verify `qrcode` is installed by reading `tools.qr-generator.tsx`; if missing, install via `bun add qrcode @types/qrcode`.
 
-### 4. `src/routes/tools.pdf-to-word.tsx`
-- Remove `PageBreak` from the `docx` import. Final import: `import { Document, Packer, Paragraph, TextRun, HeadingLevel } from "docx";`
-- Replace any `new Paragraph({ children: [new PageBreak()] })` usage. Page breaks are expressed by adding `pageBreakBefore: true` to the next page's heading paragraph:
-  - For `i > 1`: `new Paragraph({ heading: HeadingLevel.HEADING_2, pageBreakBefore: true, children: [new TextRun(`Page ${i}`)] })`
-  - For `i === 1`: `new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun(`Page ${i}`)] })`
+### 4. Create `src/routes/tools.free-time-fixer.tsx`
+- Two button groups: time (`5`,`15`,`30`,`60`,`120+` min) and mood (productive/relaxed/creative/social/active) — single select each.
+- Hardcoded suggestions map keyed by `${time}-${mood}` with ≥5 items each (`{title, description, emoji}`).
+- "What should I do?" reveals card with random pick; "Try another" rerolls (avoids repeating last).
+
+### 5. Shared per-route
+- `head: () => buildToolMeta(toolBySlug(slug, tools))`
+- ToolPageShell title/description from tools.ts entry.
+- HowToUse with the 3 steps from the spec.
+- ToolSeoContent: title, 1–2 sentence description, 2–3 paragraph body (~150–200 words), 4 FAQs each.
+- `<RelatedTools currentSlug="..." />` at the bottom.
 
 ### Out of scope
-- No dependency changes (all packages already installed).
-- No changes to `tools.pdf-page-numbers.tsx`, `tools.rotate-pdf.tsx`, shared components, or `routeTree.gen.ts`.
+- No edits to routeTree.gen.ts (auto-generated).
+- No changes to other tools or shared components.

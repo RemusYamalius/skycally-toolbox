@@ -5,7 +5,7 @@ import type { BlogPost } from "@/lib/blog";
 export function BlogCard({ post }: { post: BlogPost }) {
   return (
     <Link
-      to={post.path}
+      to="/blog/compress-pdf-online-free"
       className="group block rounded-2xl border border-border bg-card overflow-hidden transition-all md:hover:-translate-y-1 md:hover:shadow-[var(--shadow-elevated)]"
     >
       <div

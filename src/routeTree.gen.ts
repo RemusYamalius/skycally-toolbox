@@ -45,6 +45,7 @@ import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
+import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
@@ -252,6 +253,11 @@ const ToolsMarkdownToHtmlRoute = ToolsMarkdownToHtmlRouteImport.update({
   path: '/tools/markdown-to-html',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsLinkShortenerRoute = ToolsLinkShortenerRouteImport.update({
+  id: '/tools/link-shortener',
+  path: '/tools/link-shortener',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsJsonFormatterRoute = ToolsJsonFormatterRouteImport.update({
   id: '/tools/json-formatter',
   path: '/tools/json-formatter',
@@ -418,6 +424,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -482,6 +489,7 @@ export interface FileRoutesByTo {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -547,6 +555,7 @@ export interface FileRoutesById {
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -613,6 +622,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
+    | '/tools/link-shortener'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/merge-pdf'
@@ -677,6 +687,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
+    | '/tools/link-shortener'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/merge-pdf'
@@ -741,6 +752,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
+    | '/tools/link-shortener'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/merge-pdf'
@@ -806,6 +818,7 @@ export interface RootRouteChildren {
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
+  ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
   ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
@@ -1092,6 +1105,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMarkdownToHtmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/link-shortener': {
+      id: '/tools/link-shortener'
+      path: '/tools/link-shortener'
+      fullPath: '/tools/link-shortener'
+      preLoaderRoute: typeof ToolsLinkShortenerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/json-formatter': {
       id: '/tools/json-formatter'
       path: '/tools/json-formatter'
@@ -1310,6 +1330,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
+  ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
   ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,

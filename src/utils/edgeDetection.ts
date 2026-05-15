@@ -42,8 +42,8 @@ export const detectDocumentCorners = async (
   const cv = (typeof window !== "undefined" ? window.cv : null) as any;
   if (!cv || !cv.Mat) return fallback;
 
-  let src: any, small: any, gray: any, blurred: any, thresh: any, edges: any;
-  let combined: any, kernel: any, dilated: any, contours: any, hierarchy: any;
+  let src: any, small: any, gray: any, blurred: any, edges: any;
+  let kernel: any, dilated: any, contours: any, hierarchy: any;
 
   try {
     src = cv.imread(imageElement);

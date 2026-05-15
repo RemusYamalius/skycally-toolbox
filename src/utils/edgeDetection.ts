@@ -32,6 +32,11 @@ export const fallbackCorners = (width: number, height: number): DocumentCorners 
   detected: false,
 });
 
+const dist = (a: Point, b: Point) => Math.hypot(a.x - b.x, a.y - b.y);
+
+const clamp = (v: number, min: number, max: number) =>
+  Math.max(min, Math.min(max, v));
+
 export const detectDocumentCorners = async (
   imageElement: HTMLImageElement | HTMLCanvasElement,
   width: number,
@@ -72,11 +77,20 @@ export const detectDocumentCorners = async (
 
     contours = new cv.MatVector();
     hierarchy = new cv.Mat();
-    cv.findContours(dilated, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
+    cv.findContours(
+      dilated,
+      contours,
+      hierarchy,
+      cv.RETR_EXTERNAL,
+      cv.CHAIN_APPROX_SIMPLE,
+    );
 
-    let bestCorners: DocumentCorners | null = null;
-    let maxArea = 0;
-    const imageArea = small.cols * small.rows;
+    const imgW = small.cols;
+    const imgH = small.rows;
+    const imageArea = imgW * imgH;
+    const diagonal = Math.hypot(imgW, imgH);
+    const minSide = diagonal * 0.05;
+    const minArea = imageArea * 0.15;
 
     const indexed: { contour: any; area: number }[] = [];
     for (let i = 0; i < contours.size(); i++) {
@@ -86,10 +100,11 @@ export const detectDocumentCorners = async (
     indexed.sort((a, b) => b.area - a.area);
     const top = indexed.slice(0, 10);
 
-    let earlyBreak = false;
+    let bestCorners: DocumentCorners | null = null;
+    let bestArea = 0;
+
     for (const { contour, area } of top) {
-      if (earlyBreak) break;
-      if (area < imageArea * 0.1) continue;
+      if (area < minArea) continue;
 
       const perimeter = cv.arcLength(contour, true);
       const approx = new cv.Mat();
@@ -97,29 +112,72 @@ export const detectDocumentCorners = async (
       for (const epsilon of [0.01, 0.02, 0.03, 0.04, 0.05, 0.06]) {
         cv.approxPolyDP(contour, approx, epsilon * perimeter, true);
 
-        if (approx.rows === 4 && area > maxArea) {
-          const pts: Point[] = [];
-          for (let j = 0; j < 4; j++) {
-            pts.push({
-              x: approx.data32S[j * 2] / scale,
-              y: approx.data32S[j * 2 + 1] / scale,
-            });
+        if (approx.rows !== 4) continue;
+        if (!cv.isContourConvex(approx)) continue;
+
+        // Read points (scaled to original image)
+        const pts: Point[] = [];
+        let inBounds = true;
+        for (let j = 0; j < 4; j++) {
+          const x = approx.data32S[j * 2] / scale;
+          const y = approx.data32S[j * 2 + 1] / scale;
+          if (x < 0 || y < 0 || x > width || y > height) {
+            inBounds = false;
           }
-          const sorted = sortCorners(pts);
-          if (sorted) {
-            maxArea = area;
-            bestCorners = { ...sorted, detected: true };
-            if (area > imageArea * 0.5) earlyBreak = true;
-          }
-          break;
+          pts.push({ x, y });
         }
+        if (!inBounds) continue;
+
+        const sorted = sortCorners(pts);
+        if (!sorted) continue;
+
+        // Validate side lengths in scaled-down (small) image space
+        const sidesSmall = [
+          dist(
+            { x: sorted.topLeft.x * scale, y: sorted.topLeft.y * scale },
+            { x: sorted.topRight.x * scale, y: sorted.topRight.y * scale },
+          ),
+          dist(
+            { x: sorted.topRight.x * scale, y: sorted.topRight.y * scale },
+            { x: sorted.bottomRight.x * scale, y: sorted.bottomRight.y * scale },
+          ),
+          dist(
+            { x: sorted.bottomRight.x * scale, y: sorted.bottomRight.y * scale },
+            { x: sorted.bottomLeft.x * scale, y: sorted.bottomLeft.y * scale },
+          ),
+          dist(
+            { x: sorted.bottomLeft.x * scale, y: sorted.bottomLeft.y * scale },
+            { x: sorted.topLeft.x * scale, y: sorted.topLeft.y * scale },
+          ),
+        ];
+        if (sidesSmall.some((s) => s < minSide)) continue;
+
+        if (area > bestArea) {
+          bestArea = area;
+          bestCorners = { ...sorted, detected: true };
+        }
+        break;
       }
 
       approx.delete();
       contour.delete();
     }
 
-    return bestCorners || fallback;
+    if (!bestCorners) return fallback;
+
+    // Clamp corners to image bounds
+    const clampPt = (p: Point): Point => ({
+      x: clamp(p.x, 0, width),
+      y: clamp(p.y, 0, height),
+    });
+
+    return {
+      topLeft: clampPt(bestCorners.topLeft),
+      topRight: clampPt(bestCorners.topRight),
+      bottomRight: clampPt(bestCorners.bottomRight),
+      bottomLeft: clampPt(bestCorners.bottomLeft),
+      detected: true,
+    };
   } catch (error) {
     console.warn("Edge detection failed:", error);
     return fallback;

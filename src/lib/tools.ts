@@ -1,6 +1,6 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays } from "lucide-react";
 
-export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai";
+export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility";
 
 export const categoryMeta: Record<ToolCategory, { label: string; color: string; icon: string }> = {
   video: { label: "Video Tools", color: "var(--cyan-brand)", icon: "🎬" },
@@ -9,6 +9,7 @@ export const categoryMeta: Record<ToolCategory, { label: string; color: string; 
   pdf: { label: "PDF & Documents", color: "var(--orange-brand)", icon: "📄" },
   text: { label: "Text Tools", color: "var(--green-brand)", icon: "✍️" },
   ai: { label: "AI Tools", color: "var(--violet-brand)", icon: "🤖" },
+  utility: { label: "Utility Tools", color: "var(--green-brand)", icon: "🛠️" },
 };
 
 export interface Tool {
@@ -37,12 +38,12 @@ export const tools: Tool[] = [
   { slug: "pdf-text-extractor", name: "Extract Text from PDF", description: "Extract all text from any PDF instantly.", category: "pdf", icon: FileText, path: "/tools/pdf-text-extractor" },
   { slug: "word-to-pdf", name: "Word to PDF", description: "Turn Word documents into polished PDFs.", category: "pdf", icon: FileType, path: "/tools/word-to-pdf" },
   { slug: "merge-pdf", name: "Merge PDF", description: "Combine multiple PDFs into a single file.", category: "pdf", icon: Combine, path: "/tools/merge-pdf" },
-  { slug: "qr-generator", name: "QR Code Generator", description: "Create custom QR codes from any URL or text.", category: "text", icon: QrCode, path: "/tools/qr-generator" },
-  { slug: "qr-reader", name: "QR Code Reader", description: "Decode QR codes from images or your camera.", category: "text", icon: ScanLine, path: "/tools/qr-reader" },
+  { slug: "qr-generator", name: "QR Code Generator", description: "Create custom QR codes from any URL or text.", category: "utility", icon: QrCode, path: "/tools/qr-generator" },
+  { slug: "qr-reader", name: "QR Code Reader", description: "Decode QR codes from images or your camera.", category: "utility", icon: ScanLine, path: "/tools/qr-reader" },
   { slug: "image-to-text", name: "Image to Text (OCR)", description: "Extract text from images in multiple languages.", category: "image", icon: ScanText, path: "/tools/image-to-text" },
   { slug: "text-to-speech", name: "Text to Speech", description: "Convert text to natural speech in multiple languages.", category: "audio", icon: Volume2, path: "/tools/text-to-speech" },
   { slug: "speech-to-text", name: "Speech to Text", description: "Transcribe your voice to text in real-time.", category: "audio", icon: Mic, path: "/tools/speech-to-text" },
-  { slug: "password-generator", name: "Password Generator", description: "Generate strong, secure passwords instantly.", category: "text", icon: Lock, path: "/tools/password-generator" },
+  { slug: "password-generator", name: "Password Generator", description: "Generate strong, secure passwords instantly.", category: "utility", icon: Lock, path: "/tools/password-generator" },
   { slug: "base64", name: "Base64 Encoder / Decoder", description: "Encode plain text to Base64 or decode Base64 strings instantly.", category: "text", icon: Code2, path: "/tools/base64" },
   { slug: "word-counter", name: "Word Counter", description: "Count words, characters, sentences and estimate reading time.", category: "text", icon: Type, path: "/tools/word-counter" },
   { slug: "json-formatter", name: "JSON Formatter", description: "Format, prettify and minify JSON instantly.", category: "text", icon: Braces, path: "/tools/json-formatter" },
@@ -77,7 +78,11 @@ export const tools: Tool[] = [
   { slug: "pdf-page-numbers", name: "Add Page Numbers to PDF", description: "Add page numbers to any PDF with custom position and style.", category: "pdf", icon: FilePen, path: "/tools/pdf-page-numbers" },
   { slug: "protect-pdf", name: "Protect PDF", description: "Add a password to your PDF to prevent unauthorized access.", category: "pdf", icon: Shield, path: "/tools/protect-pdf" },
   { slug: "pdf-reader", name: "PDF Reader", description: "View and read PDF files directly in your browser.", category: "pdf", icon: FileSearch, path: "/tools/pdf-reader" },
-  { slug: "spinning-wheel", name: "Spinning Wheel", description: "Spin a customizable wheel to make random decisions. Add your own options.", category: "text", icon: RotateCw, path: "/tools/spinning-wheel" },
-  { slug: "link-shortener", name: "Link Shortener", description: "Shorten any URL and generate a QR code for it instantly.", category: "text", icon: Link, path: "/tools/link-shortener" },
-  { slug: "free-time-fixer", name: "Free Time Fixer", description: "Tell us how many minutes you have free — we'll tell you exactly what to do.", category: "text", icon: Clock, path: "/tools/free-time-fixer" },
+  { slug: "spinning-wheel", name: "Spinning Wheel", description: "Spin a customizable wheel to make random decisions. Add your own options.", category: "utility", icon: RotateCw, path: "/tools/spinning-wheel" },
+  { slug: "link-shortener", name: "Link Shortener", description: "Shorten any URL and generate a QR code for it instantly.", category: "utility", icon: Link, path: "/tools/link-shortener" },
+  { slug: "free-time-fixer", name: "Free Time Fixer", description: "Tell us how many minutes you have free — we'll tell you exactly what to do.", category: "utility", icon: Clock, path: "/tools/free-time-fixer" },
+  { slug: "sleep-calculator", name: "Sleep Calculator", description: "Find the best time to wake up or go to sleep based on sleep cycles.", category: "utility", icon: Moon, path: "/tools/sleep-calculator" },
+  { slug: "tip-calculator", name: "Tip Calculator", description: "Calculate tips and split bills instantly.", category: "utility", icon: Calculator, path: "/tools/tip-calculator" },
+  { slug: "bmi-calculator", name: "BMI Calculator", description: "Calculate your Body Mass Index and healthy weight range.", category: "utility", icon: Activity, path: "/tools/bmi-calculator" },
+  { slug: "age-calculator", name: "Age Calculator", description: "Calculate your exact age in years, months and days.", category: "utility", icon: CalendarDays, path: "/tools/age-calculator" },
 ];

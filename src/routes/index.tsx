@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type, Sparkles } from "lucide-react";
+import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type, Sparkles, Wrench } from "lucide-react";
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 import { AdZone } from "@/components/ad-zone";
@@ -44,6 +44,7 @@ const quickAccess = [
   { icon: Music, label: "Audio Tools", cat: "audio" as const, color: categoryMeta.audio.color },
   { icon: FileText, label: "PDF & Documents", cat: "pdf" as const, color: categoryMeta.pdf.color },
   { icon: Type, label: "Text Tools", cat: "text" as const, color: categoryMeta.text.color },
+  { icon: Wrench, label: "Utility Tools", cat: "utility" as const, color: categoryMeta.utility.color },
 ];
 
 const categoryTaglines: Record<ToolCategory, string> = {
@@ -53,6 +54,7 @@ const categoryTaglines: Record<ToolCategory, string> = {
   audio: "Convert, transcribe and synthesize audio fast.",
   pdf: "Merge, split, convert and extract from PDFs.",
   text: "Generate, format, encode and analyze text effortlessly.",
+  utility: "Calculators, decision tools and everyday utilities.",
 };
 
 const INITIAL_PER_CAT = 6;
@@ -142,7 +144,7 @@ function HomePage() {
           </div>
 
           <div className="space-y-14">
-            {(["video", "image", "audio", "pdf", "text"] as ToolCategory[]).map((cat) => {
+            {(["video", "image", "audio", "pdf", "text", "utility"] as ToolCategory[]).map((cat) => {
               const list = tools.filter((t) => toolInCategory(t, cat));
               if (list.length === 0) return null;
               const meta = categoryMeta[cat];

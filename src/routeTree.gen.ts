@@ -26,6 +26,7 @@ import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-d
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
+import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
@@ -154,6 +155,11 @@ const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
 const ToolsSplitPdfRoute = ToolsSplitPdfRouteImport.update({
   id: '/tools/split-pdf',
   path: '/tools/split-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSpinningWheelRoute = ToolsSpinningWheelRouteImport.update({
+  id: '/tools/spinning-wheel',
+  path: '/tools/spinning-wheel',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
@@ -430,6 +436,7 @@ export interface FileRoutesByFullPath {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -493,6 +500,7 @@ export interface FileRoutesByTo {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -557,6 +565,7 @@ export interface FileRoutesById {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
+  '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -622,6 +631,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
+    | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
@@ -685,6 +695,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
+    | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
@@ -748,6 +759,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/speech-to-text'
+    | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/video-compressor'
@@ -812,6 +824,7 @@ export interface RootRouteChildren {
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
+  ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
@@ -944,6 +957,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/split-pdf'
       fullPath: '/tools/split-pdf'
       preLoaderRoute: typeof ToolsSplitPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/spinning-wheel': {
+      id: '/tools/spinning-wheel'
+      path: '/tools/spinning-wheel'
+      fullPath: '/tools/spinning-wheel'
+      preLoaderRoute: typeof ToolsSpinningWheelRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/speech-to-text': {
@@ -1308,6 +1328,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
+  ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,

@@ -18,6 +18,14 @@ export const Route = createFileRoute("/tools/protect-pdf")({
   component: ProtectPdfPage,
 });
 
+function randomOwnerPassword() {
+  return Array.from({ length: 16 }, () =>
+    "ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789!@#$%^&*"[
+      Math.floor(Math.random() * 72)
+    ]
+  ).join("");
+}
+
 function ProtectPdfPage() {
   const [file, setFile] = useState<File | null>(null);
   const [pw, setPw] = useState("");

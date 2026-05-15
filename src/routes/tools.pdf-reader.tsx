@@ -141,15 +141,8 @@ function PdfReaderPage() {
               </div>
             </div>
 
-            <div ref={containerRef} className="rounded-2xl border border-border bg-secondary/30 p-4 max-h-[80vh] overflow-auto space-y-4">
-              {Array.from({ length: numPages }, (_, i) => (
-                <div key={i} className="flex justify-center">
-                  <canvas
-                    ref={(el) => { canvasRefs.current[i] = el; }}
-                    className="bg-white shadow-lg rounded-md max-w-full h-auto"
-                  />
-                </div>
-              ))}
+            <div className="rounded-2xl border border-border bg-secondary/30 p-4 max-h-[80vh] overflow-auto flex justify-center">
+              <canvas ref={canvasRef} className="bg-white shadow-lg rounded-md max-w-full h-auto" />
             </div>
           </>
         )}

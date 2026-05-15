@@ -1,6 +1,6 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays } from "lucide-react";
 
-export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai";
+export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility";
 
 export const categoryMeta: Record<ToolCategory, { label: string; color: string; icon: string }> = {
   video: { label: "Video Tools", color: "var(--cyan-brand)", icon: "🎬" },
@@ -9,6 +9,7 @@ export const categoryMeta: Record<ToolCategory, { label: string; color: string; 
   pdf: { label: "PDF & Documents", color: "var(--orange-brand)", icon: "📄" },
   text: { label: "Text Tools", color: "var(--green-brand)", icon: "✍️" },
   ai: { label: "AI Tools", color: "var(--violet-brand)", icon: "🤖" },
+  utility: { label: "Utility Tools", color: "var(--green-brand)", icon: "🛠️" },
 };
 
 export interface Tool {

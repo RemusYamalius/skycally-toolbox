@@ -40,7 +40,7 @@ function PdfToWordPage() {
       const buf = await file.arrayBuffer();
       const pdf = await pdfjsLib.getDocument({ data: buf }).promise;
 
-      const { Document, Packer, Paragraph, TextRun, PageBreak, HeadingLevel } = await import("docx");
+      const { Document, Packer, Paragraph, TextRun, HeadingLevel } = await import("docx");
       const children: any[] = [];
 
       for (let i = 1; i <= pdf.numPages; i++) {
@@ -60,12 +60,13 @@ function PdfToWordPage() {
         }
         if (current.trim()) lines.push(current.trim());
 
-        children.push(new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun(`Page ${i}`)] }));
+        if (i > 1) {
+          children.push(new Paragraph({ heading: HeadingLevel.HEADING_2, pageBreakBefore: true, children: [new TextRun(`Page ${i}`)] }));
+        } else {
+          children.push(new Paragraph({ heading: HeadingLevel.HEADING_2, children: [new TextRun(`Page ${i}`)] }));
+        }
         for (const line of lines) {
           children.push(new Paragraph({ children: [new TextRun(line)] }));
-        }
-        if (i < pdf.numPages) {
-          children.push(new Paragraph({ children: [new PageBreak()] }));
         }
       }
 

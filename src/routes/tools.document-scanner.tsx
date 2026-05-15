@@ -667,7 +667,7 @@ function EditPanel({
           onPointerMove={onPointerMove}
           onPointerUp={onPointerUp}
           onPointerCancel={onPointerUp}
-          className="absolute inset-0 w-full h-full touch-none cursor-crosshair"
+          className="absolute touch-none cursor-crosshair"
           style={{ width: displaySize.w, height: displaySize.h, left: "50%", top: "50%", transform: "translate(-50%, -50%)" }}
         />
       </div>

@@ -63,43 +63,33 @@ export const detectDocumentCorners = async (
     blurred = new cv.Mat();
     cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
 
-    thresh = new cv.Mat();
-    cv.adaptiveThreshold(
-      blurred,
-      thresh,
-      255,
-      cv.ADAPTIVE_THRESH_GAUSSIAN_C,
-      cv.THRESH_BINARY_INV,
-      11,
-      2,
-    );
-
     edges = new cv.Mat();
     cv.Canny(blurred, edges, 30, 100);
 
-    combined = new cv.Mat();
-    cv.bitwise_or(thresh, edges, combined);
-
     kernel = cv.Mat.ones(5, 5, cv.CV_8U);
     dilated = new cv.Mat();
-    cv.dilate(combined, dilated, kernel, new cv.Point(-1, -1), 2);
+    cv.dilate(edges, dilated, kernel, new cv.Point(-1, -1), 2);
 
     contours = new cv.MatVector();
     hierarchy = new cv.Mat();
-    cv.findContours(dilated, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+    cv.findContours(dilated, contours, hierarchy, cv.RETR_EXTERNAL, cv.CHAIN_APPROX_SIMPLE);
 
     let bestCorners: DocumentCorners | null = null;
     let maxArea = 0;
     const imageArea = small.cols * small.rows;
 
+    const indexed: { contour: any; area: number }[] = [];
     for (let i = 0; i < contours.size(); i++) {
-      const contour = contours.get(i);
-      const area = cv.contourArea(contour);
+      const c = contours.get(i);
+      indexed.push({ contour: c, area: cv.contourArea(c) });
+    }
+    indexed.sort((a, b) => b.area - a.area);
+    const top = indexed.slice(0, 10);
 
-      if (area < imageArea * 0.1) {
-        contour.delete();
-        continue;
-      }
+    let earlyBreak = false;
+    for (const { contour, area } of top) {
+      if (earlyBreak) break;
+      if (area < imageArea * 0.1) continue;
 
       const perimeter = cv.arcLength(contour, true);
       const approx = new cv.Mat();

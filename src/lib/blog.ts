@@ -1,3 +1,6 @@
+import compressPdfThumb from "@/assets/blog-compress-pdf.png";
+import videoToGifThumb from "@/assets/blog-video-to-gif.png";
+
 export interface BlogPost {
   slug: string;
   path: string;

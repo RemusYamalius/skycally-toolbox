@@ -1,3 +1,6 @@
+import compressPdfThumb from "@/assets/blog-compress-pdf.png";
+import videoToGifThumb from "@/assets/blog-video-to-gif.png";
+
 export interface BlogPost {
   slug: string;
   path: string;
@@ -24,7 +27,7 @@ export const blogPosts: BlogPost[] = [
     dateLabel: "May 16, 2026",
     author: "Skycally Team",
     ctaToolSlug: "compress-pdf",
-    thumbnail: "https://placehold.co/800x400/0d1526/22d3ee?text=Compress+PDF",
+    thumbnail: compressPdfThumb,
     thumbnailAlt: "Compress PDF tool interface",
   },
   {
@@ -38,7 +41,7 @@ export const blogPosts: BlogPost[] = [
     dateLabel: "May 17, 2026",
     author: "Skycally Team",
     ctaToolSlug: "video-to-gif",
-    thumbnail: "https://placehold.co/800x400/0d1526/22d3ee?text=Video+to+GIF",
+    thumbnail: videoToGifThumb,
     thumbnailAlt: "Video to GIF tool interface",
   },
 ];

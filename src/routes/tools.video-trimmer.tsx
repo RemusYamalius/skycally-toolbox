@@ -62,42 +62,67 @@ function Page() {
   };
 
   const run = async () => {
-    if (!file) return;
+    if (!file || !videoRef.current) return;
     setBusy(true);
     setProgress(0);
     setResult(null);
+    setStatus("Preparing trim...");
+
     try {
-      setStatus("Loading trimmer...");
-      const { fetchFile } = await import("@ffmpeg/util");
-      const { getFFmpeg } = await import("@/utils/ffmpegLoader");
-      const ffmpeg = await getFFmpeg(setProgress);
+      const video = videoRef.current;
+      const stream = (video as any).captureStream
+        ? (video as any).captureStream()
+        : (video as any).mozCaptureStream?.();
 
-      const ext = file.name.split(".").pop() || "mp4";
-      setStatus("Reading video...");
-      await ffmpeg.writeFile(`input.${ext}`, await fetchFile(file));
+      if (!stream) throw new Error("Your browser does not support video capture. Try Chrome or Edge.");
 
-      setStatus("Trimming video...");
-      await ffmpeg.exec([
-        "-i", `input.${ext}`,
-        "-ss", String(start),
-        "-to", String(end),
-        "-c:v", "libx264",
-        "-c:a", "aac",
-        "-preset", "ultrafast",
-        "-crf", "23",
-        "output.mp4",
-      ]);
+      const chunks: BlobPart[] = [];
+      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+        ? "video/webm;codecs=vp9"
+        : "video/webm";
 
-      const data = (await ffmpeg.readFile("output.mp4")) as Uint8Array;
-      const buf = new Uint8Array(data);
-      const blob = new Blob([buf.buffer as ArrayBuffer], { type: "video/mp4" });
+      const recorder = new MediaRecorder(stream, { mimeType });
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+      await new Promise<void>((resolve, reject) => {
+        recorder.onstop = () => resolve();
+        recorder.onerror = () => reject(new Error("Recording failed"));
+
+        video.currentTime = start;
+
+        video.onseeked = async () => {
+          video.onseeked = null;
+          setStatus("Trimming...");
+          recorder.start(100);
+          video.muted = true;
+          await video.play();
+
+          const duration = end - start;
+          const interval = setInterval(() => {
+            const elapsed = video.currentTime - start;
+            setProgress(Math.min(99, Math.round((elapsed / duration) * 100)));
+            if (video.currentTime >= end) {
+              clearInterval(interval);
+              video.pause();
+              recorder.stop();
+            }
+          }, 200);
+        };
+      });
+
+      const blob = new Blob(chunks, { type: mimeType });
       setResult({ url: URL.createObjectURL(blob), blob });
+      setProgress(100);
       toast.success("Trim complete!");
     } catch (e: any) {
       toast.error(e?.message || "Trim failed");
     } finally {
       setBusy(false);
       setStatus("");
+      if (videoRef.current) {
+        videoRef.current.muted = false;
+        videoRef.current.pause();
+      }
     }
   };
 

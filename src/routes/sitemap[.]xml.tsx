@@ -53,8 +53,8 @@ const ROUTES: [string, string, string][] = [
   ["/tools/password-generator", "0.6", "monthly"],
   ["/tools/base64", "0.6", "monthly"],
   ["/tools/color-palette", "0.6", "monthly"],
-  ["/blog", "0.7", "weekly"],
-  ["/blog/compress-pdf-online-free", "0.6", "monthly"],
+  ["/blog", "0.8", "weekly"],
+  ["/blog/compress-pdf-online-free", "0.7", "monthly"],
   ["/about", "0.5", "monthly"],
   ["/contact", "0.5", "monthly"],
   ["/privacy", "0.3", "yearly"],
@@ -65,7 +65,7 @@ export const Route = createFileRoute("/sitemap.xml")({
   server: {
     handlers: {
       GET: async () => {
-        const today = new Date().toISOString().split("T")[0];
+        const today = "2026-05-17";
         const urls = ROUTES.map(([path, priority, changefreq]) => `  <url>
     <loc>${SITE}${path}</loc>
     <lastmod>${today}</lastmod>

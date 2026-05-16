@@ -76,6 +76,7 @@ import { Route as ToolsAgeCalculatorRouteImport } from './routes/tools.age-calcu
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text-to-image'
 import { Route as ToolsAddSubtitlesRouteImport } from './routes/tools.add-subtitles'
+import { Route as BlogVideoToGifOnlineFreeRouteImport } from './routes/blog.video-to-gif-online-free'
 import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
 
 const TermsRoute = TermsRouteImport.update({
@@ -414,6 +415,12 @@ const ToolsAddSubtitlesRoute = ToolsAddSubtitlesRouteImport.update({
   path: '/tools/add-subtitles',
   getParentRoute: () => rootRouteImport,
 } as any)
+const BlogVideoToGifOnlineFreeRoute =
+  BlogVideoToGifOnlineFreeRouteImport.update({
+    id: '/blog/video-to-gif-online-free',
+    path: '/blog/video-to-gif-online-free',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BlogCompressPdfOnlineFreeRoute =
   BlogCompressPdfOnlineFreeRouteImport.update({
     id: '/blog/compress-pdf-online-free',
@@ -429,6 +436,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
+  '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
@@ -499,6 +507,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
+  '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
@@ -570,6 +579,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
+  '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
@@ -642,6 +652,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/blog/compress-pdf-online-free'
+    | '/blog/video-to-gif-online-free'
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
@@ -712,6 +723,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/blog/compress-pdf-online-free'
+    | '/blog/video-to-gif-online-free'
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
@@ -782,6 +794,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/blog/compress-pdf-online-free'
+    | '/blog/video-to-gif-online-free'
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
@@ -853,6 +866,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
+  BlogVideoToGifOnlineFreeRoute: typeof BlogVideoToGifOnlineFreeRoute
   ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
   ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
@@ -1387,6 +1401,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAddSubtitlesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/video-to-gif-online-free': {
+      id: '/blog/video-to-gif-online-free'
+      path: '/blog/video-to-gif-online-free'
+      fullPath: '/blog/video-to-gif-online-free'
+      preLoaderRoute: typeof BlogVideoToGifOnlineFreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/compress-pdf-online-free': {
       id: '/blog/compress-pdf-online-free'
       path: '/blog/compress-pdf-online-free'
@@ -1405,6 +1426,7 @@ const rootRouteChildren: RootRouteChildren = {
   SitemapDotxmlRoute: SitemapDotxmlRoute,
   TermsRoute: TermsRoute,
   BlogCompressPdfOnlineFreeRoute: BlogCompressPdfOnlineFreeRoute,
+  BlogVideoToGifOnlineFreeRoute: BlogVideoToGifOnlineFreeRoute,
   ToolsAddSubtitlesRoute: ToolsAddSubtitlesRoute,
   ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,

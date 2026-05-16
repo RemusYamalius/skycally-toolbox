@@ -49,7 +49,7 @@ export const Route = createFileRoute("/blog/video-to-gif-online-free")({
 function ArticlePage() {
   return (
     <BlogPostLayout post={post}>
-      {/* ARTICLE CONTENT GOES HERE */}
+      <p>Article content coming soon.</p>
     </BlogPostLayout>
   );
 }

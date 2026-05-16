@@ -233,7 +233,7 @@ function Page() {
           {result && (
             <div className="rounded-2xl border border-border bg-card p-5 flex flex-col items-center gap-4">
               <video src={result.url} controls className="w-full rounded-xl border border-border bg-black" />
-              <button onClick={() => downloadBlob(result.blob, "video_with_subtitles.mp4")} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5">
+              <button onClick={() => downloadBlob(result.blob, "video_with_subtitles.webm")} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5">
                 <Download className="w-4 h-4" /> Download
               </button>
             </div>
@@ -250,7 +250,7 @@ function Page() {
         "Click Burn Subtitles and download the result.",
       ]} />
 
-      <PoweredByNote />
+      <p className="text-xs text-center text-muted-foreground">Runs entirely in your browser — no uploads.</p>
           <RelatedTools currentSlug="add-subtitles" />
           <ToolSeoContent
         title={"Add Subtitles to Video Online — Free Subtitle Burner"}

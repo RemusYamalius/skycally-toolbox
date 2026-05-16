@@ -55,6 +55,7 @@ const ROUTES: [string, string, string][] = [
   ["/tools/color-palette", "0.6", "monthly"],
   ["/blog", "0.8", "weekly"],
   ["/blog/compress-pdf-online-free", "0.7", "monthly"],
+  ["/blog/video-to-gif-online-free", "0.7", "monthly"],
   ["/about", "0.5", "monthly"],
   ["/contact", "0.5", "monthly"],
   ["/privacy", "0.3", "yearly"],

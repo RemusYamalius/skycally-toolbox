@@ -12,7 +12,7 @@ export const Route = createFileRoute("/tools/video-compressor")({
   component: VideoCompressor,
 });
 
-const API = "https://skycally-api-production.up.railway.app";
+
 
 type Quality = "low" | "medium" | "high";
 
@@ -51,35 +51,49 @@ function VideoCompressor() {
 
   const compress = async () => {
     if (!file) return;
-    setLoading(true);
-    setError("");
-    setDone(false);
-    setCompressedSize(null);
+    setLoading(true); setError(""); setDone(false); setCompressedSize(null);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("quality", quality);
-      const res = await fetch(`${API}/api/video-compress`, {
-        method: "POST",
-        body: form,
+      const bitrates: Record<Quality, number> = { low: 300_000, medium: 800_000, high: 2_000_000 };
+      const targetBitrate = bitrates[quality];
+
+      const video = document.createElement("video");
+      video.src = URL.createObjectURL(file);
+      video.muted = true;
+      await new Promise<void>((res) => { video.onloadedmetadata = () => res(); });
+
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      const ctx = canvas.getContext("2d")!;
+
+      const stream = canvas.captureStream(24);
+      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
+      const recorder = new MediaRecorder(stream, { mimeType, videoBitsPerSecond: targetBitrate });
+      const chunks: BlobPart[] = [];
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+
+      recorder.start(100);
+      await video.play();
+
+      await new Promise<void>((resolve) => {
+        const interval = setInterval(() => {
+          ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+          if (video.ended) { clearInterval(interval); video.pause(); recorder.stop(); }
+        }, 1000 / 24);
+        recorder.onstop = () => resolve();
       });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || "Compression failed");
-      }
-      const blob = await res.blob();
+
+      const blob = new Blob(chunks, { type: mimeType });
       setCompressedSize(blob.size);
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
-      a.download = `${file.name.split(".")[0]}_compressed.mp4`;
+      a.download = `${file.name.split(".")[0]}_compressed.webm`;
       a.click();
       setDone(true);
     } catch (err: any) {
-      setError(err.message);
-    } finally {
-      setLoading(false);
-    }
+      setError(err.message || "Compression failed");
+    } finally { setLoading(false); }
   };
 
   const savings = file && compressedSize

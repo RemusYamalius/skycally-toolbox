@@ -129,10 +129,7 @@ function Page() {
   return (
     <ToolPageShell title="Video Trimmer" description="Cut and trim any video — works entirely in your browser, no uploads.">
       {!file && (
-        <>
-          <FFmpegBanner />
-          <DropZone accept="video/*" onFiles={onPick} label="Drop your video" hint="MP4, MOV, WEBM · max 200MB" />
-        </>
+        <DropZone accept="video/*" onFiles={onPick} label="Drop your video" hint="MP4, MOV, WEBM · max 200MB" />
       )}
 
       {file && (

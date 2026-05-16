@@ -1,39 +1,30 @@
-## Plan: Add "Utility Tools" category + 4 new calculators
+## Plan: Fix Video to GIF tool by switching to backend API
 
-### 1. `src/lib/tools.ts`
-- Extend `ToolCategory` union with `"utility"`.
-- Add `utility` entry to `categoryMeta` (label "Utility Tools", color `var(--green-brand)`, icon 🛠️).
-- Add `Moon, Calculator, Activity, CalendarDays` to lucide-react imports.
-- Change category from `"text"` to `"utility"` for: `spinning-wheel`, `free-time-fixer`, `link-shortener`, `password-generator`, `qr-generator`, `qr-reader`.
-- Append 4 new tools (sleep-calculator, tip-calculator, bmi-calculator, age-calculator) under category `"utility"` exactly as specified.
+Replace the failing ffmpeg.wasm conversion in `/tools/video-to-gif` with a call to the Skycally backend at `https://skycally-api-production.up.railway.app/api/video-to-gif`. Frontend-only change — backend endpoint will be added separately.
 
-### 2. `src/routes/index.tsx`
-- Add `Wrench` to lucide-react imports.
-- Add `{ icon: Wrench, label: "Utility Tools", cat: "utility", color: categoryMeta.utility.color }` to `quickAccess`.
-- Add `utility: "Calculators, decision tools and everyday utilities."` to `categoryTaglines`.
-- Add `"utility"` to the category iteration list in the "Browse All Tools" section so it renders.
+### Files to edit
 
-### 3. Four new route files
-Each follows the established pattern: `createFileRoute`, `buildToolMeta`, `ToolPageShell` wrapping the UI, `HowToUse` with exactly 3 steps, `ToolSeoContent` (title with keywords, 1-2 sentence description, 2-3 paragraph body ~150-200 words, 4 FAQs), and `RelatedTools`. All logic client-side, no external libraries, semantic design tokens only.
+**1. `src/routes/tools.video-to-gif.tsx`** — rewrite the page
 
-**`src/routes/tools.sleep-calculator.tsx`**
-- Mode toggle: "I want to wake up at..." / "I'm going to sleep at..." (Tabs).
-- Time input (`<input type="time">`).
-- Compute 6 recommended times = base ± multiples of 90 min (plus 14 min fall-asleep buffer). Render as clickable badges showing time + cycle count + total sleep hours.
+- Remove imports: `Progress`, `convertToGif` and `MAX_VIDEO_BYTES` from `@/services/videoToGif`.
+- Add local `MAX_VIDEO_BYTES = 50 * 1024 * 1024` and `API = import.meta.env.VITE_API_URL` (already set in `.env`).
+- Remove state: `progress`, `status`.
+- Rename `busy` usage to `loading` (or keep `busy`; keep change minimal — keep `busy`).
+- Replace `run()` with a direct `fetch` to `${API}/api/video-to-gif` using FormData fields `file`, `start`, `duration`, `width`, `fps`. On success, set `gif` from the returned blob; on failure, toast the `detail` from JSON.
+- Remove the `<Progress>` block tied to ffmpeg loading; replace with a simple muted helper line: "Converting your video... this may take a few seconds." shown while `busy`.
+- Keep: drop zone, file info card, Start/Duration/Width/FPS controls, Convert button (still using `Loader2`/`Film` icons), result preview + Download button.
+- Update SEO body and one FAQ that currently claim "runs in your browser" / "FFmpeg WebAssembly" to reflect server-side processing (single small text update — keep structure identical).
 
-**`src/routes/tools.tip-calculator.tsx`**
-- Inputs: bill amount (number), tip % preset buttons (10/15/18/20/25) + custom number, people count (stepper).
-- Live computed: tip, total, per-person. Result cards using design tokens.
+**2. `src/services/videoToGif.ts`** — delete
 
-**`src/routes/tools.bmi-calculator.tsx`**
-- Unit toggle (metric: kg/cm; imperial: lb + ft/in).
-- Compute BMI, category (Underweight <18.5 / Normal 18.5–24.9 / Overweight 25–29.9 / Obese ≥30).
-- Color-coded badge + horizontal gradient scale bar with marker at user's BMI position.
+No longer referenced after the rewrite.
 
-**`src/routes/tools.age-calculator.tsx`**
-- Date input for birthdate.
-- Outputs: years/months/days breakdown, total days lived, days until next birthday with countdown card.
+### Files NOT changed
 
-### Out of scope
-- No edits to `routeTree.gen.ts` (auto-generated).
-- No changes to existing tool routes beyond their category field.
+- `src/utils/ffmpegLoader.ts`, `src/components/ffmpeg-banner.tsx` — still used by `tools.video-trimmer.tsx`, `tools.video-merger.tsx`, `tools.add-subtitles.tsx`. Leave intact.
+- `@ffmpeg/*` npm deps — still used by the three tools above. Leave installed.
+- `skycally-api/main.py` — backend endpoint will be added separately per user choice.
+
+### Validation
+
+After edits, the project build/typecheck runs automatically. Confirm no remaining import of `@/services/videoToGif` and that the page compiles. No runtime test possible until backend endpoint exists.

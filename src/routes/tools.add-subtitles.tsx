@@ -9,7 +9,6 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
-import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -25,8 +24,23 @@ const toSRT = (subs: Sub[]) =>
 
 const COLOR_MAP: Record<string, string> = {
   white: "FFFFFF",
-  yellow: "00FFFF", // BGR for ASS
+  yellow: "00FFFF",
   cyan: "FFFF00",
+};
+
+const timeToSec = (t: string) => {
+  const [h, m, rest] = t.split(":");
+  const [s, ms] = (rest || "0").replace(",", ".").split(".");
+  return parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(s) + (parseInt(ms || "0") / 1000);
+};
+
+const parseSRT = (content: string) => {
+  const blocks = content.trim().split(/\n\n+/);
+  return blocks.map((b) => {
+    const lines = b.split("\n");
+    const times = (lines[1] || "").split(" --> ");
+    return { start: timeToSec(times[0] || "0"), end: timeToSec(times[1] || "0"), text: lines.slice(2).join(" ") };
+  }).filter((s) => s.text);
 };
 
 function Page() {

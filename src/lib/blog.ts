@@ -8,6 +8,8 @@ export interface BlogPost {
   dateLabel: string;
   author: string;
   ctaToolSlug: string;
+  thumbnail: string;
+  thumbnailAlt: string;
 }
 
 export const blogPosts: BlogPost[] = [
@@ -22,6 +24,8 @@ export const blogPosts: BlogPost[] = [
     dateLabel: "May 16, 2026",
     author: "Skycally Team",
     ctaToolSlug: "compress-pdf",
+    thumbnail: "https://placehold.co/800x400/0d1526/22d3ee?text=Compress+PDF",
+    thumbnailAlt: "Compress PDF tool interface",
   },
   {
     slug: "video-to-gif-online-free",
@@ -34,6 +38,8 @@ export const blogPosts: BlogPost[] = [
     dateLabel: "May 17, 2026",
     author: "Skycally Team",
     ctaToolSlug: "video-to-gif",
+    thumbnail: "https://placehold.co/800x400/0d1526/22d3ee?text=Video+to+GIF",
+    thumbnailAlt: "Video to GIF tool interface",
   },
 ];
 

@@ -1,19 +1,9 @@
+import { removeBackground as removeBg } from "@imgly/background-removal";
+
 export const removeBackground = async (file: File): Promise<Blob> => {
-  const formData = new FormData();
-  formData.append("file", file);
-
-  const response = await fetch(
-    `${import.meta.env.VITE_API_URL}/api/remove-bg`,
-    {
-      method: "POST",
-      body: formData,
-    }
-  );
-
-  if (!response.ok) {
-    const err = await response.json().catch(() => ({}));
-    throw new Error(err.detail || "Background removal failed");
-  }
-
-  return await response.blob();
+  const blob = await removeBg(file, {
+    publicPath: "https://cdn.jsdelivr.net/npm/@imgly/background-removal@1.4.5/dist/",
+    output: { format: "image/png", quality: 0.9 },
+  });
+  return blob;
 };

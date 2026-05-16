@@ -67,7 +67,7 @@ function RemoveBgPage() {
             </div>
           </div>
           {!resultUrl ? (
-            <button onClick={run} disabled={busy} className="w-full rounded-xl bg-foreground text-background font-semibold py-3 disabled:opacity-50">{busy ? "Removing..." : "Remove background"}</button>
+            <button onClick={run} disabled={busy} className="w-full rounded-xl bg-foreground text-background font-semibold py-3 disabled:opacity-50">{busy ? "Processing (may take ~15s)..." : "Remove background"}</button>
           ) : (
             <button onClick={() => downloadBlob(resultBlob!, file.name.replace(/\.[^.]+$/, "") + "-nobg.png")} className="w-full rounded-xl bg-foreground text-background font-semibold py-3">Download PNG</button>
           )}

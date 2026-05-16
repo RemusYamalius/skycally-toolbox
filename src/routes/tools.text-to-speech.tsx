@@ -26,7 +26,7 @@ function Page() {
   const [text, setText] = useState("Hello! Welcome to Skycally text to speech.");
   const [voices, setVoices] = useState<SpeechSynthesisVoice[]>([]);
   const [voiceURI, setVoiceURI] = useState("");
-  const [rate, setRate] = useState(1);
+  const [rate, setRate] = useState(0.9);
   const [pitch, setPitch] = useState(1);
   const [playing, setPlaying] = useState(false);
 
@@ -34,7 +34,13 @@ function Page() {
     if (typeof window === "undefined" || !window.speechSynthesis) return;
     const load = () => {
       const all = window.speechSynthesis.getVoices();
-      const filtered = all.filter((v) => ALLOWED.some((p) => v.lang.toLowerCase().startsWith(p)));
+      const filtered = all
+        .filter((v) => ALLOWED.some((p) => v.lang.toLowerCase().startsWith(p)))
+        .sort((a, b) => {
+          if (!a.localService && b.localService) return -1;
+          if (a.localService && !b.localService) return 1;
+          return 0;
+        });
       setVoices(filtered);
       if (filtered.length && !voiceURI) setVoiceURI(filtered[0].voiceURI);
     };
@@ -80,6 +86,7 @@ function Page() {
                 return <option key={v.voiceURI} value={v.voiceURI}>{flag} {v.name} ({v.lang})</option>;
               })}
             </select>
+            <p className="text-xs text-muted-foreground mt-2">💡 Voices labeled "Online" or "Neural" sound most natural.</p>
           </div>
           <div>
             <label className="text-sm font-semibold mb-2 block">Speed: {rate.toFixed(2)}x</label>

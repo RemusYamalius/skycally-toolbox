@@ -9,7 +9,6 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
-import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -48,46 +47,55 @@ function Page() {
 
   const run = async () => {
     if (videos.length < 2) return;
-    setBusy(true);
-    setProgress(0);
-    setResult(null);
+    setBusy(true); setProgress(0); setResult(null);
     try {
-      setStatus("Loading merger...");
-      const { fetchFile } = await import("@ffmpeg/util");
-      const { getFFmpeg } = await import("@/utils/ffmpegLoader");
-      const ffmpeg = await getFFmpeg(setProgress);
+      setStatus("Preparing videos...");
+      const chunks: BlobPart[] = [];
+      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
+        ? "video/webm;codecs=vp9" : "video/webm";
 
-      setStatus("Reading videos...");
-      const names: string[] = [];
       for (let i = 0; i < videos.length; i++) {
-        const ext = videos[i].file.name.split(".").pop() || "mp4";
-        const name = `input_${i}.${ext}`;
-        await ffmpeg.writeFile(name, await fetchFile(videos[i].file));
-        names.push(name);
+        setStatus(`Recording video ${i + 1} of ${videos.length}...`);
+        setProgress(Math.round((i / videos.length) * 90));
+
+        await new Promise<void>((resolve, reject) => {
+          const video = document.createElement("video");
+          video.src = videos[i].url;
+          video.muted = true;
+          video.preload = "auto";
+
+          video.onloadedmetadata = () => {
+            const stream = (video as any).captureStream?.() ?? (video as any).mozCaptureStream?.();
+            if (!stream) { reject(new Error("captureStream not supported. Use Chrome or Edge.")); return; }
+
+            const recorder = new MediaRecorder(stream, { mimeType });
+            recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
+            recorder.onstop = () => resolve();
+            recorder.onerror = () => reject(new Error("Recording error"));
+
+            recorder.start(100);
+            video.play();
+            video.onended = () => { video.pause(); recorder.stop(); };
+          };
+          video.onerror = () => reject(new Error(`Could not load video ${i + 1}`));
+        });
       }
-      const concat = names.map((n) => `file '${n}'`).join("\n");
-      await ffmpeg.writeFile("concat.txt", new TextEncoder().encode(concat));
 
-      setStatus("Merging...");
-      await ffmpeg.exec(["-f", "concat", "-safe", "0", "-i", "concat.txt", "-c", "copy", "output.mp4"]);
-
-      const data = (await ffmpeg.readFile("output.mp4")) as Uint8Array;
-      const buf = new Uint8Array(data);
-      const blob = new Blob([buf.buffer as ArrayBuffer], { type: "video/mp4" });
+      setStatus("Finalizing...");
+      setProgress(95);
+      const blob = new Blob(chunks, { type: mimeType });
       setResult({ url: URL.createObjectURL(blob), blob });
-      toast.success("Merged!");
+      setProgress(100);
+      toast.success("Videos merged!");
     } catch (e: any) {
-      toast.error(e?.message || "Merge failed. All videos must share the same codec/format.");
+      toast.error(e?.message || "Merge failed");
     } finally {
-      setBusy(false);
-      setStatus("");
+      setBusy(false); setStatus("");
     }
   };
 
   return (
     <ToolPageShell title="Video Merger" description="Combine multiple videos into one — works entirely in your browser.">
-      <FFmpegBanner />
-
       <div
         onClick={() => inputRef.current?.click()}
         onDrop={(e) => { e.preventDefault(); add(e.dataTransfer.files); }}
@@ -97,7 +105,7 @@ function Page() {
         <input ref={inputRef} type="file" accept="video/*" multiple className="hidden" onChange={(e) => add(e.target.files)} />
         <Combine className="w-10 h-10 mx-auto mb-3 text-muted-foreground" />
         <p className="font-display font-semibold">Drop videos or click to browse</p>
-        <p className="text-sm text-muted-foreground mt-1">Add 2 or more videos to merge (same format)</p>
+        <p className="text-sm text-muted-foreground mt-1">Add 2 or more videos to merge</p>
       </div>
 
       {videos.length > 0 && (
@@ -135,7 +143,7 @@ function Page() {
       {result && (
         <div className="mt-6 rounded-2xl border border-border bg-card p-5 flex flex-col items-center gap-4">
           <video src={result.url} controls className="w-full rounded-xl border border-border bg-black" />
-          <button onClick={() => downloadBlob(result.blob, "merged_video.mp4")} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5">
+          <button onClick={() => downloadBlob(result.blob, "merged_video.webm")} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5">
             <Download className="w-4 h-4" /> Download
           </button>
         </div>
@@ -150,7 +158,7 @@ function Page() {
         "Click Merge and download the combined video.",
       ]} />
 
-      <PoweredByNote />
+      <p className="text-xs text-center text-muted-foreground">Runs entirely in your browser — no uploads.</p>
           <RelatedTools currentSlug="video-merger" />
           <ToolSeoContent
         title={"Merge Videos Online Free — Combine Multiple Videos"}

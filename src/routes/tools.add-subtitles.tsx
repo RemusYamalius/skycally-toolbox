@@ -9,7 +9,6 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { Progress } from "@/components/ui/progress";
 import { downloadBlob } from "@/lib/file-utils";
-import { FFmpegBanner, PoweredByNote } from "@/components/ffmpeg-banner";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -25,8 +24,23 @@ const toSRT = (subs: Sub[]) =>
 
 const COLOR_MAP: Record<string, string> = {
   white: "FFFFFF",
-  yellow: "00FFFF", // BGR for ASS
+  yellow: "00FFFF",
   cyan: "FFFF00",
+};
+
+const timeToSec = (t: string) => {
+  const [h, m, rest] = t.split(":");
+  const [s, ms] = (rest || "0").replace(",", ".").split(".");
+  return parseInt(h) * 3600 + parseInt(m) * 60 + parseInt(s) + (parseInt(ms || "0") / 1000);
+};
+
+const parseSRT = (content: string) => {
+  const blocks = content.trim().split(/\n\n+/);
+  return blocks.map((b) => {
+    const lines = b.split("\n");
+    const times = (lines[1] || "").split(" --> ");
+    return { start: timeToSec(times[0] || "0"), end: timeToSec(times[1] || "0"), text: lines.slice(2).join(" ") };
+  }).filter((s) => s.text);
 };
 
 function Page() {
@@ -58,51 +72,73 @@ function Page() {
 
   const run = async () => {
     if (!videoFile) return;
-    setBusy(true);
-    setProgress(0);
-    setResult(null);
+    setBusy(true); setProgress(0); setResult(null);
     try {
-      setStatus("Loading processor...");
-      const { fetchFile } = await import("@ffmpeg/util");
-      const { getFFmpeg } = await import("@/utils/ffmpegLoader");
-      const ffmpeg = await getFFmpeg(setProgress);
+      setStatus("Loading video...");
+      const activeSubs: { start: number; end: number; text: string }[] = (
+        mode === "upload" && srtFile
+          ? parseSRT(await srtFile.text())
+          : subs.map((s) => ({ start: timeToSec(s.start), end: timeToSec(s.end), text: s.text }))
+      );
 
-      const ext = videoFile.name.split(".").pop() || "mp4";
-      await ffmpeg.writeFile(`input.${ext}`, await fetchFile(videoFile));
+      const video = document.createElement("video");
+      video.src = URL.createObjectURL(videoFile);
+      video.muted = true;
+      await new Promise<void>((res) => { video.onloadedmetadata = () => res(); });
 
-      let srtContent: string;
-      if (mode === "upload" && srtFile) {
-        srtContent = await srtFile.text();
-      } else {
-        srtContent = toSRT(subs);
-      }
-      await ffmpeg.writeFile("subs.srt", new TextEncoder().encode(srtContent));
+      const canvas = document.createElement("canvas");
+      canvas.width = video.videoWidth || 1280;
+      canvas.height = video.videoHeight || 720;
+      const ctx = canvas.getContext("2d")!;
 
-      setStatus("Burning subtitles...");
-      const style = `FontSize=${fontSize},PrimaryColour=&H00${COLOR_MAP[color]}&,Outline=2`;
-      await ffmpeg.exec([
-        "-i", `input.${ext}`,
-        "-vf", `subtitles=subs.srt:force_style='${style}'`,
-        "-c:a", "copy",
-        "output.mp4",
-      ]);
+      const stream = canvas.captureStream(30);
+      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
+      const recorder = new MediaRecorder(stream, { mimeType });
+      const chunks: BlobPart[] = [];
+      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
 
-      const data = (await ffmpeg.readFile("output.mp4")) as Uint8Array;
-      const buf = new Uint8Array(data);
-      const blob = new Blob([buf.buffer as ArrayBuffer], { type: "video/mp4" });
+      const colorMap: Record<string, string> = { white: "#ffffff", yellow: "#ffff00", cyan: "#00ffff" };
+      const subtitleColor = colorMap[color] || "#ffffff";
+      const drawFrame = () => {
+        ctx.drawImage(video, 0, 0, canvas.width, canvas.height);
+        const t = video.currentTime;
+        const sub = activeSubs.find((s) => t >= s.start && t <= s.end);
+        if (sub) {
+          ctx.font = `bold ${fontSize}px Arial`;
+          ctx.textAlign = "center";
+          ctx.strokeStyle = "#000000";
+          ctx.lineWidth = 4;
+          ctx.strokeText(sub.text, canvas.width / 2, canvas.height - 40);
+          ctx.fillStyle = subtitleColor;
+          ctx.fillText(sub.text, canvas.width / 2, canvas.height - 40);
+        }
+      };
+
+      recorder.start(100);
+      await video.play();
+
+      await new Promise<void>((resolve) => {
+        const interval = setInterval(() => {
+          drawFrame();
+          const pct = Math.round((video.currentTime / video.duration) * 90);
+          setProgress(pct);
+          setStatus(`Processing ${Math.round(video.currentTime)}s / ${Math.round(video.duration)}s...`);
+          if (video.ended) { clearInterval(interval); video.pause(); recorder.stop(); }
+        }, 33);
+        recorder.onstop = () => resolve();
+      });
+
+      const blob = new Blob(chunks, { type: mimeType });
       setResult({ url: URL.createObjectURL(blob), blob });
+      setProgress(100);
       toast.success("Subtitles burned!");
     } catch (e: any) {
       toast.error(e?.message || "Failed to burn subtitles");
-    } finally {
-      setBusy(false);
-      setStatus("");
-    }
+    } finally { setBusy(false); setStatus(""); }
   };
 
   return (
     <ToolPageShell title="Add Subtitles to Video" description="Burn subtitles into any video — works entirely in your browser.">
-      <FFmpegBanner />
 
       {/* Video upload */}
       <div
@@ -197,7 +233,7 @@ function Page() {
           {result && (
             <div className="rounded-2xl border border-border bg-card p-5 flex flex-col items-center gap-4">
               <video src={result.url} controls className="w-full rounded-xl border border-border bg-black" />
-              <button onClick={() => downloadBlob(result.blob, "video_with_subtitles.mp4")} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5">
+              <button onClick={() => downloadBlob(result.blob, "video_with_subtitles.webm")} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5">
                 <Download className="w-4 h-4" /> Download
               </button>
             </div>
@@ -214,7 +250,7 @@ function Page() {
         "Click Burn Subtitles and download the result.",
       ]} />
 
-      <PoweredByNote />
+      <p className="text-xs text-center text-muted-foreground">Runs entirely in your browser — no uploads.</p>
           <RelatedTools currentSlug="add-subtitles" />
           <ToolSeoContent
         title={"Add Subtitles to Video Online — Free Subtitle Burner"}

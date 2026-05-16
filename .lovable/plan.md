@@ -1,30 +1,26 @@
-## Plan: Fix Video to GIF tool by switching to backend API
+## Plan: Fix 4 tools per uploaded prompt
 
-Replace the failing ffmpeg.wasm conversion in `/tools/video-to-gif` with a call to the Skycally backend at `https://skycally-api-production.up.railway.app/api/video-to-gif`. Frontend-only change — backend endpoint will be added separately.
+FFmpeg.wasm fails in this environment (no SharedArrayBuffer). Replace with native `MediaRecorder` / canvas approaches and add a mobile warning to Screen Recorder.
 
-### Files to edit
+### 1. `src/routes/tools.video-merger.tsx`
+- Replace `run()` with a `MediaRecorder` + `video.captureStream()` loop that records each input video sequentially into one `video/webm` blob.
+- Remove `FFmpegBanner` and `PoweredByNote` imports + JSX. Replace with a small "Runs entirely in your browser — no uploads." note.
+- Change DropZone hint to "Add 2 or more videos to merge".
+- Update download filename to `merged_video.webm`.
 
-**1. `src/routes/tools.video-to-gif.tsx`** — rewrite the page
+### 2. `src/routes/tools.add-subtitles.tsx`
+- Replace `run()` with a canvas-based renderer: draw each video frame to a canvas, overlay the active subtitle text (with stroke + fill color), capture the canvas as a stream into `MediaRecorder`.
+- Add `timeToSec` and `parseSRT` helpers above the component.
+- Remove `FFmpegBanner` import/JSX. Update download filename to `video_with_subtitles.webm`.
 
-- Remove imports: `Progress`, `convertToGif` and `MAX_VIDEO_BYTES` from `@/services/videoToGif`.
-- Add local `MAX_VIDEO_BYTES = 50 * 1024 * 1024` and `API = import.meta.env.VITE_API_URL` (already set in `.env`).
-- Remove state: `progress`, `status`.
-- Rename `busy` usage to `loading` (or keep `busy`; keep change minimal — keep `busy`).
-- Replace `run()` with a direct `fetch` to `${API}/api/video-to-gif` using FormData fields `file`, `start`, `duration`, `width`, `fps`. On success, set `gif` from the returned blob; on failure, toast the `detail` from JSON.
-- Remove the `<Progress>` block tied to ffmpeg loading; replace with a simple muted helper line: "Converting your video... this may take a few seconds." shown while `busy`.
-- Keep: drop zone, file info card, Start/Duration/Width/FPS controls, Convert button (still using `Loader2`/`Film` icons), result preview + Download button.
-- Update SEO body and one FAQ that currently claim "runs in your browser" / "FFmpeg WebAssembly" to reflect server-side processing (single small text update — keep structure identical).
+### 3. `src/routes/tools.video-compressor.tsx`
+- Replace server API compression with a local canvas + `MediaRecorder` pipeline using `videoBitsPerSecond` chosen by quality (low/medium/high → 300k / 800k / 2M).
+- Remove `const API = "..."` and any server error handling. Output downloads as `<name>_compressed.webm`.
 
-**2. `src/services/videoToGif.ts`** — delete
+### 4. `src/routes/tools.screen-recorder.tsx`
+- Add `const isMobile = /Mobi|Android/i.test(navigator.userAgent);` and render a yellow warning banner at the top of the returned JSX when true.
 
-No longer referenced after the rewrite.
-
-### Files NOT changed
-
-- `src/utils/ffmpegLoader.ts`, `src/components/ffmpeg-banner.tsx` — still used by `tools.video-trimmer.tsx`, `tools.video-merger.tsx`, `tools.add-subtitles.tsx`. Leave intact.
-- `@ffmpeg/*` npm deps — still used by the three tools above. Leave installed.
-- `skycally-api/main.py` — backend endpoint will be added separately per user choice.
-
-### Validation
-
-After edits, the project build/typecheck runs automatically. Confirm no remaining import of `@/services/videoToGif` and that the page compiles. No runtime test possible until backend endpoint exists.
+### Notes
+- All output is `.webm` (VP9 when supported, otherwise default WebM).
+- No new dependencies. FFmpeg-related files (`ffmpegLoader`, `ffmpeg-banner`) are left in place — still used by `tools.video-trimmer.tsx`.
+- After edits, the auto build/typecheck confirms the changes compile.

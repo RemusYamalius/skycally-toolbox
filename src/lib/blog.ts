@@ -23,6 +23,18 @@ export const blogPosts: BlogPost[] = [
     author: "Skycally Team",
     ctaToolSlug: "compress-pdf",
   },
+  {
+    slug: "video-to-gif-online-free",
+    path: "/blog/video-to-gif-online-free",
+    title: "How to Convert Video to GIF Online for Free",
+    description:
+      "Turn any video clip into a shareable GIF in seconds — no software needed, works in your browser.",
+    category: "Video Tools",
+    date: "2026-05-17",
+    dateLabel: "May 17, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "video-to-gif",
+  },
 ];
 
 export const getBlogPostBySlug = (slug: string) =>

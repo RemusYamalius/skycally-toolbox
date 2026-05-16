@@ -77,12 +77,15 @@ function Page() {
       setStatus("Reading video...");
       await ffmpeg.writeFile(`input.${ext}`, await fetchFile(file));
 
-      setStatus("Trimming...");
+      setStatus("Trimming video...");
       await ffmpeg.exec([
-        "-ss", String(start),
-        "-t", String(end - start),
         "-i", `input.${ext}`,
-        "-c", "copy",
+        "-ss", String(start),
+        "-to", String(end),
+        "-c:v", "libx264",
+        "-c:a", "aac",
+        "-preset", "ultrafast",
+        "-crf", "23",
         "output.mp4",
       ]);
 

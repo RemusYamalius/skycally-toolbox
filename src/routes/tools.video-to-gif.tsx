@@ -8,8 +8,6 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
-import { Progress } from "@/components/ui/progress";
-import { convertToGif, MAX_VIDEO_BYTES } from "@/services/videoToGif";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
@@ -19,6 +17,9 @@ export const Route = createFileRoute("/tools/video-to-gif")({
   component: Page,
 });
 
+const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
+const API = import.meta.env.VITE_API_URL as string;
+
 function Page() {
   const [file, setFile] = useState<File | null>(null);
   const [start, setStart] = useState(0);
@@ -26,8 +27,6 @@ function Page() {
   const [width, setWidth] = useState(480);
   const [fps, setFps] = useState(15);
   const [busy, setBusy] = useState(false);
-  const [progress, setProgress] = useState(0);
-  const [status, setStatus] = useState("");
   const [gif, setGif] = useState<{ url: string; blob: Blob } | null>(null);
 
   const onPick = (files: File[]) => {
@@ -41,22 +40,41 @@ function Page() {
   const run = async () => {
     if (!file) return;
     setBusy(true);
-    setProgress(0);
     setGif(null);
     try {
-      const blob = await convertToGif(file, start, Math.min(duration, 10), width, fps, setProgress, setStatus);
+      const form = new FormData();
+      form.append("file", file);
+      form.append("start", String(start));
+      form.append("duration", String(Math.min(duration, 10)));
+      form.append("width", String(width));
+      form.append("fps", String(fps));
+
+      const res = await fetch(`${API}/api/video-to-gif`, {
+        method: "POST",
+        body: form,
+      });
+
+      if (!res.ok) {
+        let detail = "Conversion failed";
+        try {
+          const err = await res.json();
+          detail = err.detail || detail;
+        } catch {}
+        throw new Error(detail);
+      }
+
+      const blob = await res.blob();
       setGif({ url: URL.createObjectURL(blob), blob });
       toast.success("GIF ready!");
     } catch (e: any) {
-      toast.error(e.message || "Conversion failed");
+      toast.error(e?.message || "Conversion failed");
     } finally {
       setBusy(false);
-      setStatus("");
     }
   };
 
   return (
-    <ToolPageShell title="Video to GIF" description="Trim a clip from any video and turn it into a shareable GIF — all in your browser.">
+    <ToolPageShell title="Video to GIF" description="Trim a clip from any video and turn it into a shareable GIF.">
       {!file && <DropZone accept="video/mp4,video/quicktime,video/webm" onFiles={onPick} label="Drop your video" hint="MP4, MOV, or WEBM · max 50MB" />}
 
       {file && (
@@ -97,14 +115,11 @@ function Page() {
           </div>
 
           <button onClick={run} disabled={busy} className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-foreground text-background font-semibold px-4 py-3 disabled:opacity-50">
-            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Film className="w-4 h-4" />} {busy ? (status || "Converting...") : "Convert to GIF"}
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Film className="w-4 h-4" />} {busy ? "Converting..." : "Convert to GIF"}
           </button>
 
           {busy && (
-            <div className="space-y-2">
-              <Progress value={progress} />
-              <p className="text-xs text-muted-foreground text-center">{progress}%</p>
-            </div>
+            <p className="text-sm text-muted-foreground text-center">Converting your video... this may take a few seconds.</p>
           )}
 
           {gif && (
@@ -126,21 +141,21 @@ function Page() {
         "Pick start time, duration, width, and FPS.",
         "Click Convert and download your GIF.",
       ]} />
-          <RelatedTools currentSlug="video-to-gif" />
-          <ToolSeoContent
+      <RelatedTools currentSlug="video-to-gif" />
+      <ToolSeoContent
         title={"Convert Video to GIF Online — Free & Fast"}
         description={"Turn any video clip into a high-quality animated GIF using Skycally's free converter. Customize frame rate, size and duration for the perfect GIF."}
         body={[
-        "Select your video clip, set the start time and duration (up to 10 seconds), choose your preferred width and frame rate, and convert to GIF in seconds. The tool uses FFmpeg WebAssembly running entirely in your browser.",
-        "Our two-pass palette generation ensures your GIF has vibrant, accurate colors rather than the washed-out look common with basic converters. Perfect for social media, messaging apps and presentations.",
-      ]}
+          "Select your video clip, set the start time and duration (up to 10 seconds), choose your preferred width and frame rate, and convert to GIF in seconds. Conversion is handled by our secure server using FFmpeg for fast, reliable results.",
+          "Our two-pass palette generation ensures your GIF has vibrant, accurate colors rather than the washed-out look common with basic converters. Perfect for social media, messaging apps and presentations.",
+        ]}
         faqs={[
-        { question: "Why is my GIF file so large?", answer: "GIFs are inherently large format. Reduce the width (try 320px), lower the FPS to 10, or shorten the duration to get a smaller file." },
-        { question: "What is the maximum clip duration for GIF?", answer: "We limit GIF conversion to 10 seconds to keep file sizes manageable. For longer animations, consider using the Video Compressor instead." },
-        { question: "Does the conversion happen in my browser?", answer: "Yes! We use FFmpeg WebAssembly which runs entirely in your browser. Your video never leaves your device." },
-        { question: "Can I convert YouTube videos to GIF?", answer: "You need to have the video file on your device first. Use our Video Downloader to save the clip, then convert it to GIF." },
-      ]}
+          { question: "Why is my GIF file so large?", answer: "GIFs are inherently large format. Reduce the width (try 320px), lower the FPS to 10, or shorten the duration to get a smaller file." },
+          { question: "What is the maximum clip duration for GIF?", answer: "We limit GIF conversion to 10 seconds to keep file sizes manageable. For longer animations, consider using the Video Compressor instead." },
+          { question: "How is my video processed?", answer: "Your video is uploaded to our secure server, converted to GIF, and the result is sent back to your browser. Files are not stored after processing." },
+          { question: "Can I convert YouTube videos to GIF?", answer: "You need to have the video file on your device first. Use our Video Downloader to save the clip, then convert it to GIF." },
+        ]}
       />
-      </ToolPageShell>
+    </ToolPageShell>
   );
 }

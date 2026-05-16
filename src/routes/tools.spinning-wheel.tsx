@@ -18,14 +18,26 @@ export const Route = createFileRoute("/tools/spinning-wheel")({
 });
 
 const PALETTE = ["#06b6d4", "#a855f7", "#f97316", "#22c55e", "#ec4899", "#eab308", "#3b82f6", "#ef4444"];
-const SIZE = 420;
 
 function SpinningWheel() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+  const [size, setSize] = useState(420);
   const [options, setOptions] = useState<string[]>(["Option 1", "Option 2", "Option 3", "Option 4", "Option 5", "Option 6"]);
   const [rotation, setRotation] = useState(0);
   const [spinning, setSpinning] = useState(false);
   const [winner, setWinner] = useState<string | null>(null);
+
+  useEffect(() => {
+    const el = containerRef.current;
+    if (!el) return;
+    const ro = new ResizeObserver(([entry]) => {
+      const w = entry.contentRect.width;
+      setSize(Math.min(420, w));
+    });
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
 
   useEffect(() => {
     const c = canvasRef.current;
@@ -33,13 +45,13 @@ function SpinningWheel() {
     const ctx = c.getContext("2d");
     if (!ctx) return;
     const dpr = window.devicePixelRatio || 1;
-    c.width = SIZE * dpr;
-    c.height = SIZE * dpr;
+    c.width = size * dpr;
+    c.height = size * dpr;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.clearRect(0, 0, SIZE, SIZE);
-    const cx = SIZE / 2;
-    const cy = SIZE / 2;
-    const r = SIZE / 2 - 8;
+    ctx.clearRect(0, 0, size, size);
+    const cx = size / 2;
+    const cy = size / 2;
+    const r = size / 2 - 8;
     const n = Math.max(options.length, 1);
     const seg = (Math.PI * 2) / n;
     ctx.save();
@@ -78,7 +90,7 @@ function SpinningWheel() {
     ctx.strokeStyle = "#fff";
     ctx.lineWidth = 3;
     ctx.stroke();
-  }, [options, rotation]);
+  }, [options, rotation, size]);
 
   const spin = () => {
     if (spinning || options.length < 2) return;
@@ -115,15 +127,17 @@ function SpinningWheel() {
 
   return (
     <ToolPageShell title={tool.name} description={tool.description}>
-      <div className="grid gap-8 md:grid-cols-[auto,1fr] items-start">
-        <div className="relative mx-auto" style={{ width: SIZE, height: SIZE }}>
-          <canvas ref={canvasRef} style={{ width: SIZE, height: SIZE }} className="rounded-full shadow-2xl" />
-          <div className="absolute left-1/2 -translate-x-1/2 -top-2 w-0 h-0 border-l-[14px] border-r-[14px] border-t-[24px] border-l-transparent border-r-transparent border-t-[var(--cyan-brand)] drop-shadow" />
-          <div className="mt-6 flex justify-center">
-            <Button onClick={spin} disabled={spinning || options.length < 2} size="lg" className="px-10 text-base">
-              <RotateCw className={`w-4 h-4 mr-2 ${spinning ? "animate-spin" : ""}`} />
-              {spinning ? "Spinning…" : "Spin"}
-            </Button>
+      <div className="grid gap-8 md:grid-cols-[auto,1fr] items-start overflow-hidden">
+        <div ref={containerRef} className="w-full">
+          <div className="relative mx-auto" style={{ width: size, height: size }}>
+            <canvas ref={canvasRef} style={{ width: size, height: size }} className="rounded-full shadow-2xl" />
+            <div className="absolute left-1/2 -translate-x-1/2 -top-2 w-0 h-0 border-l-[14px] border-r-[14px] border-t-[24px] border-l-transparent border-r-transparent border-t-[var(--cyan-brand)] drop-shadow" />
+            <div className="mt-6 flex justify-center">
+              <Button onClick={spin} disabled={spinning || options.length < 2} size="lg" className="px-10 text-base">
+                <RotateCw className={`w-4 h-4 mr-2 ${spinning ? "animate-spin" : ""}`} />
+                {spinning ? "Spinning…" : "Spin"}
+              </Button>
+            </div>
           </div>
         </div>
 

@@ -28,6 +28,12 @@ export function BlogPostLayout({
           <span aria-hidden>·</span>
           <span>By {post.author}</span>
         </div>
+        <img
+          src={post.thumbnail}
+          alt={post.thumbnailAlt}
+          className="mt-8 w-full rounded-2xl border border-border"
+          style={{ height: "auto", objectFit: "cover" }}
+        />
       </header>
 
       <article

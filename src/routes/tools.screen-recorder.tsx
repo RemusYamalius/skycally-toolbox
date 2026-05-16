@@ -16,6 +16,7 @@ export const Route = createFileRoute("/tools/screen-recorder")({
 type RecordingState = "idle" | "recording" | "stopped";
 
 function ScreenRecorder() {
+  const isMobile = typeof navigator !== "undefined" && /Mobi|Android/i.test(navigator.userAgent);
   const [state, setState] = useState<RecordingState>("idle");
   const [videoUrl, setVideoUrl] = useState<string>("");
   const [duration, setDuration] = useState(0);
@@ -95,6 +96,11 @@ function ScreenRecorder() {
   return (
     <ToolPageShell title="Screen Recorder" description="Record your screen with audio directly in the browser — no installs needed.">
       <div className="w-full space-y-5">
+        {isMobile && (
+          <div className="rounded-xl bg-yellow-500/10 border border-yellow-500/30 text-yellow-400 text-sm px-4 py-3 mb-4">
+            Screen recording is not supported on mobile browsers. Please use a desktop browser (Chrome or Edge).
+          </div>
+        )}
         <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-8 text-center space-y-6">
           <div className="space-y-3">
             <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center border-2 transition-all ${

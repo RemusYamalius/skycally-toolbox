@@ -15,6 +15,32 @@ export const Route = createFileRoute("/blog/compress-pdf-online-free")({
     return {
       ...base,
       meta: [...base.meta, { property: "og:type", content: "article" }],
+      scripts: [{
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "Article",
+          "headline": "How to Compress a PDF Online for Free (No Signup Required)",
+          "datePublished": "2026-05-16",
+          "dateModified": "2026-05-16",
+          "author": {
+            "@type": "Organization",
+            "name": "Skycally",
+            "url": "https://skycally.com"
+          },
+          "publisher": {
+            "@type": "Organization",
+            "name": "Skycally",
+            "url": "https://skycally.com",
+            "logo": {
+              "@type": "ImageObject",
+              "url": "https://skycally.com/favicon.ico"
+            }
+          },
+          "url": "https://skycally.com/blog/compress-pdf-online-free",
+          "description": "Learn how to compress PDF files online for free without losing quality. No signup required, works entirely in your browser."
+        }),
+      }],
     };
   },
   component: ArticlePage,

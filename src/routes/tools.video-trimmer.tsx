@@ -211,7 +211,7 @@ function Page() {
         "Click Trim and download the trimmed video.",
       ]} />
 
-      <PoweredByNote />
+      <p className="mt-6 text-center text-xs text-muted-foreground">Runs entirely in your browser — no uploads, no servers.</p>
           <RelatedTools currentSlug="video-trimmer" />
           <ToolSeoContent
         title={"Free Video Trimmer — Cut and Trim Videos Online"}

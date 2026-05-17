@@ -24,6 +24,8 @@ import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif
 import { Route as ToolsVideoMergerRouteImport } from './routes/tools.video-merger'
 import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
+import { Route as ToolsUuidGeneratorRouteImport } from './routes/tools.uuid-generator'
+import { Route as ToolsUrlEncoderRouteImport } from './routes/tools.url-encoder'
 import { Route as ToolsTipCalculatorRouteImport } from './routes/tools.tip-calculator'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
@@ -47,6 +49,7 @@ import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
+import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
 import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
@@ -152,6 +155,16 @@ const ToolsVideoDownloaderRoute = ToolsVideoDownloaderRouteImport.update({
 const ToolsVideoCompressorRoute = ToolsVideoCompressorRouteImport.update({
   id: '/tools/video-compressor',
   path: '/tools/video-compressor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsUuidGeneratorRoute = ToolsUuidGeneratorRouteImport.update({
+  id: '/tools/uuid-generator',
+  path: '/tools/uuid-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsUrlEncoderRoute = ToolsUrlEncoderRouteImport.update({
+  id: '/tools/url-encoder',
+  path: '/tools/url-encoder',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsTipCalculatorRoute = ToolsTipCalculatorRouteImport.update({
@@ -267,6 +280,11 @@ const ToolsMemeGeneratorRoute = ToolsMemeGeneratorRouteImport.update({
 const ToolsMarkdownToHtmlRoute = ToolsMarkdownToHtmlRouteImport.update({
   id: '/tools/markdown-to-html',
   path: '/tools/markdown-to-html',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsLoremIpsumRoute = ToolsLoremIpsumRouteImport.update({
+  id: '/tools/lorem-ipsum',
+  path: '/tools/lorem-ipsum',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsLinkShortenerRoute = ToolsLinkShortenerRouteImport.update({
@@ -466,6 +484,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
+  '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -489,6 +508,8 @@ export interface FileRoutesByFullPath {
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
+  '/tools/url-encoder': typeof ToolsUrlEncoderRoute
+  '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-merger': typeof ToolsVideoMergerRoute
@@ -537,6 +558,7 @@ export interface FileRoutesByTo {
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
+  '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -560,6 +582,8 @@ export interface FileRoutesByTo {
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
+  '/tools/url-encoder': typeof ToolsUrlEncoderRoute
+  '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-merger': typeof ToolsVideoMergerRoute
@@ -609,6 +633,7 @@ export interface FileRoutesById {
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
+  '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -632,6 +657,8 @@ export interface FileRoutesById {
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
+  '/tools/url-encoder': typeof ToolsUrlEncoderRoute
+  '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
   '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-merger': typeof ToolsVideoMergerRoute
@@ -682,6 +709,7 @@ export interface FileRouteTypes {
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
     | '/tools/link-shortener'
+    | '/tools/lorem-ipsum'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/merge-pdf'
@@ -705,6 +733,8 @@ export interface FileRouteTypes {
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/tip-calculator'
+    | '/tools/url-encoder'
+    | '/tools/uuid-generator'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-merger'
@@ -753,6 +783,7 @@ export interface FileRouteTypes {
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
     | '/tools/link-shortener'
+    | '/tools/lorem-ipsum'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/merge-pdf'
@@ -776,6 +807,8 @@ export interface FileRouteTypes {
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/tip-calculator'
+    | '/tools/url-encoder'
+    | '/tools/uuid-generator'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-merger'
@@ -824,6 +857,7 @@ export interface FileRouteTypes {
     | '/tools/image-upscaler'
     | '/tools/json-formatter'
     | '/tools/link-shortener'
+    | '/tools/lorem-ipsum'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/merge-pdf'
@@ -847,6 +881,8 @@ export interface FileRouteTypes {
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/tip-calculator'
+    | '/tools/url-encoder'
+    | '/tools/uuid-generator'
     | '/tools/video-compressor'
     | '/tools/video-downloader'
     | '/tools/video-merger'
@@ -896,6 +932,7 @@ export interface RootRouteChildren {
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
   ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
+  ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
   ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
@@ -919,6 +956,8 @@ export interface RootRouteChildren {
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsTipCalculatorRoute: typeof ToolsTipCalculatorRoute
+  ToolsUrlEncoderRoute: typeof ToolsUrlEncoderRoute
+  ToolsUuidGeneratorRoute: typeof ToolsUuidGeneratorRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
   ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
   ToolsVideoMergerRoute: typeof ToolsVideoMergerRoute
@@ -1035,6 +1074,20 @@ declare module '@tanstack/react-router' {
       path: '/tools/video-compressor'
       fullPath: '/tools/video-compressor'
       preLoaderRoute: typeof ToolsVideoCompressorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/uuid-generator': {
+      id: '/tools/uuid-generator'
+      path: '/tools/uuid-generator'
+      fullPath: '/tools/uuid-generator'
+      preLoaderRoute: typeof ToolsUuidGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/url-encoder': {
+      id: '/tools/url-encoder'
+      path: '/tools/url-encoder'
+      fullPath: '/tools/url-encoder'
+      preLoaderRoute: typeof ToolsUrlEncoderRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/tip-calculator': {
@@ -1196,6 +1249,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/markdown-to-html'
       fullPath: '/tools/markdown-to-html'
       preLoaderRoute: typeof ToolsMarkdownToHtmlRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/lorem-ipsum': {
+      id: '/tools/lorem-ipsum'
+      path: '/tools/lorem-ipsum'
+      fullPath: '/tools/lorem-ipsum'
+      preLoaderRoute: typeof ToolsLoremIpsumRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/link-shortener': {
@@ -1456,6 +1516,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
   ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
+  ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
   ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
@@ -1479,6 +1540,8 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsTipCalculatorRoute: ToolsTipCalculatorRoute,
+  ToolsUrlEncoderRoute: ToolsUrlEncoderRoute,
+  ToolsUuidGeneratorRoute: ToolsUuidGeneratorRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,
   ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
   ToolsVideoMergerRoute: ToolsVideoMergerRoute,

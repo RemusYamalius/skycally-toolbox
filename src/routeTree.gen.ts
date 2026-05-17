@@ -61,6 +61,7 @@ import { Route as ToolsImageFiltersRouteImport } from './routes/tools.image-filt
 import { Route as ToolsImageCropperRouteImport } from './routes/tools.image-cropper'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
+import { Route as ToolsHashGeneratorRouteImport } from './routes/tools.hash-generator'
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
 import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time-fixer'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
@@ -342,6 +343,11 @@ const ToolsImageCompressorRoute = ToolsImageCompressorRouteImport.update({
   path: '/tools/image-compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsHashGeneratorRoute = ToolsHashGeneratorRouteImport.update({
+  id: '/tools/hash-generator',
+  path: '/tools/hash-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsHandGestureRoute = ToolsHandGestureRouteImport.update({
   id: '/tools/hand-gesture',
   path: '/tools/hand-gesture',
@@ -473,6 +479,7 @@ export interface FileRoutesByFullPath {
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
+  '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-cropper': typeof ToolsImageCropperRoute
@@ -547,6 +554,7 @@ export interface FileRoutesByTo {
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
+  '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-cropper': typeof ToolsImageCropperRoute
@@ -622,6 +630,7 @@ export interface FileRoutesById {
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
+  '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-cropper': typeof ToolsImageCropperRoute
@@ -698,6 +707,7 @@ export interface FileRouteTypes {
     | '/tools/face-landmarks'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
+    | '/tools/hash-generator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-cropper'
@@ -772,6 +782,7 @@ export interface FileRouteTypes {
     | '/tools/face-landmarks'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
+    | '/tools/hash-generator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-cropper'
@@ -846,6 +857,7 @@ export interface FileRouteTypes {
     | '/tools/face-landmarks'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
+    | '/tools/hash-generator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-cropper'
@@ -921,6 +933,7 @@ export interface RootRouteChildren {
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
   ToolsFreeTimeFixerRoute: typeof ToolsFreeTimeFixerRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
+  ToolsHashGeneratorRoute: typeof ToolsHashGeneratorRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
   ToolsImageCropperRoute: typeof ToolsImageCropperRoute
@@ -1335,6 +1348,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsImageCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/hash-generator': {
+      id: '/tools/hash-generator'
+      path: '/tools/hash-generator'
+      fullPath: '/tools/hash-generator'
+      preLoaderRoute: typeof ToolsHashGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/hand-gesture': {
       id: '/tools/hand-gesture'
       path: '/tools/hand-gesture'
@@ -1505,6 +1525,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
   ToolsFreeTimeFixerRoute: ToolsFreeTimeFixerRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
+  ToolsHashGeneratorRoute: ToolsHashGeneratorRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
   ToolsImageCropperRoute: ToolsImageCropperRoute,

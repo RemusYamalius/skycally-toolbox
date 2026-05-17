@@ -1,26 +1,52 @@
-## Plan: Fix 4 tools per uploaded prompt
+## Plan: SoftwareApplication schema + 4 new text tools
 
-FFmpeg.wasm fails in this environment (no SharedArrayBuffer). Replace with native `MediaRecorder` / canvas approaches and add a mobile warning to Screen Recorder.
+### Part 1 — SoftwareApplication JSON-LD on every tool page
 
-### 1. `src/routes/tools.video-merger.tsx`
-- Replace `run()` with a `MediaRecorder` + `video.captureStream()` loop that records each input video sequentially into one `video/webm` blob.
-- Remove `FFmpegBanner` and `PoweredByNote` imports + JSX. Replace with a small "Runs entirely in your browser — no uploads." note.
-- Change DropZone hint to "Add 2 or more videos to merge".
-- Update download filename to `merged_video.webm`.
+Centralize the schema in `src/lib/seo.ts` so I don't have to edit 60+ route files manually.
 
-### 2. `src/routes/tools.add-subtitles.tsx`
-- Replace `run()` with a canvas-based renderer: draw each video frame to a canvas, overlay the active subtitle text (with stroke + fill color), capture the canvas as a stream into `MediaRecorder`.
-- Add `timeToSec` and `parseSRT` helpers above the component.
-- Remove `FFmpegBanner` import/JSX. Update download filename to `video_with_subtitles.webm`.
+- Update `buildToolMeta(tool)` to also return a `scripts` array containing a single `application/ld+json` script built from the tool's `name`, `description`, and `slug`:
+  ```json
+  { "@context": "https://schema.org", "@type": "SoftwareApplication",
+    "name": tool.name, "applicationCategory": "WebApplication",
+    "operatingSystem": "Any",
+    "offers": { "@type": "Offer", "price": "0", "priceCurrency": "USD" },
+    "url": `https://skycally.com/tools/${tool.slug}`,
+    "description": tool.description }
+  ```
+- Every tool route already calls `head: () => buildToolMeta(...)`, so the schema propagates to all current and future tool pages with zero per-file edits.
 
-### 3. `src/routes/tools.video-compressor.tsx`
-- Replace server API compression with a local canvas + `MediaRecorder` pipeline using `videoBitsPerSecond` chosen by quality (low/medium/high → 300k / 800k / 2M).
-- Remove `const API = "..."` and any server error handling. Output downloads as `<name>_compressed.webm`.
+### Part 2 — Four new browser-based text tools
 
-### 4. `src/routes/tools.screen-recorder.tsx`
-- Add `const isMobile = /Mobi|Android/i.test(navigator.userAgent);` and render a yellow warning banner at the top of the returned JSX when true.
+Register each in `src/lib/tools.ts` (category: `text`) and add them to `src/routes/sitemap[.]xml.tsx` ROUTES (priority `0.6`, monthly). Each route uses the standard `ToolPageShell` + `HowToUse` + `RelatedTools` + `ToolSeoContent` layout consistent with `tools.base64.tsx`, dark theme, cyan/blue gradient buttons.
 
-### Notes
-- All output is `.webm` (VP9 when supported, otherwise default WebM).
-- No new dependencies. FFmpeg-related files (`ffmpegLoader`, `ffmpeg-banner`) are left in place — still used by `tools.video-trimmer.tsx`.
-- After edits, the auto build/typecheck confirms the changes compile.
+**1. `src/routes/tools.url-encoder.tsx`** — `/tools/url-encoder`
+- Encode/Decode tabs, textarea input, action button, output card with Copy
+- `encodeURIComponent` / `decodeURIComponent` with try/catch for malformed input
+
+**2. `src/routes/tools.lorem-ipsum.tsx`** — `/tools/lorem-ipsum`
+- Inputs: paragraphs (1–10), words per paragraph (20–100)
+- Toggle: Plain text vs `<p>` HTML output
+- Word pool drawn from classic lorem ipsum vocabulary; Generate + Copy All
+
+**3. `src/routes/tools.uuid-generator.tsx`** — `/tools/uuid-generator`
+- Count input (1–20), Generate button using `crypto.randomUUID()`
+- List with per-row Copy + Copy All
+- Fallback polyfill if `randomUUID` unavailable (manual v4 from `crypto.getRandomValues`)
+
+**4. `src/routes/tools.hash-generator.tsx`** — `/tools/hash-generator`
+- Single textarea input; on Generate computes MD5, SHA-1, SHA-256, SHA-512 in parallel
+- SHA variants via `crypto.subtle.digest`
+- MD5 via a small inline pure-JS implementation (Web Crypto doesn't support MD5)
+- Four output cards, each with its own Copy button
+
+### Files touched
+
+- `src/lib/seo.ts` — extend `buildToolMeta` with JSON-LD `scripts`
+- `src/lib/tools.ts` — add 4 entries (icons: `Link2`, `AlignLeft`, `Fingerprint`, `Hash`)
+- `src/routes/sitemap[.]xml.tsx` — append 4 URLs
+- `src/routes/tools.url-encoder.tsx` (new)
+- `src/routes/tools.lorem-ipsum.tsx` (new)
+- `src/routes/tools.uuid-generator.tsx` (new)
+- `src/routes/tools.hash-generator.tsx` (new)
+
+No new npm packages. `routeTree.gen.ts` regenerates automatically.

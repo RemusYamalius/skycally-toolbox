@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility";
 
@@ -85,4 +85,8 @@ export const tools: Tool[] = [
   { slug: "tip-calculator", name: "Tip Calculator", description: "Calculate tips and split bills instantly.", category: "utility", icon: Calculator, path: "/tools/tip-calculator" },
   { slug: "bmi-calculator", name: "BMI Calculator", description: "Calculate your Body Mass Index and healthy weight range.", category: "utility", icon: Activity, path: "/tools/bmi-calculator" },
   { slug: "age-calculator", name: "Age Calculator", description: "Calculate your exact age in years, months and days.", category: "utility", icon: CalendarDays, path: "/tools/age-calculator" },
+  { slug: "url-encoder", name: "URL Encoder / Decoder", description: "Encode or decode URL-safe strings using percent-encoding instantly.", category: "text", icon: Link2, path: "/tools/url-encoder" },
+  { slug: "lorem-ipsum", name: "Lorem Ipsum Generator", description: "Generate placeholder Lorem Ipsum text with custom length and format.", category: "text", icon: AlignLeft, path: "/tools/lorem-ipsum" },
+  { slug: "uuid-generator", name: "UUID Generator", description: "Generate random UUID v4 identifiers — single or in bulk.", category: "text", icon: Fingerprint, path: "/tools/uuid-generator" },
+  { slug: "hash-generator", name: "Hash Generator", description: "Compute MD5, SHA-1, SHA-256 and SHA-512 hashes from any text.", category: "text", icon: Hash, path: "/tools/hash-generator" },
 ];

@@ -38,7 +38,25 @@ export function buildPageMeta({ title, description, path, ogImage = OG_IMAGE }: 
 export function buildToolMeta(tool: Tool) {
   const title = `Free ${tool.name} Online — No Signup | Skycally`;
   const description = `${tool.description} Free, private, works in your browser.`;
-  return buildPageMeta({ title, description, path: tool.path });
+  const base = buildPageMeta({ title, description, path: tool.path });
+  return {
+    ...base,
+    scripts: [
+      {
+        type: "application/ld+json",
+        children: JSON.stringify({
+          "@context": "https://schema.org",
+          "@type": "SoftwareApplication",
+          name: tool.name,
+          applicationCategory: "WebApplication",
+          operatingSystem: "Any",
+          offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+          url: `${SITE_URL}${tool.path}`,
+          description: tool.description,
+        }),
+      },
+    ],
+  };
 }
 
 export function toolBySlug(slug: string, tools: Tool[]): Tool {

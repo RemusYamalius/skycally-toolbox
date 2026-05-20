@@ -43,28 +43,22 @@ function Page() {
     setBusy(true);
     setGif(null);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("start", String(start));
-      form.append("duration", String(Math.min(duration, 10)));
-      form.append("width", String(width));
-      form.append("fps", String(fps));
-
-      const res = await fetch(`${API}/api/video-to-gif`, {
-        method: "POST",
-        body: form,
-      });
-
-      if (!res.ok) {
-        let detail = "Conversion failed";
-        try {
-          const err = await res.json();
-          detail = err.detail || detail;
-        } catch {}
-        throw new Error(detail);
-      }
-
-      const blob = await res.blob();
+      const ffmpeg = await getFFmpeg();
+      const inputName = "input_" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      await ffmpeg.writeFile(inputName, await fetchFile(file));
+      const dur = String(Math.min(duration, 10));
+      const vf = `fps=${fps},scale=${width}:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`;
+      await ffmpeg.exec([
+        "-ss", String(start),
+        "-t", dur,
+        "-i", inputName,
+        "-filter_complex", vf,
+        "-loop", "0",
+        "output.gif",
+      ]);
+      const data = await ffmpeg.readFile("output.gif");
+      const bytes = data as Uint8Array;
+      const blob = new Blob([new Uint8Array(bytes)], { type: "image/gif" });
       setGif({ url: URL.createObjectURL(blob), blob });
       toast.success("GIF ready!");
     } catch (e: any) {

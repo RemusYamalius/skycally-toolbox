@@ -1,14 +1,9 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
-import { useState } from "react";
-import { toast } from "sonner";
-import { Loader2 } from "lucide-react";
+import { AlertCircle } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
-import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
-import { checkSize } from "@/lib/file-utils";
-import { convertWordToPdf } from "@/services/wordToPdf";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -18,69 +13,39 @@ export const Route = createFileRoute("/tools/word-to-pdf")({
 });
 
 function WordToPdf() {
-  const [file, setFile] = useState<File | null>(null);
-  const [busy, setBusy] = useState(false);
-
-  const onFile = (files: File[]) => {
-    const f = files[0];
-    const err = checkSize(f);
-    if (err) { toast.error(err); return; }
-    setFile(f);
-  };
-
-  const convert = async () => {
-    if (!file) return;
-    setBusy(true);
-    try {
-      await convertWordToPdf(file);
-      toast.success("Conversion complete!");
-    } catch (e: any) {
-      toast.error(e?.message || "Conversion failed");
-    } finally {
-      setBusy(false);
-    }
-  };
-
   return (
-    <ToolPageShell title="Word to PDF" description="Upload a Word document and get a polished PDF.">
-      {!file ? (
-        <DropZone accept=".doc,.docx,application/msword,application/vnd.openxmlformats-officedocument.wordprocessingml.document" onFiles={onFile} hint="DOC or DOCX, up to 10MB" />
-      ) : (
-        <div className="rounded-2xl border border-border bg-card p-6 space-y-5">
-          <div className="flex items-center justify-between">
-            <div>
-              <p className="font-semibold">{file.name}</p>
-              <p className="text-xs text-muted-foreground">{formatBytes(file.size)}</p>
-            </div>
-            <button onClick={() => setFile(null)} className="text-sm text-muted-foreground hover:text-foreground">Change</button>
-          </div>
-          <button onClick={convert} disabled={busy} className="w-full rounded-xl bg-foreground text-background font-semibold py-3 disabled:opacity-50 inline-flex items-center justify-center gap-2">
-            {busy ? <><Loader2 className="w-4 h-4 animate-spin" /> Converting…</> : "Convert to PDF"}
-          </button>
-          <p className="text-xs text-center text-muted-foreground">Arabic and RTL text are fully supported.</p>
+    <ToolPageShell title="Word to PDF" description="Convert Word documents to PDF.">
+      <div className="rounded-2xl border border-border bg-card p-8 text-center space-y-4">
+        <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
+          <AlertCircle className="w-6 h-6 text-amber-400" />
         </div>
-      )}
+        <h2 className="font-display text-xl font-bold">Temporarily unavailable</h2>
+        <p className="text-sm text-muted-foreground max-w-md mx-auto">
+          The Word to PDF converter relied on a backend service that has been retired. As a workaround,
+          use Microsoft Word's built-in "Save As PDF" or Google Docs' "Download as PDF" feature.
+        </p>
+      </div>
 
       <HowToUse steps={[
-        "Drop a .doc or .docx file.",
-        "Click Convert to PDF — we process it server-side.",
-        "Your PDF is downloaded automatically.",
+        "This tool is temporarily offline.",
+        "Use your word processor's built-in PDF export as a workaround.",
+        "Check back soon for a browser-based replacement.",
       ]} />
-          <RelatedTools currentSlug="word-to-pdf" />
-          <ToolSeoContent
-        title={"Word to PDF Converter Free — Convert DOCX to PDF Online"}
-        description={"Convert Word documents to PDF format for free. Supports DOC and DOCX files. Preserves formatting, fonts and layout. Arabic and RTL text fully supported."}
+      <RelatedTools currentSlug="word-to-pdf" />
+      <ToolSeoContent
+        title={"Word to PDF Converter — Skycally"}
+        description={"Skycally's Word to PDF converter is temporarily unavailable while we move to a fully browser-based pipeline."}
         body={[
-        "Upload your Word document and receive a perfectly formatted PDF within seconds. Our converter uses LibreOffice on the server side to ensure accurate conversion that preserves tables, images, headers, footers and all formatting elements.",
-        "Arabic, French, Spanish and all other languages are fully supported including right-to-left text direction. The converter handles complex layouts including multi-column documents and embedded graphics.",
-      ]}
+          "We're rebuilding our Word to PDF converter to run entirely in your browser, with no server uploads required.",
+          "In the meantime, Microsoft Word, LibreOffice Writer, and Google Docs all include a built-in PDF export that handles DOC and DOCX files locally on your device.",
+        ]}
         faqs={[
-        { question: "Does the converter support Arabic text?", answer: "Yes, Arabic and all RTL (right-to-left) languages are fully supported with correct text direction preserved in the output PDF." },
-        { question: "What Word formats are supported?", answer: "We support both DOC (older Word format) and DOCX (modern Word format, recommended for best results)." },
-        { question: "Is my document kept private?", answer: "Your document is processed on our secure server and immediately deleted after the PDF is generated. We never store or share your documents." },
-        { question: "Will my document formatting be preserved?", answer: "Yes. Tables, images, headers, footers, fonts and page layout are all preserved accurately in the output PDF." },
-      ]}
+          { question: "When will the converter come back?", answer: "We're working on a fully browser-based replacement. No date yet — check back soon." },
+          { question: "Why was it taken offline?", answer: "The backend service it relied on has been retired so we can focus on tools that run entirely on your device." },
+          { question: "What can I use in the meantime?", answer: "Microsoft Word, LibreOffice Writer and Google Docs all export to PDF directly." },
+          { question: "Will Arabic and RTL languages be supported?", answer: "Yes — full RTL and Arabic support is a requirement for the replacement." },
+        ]}
       />
-      </ToolPageShell>
+    </ToolPageShell>
   );
 }

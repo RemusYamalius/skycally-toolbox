@@ -73,18 +73,16 @@ function SplitPdf() {
     setError("");
     setDone(false);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("pages", pages.trim());
-      const res = await fetch(`${API}/api/split-pdf`, {
-        method: "POST",
-        body: form,
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || "Split failed");
-      }
-      const blob = await res.blob();
+      const srcBytes = await file.arrayBuffer();
+      const srcPdf = await PDFDocument.load(srcBytes);
+      const total = srcPdf.getPageCount();
+      const selected = parsePages(pages.trim(), total);
+      if (selected.length === 0) throw new Error("No valid pages selected");
+      const outPdf = await PDFDocument.create();
+      const copied = await outPdf.copyPages(srcPdf, selected.map((p) => p - 1));
+      copied.forEach((p) => outPdf.addPage(p));
+      const out = await outPdf.save();
+      const blob = new Blob([new Uint8Array(out)], { type: "application/pdf" });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -92,7 +90,7 @@ function SplitPdf() {
       a.click();
       setDone(true);
     } catch (err: any) {
-      setError(err.message);
+      setError(err?.message || "Split failed");
     } finally {
       setLoading(false);
     }

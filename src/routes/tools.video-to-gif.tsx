@@ -9,8 +9,8 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
-import ToolSeoContent from "@/components/tool-seo-content";
-import { RelatedTools } from "@/components/related-tools";
+import { getFFmpeg } from "@/utils/ffmpegLoader";
+import { fetchFile } from "@ffmpeg/util";
 
 export const Route = createFileRoute("/tools/video-to-gif")({
   head: () => buildToolMeta(toolBySlug("video-to-gif", tools)),
@@ -18,7 +18,6 @@ export const Route = createFileRoute("/tools/video-to-gif")({
 });
 
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
-const API = import.meta.env.VITE_API_URL as string;
 
 function Page() {
   const [file, setFile] = useState<File | null>(null);

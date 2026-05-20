@@ -53,7 +53,7 @@ export function SiteFooter() {
                     {meta.label}
                   </h5>
                   <ul className="space-y-2 text-sm text-muted-foreground">
-                    {list.map((t) => (
+                    {list.filter((t) => !t.hidden).map((t) => (
                       <li key={t.slug}>
                         <Link to={t.path} className="hover:text-foreground transition">{t.name}</Link>
                       </li>

@@ -41,7 +41,7 @@ function ToolsPage() {
     navigate({ search: c === "all" ? {} : { cat: c }, replace: true });
   };
 
-  const list = useMemo(() => tools.filter((t) => (cat === "all" || toolInCategory(t, cat)) && (t.name + t.description).toLowerCase().includes(q.toLowerCase())), [cat, q]);
+  const list = useMemo(() => tools.filter((t) => !t.hidden && (cat === "all" || toolInCategory(t, cat)) && (t.name + t.description).toLowerCase().includes(q.toLowerCase())), [cat, q]);
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">

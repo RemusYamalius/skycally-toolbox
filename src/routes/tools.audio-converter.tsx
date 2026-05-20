@@ -64,7 +64,8 @@ function AudioConverter() {
       args.push(outputName);
       await ffmpeg.exec(args);
       const data = await ffmpeg.readFile(outputName);
-      const blob = new Blob([data as Uint8Array], { type: "audio/" + format });
+      const bytes = data as Uint8Array;
+      const blob = new Blob([new Uint8Array(bytes)], { type: "audio/" + format });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;

@@ -13,7 +13,8 @@ export const Route = createFileRoute("/tools/audio-converter")({
   component: AudioConverter,
 });
 
-const API = "https://skycally-api-production.up.railway.app";
+import { getFFmpeg } from "@/utils/ffmpegLoader";
+import { fetchFile } from "@ffmpeg/util";
 
 const FORMATS = ["mp3", "wav", "ogg", "aac", "flac"];
 const FORMAT_INFO: Record<string, string> = {

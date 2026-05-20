@@ -171,7 +171,7 @@ function HomePage() {
                     </span>
                   </div>
                   <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 contain-paint">
-                    {(expanded[cat] ? list : list.slice(0, INITIAL_PER_CAT)).map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
+                    {(expanded[cat] ? list : list.slice(0, INITIAL_PER_CAT)).filter((t) => !t.hidden).map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
                   </div>
                   {list.length > INITIAL_PER_CAT && !expanded[cat] && (
                     <div className="mt-6 text-center">

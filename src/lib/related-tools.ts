@@ -70,7 +70,7 @@ export function getRelatedTools(slug: string): Tool[] {
 
   for (const s of relatedToolsMap[slug] ?? []) {
     const t = bySlug(s);
-    if (t && !seen.has(t.slug)) {
+    if (t && !seen.has(t.slug) && !t.hidden) {
       out.push(t);
       seen.add(t.slug);
     }
@@ -82,7 +82,7 @@ export function getRelatedTools(slug: string): Tool[] {
   if (current) {
     for (const t of tools) {
       if (out.length === 3) break;
-      if (!seen.has(t.slug) && t.category === current.category) {
+      if (!seen.has(t.slug) && !t.hidden && t.category === current.category) {
         out.push(t);
         seen.add(t.slug);
       }
@@ -91,7 +91,7 @@ export function getRelatedTools(slug: string): Tool[] {
   // Final fallback: any other tool
   for (const t of tools) {
     if (out.length === 3) break;
-    if (!seen.has(t.slug)) {
+    if (!seen.has(t.slug) && !t.hidden) {
       out.push(t);
       seen.add(t.slug);
     }

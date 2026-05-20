@@ -20,13 +20,14 @@ export interface Tool {
   categories?: ToolCategory[];
   icon: typeof Download;
   path: string;
+  hidden?: boolean;
 }
 
 export const toolInCategory = (t: Tool, c: ToolCategory) =>
   t.category === c || (t.categories?.includes(c) ?? false);
 
 export const tools: Tool[] = [
-  { slug: "video-downloader", name: "Video Downloader", description: "Download videos from TikTok, Instagram, YouTube and more.", category: "video", icon: Download, path: "/tools/video-downloader" },
+  { slug: "video-downloader", name: "Video Downloader", description: "Download videos from TikTok, Instagram, YouTube and more.", category: "video", icon: Download, path: "/tools/video-downloader", hidden: true },
   { slug: "video-to-gif", name: "Video to GIF", description: "Convert any video clip to a high-quality animated GIF.", category: "video", icon: Film, path: "/tools/video-to-gif" },
   { slug: "video-trimmer", name: "Video Trimmer", description: "Cut and trim video clips instantly in your browser.", category: "video", icon: Scissors, path: "/tools/video-trimmer" },
   { slug: "video-merger", name: "Video Merger", description: "Combine multiple videos into one — no uploads needed.", category: "video", icon: Combine, path: "/tools/video-merger" },

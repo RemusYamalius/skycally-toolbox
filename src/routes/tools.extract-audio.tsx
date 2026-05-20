@@ -12,7 +12,8 @@ export const Route = createFileRoute("/tools/extract-audio")({
   component: ExtractAudio,
 });
 
-const API = import.meta.env.VITE_API_URL;
+import { getFFmpeg } from "@/utils/ffmpegLoader";
+import { fetchFile } from "@ffmpeg/util";
 
 type Format = "mp3" | "aac" | "wav";
 

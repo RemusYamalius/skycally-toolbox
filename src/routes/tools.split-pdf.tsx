@@ -12,7 +12,26 @@ export const Route = createFileRoute("/tools/split-pdf")({
   component: SplitPdf,
 });
 
-const API = "https://skycally-api-production.up.railway.app";
+import { PDFDocument } from "pdf-lib";
+
+function parsePages(spec: string, total: number): number[] {
+  const result = new Set<number>();
+  for (const part of spec.split(",").map((s) => s.trim()).filter(Boolean)) {
+    const m = part.match(/^(\d+)\s*-\s*(\d+)$/);
+    if (m) {
+      const a = parseInt(m[1], 10);
+      const b = parseInt(m[2], 10);
+      const [lo, hi] = a <= b ? [a, b] : [b, a];
+      for (let i = lo; i <= hi; i++) if (i >= 1 && i <= total) result.add(i);
+    } else if (/^\d+$/.test(part)) {
+      const n = parseInt(part, 10);
+      if (n >= 1 && n <= total) result.add(n);
+    } else {
+      throw new Error(`Invalid page selector: ${part}`);
+    }
+  }
+  return [...result].sort((a, b) => a - b);
+}
 
 function SplitPdf() {
   const [file, setFile] = useState<File | null>(null);

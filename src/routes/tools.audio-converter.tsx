@@ -51,18 +51,20 @@ function AudioConverter() {
     setError("");
     setDone(false);
     try {
-      const form = new FormData();
-      form.append("file", file);
-      form.append("format", format);
-      const res = await fetch(`${API}/api/audio-convert`, {
-        method: "POST",
-        body: form,
-      });
-      if (!res.ok) {
-        const err = await res.json();
-        throw new Error(err.detail || "Conversion failed");
-      }
-      const blob = await res.blob();
+      const ffmpeg = await getFFmpeg();
+      const inputName = "input_" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const outputName = "output." + format;
+      await ffmpeg.writeFile(inputName, await fetchFile(file));
+      const args: string[] = ["-i", inputName];
+      if (format === "mp3") args.push("-codec:a", "libmp3lame", "-qscale:a", "2");
+      else if (format === "aac") args.push("-codec:a", "aac", "-b:a", "192k");
+      else if (format === "ogg") args.push("-codec:a", "libvorbis", "-qscale:a", "5");
+      else if (format === "flac") args.push("-codec:a", "flac");
+      else if (format === "wav") args.push("-codec:a", "pcm_s16le");
+      args.push(outputName);
+      await ffmpeg.exec(args);
+      const data = await ffmpeg.readFile(outputName);
+      const blob = new Blob([data as Uint8Array], { type: "audio/" + format });
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -71,7 +73,7 @@ function AudioConverter() {
       a.click();
       setDone(true);
     } catch (err: any) {
-      setError(err.message);
+      setError(err?.message || "Conversion failed");
     } finally {
       setLoading(false);
     }

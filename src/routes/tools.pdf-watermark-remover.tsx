@@ -6,14 +6,14 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
-import { PDFDocument, PDFName, PDFDict, PDFArray, PDFRawStream, PDFRef } from "pdf-lib";
+import { PDFDocument, PDFName, PDFDict, PDFArray, PDFRef } from "pdf-lib";
 
 export const Route = createFileRoute("/tools/pdf-watermark-remover")({
   head: () => buildToolMeta(toolBySlug("pdf-watermark-remover", tools)),
   component: PdfWatermarkRemover,
 });
 
-// ---------- Helpers ----------
+// ---------- Stream byte helpers ----------
 
 function decodeStreamBytes(stream: any): Uint8Array {
   try {
@@ -39,14 +39,22 @@ function latin1ToBytes(s: string): Uint8Array {
   return out;
 }
 
-// Extract all text strings shown via Tj / TJ from a decoded content stream.
+function nameToString(n: any): string {
+  if (!n) return "";
+  if (typeof n.asString === "function") {
+    const s = n.asString();
+    return s.startsWith("/") ? s.slice(1) : s;
+  }
+  return String(n);
+}
+
+// ---------- Strategy 1: text watermarks ----------
+
 function extractShownStrings(content: string): string[] {
   const out: string[] = [];
-  // (...)Tj  and  (...)'  and  (...)"
   const reTj = /\(((?:\\.|[^()\\])*)\)\s*(?:Tj|'|")/g;
   let m: RegExpExecArray | null;
   while ((m = reTj.exec(content)) !== null) out.push(m[1]);
-  // TJ arrays
   const reTJ = /\[([^\]]*)\]\s*TJ/g;
   while ((m = reTJ.exec(content)) !== null) {
     const inner = m[1];
@@ -59,11 +67,12 @@ function extractShownStrings(content: string): string[] {
   return out;
 }
 
-// Build set of "watermark" strings that repeat across > 50% of pages.
 function detectRepeatedStrings(pageContents: string[]): Set<string> {
   const counts = new Map<string, number>();
   for (const c of pageContents) {
-    const seen = new Set(extractShownStrings(c).map((s) => s.trim()).filter((s) => s.length >= 3));
+    const seen = new Set(
+      extractShownStrings(c).map((s) => s.trim()).filter((s) => s.length >= 2),
+    );
     for (const s of seen) counts.set(s, (counts.get(s) ?? 0) + 1);
   }
   const threshold = Math.max(2, Math.floor(pageContents.length * 0.5) + 1);
@@ -72,56 +81,6 @@ function detectRepeatedStrings(pageContents: string[]): Set<string> {
   return out;
 }
 
-// Strip BT...ET text blocks where any shown string is in `targets` OR the block
-// is rotated (detected via a `cm` with rotation just before / inside the block)
-// OR uses low-alpha graphics state.
-function stripWatermarkTextBlocks(
-  content: string,
-  targets: Set<string>,
-  lowAlphaGStates: Set<string>,
-): { out: string; removed: number } {
-  let removed = 0;
-  // Find all BT ... ET blocks (non-greedy)
-  const re = /BT\b([\s\S]*?)\bET\b/g;
-  const out = content.replace(re, (full, body: string) => {
-    const shown = extractShownStrings(body).map((s) => s.trim());
-    const matchesTarget = shown.some((s) => targets.has(s));
-    // low alpha via /Name gs inside or just before block
-    const gsRefs = [...body.matchAll(/\/([A-Za-z0-9_.+-]+)\s+gs/g)].map((m) => m[1]);
-    const lowAlpha = gsRefs.some((g) => lowAlphaGStates.has(g));
-    // rotation: cm with non-axis-aligned matrix (a,b,c,d,e,f cm)
-    const cmRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+cm/g;
-    let rotated = false;
-    let cm: RegExpExecArray | null;
-    while ((cm = cmRe.exec(body)) !== null) {
-      const b = parseFloat(cm[2]);
-      const c = parseFloat(cm[3]);
-      if (Math.abs(b) > 0.01 || Math.abs(c) > 0.01) {
-        rotated = true;
-        break;
-      }
-    }
-    // Also detect Tm rotation matrices
-    const tmRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+Tm/g;
-    let tm: RegExpExecArray | null;
-    while ((tm = tmRe.exec(body)) !== null) {
-      const b = parseFloat(tm[2]);
-      const c = parseFloat(tm[3]);
-      if (Math.abs(b) > 0.01 || Math.abs(c) > 0.01) {
-        rotated = true;
-        break;
-      }
-    }
-    if (matchesTarget || lowAlpha || rotated) {
-      removed++;
-      return ""; // drop the whole text block
-    }
-    return full;
-  });
-  return { out, removed };
-}
-
-// Find ExtGState resources with ca<0.5 or CA<0.5 on a page.
 function findLowAlphaGStates(page: any): Set<string> {
   const out = new Set<string>();
   try {
@@ -129,8 +88,7 @@ function findLowAlphaGStates(page: any): Set<string> {
     if (!resources) return out;
     const ext = resources.lookup(PDFName.of("ExtGState"));
     if (!ext || !(ext instanceof PDFDict)) return out;
-    const entries = ext.entries();
-    for (const [key, val] of entries) {
+    for (const [key, val] of ext.entries()) {
       let gs: any = val;
       try {
         if (gs instanceof PDFRef) gs = page.doc.context.lookup(gs);
@@ -141,7 +99,7 @@ function findLowAlphaGStates(page: any): Set<string> {
         const caV = ca && typeof (ca as any).asNumber === "function" ? (ca as any).asNumber() : undefined;
         const CAV = CA && typeof (CA as any).asNumber === "function" ? (CA as any).asNumber() : undefined;
         if ((caV !== undefined && caV < 0.5) || (CAV !== undefined && CAV < 0.5)) {
-          out.add(key.asString().replace(/^\//, ""));
+          out.add(nameToString(key));
         }
       }
     }
@@ -149,38 +107,104 @@ function findLowAlphaGStates(page: any): Set<string> {
   return out;
 }
 
-// Strategy 2: remove large image draws (>40% of page in both dims, by `cm` scale).
-function stripLargeImageDraws(content: string, pageWidth: number, pageHeight: number): { out: string; removed: number } {
+function stripWatermarkTextBlocks(
+  content: string,
+  targets: Set<string>,
+  lowAlphaGStates: Set<string>,
+): { out: string; removed: number } {
   let removed = 0;
-  // Walk lines, track last cm matrix, drop `/Name Do` if scale too large.
-  const tokens = content.split(/(\r?\n)/);
-  const cmRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+cm/;
-  const doRe = /\/([A-Za-z0-9_.+-]+)\s+Do/;
-  let lastA = 1, lastD = 1;
-  const out: string[] = [];
-  for (const tok of tokens) {
-    const cm = cmRe.exec(tok);
-    if (cm) {
+  const re = /BT\b([\s\S]*?)\bET\b/g;
+  const out = content.replace(re, (full, body: string) => {
+    const shown = extractShownStrings(body).map((s) => s.trim());
+    const matchesTarget = shown.some((s) => targets.has(s));
+    const gsRefs = [...body.matchAll(/\/([A-Za-z0-9_.+-]+)\s+gs/g)].map((m) => m[1]);
+    const lowAlpha = gsRefs.some((g) => lowAlphaGStates.has(g));
+    let rotated = false;
+    const matRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(?:cm|Tm)/g;
+    let mm: RegExpExecArray | null;
+    while ((mm = matRe.exec(body)) !== null) {
+      const b = parseFloat(mm[2]);
+      const c = parseFloat(mm[3]);
+      if (Math.abs(b) > 0.01 || Math.abs(c) > 0.01) {
+        rotated = true;
+        break;
+      }
+    }
+    if (matchesTarget || lowAlpha || rotated) {
+      removed++;
+      return "";
+    }
+    return full;
+  });
+  return { out, removed };
+}
+
+// ---------- Strategy 2: image watermarks ----------
+
+function collectXObjectNames(page: any): Map<string, "Image" | "Form" | "Other"> {
+  const out = new Map<string, "Image" | "Form" | "Other">();
+  try {
+    const resources = page.node.Resources();
+    if (!resources) return out;
+    const xobj = resources.lookup(PDFName.of("XObject"));
+    if (!xobj || !(xobj instanceof PDFDict)) return out;
+    for (const [key, val] of xobj.entries()) {
+      let v: any = val;
+      try {
+        if (v instanceof PDFRef) v = page.doc.context.lookup(v);
+      } catch {}
+      let kind: "Image" | "Form" | "Other" = "Other";
+      if (v instanceof PDFDict) {
+        const sub = v.lookup(PDFName.of("Subtype"));
+        const sn = nameToString(sub);
+        if (sn === "Image") kind = "Image";
+        else if (sn === "Form") kind = "Form";
+      }
+      out.set(nameToString(key), kind);
+    }
+  } catch {}
+  return out;
+}
+
+function stripLargeImageDraws(
+  content: string,
+  pageWidth: number,
+  pageHeight: number,
+  imageNames: Set<string>,
+  globalWatermarkImages: Set<string>,
+): { out: string; removed: number } {
+  let removed = 0;
+  // Remove entire q ... Q blocks that draw a watermark image.
+  const re = /q\b([\s\S]*?)\bQ\b/g;
+  const out = content.replace(re, (full, body: string) => {
+    const doMatches = [...body.matchAll(/\/([A-Za-z0-9_.+-]+)\s+Do\b/g)].map((m) => m[1]);
+    if (!doMatches.length) return full;
+    // Last cm in this block
+    const cmRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+cm/g;
+    let lastA = 1, lastD = 1;
+    let cm: RegExpExecArray | null;
+    while ((cm = cmRe.exec(body)) !== null) {
       lastA = Math.abs(parseFloat(cm[1]));
       lastD = Math.abs(parseFloat(cm[4]));
     }
-    const d = doRe.exec(tok);
-    if (d) {
-      const widthFrac = lastA / Math.max(1, pageWidth);
-      const heightFrac = lastD / Math.max(1, pageHeight);
-      if (widthFrac > 0.4 && heightFrac > 0.4) {
-        removed++;
-        // drop the Do; also try to drop the q/Q-less local block by skipping this token
-        out.push(tok.replace(doRe, ""));
-        continue;
-      }
+    const drop = doMatches.some((name) => {
+      if (!imageNames.has(name)) return false;
+      if (globalWatermarkImages.has(name)) return true;
+      const wFrac = lastA / Math.max(1, pageWidth);
+      const hFrac = lastD / Math.max(1, pageHeight);
+      return wFrac > 0.4 && hFrac > 0.4;
+    });
+    if (drop) {
+      removed++;
+      return "";
     }
-    out.push(tok);
-  }
-  return { out: out.join(""), removed };
+    return full;
+  });
+  return { out, removed };
 }
 
-// Strategy 3: remove /Stamp and /Watermark annotations.
+// ---------- Strategy 3: stamp/watermark annotations ----------
+
 function stripStampAnnots(page: any): number {
   let removed = 0;
   try {
@@ -189,7 +213,7 @@ function stripStampAnnots(page: any): number {
     const keep: any[] = [];
     const len = annots.size();
     for (let i = 0; i < len; i++) {
-      let a: any = annots.get(i);
+      const a: any = annots.get(i);
       let aDict: any = a;
       try {
         if (a instanceof PDFRef) aDict = page.doc.context.lookup(a);
@@ -197,8 +221,16 @@ function stripStampAnnots(page: any): number {
       let drop = false;
       if (aDict instanceof PDFDict) {
         const sub = aDict.lookup(PDFName.of("Subtype"));
-        const name = sub && typeof (sub as any).asString === "function" ? (sub as any).asString() : "";
-        if (name === "/Stamp" || name === "/Watermark") drop = true;
+        const name = nameToString(sub);
+        if (name === "Stamp" || name === "Watermark") drop = true;
+        // Also: FreeText / Square / Widget annots whose contents look like a watermark
+        if (!drop) {
+          const contents = aDict.lookup(PDFName.of("Contents"));
+          const text = contents && typeof (contents as any).asString === "function"
+            ? (contents as any).asString()
+            : "";
+          if (/water\s*mark|confidential|draft|sample|specimen/i.test(text)) drop = true;
+        }
       }
       if (drop) removed++;
       else keep.push(a);
@@ -211,11 +243,13 @@ function stripStampAnnots(page: any): number {
   return removed;
 }
 
+// ---------- Pipeline (strategies 1-3, always all three) ----------
+
 async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8Array; removed: number }> {
   const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
   const pages = pdf.getPages();
 
-  // First pass: decode all content streams (one merged string per page).
+  // Pass A: decode all page content streams.
   const pageContents: string[] = pages.map((p: any) => {
     const contents = p.node.normalizedEntries().Contents;
     if (!contents) return "";
@@ -226,19 +260,35 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
       try {
         if (s instanceof PDFRef) s = pdf.context.lookup(s);
       } catch {}
-      const bytes = decodeStreamBytes(s);
-      merged += bytesToLatin1(bytes) + "\n";
+      const sb = decodeStreamBytes(s);
+      merged += bytesToLatin1(sb) + "\n";
     }
     return merged;
   });
 
+  // Detect strings repeating across >50% of pages.
   const repeated = detectRepeatedStrings(pageContents);
+
+  // Detect image XObject names referenced on >50% of pages (likely watermark).
+  const perPageImages = pages.map((p: any) => collectXObjectNames(p));
+  const imageFreq = new Map<string, number>();
+  perPageImages.forEach((m) => {
+    for (const [name, kind] of m) {
+      if (kind === "Image") imageFreq.set(name, (imageFreq.get(name) ?? 0) + 1);
+    }
+  });
+  const globalThreshold = Math.max(2, Math.floor(pages.length * 0.5) + 1);
+  const globalWatermarkImages = new Set<string>();
+  for (const [n, c] of imageFreq) if (c >= globalThreshold) globalWatermarkImages.add(n);
 
   let totalRemoved = 0;
   pages.forEach((page: any, i: number) => {
-    const lowAlpha = findLowAlphaGStates(page);
+    // Strategy 3 — annotations (independent of content stream)
+    totalRemoved += stripStampAnnots(page);
+
     let content = pageContents[i];
     if (!content) return;
+    const lowAlpha = findLowAlphaGStates(page);
 
     // Strategy 1
     const r1 = stripWatermarkTextBlocks(content, repeated, lowAlpha);
@@ -247,14 +297,12 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
 
     // Strategy 2
     const { width, height } = page.getSize();
-    const r2 = stripLargeImageDraws(content, width, height);
+    const imageNames = new Set<string>();
+    for (const [n, k] of perPageImages[i]) if (k === "Image") imageNames.add(n);
+    const r2 = stripLargeImageDraws(content, width, height, imageNames, globalWatermarkImages);
     content = r2.out;
     totalRemoved += r2.removed;
 
-    // Strategy 3 (annotations)
-    totalRemoved += stripStampAnnots(page);
-
-    // Write back content stream as a single new stream replacing Contents.
     if (r1.removed > 0 || r2.removed > 0) {
       const newStream = pdf.context.stream(latin1ToBytes(content));
       const ref = pdf.context.register(newStream);
@@ -266,7 +314,8 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
   return { pdfBytes: out, removed: totalRemoved };
 }
 
-// Strategy 4: rasterize via pdfjs and rebuild PDF.
+// ---------- Strategy 4: raster rebuild ----------
+
 async function runRasterRebuild(bytes: ArrayBuffer, onProgress: (pct: number) => void): Promise<Uint8Array> {
   const pdfjsLib: any = await import("pdfjs-dist");
   const workerSrc = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url")).default;
@@ -323,7 +372,7 @@ function PdfWatermarkRemover() {
 
   const onFile = (f: File) => {
     if (!f.name.toLowerCase().endsWith(".pdf")) {
-      setError("الرجاء اختيار ملف PDF فقط");
+      setError("Please select a PDF file.");
       return;
     }
     if (downloadUrl) URL.revokeObjectURL(downloadUrl);
@@ -340,7 +389,6 @@ function PdfWatermarkRemover() {
     const blob = new Blob([new Uint8Array(bytes)], { type: "application/pdf" });
     const url = URL.createObjectURL(blob);
     setDownloadUrl(url);
-    // auto-download once
     const a = document.createElement("a");
     a.href = url;
     a.download = (file?.name.replace(/\.pdf$/i, "") || "document") + suffix + ".pdf";
@@ -364,7 +412,7 @@ function PdfWatermarkRemover() {
       setProgress(100);
       if (removed === 0) setAskAdvanced(true);
     } catch (e: any) {
-      setError(e?.message || "تعذرت معالجة الملف");
+      setError(e?.message || "Failed to process the file.");
       setStage("idle");
     }
   };
@@ -382,7 +430,7 @@ function PdfWatermarkRemover() {
       setStage("done");
       setProgress(100);
     } catch (e: any) {
-      setError(e?.message || "تعذر تنفيذ الوضع المتقدم");
+      setError(e?.message || "Advanced mode failed.");
       setStage("idle");
     }
   };
@@ -397,7 +445,7 @@ function PdfWatermarkRemover() {
 
   return (
     <ToolPageShell title="PDF Watermark Remover" description="Remove watermarks from PDF files — fully in your browser, no uploads.">
-      <div dir="rtl" className="w-full max-w-xl mx-auto space-y-5 text-right">
+      <div className="w-full max-w-xl mx-auto space-y-5">
         <div
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
@@ -418,13 +466,13 @@ function PdfWatermarkRemover() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-gray-200 font-medium text-sm" dir="ltr">{file.name}</p>
-              <p className="text-gray-500 text-xs" dir="ltr">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+              <p className="text-gray-200 font-medium text-sm">{file.name}</p>
+              <p className="text-gray-500 text-xs">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
               <button
                 onClick={(e) => { e.stopPropagation(); reset(); }}
                 className="text-xs text-gray-600 hover:text-red-400 transition-colors"
               >
-                إزالة
+                Remove
               </button>
             </div>
           ) : (
@@ -434,7 +482,7 @@ function PdfWatermarkRemover() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-gray-500 text-sm">أفلت ملف PDF هنا أو اضغط للاختيار</p>
+              <p className="text-gray-500 text-sm">Drop a PDF file here or click to select</p>
             </div>
           )}
         </div>
@@ -442,7 +490,7 @@ function PdfWatermarkRemover() {
         {busy && (
           <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4 space-y-2">
             <p className="text-sm text-gray-300">
-              {stage === "advanced" ? "جاري المعالجة بالوضع المتقدم..." : "جاري إزالة العلامة المائية..."}
+              {stage === "advanced" ? "Processing in advanced mode..." : "Removing watermark..."}
             </p>
             <div className="h-2 rounded-full bg-[#0a0f1e] overflow-hidden">
               <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all" style={{ width: `${progress}%` }} />
@@ -460,8 +508,8 @@ function PdfWatermarkRemover() {
           <div className="bg-green-500/10 border border-green-500/20 rounded-xl p-3 space-y-1">
             <p className="text-green-400 text-sm">
               {removedCount > 0
-                ? `تمت إزالة ${removedCount} عنصر يحتمل أن يكون علامة مائية.`
-                : "اكتملت المعالجة. تم تجهيز الملف للتحميل."}
+                ? `Removed ${removedCount} likely watermark element${removedCount === 1 ? "" : "s"}.`
+                : "Processing complete. Your file is ready to download."}
             </p>
           </div>
         )}
@@ -469,20 +517,20 @@ function PdfWatermarkRemover() {
         {askAdvanced && stage === "done" && (
           <div className="bg-yellow-500/10 border border-yellow-500/30 rounded-2xl p-4 space-y-3">
             <p className="text-yellow-300 text-sm">
-              لم يتم اكتشاف علامة مائية قابلة للإزالة تلقائياً. هل تريد المحاولة بالوضع المتقدم؟ (قد يؤثر على جودة النص)
+              No watermark was automatically detected. Try Advanced Mode? (may affect text quality)
             </p>
             <div className="flex gap-2">
               <button
                 onClick={runAdvanced}
                 className="px-4 py-2 rounded-xl bg-yellow-500 hover:bg-yellow-400 text-black font-semibold text-sm transition-all"
               >
-                محاولة متقدمة
+                Advanced Mode
               </button>
               <button
                 onClick={() => setAskAdvanced(false)}
                 className="px-4 py-2 rounded-xl border border-[#1e2d4a] text-gray-400 hover:text-gray-200 text-sm transition-all"
               >
-                إلغاء
+                Cancel
               </button>
             </div>
           </div>
@@ -494,7 +542,7 @@ function PdfWatermarkRemover() {
             disabled={busy}
             className="w-full py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold transition-all hover:scale-[1.02] active:scale-[0.98] disabled:opacity-40 disabled:cursor-not-allowed disabled:hover:scale-100"
           >
-            {busy ? "جاري المعالجة..." : "إزالة العلامة المائية"}
+            {busy ? "Processing..." : "Remove Watermark"}
           </button>
         )}
 
@@ -504,15 +552,15 @@ function PdfWatermarkRemover() {
             download={(file?.name.replace(/\.pdf$/i, "") || "document") + "-clean.pdf"}
             className="block w-full text-center py-3.5 rounded-2xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold transition-all"
           >
-            تحميل الملف
+            Download File
           </a>
         )}
       </div>
 
       <HowToUse steps={[
-        "ارفع ملف PDF عن طريق السحب أو الضغط لاختيار الملف.",
-        "اضغط على زر «إزالة العلامة المائية» وانتظر اكتمال المعالجة.",
-        "حمّل الملف الناتج. إذا لم يتم اكتشاف علامة مائية يمكنك تجربة الوضع المتقدم.",
+        "Upload a PDF by dragging it in or clicking to select a file.",
+        "Click \"Remove Watermark\" and wait for processing to finish.",
+        "Download the cleaned file. If no watermark was detected, try Advanced Mode.",
       ]} />
       <RelatedTools currentSlug="pdf-watermark-remover" />
       <ToolSeoContent

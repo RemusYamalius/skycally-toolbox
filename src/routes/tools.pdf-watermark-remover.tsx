@@ -129,9 +129,9 @@ function stripWatermarkTextBlocks(
   let removed = 0;
 
   function isRotated(text: string): boolean {
-    const matRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(?:cm|Tm)/g;
+    const re = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(?:cm|Tm)/g;
     let m: RegExpExecArray | null;
-    while ((m = matRe.exec(text)) !== null) {
+    while ((m = re.exec(text)) !== null) {
       if (Math.abs(parseFloat(m[2])) > 0.01 || Math.abs(parseFloat(m[3])) > 0.01) return true;
     }
     return false;
@@ -147,19 +147,35 @@ function stripWatermarkTextBlocks(
     return extractShownStrings(text).map((s) => s.trim()).some((s) => targets.has(s));
   }
 
-  let out = content;
+  function isWatermarkBlock(block: string): boolean {
+    if (!/\bBT\b/.test(block)) return false;
+    return isRotated(block) || hasLowAlpha(block) || matchesTargets(block);
+  }
 
-  // Pass 1: q...Q blocks containing text with any watermark characteristic.
-  out = out.replace(/q\b([\s\S]*?)\bQ\b/g, (full, body: string) => {
-    if (!/\bBT\b/.test(body)) return full;
-    if (isRotated(body) || hasLowAlpha(body) || matchesTargets(body)) {
-      removed++;
-      return "";
+  // Stack-based parser: correctly handles arbitrarily nested q...Q blocks
+  const tokens = content.split(/(\bq\b|\bQ\b)/);
+  const stack: string[] = [];
+  let current = "";
+
+  for (const token of tokens) {
+    if (token === "q") {
+      stack.push(current);
+      current = "q";
+    } else if (token === "Q") {
+      const block = current + "\nQ";
+      const parent = stack.pop() ?? "";
+      if (isWatermarkBlock(block)) {
+        removed++;
+        current = parent;
+      } else {
+        current = parent + block;
+      }
+    } else {
+      current += token;
     }
-    return full;
-  });
+  }
 
-  // Pass 2: standalone BT...ET blocks not inside a q...Q.
+  let out = current;
   out = out.replace(/BT\b([\s\S]*?)\bET\b/g, (full, body: string) => {
     if (isRotated(body) || hasLowAlpha(body) || matchesTargets(body)) {
       removed++;

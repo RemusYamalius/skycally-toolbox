@@ -370,7 +370,12 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
     totalRemoved += r2.removed;
 
     if (r1.removed > 0 || r2.removed > 0) {
-      const newStream = pdf.context.stream(latin1ToBytes(content));
+      const contentBytes = latin1ToBytes(content);
+      const newStream = pdf.context.stream(contentBytes, {
+        Length: pdf.context.obj(contentBytes.length),
+      });
+      newStream.dict.delete(PDFName.of("Filter"));
+      newStream.dict.delete(PDFName.of("DecodeParms"));
       const ref = pdf.context.register(newStream);
       page.node.set(PDFName.of("Contents"), ref);
     }

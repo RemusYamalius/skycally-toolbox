@@ -39,6 +39,7 @@ import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsProtectPdfRouteImport } from './routes/tools.protect-pdf'
+import { Route as ToolsPdfWatermarkRemoverRouteImport } from './routes/tools.pdf-watermark-remover'
 import { Route as ToolsPdfToWordRouteImport } from './routes/tools.pdf-to-word'
 import { Route as ToolsPdfToImagesRouteImport } from './routes/tools.pdf-to-images'
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
@@ -233,6 +234,12 @@ const ToolsProtectPdfRoute = ToolsProtectPdfRouteImport.update({
   path: '/tools/protect-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsPdfWatermarkRemoverRoute =
+  ToolsPdfWatermarkRemoverRouteImport.update({
+    id: '/tools/pdf-watermark-remover',
+    path: '/tools/pdf-watermark-remover',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsPdfToWordRoute = ToolsPdfToWordRouteImport.update({
   id: '/tools/pdf-to-word',
   path: '/tools/pdf-to-word',
@@ -502,6 +509,7 @@ export interface FileRoutesByFullPath {
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -577,6 +585,7 @@ export interface FileRoutesByTo {
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -653,6 +662,7 @@ export interface FileRoutesById {
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
+  '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -730,6 +740,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-text-extractor'
     | '/tools/pdf-to-images'
     | '/tools/pdf-to-word'
+    | '/tools/pdf-watermark-remover'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -805,6 +816,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-text-extractor'
     | '/tools/pdf-to-images'
     | '/tools/pdf-to-word'
+    | '/tools/pdf-watermark-remover'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -880,6 +892,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-text-extractor'
     | '/tools/pdf-to-images'
     | '/tools/pdf-to-word'
+    | '/tools/pdf-watermark-remover'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -956,6 +969,7 @@ export interface RootRouteChildren {
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
   ToolsPdfToImagesRoute: typeof ToolsPdfToImagesRoute
   ToolsPdfToWordRoute: typeof ToolsPdfToWordRoute
+  ToolsPdfWatermarkRemoverRoute: typeof ToolsPdfWatermarkRemoverRoute
   ToolsProtectPdfRoute: typeof ToolsProtectPdfRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
@@ -1192,6 +1206,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/protect-pdf'
       fullPath: '/tools/protect-pdf'
       preLoaderRoute: typeof ToolsProtectPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/pdf-watermark-remover': {
+      id: '/tools/pdf-watermark-remover'
+      path: '/tools/pdf-watermark-remover'
+      fullPath: '/tools/pdf-watermark-remover'
+      preLoaderRoute: typeof ToolsPdfWatermarkRemoverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/pdf-to-word': {
@@ -1548,6 +1569,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,
   ToolsPdfToImagesRoute: ToolsPdfToImagesRoute,
   ToolsPdfToWordRoute: ToolsPdfToWordRoute,
+  ToolsPdfWatermarkRemoverRoute: ToolsPdfWatermarkRemoverRoute,
   ToolsProtectPdfRoute: ToolsProtectPdfRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,

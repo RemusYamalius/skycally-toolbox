@@ -75,7 +75,7 @@ function detectRepeatedStrings(pageContents: string[]): Set<string> {
     );
     for (const s of seen) counts.set(s, (counts.get(s) ?? 0) + 1);
   }
-  const threshold = Math.max(2, Math.floor(pageContents.length * 0.5) + 1);
+  const threshold = pageContents.length <= 2 ? 1 : Math.max(2, Math.floor(pageContents.length * 0.5));
   const out = new Set<string>();
   for (const [s, n] of counts) if (n >= threshold) out.add(s);
   return out;
@@ -113,29 +113,47 @@ function stripWatermarkTextBlocks(
   lowAlphaGStates: Set<string>,
 ): { out: string; removed: number } {
   let removed = 0;
-  const re = /BT\b([\s\S]*?)\bET\b/g;
-  const out = content.replace(re, (full, body: string) => {
-    const shown = extractShownStrings(body).map((s) => s.trim());
-    const matchesTarget = shown.some((s) => targets.has(s));
-    const gsRefs = [...body.matchAll(/\/([A-Za-z0-9_.+-]+)\s+gs/g)].map((m) => m[1]);
-    const lowAlpha = gsRefs.some((g) => lowAlphaGStates.has(g));
-    let rotated = false;
+
+  function isRotated(text: string): boolean {
     const matRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(?:cm|Tm)/g;
-    let mm: RegExpExecArray | null;
-    while ((mm = matRe.exec(body)) !== null) {
-      const b = parseFloat(mm[2]);
-      const c = parseFloat(mm[3]);
-      if (Math.abs(b) > 0.01 || Math.abs(c) > 0.01) {
-        rotated = true;
-        break;
-      }
+    let m: RegExpExecArray | null;
+    while ((m = matRe.exec(text)) !== null) {
+      if (Math.abs(parseFloat(m[2])) > 0.01 || Math.abs(parseFloat(m[3])) > 0.01) return true;
     }
-    if (matchesTarget || lowAlpha || rotated) {
+    return false;
+  }
+
+  function hasLowAlpha(text: string): boolean {
+    return [...text.matchAll(/\/([A-Za-z0-9_.+-]+)\s+gs/g)]
+      .map((m) => m[1])
+      .some((g) => lowAlphaGStates.has(g));
+  }
+
+  function matchesTargets(text: string): boolean {
+    return extractShownStrings(text).map((s) => s.trim()).some((s) => targets.has(s));
+  }
+
+  let out = content;
+
+  // Pass 1: q...Q blocks containing text with any watermark characteristic.
+  out = out.replace(/q\b([\s\S]*?)\bQ\b/g, (full, body: string) => {
+    if (!/\bBT\b/.test(body)) return full;
+    if (isRotated(body) || hasLowAlpha(body) || matchesTargets(body)) {
       removed++;
       return "";
     }
     return full;
   });
+
+  // Pass 2: standalone BT...ET blocks not inside a q...Q.
+  out = out.replace(/BT\b([\s\S]*?)\bET\b/g, (full, body: string) => {
+    if (isRotated(body) || hasLowAlpha(body) || matchesTargets(body)) {
+      removed++;
+      return "";
+    }
+    return full;
+  });
+
   return { out, removed };
 }
 
@@ -306,8 +324,6 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
 
     let content = pageContents[i];
     const lowAlpha = findLowAlphaGStates(page);
-    // TODO: remove after verifying
-    console.log(`[WatermarkRemover] Page ${i + 1}: content length=${pageContents[i].length}, repeated=${repeated.size}, lowAlpha=${lowAlpha.size}`);
     if (!content) return;
 
     // Strategy 1
@@ -445,7 +461,8 @@ function PdfWatermarkRemover() {
     setAskAdvanced(false);
     try {
       const buf = await file.arrayBuffer();
-      const bytes = await runRasterRebuild(buf, (p) => setProgress(p));
+      const { pdfBytes: cleaned } = await runStrategies1to3(buf);
+      const bytes = await runRasterRebuild(cleaned.buffer as ArrayBuffer, (p) => setProgress(p));
       buildDownload(bytes, "-flattened");
       setStage("done");
       setProgress(100);

@@ -18,11 +18,25 @@ export const Route = createFileRoute("/tools/pdf-watermark-remover")({
 function decodeStreamBytes(stream: any): Uint8Array {
   try {
     if (typeof stream.getUnencodedContents === "function") {
-      return stream.getUnencodedContents();
+      const result = stream.getUnencodedContents();
+      if (result && result.length > 0) return result;
     }
   } catch {}
   try {
-    if (typeof stream.getContents === "function") return stream.getContents();
+    if (typeof stream.getContents === "function") {
+      const result = stream.getContents();
+      if (result && result.length > 0) return result;
+    }
+  } catch {}
+  try {
+    if (stream.contents instanceof Uint8Array && stream.contents.length > 0) {
+      return stream.contents;
+    }
+  } catch {}
+  try {
+    if (typeof stream.asPDFStream === "function") {
+      return stream.asPDFStream().contents;
+    }
   } catch {}
   return new Uint8Array();
 }

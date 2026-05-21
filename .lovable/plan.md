@@ -1,28 +1,36 @@
 ## Goal
+Make PDF Watermark Remover generic — work for any watermark type on any PDF.
 
-Fix the PDF Watermark Remover so the strategies actually mutate the PDF. Root cause: `p.node.normalizedEntries().Contents` returns nothing (or an unresolved ref) on most real-world PDFs, so `pageContents[i]` is empty and Strategies 1 and 2 short-circuit at `if (!content) return;`.
+## File
+`src/routes/tools.pdf-watermark-remover.tsx` (only file touched)
 
-## Changes (single file: `src/routes/tools.pdf-watermark-remover.tsx`)
+## Changes
 
-1. **Add helper `getPageContents(page, pdf)`** above `runStrategies1to3`. Uses `page.node.get(PDFName.of("Contents")) ?? page.node.lookup(PDFName.of("Contents"))`, resolves a top-level `PDFRef` that may point to either a stream or a `PDFArray` of stream refs, then decodes each stream via the existing `decodeStreamBytes` + `bytesToLatin1` and joins with `"\n"`. Wrapped in try/catch returning `""`.
+### 1. Rewrite `stripWatermarkTextBlocks` (Strategy 1)
+Replace current implementation with a two-pass version:
+- Helpers: `isRotated(text)`, `hasLowAlpha(text)`, `matchesTargets(text)`.
+- **Pass 1**: scan `q...Q` blocks; if block contains a `BT` and any of (rotated cm/Tm, low-alpha gs ref, matches a repeated target string), drop the entire `q...Q`.
+- **Pass 2**: on the result, scan remaining `BT...ET` blocks and drop if rotated/lowAlpha/matchesTargets.
+- Return `{ out, removed }`. Fix the dangling `var out = content;` from the user's snippet by declaring `let out = content;` at the top before Pass 1.
 
-2. **Replace the inline `pages.map` block** in `runStrategies1to3` (lines 253–267) with:
-   ```ts
-   const pageContents: string[] = pages.map((p: any) => getPageContents(p, pdf));
-   ```
+### 2. Lower repeated-string threshold
+In `detectRepeatedStrings`, change:
+```ts
+const threshold = pageContents.length <= 2 ? 1 : Math.max(2, Math.floor(pageContents.length * 0.5));
+```
+So 1–2 page docs accept any string seen on a page; longer docs use 50%.
 
-3. **Temporary debug log** inside the per-page loop, right after computing `lowAlpha`:
-   ```ts
-   console.log(`[WatermarkRemover] Page ${i+1}: content length=${pageContents[i].length}, repeated=${repeated.size}, lowAlpha=${lowAlpha.size}`);
-   ```
-   Labeled `// TODO: remove after verifying` so it's easy to strip later.
+### 3. Confirm Strategy 2 size check (no change needed)
+Verify `stripLargeImageDraws` already evaluates `wFrac > 0.4 && hFrac > 0.4` for any image in `imageNames` (not gated by `globalWatermarkImages`). Current code is correct — leave as-is.
 
-4. **Bug 2 verification only — no code change.** `stripStampAnnots` already mutates `page.node` directly via `page.node.set(PDFName.of("Annots"), …)`, and `await pdf.save()` at the end serializes the whole document including those node mutations. The existing `if (r1.removed > 0 || r2.removed > 0)` guard correctly applies only to the *content stream* rewrite (it would be wrong to write back an unchanged stream as a fresh object). No change needed here.
+### 4. Chain Advanced Mode after strategies 1–3
+In `runAdvanced`, run `runStrategies1to3(buf)` first, then pass `cleaned.buffer` to `runRasterRebuild`.
+
+### 5. Remove debug log
+Delete the `console.log("[WatermarkRemover] Page ...")` line and its `// TODO` comment inside the per-page loop in `runStrategies1to3`.
 
 ## Out of scope
-
-UI, styles, other tools, file structure, strategy detection heuristics — all untouched.
+UI, styles, copy, other tools, other strategies' heuristics, file structure.
 
 ## Verification
-
-After the edit, load a watermarked PDF in the preview, open devtools, and confirm the `[WatermarkRemover]` logs show non-zero `content length` per page. If repeated/lowAlpha counts are also non-zero on a known watermarked file, the bug is fixed.
+Load preview, upload (a) a PDF with rotated diagonal text watermark wrapped in q...Q, (b) a 1–2 page PDF with a single repeated string watermark, (c) a PDF with one large background image watermark. All three should report `removed > 0` and download a cleaned file without showing the Advanced Mode prompt. Advanced Mode, when triggered, should operate on the already-stripped output.

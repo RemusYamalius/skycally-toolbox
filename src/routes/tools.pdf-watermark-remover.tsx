@@ -75,7 +75,7 @@ function detectRepeatedStrings(pageContents: string[]): Set<string> {
     );
     for (const s of seen) counts.set(s, (counts.get(s) ?? 0) + 1);
   }
-  const threshold = Math.max(2, Math.floor(pageContents.length * 0.5) + 1);
+  const threshold = pageContents.length <= 2 ? 1 : Math.max(2, Math.floor(pageContents.length * 0.5));
   const out = new Set<string>();
   for (const [s, n] of counts) if (n >= threshold) out.add(s);
   return out;

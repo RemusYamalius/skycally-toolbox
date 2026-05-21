@@ -461,7 +461,8 @@ function PdfWatermarkRemover() {
     setAskAdvanced(false);
     try {
       const buf = await file.arrayBuffer();
-      const bytes = await runRasterRebuild(buf, (p) => setProgress(p));
+      const { pdfBytes: cleaned } = await runStrategies1to3(buf);
+      const bytes = await runRasterRebuild(cleaned.buffer as ArrayBuffer, (p) => setProgress(p));
       buildDownload(bytes, "-flattened");
       setStage("done");
       setProgress(100);

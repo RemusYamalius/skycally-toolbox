@@ -243,17 +243,23 @@ function stripStampAnnots(page: any): number {
   return removed;
 }
 
-// ---------- Pipeline (strategies 1-3, always all three) ----------
-
-async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8Array; removed: number }> {
-  const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
-  const pages = pdf.getPages();
-
-  // Pass A: decode all page content streams.
-  const pageContents: string[] = pages.map((p: any) => {
-    const contents = p.node.normalizedEntries().Contents;
+// Robust per-page content stream reader. Handles missing entries, direct
+// streams, indirect refs, and arrays of refs/streams.
+function getPageContents(page: any, pdf: any): string {
+  try {
+    let contents: any =
+      (typeof page.node.get === "function" ? page.node.get(PDFName.of("Contents")) : undefined) ??
+      (typeof page.node.lookup === "function" ? page.node.lookup(PDFName.of("Contents")) : undefined);
     if (!contents) return "";
-    const arr: any[] = contents instanceof PDFArray ? contents.asArray() : [contents];
+    const arr: any[] =
+      contents instanceof PDFArray
+        ? contents.asArray()
+        : contents instanceof PDFRef
+        ? (() => {
+            const resolved = pdf.context.lookup(contents);
+            return resolved instanceof PDFArray ? resolved.asArray() : [resolved];
+          })()
+        : [contents];
     let merged = "";
     for (const item of arr) {
       let s: any = item;
@@ -264,7 +270,19 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
       merged += bytesToLatin1(sb) + "\n";
     }
     return merged;
-  });
+  } catch {
+    return "";
+  }
+}
+
+// ---------- Pipeline (strategies 1-3, always all three) ----------
+
+async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8Array; removed: number }> {
+  const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
+  const pages = pdf.getPages();
+
+  // Pass A: decode all page content streams.
+  const pageContents: string[] = pages.map((p: any) => getPageContents(p, pdf));
 
   // Detect strings repeating across >50% of pages.
   const repeated = detectRepeatedStrings(pageContents);

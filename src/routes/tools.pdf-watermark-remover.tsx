@@ -324,8 +324,6 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
 
     let content = pageContents[i];
     const lowAlpha = findLowAlphaGStates(page);
-    // TODO: remove after verifying
-    console.log(`[WatermarkRemover] Page ${i + 1}: content length=${pageContents[i].length}, repeated=${repeated.size}, lowAlpha=${lowAlpha.size}`);
     if (!content) return;
 
     // Strategy 1

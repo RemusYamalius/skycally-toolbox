@@ -24,7 +24,7 @@ export const Route = createFileRoute("/tools/")({
     return {
       ...base,
       scripts: [
-        ...(base.scripts ?? []),
+        ...((base as { scripts?: unknown[] }).scripts ?? []),
         {
           type: "application/ld+json",
           children: JSON.stringify({

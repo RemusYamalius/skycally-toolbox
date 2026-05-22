@@ -1,45 +1,43 @@
-## Add third blog post: "Best Free Online Tools for Designers (2025)"
+## Add CollectionPage + ItemList JSON-LD to `/tools`
 
-Follow the exact pattern of the two existing posts. No component, layout, or style changes.
+Inject structured data into the tools listing route so Google can recognize it as a curated collection of tools.
 
-### 1. Hero image
-Generate `src/assets/blog-designers-tools.png` — a clean screenshot-style mock of the Remove Background tool interface (matches the visual style of `blog-compress-pdf.png` and `blog-video-to-gif.png`).
+### File to edit
+`src/routes/tools.index.tsx` — extend the existing `head()` to add a `scripts` array alongside the current `buildPageMeta(...)` return.
 
-### 2. Register post in `src/lib/blog.ts`
-Append a third entry to `blogPosts`:
-- slug: `best-free-online-tools-for-designers`
-- path: `/blog/best-free-online-tools-for-designers`
-- title: `Best Free Online Tools for Designers (2025)`
-- description: `The best browser-based tools for designers in 2025 — free, no signup, no installs.`
-- category: `Design Tools` (rendered uppercase by the card)
-- date: `2026-05-22`, dateLabel: `May 22, 2026`
-- author: `Skycally Team`
-- ctaToolSlug: `remove-bg`
-- thumbnail: imported `blog-designers-tools.png`
-- thumbnailAlt: `Remove Background tool interface`
+### Schema shape
+Single JSON-LD `<script type="application/ld+json">` containing a `CollectionPage` whose `mainEntity` is an `ItemList`. Each entry maps a visible (non-hidden) tool to its absolute URL, name, and description.
 
-### 3. New route `src/routes/blog.best-free-online-tools-for-designers.tsx`
-Mirror `blog.compress-pdf-online-free.tsx` exactly:
-- `createFileRoute('/blog/best-free-online-tools-for-designers')`
-- `head()` returning `buildPageMeta(...)` + `og:type: article` + Article JSON-LD (headline, datePublished/Modified `2026-05-22`, author/publisher Skycally, url, description)
-- `<BlogPostLayout post={post}>` body containing:
-  - Intro paragraph
-  - Ten `<h2>` sections (Remove Background, Image Compressor, Image Filters, Image to Sketch, Add Watermark, Word to PDF, Merge PDF, Compress PDF, QR Code Generator, PDF Watermark Remover) — each with description paragraph + `<strong>Best for:</strong>` line
-  - `<h2>Why Browser-Based Tools Work for Designers</h2>` section
-  - `<h2>Frequently Asked Questions</h2>` with 5 Q/A pairs in the same `<strong>Q</strong><br/>A` format used by existing posts
-- Internal links use `<a href="/tools/{slug}">` for each mentioned tool
+```json
+{
+  "@context": "https://schema.org",
+  "@type": "CollectionPage",
+  "name": "All Free Online Tools — Skycally",
+  "description": "Browse 40+ free tools: compress images, convert PDFs, generate QR codes, download videos and more.",
+  "url": "https://skycally.com/tools",
+  "mainEntity": {
+    "@type": "ItemList",
+    "numberOfItems": 40,
+    "itemListElement": [
+      {
+        "@type": "ListItem",
+        "position": 1,
+        "url": "https://skycally.com/tools/video-to-gif",
+        "name": "Video to GIF",
+        "description": "Convert any video clip to a high-quality animated GIF."
+      }
+      // ...one entry per visible tool
+    ]
+  }
+}
+```
 
-The CTA card and "You might also like" rail render automatically from `BlogPostLayout` via `ctaToolSlug: "remove-bg"`.
+### Implementation details
+- Build the list inside `head()` from `tools.filter(t => !t.hidden)`, preserving the array order (which already groups by category).
+- Use `SITE_URL` from `@/lib/seo` to produce absolute URLs (`${SITE_URL}${tool.path}`).
+- Spread the existing `buildPageMeta(...)` result and append a `scripts` array — do not duplicate or alter `meta`/`links`.
+- No new helper file; the schema is page-specific and only used here.
 
-### 4. Tweak related-tools for the requested rail
-The user asked the "You might also like" rail to show Remove Background, Image Compressor, QR Code Generator. `RelatedTools` derives this from `relatedToolsMap[ctaToolSlug]`. Since the CTA tool is `remove-bg`, change `relatedToolsMap["remove-bg"]` in `src/lib/related-tools.ts` from `["image-upscaler", "add-watermark", "image-compressor"]` to `["image-compressor", "qr-generator", "image-upscaler"]` — keeps remove-bg itself out of its own list (it's the CTA tool, can't be in the rail), satisfies 2 of the 3 requested, and uses `image-upscaler` as the third since the rail can only show 3 and the CTA tool can't appear in its own related list. This is the only existing-file change.
-
-Note: this also affects the Remove Background tool page's related rail. If you'd prefer to leave that map untouched, I'll skip step 4 and the rail will show the current defaults instead.
-
-### Files
-- new: `src/assets/blog-designers-tools.png`
-- new: `src/routes/blog.best-free-online-tools-for-designers.tsx`
-- edit: `src/lib/blog.ts` (append entry + import)
-- edit: `src/lib/related-tools.ts` (one-line map change — optional, see step 4)
-
-No edits to existing posts, routes, components, or styles.
+### Out of scope
+- No changes to UI, styles, tool logic, or any other route.
+- No changes to `buildToolMeta` (per-tool `SoftwareApplication` schema already in place).

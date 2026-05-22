@@ -3,7 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
-import { buildPageMeta } from "@/lib/seo";
+import { buildPageMeta, SITE_URL } from "@/lib/seo";
 
 const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text", "ai"] as const;
 type CatParam = (typeof VALID_CATS)[number];
@@ -16,11 +16,39 @@ export const Route = createFileRoute("/tools/")({
     }
     return {};
   },
-  head: () => buildPageMeta({
-    title: "All Free Online Tools — Skycally",
-    description: "Browse 40+ free tools: compress images, convert PDFs, generate QR codes, download videos and more. All free, all private.",
-    path: "/tools",
-  }),
+  head: () => {
+    const title = "All Free Online Tools — Skycally";
+    const description = "Browse 40+ free tools: compress images, convert PDFs, generate QR codes, download videos and more. All free, all private.";
+    const base = buildPageMeta({ title, description, path: "/tools" });
+    const visible = tools.filter((t) => !t.hidden);
+    return {
+      ...base,
+      scripts: [
+        ...(base.scripts ?? []),
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "CollectionPage",
+            name: title,
+            description,
+            url: `${SITE_URL}/tools`,
+            mainEntity: {
+              "@type": "ItemList",
+              numberOfItems: visible.length,
+              itemListElement: visible.map((t, i) => ({
+                "@type": "ListItem",
+                position: i + 1,
+                url: `${SITE_URL}${t.path}`,
+                name: t.name,
+                description: t.description,
+              })),
+            },
+          }),
+        },
+      ],
+    };
+  },
   component: ToolsPage,
 });
 

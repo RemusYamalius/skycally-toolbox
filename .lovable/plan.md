@@ -1,22 +1,24 @@
-## Fix PDF Watermark Remover — 3 root cause bugs
+## Plan: Rewrite `src/routes/tools.word-to-pdf.tsx`
 
-Single file: `src/routes/tools.pdf-watermark-remover.tsx`
+Replace the entire file with a working browser-based DOCX → PDF converter using `mammoth` + hidden iframe `window.print()`.
 
-### Bug 1 — Stack-based parser for nested q...Q blocks
-Replace the current regex-based `stripWatermarkTextBlocks` with the stack-based parser from the spec. Keeps helpers `isRotated`, `hasLowAlpha`, `matchesTargets`, adds `isWatermarkBlock`. Tokenizes on `\bq\b|\bQ\b`, uses a stack to correctly drop entire nested watermark blocks without orphaning `Q` operators. After the q/Q pass, runs a standalone `BT...ET` sweep on the remainder.
+The snippet in your message has several rendering gaps (unterminated template literal, missing `<ToolPageShell>` wrapper, empty `<div>` blocks, missing hidden `<iframe>`). I will reconstruct a clean, working version preserving your exact intent:
 
-### Bug 2 — Explicit /Length on new content stream
-In `runStrategies1to3`, where the rewritten content is committed:
-- Build `contentBytes` once.
-- Create stream via `pdf.context.stream(contentBytes, { Length: pdf.context.obj(contentBytes.length) })`.
-- Then `newStream.dict.delete(PDFName.of("Filter"))` and `newStream.dict.delete(PDFName.of("DecodeParms"))` to prevent double-decoding from any inherited filter entries.
-- Ensure `PDFName` is imported from `pdf-lib` (add to existing import if missing).
+### Behavior
+- `DropZone` accepts `.docx` only, single file.
+- On "Convert to PDF": read arrayBuffer → `mammoth.convertToHtml` → inject into hidden iframe via `srcdoc` → on load, focus + `print()`.
+- Toast success/error via `sonner`.
+- Hidden `<iframe ref={iframeRef}>` rendered with `style={{ display: "none" }}`.
 
-### Bug 3 — Robust `decodeStreamBytes` fallback chain
-Replace the body of `decodeStreamBytes` with the 4-step fallback: `getUnencodedContents` → `getContents` → `stream.contents` (Uint8Array) → `asPDFStream().contents`. Each wrapped in try/catch; returns `new Uint8Array()` only if all fail.
+### Structure (inside `<ToolPageShell title="Word to PDF" description="...">`)
+1. `<DropZone accept=".docx" onFiles={(f) => setFile(f[0])} label="Drop your Word file here" hint=".docx files only" />`
+2. If `file`: card showing filename + size + Convert button (styled like other tools: `w-full py-3 rounded-xl bg-foreground text-background font-semibold disabled:opacity-50`).
+3. Small muted helper text: "When the print dialog opens, choose Save as PDF…".
+4. Hidden iframe.
+5. `<HowToUse>`, `<RelatedTools currentSlug="word-to-pdf" />`, `<ToolSeoContent ... />` exactly as in your snippet.
+
+### Inline print CSS
+Complete template literal with closing `</style></head><body>{html}</body></html>`, including the body/heading/table/img styles you provided and `@media print { body { margin: 1cm; } }`.
 
 ### Out of scope
-UI, styles, copy, other tools, other strategies, file layout.
-
-### Verification
-Upload (a) PDF with watermark wrapped in nested `q q BT...ET Q Q`, (b) PDF that previously produced corrupted output, (c) compressed FlateDecode content streams. Confirm `removed > 0`, downloaded PDF opens cleanly in a viewer, no orphaned `Q` operators in output.
+No other files touched. No new deps. No UI changes elsewhere.

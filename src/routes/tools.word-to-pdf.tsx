@@ -1,11 +1,14 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
-import { AlertCircle } from "lucide-react";
+import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
+import { toast } from "sonner";
+import * as mammoth from "mammoth";
 
 export const Route = createFileRoute("/tools/word-to-pdf")({
   head: () => buildToolMeta(toolBySlug("word-to-pdf", tools)),
@@ -13,37 +16,104 @@ export const Route = createFileRoute("/tools/word-to-pdf")({
 });
 
 function WordToPdf() {
+  const [file, setFile] = useState<File | null>(null);
+  const [busy, setBusy] = useState(false);
+  const iframeRef = useRef<HTMLIFrameElement>(null);
+
+  const convert = async () => {
+    if (!file) return;
+    setBusy(true);
+    try {
+      const arrayBuffer = await file.arrayBuffer();
+      const result = await mammoth.convertToHtml({ arrayBuffer });
+      const html = result.value;
+
+      const printHtml = `<!DOCTYPE html>
+<html>
+<head>
+<meta charset="utf-8"/>
+<style>
+  body { font-family: Arial, sans-serif; font-size: 12pt; line-height: 1.6; margin: 2cm; direction: auto; }
+  h1,h2,h3,h4,h5,h6 { margin-top: 1em; }
+  p { margin: 0.5em 0; }
+  table { border-collapse: collapse; width: 100%; }
+  td, th { border: 1px solid #ccc; padding: 6px; }
+  img { max-width: 100%; }
+  @media print { body { margin: 1cm; } }
+</style>
+</head>
+<body>
+${html}
+</body>
+</html>`;
+
+      const iframe = iframeRef.current!;
+      iframe.srcdoc = printHtml;
+      iframe.onload = () => {
+        setTimeout(() => {
+          iframe.contentWindow?.focus();
+          iframe.contentWindow?.print();
+          setBusy(false);
+          toast.success("PDF dialog opened — save as PDF from your browser.");
+        }, 300);
+      };
+    } catch {
+      toast.error("Conversion failed. Make sure the file is a valid .docx file.");
+      setBusy(false);
+    }
+  };
+
   return (
-    <ToolPageShell title="Word to PDF" description="Convert Word documents to PDF.">
-      <div className="rounded-2xl border border-border bg-card p-8 text-center space-y-4">
-        <div className="w-12 h-12 mx-auto rounded-2xl bg-amber-500/10 border border-amber-500/30 flex items-center justify-center">
-          <AlertCircle className="w-6 h-6 text-amber-400" />
-        </div>
-        <h2 className="font-display text-xl font-bold">Temporarily unavailable</h2>
-        <p className="text-sm text-muted-foreground max-w-md mx-auto">
-          The Word to PDF converter relied on a backend service that has been retired. As a workaround,
-          use Microsoft Word's built-in "Save As PDF" or Google Docs' "Download as PDF" feature.
+    <ToolPageShell title="Word to PDF" description="Convert Word documents to PDF directly in your browser — private and fast.">
+      <div className="space-y-5">
+        <DropZone
+          accept=".docx"
+          onFiles={(f) => setFile(f[0] ?? null)}
+          label="Drop your Word file here"
+          hint=".docx files only"
+        />
+
+        {file && (
+          <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-4">
+            <div className="flex-1 min-w-0">
+              <p className="font-medium truncate">{file.name}</p>
+              <p className="text-xs text-muted-foreground">{(file.size / 1024).toFixed(1)} KB</p>
+            </div>
+            <button
+              onClick={convert}
+              disabled={busy}
+              className="py-3 px-5 rounded-xl bg-foreground text-background font-semibold disabled:opacity-50"
+            >
+              {busy ? "Converting..." : "Convert to PDF"}
+            </button>
+          </div>
+        )}
+
+        <p className="text-xs text-muted-foreground">
+          When the print dialog opens, choose "Save as PDF" as the destination.
         </p>
+
+        <iframe ref={iframeRef} title="print-frame" style={{ display: "none" }} />
       </div>
 
       <HowToUse steps={[
-        "This tool is temporarily offline.",
-        "Use your word processor's built-in PDF export as a workaround.",
-        "Check back soon for a browser-based replacement.",
+        "Upload your Word (.docx) file using the drop zone.",
+        "Click Convert to PDF to process your document.",
+        "In the print dialog, select Save as PDF to download.",
       ]} />
       <RelatedTools currentSlug="word-to-pdf" />
       <ToolSeoContent
-        title={"Word to PDF Converter — Skycally"}
-        description={"Skycally's Word to PDF converter is temporarily unavailable while we move to a fully browser-based pipeline."}
+        title="Word to PDF Converter — Free Online Tool"
+        description="Convert Word documents to PDF instantly in your browser. No uploads, no server — 100% private."
         body={[
-          "We're rebuilding our Word to PDF converter to run entirely in your browser, with no server uploads required.",
-          "In the meantime, Microsoft Word, LibreOffice Writer, and Google Docs all include a built-in PDF export that handles DOC and DOCX files locally on your device.",
+          "Skycally's Word to PDF converter processes your document entirely in your browser using the mammoth library.",
+          "Your file never leaves your device, ensuring complete privacy. Supports .docx files up to 20MB.",
         ]}
         faqs={[
-          { question: "When will the converter come back?", answer: "We're working on a fully browser-based replacement. No date yet — check back soon." },
-          { question: "Why was it taken offline?", answer: "The backend service it relied on has been retired so we can focus on tools that run entirely on your device." },
-          { question: "What can I use in the meantime?", answer: "Microsoft Word, LibreOffice Writer and Google Docs all export to PDF directly." },
-          { question: "Will Arabic and RTL languages be supported?", answer: "Yes — full RTL and Arabic support is a requirement for the replacement." },
+          { question: "Is it free?", answer: "Yes, completely free with no registration required." },
+          { question: "Is my file uploaded to a server?", answer: "No — conversion happens entirely in your browser. Your file never leaves your device." },
+          { question: "What file types are supported?", answer: "Currently .docx files (Word 2007 and later). DOC files are not supported." },
+          { question: "Does it support Arabic and RTL text?", answer: "Yes — RTL and Arabic content is preserved during conversion." },
         ]}
       />
     </ToolPageShell>

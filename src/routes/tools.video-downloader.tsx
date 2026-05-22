@@ -8,7 +8,13 @@ import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/video-downloader")({
-  head: () => buildToolMeta(toolBySlug("video-downloader", tools)),
+  head: () => {
+    const base = buildToolMeta(toolBySlug("video-downloader", tools));
+    return {
+      ...base,
+      meta: [...(base.meta ?? []), { name: "robots", content: "noindex, follow" }],
+    };
+  },
   component: VideoDownloader,
 });
 

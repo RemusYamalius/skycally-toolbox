@@ -24,7 +24,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "image-converter": ["image-compressor", "image-resizer", "image-to-pdf"],
   "image-compressor": ["image-resizer", "image-converter", "add-watermark"],
   "image-upscaler": ["image-compressor", "remove-bg", "image-filters"],
-  "remove-bg": ["image-upscaler", "add-watermark", "image-compressor"],
+  "remove-bg": ["image-compressor", "qr-generator", "image-upscaler"],
   "image-to-text": ["pdf-text-extractor", "word-counter", "image-to-pdf"],
   "color-palette": ["image-filters", "image-to-sketch", "add-watermark"],
   "image-filters": ["image-to-sketch", "add-watermark", "color-palette"],

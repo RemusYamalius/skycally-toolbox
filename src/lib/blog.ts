@@ -1,5 +1,6 @@
 import compressPdfThumb from "@/assets/blog-compress-pdf.png";
 import videoToGifThumb from "@/assets/blog-video-to-gif.png";
+import designersToolsThumb from "@/assets/blog-designers-tools.png";
 
 export interface BlogPost {
   slug: string;
@@ -43,6 +44,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "video-to-gif",
     thumbnail: videoToGifThumb,
     thumbnailAlt: "Video to GIF tool interface",
+  },
+  {
+    slug: "best-free-online-tools-for-designers",
+    path: "/blog/best-free-online-tools-for-designers",
+    title: "Best Free Online Tools for Designers (2025)",
+    description:
+      "The best browser-based tools for designers in 2025 — free, no signup, no installs.",
+    category: "Design Tools",
+    date: "2026-05-22",
+    dateLabel: "May 22, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "remove-bg",
+    thumbnail: designersToolsThumb,
+    thumbnailAlt: "Remove Background tool interface",
   },
 ];
 

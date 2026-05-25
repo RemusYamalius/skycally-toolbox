@@ -66,7 +66,7 @@ export const tools: Tool[] = [
   { slug: "image-resizer", name: "Image Resizer", description: "Resize images by pixels or percentage with quality control.", category: "image", icon: Maximize2, path: "/tools/image-resizer" },
   { slug: "image-cropper", name: "Image Cropper", description: "Crop, rotate and flip images with aspect-ratio presets.", category: "image", icon: Crop, path: "/tools/image-cropper" },
   { slug: "add-text-to-image", name: "Add Text to Image", description: "Add custom, draggable text layers to any image.", category: "image", icon: Type, path: "/tools/add-text-to-image" },
-  { slug: "image-to-pdf", name: "Image to PDF", description: "Convert one or many images into a single PDF document.", category: "image", categories: ["image", "pdf"], icon: FileImage, path: "/tools/image-to-pdf" },
+  { slug: "image-to-pdf", name: "Image to PDF", description: "Convert one or many images into a single PDF document.", category: "pdf", categories: ["image", "pdf"], icon: FileImage, path: "/tools/image-to-pdf" },
   { slug: "collage-maker", name: "Photo Collage Maker", description: "Combine 2–9 photos into a beautiful grid collage.", category: "image", icon: LayoutGrid, path: "/tools/collage-maker" },
   { slug: "meme-generator", name: "Meme Generator", description: "Create classic memes from popular templates or your own image.", category: "image", icon: Laugh, path: "/tools/meme-generator" },
   { slug: "business-card-generator", name: "Business Card Generator", description: "Design print-ready business cards with QR codes.", category: "image", icon: CreditCard, path: "/tools/business-card-generator" },

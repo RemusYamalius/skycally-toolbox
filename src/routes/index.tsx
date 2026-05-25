@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type, Sparkles, Wrench } from "lucide-react";
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
-import { ToolCard } from "@/components/tool-card";
+import { LazyVisible } from "@/components/lazy-visible";
 import { AdZone } from "@/components/ad-zone";
 import { buildPageMeta } from "@/lib/seo";
+
+const ToolCard = lazy(() => import("@/components/tool-card").then((m) => ({ default: m.ToolCard })));
+
 
 const HOME_META = buildPageMeta({
   title: "Skycally — Free Online Tools, No Signup Required",
@@ -143,50 +146,55 @@ function HomePage() {
             <Link to="/tools" className="hidden sm:inline-flex text-sm font-medium text-muted-foreground hover:text-foreground">View all →</Link>
           </div>
 
-          <div className="space-y-14">
-            {(["video", "image", "audio", "pdf", "text", "utility"] as ToolCategory[]).map((cat) => {
-              const list = tools.filter((t) => toolInCategory(t, cat));
-              if (list.length === 0) return null;
-              const meta = categoryMeta[cat];
-              return (
-                <div key={cat} className="border-t border-border/60 pt-10">
-                  <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
-                    <div className="flex items-center gap-3">
-                      <div
-                        className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
-                        style={{ background: `color-mix(in oklab, ${meta.color} 18%, transparent)`, color: meta.color }}
-                      >
-                        <span aria-hidden>{meta.icon}</span>
+          <LazyVisible rootMargin="300px" minHeight={600}>
+            <Suspense fallback={<div style={{ minHeight: 600 }} />}>
+              <div className="space-y-14">
+                {(["video", "image", "audio", "pdf", "text", "utility"] as ToolCategory[]).map((cat) => {
+                  const list = tools.filter((t) => toolInCategory(t, cat));
+                  if (list.length === 0) return null;
+                  const meta = categoryMeta[cat];
+                  return (
+                    <div key={cat} className="border-t border-border/60 pt-10">
+                      <div className="flex items-end justify-between mb-6 flex-wrap gap-3">
+                        <div className="flex items-center gap-3">
+                          <div
+                            className="w-11 h-11 rounded-xl flex items-center justify-center text-xl"
+                            style={{ background: `color-mix(in oklab, ${meta.color} 18%, transparent)`, color: meta.color }}
+                          >
+                            <span aria-hidden>{meta.icon}</span>
+                          </div>
+                          <div>
+                            <h3 className="font-display text-2xl font-bold">{meta.label}</h3>
+                            <p className="text-sm text-muted-foreground">{categoryTaglines[cat]}</p>
+                          </div>
+                        </div>
+                        <span
+                          className="text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full"
+                          style={{ background: `color-mix(in oklab, ${meta.color} 12%, transparent)`, color: meta.color }}
+                        >
+                          {list.length} {list.length === 1 ? "tool" : "tools"}
+                        </span>
                       </div>
-                      <div>
-                        <h3 className="font-display text-2xl font-bold">{meta.label}</h3>
-                        <p className="text-sm text-muted-foreground">{categoryTaglines[cat]}</p>
+                      <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 contain-paint">
+                        {(expanded[cat] ? list : list.slice(0, INITIAL_PER_CAT)).filter((t) => !t.hidden).map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
                       </div>
+                      {list.length > INITIAL_PER_CAT && !expanded[cat] && (
+                        <div className="mt-6 text-center">
+                          <button
+                            onClick={() => setExpanded((p) => ({ ...p, [cat]: true }))}
+                            className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium hover:bg-secondary transition"
+                          >
+                            Show {list.length - INITIAL_PER_CAT} more {meta.label.toLowerCase()} →
+                          </button>
+                        </div>
+                      )}
                     </div>
-                    <span
-                      className="text-xs font-semibold uppercase tracking-wider px-3 py-1 rounded-full"
-                      style={{ background: `color-mix(in oklab, ${meta.color} 12%, transparent)`, color: meta.color }}
-                    >
-                      {list.length} {list.length === 1 ? "tool" : "tools"}
-                    </span>
-                  </div>
-                  <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3 contain-paint">
-                    {(expanded[cat] ? list : list.slice(0, INITIAL_PER_CAT)).filter((t) => !t.hidden).map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
-                  </div>
-                  {list.length > INITIAL_PER_CAT && !expanded[cat] && (
-                    <div className="mt-6 text-center">
-                      <button
-                        onClick={() => setExpanded((p) => ({ ...p, [cat]: true }))}
-                        className="inline-flex items-center gap-2 rounded-full border border-border px-5 py-2.5 text-sm font-medium hover:bg-secondary transition"
-                      >
-                        Show {list.length - INITIAL_PER_CAT} more {meta.label.toLowerCase()} →
-                      </button>
-                    </div>
-                  )}
-                </div>
-              );
-            })}
-          </div>
+                  );
+                })}
+              </div>
+            </Suspense>
+          </LazyVisible>
+
         </section>
 
         {/* ADSENSE_ZONE: homepage-middle-rectangle 300x250 */}

@@ -19,7 +19,7 @@ export function SiteHeader() {
     <header className="sticky top-0 z-40 backdrop-blur-xl bg-background/70 md:bg-background/70 max-md:bg-background/95 border-b border-border gpu-isolate mobile-no-backdrop">
       <div className="max-w-7xl mx-auto flex items-center justify-between px-4 sm:px-6 h-16">
         <Link to="/" className="flex items-center">
-          <img src="/logo.webp" alt="Skycally" width="200" height="35" decoding="async" loading="eager" fetchPriority="high" style={{ height: "38px", width: "auto" }} />
+          <img src="/logo.webp" alt="Skycally" width="219" height="38" decoding="async" style={{ height: "38px", width: "auto" }} />
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">

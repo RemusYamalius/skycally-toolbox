@@ -1,70 +1,38 @@
-# Mobile PageSpeed improvements (target 82+)
+## Goal
 
-All five fixes applied without changing UI, styles, or tool logic.
+Fix indexing signals by rebuilding the sitemap to cover every public route automatically, add `lastmod` + tuned `priority` to every entry, and `noindex` hidden/utility routes. No UI, styling, or tool-logic changes.
 
-## 1. Logo resize + fetchpriority (highest impact, ~70 KiB)
+## Findings
 
-- Re-encode `public/logo.webp` from 1920×333 down to **400×70** (2× retina) at quality 85 using `cwebp` (via `nix run nixpkgs#libwebp`). New file replaces the old at the same path.
-- `src/components/site-header.tsx`: change `<img>` to `width="200" height="35"` and add `fetchpriority="high"` + `loading="eager"`. Keep inline style intact so visual size is unchanged.
-- `src/components/site-footer.tsx`: update `width`/`height` attributes to match the new intrinsic ratio (200×35 displayed). Add `loading="lazy"` (footer is below the fold).
+- **Fix 4 (internal links)** is already satisfied: `src/components/tool-card.tsx` uses TanStack `<Link to={tool.path}>` which renders a real `<a href>` server-side. No change needed; will note in response.
+- **Fix 5 (`/generate`)**: route does not exist in the project, so nothing to noindex there. The only hidden/utility tool route is `/tools/video-downloader` (`hidden: true` in `src/lib/tools.ts`) — it is currently offline and should be `noindex, follow`.
+- Current `src/routes/sitemap[.]xml.tsx` hardcodes a partial list and is missing recent tools (`lorem-ipsum`, `uuid-generator`, `add-text-to-image`, `audio-converter`, `background-blur`, `base64`, `collage-maker`, `color-palette`, `face-landmarks`, `hash-generator`, plus `image-resizer`, `image-cropper`, calculators, etc.) and the new blog post `best-free-online-tools-for-designers`. It also has a stale hardcoded `lastmod`.
 
-## 2. Defer non-critical CSS (~160 ms)
+## Changes
 
-The single Vite-bundled stylesheet (`styles.css`) is the only render-blocking sheet. In `src/routes/__root.tsx`:
+### 1. `src/routes/sitemap[.]xml.tsx` — rebuild dynamically
 
-- Replace `{ rel: "stylesheet", href: appCss }` with `{ rel: "preload", as: "style", href: appCss, onload: "this.onload=null;this.rel='stylesheet'" }`.
-- Keep the existing `<noscript><link rel="stylesheet" href={FONTS_HREF} /></noscript>` block and add a second `<noscript><link rel="stylesheet" href={appCss} /></noscript>` for crawlers/no-JS users.
+- Import `tools` from `@/lib/tools` and `blogPosts` from `@/lib/blog`.
+- Build entries programmatically so new tools/posts are picked up automatically on every deploy:
+  - `/` → priority `1.0`, changefreq `weekly`
+  - `/tools` → `0.9`, `weekly`
+  - `/blog` → `0.8`, `weekly`
+  - Every `tools.filter(t => !t.hidden)` path → `0.8`, `monthly`
+  - Every `blogPosts` path → `0.7`, `monthly`
+  - `/about`, `/contact` → `0.5`, `monthly`
+  - `/terms`, `/privacy` → `0.3`, `yearly` (kept indexed)
+- `<lastmod>` = today's date (`new Date().toISOString().slice(0, 10)`) computed at request time, so it refreshes on every deploy/request.
+- Output the same XML shape as today (Content-Type `application/xml`, 1h cache).
 
-Note: true "inline critical CSS" extraction requires a build-time tool (Critters/Beasties) that isn't wired into this project. The `preload + onload` swap covers the same Lighthouse audit ("Eliminate render-blocking resources") without introducing a new build step or risking FOUC mismatches in SSR. Flagging this trade-off because the original request mentioned inlining critical CSS — happy to add Beasties as a follow-up if the score still falls short.
+### 2. Noindex hidden tool route — `src/routes/tools.video-downloader.tsx`
 
-## 3. Defer Google Tag Manager (~62 KiB)
+Replace the route's `head: () => buildToolMeta(...)` with a thin wrapper that spreads `buildToolMeta(tool)` and appends a `{ name: "robots", content: "noindex, follow" }` meta entry (overrides the default `index, follow` from `buildPageMeta`). No other tool route changes.
 
-In `src/routes/__root.tsx` `scripts` array:
+### 3. Verification notes (no code change)
 
-- Remove the two GTM-related entries (the `gtag/js` external script and the inline `dataLayer` init).
-- Add a single inline script that registers a `load` listener which injects the GTM `<script src="…gtag/js?id=G-WHRM5Z08KR">` tag and runs the `gtag('js', new Date()); gtag('config', 'G-WHRM5Z08KR');` snippet after the page is interactive.
-
-GA still records the session because gtag fires on `load`, before the user typically interacts.
-
-## 4. Lazy-load `ToolCard` JS (~22 KiB)
-
-- Convert `ToolCard` import in `src/routes/index.tsx` to `React.lazy(() => import("@/components/tool-card").then(m => ({ default: m.ToolCard })))`.
-- Wrap the category grid in a small `<LazyVisible>` wrapper component (new file `src/components/lazy-visible.tsx`) that uses `IntersectionObserver` with `rootMargin: "200px"` and only renders `children` once the grid container is near the viewport. Until then, render a same-size placeholder div (min-height matched to one row) so layout is preserved (no CLS).
-- Inside the lazy region, wrap the `ToolCard` rendering in `<Suspense fallback={null}>`.
-- `src/routes/tools.index.tsx` continues to import `ToolCard` directly (entire page is the grid, so lazy-loading there adds no value).
-
-## 5. Cache headers for static assets
-
-Cloudflare Workers (TanStack Start) serves `public/` via the assets binding, which honors a Cloudflare `_headers` file. Create `public/_headers`:
-
-```text
-/logo.webp
-  Cache-Control: public, max-age=31536000, immutable
-
-/favicon.png
-  Cache-Control: public, max-age=31536000, immutable
-
-/apple-touch-icon.png
-  Cache-Control: public, max-age=31536000, immutable
-
-/assets/*
-  Cache-Control: public, max-age=31536000, immutable
-```
-
-Vite already content-hashes everything under `/assets/`, so `immutable` is safe.
+- `tool-card.tsx` already emits crawlable anchors via `<Link to=...>`; Fix 4 confirmed.
+- `/generate` route does not exist; no action.
 
 ## Out of scope
 
-- No changes to tool routes, tool logic, design tokens, colors, or copy.
-- No new dependencies (Beasties/Critters intentionally skipped — see note in Fix 2).
-- `src/routes/__root.tsx` edits are limited to the `links`/`scripts` arrays; the shell, providers, and `<Outlet />` remain untouched.
-
-## Files touched
-
-- `public/logo.webp` (re-encoded in place)
-- `public/_headers` (new)
-- `src/components/site-header.tsx`
-- `src/components/site-footer.tsx`
-- `src/routes/__root.tsx`
-- `src/routes/index.tsx`
-- `src/components/lazy-visible.tsx` (new)
+UI, styles, tool logic, copy, and any non-listed routes are untouched. `buildToolMeta` / `buildPageMeta` are not modified.

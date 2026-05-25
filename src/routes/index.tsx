@@ -1,11 +1,14 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { lazy, Suspense, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type, Sparkles, Wrench } from "lucide-react";
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
-import { ToolCard } from "@/components/tool-card";
+import { LazyVisible } from "@/components/lazy-visible";
 import { AdZone } from "@/components/ad-zone";
 import { buildPageMeta } from "@/lib/seo";
+
+const ToolCard = lazy(() => import("@/components/tool-card").then((m) => ({ default: m.ToolCard })));
+
 
 const HOME_META = buildPageMeta({
   title: "Skycally — Free Online Tools, No Signup Required",

@@ -69,7 +69,9 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <HeadContent />
         <noscript>
           <link rel="stylesheet" href={FONTS_HREF} />
+          <link rel="stylesheet" href={appCss} />
         </noscript>
+
       </head>
       <body>
         {children}

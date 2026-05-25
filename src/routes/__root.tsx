@@ -51,12 +51,9 @@ export const Route = createRootRoute({
       {
         children: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(FONTS_HREF)};l.media='print';l.onload=function(){l.media='all'};document.head.appendChild(l);})();`,
       },
-      { src: "https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR", async: true },
+      
       {
-        children: `window.dataLayer = window.dataLayer || [];
-function gtag(){dataLayer.push(arguments);}
-gtag('js', new Date());
-gtag('config', 'G-WHRM5Z08KR');`,
+        children: `window.addEventListener('load',function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR';document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-WHRM5Z08KR');});`,
       },
     ],
   }),

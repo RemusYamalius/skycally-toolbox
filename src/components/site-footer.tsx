@@ -11,7 +11,7 @@ export function SiteFooter() {
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid gap-10 md:grid-cols-4">
         <div>
           <Link to="/" className="flex items-center">
-            <img src="/logo.webp" alt="Skycally" width="173" height="30" decoding="async" style={{ height: "30px", width: "auto" }} />
+            <img src="/logo.webp" alt="Skycally" width="200" height="35" decoding="async" style={{ height: "30px", width: "auto" }} />
           </Link>
           <p className="mt-3 text-sm text-muted-foreground max-w-xs">Every tool you need, one place. Fast, free, and private — no registration required.</p>
         </div>

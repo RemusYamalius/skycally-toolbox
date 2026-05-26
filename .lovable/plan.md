@@ -1,52 +1,44 @@
-## Homepage performance + UX redesign
+## Performance fixes — homepage render path
 
-### Change 1 — Remove framer-motion from the hero (`src/routes/index.tsx`)
-- Drop `import { motion } from "framer-motion"` (keep the import only if "How it works" still uses it — it does, so keep it).
-- Replace the 3 hero `motion.div` wrappers (badge+headline, search bar, quick-access pills) with plain `<div>` using CSS classes:
-  - badge+headline: `class="hero-fade-up"`
-  - search bar: `class="hero-fade-up-delay"`
-  - quick-access pills: `class="hero-fade-up-delay2"`
-- Keep `motion.div` only in the "How it works" steps (already below the fold with `viewport={{ once: true }}`).
+### Fix 1 — Inline critical CSS (`src/routes/__root.tsx`)
 
-Add to `src/styles.css` (project uses `styles.css`, not `index.css`):
+Add a `style` entry at the top of `head().scripts`... actually TanStack uses `links` for stylesheets and doesn't expose an inline `style` slot in `head()`. The cleanest approach: add an inline `<style>` element directly inside `RootShell`'s `<head>`, rendered before `<HeadContent />` so it ships in the SSR HTML ahead of the async-loaded `appCss` stylesheet.
+
+Critical CSS to inline (above-the-fold only):
 ```css
-@keyframes heroFadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
-}
-.hero-fade-up        { animation: heroFadeUp 0.55s ease both; }
-.hero-fade-up-delay  { animation: heroFadeUp 0.55s 0.12s ease both; }
-.hero-fade-up-delay2 { animation: heroFadeUp 0.55s 0.25s ease both; }
+*,::before,::after{box-sizing:border-box}
+body{margin:0;font-family:system-ui,-apple-system,"Inter",sans-serif;background:#0a0f1e;color:#fff}
+.bg-hero{background:linear-gradient(135deg,#0a0f1e 0%,#0d1b3e 100%)}
+h1{margin:0}
 ```
 
-### Change 2 — Defer Sonner Toaster (`src/routes/__root.tsx`)
-- `Toaster` is already `lazy()`-imported. Convert `RootComponent` to a stateful component:
-  - `const [toasterReady, setToasterReady] = useState(false)`
-  - `useEffect`: `setTimeout(() => setToasterReady(true), 1500)`, cleared on unmount.
-  - Render `{toasterReady && <Suspense fallback={null}><Toaster position="top-center" richColors /></Suspense>}`.
-- Add `useState`, `useEffect` to existing React import.
+Use `<style dangerouslySetInnerHTML={{ __html: "..." }} />` placed in `RootShell`'s `<head>` before `<HeadContent />`. No change to existing `appCss` link.
 
-### Change 3 — Lazy-load below-the-fold categories (`src/routes/index.tsx`)
-- Add `useState`, `useEffect`, `useRef` to existing react import.
-- Inside `HomePage()`:
-  - `const [visibleCats, setVisibleCats] = useState(2)`
-  - `const loaderRef = useRef<HTMLDivElement>(null)`
-  - `useEffect` (deps `[visibleCats]`): if `visibleCats >= 6` return; create `IntersectionObserver` with `rootMargin: "300px"` that bumps `visibleCats` by 2 (capped at 6); observe `loaderRef.current`; disconnect on cleanup.
-- In the categories map, change `(["video", …]).map(...)` to `.slice(0, visibleCats).map(...)`.
-- Render `<div ref={loaderRef} className="h-10" />` immediately after the categories `space-y-14` wrapper closes, only when `visibleCats < 6`.
+### Fix 2 — Delay GTM 3s after load (`src/routes/__root.tsx`)
 
-### Change 4 — Hero copy + "Most Popular" strip (`src/routes/index.tsx`)
-- Replace hero paragraph text with: `50+ free browser-based tools. No signup, no uploads, no limits.`
-- Add a "Most Popular" section between the hero `</section>` and the top AdZone, inside the `max-w-7xl` wrapper. Render a horizontal grid of 6 featured tools by slug:
-  - `compress-pdf`, `remove-bg`, `image-converter`, `qr-generator`, `video-to-gif`, `word-to-pdf`
-  - For each, find via `tools.find(x => x.slug === slug)`, get `categoryMeta[t.category]`, render a `<Link to={t.path}>` card showing the tool icon (tinted with the category color) and tool name. Use the existing card styling vocabulary (`rounded-2xl border border-border bg-card` + small padding, hover translate/shadow consistent with `ToolCard`).
-  - Grid: `grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3` so it fits on mobile and desktop.
-  - Section heading: `<h2 class="font-display text-xl font-semibold mb-4">Most Popular</h2>` with `pt-10`.
-- Keep all existing AdZones, "Browse All Tools", "How it works" sections in place and unchanged.
+Wrap the existing GTM `scripts[]` body in a `setTimeout(..., 3000)` inside the `load` listener. Only the trigger timing changes; gtag config (`G-WHRM5Z08KR`) is untouched.
 
-### Change 5 — Confirmation only
-- "How it works" `motion.div`s already use `viewport={{ once: true }}` — leave untouched.
+```js
+window.addEventListener('load',function(){
+  setTimeout(function(){
+    var s=document.createElement('script');
+    s.async=true;
+    s.src='https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR';
+    document.head.appendChild(s);
+    window.dataLayer=window.dataLayer||[];
+    function gtag(){dataLayer.push(arguments);}
+    gtag('js',new Date());
+    gtag('config','G-WHRM5Z08KR');
+  },3000);
+});
+```
+
+### Fix 3 — Verify lucide-react tree-shaking (no code change)
+
+Verified with ripgrep: zero files use `import * as ... from "lucide-react"`. All imports are already named (`import { X, Y } from "lucide-react"`), which Vite tree-shakes correctly. No action needed; documenting as a confirmation step only.
 
 ### Out of scope
-- No changes to routing, `ToolCard`, `categoryMeta`, `tools` data, SEO meta, sitemap, footer, or any tool route.
-- `Toaster` API surface unchanged.
+No changes to `vite.config.ts`, routing, tool data, business logic, or any component file besides `src/routes/__root.tsx`.
+
+### Files touched
+- `src/routes/__root.tsx` (Fixes 1 + 2)

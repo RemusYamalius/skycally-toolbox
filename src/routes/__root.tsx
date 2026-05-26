@@ -53,7 +53,7 @@ export const Route = createRootRoute({
       },
       
       {
-        children: `window.addEventListener('load',function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR';document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-WHRM5Z08KR');});`,
+        children: `window.addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR';document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-WHRM5Z08KR');},3000);});`,
       },
     ],
   }),
@@ -66,6 +66,7 @@ function RootShell({ children }: { children: React.ReactNode }) {
   return (
     <html lang="en" className="dark" suppressHydrationWarning>
       <head>
+        <style dangerouslySetInnerHTML={{ __html: `*,::before,::after{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Inter",sans-serif;background:#0a0f1e;color:#fff}.bg-hero{background:linear-gradient(135deg,#0a0f1e 0%,#0d1b3e 100%)}h1{margin:0}` }} />
         <HeadContent />
         <noscript>
           <link rel="stylesheet" href={FONTS_HREF} />

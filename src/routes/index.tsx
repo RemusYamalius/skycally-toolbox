@@ -238,6 +238,7 @@ function HomePage() {
               );
             })}
           </div>
+          {visibleCats < ALL_CATS.length && <div ref={loaderRef} className="h-10" />}
         </section>
 
         {/* ADSENSE_ZONE: homepage-middle-rectangle 300x250 */}

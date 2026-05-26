@@ -59,12 +59,37 @@ const categoryTaglines: Record<ToolCategory, string> = {
 
 const INITIAL_PER_CAT = 6;
 
+const POPULAR_SLUGS = ["compress-pdf", "remove-bg", "image-converter", "qr-generator", "video-to-gif", "word-to-pdf"];
+const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility"];
+
 function HomePage() {
   const [q, setQ] = useState("");
   const [expanded, setExpanded] = useState<Record<string, boolean>>({});
+  const [visibleCats, setVisibleCats] = useState(2);
+  const loaderRef = useRef<HTMLDivElement>(null);
   const filtered = useMemo(
     () => tools.filter((t) => (t.name + t.description).toLowerCase().includes(q.toLowerCase())),
     [q]
+  );
+
+  useEffect(() => {
+    if (visibleCats >= ALL_CATS.length) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setVisibleCats((prev) => Math.min(prev + 2, ALL_CATS.length));
+        }
+      },
+      { rootMargin: "300px" }
+    );
+    const el = loaderRef.current;
+    if (el) observer.observe(el);
+    return () => observer.disconnect();
+  }, [visibleCats]);
+
+  const popularTools = useMemo(
+    () => POPULAR_SLUGS.map((s) => tools.find((t) => t.slug === s)).filter(Boolean) as typeof tools,
+    []
   );
 
   return (

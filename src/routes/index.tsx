@@ -101,7 +101,7 @@ function HomePage() {
         <div className="absolute -bottom-32 -right-20 w-96 h-96 rounded-full opacity-30 blur-3xl animate-float" style={{ background: "var(--cyan-brand)", animationDelay: "2s" }} />
 
         <div className="relative max-w-6xl mx-auto px-4 sm:px-6 pt-20 pb-28 text-center">
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <div className="hero-fade-up">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-3 py-1 text-xs font-medium backdrop-blur">
               <span className="w-1.5 h-1.5 rounded-full" style={{ background: "var(--cyan-brand)" }} /> Free · Fast · No signup
             </span>
@@ -110,11 +110,11 @@ function HomePage() {
               <span className="text-gradient">You Need.</span>
             </h1>
             <p className="mt-5 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto">
-              Download videos, convert files, compress images — all free, all fast.
+              50+ free browser-based tools. No signup, no uploads, no limits.
             </p>
-          </motion.div>
+          </div>
 
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6, delay: 0.15 }} className="mt-10 max-w-xl mx-auto">
+          <div className="hero-fade-up-delay mt-10 max-w-xl mx-auto">
             <div className="relative">
               <Search className="absolute left-4 top-1/2 -translate-y-1/2 w-5 h-5 text-white/50" />
               <input
@@ -136,9 +136,9 @@ function HomePage() {
                 {filtered.length === 0 && <div className="px-4 py-3 text-sm text-white/50">No tools match "{q}"</div>}
               </div>
             )}
-          </motion.div>
+          </div>
 
-          <motion.div initial={{ opacity: 0 }} animate={{ opacity: 1 }} transition={{ duration: 0.6, delay: 0.3 }} className="mt-10 flex flex-wrap items-center justify-center gap-3">
+          <div className="hero-fade-up-delay2 mt-10 flex flex-wrap items-center justify-center gap-3">
             {quickAccess.map((q) => (
               <Link
                 key={q.label}
@@ -150,11 +150,37 @@ function HomePage() {
                 {q.label}
               </Link>
             ))}
-          </motion.div>
+          </div>
         </div>
       </section>
 
       <div className="max-w-7xl mx-auto px-4 sm:px-6">
+        {/* Most Popular */}
+        <section className="pt-10">
+          <h2 className="font-display text-xl font-semibold mb-4">Most Popular</h2>
+          <div className="grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3">
+            {popularTools.map((t) => {
+              const Icon = t.icon;
+              const color = categoryMeta[t.category].color;
+              return (
+                <Link
+                  key={t.slug}
+                  to={t.path}
+                  className="group flex flex-col items-center text-center gap-2 rounded-2xl border border-border bg-card p-4 transition hover:-translate-y-0.5 hover:shadow-[var(--shadow-elevated)]"
+                >
+                  <div
+                    className="w-10 h-10 rounded-xl flex items-center justify-center"
+                    style={{ background: `color-mix(in oklab, ${color} 18%, transparent)`, color }}
+                  >
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-sm font-medium leading-tight">{t.name}</span>
+                </Link>
+              );
+            })}
+          </div>
+        </section>
+
         {/* ADSENSE_ZONE: homepage-top-banner 728x90 */}
         <AdZone id="homepage-top-banner" size="728x90" />
 

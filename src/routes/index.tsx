@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type, Sparkles, Wrench } from "lucide-react";
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";

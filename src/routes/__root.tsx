@@ -1,5 +1,5 @@
 import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
-import { lazy, Suspense } from "react";
+import { lazy, Suspense, useEffect, useState } from "react";
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/site-header";
@@ -80,6 +80,11 @@ function RootShell({ children }: { children: React.ReactNode }) {
 }
 
 function RootComponent() {
+  const [toasterReady, setToasterReady] = useState(false);
+  useEffect(() => {
+    const t = setTimeout(() => setToasterReady(true), 1500);
+    return () => clearTimeout(t);
+  }, []);
   return (
     <ThemeProvider>
       <div className="min-h-screen flex flex-col">
@@ -89,9 +94,11 @@ function RootComponent() {
         </main>
         <SiteFooter />
       </div>
-      <Suspense fallback={null}>
-        <Toaster position="top-center" richColors />
-      </Suspense>
+      {toasterReady && (
+        <Suspense fallback={null}>
+          <Toaster position="top-center" richColors />
+        </Suspense>
+      )}
     </ThemeProvider>
   );
 }

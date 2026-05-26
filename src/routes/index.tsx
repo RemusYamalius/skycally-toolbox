@@ -195,7 +195,7 @@ function HomePage() {
           </div>
 
           <div className="space-y-14">
-            {(["video", "image", "audio", "pdf", "text", "utility"] as ToolCategory[]).map((cat) => {
+            {ALL_CATS.slice(0, visibleCats).map((cat) => {
               const list = tools.filter((t) => toolInCategory(t, cat));
               if (list.length === 0) return null;
               const meta = categoryMeta[cat];

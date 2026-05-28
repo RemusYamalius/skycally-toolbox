@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility";
 
@@ -91,4 +91,5 @@ export const tools: Tool[] = [
   { slug: "uuid-generator", name: "UUID Generator", description: "Generate random UUID v4 identifiers — single or in bulk.", category: "text", icon: Fingerprint, path: "/tools/uuid-generator" },
   { slug: "hash-generator", name: "Hash Generator", description: "Compute MD5, SHA-1, SHA-256 and SHA-512 hashes from any text.", category: "text", icon: Hash, path: "/tools/hash-generator" },
   { slug: "pdf-watermark-remover", name: "PDF Watermark Remover", description: "Remove watermarks from PDF files entirely in your browser.", category: "pdf", icon: Stamp, path: "/tools/pdf-watermark-remover" },
+  { slug: "role-spinner", name: "Role Spinner", description: "Randomly assign roles to players. Perfect for Mafia, party games and team activities.", category: "utility", icon: Shuffle, path: "/tools/role-spinner" },
 ];

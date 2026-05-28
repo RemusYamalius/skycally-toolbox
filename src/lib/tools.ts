@@ -91,4 +91,5 @@ export const tools: Tool[] = [
   { slug: "uuid-generator", name: "UUID Generator", description: "Generate random UUID v4 identifiers — single or in bulk.", category: "text", icon: Fingerprint, path: "/tools/uuid-generator" },
   { slug: "hash-generator", name: "Hash Generator", description: "Compute MD5, SHA-1, SHA-256 and SHA-512 hashes from any text.", category: "text", icon: Hash, path: "/tools/hash-generator" },
   { slug: "pdf-watermark-remover", name: "PDF Watermark Remover", description: "Remove watermarks from PDF files entirely in your browser.", category: "pdf", icon: Stamp, path: "/tools/pdf-watermark-remover" },
+  { slug: "role-spinner", name: "Role Spinner", description: "Randomly assign roles to players. Perfect for Mafia, party games and team activities.", category: "utility", icon: Shuffle, path: "/tools/role-spinner" },
 ];

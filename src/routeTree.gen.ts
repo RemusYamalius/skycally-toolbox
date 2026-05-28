@@ -35,6 +35,7 @@ import { Route as ToolsSleepCalculatorRouteImport } from './routes/tools.sleep-c
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
 import { Route as ToolsRotatePdfRouteImport } from './routes/tools.rotate-pdf'
+import { Route as ToolsRoleSpinnerRouteImport } from './routes/tools.role-spinner'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
@@ -213,6 +214,11 @@ const ToolsScreenRecorderRoute = ToolsScreenRecorderRouteImport.update({
 const ToolsRotatePdfRoute = ToolsRotatePdfRouteImport.update({
   id: '/tools/rotate-pdf',
   path: '/tools/rotate-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRoleSpinnerRoute = ToolsRoleSpinnerRouteImport.update({
+  id: '/tools/role-spinner',
+  path: '/tools/role-spinner',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
@@ -522,6 +528,7 @@ export interface FileRoutesByFullPath {
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
@@ -599,6 +606,7 @@ export interface FileRoutesByTo {
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
@@ -677,6 +685,7 @@ export interface FileRoutesById {
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
@@ -756,6 +765,7 @@ export interface FileRouteTypes {
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/role-spinner'
     | '/tools/rotate-pdf'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
@@ -833,6 +843,7 @@ export interface FileRouteTypes {
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/role-spinner'
     | '/tools/rotate-pdf'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
@@ -910,6 +921,7 @@ export interface FileRouteTypes {
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/remove-bg'
+    | '/tools/role-spinner'
     | '/tools/rotate-pdf'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
@@ -988,6 +1000,7 @@ export interface RootRouteChildren {
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
+  ToolsRoleSpinnerRoute: typeof ToolsRoleSpinnerRoute
   ToolsRotatePdfRoute: typeof ToolsRotatePdfRoute
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
@@ -1192,6 +1205,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/rotate-pdf'
       fullPath: '/tools/rotate-pdf'
       preLoaderRoute: typeof ToolsRotatePdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/role-spinner': {
+      id: '/tools/role-spinner'
+      path: '/tools/role-spinner'
+      fullPath: '/tools/role-spinner'
+      preLoaderRoute: typeof ToolsRoleSpinnerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/remove-bg': {
@@ -1597,6 +1617,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
+  ToolsRoleSpinnerRoute: ToolsRoleSpinnerRoute,
   ToolsRotatePdfRoute: ToolsRotatePdfRoute,
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,

@@ -54,6 +54,7 @@ import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
+import { Route as ToolsMemoryMatchRouteImport } from './routes/tools.memory-match'
 import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
 import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
@@ -319,6 +320,11 @@ const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
   path: '/tools/merge-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMemoryMatchRoute = ToolsMemoryMatchRouteImport.update({
+  id: '/tools/memory-match',
+  path: '/tools/memory-match',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsMemeGeneratorRoute = ToolsMemeGeneratorRouteImport.update({
   id: '/tools/meme-generator',
   path: '/tools/meme-generator',
@@ -559,6 +565,7 @@ export interface FileRoutesByFullPath {
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
+  '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -644,6 +651,7 @@ export interface FileRoutesByTo {
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
+  '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -730,6 +738,7 @@ export interface FileRoutesById {
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
+  '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -817,6 +826,7 @@ export interface FileRouteTypes {
     | '/tools/lorem-ipsum'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
+    | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
@@ -902,6 +912,7 @@ export interface FileRouteTypes {
     | '/tools/lorem-ipsum'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
+    | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
@@ -987,6 +998,7 @@ export interface FileRouteTypes {
     | '/tools/lorem-ipsum'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
+    | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
@@ -1073,6 +1085,7 @@ export interface RootRouteChildren {
   ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
   ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
+  ToolsMemoryMatchRoute: typeof ToolsMemoryMatchRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
@@ -1431,6 +1444,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMergePdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/memory-match': {
+      id: '/tools/memory-match'
+      path: '/tools/memory-match'
+      fullPath: '/tools/memory-match'
+      preLoaderRoute: typeof ToolsMemoryMatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/meme-generator': {
       id: '/tools/meme-generator'
       path: '/tools/meme-generator'
@@ -1746,6 +1766,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
   ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
+  ToolsMemoryMatchRoute: ToolsMemoryMatchRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,

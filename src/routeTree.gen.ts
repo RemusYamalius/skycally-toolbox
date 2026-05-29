@@ -26,6 +26,7 @@ import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-d
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
 import { Route as ToolsUuidGeneratorRouteImport } from './routes/tools.uuid-generator'
 import { Route as ToolsUrlEncoderRouteImport } from './routes/tools.url-encoder'
+import { Route as ToolsTruthOrDareRouteImport } from './routes/tools.truth-or-dare'
 import { Route as ToolsTipCalculatorRouteImport } from './routes/tools.tip-calculator'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
@@ -170,6 +171,11 @@ const ToolsUuidGeneratorRoute = ToolsUuidGeneratorRouteImport.update({
 const ToolsUrlEncoderRoute = ToolsUrlEncoderRouteImport.update({
   id: '/tools/url-encoder',
   path: '/tools/url-encoder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsTruthOrDareRoute = ToolsTruthOrDareRouteImport.update({
+  id: '/tools/truth-or-dare',
+  path: '/tools/truth-or-dare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsTipCalculatorRoute = ToolsTipCalculatorRouteImport.update({
@@ -545,6 +551,7 @@ export interface FileRoutesByFullPath {
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
+  '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -624,6 +631,7 @@ export interface FileRoutesByTo {
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
+  '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -704,6 +712,7 @@ export interface FileRoutesById {
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
+  '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -785,6 +794,7 @@ export interface FileRouteTypes {
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/tip-calculator'
+    | '/tools/truth-or-dare'
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
@@ -864,6 +874,7 @@ export interface FileRouteTypes {
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/tip-calculator'
+    | '/tools/truth-or-dare'
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
@@ -943,6 +954,7 @@ export interface FileRouteTypes {
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/tip-calculator'
+    | '/tools/truth-or-dare'
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
@@ -1023,6 +1035,7 @@ export interface RootRouteChildren {
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsTipCalculatorRoute: typeof ToolsTipCalculatorRoute
+  ToolsTruthOrDareRoute: typeof ToolsTruthOrDareRoute
   ToolsUrlEncoderRoute: typeof ToolsUrlEncoderRoute
   ToolsUuidGeneratorRoute: typeof ToolsUuidGeneratorRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
@@ -1155,6 +1168,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/url-encoder'
       fullPath: '/tools/url-encoder'
       preLoaderRoute: typeof ToolsUrlEncoderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/truth-or-dare': {
+      id: '/tools/truth-or-dare'
+      path: '/tools/truth-or-dare'
+      fullPath: '/tools/truth-or-dare'
+      preLoaderRoute: typeof ToolsTruthOrDareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/tip-calculator': {
@@ -1648,6 +1668,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsTipCalculatorRoute: ToolsTipCalculatorRoute,
+  ToolsTruthOrDareRoute: ToolsTruthOrDareRoute,
   ToolsUrlEncoderRoute: ToolsUrlEncoderRoute,
   ToolsUuidGeneratorRoute: ToolsUuidGeneratorRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,

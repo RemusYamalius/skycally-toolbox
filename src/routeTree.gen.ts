@@ -37,6 +37,7 @@ import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-r
 import { Route as ToolsRotatePdfRouteImport } from './routes/tools.rotate-pdf'
 import { Route as ToolsRoleSpinnerRouteImport } from './routes/tools.role-spinner'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
+import { Route as ToolsRandomTeamMakerRouteImport } from './routes/tools.random-team-maker'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsProtectPdfRouteImport } from './routes/tools.protect-pdf'
@@ -224,6 +225,11 @@ const ToolsRoleSpinnerRoute = ToolsRoleSpinnerRouteImport.update({
 const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
   id: '/tools/remove-bg',
   path: '/tools/remove-bg',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsRandomTeamMakerRoute = ToolsRandomTeamMakerRouteImport.update({
+  id: '/tools/random-team-maker',
+  path: '/tools/random-team-maker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsQrReaderRoute = ToolsQrReaderRouteImport.update({
@@ -527,6 +533,7 @@ export interface FileRoutesByFullPath {
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
+  '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
@@ -605,6 +612,7 @@ export interface FileRoutesByTo {
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
+  '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
@@ -684,6 +692,7 @@ export interface FileRoutesById {
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
+  '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
@@ -764,6 +773,7 @@ export interface FileRouteTypes {
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
+    | '/tools/random-team-maker'
     | '/tools/remove-bg'
     | '/tools/role-spinner'
     | '/tools/rotate-pdf'
@@ -842,6 +852,7 @@ export interface FileRouteTypes {
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
+    | '/tools/random-team-maker'
     | '/tools/remove-bg'
     | '/tools/role-spinner'
     | '/tools/rotate-pdf'
@@ -920,6 +931,7 @@ export interface FileRouteTypes {
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
+    | '/tools/random-team-maker'
     | '/tools/remove-bg'
     | '/tools/role-spinner'
     | '/tools/rotate-pdf'
@@ -999,6 +1011,7 @@ export interface RootRouteChildren {
   ToolsProtectPdfRoute: typeof ToolsProtectPdfRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
+  ToolsRandomTeamMakerRoute: typeof ToolsRandomTeamMakerRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
   ToolsRoleSpinnerRoute: typeof ToolsRoleSpinnerRoute
   ToolsRotatePdfRoute: typeof ToolsRotatePdfRoute
@@ -1219,6 +1232,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/remove-bg'
       fullPath: '/tools/remove-bg'
       preLoaderRoute: typeof ToolsRemoveBgRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/random-team-maker': {
+      id: '/tools/random-team-maker'
+      path: '/tools/random-team-maker'
+      fullPath: '/tools/random-team-maker'
+      preLoaderRoute: typeof ToolsRandomTeamMakerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/qr-reader': {
@@ -1616,6 +1636,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsProtectPdfRoute: ToolsProtectPdfRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,
+  ToolsRandomTeamMakerRoute: ToolsRandomTeamMakerRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
   ToolsRoleSpinnerRoute: ToolsRoleSpinnerRoute,
   ToolsRotatePdfRoute: ToolsRotatePdfRoute,

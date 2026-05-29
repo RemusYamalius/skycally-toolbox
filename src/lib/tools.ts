@@ -1,6 +1,6 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2 } from "lucide-react";
 
-export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility";
+export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games";
 
 export const categoryMeta: Record<ToolCategory, { label: string; color: string; icon: string }> = {
   video: { label: "Video Tools", color: "var(--cyan-brand)", icon: "🎬" },
@@ -10,7 +10,9 @@ export const categoryMeta: Record<ToolCategory, { label: string; color: string; 
   text: { label: "Text Tools", color: "var(--green-brand)", icon: "✍️" },
   ai: { label: "AI Tools", color: "var(--violet-brand)", icon: "🤖" },
   utility: { label: "Utility Tools", color: "var(--green-brand)", icon: "🛠️" },
+  games: { label: "Games & Fun", color: "var(--violet-brand)", icon: "🎮" },
 };
+
 
 export interface Tool {
   slug: string;
@@ -79,7 +81,8 @@ export const tools: Tool[] = [
   { slug: "pdf-page-numbers", name: "Add Page Numbers to PDF", description: "Add page numbers to any PDF with custom position and style.", category: "pdf", icon: FilePen, path: "/tools/pdf-page-numbers" },
   { slug: "protect-pdf", name: "Protect PDF", description: "Add a password to your PDF to prevent unauthorized access.", category: "pdf", icon: Shield, path: "/tools/protect-pdf" },
   { slug: "pdf-reader", name: "PDF Reader", description: "View and read PDF files directly in your browser.", category: "pdf", icon: FileSearch, path: "/tools/pdf-reader" },
-  { slug: "spinning-wheel", name: "Spinning Wheel", description: "Spin a customizable wheel to make random decisions. Add your own options.", category: "utility", icon: RotateCw, path: "/tools/spinning-wheel" },
+  { slug: "spinning-wheel", name: "Spinning Wheel", description: "Spin a customizable wheel to make random decisions. Add your own options.", category: "games", icon: RotateCw, path: "/tools/spinning-wheel" },
+
   { slug: "link-shortener", name: "Link Shortener", description: "Shorten any URL and generate a QR code for it instantly.", category: "utility", icon: Link, path: "/tools/link-shortener" },
   { slug: "free-time-fixer", name: "Free Time Fixer", description: "Tell us how many minutes you have free — we'll tell you exactly what to do.", category: "utility", icon: Clock, path: "/tools/free-time-fixer" },
   { slug: "sleep-calculator", name: "Sleep Calculator", description: "Find the best time to wake up or go to sleep based on sleep cycles.", category: "utility", icon: Moon, path: "/tools/sleep-calculator" },
@@ -91,5 +94,7 @@ export const tools: Tool[] = [
   { slug: "uuid-generator", name: "UUID Generator", description: "Generate random UUID v4 identifiers — single or in bulk.", category: "text", icon: Fingerprint, path: "/tools/uuid-generator" },
   { slug: "hash-generator", name: "Hash Generator", description: "Compute MD5, SHA-1, SHA-256 and SHA-512 hashes from any text.", category: "text", icon: Hash, path: "/tools/hash-generator" },
   { slug: "pdf-watermark-remover", name: "PDF Watermark Remover", description: "Remove watermarks from PDF files entirely in your browser.", category: "pdf", icon: Stamp, path: "/tools/pdf-watermark-remover" },
-  { slug: "role-spinner", name: "Role Spinner", description: "Randomly assign roles to players. Perfect for Mafia, party games and team activities.", category: "utility", icon: Shuffle, path: "/tools/role-spinner" },
+  { slug: "role-spinner", name: "Role Spinner", description: "Randomly assign roles to players. Perfect for Mafia, party games and team activities.", category: "games", icon: Shuffle, path: "/tools/role-spinner" },
+  { slug: "random-team-maker", name: "Random Team Maker", description: "Split any group of players into balanced random teams instantly.", category: "games", icon: Users, path: "/tools/random-team-maker" },
 ];
+

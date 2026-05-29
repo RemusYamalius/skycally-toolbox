@@ -110,7 +110,6 @@ function TicTacToePage() {
   const [winLine, setWinLine] = useState<number[] | null>(null);
   const [aiThinking, setAiThinking] = useState(false);
 
-  // Check winner after every board change
   useEffect(() => {
     const result = checkWinner(board);
     if (!result) return;
@@ -118,10 +117,12 @@ function TicTacToePage() {
       setWinner("draw");
       setWinLine(null);
       setScores((s) => ({ ...s, draws: s.draws + 1 }));
+      playSound("fail");
     } else {
       setWinner(result.winner);
       setWinLine(result.line);
       setScores((s) => ({ ...s, [result.winner]: s[result.winner] + 1 }));
+      playChord(["success", "win"]);
     }
   }, [board]);
 

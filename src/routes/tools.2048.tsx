@@ -133,7 +133,7 @@ function Game2048() {
     setMounted(true);
   }, []);
   const [score, setScore] = useState(0);
-  const [best, setBest] = useState<number>(() => loadBest());
+  const [best, setBest] = useState<number>(0);
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
 

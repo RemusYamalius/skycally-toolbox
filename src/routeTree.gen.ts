@@ -26,6 +26,7 @@ import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-d
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
 import { Route as ToolsUuidGeneratorRouteImport } from './routes/tools.uuid-generator'
 import { Route as ToolsUrlEncoderRouteImport } from './routes/tools.url-encoder'
+import { Route as ToolsTruthOrDareRouteImport } from './routes/tools.truth-or-dare'
 import { Route as ToolsTipCalculatorRouteImport } from './routes/tools.tip-calculator'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
@@ -70,6 +71,7 @@ import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
+import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
@@ -170,6 +172,11 @@ const ToolsUuidGeneratorRoute = ToolsUuidGeneratorRouteImport.update({
 const ToolsUrlEncoderRoute = ToolsUrlEncoderRouteImport.update({
   id: '/tools/url-encoder',
   path: '/tools/url-encoder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsTruthOrDareRoute = ToolsTruthOrDareRouteImport.update({
+  id: '/tools/truth-or-dare',
+  path: '/tools/truth-or-dare',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsTipCalculatorRoute = ToolsTipCalculatorRouteImport.update({
@@ -393,6 +400,11 @@ const ToolsDocumentScannerRoute = ToolsDocumentScannerRouteImport.update({
   path: '/tools/document-scanner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsDiceRollerRoute = ToolsDiceRollerRouteImport.update({
+  id: '/tools/dice-roller',
+  path: '/tools/dice-roller',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsDeletePdfPagesRoute = ToolsDeletePdfPagesRouteImport.update({
   id: '/tools/delete-pdf-pages',
   path: '/tools/delete-pdf-pages',
@@ -501,6 +513,7 @@ export interface FileRoutesByFullPath {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
+  '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -545,6 +558,7 @@ export interface FileRoutesByFullPath {
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
+  '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -580,6 +594,7 @@ export interface FileRoutesByTo {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
+  '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -624,6 +639,7 @@ export interface FileRoutesByTo {
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
+  '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -660,6 +676,7 @@ export interface FileRoutesById {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
+  '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -704,6 +721,7 @@ export interface FileRoutesById {
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
+  '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -741,6 +759,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/compress-pdf'
     | '/tools/delete-pdf-pages'
+    | '/tools/dice-roller'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -785,6 +804,7 @@ export interface FileRouteTypes {
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/tip-calculator'
+    | '/tools/truth-or-dare'
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
@@ -820,6 +840,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/compress-pdf'
     | '/tools/delete-pdf-pages'
+    | '/tools/dice-roller'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -864,6 +885,7 @@ export interface FileRouteTypes {
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/tip-calculator'
+    | '/tools/truth-or-dare'
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
@@ -899,6 +921,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/compress-pdf'
     | '/tools/delete-pdf-pages'
+    | '/tools/dice-roller'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -943,6 +966,7 @@ export interface FileRouteTypes {
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
     | '/tools/tip-calculator'
+    | '/tools/truth-or-dare'
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
@@ -979,6 +1003,7 @@ export interface RootRouteChildren {
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
+  ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
@@ -1023,6 +1048,7 @@ export interface RootRouteChildren {
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsTipCalculatorRoute: typeof ToolsTipCalculatorRoute
+  ToolsTruthOrDareRoute: typeof ToolsTruthOrDareRoute
   ToolsUrlEncoderRoute: typeof ToolsUrlEncoderRoute
   ToolsUuidGeneratorRoute: typeof ToolsUuidGeneratorRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
@@ -1155,6 +1181,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/url-encoder'
       fullPath: '/tools/url-encoder'
       preLoaderRoute: typeof ToolsUrlEncoderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/truth-or-dare': {
+      id: '/tools/truth-or-dare'
+      path: '/tools/truth-or-dare'
+      fullPath: '/tools/truth-or-dare'
+      preLoaderRoute: typeof ToolsTruthOrDareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/tip-calculator': {
@@ -1465,6 +1498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsDocumentScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/dice-roller': {
+      id: '/tools/dice-roller'
+      path: '/tools/dice-roller'
+      fullPath: '/tools/dice-roller'
+      preLoaderRoute: typeof ToolsDiceRollerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/delete-pdf-pages': {
       id: '/tools/delete-pdf-pages'
       path: '/tools/delete-pdf-pages'
@@ -1604,6 +1644,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
+  ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
@@ -1648,6 +1689,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsTipCalculatorRoute: ToolsTipCalculatorRoute,
+  ToolsTruthOrDareRoute: ToolsTruthOrDareRoute,
   ToolsUrlEncoderRoute: ToolsUrlEncoderRoute,
   ToolsUuidGeneratorRoute: ToolsUuidGeneratorRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,

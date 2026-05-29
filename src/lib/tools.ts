@@ -96,5 +96,7 @@ export const tools: Tool[] = [
   { slug: "pdf-watermark-remover", name: "PDF Watermark Remover", description: "Remove watermarks from PDF files entirely in your browser.", category: "pdf", icon: Stamp, path: "/tools/pdf-watermark-remover" },
   { slug: "role-spinner", name: "Role Spinner", description: "Randomly assign roles to players. Perfect for Mafia, party games and team activities.", category: "games", icon: Shuffle, path: "/tools/role-spinner" },
   { slug: "random-team-maker", name: "Random Team Maker", description: "Split any group of players into balanced random teams instantly.", category: "games", icon: Users, path: "/tools/random-team-maker" },
+  { slug: "truth-or-dare", name: "Truth or Dare", description: "Spin the bottle and get random Truth or Dare challenges. Perfect for parties and friend groups.", category: "games", icon: Flame, path: "/tools/truth-or-dare" },
+  { slug: "dice-roller", name: "Dice Roller", description: "Roll multiple dice of any type — D4, D6, D8, D10, D12, D20. Perfect for board games and RPGs.", category: "games", icon: Dices, path: "/tools/dice-roller" },
 ];
 

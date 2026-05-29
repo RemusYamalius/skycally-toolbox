@@ -347,7 +347,7 @@ function WordSearchPage() {
 
           <div
             ref={gridRef}
-            className="w-full max-w-sm mx-auto touch-none select-none rounded-xl overflow-hidden border border-border"
+            className="w-full max-w-sm mx-auto touch-none select-none rounded-xl overflow-hidden border border-border bg-card"
             onMouseDown={handlePointerDown}
             onMouseMove={handlePointerMove}
             onMouseUp={handlePointerUp}

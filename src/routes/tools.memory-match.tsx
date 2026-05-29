@@ -107,6 +107,7 @@ function MemoryMatchPage() {
               if (newM === CARD_COUNT[difficulty] / 2) {
                 setWon(true);
                 setRunning(false);
+                playChord(["match", "success"]);
                 setBest((prev) => {
                   const cur = prev[difficulty];
                   const next = cur === 0 ? nextMoves : Math.min(cur, nextMoves);
@@ -120,6 +121,8 @@ function MemoryMatchPage() {
                   }
                   return updated;
                 });
+              } else {
+                playSound("match");
               }
               return newM;
             });

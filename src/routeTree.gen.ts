@@ -34,6 +34,7 @@ import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-sp
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
+import { Route as ToolsSnakeRouteImport } from './routes/tools.snake'
 import { Route as ToolsSleepCalculatorRouteImport } from './routes/tools.sleep-calculator'
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
@@ -215,6 +216,11 @@ const ToolsSpinningWheelRoute = ToolsSpinningWheelRouteImport.update({
 const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
   id: '/tools/speech-to-text',
   path: '/tools/speech-to-text',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSnakeRoute = ToolsSnakeRouteImport.update({
+  id: '/tools/snake',
+  path: '/tools/snake',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSleepCalculatorRoute = ToolsSleepCalculatorRouteImport.update({
@@ -572,6 +578,7 @@ export interface FileRoutesByFullPath {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
+  '/tools/snake': typeof ToolsSnakeRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
@@ -656,6 +663,7 @@ export interface FileRoutesByTo {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
+  '/tools/snake': typeof ToolsSnakeRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
@@ -741,6 +749,7 @@ export interface FileRoutesById {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
+  '/tools/snake': typeof ToolsSnakeRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
@@ -827,6 +836,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
+    | '/tools/snake'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
@@ -911,6 +921,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
+    | '/tools/snake'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
@@ -995,6 +1006,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
+    | '/tools/snake'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
@@ -1080,6 +1092,7 @@ export interface RootRouteChildren {
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
   ToolsSleepCalculatorRoute: typeof ToolsSleepCalculatorRoute
+  ToolsSnakeRoute: typeof ToolsSnakeRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
@@ -1276,6 +1289,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/speech-to-text'
       fullPath: '/tools/speech-to-text'
       preLoaderRoute: typeof ToolsSpeechToTextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/snake': {
+      id: '/tools/snake'
+      path: '/tools/snake'
+      fullPath: '/tools/snake'
+      preLoaderRoute: typeof ToolsSnakeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/sleep-calculator': {
@@ -1745,6 +1765,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
   ToolsSleepCalculatorRoute: ToolsSleepCalculatorRoute,
+  ToolsSnakeRoute: ToolsSnakeRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,

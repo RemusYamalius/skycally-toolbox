@@ -97,7 +97,7 @@ function ToolsPage() {
 
       {cat === "all" ? (
         <div className="space-y-14">
-          {(["ai", "video", "image", "audio", "pdf", "text"] as ToolCategory[]).map((c) => {
+          {(["ai", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"] as ToolCategory[]).map((c) => {
             const groupList = list.filter((t) => toolInCategory(t, c));
             if (groupList.length === 0) return null;
             const meta = categoryMeta[c];

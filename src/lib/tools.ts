@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2 } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
 
@@ -102,6 +102,8 @@ export const tools: Tool[] = [
   { slug: "dice-roller", name: "Dice Roller", description: "Roll multiple dice of any type — D4, D6, D8, D10, D12, D20. Perfect for board games and RPGs.", category: "games", icon: Dices, path: "/tools/dice-roller" },
   { slug: "wordle", name: "Wordle", description: "Guess the hidden 5-letter word in 6 tries. A new word every day!", category: "minigames", icon: Grid2x2, path: "/tools/wordle" },
   { slug: "2048", name: "2048", description: "Slide tiles and merge numbers to reach 2048. Simple rules, endless challenge.", category: "minigames", icon: Joystick, path: "/tools/2048" },
+  { slug: "tic-tac-toe", name: "Tic Tac Toe", description: "Classic X and O game. Play against a friend or challenge the AI.", category: "minigames", icon: X, path: "/tools/tic-tac-toe" },
+  { slug: "snake", name: "Snake", description: "Eat the food, grow longer, don't hit the walls. The classic arcade game!", category: "minigames", icon: Crosshair, path: "/tools/snake" },
 ];
 
 

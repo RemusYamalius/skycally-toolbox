@@ -29,10 +29,12 @@ import { Route as ToolsUuidGeneratorRouteImport } from './routes/tools.uuid-gene
 import { Route as ToolsUrlEncoderRouteImport } from './routes/tools.url-encoder'
 import { Route as ToolsTruthOrDareRouteImport } from './routes/tools.truth-or-dare'
 import { Route as ToolsTipCalculatorRouteImport } from './routes/tools.tip-calculator'
+import { Route as ToolsTicTacToeRouteImport } from './routes/tools.tic-tac-toe'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
+import { Route as ToolsSnakeRouteImport } from './routes/tools.snake'
 import { Route as ToolsSleepCalculatorRouteImport } from './routes/tools.sleep-calculator'
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
@@ -191,6 +193,11 @@ const ToolsTipCalculatorRoute = ToolsTipCalculatorRouteImport.update({
   path: '/tools/tip-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsTicTacToeRoute = ToolsTicTacToeRouteImport.update({
+  id: '/tools/tic-tac-toe',
+  path: '/tools/tic-tac-toe',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
   id: '/tools/text-to-speech',
   path: '/tools/text-to-speech',
@@ -209,6 +216,11 @@ const ToolsSpinningWheelRoute = ToolsSpinningWheelRouteImport.update({
 const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
   id: '/tools/speech-to-text',
   path: '/tools/speech-to-text',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSnakeRoute = ToolsSnakeRouteImport.update({
+  id: '/tools/snake',
+  path: '/tools/snake',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSleepCalculatorRoute = ToolsSleepCalculatorRouteImport.update({
@@ -566,10 +578,12 @@ export interface FileRoutesByFullPath {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
+  '/tools/snake': typeof ToolsSnakeRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
@@ -649,10 +663,12 @@ export interface FileRoutesByTo {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
+  '/tools/snake': typeof ToolsSnakeRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
@@ -733,10 +749,12 @@ export interface FileRoutesById {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
+  '/tools/snake': typeof ToolsSnakeRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
@@ -818,10 +836,12 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
+    | '/tools/snake'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
     | '/tools/truth-or-dare'
     | '/tools/url-encoder'
@@ -901,10 +921,12 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
+    | '/tools/snake'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
     | '/tools/truth-or-dare'
     | '/tools/url-encoder'
@@ -984,10 +1006,12 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
+    | '/tools/snake'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
     | '/tools/truth-or-dare'
     | '/tools/url-encoder'
@@ -1068,10 +1092,12 @@ export interface RootRouteChildren {
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
   ToolsSleepCalculatorRoute: typeof ToolsSleepCalculatorRoute
+  ToolsSnakeRoute: typeof ToolsSnakeRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
+  ToolsTicTacToeRoute: typeof ToolsTicTacToeRoute
   ToolsTipCalculatorRoute: typeof ToolsTipCalculatorRoute
   ToolsTruthOrDareRoute: typeof ToolsTruthOrDareRoute
   ToolsUrlEncoderRoute: typeof ToolsUrlEncoderRoute
@@ -1230,6 +1256,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsTipCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/tic-tac-toe': {
+      id: '/tools/tic-tac-toe'
+      path: '/tools/tic-tac-toe'
+      fullPath: '/tools/tic-tac-toe'
+      preLoaderRoute: typeof ToolsTicTacToeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/text-to-speech': {
       id: '/tools/text-to-speech'
       path: '/tools/text-to-speech'
@@ -1256,6 +1289,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/speech-to-text'
       fullPath: '/tools/speech-to-text'
       preLoaderRoute: typeof ToolsSpeechToTextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/snake': {
+      id: '/tools/snake'
+      path: '/tools/snake'
+      fullPath: '/tools/snake'
+      preLoaderRoute: typeof ToolsSnakeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/sleep-calculator': {
@@ -1725,10 +1765,12 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
   ToolsSleepCalculatorRoute: ToolsSleepCalculatorRoute,
+  ToolsSnakeRoute: ToolsSnakeRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
+  ToolsTicTacToeRoute: ToolsTicTacToeRoute,
   ToolsTipCalculatorRoute: ToolsTipCalculatorRoute,
   ToolsTruthOrDareRoute: ToolsTruthOrDareRoute,
   ToolsUrlEncoderRoute: ToolsUrlEncoderRoute,
@@ -1747,12 +1789,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

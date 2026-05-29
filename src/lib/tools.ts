@@ -1,6 +1,6 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2 } from "lucide-react";
 
-export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games";
+export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
 
 export const categoryMeta: Record<ToolCategory, { label: string; color: string; icon: string }> = {
   video: { label: "Video Tools", color: "var(--cyan-brand)", icon: "🎬" },
@@ -11,7 +11,9 @@ export const categoryMeta: Record<ToolCategory, { label: string; color: string; 
   ai: { label: "AI Tools", color: "var(--violet-brand)", icon: "🤖" },
   utility: { label: "Utility Tools", color: "var(--green-brand)", icon: "🛠️" },
   games: { label: "Game Tools", color: "var(--violet-brand)", icon: "🎲" },
+  minigames: { label: "Mini Games", color: "var(--cyan-brand)", icon: "🕹️" },
 };
+
 
 
 export interface Tool {
@@ -98,5 +100,8 @@ export const tools: Tool[] = [
   { slug: "random-team-maker", name: "Random Team Maker", description: "Split any group of players into balanced random teams instantly.", category: "games", icon: Users, path: "/tools/random-team-maker" },
   { slug: "truth-or-dare", name: "Truth or Dare", description: "Spin the bottle and get random Truth or Dare challenges. Perfect for parties and friend groups.", category: "games", icon: Flame, path: "/tools/truth-or-dare" },
   { slug: "dice-roller", name: "Dice Roller", description: "Roll multiple dice of any type — D4, D6, D8, D10, D12, D20. Perfect for board games and RPGs.", category: "games", icon: Dices, path: "/tools/dice-roller" },
+  { slug: "wordle", name: "Wordle", description: "Guess the hidden 5-letter word in 6 tries. A new word every day!", category: "minigames", icon: Grid2x2, path: "/tools/wordle" },
+  { slug: "2048", name: "2048", description: "Slide tiles and merge numbers to reach 2048. Simple rules, endless challenge.", category: "minigames", icon: Joystick, path: "/tools/2048" },
 ];
+
 

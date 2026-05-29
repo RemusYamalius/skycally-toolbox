@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type, Sparkles, Wrench, Gamepad2 } from "lucide-react";
+import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type, Sparkles, Wrench, Gamepad2, Joystick } from "lucide-react";
 
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
@@ -47,6 +47,7 @@ const quickAccess = [
   { icon: Type, label: "Text Tools", cat: "text" as const, color: categoryMeta.text.color },
   { icon: Wrench, label: "Utility Tools", cat: "utility" as const, color: categoryMeta.utility.color },
   { icon: Gamepad2, label: "Game Tools", cat: "games" as const, color: categoryMeta.games.color },
+  { icon: Joystick, label: "Mini Games", cat: "minigames" as const, color: categoryMeta.minigames.color },
 ];
 
 const categoryTaglines: Record<ToolCategory, string> = {
@@ -58,13 +59,15 @@ const categoryTaglines: Record<ToolCategory, string> = {
   text: "Generate, format, encode and analyze text effortlessly.",
   utility: "Calculators, decision tools and everyday utilities.",
   games: "Spinning wheels, role assignments, team makers and more party games.",
+  minigames: "Play Wordle, 2048 and more — directly in your browser, no download needed.",
 };
+
 
 
 const INITIAL_PER_CAT = 6;
 
 const POPULAR_SLUGS = ["compress-pdf", "remove-bg", "image-converter", "qr-generator", "video-to-gif", "word-to-pdf"];
-const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games"];
+const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games", "minigames"];
 
 function HomePage() {
   const [q, setQ] = useState("");

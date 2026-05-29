@@ -10,7 +10,7 @@ export const categoryMeta: Record<ToolCategory, { label: string; color: string; 
   text: { label: "Text Tools", color: "var(--green-brand)", icon: "✍️" },
   ai: { label: "AI Tools", color: "var(--violet-brand)", icon: "🤖" },
   utility: { label: "Utility Tools", color: "var(--green-brand)", icon: "🛠️" },
-  games: { label: "Games & Fun", color: "var(--violet-brand)", icon: "🎮" },
+  games: { label: "Game Tools", color: "var(--violet-brand)", icon: "🎲" },
 };
 
 

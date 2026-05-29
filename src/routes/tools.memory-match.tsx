@@ -133,6 +133,7 @@ function MemoryMatchPage() {
               prev.map((c, i) => (i === a || i === b ? { ...c, flipped: false } : c)),
             );
             setFlipped([]);
+            playSound("noMatch");
           }, 800);
         }
       }

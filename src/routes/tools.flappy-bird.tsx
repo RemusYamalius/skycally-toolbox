@@ -41,10 +41,14 @@ type Phase = "idle" | "playing" | "dead";
 function FlappyBirdPage() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [score, setScore] = useState(0);
-  const [best, setBest] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    return Number(window.localStorage.getItem("flappy-best") || 0);
-  });
+  const [best, setBest] = useState<number>(0);
+
+  useEffect(() => {
+    try {
+      const v = Number(window.localStorage.getItem("flappy-best") || 0);
+      if (v > 0) setBest(v);
+    } catch { /* ignore */ }
+  }, []);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const birdRef = useRef<BirdState>({ y: H / 2, vy: 0 });

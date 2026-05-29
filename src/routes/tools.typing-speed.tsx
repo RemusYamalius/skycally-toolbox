@@ -139,6 +139,7 @@ function TypingSpeedPage() {
       finishGame();
       return;
     }
+    if (timeLeft <= 5) playSound("tick");
     const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000);
     return () => clearTimeout(t);
   }, [phase, started, timeLeft]);

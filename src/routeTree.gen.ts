@@ -17,6 +17,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as ToolsWordleRouteImport } from './routes/tools.wordle'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
 import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
@@ -127,6 +128,11 @@ const ToolsIndexRoute = ToolsIndexRouteImport.update({
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsWordleRoute = ToolsWordleRouteImport.update({
+  id: '/tools/wordle',
+  path: '/tools/wordle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsWordToPdfRoute = ToolsWordToPdfRouteImport.update({
@@ -568,6 +574,7 @@ export interface FileRoutesByFullPath {
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
+  '/tools/wordle': typeof ToolsWordleRoute
   '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -649,6 +656,7 @@ export interface FileRoutesByTo {
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
+  '/tools/wordle': typeof ToolsWordleRoute
   '/blog': typeof BlogIndexRoute
   '/tools': typeof ToolsIndexRoute
 }
@@ -731,6 +739,7 @@ export interface FileRoutesById {
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
+  '/tools/wordle': typeof ToolsWordleRoute
   '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -814,6 +823,7 @@ export interface FileRouteTypes {
     | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
+    | '/tools/wordle'
     | '/blog/'
     | '/tools/'
   fileRoutesByTo: FileRoutesByTo
@@ -895,6 +905,7 @@ export interface FileRouteTypes {
     | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
+    | '/tools/wordle'
     | '/blog'
     | '/tools'
   id:
@@ -976,6 +987,7 @@ export interface FileRouteTypes {
     | '/tools/video-trimmer'
     | '/tools/word-counter'
     | '/tools/word-to-pdf'
+    | '/tools/wordle'
     | '/blog/'
     | '/tools/'
   fileRoutesById: FileRoutesById
@@ -1058,6 +1070,7 @@ export interface RootRouteChildren {
   ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
+  ToolsWordleRoute: typeof ToolsWordleRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
@@ -1118,6 +1131,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/wordle': {
+      id: '/tools/wordle'
+      path: '/tools/wordle'
+      fullPath: '/tools/wordle'
+      preLoaderRoute: typeof ToolsWordleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/word-to-pdf': {
@@ -1699,6 +1719,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
+  ToolsWordleRoute: ToolsWordleRoute,
   BlogIndexRoute: BlogIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }

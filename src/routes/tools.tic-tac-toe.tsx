@@ -273,7 +273,7 @@ function TicTacToePage() {
         ]}
       />
 
-      {tool && <RelatedTools currentSlug={tool.slug} category={tool.category} />}
+      <RelatedTools currentSlug="tic-tac-toe" />
     </ToolPageShell>
   );
 }

@@ -88,6 +88,7 @@ function TypingSpeedPage() {
     }
   });
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const lastSoundRef = useRef<number>(0);
 
   const startGame = () => {
     const quotes = QUOTE_BANK[category];

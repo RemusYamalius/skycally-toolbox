@@ -113,6 +113,7 @@ export const tools: Tool[] = [
   { slug: "word-search", name: "Word Search", description: "Find hidden words in the letter grid — horizontally, vertically and diagonally!", category: "minigames", icon: Search, path: "/tools/word-search" },
   { slug: "typing-speed", name: "Typing Speed Test", description: "Test your typing speed and accuracy! How many words per minute can you type?", category: "minigames", icon: Keyboard, path: "/tools/typing-speed" },
   { slug: "flappy-bird", name: "Flappy Bird", description: "Tap to flap and fly through the pipes! How far can you go?", category: "minigames", icon: Bird, path: "/tools/flappy-bird" },
+  { slug: "chess", name: "Chess", description: "Play chess against a smart AI opponent. Classic strategy game with full rules support!", category: "minigames", icon: Crown, path: "/tools/chess" },
 ];
 
 

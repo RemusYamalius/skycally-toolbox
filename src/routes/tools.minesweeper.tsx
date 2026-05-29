@@ -259,11 +259,13 @@ function MinesweeperPage() {
       b = revealAllMines(b);
       setBoard(b);
       setPhase("lost");
+      playSound("die");
       return;
     }
     setBoard(b);
     if (checkWin(b, difficulty)) {
       setPhase("won");
+      playChord(["success", "win"]);
       persistBest(difficulty, time);
     }
   };

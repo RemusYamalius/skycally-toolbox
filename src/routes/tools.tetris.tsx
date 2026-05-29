@@ -273,6 +273,8 @@ function TetrisPage() {
       const newBoard = placePiece(board, piece);
       const { board: clearedBoard, cleared } = clearLines(newBoard);
       boardRef.current = clearedBoard;
+      playSound("place");
+      if (cleared > 0) playSound("clear");
 
       const points = SCORE_TABLE[cleared] * levelRef.current;
       scoreRef.current += points;

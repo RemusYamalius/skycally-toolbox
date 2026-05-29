@@ -146,7 +146,7 @@ function MarkdownToHtml() {
                   [&_h1]:text-cyan-300 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-3
                   [&_h2]:text-cyan-400 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-2
                   [&_h3]:text-cyan-500 [&_h3]:text-lg [&_h3]:font-medium [&_h3]:mb-2
-                  [&_strong]:text-white [&_em]:text-muted-foreground
+                  [&_strong]:text-foreground [&_em]:text-muted-foreground
                   [&_code]:bg-background [&_code]:text-cyan-300 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono
                   [&_blockquote]:border-l-2 [&_blockquote]:border-cyan-500 [&_blockquote]:pl-4 [&_blockquote]:text-muted-foreground [&_blockquote]:italic
                   [&_hr]:border-border [&_hr]:my-4

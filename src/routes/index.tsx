@@ -47,6 +47,7 @@ const quickAccess = [
   { icon: Type, label: "Text Tools", cat: "text" as const, color: categoryMeta.text.color },
   { icon: Wrench, label: "Utility Tools", cat: "utility" as const, color: categoryMeta.utility.color },
   { icon: Gamepad2, label: "Game Tools", cat: "games" as const, color: categoryMeta.games.color },
+  { icon: Joystick, label: "Mini Games", cat: "minigames" as const, color: categoryMeta.minigames.color },
 ];
 
 const categoryTaglines: Record<ToolCategory, string> = {
@@ -58,7 +59,9 @@ const categoryTaglines: Record<ToolCategory, string> = {
   text: "Generate, format, encode and analyze text effortlessly.",
   utility: "Calculators, decision tools and everyday utilities.",
   games: "Spinning wheels, role assignments, team makers and more party games.",
+  minigames: "Play Wordle, 2048 and more — directly in your browser, no download needed.",
 };
+
 
 
 const INITIAL_PER_CAT = 6;

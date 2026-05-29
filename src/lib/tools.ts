@@ -107,6 +107,7 @@ export const tools: Tool[] = [
   { slug: "memory-match", name: "Memory Match", description: "Flip cards and find matching pairs. Train your memory with increasing difficulty!", category: "minigames", icon: LayoutGrid, path: "/tools/memory-match" },
   { slug: "hangman", name: "Hangman", description: "Guess the hidden word letter by letter before the hangman is complete!", category: "minigames", icon: BookOpen, path: "/tools/hangman" },
   { slug: "minesweeper", name: "Minesweeper", description: "Classic Minesweeper — uncover all safe cells without hitting a mine!", category: "minigames", icon: Bomb, path: "/tools/minesweeper" },
+  { slug: "sudoku", name: "Sudoku", description: "Fill the 9×9 grid so every row, column and box contains digits 1–9.", category: "minigames", icon: Hash, path: "/tools/sudoku" },
 ];
 
 

@@ -126,7 +126,12 @@ function initialBoard(): Board {
 function Game2048() {
   const tool = toolBySlug("2048", tools);
 
-  const [board, setBoard] = useState<Board>(() => initialBoard());
+  const [board, setBoard] = useState<Board>(() => emptyBoard());
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => {
+    setBoard(initialBoard());
+    setMounted(true);
+  }, []);
   const [score, setScore] = useState(0);
   const [best, setBest] = useState<number>(() => loadBest());
   const [gameOver, setGameOver] = useState(false);

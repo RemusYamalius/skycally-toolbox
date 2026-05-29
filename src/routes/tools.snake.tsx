@@ -72,6 +72,7 @@ function SnakePage() {
     stopLoop();
     setRunning(false);
     setDead(true);
+    playSound("fail");
   }, [stopLoop]);
 
   const tick = useCallback(() => {

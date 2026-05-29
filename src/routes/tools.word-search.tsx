@@ -249,11 +249,14 @@ function WordSearchPage() {
       });
       if (updated.every((pw) => pw.found)) {
         setPhase("won");
+        playChord(["allFound", "success"]);
         if (best[difficulty] === 0 || time < best[difficulty]) {
           const upd = { ...best, [difficulty]: time };
           setBest(upd);
           try { window.localStorage.setItem("wordsearch-best", JSON.stringify(upd)); } catch {}
         }
+      } else {
+        playSound("found");
       }
     }
   };

@@ -687,6 +687,8 @@ function ChessPage() {
       else setCapturedB((prev) => [...prev, captured.type]);
     }
     const newState = applyMove(gameState, move);
+    const wasCapture = !!captured || (piece?.type === "P" && !!gameState.enPassant && move.toR === gameState.enPassant[0] && move.toC === gameState.enPassant[1]);
+    playMoveSound(gameState, move, wasCapture, "b");
     setGameState(newState);
     setLastMove(move);
     setSelected(null);

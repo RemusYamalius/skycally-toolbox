@@ -148,6 +148,22 @@ function TypingSpeedPage() {
     if (!started) setStarted(true);
     if (timeLeft <= 0) return;
     const val = e.target.value;
+    const prevLen = input.length;
+    if (val.length > prevLen) {
+      const i = val.length - 1;
+      const now = Date.now();
+      if (val[i] === quote[i]) {
+        if (now - lastSoundRef.current >= 80) {
+          playSound("correct");
+          lastSoundRef.current = now;
+        }
+      } else {
+        if (now - lastSoundRef.current >= 80) {
+          playSound("wrong");
+          lastSoundRef.current = now;
+        }
+      }
+    }
     setInput(val);
     if (val === quote) {
       setTimeout(() => finishGame(), 0);

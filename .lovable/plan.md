@@ -1,88 +1,65 @@
-# Light Mode Text Visibility Fix
+# Add Games & Fun category + Random Team Maker
 
-## Diagnosis adjustments before implementing
+## 1. `src/lib/tools.ts`
+- Add `Gamepad2` to lucide-react import (`Users` already imported).
+- Extend `ToolCategory` union with `"games"`.
+- Add `games: { label: "Games & Fun", color: "var(--violet-brand)", icon: "🎮" }` to `categoryMeta`.
+- Change `category` from `"utility"` to `"games"` for `spinning-wheel` and `role-spinner` entries.
+- Append new tool entry after `role-spinner`:
+  ```ts
+  { slug: "random-team-maker", name: "Random Team Maker", description: "Split any group of players into balanced random teams instantly.", category: "games", icon: Users, path: "/tools/random-team-maker" }
+  ```
 
-Two things in the original brief don't match the project, so the plan corrects them:
+## 2. `src/components/site-footer.tsx`
+- Append `"games"` to `categoryOrder`.
 
-1. **`.light` class doesn't exist.** `theme-provider.tsx` only toggles `.dark` on `<html>`. Light is the default (no class). So `.light .bg-card { … }` selectors would never match. The fix below uses the default cascade + a `:root:not(.dark)` scope where needed.
-2. **`src/routes/tools.role-spinner.tsx` already uses semantic tokens** (`bg-card`, `border-border`, `text-muted-foreground`, `text-foreground`). It does NOT contain `text-white`, `text-gray-*`, or inline white colors. No edits needed there — flagging this so we don't invent diffs.
-3. **The proposed broad selectors (`[class*="rounded-xl"]`, blanket `input { color !important }`) are too aggressive** — they'd repaint hero CTAs, badges, and the homepage search input (which is intentionally white-on-dark inside `.bg-hero`). The plan scopes the safeguard to actual card containers only.
+## 3. `src/routes/index.tsx`
+- Add `Gamepad2` to lucide imports.
+- Add `{ icon: Gamepad2, label: "Games & Fun", cat: "games", color: categoryMeta.games.color }` to `quickAccess`.
+- Add `games: "Spinning wheels, role assignments, team makers and more party games."` to `categoryTaglines`.
+- Update `ALL_CATS` constant to include `"games"` (file uses `ALL_CATS`, not `allCats` — adapt the user's instruction accordingly).
 
-## Real culprits (from a repo-wide audit)
+## 4. `src/routes/tools.random-team-maker.tsx` (new)
+Mirror structure of `tools.role-spinner.tsx`: same `Route` declaration, `Wheel` canvas component reused verbatim, `PALETTE`, `ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools`.
 
-These tool routes were authored assuming a permanent dark canvas and break in light mode:
+State:
+- `phase: "setup" | "spin" | "done"`
+- `players: string[]` (defaults: Alice…Hannah, 8 names)
+- `playerInput: string`
+- `teamCount: 2|3|4|5` (default 2)
+- `balanced: boolean` (default true)
+- `teamNames: string[]` (auto "Team 1"…"Team N", inline editable; resync when count changes)
+- `editingTeamIdx: number | null`
+- `assignments: string[][]` (one array per team)
+- `queue: string[]` (shuffled players remaining to assign)
+- `nextTeamIdx: number` (rotation pointer; with `balanced` true → rotate 0,1,2…; with `balanced` false → pick random team each spin)
+- `rotation`, `spinning` (for wheel)
 
-```
-tools.add-watermark.tsx
-tools.extract-audio.tsx
-tools.markdown-to-html.tsx
-tools.lorem-ipsum.tsx
-tools.json-formatter.tsx
-tools.image-upscaler.tsx
-tools.image-filters.tsx
-tools.image-to-sketch.tsx
-tools.audio-converter.tsx
-tools.video-compressor.tsx
-tools.pdf-watermark-remover.tsx
-tools.screen-recorder.tsx
-tools.split-pdf.tsx
-contact.tsx (submit button uses hardcoded gradient + text-white — OK, it's a button)
-```
+Phase 1 — Setup (two-panel grid like role-spinner):
+- Left: Players panel with Input+Add, list with delete buttons (min 2 enforced), header "Players (N)".
+- Right: Teams panel — row of `2 3 4 5` buttons (active styled), preview text `~{Math.floor(players.length / teamCount)} players per team`, "Balanced teams" toggle (Switch), editable team name list (click name → input; blur/Enter commits).
+- "Make Teams!" button disabled when `players.length < 2` or `teamCount > players.length`.
 
-They use combinations of: `text-gray-{200,300,400,500,600,700}`, `bg-[#0a0f1e]`, `border-[#1e2d4a]`, `text-white` on non-button surfaces, custom drop zones, etc.
+Phase 2 — Spin:
+- Single `Wheel` with `nameSegments` from `queue`.
+- Status line: `Assigning to: {teamNames[nextTeamIdx]} ({assignments[nextTeamIdx].length}/{targetCount} players)`.
+- "Spin" button → reuses `spin()` from role-spinner; on land: push picked player into `assignments[nextTeamIdx]`, drop from `queue`, advance `nextTeamIdx` (round-robin when balanced; random otherwise).
+- "Skip animation — assign all randomly" button → loops through remaining queue applying same assignment logic, then sets `phase="done"`.
+- When `queue.length === 0` after a spin → `phase="done"`.
 
-## Plan
+Phase 3 — Results:
+- Responsive grid (`sm:grid-cols-2 lg:grid-cols-3`) of team cards. Each card: colored header (color from PALETTE[i]), team name, divider, player list.
+- Buttons: "Shuffle Again" (re-shuffle players into new `assignments` keeping names/teamCount, jumps back to phase "done" with new result, no spin), "Start Over" (reset to "setup"), "Copy Results" (plaintext: `Team 1:\n  Alice\n  Bob\n\nTeam 2:\n…`).
 
-### 1. Corrected safeguard in `src/styles.css`
+Helpers:
+- `shuffle<T>(arr)`: Fisher–Yates.
+- `distribute(players, k, balanced)`: returns `string[][]`. Balanced → shuffled, then round-robin assign by `i % k`. Unbalanced → shuffled, each player to random bucket.
 
-Append (NOT prepend — keeping existing animation/critical CSS intact):
-
-```css
-/*
-  COLOR RULES — always use semantic tokens, never hardcode:
-  ✅ text-foreground, text-muted-foreground, text-card-foreground
-  ✅ bg-card, bg-background, bg-muted, border-border
-  ❌ Avoid: text-white, text-gray-*, bg-white, bg-[#hex] inside content surfaces.
-     Exceptions: hero section (.bg-hero), intentionally inverted UI, buttons.
-*/
-
-/* Light-mode safeguard: any card/panel inherits readable color even if a
-   child author forgot to set one. Scoped to .bg-card so we don't repaint
-   hero buttons, badges, or .bg-hero descendants. */
-:root:not(.dark) .bg-card {
-  color: var(--card-foreground);
-}
-```
-
-(No `input { color !important }` rule — `Input`/`Textarea` shadcn components already inherit `text-base` from `currentColor` and work correctly in both themes. Forcing it would break the hero search input which is intentionally white-on-dark.)
-
-### 2. Tool-route cleanup (semantic-token rewrite)
-
-For each of the 12 files listed above, replace hardcoded color patterns with tokens:
-
-| Hardcoded | Replacement |
-|---|---|
-| `text-gray-200`, `text-gray-300` | `text-foreground` |
-| `text-gray-400`, `text-gray-500`, `text-gray-600`, `text-gray-700` | `text-muted-foreground` |
-| `text-white` (on non-button surfaces) | `text-foreground` |
-| `bg-[#0a0f1e]` | `bg-background` (or `bg-card` for nested panels) |
-| `border-[#1e2d4a]` | `border-border` |
-| `placeholder-gray-700` etc. | `placeholder:text-muted-foreground` |
-| Inline `style={{ color: 'white' }}` on text | remove + add `className="text-foreground"` |
-
-Keep untouched:
-- Hero section in `src/routes/index.tsx` (`text-white`, `bg-white/8`, `text-white/40`) — these sit on `.bg-hero` and are intentional.
-- Gradient action buttons (`bg-gradient-to-r ... text-white`) — buttons are inverted by design.
-- `bg-black` on `<video>`/`<canvas>` letterbox backgrounds and dialog overlays (`bg-black/80`) — these are media frames, not text surfaces.
-
-### 3. Verify no regressions
-
-- Scan `src/components/` — already uses tokens (verified: ai-badges, tool-page-shell, card/input/textarea). No edits needed.
-- Confirm `role-spinner.tsx` and `spinning-wheel.tsx` already use tokens — no edits.
-- Toggle theme in preview after edits; the listed tool pages should render with readable text in both light and dark mode.
+SEO content:
+- `HowToUse` steps: `["Enter all player names and choose how many teams you need.", "Hit Make Teams and watch the wheel assign each player randomly.", "Share the results or shuffle again for a different split."]`
+- `ToolSeoContent` with title/description/2 paragraphs/4 FAQs as specified.
 
 ## Out of scope
-
-- No functionality, layout, behavior, or animation changes.
-- No edits to hero, header, footer, buttons, dialogs, video/canvas backgrounds, or `routeTree.gen.ts`.
+- No edits to `routeTree.gen.ts` beyond auto-regeneration.
+- No changes to other tool routes, hero, dark mode, or category colors.
 - No new dependencies.

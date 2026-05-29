@@ -369,8 +369,8 @@ function WordSearchPage() {
                     className={cn(
                       "aspect-square flex items-center justify-center text-[10px] sm:text-xs font-black border border-border/20 transition-colors",
                       isFound && foundColor ? foundColor :
-                      isSelected ? "bg-primary/40 text-primary-foreground" :
-                      "text-foreground"
+                      isSelected ? "bg-primary/40 text-white" :
+                      "text-foreground bg-card hover:bg-muted/40"
                     )}
                   >
                     {cell.letter}

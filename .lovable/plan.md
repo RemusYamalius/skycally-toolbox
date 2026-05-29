@@ -1,34 +1,30 @@
-# Add Typing Speed Test to Mini Games
+# Add Flappy Bird to Mini Games
 
 ## Step 1 — Update `src/lib/tools.ts`
-- Add `Keyboard` to the `lucide-react` import line.
-- Append new tool entry after `word-search`:
+- Add `Bird` to the `lucide-react` import line.
+- Append after `typing-speed`:
   ```ts
-  { slug: "typing-speed", name: "Typing Speed Test", description: "Test your typing speed and accuracy! How many words per minute can you type?", category: "minigames", icon: Keyboard, path: "/tools/typing-speed" },
+  { slug: "flappy-bird", name: "Flappy Bird", description: "Tap to flap and fly through the pipes! How far can you go?", category: "minigames", icon: Bird, path: "/tools/flappy-bird" },
   ```
 
-## Step 2 — Create `src/routes/tools.typing-speed.tsx`
-Mirror the file structure of `src/routes/tools.word-search.tsx` (route export, head meta via `buildToolMeta`, `ToolPageShell` + `HowToUse` + `RelatedTools` + `ToolSeoContent`).
+## Step 2 — Create `src/routes/tools.flappy-bird.tsx`
+Mirror the structure of `src/routes/tools.typing-speed.tsx` (route export, `buildToolMeta` head, `ToolPageShell` + `HowToUse` + `RelatedTools` + `ToolSeoContent`).
 
-Implementation per spec:
-- **Data**: `QUOTE_BANK` (General, Technology, Motivational, Science) and `CONFIG` (easy 60s / medium 30s / hard 15s).
-- **State**: difficulty, category, quote, input, phase (`setup` | `playing` | `done`), timeLeft, started, result, best (persisted to `localStorage` key `typing-best-wpm`), textarea ref.
-- **Logic**:
-  - `startGame` picks random quote from selected category, resets state, focuses textarea.
-  - Timer effect ticks once per second after first keystroke; calls `finishGame` at 0.
-  - `finishGame` word-by-word comparison → WPM = `correct / duration * 60`, accuracy = `correct / typedWords * 100`; updates best.
-  - `handleInput` starts timer on first keystroke; blocks input when time up.
-  - `renderQuote` colors each char (green correct / red wrong / muted untyped) with pulsing cursor at current position.
-  - `liveWpm` memo from elapsed seconds.
-- **UI**:
-  - Setup screen: category buttons (4), difficulty buttons (3), Start button.
-  - Playing screen: timer + live WPM + best WPM bar, progress bar, quote display (mono), textarea input.
-  - Done screen: fixed overlay with WPM, accuracy, correct/incorrect grid, "New Personal Best" badge, Try Again + Change Settings buttons.
-- **SEO**:
-  - `HowToUse` steps as specified.
-  - `ToolSeoContent` with required title, description, 2-paragraph body, 4 FAQs (WPM calc, timer start, categories, improvement tips).
-- English only. Use semantic tokens (`bg-card`, `text-foreground`, `border-border`, `text-primary`, etc.) consistent with other mini-game routes. The route file is auto-registered by the TanStack Router Vite plugin — do not hand-edit `routeTree.gen.ts`.
+Canvas-based game (no external libs) per spec:
+- **Constants**: W=400, H=600, GRAVITY=0.5, FLAP_FORCE=-9, PIPE_WIDTH=60, PIPE_GAP=160, PIPE_SPEED=2.5, PIPE_INTERVAL=1600, BIRD_X=80, BIRD_SIZE=28.
+- **State**: `phase` (`idle` | `playing` | `dead`), `score`, `best` (persisted to `localStorage["flappy-best"]`).
+- **Refs**: `canvasRef`, `birdRef` ({ y, vy }), `pipesRef` (Pipe[]), `scoreRef`, `phaseRef`, `animRef`, `lastPipeRef`. Refs are the single source of truth during the loop; React state is UI-only.
+- **Loop**: spawn pipes every PIPE_INTERVAL ms, apply gravity, move pipes, score when pipe passes bird, collide vs ceiling/floor/pipes (with 4px tolerance), draw each frame via `requestAnimationFrame`. On hit → `phase=dead`, update best.
+- **Draw**: sky/ground/grass, green pipes with caps, rotated yellow bird (body, wing, eye, beak) with angle based on vy, score badge centered top.
+- **Overlay**: idle screen ("Tap / Press Space to Start"), dead screen (score, best, restart prompt).
+- **Input**: click + touchstart on canvas, Space key globally → `flap()` (jumps to FLAP_FORCE while playing, otherwise starts a new game).
+- **Lifecycle**: draw idle overlay on mount; draw dead overlay when phase becomes dead; cancel animation frame on unmount.
+- **JSX**: best score above canvas (when >0), `<canvas width={W} height={H}>` with rounded border, hint text below.
+- **HowToUse**: 3 steps as specified.
+- **ToolSeoContent**: title, description, 2 paragraphs, 4 FAQs (controls, scoring, keyboard, mobile touch).
+
+English only. Semantic tokens (`border-border`, `text-muted-foreground`) for shell; raw colors are fine inside canvas drawing calls. Route file is auto-registered — do not edit `routeTree.gen.ts`.
 
 ## Files
 - edit: `src/lib/tools.ts`
-- create: `src/routes/tools.typing-speed.tsx`
+- create: `src/routes/tools.flappy-bird.tsx`

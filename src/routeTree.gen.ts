@@ -78,6 +78,7 @@ import { Route as ToolsHashGeneratorRouteImport } from './routes/tools.hash-gene
 import { Route as ToolsHangmanRouteImport } from './routes/tools.hangman'
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
 import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time-fixer'
+import { Route as ToolsFlappyBirdRouteImport } from './routes/tools.flappy-bird'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
@@ -446,6 +447,11 @@ const ToolsFreeTimeFixerRoute = ToolsFreeTimeFixerRouteImport.update({
   path: '/tools/free-time-fixer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsFlappyBirdRoute = ToolsFlappyBirdRouteImport.update({
+  id: '/tools/flappy-bird',
+  path: '/tools/flappy-bird',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsFaceLandmarksRoute = ToolsFaceLandmarksRouteImport.update({
   id: '/tools/face-landmarks',
   path: '/tools/face-landmarks',
@@ -584,6 +590,7 @@ export interface FileRoutesByFullPath {
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/hangman': typeof ToolsHangmanRoute
@@ -676,6 +683,7 @@ export interface FileRoutesByTo {
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/hangman': typeof ToolsHangmanRoute
@@ -769,6 +777,7 @@ export interface FileRoutesById {
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/hangman': typeof ToolsHangmanRoute
@@ -863,6 +872,7 @@ export interface FileRouteTypes {
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/flappy-bird'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
     | '/tools/hangman'
@@ -955,6 +965,7 @@ export interface FileRouteTypes {
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/flappy-bird'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
     | '/tools/hangman'
@@ -1047,6 +1058,7 @@ export interface FileRouteTypes {
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/flappy-bird'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
     | '/tools/hangman'
@@ -1140,6 +1152,7 @@ export interface RootRouteChildren {
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
+  ToolsFlappyBirdRoute: typeof ToolsFlappyBirdRoute
   ToolsFreeTimeFixerRoute: typeof ToolsFreeTimeFixerRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
   ToolsHangmanRoute: typeof ToolsHangmanRoute
@@ -1690,6 +1703,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsFreeTimeFixerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/flappy-bird': {
+      id: '/tools/flappy-bird'
+      path: '/tools/flappy-bird'
+      fullPath: '/tools/flappy-bird'
+      preLoaderRoute: typeof ToolsFlappyBirdRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/face-landmarks': {
       id: '/tools/face-landmarks'
       path: '/tools/face-landmarks'
@@ -1869,6 +1889,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
+  ToolsFlappyBirdRoute: ToolsFlappyBirdRoute,
   ToolsFreeTimeFixerRoute: ToolsFreeTimeFixerRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
   ToolsHangmanRoute: ToolsHangmanRoute,

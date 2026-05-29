@@ -1,60 +1,50 @@
-# Add "Mini Games" Category with Wordle and 2048
+# Add Tic Tac Toe and Snake to Mini Games
 
-Add a new `minigames` category to Skycally and ship two fully playable browser games: **Wordle** (daily 5-letter word puzzle) and **2048** (slide-and-merge tile puzzle). All UI in English, following existing tool route conventions (ToolPageShell + HowToUse + ToolSeoContent + RelatedTools).
+Add two more playable games to the existing `minigames` category, following the exact pattern of `src/routes/tools.wordle.tsx` (route shell + SEO `head()` + `ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools`). English-only UI.
 
 ## Scope
 
 ### 1. Registry (`src/lib/tools.ts`)
-- Add `Joystick`, `Grid2x2` to the `lucide-react` import line.
-- Extend `ToolCategory` union with `"minigames"`.
-- Add `categoryMeta.minigames`: label `"Mini Games"`, color `var(--cyan-brand)`, icon `🕹️`.
-- Append two tool entries after the existing `games` block:
-  - `wordle` → icon `Grid2x2`, path `/tools/wordle`
-  - `2048` → icon `Joystick`, path `/tools/2048`
+- Add `X` and `Crosshair` to the `lucide-react` import line.
+- Append two tool entries after the `2048` entry:
+  - `tic-tac-toe` → icon `X`, path `/tools/tic-tac-toe`
+  - `snake` → icon `Crosshair`, path `/tools/snake`
+- No other file edits needed — `site-footer.tsx` and `index.tsx` already render the `minigames` category.
 
-### 2. Footer (`src/components/site-footer.tsx`)
-- Append `"minigames"` to `categoryOrder`.
+### 2. Tic Tac Toe (`src/routes/tools.tic-tac-toe.tsx`)
+Standard route shell.
 
-### 3. Home page (`src/routes/index.tsx`)
-- Add `Joystick` to lucide imports.
-- Push `{ icon: Joystick, label: "Mini Games", cat: "minigames", color: categoryMeta.minigames.color }` into `quickAccess`.
-- Add `minigames` entry to `categoryTaglines` ("Play Wordle, 2048 and more — directly in your browser, no download needed.").
-- Add `"minigames"` to the `ALL_CATS` array so the homepage renders the new category section.
+- **State:** `board: Cell[]` (9), `isX`, `mode: "pvp" | "ai"`, `difficulty: "easy" | "medium" | "hard"`, `scores: { X, O, draws }`, `winner`, `winLine`.
+- **Win detection:** `LINES` constant (8 winning lines) + `checkWinner` returning `{ winner, line }`, `"draw"`, or `null`.
+- **AI:** Minimax (`O` maximizes, depth-weighted for faster wins) + `getBestMove`. `getAIMove` picks by difficulty — easy: random, medium: 50/50 best vs random, hard: always best.
+- **AI turn:** `useEffect` watching `[isX, mode, winner, board]` — when AI's turn, `setTimeout(400)` then play. Cleanup on unmount.
+- **Score updates:** on win/draw, bump `scores` once via effect watching `winner`.
+- **UI:** mode toggle (PvP/AI) + difficulty selector (only shown when AI), scoreboard (X / Draws / O cards), 3×3 button grid with `aspect-square` cells, status message ("Your turn (X)", "AI is thinking...", "🎉 X wins!", "🤖 AI wins!", "🤝 It's a draw!"), `New Game` (resets board, keeps scores) + `Reset Scores`.
+- **Tokens:** chrome uses semantic tokens; `text-cyan-400` / `text-violet-400` for X/O marks are intentional game colors (same exception as Wordle/2048 palettes).
+- HowToUse + ToolSeoContent (title, description, 2 paragraphs, 4 FAQs) per the prompt.
 
-### 4. Wordle (`src/routes/tools.wordle.tsx`)
-Standard route shell (`createFileRoute` + SEO `head()` + `ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools`).
+### 3. Snake (`src/routes/tools.snake.tsx`)
+Standard route shell. Canvas-based.
 
-- **Word list:** ~100 common 5-letter words as a `const WORDS` array (from prompt).
-- **Daily word:** `WORDS[Math.floor(Date.now() / 86400000) % WORDS.length]`.
-- **State:** `target`, `guesses[]`, `current`, `gameOver`, `won`, `letterStates` (Record of `correct | present | absent | unused`).
-- **Evaluation:** two-pass algorithm (correct first, then present) so duplicate letters score correctly.
-- **Board:** 6×5 grid, semantic tokens for empty/filled, raw Tailwind colors for correct/present/absent (green-500, yellow-500, muted).
-- **Keyboard:** on-screen 3-row QWERTY + Enter/Backspace, each key tinted by best known state. Physical `keydown` listener mirrors input.
-- **Win/Lose:** sonner `toast.success` / `toast.error`; CSS-keyframes confetti on win; `Play Again` button reseeds a random word (not just daily).
-- **Stats panel:** Games played, Win %, Current streak, Best streak — persisted under `localStorage["wordle-stats"]` (guarded by `typeof window !== "undefined"` to keep SSR safe).
-- HowToUse + ToolSeoContent copy per the prompt.
+- **Constants:** `GRID=20`, `CELL=20`, `SIZE=400`, `INITIAL_SPEED=150`.
+- **State + refs:** React state for `snake`, `food`, `score`, `best`, `running`, `dead`, `speed`. Mirrored refs (`snakeRef`, `dirRef`, `foodRef`, `scoreRef`) so the `setInterval` `tick` always sees the latest values without re-binding.
+- **Best score:** lazy-init from `localStorage["snake-best"]` (SSR-guarded with `typeof window !== "undefined"`).
+- **Game loop:** `setInterval(tick, speed)` started on `startGame`, cleared on death/unmount. `tick` moves head, checks wall + self collision, eats food (score +10, speed up every 50 pts down to 60ms floor), spawns food on an empty cell.
+- **Rendering:** `useEffect` on `[snake, food]` paints background, subtle grid dots, snake (head bright green, body fading), food (red circle). `roundRect` used (widely supported; fall back to `rect` if needed).
+- **Controls:** keyboard `keydown` for arrow keys + WASD, with 180° reversal guard. On-screen D-pad (▲◄▼►) for mobile. `preventDefault` on arrow keys to avoid page scroll.
+- **Overlays:** start screen (before first play) with 🐍 + Start button; game-over overlay with score, best, and Play Again. Both absolutely positioned inside a `relative` wrapper around the canvas.
+- **Layout:** canvas wrapper `w-full max-w-sm mx-auto relative`; canvas itself `width={SIZE} height={SIZE} className="w-full rounded-xl border-2 border-border"` so it scales responsively while keeping a 400×400 backing buffer.
+- HowToUse + ToolSeoContent (title, description, 2 paragraphs, 4 FAQs) per the prompt.
 
-### 5. 2048 (`src/routes/tools.2048.tsx`)
-Same shell. **Route string:** `createFileRoute("/tools/2048")` — the filename `tools.2048.tsx` is valid (numeric segment) and the path string must match exactly.
+## Technical Notes
 
-- **Types:** `Board = (number | null)[][]`, 4×4.
-- **Helpers:** `addTile` (90% 2 / 10% 4), `slideRow` (filter → merge adjacent equals → pad), `transpose`, `move(dir)` (rotate-to-left → slide → rotate-back), `canMove` (any empty cell OR any adjacent equal pair), `boardsEqual` (to skip illegal moves so no tile spawns when nothing moved).
-- **State:** `board`, `score`, `best` (lazy-init from `localStorage["2048-best"]`, SSR-guarded), `gameOver`, `won`.
-- **Controls:** `keydown` listener for arrow keys; `onTouchStart` / `onTouchEnd` on board for swipe (threshold ~20px, pick axis by larger |Δ|). Effect cleanup on unmount; deps include `board`/`score` so the latest closure is used.
-- **Rendering:** `grid grid-cols-4 gap-2` board with `aspect-square`, `max-w-sm`. Tiles use inline `TILE_COLORS` map (classic palette) with a fallback for values >2048. Header shows title + Score + Best chips.
-- **Game flow:** On every move, update score, persist new best, spawn new tile, set `won` once a 2048 appears (game keeps going), set `gameOver` when no moves remain. `New Game` button resets board and score, keeps best.
-- HowToUse + ToolSeoContent copy per the prompt.
-
-## Technical Details
-
-- **Route IDs:** filenames `tools.wordle.tsx` and `tools.2048.tsx` map to `createFileRoute("/tools/wordle")` and `createFileRoute("/tools/2048")`. `routeTree.gen.ts` is auto-regenerated — not edited by hand.
-- **SSR safety:** all `localStorage` reads wrapped in `typeof window !== "undefined"` checks (lazy-init form in `useState`).
-- **Design tokens:** chrome/text uses semantic tokens; game-specific colors (Wordle green/yellow, 2048 tile palette) are intentional brand-of-game colors and kept inline — these are the documented exception for "intentionally inverted UI elements".
-- **English-only:** every label, toast, FAQ, body paragraph in English.
-- **No new dependencies.**
+- `routeTree.gen.ts` is auto-regenerated by the TanStack Router Vite plugin — not edited by hand.
+- Route strings: `createFileRoute("/tools/tic-tac-toe")` and `createFileRoute("/tools/snake")` matching the filenames.
+- All `localStorage` access guarded for SSR.
+- Snake game-specific colors (green snake, red food, dark canvas bg) are inline brand-of-game colors — same documented exception used in Wordle/2048.
+- No new dependencies, no backend changes.
 
 ## Out of Scope
 
-- No edits to `src/routeTree.gen.ts` (auto-generated).
-- No changes to `tools.index.tsx` filter chip list (it currently shows `ai/video/image/audio/pdf/text` only — leaving as-is to match how `games` is already handled).
-- No new shared components, no backend, no analytics.
+- No edits to `routeTree.gen.ts`, `site-footer.tsx`, `index.tsx`, or `tools.index.tsx`.
+- No shared components, no analytics, no persistence beyond `localStorage` best score.

@@ -104,6 +104,8 @@ export const tools: Tool[] = [
   { slug: "2048", name: "2048", description: "Slide tiles and merge numbers to reach 2048. Simple rules, endless challenge.", category: "minigames", icon: Joystick, path: "/tools/2048" },
   { slug: "tic-tac-toe", name: "Tic Tac Toe", description: "Classic X and O game. Play against a friend or challenge the AI.", category: "minigames", icon: X, path: "/tools/tic-tac-toe" },
   { slug: "snake", name: "Snake", description: "Eat the food, grow longer, don't hit the walls. The classic arcade game!", category: "minigames", icon: Crosshair, path: "/tools/snake" },
+  { slug: "memory-match", name: "Memory Match", description: "Flip cards and find matching pairs. Train your memory with increasing difficulty!", category: "minigames", icon: LayoutGrid, path: "/tools/memory-match" },
+  { slug: "hangman", name: "Hangman", description: "Guess the hidden word letter by letter before the hangman is complete!", category: "minigames", icon: BookOpen, path: "/tools/hangman" },
 ];
 
 

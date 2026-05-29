@@ -46,7 +46,7 @@ const quickAccess = [
   { icon: FileText, label: "PDF & Documents", cat: "pdf" as const, color: categoryMeta.pdf.color },
   { icon: Type, label: "Text Tools", cat: "text" as const, color: categoryMeta.text.color },
   { icon: Wrench, label: "Utility Tools", cat: "utility" as const, color: categoryMeta.utility.color },
-  { icon: Gamepad2, label: "Games & Fun", cat: "games" as const, color: categoryMeta.games.color },
+  { icon: Gamepad2, label: "Game Tools", cat: "games" as const, color: categoryMeta.games.color },
 ];
 
 const categoryTaglines: Record<ToolCategory, string> = {

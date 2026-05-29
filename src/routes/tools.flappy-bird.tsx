@@ -175,6 +175,7 @@ function FlappyBirdPage() {
         p.passed = true;
         scoreRef.current += 1;
         setScore(scoreRef.current);
+        playSound("score");
       }
     });
 

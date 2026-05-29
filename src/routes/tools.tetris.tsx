@@ -410,6 +410,7 @@ function TetrisPage() {
         }
         case " ": {
           e.preventDefault();
+          playSound("tetrisDrop");
           let dropY = piece.y;
           while (!isColliding(boardRef.current, piece, 0, dropY - piece.y + 1)) dropY++;
           scoreRef.current += (dropY - piece.y) * 2;

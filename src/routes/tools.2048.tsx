@@ -130,6 +130,7 @@ function Game2048() {
   const [mounted, setMounted] = useState(false);
   useEffect(() => {
     setBoard(initialBoard());
+    setBest(loadBest());
     setMounted(true);
   }, []);
   const [score, setScore] = useState(0);

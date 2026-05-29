@@ -634,19 +634,35 @@ function ChessPage() {
     const moves = getLegalMoves(state);
     if (moves.length === 0) {
       if (isInCheck(state, state.turn)) {
-        setResult(state.turn === "w" ? "b" : "w");
+        const winner = state.turn === "w" ? "b" : "w";
+        setResult(winner);
+        if (winner === "w") playChord(["win", "success"]);
+        else playSound("lose");
       } else {
         setResult("draw");
+        playSound("fail");
       }
       setPhase("ended");
       return true;
     }
     if (state.halfMove >= 100) {
       setResult("draw");
+      playSound("fail");
       setPhase("ended");
       return true;
     }
     return false;
+  };
+
+  const playMoveSound = (state: GameState, move: Move, wasCapture: boolean, opponent: Color) => {
+    const piece = state.board[move.fromR][move.fromC];
+    const isCastle = piece?.type === "K" && Math.abs(move.toC - move.fromC) === 2;
+    if (isCastle) playSound("castle");
+    else if (wasCapture) playSound("capture");
+    else playSound("move");
+    // check sound shortly after
+    const next = applyMove(state, move);
+    if (isInCheck(next, opponent)) setTimeout(() => playSound("check"), 120);
   };
 
   const doMove = (move: Move) => {

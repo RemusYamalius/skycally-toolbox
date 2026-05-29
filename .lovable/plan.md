@@ -1,65 +1,43 @@
-# Add Games & Fun category + Random Team Maker
+## Plan: Add Truth or Dare & Dice Roller to Games & Fun
 
-## 1. `src/lib/tools.ts`
-- Add `Gamepad2` to lucide-react import (`Users` already imported).
-- Extend `ToolCategory` union with `"games"`.
-- Add `games: { label: "Games & Fun", color: "var(--violet-brand)", icon: "🎮" }` to `categoryMeta`.
-- Change `category` from `"utility"` to `"games"` for `spinning-wheel` and `role-spinner` entries.
-- Append new tool entry after `role-spinner`:
-  ```ts
-  { slug: "random-team-maker", name: "Random Team Maker", description: "Split any group of players into balanced random teams instantly.", category: "games", icon: Users, path: "/tools/random-team-maker" }
-  ```
+### 1. `src/lib/tools.ts`
+- Add `Flame` and `Dices` to the existing `lucide-react` import line.
+- Append two new entries to the `tools` array after `random-team-maker`:
+  - `truth-or-dare` → category `games`, icon `Flame`, path `/tools/truth-or-dare`
+  - `dice-roller` → category `games`, icon `Dices`, path `/tools/dice-roller`
 
-## 2. `src/components/site-footer.tsx`
-- Append `"games"` to `categoryOrder`.
+### 2. `src/routes/tools.truth-or-dare.tsx` (new)
+Mirror the structure of `tools.role-spinner.tsx`:
+- `createFileRoute("/tools/truth-or-dare")` with `head()` SEO meta (title, description, og tags).
+- Wrap UI in `ToolPageShell` → content → `HowToUse` → `ToolSeoContent` → `RelatedTools`.
+- Constants: `TRUTHS` (20 items) and `DARES` (20 items) as specified.
+- State: `mode`, `current`, `spinning`, `customTruths`, `customDares`, `useCustomOnly`, `showCustomize`.
+- Sections:
+  - **Mode selector**: two toggle buttons (Truth 🔥 / Dare 💀); clicking toggles inclusion, defaults to both selected. Internally normalized to `"both" | "truth" | "dare"`.
+  - **Spin area**: animated bottle div (CSS `@keyframes spin`, 1.5s) + large `Spin!` button with `Flame` icon, disabled while spinning.
+  - **Result card**: framer-motion scale+fade in, shows type badge (TRUTH/DARE) + question text + Spin Again button.
+  - **Customize panel**: `Collapsible` with two textareas/inputs to add custom truths and dares (list + add/remove), plus a `Switch` for "Use custom only".
+- `spin()` implements the timeout-based pick exactly as specified.
+- Uses semantic tokens only (`text-foreground`, `bg-card`, `border-border`, brand vars for accent color).
 
-## 3. `src/routes/index.tsx`
-- Add `Gamepad2` to lucide imports.
-- Add `{ icon: Gamepad2, label: "Games & Fun", cat: "games", color: categoryMeta.games.color }` to `quickAccess`.
-- Add `games: "Spinning wheels, role assignments, team makers and more party games."` to `categoryTaglines`.
-- Update `ALL_CATS` constant to include `"games"` (file uses `ALL_CATS`, not `allCats` — adapt the user's instruction accordingly).
+### 3. `src/routes/tools.dice-roller.tsx` (new)
+Same shell pattern:
+- `createFileRoute("/tools/dice-roller")` with SEO `head()`.
+- Constants: `DIE_SIDES`, `DICE_COLORS`.
+- State: `selected`, `modifier`, `results`, `history`, `rolling`.
+- Sections:
+  - **Dice selector**: 6 dice-type buttons (D4–D20). Selected state highlighted with `DICE_COLORS[die]`. Below each selected die, a `+`/`-` counter (clamped 1–10; 0 means unselected).
+  - **Modifier input**: small numeric input with `+`/`-` controls.
+  - **Roll button**: large primary button with 🎲 emoji; disabled while rolling.
+  - **Results grid**: animated cards (framer-motion bounce/scale) showing die label + value, tinted with `DICE_COLORS`. Total line below = sum + modifier. "Roll Again" button reuses config.
+  - **History**: last 5 roll summaries as small `Badge` chips.
+- `roll()` follows the spec (600ms delay, history capped at 5).
+- All colors via tokens + the inline `DICE_COLORS` map (allowed since die colors are intentional brand-ish accents per the spec).
 
-## 4. `src/routes/tools.random-team-maker.tsx` (new)
-Mirror structure of `tools.role-spinner.tsx`: same `Route` declaration, `Wheel` canvas component reused verbatim, `PALETTE`, `ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools`.
+### 4. Out of scope
+- No edits to `routeTree.gen.ts` (auto-generated).
+- No changes to footer, homepage, or other tool routes (Games category already wired up).
+- No new dependencies (framer-motion, lucide-react, shadcn primitives already available).
 
-State:
-- `phase: "setup" | "spin" | "done"`
-- `players: string[]` (defaults: Alice…Hannah, 8 names)
-- `playerInput: string`
-- `teamCount: 2|3|4|5` (default 2)
-- `balanced: boolean` (default true)
-- `teamNames: string[]` (auto "Team 1"…"Team N", inline editable; resync when count changes)
-- `editingTeamIdx: number | null`
-- `assignments: string[][]` (one array per team)
-- `queue: string[]` (shuffled players remaining to assign)
-- `nextTeamIdx: number` (rotation pointer; with `balanced` true → rotate 0,1,2…; with `balanced` false → pick random team each spin)
-- `rotation`, `spinning` (for wheel)
-
-Phase 1 — Setup (two-panel grid like role-spinner):
-- Left: Players panel with Input+Add, list with delete buttons (min 2 enforced), header "Players (N)".
-- Right: Teams panel — row of `2 3 4 5` buttons (active styled), preview text `~{Math.floor(players.length / teamCount)} players per team`, "Balanced teams" toggle (Switch), editable team name list (click name → input; blur/Enter commits).
-- "Make Teams!" button disabled when `players.length < 2` or `teamCount > players.length`.
-
-Phase 2 — Spin:
-- Single `Wheel` with `nameSegments` from `queue`.
-- Status line: `Assigning to: {teamNames[nextTeamIdx]} ({assignments[nextTeamIdx].length}/{targetCount} players)`.
-- "Spin" button → reuses `spin()` from role-spinner; on land: push picked player into `assignments[nextTeamIdx]`, drop from `queue`, advance `nextTeamIdx` (round-robin when balanced; random otherwise).
-- "Skip animation — assign all randomly" button → loops through remaining queue applying same assignment logic, then sets `phase="done"`.
-- When `queue.length === 0` after a spin → `phase="done"`.
-
-Phase 3 — Results:
-- Responsive grid (`sm:grid-cols-2 lg:grid-cols-3`) of team cards. Each card: colored header (color from PALETTE[i]), team name, divider, player list.
-- Buttons: "Shuffle Again" (re-shuffle players into new `assignments` keeping names/teamCount, jumps back to phase "done" with new result, no spin), "Start Over" (reset to "setup"), "Copy Results" (plaintext: `Team 1:\n  Alice\n  Bob\n\nTeam 2:\n…`).
-
-Helpers:
-- `shuffle<T>(arr)`: Fisher–Yates.
-- `distribute(players, k, balanced)`: returns `string[][]`. Balanced → shuffled, then round-robin assign by `i % k`. Unbalanced → shuffled, each player to random bucket.
-
-SEO content:
-- `HowToUse` steps: `["Enter all player names and choose how many teams you need.", "Hit Make Teams and watch the wheel assign each player randomly.", "Share the results or shuffle again for a different split."]`
-- `ToolSeoContent` with title/description/2 paragraphs/4 FAQs as specified.
-
-## Out of scope
-- No edits to `routeTree.gen.ts` beyond auto-regeneration.
-- No changes to other tool routes, hero, dark mode, or category colors.
-- No new dependencies.
+### Verification
+After implementation, confirm both routes render in preview, dice colors apply, and spin/roll animations trigger.

@@ -19,6 +19,7 @@ import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as ToolsWordleRouteImport } from './routes/tools.wordle'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
+import { Route as ToolsWordSearchRouteImport } from './routes/tools.word-search'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
 import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
@@ -146,6 +147,11 @@ const ToolsWordleRoute = ToolsWordleRouteImport.update({
 const ToolsWordToPdfRoute = ToolsWordToPdfRouteImport.update({
   id: '/tools/word-to-pdf',
   path: '/tools/word-to-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsWordSearchRoute = ToolsWordSearchRouteImport.update({
+  id: '/tools/word-search',
+  path: '/tools/word-search',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsWordCounterRoute = ToolsWordCounterRouteImport.update({
@@ -629,6 +635,7 @@ export interface FileRoutesByFullPath {
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
+  '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
   '/blog/': typeof BlogIndexRoute
@@ -719,6 +726,7 @@ export interface FileRoutesByTo {
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
+  '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
   '/blog': typeof BlogIndexRoute
@@ -810,6 +818,7 @@ export interface FileRoutesById {
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
+  '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
   '/blog/': typeof BlogIndexRoute
@@ -902,6 +911,7 @@ export interface FileRouteTypes {
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
     | '/tools/word-counter'
+    | '/tools/word-search'
     | '/tools/word-to-pdf'
     | '/tools/wordle'
     | '/blog/'
@@ -992,6 +1002,7 @@ export interface FileRouteTypes {
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
     | '/tools/word-counter'
+    | '/tools/word-search'
     | '/tools/word-to-pdf'
     | '/tools/wordle'
     | '/blog'
@@ -1082,6 +1093,7 @@ export interface FileRouteTypes {
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
     | '/tools/word-counter'
+    | '/tools/word-search'
     | '/tools/word-to-pdf'
     | '/tools/wordle'
     | '/blog/'
@@ -1173,6 +1185,7 @@ export interface RootRouteChildren {
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
   ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
+  ToolsWordSearchRoute: typeof ToolsWordSearchRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
   ToolsWordleRoute: typeof ToolsWordleRoute
   BlogIndexRoute: typeof BlogIndexRoute
@@ -1249,6 +1262,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/word-to-pdf'
       fullPath: '/tools/word-to-pdf'
       preLoaderRoute: typeof ToolsWordToPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/word-search': {
+      id: '/tools/word-search'
+      path: '/tools/word-search'
+      fullPath: '/tools/word-search'
+      preLoaderRoute: typeof ToolsWordSearchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/word-counter': {
@@ -1886,6 +1906,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
   ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,
+  ToolsWordSearchRoute: ToolsWordSearchRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
   ToolsWordleRoute: ToolsWordleRoute,
   BlogIndexRoute: BlogIndexRoute,

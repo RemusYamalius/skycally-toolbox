@@ -153,6 +153,7 @@ function TicTacToePage() {
     next[i] = mark;
     setBoard(next);
     setIsX((v) => !v);
+    playSound("click");
   }, [board, isX, winner, mode]);
 
   const newGame = useCallback(() => {

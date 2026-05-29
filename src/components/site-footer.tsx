@@ -3,7 +3,8 @@ import { Link } from "@tanstack/react-router";
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 import qrCodeImage from "@/assets/skycally-qrcode.webp";
 
-const categoryOrder: ToolCategory[] = ["ai", "video", "image", "audio", "pdf", "text", "utility"];
+const categoryOrder: ToolCategory[] = ["ai", "video", "image", "audio", "pdf", "text", "utility", "games"];
+
 
 export function SiteFooter() {
   return (

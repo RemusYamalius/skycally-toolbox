@@ -109,6 +109,7 @@ export const tools: Tool[] = [
   { slug: "hangman", name: "Hangman", description: "Guess the hidden word letter by letter before the hangman is complete!", category: "minigames", icon: BookOpen, path: "/tools/hangman" },
   { slug: "minesweeper", name: "Minesweeper", description: "Classic Minesweeper — uncover all safe cells without hitting a mine!", category: "minigames", icon: Bomb, path: "/tools/minesweeper" },
   { slug: "sudoku", name: "Sudoku", description: "Fill the 9×9 grid so every row, column and box contains digits 1–9.", category: "minigames", icon: Hash, path: "/tools/sudoku" },
+  { slug: "tetris", name: "Tetris", description: "Stack falling blocks and clear lines in the ultimate classic arcade game!", category: "minigames", icon: Layers, path: "/tools/tetris" },
 ];
 
 

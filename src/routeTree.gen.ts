@@ -31,6 +31,7 @@ import { Route as ToolsTruthOrDareRouteImport } from './routes/tools.truth-or-da
 import { Route as ToolsTipCalculatorRouteImport } from './routes/tools.tip-calculator'
 import { Route as ToolsTicTacToeRouteImport } from './routes/tools.tic-tac-toe'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
+import { Route as ToolsSudokuRouteImport } from './routes/tools.sudoku'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
@@ -204,6 +205,11 @@ const ToolsTicTacToeRoute = ToolsTicTacToeRouteImport.update({
 const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
   id: '/tools/text-to-speech',
   path: '/tools/text-to-speech',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSudokuRoute = ToolsSudokuRouteImport.update({
+  id: '/tools/sudoku',
+  path: '/tools/sudoku',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSplitPdfRoute = ToolsSplitPdfRouteImport.update({
@@ -603,6 +609,7 @@ export interface FileRoutesByFullPath {
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
+  '/tools/sudoku': typeof ToolsSudokuRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
@@ -691,6 +698,7 @@ export interface FileRoutesByTo {
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
+  '/tools/sudoku': typeof ToolsSudokuRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
@@ -780,6 +788,7 @@ export interface FileRoutesById {
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
+  '/tools/sudoku': typeof ToolsSudokuRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
@@ -870,6 +879,7 @@ export interface FileRouteTypes {
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
+    | '/tools/sudoku'
     | '/tools/text-to-speech'
     | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
@@ -958,6 +968,7 @@ export interface FileRouteTypes {
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
+    | '/tools/sudoku'
     | '/tools/text-to-speech'
     | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
@@ -1046,6 +1057,7 @@ export interface FileRouteTypes {
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
+    | '/tools/sudoku'
     | '/tools/text-to-speech'
     | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
@@ -1135,6 +1147,7 @@ export interface RootRouteChildren {
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
+  ToolsSudokuRoute: typeof ToolsSudokuRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsTicTacToeRoute: typeof ToolsTicTacToeRoute
   ToolsTipCalculatorRoute: typeof ToolsTipCalculatorRoute
@@ -1307,6 +1320,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/text-to-speech'
       fullPath: '/tools/text-to-speech'
       preLoaderRoute: typeof ToolsTextToSpeechRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/sudoku': {
+      id: '/tools/sudoku'
+      path: '/tools/sudoku'
+      fullPath: '/tools/sudoku'
+      preLoaderRoute: typeof ToolsSudokuRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/split-pdf': {
@@ -1832,6 +1852,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
+  ToolsSudokuRoute: ToolsSudokuRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsTicTacToeRoute: ToolsTicTacToeRoute,
   ToolsTipCalculatorRoute: ToolsTipCalculatorRoute,

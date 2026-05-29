@@ -91,7 +91,7 @@ function ExtractAudio() {
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => !file && inputRef.current?.click()}
-          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
+          className="border-2 border-dashed border-border hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
         >
           <input
             ref={inputRef}
@@ -107,8 +107,8 @@ function ExtractAudio() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
               </div>
-              <p className="text-gray-200 font-medium text-sm">{file.name}</p>
-              <p className="text-gray-500 text-xs">{formatSize(file.size)}</p>
+              <p className="text-foreground font-medium text-sm">{file.name}</p>
+              <p className="text-muted-foreground text-xs">{formatSize(file.size)}</p>
               <button
                 onClick={(e) => {
                   e.stopPropagation();
@@ -116,40 +116,40 @@ function ExtractAudio() {
                   setDone(false);
                   setAudioSize(null);
                 }}
-                className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+                className="text-xs text-muted-foreground hover:text-red-400 transition-colors"
               >
                 Remove
               </button>
             </div>
           ) : (
             <div className="space-y-2 py-4">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-[#1e2d4a] flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
+                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
               </div>
-              <p className="text-gray-500 text-sm">Drop a video or click to browse</p>
-              <p className="text-gray-700 text-xs">MP4, MOV, AVI, MKV, WEBM</p>
+              <p className="text-muted-foreground text-sm">Drop a video or click to browse</p>
+              <p className="text-muted-foreground text-xs">MP4, MOV, AVI, MKV, WEBM</p>
             </div>
           )}
         </div>
 
         {file && (
-          <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-5">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Output Format</p>
+          <div className="bg-[#0d1526] border border-border rounded-2xl p-5">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">Output Format</p>
             <div className="grid grid-cols-3 gap-3">
               {(Object.keys(FORMAT_INFO) as Format[]).map((f) => (
                 <button
                   key={f}
                   onClick={() => setFormat(f)}
                   className={`p-3 rounded-xl border text-left transition-all ${
-                    format === f ? "border-cyan-500 bg-cyan-500/10" : "border-[#1e2d4a] hover:border-gray-500"
+                    format === f ? "border-cyan-500 bg-cyan-500/10" : "border-border hover:border-border"
                   }`}
                 >
-                  <p className={`text-sm font-medium ${format === f ? FORMAT_INFO[f].color : "text-gray-400"}`}>
+                  <p className={`text-sm font-medium ${format === f ? FORMAT_INFO[f].color : "text-muted-foreground"}`}>
                     {FORMAT_INFO[f].label}
                   </p>
-                  <p className="text-xs text-gray-600 mt-0.5">{FORMAT_INFO[f].desc}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{FORMAT_INFO[f].desc}</p>
                 </button>
               ))}
             </div>
@@ -172,11 +172,11 @@ function ExtractAudio() {
             </div>
             <div className="grid grid-cols-2 gap-2 text-center">
               <div>
-                <p className="text-xs text-gray-500">Video size</p>
-                <p className="text-sm font-mono text-gray-300">{formatSize(file.size)}</p>
+                <p className="text-xs text-muted-foreground">Video size</p>
+                <p className="text-sm font-mono text-foreground">{formatSize(file.size)}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">Audio size</p>
+                <p className="text-xs text-muted-foreground">Audio size</p>
                 <p className="text-sm font-mono text-cyan-400">{formatSize(audioSize)}</p>
               </div>
             </div>

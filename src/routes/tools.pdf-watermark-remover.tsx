@@ -522,7 +522,7 @@ function PdfWatermarkRemover() {
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => !file && inputRef.current?.click()}
-          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
+          className="border-2 border-dashed border-border hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
         >
           <input
             ref={inputRef}
@@ -538,33 +538,33 @@ function PdfWatermarkRemover() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-gray-200 font-medium text-sm">{file.name}</p>
-              <p className="text-gray-500 text-xs">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+              <p className="text-foreground font-medium text-sm">{file.name}</p>
+              <p className="text-muted-foreground text-xs">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
               <button
                 onClick={(e) => { e.stopPropagation(); reset(); }}
-                className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+                className="text-xs text-muted-foreground hover:text-red-400 transition-colors"
               >
                 Remove
               </button>
             </div>
           ) : (
             <div className="space-y-2 py-4">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-[#1e2d4a] flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
+                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-gray-500 text-sm">Drop a PDF file here or click to select</p>
+              <p className="text-muted-foreground text-sm">Drop a PDF file here or click to select</p>
             </div>
           )}
         </div>
 
         {busy && (
-          <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4 space-y-2">
-            <p className="text-sm text-gray-300">
+          <div className="bg-[#0d1526] border border-border rounded-2xl p-4 space-y-2">
+            <p className="text-sm text-foreground">
               {stage === "advanced" ? "Processing in advanced mode..." : "Removing watermark..."}
             </p>
-            <div className="h-2 rounded-full bg-[#0a0f1e] overflow-hidden">
+            <div className="h-2 rounded-full bg-background overflow-hidden">
               <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all" style={{ width: `${progress}%` }} />
             </div>
           </div>
@@ -600,7 +600,7 @@ function PdfWatermarkRemover() {
               </button>
               <button
                 onClick={() => setAskAdvanced(false)}
-                className="px-4 py-2 rounded-xl border border-[#1e2d4a] text-gray-400 hover:text-gray-200 text-sm transition-all"
+                className="px-4 py-2 rounded-xl border border-border text-muted-foreground hover:text-foreground text-sm transition-all"
               >
                 Cancel
               </button>

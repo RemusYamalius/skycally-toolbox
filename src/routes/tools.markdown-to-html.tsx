@@ -85,20 +85,20 @@ function MarkdownToHtml() {
         <div className="flex gap-3 flex-wrap">
           <button
             onClick={() => setMarkdown(SAMPLE)}
-            className="px-4 py-2 rounded-xl border border-[#1e2d4a] text-gray-500 hover:text-gray-300 hover:border-gray-500 text-sm transition-all"
+            className="px-4 py-2 rounded-xl border border-border text-muted-foreground hover:text-foreground hover:border-border text-sm transition-all"
           >
             Load Sample
           </button>
           <button
             onClick={clear}
-            className="px-4 py-2 rounded-xl border border-[#1e2d4a] text-gray-500 hover:text-red-400 hover:border-red-500/30 text-sm transition-all"
+            className="px-4 py-2 rounded-xl border border-border text-muted-foreground hover:text-red-400 hover:border-red-500/30 text-sm transition-all"
           >
             Clear
           </button>
           <div className="ml-auto flex gap-2">
             <button
               onClick={copy}
-              className="px-4 py-2 rounded-xl border border-[#1e2d4a] text-gray-400 hover:text-cyan-400 hover:border-cyan-500/50 text-sm transition-all"
+              className="px-4 py-2 rounded-xl border border-border text-muted-foreground hover:text-cyan-400 hover:border-cyan-500/50 text-sm transition-all"
             >
               {copied ? "✓ Copied" : "Copy HTML"}
             </button>
@@ -112,19 +112,19 @@ function MarkdownToHtml() {
         </div>
 
         <div className="grid grid-cols-1 md:grid-cols-2 gap-4">
-          <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4 flex flex-col">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Markdown</p>
+          <div className="bg-[#0d1526] border border-border rounded-2xl p-4 flex flex-col">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">Markdown</p>
             <textarea
               value={markdown}
               onChange={(e) => setMarkdown(e.target.value)}
-              className="flex-1 bg-transparent text-gray-300 placeholder-gray-700 resize-none outline-none font-mono text-sm leading-relaxed min-h-[400px]"
+              className="flex-1 bg-transparent text-foreground placeholder:text-muted-foreground resize-none outline-none font-mono text-sm leading-relaxed min-h-[400px]"
               placeholder="Type your Markdown here..."
               spellCheck={false}
             />
           </div>
 
-          <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4 flex flex-col">
-            <div className="flex gap-1 mb-4 bg-[#0a0f1e] rounded-xl p-1 w-fit">
+          <div className="bg-[#0d1526] border border-border rounded-2xl p-4 flex flex-col">
+            <div className="flex gap-1 mb-4 bg-background rounded-xl p-1 w-fit">
               {(["preview", "html"] as const).map((t) => (
                 <button
                   key={t}
@@ -132,7 +132,7 @@ function MarkdownToHtml() {
                   className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
                     tab === t
                       ? "bg-cyan-500 text-black"
-                      : "text-gray-500 hover:text-gray-300"
+                      : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {t === "preview" ? "Preview" : "HTML"}
@@ -142,14 +142,14 @@ function MarkdownToHtml() {
 
             {tab === "preview" ? (
               <div
-                className="prose prose-invert prose-sm max-w-none flex-1 overflow-auto text-gray-300 leading-relaxed
+                className="prose prose-invert prose-sm max-w-none flex-1 overflow-auto text-foreground leading-relaxed
                   [&_h1]:text-cyan-300 [&_h1]:text-2xl [&_h1]:font-bold [&_h1]:mb-3
                   [&_h2]:text-cyan-400 [&_h2]:text-xl [&_h2]:font-semibold [&_h2]:mb-2
                   [&_h3]:text-cyan-500 [&_h3]:text-lg [&_h3]:font-medium [&_h3]:mb-2
-                  [&_strong]:text-white [&_em]:text-gray-400
-                  [&_code]:bg-[#0a0f1e] [&_code]:text-cyan-300 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono
-                  [&_blockquote]:border-l-2 [&_blockquote]:border-cyan-500 [&_blockquote]:pl-4 [&_blockquote]:text-gray-500 [&_blockquote]:italic
-                  [&_hr]:border-[#1e2d4a] [&_hr]:my-4
+                  [&_strong]:text-white [&_em]:text-muted-foreground
+                  [&_code]:bg-background [&_code]:text-cyan-300 [&_code]:px-1.5 [&_code]:py-0.5 [&_code]:rounded [&_code]:text-xs [&_code]:font-mono
+                  [&_blockquote]:border-l-2 [&_blockquote]:border-cyan-500 [&_blockquote]:pl-4 [&_blockquote]:text-muted-foreground [&_blockquote]:italic
+                  [&_hr]:border-border [&_hr]:my-4
                   [&_a]:text-cyan-400 [&_a]:underline
                   [&_li]:ml-4 [&_li]:list-disc"
                 dangerouslySetInnerHTML={{ __html: html }}

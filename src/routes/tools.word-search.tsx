@@ -388,7 +388,7 @@ function WordSearchPage() {
                   "px-3 py-1.5 rounded-lg text-xs font-bold text-center border transition-all",
                   pw.found
                     ? cn(wordColors[pw.word], "border-transparent line-through opacity-70")
-                    : "bg-card border-border text-foreground"
+                    : "bg-card border-border text-foreground dark:bg-card dark:text-foreground"
                 )}
               >
                 {pw.found ? "✓ " : ""}{pw.word}

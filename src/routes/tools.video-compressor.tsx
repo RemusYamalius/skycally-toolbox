@@ -107,7 +107,7 @@ function VideoCompressor() {
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => !file && inputRef.current?.click()}
-          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
+          className="border-2 border-dashed border-border hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
         >
           <input
             ref={inputRef} type="file" accept="video/*" className="hidden"
@@ -120,31 +120,31 @@ function VideoCompressor() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
                 </svg>
               </div>
-              <p className="text-gray-200 font-medium text-sm">{file.name}</p>
-              <p className="text-gray-500 text-xs">{formatSize(file.size)}</p>
+              <p className="text-foreground font-medium text-sm">{file.name}</p>
+              <p className="text-muted-foreground text-xs">{formatSize(file.size)}</p>
               <button
                 onClick={(e) => { e.stopPropagation(); setFile(null); setDone(false); setCompressedSize(null); }}
-                className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+                className="text-xs text-muted-foreground hover:text-red-400 transition-colors"
               >
                 Remove
               </button>
             </div>
           ) : (
             <div className="space-y-2 py-4">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-[#1e2d4a] flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
+                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
                 </svg>
               </div>
-              <p className="text-gray-500 text-sm">Drop a video or click to browse</p>
-              <p className="text-gray-700 text-xs">MP4, MOV, AVI, MKV, WEBM</p>
+              <p className="text-muted-foreground text-sm">Drop a video or click to browse</p>
+              <p className="text-muted-foreground text-xs">MP4, MOV, AVI, MKV, WEBM</p>
             </div>
           )}
         </div>
 
         {file && (
-          <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-5">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Compression Quality</p>
+          <div className="bg-[#0d1526] border border-border rounded-2xl p-5">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">Compression Quality</p>
             <div className="grid grid-cols-3 gap-3">
               {(Object.keys(QUALITY_INFO) as Quality[]).map((q) => (
                 <button
@@ -153,13 +153,13 @@ function VideoCompressor() {
                   className={`p-3 rounded-xl border text-left transition-all ${
                     quality === q
                       ? "border-cyan-500 bg-cyan-500/10"
-                      : "border-[#1e2d4a] hover:border-gray-500"
+                      : "border-border hover:border-border"
                   }`}
                 >
-                  <p className={`text-sm font-medium ${quality === q ? QUALITY_INFO[q].color : "text-gray-400"}`}>
+                  <p className={`text-sm font-medium ${quality === q ? QUALITY_INFO[q].color : "text-muted-foreground"}`}>
                     {QUALITY_INFO[q].label}
                   </p>
-                  <p className="text-xs text-gray-600 mt-0.5">{QUALITY_INFO[q].desc}</p>
+                  <p className="text-xs text-muted-foreground mt-0.5">{QUALITY_INFO[q].desc}</p>
                 </button>
               ))}
             </div>
@@ -182,15 +182,15 @@ function VideoCompressor() {
             </div>
             <div className="grid grid-cols-3 gap-2 text-center">
               <div>
-                <p className="text-xs text-gray-500">Original</p>
-                <p className="text-sm font-mono text-gray-300">{formatSize(file.size)}</p>
+                <p className="text-xs text-muted-foreground">Original</p>
+                <p className="text-sm font-mono text-foreground">{formatSize(file.size)}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">Compressed</p>
+                <p className="text-xs text-muted-foreground">Compressed</p>
                 <p className="text-sm font-mono text-cyan-400">{formatSize(compressedSize)}</p>
               </div>
               <div>
-                <p className="text-xs text-gray-500">Saved</p>
+                <p className="text-xs text-muted-foreground">Saved</p>
                 <p className="text-sm font-mono text-green-400">{savings}%</p>
               </div>
             </div>

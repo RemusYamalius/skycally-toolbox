@@ -89,7 +89,7 @@ function AudioConverter() {
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => !file && inputRef.current?.click()}
-          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
+          className="border-2 border-dashed border-border hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
         >
           <input
             ref={inputRef} type="file"
@@ -104,34 +104,34 @@ function AudioConverter() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
               </div>
-              <p className="text-gray-200 font-medium text-sm">{file.name}</p>
-              <p className="text-gray-500 text-xs">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
+              <p className="text-foreground font-medium text-sm">{file.name}</p>
+              <p className="text-muted-foreground text-xs">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
               <button
                 onClick={(e) => { e.stopPropagation(); setFile(null); setDone(false); }}
-                className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+                className="text-xs text-muted-foreground hover:text-red-400 transition-colors"
               >
                 Remove
               </button>
             </div>
           ) : (
             <div className="space-y-2 py-4">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-[#1e2d4a] flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
+                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
                 </svg>
               </div>
-              <p className="text-gray-500 text-sm">Drop an audio file or click to browse</p>
-              <p className="text-gray-700 text-xs">MP3, WAV, OGG, AAC, FLAC, M4A</p>
+              <p className="text-muted-foreground text-sm">Drop an audio file or click to browse</p>
+              <p className="text-muted-foreground text-xs">MP3, WAV, OGG, AAC, FLAC, M4A</p>
             </div>
           )}
         </div>
 
         {file && (
-          <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-5 space-y-3">
+          <div className="bg-[#0d1526] border border-border rounded-2xl p-5 space-y-3">
             <div className="flex items-center gap-2 mb-1">
-              <span className="text-xs text-gray-500 uppercase tracking-wider">Convert to</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">Convert to</span>
               {currentExt && (
-                <span className="text-xs font-mono text-gray-600">
+                <span className="text-xs font-mono text-muted-foreground">
                   .{currentExt} →
                 </span>
               )}
@@ -146,15 +146,15 @@ function AudioConverter() {
                     format === f
                       ? "border-cyan-500 bg-cyan-500/10 text-cyan-300"
                       : f === currentExt
-                      ? "border-[#1e2d4a] text-gray-700 cursor-not-allowed"
-                      : "border-[#1e2d4a] text-gray-500 hover:border-gray-500 hover:text-gray-300"
+                      ? "border-border text-muted-foreground cursor-not-allowed"
+                      : "border-border text-muted-foreground hover:border-border hover:text-foreground"
                   }`}
                 >
                   .{f}
                 </button>
               ))}
             </div>
-            <p className="text-xs text-gray-600">{FORMAT_INFO[format]}</p>
+            <p className="text-xs text-muted-foreground">{FORMAT_INFO[format]}</p>
           </div>
         )}
 

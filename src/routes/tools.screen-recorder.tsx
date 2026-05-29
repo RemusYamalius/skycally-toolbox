@@ -101,14 +101,14 @@ function ScreenRecorder() {
             Screen recording is not supported on mobile browsers. Please use a desktop browser (Chrome or Edge).
           </div>
         )}
-        <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-8 text-center space-y-6">
+        <div className="bg-[#0d1526] border border-border rounded-2xl p-8 text-center space-y-6">
           <div className="space-y-3">
             <div className={`w-20 h-20 mx-auto rounded-full flex items-center justify-center border-2 transition-all ${
               state === "recording"
                 ? "border-red-500 bg-red-500/10 animate-pulse"
                 : state === "stopped"
                 ? "border-green-500 bg-green-500/10"
-                : "border-[#1e2d4a] bg-[#0a0f1e]"
+                : "border-border bg-background"
             }`}>
               {state === "recording" ? (
                 <div className="w-5 h-5 bg-red-500 rounded-sm" />
@@ -117,13 +117,13 @@ function ScreenRecorder() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M5 13l4 4L19 7" />
                 </svg>
               ) : (
-                <svg className="w-8 h-8 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                <svg className="w-8 h-8 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15 10l4.553-2.276A1 1 0 0121 8.618v6.764a1 1 0 01-1.447.894L15 14M3 8a2 2 0 012-2h8a2 2 0 012 2v8a2 2 0 01-2 2H5a2 2 0 01-2-2V8z" />
                 </svg>
               )}
             </div>
             <div>
-              <p className="text-lg font-semibold text-gray-200">
+              <p className="text-lg font-semibold text-foreground">
                 {state === "idle" && "Ready to Record"}
                 {state === "recording" && "Recording..."}
                 {state === "stopped" && "Recording Complete"}
@@ -134,7 +134,7 @@ function ScreenRecorder() {
                 </p>
               )}
               {state === "idle" && (
-                <p className="text-gray-600 text-sm mt-1">
+                <p className="text-muted-foreground text-sm mt-1">
                   Captures screen + audio • Runs entirely in browser
                 </p>
               )}
@@ -174,7 +174,7 @@ function ScreenRecorder() {
                 </button>
                 <button
                   onClick={reset}
-                  className="w-full py-3 rounded-2xl border border-[#1e2d4a] text-gray-500 hover:text-gray-300 hover:border-gray-500 text-sm transition-all"
+                  className="w-full py-3 rounded-2xl border border-border text-muted-foreground hover:text-foreground hover:border-border text-sm transition-all"
                 >
                   Record Again
                 </button>
@@ -184,15 +184,15 @@ function ScreenRecorder() {
         </div>
 
         {videoUrl && (
-          <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4 space-y-3">
-            <p className="text-xs text-gray-500 uppercase tracking-wider">Preview</p>
+          <div className="bg-[#0d1526] border border-border rounded-2xl p-4 space-y-3">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider">Preview</p>
             <video
               ref={videoRef}
               src={videoUrl}
               controls
               className="w-full rounded-xl max-h-64 bg-black"
             />
-            <p className="text-xs text-gray-600 text-center">
+            <p className="text-xs text-muted-foreground text-center">
               Duration: {formatTime(duration)}
             </p>
           </div>
@@ -207,11 +207,11 @@ function ScreenRecorder() {
             ].map((item) => (
               <div
                 key={item.label}
-                className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4 text-center"
+                className="bg-[#0d1526] border border-border rounded-2xl p-4 text-center"
               >
                 <p className="text-2xl mb-1">{item.icon}</p>
-                <p className="text-xs font-medium text-gray-300">{item.label}</p>
-                <p className="text-xs text-gray-600 mt-0.5">{item.desc}</p>
+                <p className="text-xs font-medium text-foreground">{item.label}</p>
+                <p className="text-xs text-muted-foreground mt-0.5">{item.desc}</p>
               </div>
             ))}
           </div>

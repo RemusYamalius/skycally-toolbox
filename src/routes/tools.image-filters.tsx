@@ -71,7 +71,7 @@ function ImageFilters() {
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => !preview && inputRef.current?.click()}
-          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-6 text-center cursor-pointer transition-all"
+          className="border-2 border-dashed border-border hover:border-cyan-500/50 rounded-2xl p-6 text-center cursor-pointer transition-all"
         >
           <input
             ref={inputRef}
@@ -91,27 +91,27 @@ function ImageFilters() {
               />
               <button
                 onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
-                className="text-xs text-gray-600 hover:text-cyan-400 transition-colors"
+                className="text-xs text-muted-foreground hover:text-cyan-400 transition-colors"
               >
                 Change image
               </button>
             </div>
           ) : (
             <div className="space-y-2 py-6">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-[#1e2d4a] flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
+                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <p className="text-gray-500 text-sm">Drop an image or click to browse</p>
+              <p className="text-muted-foreground text-sm">Drop an image or click to browse</p>
             </div>
           )}
         </div>
 
         {/* Filters Row */}
         {preview && (
-          <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4">
-            <p className="text-xs text-gray-500 uppercase tracking-wider mb-3">Choose Filter</p>
+          <div className="bg-[#0d1526] border border-border rounded-2xl p-4">
+            <p className="text-xs text-muted-foreground uppercase tracking-wider mb-3">Choose Filter</p>
             <div className="flex gap-3 overflow-x-auto pb-2">
               {FILTERS.map((f, i) => (
                 <button
@@ -131,7 +131,7 @@ function ImageFilters() {
                       style={{ filter: f.style === "none" ? undefined : f.style }}
                     />
                   </div>
-                  <span className={`text-xs ${selected === i ? "text-cyan-400" : "text-gray-600"}`}>
+                  <span className={`text-xs ${selected === i ? "text-cyan-400" : "text-muted-foreground"}`}>
                     {f.name}
                   </span>
                 </button>

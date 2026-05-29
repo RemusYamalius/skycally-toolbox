@@ -111,7 +111,7 @@ function SplitPdf() {
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => !file && inputRef.current?.click()}
-          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
+          className="border-2 border-dashed border-border hover:border-cyan-500/50 rounded-2xl p-8 text-center cursor-pointer transition-all"
         >
           <input
             ref={inputRef} type="file" accept=".pdf" className="hidden"
@@ -124,41 +124,41 @@ function SplitPdf() {
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-gray-200 font-medium text-sm">{file.name}</p>
-              <p className="text-gray-500 text-xs">
+              <p className="text-foreground font-medium text-sm">{file.name}</p>
+              <p className="text-muted-foreground text-xs">
                 {(file.size / 1024 / 1024).toFixed(2)} MB
                 {totalPages && ` • ${totalPages} pages`}
               </p>
               <button
                 onClick={(e) => { e.stopPropagation(); reset(); }}
-                className="text-xs text-gray-600 hover:text-red-400 transition-colors"
+                className="text-xs text-muted-foreground hover:text-red-400 transition-colors"
               >
                 Remove
               </button>
             </div>
           ) : (
             <div className="space-y-2 py-4">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-[#1e2d4a] flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
+                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                 </svg>
               </div>
-              <p className="text-gray-500 text-sm">Drop a PDF or click to browse</p>
+              <p className="text-muted-foreground text-sm">Drop a PDF or click to browse</p>
             </div>
           )}
         </div>
 
         {file && (
-          <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-5 space-y-4">
+          <div className="bg-[#0d1526] border border-border rounded-2xl p-5 space-y-4">
             <div>
-              <label className="text-xs text-gray-500 uppercase tracking-wider block mb-2">
+              <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">
                 Pages to extract
               </label>
               <input
                 value={pages}
                 onChange={(e) => setPages(e.target.value)}
                 placeholder="e.g. 1,3,5 or 1-4 or 2-5,8"
-                className="w-full bg-[#0a0f1e] border border-[#1e2d4a] rounded-xl px-4 py-2.5 text-sm text-gray-200 placeholder-gray-700 outline-none focus:border-cyan-500/50 transition-colors font-mono"
+                className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground placeholder:text-muted-foreground outline-none focus:border-cyan-500/50 transition-colors font-mono"
               />
             </div>
             <div className="flex flex-wrap gap-2">
@@ -166,14 +166,14 @@ function SplitPdf() {
                 <button
                   key={ex}
                   onClick={() => setPages(ex)}
-                  className="px-3 py-1 rounded-lg border border-[#1e2d4a] text-xs text-gray-500 hover:border-cyan-500/50 hover:text-cyan-400 transition-all font-mono"
+                  className="px-3 py-1 rounded-lg border border-border text-xs text-muted-foreground hover:border-cyan-500/50 hover:text-cyan-400 transition-all font-mono"
                 >
                   {ex}
                 </button>
               ))}
             </div>
-            <p className="text-xs text-gray-600">
-              Use commas for individual pages, hyphens for ranges. Example: <span className="text-gray-500 font-mono">1-3,5,7-9</span>
+            <p className="text-xs text-muted-foreground">
+              Use commas for individual pages, hyphens for ranges. Example: <span className="text-muted-foreground font-mono">1-3,5,7-9</span>
             </p>
           </div>
         )}

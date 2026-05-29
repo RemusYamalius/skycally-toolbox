@@ -109,7 +109,7 @@ function AddWatermark() {
           onDrop={onDrop}
           onDragOver={(e) => e.preventDefault()}
           onClick={() => !preview && inputRef.current?.click()}
-          className="border-2 border-dashed border-[#1e2d4a] hover:border-cyan-500/50 rounded-2xl p-6 text-center cursor-pointer transition-all"
+          className="border-2 border-dashed border-border hover:border-cyan-500/50 rounded-2xl p-6 text-center cursor-pointer transition-all"
         >
           <input
             ref={inputRef} type="file" accept="image/*" className="hidden"
@@ -123,19 +123,19 @@ function AddWatermark() {
               />
               <button
                 onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
-                className="text-xs text-gray-600 hover:text-cyan-400 transition-colors"
+                className="text-xs text-muted-foreground hover:text-cyan-400 transition-colors"
               >
                 Change image
               </button>
             </div>
           ) : (
             <div className="py-8 space-y-2">
-              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-[#1e2d4a] flex items-center justify-center">
-                <svg className="w-6 h-6 text-gray-600" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+              <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
+                <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
                   <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z" />
                 </svg>
               </div>
-              <p className="text-gray-500 text-sm">Drop an image or click to browse</p>
+              <p className="text-muted-foreground text-sm">Drop an image or click to browse</p>
             </div>
           )}
         </div>
@@ -143,13 +143,13 @@ function AddWatermark() {
         {preview && (
           <>
             {/* Watermark Text */}
-            <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4 space-y-4">
+            <div className="bg-[#0d1526] border border-border rounded-2xl p-4 space-y-4">
               <div>
-                <label className="text-xs text-gray-500 uppercase tracking-wider block mb-2">Watermark Text</label>
+                <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-2">Watermark Text</label>
                 <input
                   value={text}
                   onChange={(e) => { setText(e.target.value); setResult(""); }}
-                  className="w-full bg-[#0a0f1e] border border-[#1e2d4a] rounded-xl px-4 py-2.5 text-sm text-gray-200 outline-none focus:border-cyan-500/50 transition-colors"
+                  className="w-full bg-background border border-border rounded-xl px-4 py-2.5 text-sm text-foreground outline-none focus:border-cyan-500/50 transition-colors"
                   placeholder="Your watermark..."
                 />
               </div>
@@ -157,7 +157,7 @@ function AddWatermark() {
               {/* Font Size */}
               <div>
                 <div className="flex justify-between mb-2">
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Font Size</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider">Font Size</label>
                   <span className="text-cyan-400 font-mono text-xs">{fontSize}px</span>
                 </div>
                 <input
@@ -170,7 +170,7 @@ function AddWatermark() {
               {/* Opacity */}
               <div>
                 <div className="flex justify-between mb-2">
-                  <label className="text-xs text-gray-500 uppercase tracking-wider">Opacity</label>
+                  <label className="text-xs text-muted-foreground uppercase tracking-wider">Opacity</label>
                   <span className="text-cyan-400 font-mono text-xs">{opacity}%</span>
                 </div>
                 <input
@@ -182,19 +182,19 @@ function AddWatermark() {
 
               {/* Color */}
               <div className="flex items-center gap-3">
-                <label className="text-xs text-gray-500 uppercase tracking-wider">Color</label>
+                <label className="text-xs text-muted-foreground uppercase tracking-wider">Color</label>
                 <input
                   type="color" value={color}
                   onChange={(e) => { setColor(e.target.value); setResult(""); }}
-                  className="w-10 h-10 rounded-xl border border-[#1e2d4a] bg-transparent cursor-pointer"
+                  className="w-10 h-10 rounded-xl border border-border bg-transparent cursor-pointer"
                 />
-                <span className="font-mono text-sm text-gray-400">{color}</span>
+                <span className="font-mono text-sm text-muted-foreground">{color}</span>
               </div>
             </div>
 
             {/* Position Grid */}
-            <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4">
-              <label className="text-xs text-gray-500 uppercase tracking-wider block mb-3">Position</label>
+            <div className="bg-[#0d1526] border border-border rounded-2xl p-4">
+              <label className="text-xs text-muted-foreground uppercase tracking-wider block mb-3">Position</label>
               <div className="grid grid-cols-3 gap-2 max-w-[160px]">
                 {POSITIONS.map((p) => (
                   <button
@@ -203,7 +203,7 @@ function AddWatermark() {
                     className={`h-10 rounded-xl text-lg transition-all ${
                       position === p.value
                         ? "bg-cyan-500/20 border border-cyan-500 text-cyan-400"
-                        : "border border-[#1e2d4a] text-gray-600 hover:border-gray-500 hover:text-gray-400"
+                        : "border border-border text-muted-foreground hover:border-border hover:text-muted-foreground"
                     }`}
                   >
                     {p.label}
@@ -222,8 +222,8 @@ function AddWatermark() {
 
             {/* Result */}
             {result && (
-              <div className="bg-[#0d1526] border border-[#1e2d4a] rounded-2xl p-4 space-y-3">
-                <p className="text-xs text-gray-500 uppercase tracking-wider">Result</p>
+              <div className="bg-[#0d1526] border border-border rounded-2xl p-4 space-y-3">
+                <p className="text-xs text-muted-foreground uppercase tracking-wider">Result</p>
                 <img src={result} alt="Watermarked" className="max-h-64 mx-auto rounded-xl object-contain" />
                 <button
                   onClick={download}

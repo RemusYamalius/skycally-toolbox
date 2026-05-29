@@ -91,13 +91,20 @@ function HangmanPage() {
       const wordSet = new Set(word.split(""));
       const allFound = [...wordSet].every((l) => next.has(l));
       const wrong = [...next].filter((l) => !word.includes(l)).length;
+      const isCorrect = word.includes(letter);
 
       if (allFound) {
         setPhase("won");
         setStreak((s) => s + 1);
+        playChord(["success", "win"]);
       } else if (wrong >= MAX_WRONG) {
         setPhase("lost");
         setStreak(0);
+        playSound("fail");
+      } else if (isCorrect) {
+        playSound("click");
+      } else {
+        playSound("wrong");
       }
     },
     [phase, guessed, word],

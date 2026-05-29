@@ -233,8 +233,10 @@ function FlappyBirdPage() {
   const flap = () => {
     if (phaseRef.current === "playing") {
       birdRef.current.vy = FLAP_FORCE;
+      playSound("flap");
     } else {
       startGame();
+      playSound("flap");
     }
   };
 

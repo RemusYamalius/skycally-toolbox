@@ -87,6 +87,7 @@ import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-p
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
+import { Route as ToolsChessRouteImport } from './routes/tools.chess'
 import { Route as ToolsBusinessCardGeneratorRouteImport } from './routes/tools.business-card-generator'
 import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calculator'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
@@ -492,6 +493,11 @@ const ToolsCollageMakerRoute = ToolsCollageMakerRouteImport.update({
   path: '/tools/collage-maker',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsChessRoute = ToolsChessRouteImport.update({
+  id: '/tools/chess',
+  path: '/tools/chess',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsBusinessCardGeneratorRoute =
   ToolsBusinessCardGeneratorRouteImport.update({
     id: '/tools/business-card-generator',
@@ -582,6 +588,7 @@ export interface FileRoutesByFullPath {
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
+  '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
@@ -675,6 +682,7 @@ export interface FileRoutesByTo {
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
+  '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
@@ -769,6 +777,7 @@ export interface FileRoutesById {
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
+  '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
@@ -864,6 +873,7 @@ export interface FileRouteTypes {
     | '/tools/base64'
     | '/tools/bmi-calculator'
     | '/tools/business-card-generator'
+    | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
@@ -957,6 +967,7 @@ export interface FileRouteTypes {
     | '/tools/base64'
     | '/tools/bmi-calculator'
     | '/tools/business-card-generator'
+    | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
@@ -1050,6 +1061,7 @@ export interface FileRouteTypes {
     | '/tools/base64'
     | '/tools/bmi-calculator'
     | '/tools/business-card-generator'
+    | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
@@ -1144,6 +1156,7 @@ export interface RootRouteChildren {
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsBmiCalculatorRoute: typeof ToolsBmiCalculatorRoute
   ToolsBusinessCardGeneratorRoute: typeof ToolsBusinessCardGeneratorRoute
+  ToolsChessRoute: typeof ToolsChessRoute
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
@@ -1766,6 +1779,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsCollageMakerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/chess': {
+      id: '/tools/chess'
+      path: '/tools/chess'
+      fullPath: '/tools/chess'
+      preLoaderRoute: typeof ToolsChessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/business-card-generator': {
       id: '/tools/business-card-generator'
       path: '/tools/business-card-generator'
@@ -1881,6 +1901,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsBase64Route: ToolsBase64Route,
   ToolsBmiCalculatorRoute: ToolsBmiCalculatorRoute,
   ToolsBusinessCardGeneratorRoute: ToolsBusinessCardGeneratorRoute,
+  ToolsChessRoute: ToolsChessRoute,
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,

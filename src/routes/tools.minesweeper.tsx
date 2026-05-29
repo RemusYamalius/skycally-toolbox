@@ -204,14 +204,17 @@ function MinesweeperPage() {
       b = revealAllMines(b);
       setBoard(b);
       setPhase("lost");
+      playSound("die");
       return;
     }
 
     b = floodReveal(b, r, c);
     setBoard(b);
+    playSound("click");
 
     if (checkWin(b, difficulty)) {
       setPhase("won");
+      playChord(["success", "win"]);
       persistBest(difficulty, time);
     }
   };

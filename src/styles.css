@@ -227,3 +227,15 @@ html, body {
 .hero-fade-up        { animation: heroFadeUp 0.55s ease both; }
 .hero-fade-up-delay  { animation: heroFadeUp 0.55s 0.12s ease both; }
 .hero-fade-up-delay2 { animation: heroFadeUp 0.55s 0.25s ease both; }
+
+/*
+  COLOR RULES — always use semantic tokens, never hardcode:
+  ✅ text-foreground, text-muted-foreground, text-card-foreground
+  ✅ bg-card, bg-background, bg-muted, border-border
+  ❌ Avoid: text-white, text-gray-*, bg-white, bg-[#hex] inside content surfaces.
+     Exceptions: hero section (.bg-hero), intentionally inverted UI, buttons.
+*/
+:root:not(.dark) .bg-card {
+  color: var(--card-foreground);
+}
+

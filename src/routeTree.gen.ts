@@ -71,6 +71,7 @@ import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
+import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
@@ -399,6 +400,11 @@ const ToolsDocumentScannerRoute = ToolsDocumentScannerRouteImport.update({
   path: '/tools/document-scanner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsDiceRollerRoute = ToolsDiceRollerRouteImport.update({
+  id: '/tools/dice-roller',
+  path: '/tools/dice-roller',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsDeletePdfPagesRoute = ToolsDeletePdfPagesRouteImport.update({
   id: '/tools/delete-pdf-pages',
   path: '/tools/delete-pdf-pages',
@@ -507,6 +513,7 @@ export interface FileRoutesByFullPath {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
+  '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -587,6 +594,7 @@ export interface FileRoutesByTo {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
+  '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -668,6 +676,7 @@ export interface FileRoutesById {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
+  '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -750,6 +759,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/compress-pdf'
     | '/tools/delete-pdf-pages'
+    | '/tools/dice-roller'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -830,6 +840,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/compress-pdf'
     | '/tools/delete-pdf-pages'
+    | '/tools/dice-roller'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -910,6 +921,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/compress-pdf'
     | '/tools/delete-pdf-pages'
+    | '/tools/dice-roller'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -991,6 +1003,7 @@ export interface RootRouteChildren {
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
+  ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
@@ -1485,6 +1498,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsDocumentScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/dice-roller': {
+      id: '/tools/dice-roller'
+      path: '/tools/dice-roller'
+      fullPath: '/tools/dice-roller'
+      preLoaderRoute: typeof ToolsDiceRollerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/delete-pdf-pages': {
       id: '/tools/delete-pdf-pages'
       path: '/tools/delete-pdf-pages'
@@ -1624,6 +1644,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
+  ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,

@@ -98,7 +98,7 @@ function getAIMove(b: Cell[], difficulty: Difficulty): number {
 }
 
 function TicTacToePage() {
-  const tool = toolBySlug("tic-tac-toe", tools);
+
 
   const [board, setBoard] = useState<Cell[]>(() => Array(9).fill(null));
   const [isX, setIsX] = useState(true);

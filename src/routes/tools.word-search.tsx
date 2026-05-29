@@ -347,7 +347,7 @@ function WordSearchPage() {
 
           <div
             ref={gridRef}
-            className="w-full max-w-sm mx-auto touch-none select-none rounded-xl overflow-hidden border border-border"
+            className="w-full max-w-sm mx-auto touch-none select-none rounded-xl overflow-hidden border border-border bg-card"
             onMouseDown={handlePointerDown}
             onMouseMove={handlePointerMove}
             onMouseUp={handlePointerUp}
@@ -369,8 +369,8 @@ function WordSearchPage() {
                     className={cn(
                       "aspect-square flex items-center justify-center text-[10px] sm:text-xs font-black border border-border/20 transition-colors",
                       isFound && foundColor ? foundColor :
-                      isSelected ? "bg-primary/40 text-primary-foreground" :
-                      "text-foreground"
+                      isSelected ? "bg-primary/40 text-white" :
+                      "text-foreground bg-card hover:bg-muted/40"
                     )}
                   >
                     {cell.letter}
@@ -388,7 +388,7 @@ function WordSearchPage() {
                   "px-3 py-1.5 rounded-lg text-xs font-bold text-center border transition-all",
                   pw.found
                     ? cn(wordColors[pw.word], "border-transparent line-through opacity-70")
-                    : "bg-card border-border text-foreground"
+                    : "bg-card border-border text-foreground dark:bg-card dark:text-foreground"
                 )}
               >
                 {pw.found ? "✓ " : ""}{pw.word}

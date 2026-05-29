@@ -1,6 +1,6 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2 } from "lucide-react";
 
-export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games";
+export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
 
 export const categoryMeta: Record<ToolCategory, { label: string; color: string; icon: string }> = {
   video: { label: "Video Tools", color: "var(--cyan-brand)", icon: "🎬" },
@@ -11,7 +11,9 @@ export const categoryMeta: Record<ToolCategory, { label: string; color: string; 
   ai: { label: "AI Tools", color: "var(--violet-brand)", icon: "🤖" },
   utility: { label: "Utility Tools", color: "var(--green-brand)", icon: "🛠️" },
   games: { label: "Game Tools", color: "var(--violet-brand)", icon: "🎲" },
+  minigames: { label: "Mini Games", color: "var(--cyan-brand)", icon: "🕹️" },
 };
+
 
 
 export interface Tool {

@@ -1,7 +1,8 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type, Sparkles, Wrench } from "lucide-react";
+import { Search, Upload, Wand2, ArrowDown, Video, Image as ImageIcon, Music, FileText, Type, Sparkles, Wrench, Gamepad2 } from "lucide-react";
+
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 import { AdZone } from "@/components/ad-zone";
@@ -40,11 +41,15 @@ export const Route = createFileRoute("/")({
 const quickAccess = [
   { icon: Sparkles, label: "AI Tools", cat: "ai" as const, color: categoryMeta.ai.color },
   { icon: Video, label: "Video Tools", cat: "video" as const, color: categoryMeta.video.color },
+const quickAccess = [
+  { icon: Sparkles, label: "AI Tools", cat: "ai" as const, color: categoryMeta.ai.color },
+  { icon: Video, label: "Video Tools", cat: "video" as const, color: categoryMeta.video.color },
   { icon: ImageIcon, label: "Image Tools", cat: "image" as const, color: categoryMeta.image.color },
   { icon: Music, label: "Audio Tools", cat: "audio" as const, color: categoryMeta.audio.color },
   { icon: FileText, label: "PDF & Documents", cat: "pdf" as const, color: categoryMeta.pdf.color },
   { icon: Type, label: "Text Tools", cat: "text" as const, color: categoryMeta.text.color },
   { icon: Wrench, label: "Utility Tools", cat: "utility" as const, color: categoryMeta.utility.color },
+  { icon: Gamepad2, label: "Games & Fun", cat: "games" as const, color: categoryMeta.games.color },
 ];
 
 const categoryTaglines: Record<ToolCategory, string> = {
@@ -55,12 +60,14 @@ const categoryTaglines: Record<ToolCategory, string> = {
   pdf: "Merge, split, convert and extract from PDFs.",
   text: "Generate, format, encode and analyze text effortlessly.",
   utility: "Calculators, decision tools and everyday utilities.",
+  games: "Spinning wheels, role assignments, team makers and more party games.",
 };
+
 
 const INITIAL_PER_CAT = 6;
 
 const POPULAR_SLUGS = ["compress-pdf", "remove-bg", "image-converter", "qr-generator", "video-to-gif", "word-to-pdf"];
-const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility"];
+const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games"];
 
 function HomePage() {
   const [q, setQ] = useState("");

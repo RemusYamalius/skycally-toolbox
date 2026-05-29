@@ -70,6 +70,7 @@ import { Route as ToolsImageCropperRouteImport } from './routes/tools.image-crop
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 import { Route as ToolsHashGeneratorRouteImport } from './routes/tools.hash-generator'
+import { Route as ToolsHangmanRouteImport } from './routes/tools.hangman'
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
 import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time-fixer'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
@@ -400,6 +401,11 @@ const ToolsHashGeneratorRoute = ToolsHashGeneratorRouteImport.update({
   path: '/tools/hash-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsHangmanRoute = ToolsHangmanRouteImport.update({
+  id: '/tools/hangman',
+  path: '/tools/hangman',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsHandGestureRoute = ToolsHandGestureRouteImport.update({
   id: '/tools/hand-gesture',
   path: '/tools/hand-gesture',
@@ -550,6 +556,7 @@ export interface FileRoutesByFullPath {
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
+  '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -636,6 +643,7 @@ export interface FileRoutesByTo {
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
+  '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -723,6 +731,7 @@ export interface FileRoutesById {
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
+  '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -811,6 +820,7 @@ export interface FileRouteTypes {
     | '/tools/face-landmarks'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
+    | '/tools/hangman'
     | '/tools/hash-generator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -897,6 +907,7 @@ export interface FileRouteTypes {
     | '/tools/face-landmarks'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
+    | '/tools/hangman'
     | '/tools/hash-generator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -983,6 +994,7 @@ export interface FileRouteTypes {
     | '/tools/face-landmarks'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
+    | '/tools/hangman'
     | '/tools/hash-generator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -1070,6 +1082,7 @@ export interface RootRouteChildren {
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
   ToolsFreeTimeFixerRoute: typeof ToolsFreeTimeFixerRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
+  ToolsHangmanRoute: typeof ToolsHangmanRoute
   ToolsHashGeneratorRoute: typeof ToolsHashGeneratorRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
@@ -1556,6 +1569,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsHashGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/hangman': {
+      id: '/tools/hangman'
+      path: '/tools/hangman'
+      fullPath: '/tools/hangman'
+      preLoaderRoute: typeof ToolsHangmanRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/hand-gesture': {
       id: '/tools/hand-gesture'
       path: '/tools/hand-gesture'
@@ -1751,6 +1771,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
   ToolsFreeTimeFixerRoute: ToolsFreeTimeFixerRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
+  ToolsHangmanRoute: ToolsHangmanRoute,
   ToolsHashGeneratorRoute: ToolsHashGeneratorRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,

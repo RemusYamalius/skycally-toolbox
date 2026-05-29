@@ -1,105 +1,88 @@
-# Add Role Spinner Tool
+# Light Mode Text Visibility Fix
 
-## 1. Register the tool (`src/lib/tools.ts`)
+## Diagnosis adjustments before implementing
 
-- Extend the lucide-react import line with `Shuffle` and `Users`.
-- Append to the `tools` array (utility category):
+Two things in the original brief don't match the project, so the plan corrects them:
 
-```ts
-{ slug: "role-spinner", name: "Role Spinner", description: "Randomly assign roles to players. Perfect for Mafia, party games and team activities.", category: "utility", icon: Shuffle, path: "/tools/role-spinner" },
+1. **`.light` class doesn't exist.** `theme-provider.tsx` only toggles `.dark` on `<html>`. Light is the default (no class). So `.light .bg-card { … }` selectors would never match. The fix below uses the default cascade + a `:root:not(.dark)` scope where needed.
+2. **`src/routes/tools.role-spinner.tsx` already uses semantic tokens** (`bg-card`, `border-border`, `text-muted-foreground`, `text-foreground`). It does NOT contain `text-white`, `text-gray-*`, or inline white colors. No edits needed there — flagging this so we don't invent diffs.
+3. **The proposed broad selectors (`[class*="rounded-xl"]`, blanket `input { color !important }`) are too aggressive** — they'd repaint hero CTAs, badges, and the homepage search input (which is intentionally white-on-dark inside `.bg-hero`). The plan scopes the safeguard to actual card containers only.
+
+## Real culprits (from a repo-wide audit)
+
+These tool routes were authored assuming a permanent dark canvas and break in light mode:
+
+```
+tools.add-watermark.tsx
+tools.extract-audio.tsx
+tools.markdown-to-html.tsx
+tools.lorem-ipsum.tsx
+tools.json-formatter.tsx
+tools.image-upscaler.tsx
+tools.image-filters.tsx
+tools.image-to-sketch.tsx
+tools.audio-converter.tsx
+tools.video-compressor.tsx
+tools.pdf-watermark-remover.tsx
+tools.screen-recorder.tsx
+tools.split-pdf.tsx
+contact.tsx (submit button uses hardcoded gradient + text-white — OK, it's a button)
 ```
 
-The route auto-registers via TanStack Router's file-based routing (no manual edit to `routeTree.gen.ts`).
+They use combinations of: `text-gray-{200,300,400,500,600,700}`, `bg-[#0a0f1e]`, `border-[#1e2d4a]`, `text-white` on non-button surfaces, custom drop zones, etc.
 
-## 2. Create `src/routes/tools.role-spinner.tsx`
+## Plan
 
-Mirror the structure of `tools.spinning-wheel.tsx`: same imports, `createFileRoute("/tools/role-spinner")`, `buildToolMeta(toolBySlug("role-spinner", tools))`, `ToolPageShell` wrapper, `HowToUse`, `ToolSeoContent`, `RelatedTools` at the bottom. All copy in English.
+### 1. Corrected safeguard in `src/styles.css`
 
-### State
+Append (NOT prepend — keeping existing animation/critical CSS intact):
 
-```ts
-type Phase = "setup" | "spinName" | "spinRole" | "done";
-type Role = { name: string; count: number; color: string };
-type Assignment = { name: string; role: string; color: string };
+```css
+/*
+  COLOR RULES — always use semantic tokens, never hardcode:
+  ✅ text-foreground, text-muted-foreground, text-card-foreground
+  ✅ bg-card, bg-background, bg-muted, border-border
+  ❌ Avoid: text-white, text-gray-*, bg-white, bg-[#hex] inside content surfaces.
+     Exceptions: hero section (.bg-hero), intentionally inverted UI, buttons.
+*/
 
-const [phase, setPhase] = useState<Phase>("setup");
-const [players, setPlayers] = useState<string[]>(["Alice","Bob","Charlie","Diana","Eve","Frank"]);
-const [roles, setRoles] = useState<Role[]>([
-  { name: "Mafia", count: 1, color: "#ef4444" },
-  { name: "Doctor", count: 1, color: "#22c55e" },
-  { name: "Sheriff", count: 1, color: "#f59e0b" },
-  { name: "Citizen", count: 3, color: "#3b82f6" },
-]);
-const [remainingPlayers, setRemainingPlayers] = useState<string[]>([]);
-const [remainingRoles, setRemainingRoles] = useState<Role[]>([]); // working copy with decreasing counts
-const [assignments, setAssignments] = useState<Assignment[]>([]);
-const [currentName, setCurrentName] = useState<string | null>(null);
-const [currentRole, setCurrentRole] = useState<{name:string;color:string} | null>(null);
-const [rotation, setRotation] = useState(0);
-const [spinning, setSpinning] = useState(false);
-const [revealOpen, setRevealOpen] = useState(false);
+/* Light-mode safeguard: any card/panel inherits readable color even if a
+   child author forgot to set one. Scoped to .bg-card so we don't repaint
+   hero buttons, badges, or .bg-hero descendants. */
+:root:not(.dark) .bg-card {
+  color: var(--card-foreground);
+}
 ```
 
-### Phase 1 — Setup (two-column grid)
+(No `input { color !important }` rule — `Input`/`Textarea` shadcn components already inherit `text-base` from `currentColor` and work correctly in both themes. Forcing it would break the hero search input which is intentionally white-on-dark.)
 
-Left card "Players": input + Add button, list of name chips each with `Trash2` delete. Min 2 enforced (delete disabled at 2).
+### 2. Tool-route cleanup (semantic-token rewrite)
 
-Right card "Roles": list of role rows showing color dot, name, `-` / count / `+` buttons, and delete. Input + Add for custom role (color auto-assigned from PALETTE based on roles.length).
+For each of the 12 files listed above, replace hardcoded color patterns with tokens:
 
-Totals row: `playersTotal = players.length`, `rolesTotal = sum(roles[i].count)`. If unequal, render red warning `⚠️ Roles total (X) must equal players total (Y)`.
+| Hardcoded | Replacement |
+|---|---|
+| `text-gray-200`, `text-gray-300` | `text-foreground` |
+| `text-gray-400`, `text-gray-500`, `text-gray-600`, `text-gray-700` | `text-muted-foreground` |
+| `text-white` (on non-button surfaces) | `text-foreground` |
+| `bg-[#0a0f1e]` | `bg-background` (or `bg-card` for nested panels) |
+| `border-[#1e2d4a]` | `border-border` |
+| `placeholder-gray-700` etc. | `placeholder:text-muted-foreground` |
+| Inline `style={{ color: 'white' }}` on text | remove + add `className="text-foreground"` |
 
-`Start Game` button disabled unless equal and players ≥ 2. On click:
-- `setRemainingPlayers([...players])`
-- `setRemainingRoles(roles.map(r => ({...r})))`
-- `setAssignments([])`
-- `setPhase("spinName")`
+Keep untouched:
+- Hero section in `src/routes/index.tsx` (`text-white`, `bg-white/8`, `text-white/40`) — these sit on `.bg-hero` and are intentional.
+- Gradient action buttons (`bg-gradient-to-r ... text-white`) — buttons are inverted by design.
+- `bg-black` on `<video>`/`<canvas>` letterbox backgrounds and dialog overlays (`bg-black/80`) — these are media frames, not text surfaces.
 
-### Phase 2 — Name Spin
+### 3. Verify no regressions
 
-Canvas + pointer + `Spin Name` button. Reuse spinning-wheel's drawWheel logic (DPR, segments, rotation, hub, pointer triangle) with `options = remainingPlayers`, color cycling from PALETTE by index. Same `spin()` easing function setting `currentName` on land. After land, show large badge `🎯 {currentName}` with `animate-pulse` class, then `Spin Role →` button → `setPhase("spinRole"); setRotation(0); setCurrentRole(null)`.
-
-### Phase 3 — Role Spin
-
-Build segments from remainingRoles:
-```ts
-const roleSegments = remainingRoles.flatMap(r => Array(r.count).fill({name:r.name, color:r.color}));
-```
-Draw the same wheel but use `segment.color` for fill (override PALETTE) and `segment.name` as label. `Spin Role` button triggers same spin logic; on land set `currentRole` and open the reveal `Dialog` (from `@/components/ui/dialog`) showing:
-```
-👤 {currentName}
-─────────
-● {currentRole.name}    (colored dot)
-```
-Dialog footer: `Next Player →` button which:
-- pushes `{name: currentName, role: currentRole.name, color: currentRole.color}` into `assignments`
-- removes `currentName` from `remainingPlayers`
-- decrements that role's count in `remainingRoles` (filter out if count hits 0)
-- closes dialog, resets `currentName`/`currentRole`/`rotation`
-- if `remainingPlayers.length - 1 === 0` → `setPhase("done")`, else `setPhase("spinName")`
-
-### Phase 4 — Done
-
-Card with table (Player | Role) rendering each assignment; colored dot before role name.
-
-Buttons:
-- `Play Again` → reset all state back to Phase 1 defaults (or keep configured players/roles? — reset to Phase 1 with the configured players/roles preserved and assignments cleared).
-- `Copy Results` → build plain-text table `"Player\tRole\nAlice\tMafia\n..."` and `navigator.clipboard.writeText(...)`, show a brief toast via `sonner` (already in project).
-
-### Wheel drawing reuse
-
-Copy spinning-wheel's `containerRef`/`ResizeObserver`, `canvasRef`, draw `useEffect`, and `spin()` easing into this file (adapted so it accepts a segments array + per-segment color). Pointer and hub identical.
-
-### PALETTE
-
-Reuse the same constant:
-```ts
-const PALETTE = ["#06b6d4","#a855f7","#f97316","#22c55e","#ec4899","#eab308","#3b82f6","#ef4444"];
-```
-
-### HowToUse + ToolSeoContent
-
-`HowToUse` steps exactly as specified. `ToolSeoContent` with the supplied title/description, 2-paragraph body about random role assignment for Mafia/Werewolf/party games and browser-local privacy, 4 FAQs (how it works, supported games, custom roles, privacy).
+- Scan `src/components/` — already uses tokens (verified: ai-badges, tool-page-shell, card/input/textarea). No edits needed.
+- Confirm `role-spinner.tsx` and `spinning-wheel.tsx` already use tokens — no edits.
+- Toggle theme in preview after edits; the listed tool pages should render with readable text in both light and dark mode.
 
 ## Out of scope
 
-No changes to other files, no business logic changes, no routing config edits beyond the new route file, no edits to `routeTree.gen.ts` (auto-generated).
+- No functionality, layout, behavior, or animation changes.
+- No edits to hero, header, footer, buttons, dialogs, video/canvas backgrounds, or `routeTree.gen.ts`.
+- No new dependencies.

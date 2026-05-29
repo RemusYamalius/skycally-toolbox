@@ -102,6 +102,8 @@ export const tools: Tool[] = [
   { slug: "dice-roller", name: "Dice Roller", description: "Roll multiple dice of any type — D4, D6, D8, D10, D12, D20. Perfect for board games and RPGs.", category: "games", icon: Dices, path: "/tools/dice-roller" },
   { slug: "wordle", name: "Wordle", description: "Guess the hidden 5-letter word in 6 tries. A new word every day!", category: "minigames", icon: Grid2x2, path: "/tools/wordle" },
   { slug: "2048", name: "2048", description: "Slide tiles and merge numbers to reach 2048. Simple rules, endless challenge.", category: "minigames", icon: Joystick, path: "/tools/2048" },
+  { slug: "tic-tac-toe", name: "Tic Tac Toe", description: "Classic X and O game. Play against a friend or challenge the AI.", category: "minigames", icon: X, path: "/tools/tic-tac-toe" },
+  { slug: "snake", name: "Snake", description: "Eat the food, grow longer, don't hit the walls. The classic arcade game!", category: "minigames", icon: Crosshair, path: "/tools/snake" },
 ];
 
 

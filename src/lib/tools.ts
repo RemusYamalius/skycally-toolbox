@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search, Keyboard } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
@@ -111,6 +111,7 @@ export const tools: Tool[] = [
   { slug: "sudoku", name: "Sudoku", description: "Fill the 9×9 grid so every row, column and box contains digits 1–9.", category: "minigames", icon: Hash, path: "/tools/sudoku" },
   { slug: "tetris", name: "Tetris", description: "Stack falling blocks and clear lines in the ultimate classic arcade game!", category: "minigames", icon: Layers, path: "/tools/tetris" },
   { slug: "word-search", name: "Word Search", description: "Find hidden words in the letter grid — horizontally, vertically and diagonally!", category: "minigames", icon: Search, path: "/tools/word-search" },
+  { slug: "typing-speed", name: "Typing Speed Test", description: "Test your typing speed and accuracy! How many words per minute can you type?", category: "minigames", icon: Keyboard, path: "/tools/typing-speed" },
 ];
 
 

@@ -31,6 +31,7 @@ import { Route as ToolsTruthOrDareRouteImport } from './routes/tools.truth-or-da
 import { Route as ToolsTipCalculatorRouteImport } from './routes/tools.tip-calculator'
 import { Route as ToolsTicTacToeRouteImport } from './routes/tools.tic-tac-toe'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
+import { Route as ToolsTetrisRouteImport } from './routes/tools.tetris'
 import { Route as ToolsSudokuRouteImport } from './routes/tools.sudoku'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
@@ -205,6 +206,11 @@ const ToolsTicTacToeRoute = ToolsTicTacToeRouteImport.update({
 const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
   id: '/tools/text-to-speech',
   path: '/tools/text-to-speech',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsTetrisRoute = ToolsTetrisRouteImport.update({
+  id: '/tools/tetris',
+  path: '/tools/tetris',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSudokuRoute = ToolsSudokuRouteImport.update({
@@ -610,6 +616,7 @@ export interface FileRoutesByFullPath {
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/sudoku': typeof ToolsSudokuRoute
+  '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
@@ -699,6 +706,7 @@ export interface FileRoutesByTo {
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/sudoku': typeof ToolsSudokuRoute
+  '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
@@ -789,6 +797,7 @@ export interface FileRoutesById {
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/sudoku': typeof ToolsSudokuRoute
+  '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
@@ -880,6 +889,7 @@ export interface FileRouteTypes {
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/sudoku'
+    | '/tools/tetris'
     | '/tools/text-to-speech'
     | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
@@ -969,6 +979,7 @@ export interface FileRouteTypes {
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/sudoku'
+    | '/tools/tetris'
     | '/tools/text-to-speech'
     | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
@@ -1058,6 +1069,7 @@ export interface FileRouteTypes {
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/sudoku'
+    | '/tools/tetris'
     | '/tools/text-to-speech'
     | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
@@ -1148,6 +1160,7 @@ export interface RootRouteChildren {
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsSudokuRoute: typeof ToolsSudokuRoute
+  ToolsTetrisRoute: typeof ToolsTetrisRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsTicTacToeRoute: typeof ToolsTicTacToeRoute
   ToolsTipCalculatorRoute: typeof ToolsTipCalculatorRoute
@@ -1320,6 +1333,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/text-to-speech'
       fullPath: '/tools/text-to-speech'
       preLoaderRoute: typeof ToolsTextToSpeechRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/tetris': {
+      id: '/tools/tetris'
+      path: '/tools/tetris'
+      fullPath: '/tools/tetris'
+      preLoaderRoute: typeof ToolsTetrisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/sudoku': {
@@ -1853,6 +1873,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsSudokuRoute: ToolsSudokuRoute,
+  ToolsTetrisRoute: ToolsTetrisRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsTicTacToeRoute: ToolsTicTacToeRoute,
   ToolsTipCalculatorRoute: ToolsTipCalculatorRoute,

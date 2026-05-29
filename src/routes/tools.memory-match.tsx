@@ -86,6 +86,7 @@ function MemoryMatchPage() {
       const newFlipped = [...flipped, idx];
       setCards((prev) => prev.map((c, i) => (i === idx ? { ...c, flipped: true } : c)));
       setFlipped(newFlipped);
+      playSound("flip");
 
       if (newFlipped.length === 2) {
         const nextMoves = moves + 1;

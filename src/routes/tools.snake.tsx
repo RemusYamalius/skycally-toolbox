@@ -101,6 +101,7 @@ function SnakePage() {
     if (head.x === f.x && head.y === f.y) {
       scoreRef.current += 10;
       setScore(scoreRef.current);
+      playSound("score");
       try {
         const stored = parseInt(localStorage.getItem("snake-best") || "0", 10) || 0;
         if (scoreRef.current > stored) {

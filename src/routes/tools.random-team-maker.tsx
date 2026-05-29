@@ -503,7 +503,7 @@ function RandomTeamMaker() {
         ]}
       />
 
-      <RelatedTools slug="random-team-maker" />
+      <RelatedTools currentSlug="random-team-maker" />
     </ToolPageShell>
   );
 }

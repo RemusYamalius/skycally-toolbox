@@ -300,6 +300,7 @@ function TetrisPage() {
       if (isColliding(clearedBoard, newPiece)) {
         pieceRef.current = null;
         setPhase("over");
+        playSound("lose");
         if (intervalRef.current) clearInterval(intervalRef.current);
         drawBoard();
         drawNextPiece();

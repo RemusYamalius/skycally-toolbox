@@ -41,9 +41,6 @@ export const Route = createFileRoute("/")({
 const quickAccess = [
   { icon: Sparkles, label: "AI Tools", cat: "ai" as const, color: categoryMeta.ai.color },
   { icon: Video, label: "Video Tools", cat: "video" as const, color: categoryMeta.video.color },
-const quickAccess = [
-  { icon: Sparkles, label: "AI Tools", cat: "ai" as const, color: categoryMeta.ai.color },
-  { icon: Video, label: "Video Tools", cat: "video" as const, color: categoryMeta.video.color },
   { icon: ImageIcon, label: "Image Tools", cat: "image" as const, color: categoryMeta.image.color },
   { icon: Music, label: "Audio Tools", cat: "audio" as const, color: categoryMeta.audio.color },
   { icon: FileText, label: "PDF & Documents", cat: "pdf" as const, color: categoryMeta.pdf.color },

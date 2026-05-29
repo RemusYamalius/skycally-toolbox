@@ -120,6 +120,7 @@ function TypingSpeedPage() {
     const res: Result = { wpm, accuracy, correct, incorrect, duration };
     setResult(res);
     setPhase("done");
+    playChord(["finish", "success"]);
 
     if (wpm > (best[difficulty] || 0)) {
       const upd = { ...best, [difficulty]: wpm };

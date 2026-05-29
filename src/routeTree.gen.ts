@@ -53,6 +53,7 @@ import { Route as ToolsPdfReaderRouteImport } from './routes/tools.pdf-reader'
 import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page-numbers'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
+import { Route as ToolsMinesweeperRouteImport } from './routes/tools.minesweeper'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMemoryMatchRouteImport } from './routes/tools.memory-match'
 import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
@@ -316,6 +317,11 @@ const ToolsObjectDetectionRoute = ToolsObjectDetectionRouteImport.update({
   path: '/tools/object-detection',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMinesweeperRoute = ToolsMinesweeperRouteImport.update({
+  id: '/tools/minesweeper',
+  path: '/tools/minesweeper',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
   id: '/tools/merge-pdf',
   path: '/tools/merge-pdf',
@@ -574,6 +580,7 @@ export interface FileRoutesByFullPath {
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
@@ -661,6 +668,7 @@ export interface FileRoutesByTo {
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
@@ -749,6 +757,7 @@ export interface FileRoutesById {
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
+  '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
@@ -838,6 +847,7 @@ export interface FileRouteTypes {
     | '/tools/meme-generator'
     | '/tools/memory-match'
     | '/tools/merge-pdf'
+    | '/tools/minesweeper'
     | '/tools/object-detection'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
@@ -925,6 +935,7 @@ export interface FileRouteTypes {
     | '/tools/meme-generator'
     | '/tools/memory-match'
     | '/tools/merge-pdf'
+    | '/tools/minesweeper'
     | '/tools/object-detection'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
@@ -1012,6 +1023,7 @@ export interface FileRouteTypes {
     | '/tools/meme-generator'
     | '/tools/memory-match'
     | '/tools/merge-pdf'
+    | '/tools/minesweeper'
     | '/tools/object-detection'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
@@ -1100,6 +1112,7 @@ export interface RootRouteChildren {
   ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
   ToolsMemoryMatchRoute: typeof ToolsMemoryMatchRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
+  ToolsMinesweeperRoute: typeof ToolsMinesweeperRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPdfPageNumbersRoute: typeof ToolsPdfPageNumbersRoute
@@ -1450,6 +1463,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsObjectDetectionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/minesweeper': {
+      id: '/tools/minesweeper'
+      path: '/tools/minesweeper'
+      fullPath: '/tools/minesweeper'
+      preLoaderRoute: typeof ToolsMinesweeperRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/merge-pdf': {
       id: '/tools/merge-pdf'
       path: '/tools/merge-pdf'
@@ -1789,6 +1809,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
   ToolsMemoryMatchRoute: ToolsMemoryMatchRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
+  ToolsMinesweeperRoute: ToolsMinesweeperRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPdfPageNumbersRoute: ToolsPdfPageNumbersRoute,
@@ -1831,12 +1852,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

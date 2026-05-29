@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb } from "lucide-react";
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
 
@@ -106,6 +106,7 @@ export const tools: Tool[] = [
   { slug: "snake", name: "Snake", description: "Eat the food, grow longer, don't hit the walls. The classic arcade game!", category: "minigames", icon: Crosshair, path: "/tools/snake" },
   { slug: "memory-match", name: "Memory Match", description: "Flip cards and find matching pairs. Train your memory with increasing difficulty!", category: "minigames", icon: LayoutGrid, path: "/tools/memory-match" },
   { slug: "hangman", name: "Hangman", description: "Guess the hidden word letter by letter before the hangman is complete!", category: "minigames", icon: BookOpen, path: "/tools/hangman" },
+  { slug: "minesweeper", name: "Minesweeper", description: "Classic Minesweeper — uncover all safe cells without hitting a mine!", category: "minigames", icon: Bomb, path: "/tools/minesweeper" },
 ];
 
 

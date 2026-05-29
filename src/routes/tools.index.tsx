@@ -51,7 +51,7 @@ export const Route = createFileRoute("/tools/")({
   component: ToolsPage,
 });
 
-const cats: ("all" | ToolCategory)[] = ["all", "ai", "video", "image", "audio", "pdf", "text"];
+const cats: ("all" | ToolCategory)[] = ["all", "ai", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"];
 
 function ToolsPage() {
   const search = Route.useSearch();

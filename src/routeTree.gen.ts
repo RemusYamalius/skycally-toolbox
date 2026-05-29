@@ -29,6 +29,7 @@ import { Route as ToolsUuidGeneratorRouteImport } from './routes/tools.uuid-gene
 import { Route as ToolsUrlEncoderRouteImport } from './routes/tools.url-encoder'
 import { Route as ToolsTruthOrDareRouteImport } from './routes/tools.truth-or-dare'
 import { Route as ToolsTipCalculatorRouteImport } from './routes/tools.tip-calculator'
+import { Route as ToolsTicTacToeRouteImport } from './routes/tools.tic-tac-toe'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
@@ -189,6 +190,11 @@ const ToolsTruthOrDareRoute = ToolsTruthOrDareRouteImport.update({
 const ToolsTipCalculatorRoute = ToolsTipCalculatorRouteImport.update({
   id: '/tools/tip-calculator',
   path: '/tools/tip-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsTicTacToeRoute = ToolsTicTacToeRouteImport.update({
+  id: '/tools/tic-tac-toe',
+  path: '/tools/tic-tac-toe',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsTextToSpeechRoute = ToolsTextToSpeechRouteImport.update({
@@ -570,6 +576,7 @@ export interface FileRoutesByFullPath {
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
@@ -653,6 +660,7 @@ export interface FileRoutesByTo {
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
@@ -737,6 +745,7 @@ export interface FileRoutesById {
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
+  '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
@@ -822,6 +831,7 @@ export interface FileRouteTypes {
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
     | '/tools/truth-or-dare'
     | '/tools/url-encoder'
@@ -905,6 +915,7 @@ export interface FileRouteTypes {
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
     | '/tools/truth-or-dare'
     | '/tools/url-encoder'
@@ -988,6 +999,7 @@ export interface FileRouteTypes {
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/text-to-speech'
+    | '/tools/tic-tac-toe'
     | '/tools/tip-calculator'
     | '/tools/truth-or-dare'
     | '/tools/url-encoder'
@@ -1072,6 +1084,7 @@ export interface RootRouteChildren {
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
+  ToolsTicTacToeRoute: typeof ToolsTicTacToeRoute
   ToolsTipCalculatorRoute: typeof ToolsTipCalculatorRoute
   ToolsTruthOrDareRoute: typeof ToolsTruthOrDareRoute
   ToolsUrlEncoderRoute: typeof ToolsUrlEncoderRoute
@@ -1228,6 +1241,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/tip-calculator'
       fullPath: '/tools/tip-calculator'
       preLoaderRoute: typeof ToolsTipCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/tic-tac-toe': {
+      id: '/tools/tic-tac-toe'
+      path: '/tools/tic-tac-toe'
+      fullPath: '/tools/tic-tac-toe'
+      preLoaderRoute: typeof ToolsTicTacToeRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/text-to-speech': {
@@ -1729,6 +1749,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
+  ToolsTicTacToeRoute: ToolsTicTacToeRoute,
   ToolsTipCalculatorRoute: ToolsTipCalculatorRoute,
   ToolsTruthOrDareRoute: ToolsTruthOrDareRoute,
   ToolsUrlEncoderRoute: ToolsUrlEncoderRoute,

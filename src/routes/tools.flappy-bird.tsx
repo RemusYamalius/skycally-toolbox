@@ -199,6 +199,8 @@ function FlappyBirdPage() {
     if (hit) {
       phaseRef.current = "dead";
       setPhase("dead");
+      playSound("hit");
+      setTimeout(() => playSound("die"), 200);
       if (scoreRef.current > bestRef.current) {
         bestRef.current = scoreRef.current;
         setBest(scoreRef.current);

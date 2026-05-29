@@ -54,6 +54,7 @@ import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
+import { Route as ToolsMemoryMatchRouteImport } from './routes/tools.memory-match'
 import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
 import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
@@ -69,6 +70,7 @@ import { Route as ToolsImageCropperRouteImport } from './routes/tools.image-crop
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 import { Route as ToolsHashGeneratorRouteImport } from './routes/tools.hash-generator'
+import { Route as ToolsHangmanRouteImport } from './routes/tools.hangman'
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
 import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time-fixer'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
@@ -319,6 +321,11 @@ const ToolsMergePdfRoute = ToolsMergePdfRouteImport.update({
   path: '/tools/merge-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMemoryMatchRoute = ToolsMemoryMatchRouteImport.update({
+  id: '/tools/memory-match',
+  path: '/tools/memory-match',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsMemeGeneratorRoute = ToolsMemeGeneratorRouteImport.update({
   id: '/tools/meme-generator',
   path: '/tools/meme-generator',
@@ -392,6 +399,11 @@ const ToolsImageCompressorRoute = ToolsImageCompressorRouteImport.update({
 const ToolsHashGeneratorRoute = ToolsHashGeneratorRouteImport.update({
   id: '/tools/hash-generator',
   path: '/tools/hash-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsHangmanRoute = ToolsHangmanRouteImport.update({
+  id: '/tools/hangman',
+  path: '/tools/hangman',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsHandGestureRoute = ToolsHandGestureRouteImport.update({
@@ -544,6 +556,7 @@ export interface FileRoutesByFullPath {
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
+  '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -559,6 +572,7 @@ export interface FileRoutesByFullPath {
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
+  '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -629,6 +643,7 @@ export interface FileRoutesByTo {
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
+  '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -644,6 +659,7 @@ export interface FileRoutesByTo {
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
+  '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -715,6 +731,7 @@ export interface FileRoutesById {
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
+  '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -730,6 +747,7 @@ export interface FileRoutesById {
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
+  '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -802,6 +820,7 @@ export interface FileRouteTypes {
     | '/tools/face-landmarks'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
+    | '/tools/hangman'
     | '/tools/hash-generator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -817,6 +836,7 @@ export interface FileRouteTypes {
     | '/tools/lorem-ipsum'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
+    | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
@@ -887,6 +907,7 @@ export interface FileRouteTypes {
     | '/tools/face-landmarks'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
+    | '/tools/hangman'
     | '/tools/hash-generator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -902,6 +923,7 @@ export interface FileRouteTypes {
     | '/tools/lorem-ipsum'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
+    | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
@@ -972,6 +994,7 @@ export interface FileRouteTypes {
     | '/tools/face-landmarks'
     | '/tools/free-time-fixer'
     | '/tools/hand-gesture'
+    | '/tools/hangman'
     | '/tools/hash-generator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -987,6 +1010,7 @@ export interface FileRouteTypes {
     | '/tools/lorem-ipsum'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
+    | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/object-detection'
     | '/tools/password-generator'
@@ -1058,6 +1082,7 @@ export interface RootRouteChildren {
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
   ToolsFreeTimeFixerRoute: typeof ToolsFreeTimeFixerRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
+  ToolsHangmanRoute: typeof ToolsHangmanRoute
   ToolsHashGeneratorRoute: typeof ToolsHashGeneratorRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
@@ -1073,6 +1098,7 @@ export interface RootRouteChildren {
   ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
   ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
+  ToolsMemoryMatchRoute: typeof ToolsMemoryMatchRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
@@ -1431,6 +1457,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMergePdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/memory-match': {
+      id: '/tools/memory-match'
+      path: '/tools/memory-match'
+      fullPath: '/tools/memory-match'
+      preLoaderRoute: typeof ToolsMemoryMatchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/meme-generator': {
       id: '/tools/meme-generator'
       path: '/tools/meme-generator'
@@ -1534,6 +1567,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/hash-generator'
       fullPath: '/tools/hash-generator'
       preLoaderRoute: typeof ToolsHashGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/hangman': {
+      id: '/tools/hangman'
+      path: '/tools/hangman'
+      fullPath: '/tools/hangman'
+      preLoaderRoute: typeof ToolsHangmanRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/hand-gesture': {
@@ -1731,6 +1771,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
   ToolsFreeTimeFixerRoute: ToolsFreeTimeFixerRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
+  ToolsHangmanRoute: ToolsHangmanRoute,
   ToolsHashGeneratorRoute: ToolsHashGeneratorRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
@@ -1746,6 +1787,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
   ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
+  ToolsMemoryMatchRoute: ToolsMemoryMatchRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,

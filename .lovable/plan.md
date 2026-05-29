@@ -1,50 +1,49 @@
-# Add Tic Tac Toe and Snake to Mini Games
+# Add Memory Match and Hangman to Mini Games
 
-Add two more playable games to the existing `minigames` category, following the exact pattern of `src/routes/tools.wordle.tsx` (route shell + SEO `head()` + `ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools`). English-only UI.
+Add two more playable games to the `minigames` category, following the exact pattern of `src/routes/tools.tic-tac-toe.tsx` (route shell + SEO `head()` + `ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools`). English-only UI.
 
 ## Scope
 
 ### 1. Registry (`src/lib/tools.ts`)
-- Add `X` and `Crosshair` to the `lucide-react` import line.
-- Append two tool entries after the `2048` entry:
-  - `tic-tac-toe` → icon `X`, path `/tools/tic-tac-toe`
-  - `snake` → icon `Crosshair`, path `/tools/snake`
-- No other file edits needed — `site-footer.tsx` and `index.tsx` already render the `minigames` category.
+- Verify `LayoutGrid` is in the `lucide-react` import; add `BookOpen` to the same import line.
+- Append two tool entries after the `snake` entry:
+  - `memory-match` → icon `LayoutGrid`, path `/tools/memory-match`
+  - `hangman` → icon `BookOpen`, path `/tools/hangman`
+- No edits to `routeTree.gen.ts`, `site-footer.tsx`, `index.tsx`, or `tools.index.tsx` — minigames category already wired.
 
-### 2. Tic Tac Toe (`src/routes/tools.tic-tac-toe.tsx`)
+### 2. Memory Match (`src/routes/tools.memory-match.tsx`)
 Standard route shell.
 
-- **State:** `board: Cell[]` (9), `isX`, `mode: "pvp" | "ai"`, `difficulty: "easy" | "medium" | "hard"`, `scores: { X, O, draws }`, `winner`, `winLine`.
-- **Win detection:** `LINES` constant (8 winning lines) + `checkWinner` returning `{ winner, line }`, `"draw"`, or `null`.
-- **AI:** Minimax (`O` maximizes, depth-weighted for faster wins) + `getBestMove`. `getAIMove` picks by difficulty — easy: random, medium: 50/50 best vs random, hard: always best.
-- **AI turn:** `useEffect` watching `[isX, mode, winner, board]` — when AI's turn, `setTimeout(400)` then play. Cleanup on unmount.
-- **Score updates:** on win/draw, bump `scores` once via effect watching `winner`.
-- **UI:** mode toggle (PvP/AI) + difficulty selector (only shown when AI), scoreboard (X / Draws / O cards), 3×3 button grid with `aspect-square` cells, status message ("Your turn (X)", "AI is thinking...", "🎉 X wins!", "🤖 AI wins!", "🤝 It's a draw!"), `New Game` (resets board, keeps scores) + `Reset Scores`.
-- **Tokens:** chrome uses semantic tokens; `text-cyan-400` / `text-violet-400` for X/O marks are intentional game colors (same exception as Wordle/2048 palettes).
-- HowToUse + ToolSeoContent (title, description, 2 paragraphs, 4 FAQs) per the prompt.
+- **Themes:** `EMOJI_SETS` with `animals`, `food`, `sports` (16 emojis each).
+- **Difficulty:** `easy` (4 pairs / 8 cards, 4-col), `medium` (8 pairs / 16 cards, 4-col), `hard` (12 pairs / 24 cards, 6-col).
+- **State:** `difficulty`, `theme`, `cards: Card[]`, `flipped: number[]`, `moves`, `matches`, `time`, `running`, `won`, `best: Record<Difficulty, number>` persisted to `localStorage["memory-best"]` (SSR-guarded with `mounted` flag like 2048).
+- **Init:** `initBoard` slices `count = pairs` emojis from the chosen theme, doubles + shuffles, resets all counters, sets `running=true`.
+- **Flip logic:** ignore if 2 already flipped or card already flipped/matched. On second flip, increment `moves`; if emojis match, mark both `matched` after 400ms; else flip both back after 800ms. On all pairs matched: set `won`, stop timer, update `best[difficulty]` (lowest moves wins; 0 means unset).
+- **Timer:** `useEffect` on `running` runs `setInterval(1000)`, cleared on unmount or stop.
+- **UI:** Setup screen (theme buttons + difficulty buttons + Start) shown when `cards.length === 0`. In-game stats bar (`⏱ time`, `🔄 moves`, `✅ matches/total`, `🏆 best`). Responsive card grid (aspect-square buttons) with states: default / flipped (`bg-primary/20`) / matched (`bg-green-500/20 scale-95`). Win overlay with summary and Play Again button.
+- HowToUse + ToolSeoContent (title, description, 2 paragraphs, 4 FAQs) per prompt.
 
-### 3. Snake (`src/routes/tools.snake.tsx`)
-Standard route shell. Canvas-based.
+### 3. Hangman (`src/routes/tools.hangman.tsx`)
+Standard route shell.
 
-- **Constants:** `GRID=20`, `CELL=20`, `SIZE=400`, `INITIAL_SPEED=150`.
-- **State + refs:** React state for `snake`, `food`, `score`, `best`, `running`, `dead`, `speed`. Mirrored refs (`snakeRef`, `dirRef`, `foodRef`, `scoreRef`) so the `setInterval` `tick` always sees the latest values without re-binding.
-- **Best score:** lazy-init from `localStorage["snake-best"]` (SSR-guarded with `typeof window !== "undefined"`).
-- **Game loop:** `setInterval(tick, speed)` started on `startGame`, cleared on death/unmount. `tick` moves head, checks wall + self collision, eats food (score +10, speed up every 50 pts down to 60ms floor), spawns food on an empty cell.
-- **Rendering:** `useEffect` on `[snake, food]` paints background, subtle grid dots, snake (head bright green, body fading), food (red circle). `roundRect` used (widely supported; fall back to `rect` if needed).
-- **Controls:** keyboard `keydown` for arrow keys + WASD, with 180° reversal guard. On-screen D-pad (▲◄▼►) for mobile. `preventDefault` on arrow keys to avoid page scroll.
-- **Overlays:** start screen (before first play) with 🐍 + Start button; game-over overlay with score, best, and Play Again. Both absolutely positioned inside a `relative` wrapper around the canvas.
-- **Layout:** canvas wrapper `w-full max-w-sm mx-auto relative`; canvas itself `width={SIZE} height={SIZE} className="w-full rounded-xl border-2 border-border"` so it scales responsively while keeping a 400×400 backing buffer.
-- HowToUse + ToolSeoContent (title, description, 2 paragraphs, 4 FAQs) per the prompt.
+- **Word bank:** `WORD_BANK` with 6 categories (Animals, Countries, Sports, Technology, Food, Movies), 10 uppercase words each.
+- **State:** `category`, `word`, `guessed: Set<string>`, `phase: "setup" | "playing" | "won" | "lost"`, `streak`. Derived: `wrong = [...guessed].filter(l => !word.includes(l))`; `MAX_WRONG = 6`.
+- **Start:** picks a random word from selected category, clears `guessed`, sets phase to `playing`.
+- **Guess:** ignored if already guessed or phase != playing. Adds letter; if every letter of `word` is in `guessed` → `phase = "won"`, `streak++`; else if `wrong.length >= MAX_WRONG` → `phase = "lost"`, `streak = 0`.
+- **Keyboard:** physical `keydown` listener (A–Z only) registered when `phase === "playing"`, plus on-screen A–Z grid with three visual states (unused / correct green / wrong faded).
+- **HangmanSVG:** inline component drawing gallows + 6 progressive body parts based on `wrong` count.
+- **UI:** Setup screen = category grid + Start. In-game = HangmanSVG, lives progress bar (`MAX_WRONG - wrong.length` green segments), category hint, word slots (underscored letters, revealed when guessed), keyboard, streak counter. Win = "🎉 You got it!" + reveal green + Next Word. Lose = "💀 Game Over" + reveal red + Try Again.
+- HowToUse + ToolSeoContent (title, description, 2 paragraphs, 4 FAQs) per prompt.
 
 ## Technical Notes
 
-- `routeTree.gen.ts` is auto-regenerated by the TanStack Router Vite plugin — not edited by hand.
-- Route strings: `createFileRoute("/tools/tic-tac-toe")` and `createFileRoute("/tools/snake")` matching the filenames.
-- All `localStorage` access guarded for SSR.
-- Snake game-specific colors (green snake, red food, dark canvas bg) are inline brand-of-game colors — same documented exception used in Wordle/2048.
+- `routeTree.gen.ts` is auto-regenerated by the TanStack Router Vite plugin.
+- Route strings: `createFileRoute("/tools/memory-match")` and `createFileRoute("/tools/hangman")`.
+- All `localStorage` access SSR-guarded (`typeof window !== "undefined"`); Memory Match uses a `mounted` flag before reading best scores to avoid hydration mismatch (same approach already used in 2048).
+- Game-specific accent colors (green for matched/correct, red for wrong) are intentional brand-of-game colors, same exception used in Wordle/2048/Snake.
 - No new dependencies, no backend changes.
 
 ## Out of Scope
 
 - No edits to `routeTree.gen.ts`, `site-footer.tsx`, `index.tsx`, or `tools.index.tsx`.
-- No shared components, no analytics, no persistence beyond `localStorage` best score.
+- No shared components, no analytics, no persistence beyond Memory Match's `localStorage` best scores.

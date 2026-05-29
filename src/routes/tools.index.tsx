@@ -5,7 +5,7 @@ import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/to
 import { ToolCard } from "@/components/tool-card";
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
 
-const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text", "ai"] as const;
+const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text", "ai", "utility", "games", "minigames"] as const;
 type CatParam = (typeof VALID_CATS)[number];
 
 export const Route = createFileRoute("/tools/")({

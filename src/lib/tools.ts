@@ -112,6 +112,7 @@ export const tools: Tool[] = [
   { slug: "tetris", name: "Tetris", description: "Stack falling blocks and clear lines in the ultimate classic arcade game!", category: "minigames", icon: Layers, path: "/tools/tetris" },
   { slug: "word-search", name: "Word Search", description: "Find hidden words in the letter grid — horizontally, vertically and diagonally!", category: "minigames", icon: Search, path: "/tools/word-search" },
   { slug: "typing-speed", name: "Typing Speed Test", description: "Test your typing speed and accuracy! How many words per minute can you type?", category: "minigames", icon: Keyboard, path: "/tools/typing-speed" },
+  { slug: "flappy-bird", name: "Flappy Bird", description: "Tap to flap and fly through the pipes! How far can you go?", category: "minigames", icon: Bird, path: "/tools/flappy-bird" },
 ];
 
 

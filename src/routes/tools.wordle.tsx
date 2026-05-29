@@ -132,11 +132,14 @@ function WordlePage() {
       return next;
     });
 
+    if (evals.some((s) => s === "correct")) playSound("correct");
+
     const isWin = guess === target;
     if (isWin) {
       setWon(true);
       setGameOver(true);
       setShowConfetti(true);
+      playChord(["success", "win"]);
       toast.success(`🎉 Brilliant! You got it in ${nextGuesses.length}/${MAX_TRIES}!`);
       const newStats: Stats = {
         played: stats.played + 1,
@@ -149,6 +152,7 @@ function WordlePage() {
       setTimeout(() => setShowConfetti(false), 3000);
     } else if (nextGuesses.length >= MAX_TRIES) {
       setGameOver(true);
+      playSound("fail");
       toast.error(`😔 The word was: ${target}`);
       const newStats: Stats = {
         played: stats.played + 1,

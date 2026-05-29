@@ -1,49 +1,43 @@
-# Add Memory Match and Hangman to Mini Games
+# Add Minesweeper to Mini Games
 
-Add two more playable games to the `minigames` category, following the exact pattern of `src/routes/tools.tic-tac-toe.tsx` (route shell + SEO `head()` + `ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools`). English-only UI.
+Add a fully playable Minesweeper game to the `minigames` category, following the exact pattern of `src/routes/tools.snake.tsx`. English-only UI.
 
 ## Scope
 
 ### 1. Registry (`src/lib/tools.ts`)
-- Verify `LayoutGrid` is in the `lucide-react` import; add `BookOpen` to the same import line.
-- Append two tool entries after the `snake` entry:
-  - `memory-match` → icon `LayoutGrid`, path `/tools/memory-match`
-  - `hangman` → icon `BookOpen`, path `/tools/hangman`
-- No edits to `routeTree.gen.ts`, `site-footer.tsx`, `index.tsx`, or `tools.index.tsx` — minigames category already wired.
+- Add `Bomb` to the existing `lucide-react` import line.
+- Append one tool entry after `hangman`:
+  - `minesweeper` → icon `Bomb`, path `/tools/minesweeper`, category `minigames`.
 
-### 2. Memory Match (`src/routes/tools.memory-match.tsx`)
-Standard route shell.
+### 2. Minesweeper (`src/routes/tools.minesweeper.tsx`)
+Standard route shell: `createFileRoute("/tools/minesweeper")` + SEO `head()` + `ToolPageShell` + game UI + `HowToUse` + `ToolSeoContent` + `RelatedTools`.
 
-- **Themes:** `EMOJI_SETS` with `animals`, `food`, `sports` (16 emojis each).
-- **Difficulty:** `easy` (4 pairs / 8 cards, 4-col), `medium` (8 pairs / 16 cards, 4-col), `hard` (12 pairs / 24 cards, 6-col).
-- **State:** `difficulty`, `theme`, `cards: Card[]`, `flipped: number[]`, `moves`, `matches`, `time`, `running`, `won`, `best: Record<Difficulty, number>` persisted to `localStorage["memory-best"]` (SSR-guarded with `mounted` flag like 2048).
-- **Init:** `initBoard` slices `count = pairs` emojis from the chosen theme, doubles + shuffles, resets all counters, sets `running=true`.
-- **Flip logic:** ignore if 2 already flipped or card already flipped/matched. On second flip, increment `moves`; if emojis match, mark both `matched` after 400ms; else flip both back after 800ms. On all pairs matched: set `won`, stop timer, update `best[difficulty]` (lowest moves wins; 0 means unset).
-- **Timer:** `useEffect` on `running` runs `setInterval(1000)`, cleared on unmount or stop.
-- **UI:** Setup screen (theme buttons + difficulty buttons + Start) shown when `cards.length === 0`. In-game stats bar (`⏱ time`, `🔄 moves`, `✅ matches/total`, `🏆 best`). Responsive card grid (aspect-square buttons) with states: default / flipped (`bg-primary/20`) / matched (`bg-green-500/20 scale-95`). Win overlay with summary and Play Again button.
-- HowToUse + ToolSeoContent (title, description, 2 paragraphs, 4 FAQs) per prompt.
-
-### 3. Hangman (`src/routes/tools.hangman.tsx`)
-Standard route shell.
-
-- **Word bank:** `WORD_BANK` with 6 categories (Animals, Countries, Sports, Technology, Food, Movies), 10 uppercase words each.
-- **State:** `category`, `word`, `guessed: Set<string>`, `phase: "setup" | "playing" | "won" | "lost"`, `streak`. Derived: `wrong = [...guessed].filter(l => !word.includes(l))`; `MAX_WRONG = 6`.
-- **Start:** picks a random word from selected category, clears `guessed`, sets phase to `playing`.
-- **Guess:** ignored if already guessed or phase != playing. Adds letter; if every letter of `word` is in `guessed` → `phase = "won"`, `streak++`; else if `wrong.length >= MAX_WRONG` → `phase = "lost"`, `streak = 0`.
-- **Keyboard:** physical `keydown` listener (A–Z only) registered when `phase === "playing"`, plus on-screen A–Z grid with three visual states (unused / correct green / wrong faded).
-- **HangmanSVG:** inline component drawing gallows + 6 progressive body parts based on `wrong` count.
-- **UI:** Setup screen = category grid + Start. In-game = HangmanSVG, lives progress bar (`MAX_WRONG - wrong.length` green segments), category hint, word slots (underscored letters, revealed when guessed), keyboard, streak counter. Win = "🎉 You got it!" + reveal green + Next Word. Lose = "💀 Game Over" + reveal red + Try Again.
-- HowToUse + ToolSeoContent (title, description, 2 paragraphs, 4 FAQs) per prompt.
+- **Difficulty configs:** `easy` (9×9, 10 mines), `medium` (16×16, 40), `hard` (16×30, 99).
+- **Cell type:** `{ mine, revealed, flagged, adjacent }`.
+- **State:** `difficulty`, `board`, `phase: "setup" | "playing" | "won" | "lost"`, `time`, `best: Record<Difficulty, number>` persisted to `localStorage["minesweeper-best"]` (SSR-guarded with `mounted` flag like 2048), `firstClick`, `flagCount`.
+- **First-click safety:** mines are placed AFTER the first click, excluding the clicked cell and its 3×3 neighborhood.
+- **Reveal:** flood-fill BFS expands when `adjacent === 0`.
+- **Right-click:** toggles flag (also blocked when revealed); updates `flagCount`.
+- **Chord click:** clicking a revealed numbered cell whose flagged-neighbor count equals its number reveals all unflagged neighbors (loses if any is a mine).
+- **Loss:** reveals all mines, sets phase `lost`.
+- **Win:** when revealed count === total − mines; update best time if lower (0 means unset).
+- **Timer:** `useEffect` on `phase === "playing"` runs `setInterval(1000)`, cleared on cleanup.
+- **Mobile:** `onTouchStart`/`onTouchEnd` long-press (500ms) triggers flag via a `useRef` timer.
+- **UI:**
+  - Setup screen: difficulty selector with labels + best times + Start button.
+  - In-game header: `💣 mines − flags` left, smiley reset button (🙂/😎/😵) center, `⏱ time` right.
+  - Board: horizontally scrollable wrapper for hard difficulty on mobile; classic numeric color palette (1 blue → 8 gray); cells use `bg-secondary` (covered), `bg-background` (revealed), `bg-red-500` (mine on loss), `bg-yellow-500/20` (flagged).
+  - Win/Loss overlays with Play Again / Try Again buttons.
+- HowToUse + ToolSeoContent (title, description, 2 paragraphs about the classic Windows game, 4 FAQs: mobile flagging, difficulty levels, chord clicking, best time tracking) per prompt.
 
 ## Technical Notes
 
-- `routeTree.gen.ts` is auto-regenerated by the TanStack Router Vite plugin.
-- Route strings: `createFileRoute("/tools/memory-match")` and `createFileRoute("/tools/hangman")`.
-- All `localStorage` access SSR-guarded (`typeof window !== "undefined"`); Memory Match uses a `mounted` flag before reading best scores to avoid hydration mismatch (same approach already used in 2048).
-- Game-specific accent colors (green for matched/correct, red for wrong) are intentional brand-of-game colors, same exception used in Wordle/2048/Snake.
+- `routeTree.gen.ts` auto-regenerates via the TanStack Router Vite plugin — no manual edit.
+- All `localStorage` access SSR-guarded; `best` initialized via `mounted` flag (same approach as 2048) to avoid hydration mismatch.
+- Game-specific accent colors (classic Minesweeper number palette, red mine, yellow flag, green/red overlays) are intentional brand-of-game exceptions, same as Wordle/2048/Snake/Hangman.
 - No new dependencies, no backend changes.
 
 ## Out of Scope
 
 - No edits to `routeTree.gen.ts`, `site-footer.tsx`, `index.tsx`, or `tools.index.tsx`.
-- No shared components, no analytics, no persistence beyond Memory Match's `localStorage` best scores.
+- No shared components, no analytics, no persistence beyond `localStorage` best times.

@@ -214,6 +214,7 @@ function SudokuPage() {
     );
     if (complete) {
       setPhase("won");
+      playChord(["success", "win"]);
       if (best[difficulty] === 0 || time < best[difficulty]) {
         const updated = { ...best, [difficulty]: time };
         setBest(updated);

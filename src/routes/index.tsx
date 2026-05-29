@@ -67,7 +67,7 @@ const categoryTaglines: Record<ToolCategory, string> = {
 const INITIAL_PER_CAT = 6;
 
 const POPULAR_SLUGS = ["compress-pdf", "remove-bg", "image-converter", "qr-generator", "video-to-gif", "word-to-pdf"];
-const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games"];
+const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games", "minigames"];
 
 function HomePage() {
   const [q, setQ] = useState("");

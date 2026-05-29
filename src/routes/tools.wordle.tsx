@@ -168,9 +168,10 @@ function WordlePage() {
   const handleKey = useCallback((k: string) => {
     if (gameOver) return;
     if (k === "ENTER") { submitGuess(); return; }
-    if (k === "BACK") { setCurrent((c) => c.slice(0, -1)); return; }
+    if (k === "BACK") { setCurrent((c) => c.slice(0, -1)); playSound("click"); return; }
     if (/^[A-Z]$/.test(k) && current.length < WORD_LEN) {
       setCurrent((c) => (c + k).slice(0, WORD_LEN));
+      playSound("click");
     }
   }, [current, submitGuess, gameOver]);
 

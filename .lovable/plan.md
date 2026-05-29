@@ -1,50 +1,68 @@
-# Add Chess to Mini Games
+# Add Sound Effects to All Mini Games
 
-## Step 1 — Update `src/lib/tools.ts`
-- Add `Crown` to the `lucide-react` import line.
-- Append after the `flappy-bird` entry:
-  ```ts
-  { slug: "chess", name: "Chess", description: "Play chess against a smart AI opponent. Classic strategy game with full rules support!", category: "minigames", icon: Crown, path: "/tools/chess" },
-  ```
+Shared Web Audio utility + targeted `playSound` calls in each mini-game route. No new dependencies, no UI changes.
 
-## Step 2 — Create `src/routes/tools.chess.tsx`
-Mirror the structure of `src/routes/tools.flappy-bird.tsx` (route export, `buildToolMeta` head, `ToolPageShell` + `HowToUse` + `RelatedTools` + `ToolSeoContent`).
+## Step 1 — Create `src/lib/sound.ts`
+New file with:
+- `SoundType` union covering all events listed in the spec.
+- Lazy `AudioContext` getter (created on first call, resumed if suspended).
+- `SOUNDS` config map (freq / type / duration / gain / optional freqEnd) exactly as specified.
+- `playSound(type)` — creates oscillator + gain, schedules frequency ramp and exponential gain decay, wrapped in `try/catch` so SSR / blocked-autoplay environments fail silently.
+- `playChord(types)` — sequences `playSound` calls 80 ms apart via `setTimeout`.
 
-### Engine (pure TS, no libs)
-- **Types**: `Color`, `PieceType`, `Piece`, `Board`, `Move`, `GameState` as specified (includes castling rights, en passant target, half/full move counters).
-- **Constants**: `SYMBOLS` (unicode), `INIT_BOARD`, `INIT_STATE`, `PIECE_VALUE`, `PST` (8×8 piece-square tables).
-- **Move generation**:
-  - `getPieceMoves(state, r, c)` — per-piece pseudo-legal moves. Sliding pieces (R/B/Q) via ray casting. Pawns: 1-step, 2-step from start row, diagonal captures, en passant. King: 1-step + castling (kingside/queenside) when rights intact, path clear, and king not in/through/into check. Knight: 8 jumps.
-  - `getLegalMoves(state)` — filters out moves that leave own king in check.
-  - `isInCheck(state, color)` — scans opponent attacks against own king's square.
-  - `applyMove(state, move)` — immutable: returns new state with board updated; handles captures, castling rook move, en passant capture removal, promotion (defaults to Q if `promotion` unset), updates castling rights when K/R move or rook captured, sets `enPassant` only on pawn 2-step, updates `halfMove` (reset on pawn move/capture) and `fullMove`, toggles `turn`.
+## Step 2 — `src/routes/tools.flappy-bird.tsx`
+- Import `playSound`.
+- `flap()` → `playSound("flap")` (only when phase is `playing`; the start-game branch stays silent or also flaps — match spec: on flap).
+- Inside the score increment block (`p.passed = true`) → `playSound("score")`.
+- On collision (`hit` true) → `playSound("hit")` and `setTimeout(() => playSound("die"), 200)` before the early return.
 
-### AI
-- `evaluate(state)` — material + PST (flip row for black) from white's perspective.
-- `minimax(state, depth, alpha, beta, maximizing)` — alpha-beta as spec'd.
-- `getBestMove(state)` — depth 3, minimizes (AI is black).
-- Trigger via `useEffect` watching `gameState`/`phase`; guard with `aiThinking` ref; run inside `setTimeout(..., 50)` to yield to UI. After AI move call `checkGameOver`.
+## Step 3 — `src/routes/tools.chess.tsx`
+- Import `playSound`, `playChord`.
+- After human move applied: detect capture (target square non-empty pre-move) and castling (king moves 2 files) → play `capture` / `castle` / `move` accordingly. Then if `isInCheck(newState, "black")` → `playSound("check")`.
+- After AI move applied: same classification for AI; check on white.
+- In `checkGameOver`: checkmate with winner=white → `playChord(["win","success"])`; winner=black → `playSound("lose")`; stalemate / 50-move draw → `playSound("fail")`.
 
-### Component state
-`gameState`, `selected`, `legalMoves`, `phase` (`idle`|`playing`|`ended`), `result`, `aiThinkingState`, `promotionPending`, `capturedW`, `capturedB`. Update captured arrays inside the click/AI handlers by diffing before/after boards (or by inspecting the destination square in `applyMove`'s caller).
+## Step 4 — `src/routes/tools.typing-speed.tsx`
+- Import `playSound`, `playChord`.
+- In the input change handler: compare new char vs target char. Correct char → `playSound("correct")` throttled via a `useRef<number>` timestamp (≥80 ms gap). Wrong char → `playSound("wrong")` (also throttled lightly to avoid spam on backspace loops).
+- In `finishGame` → `playChord(["finish","success"])`.
+- In the countdown effect, when `timeLeft <= 5 && timeLeft > 0` → `playSound("tick")` once per tick.
 
-### UI
-- **Status bar** above board: captured pieces left/right, center pill shows "Your turn" / "AI thinking..." / "AI's turn" / end result.
-- **Board**: 8×8 grid, `#F0D9B5`/`#B58863` squares, selected = yellow ring, legal empty = center dot, legal capture = inset ring, rank labels on col 0, file labels on row 7. Unicode pieces with text-shadow for contrast.
-- **Promotion modal**: shown when human pawn reaches row 0; 4 buttons (Q/R/B/N) apply the move with `promotion` field.
-- **Game-over overlay**: emoji + result + Play Again button. Detection covers checkmate, stalemate, and 50-move rule.
-- **Idle state**: a Start button sets `phase` to `playing` (same New Game reset path).
-- **New Game button** below board resets full state.
-- Click handler ignores input unless `phase === "playing"`, white's turn, and AI not thinking.
+## Step 5 — `src/routes/tools.word-search.tsx`
+- Import `playSound`, `playChord`.
+- On word-found branch → `playSound("found")`.
+- When `foundWords.length === words.length` after that update → `playChord(["allFound","success"])`.
 
-### Shell
-- `HowToUse` steps (3) as specified.
-- `RelatedTools currentSlug="chess"`.
-- `ToolSeoContent` with title, description, 2-paragraph body, 4 FAQs (AI difficulty/depth-3, how to castle, pawn promotion modal, how to start a new game).
-- English only, semantic tokens for chrome (board colors are intentional raw hex).
+## Step 6 — `src/routes/tools.tetris.tsx`
+- Import `playSound`, `playChord`.
+- On piece lock (merging into board) → `playSound("place")`.
+- On hard drop key handler → `playSound("tetrisDrop")` (before lock sound is fine; both can fire).
+- When cleared-lines count > 0 → `playSound("clear")`.
+- On game-over transition → `playSound("lose")`.
+
+## Step 7 — `src/routes/tools.memory-match.tsx`
+- Import `playSound`, `playChord`.
+- Card click that reveals → `playSound("flip")`.
+- On match resolution → `playSound("match")`; on mismatch → `playSound("noMatch")`.
+- When all pairs solved → `playChord(["match","success"])`.
+
+## Step 8 — Remaining games
+For each of `tools.2048.tsx`, `tools.sudoku.tsx`, `tools.hangman.tsx`, `tools.wordle.tsx`, `tools.snake.tsx`, `tools.minesweeper.tsx`, `tools.tic-tac-toe.tsx`:
+- Import `playSound`, `playChord`.
+- Wire per the mapping table in the spec:
+  - 2048: move/merge → `click`; win (2048 tile) → `playChord(["success","win"])`; game-over → `fail`.
+  - Sudoku: cell input → `click`; complete/correct solve → `playChord(["success","win"])`; invalid → `wrong`.
+  - Hangman: correct letter → `click`; wrong letter → `wrong`; win → `success`; loss → `fail`.
+  - Wordle: key press → `click`; letter in correct position on submit → `correct` (once per row reveal); win → `playChord(["success","win"])`; loss → `fail`.
+  - Snake: direction key → `click`; food eaten → `score`; death → `fail`.
+  - Minesweeper: reveal → `click`; mine → `die`; win → `playChord(["success","win"])`.
+  - Tic-tac-toe: move → `click`; win → `playChord(["success","win"])`; draw → `fail`.
+
+## Constraints
+- All `playSound` calls live inside user interaction handlers or game-loop callbacks — never at mount.
+- No mute UI, no settings, no extra deps.
+- No changes to `tools.ts`, route tree, SEO blocks, or component shells.
 
 ## Files
-- edit: `src/lib/tools.ts`
-- create: `src/routes/tools.chess.tsx`
-
-Route file is auto-registered — do not edit `routeTree.gen.ts`.
+- create: `src/lib/sound.ts`
+- edit: all 12 mini-game route files listed above.

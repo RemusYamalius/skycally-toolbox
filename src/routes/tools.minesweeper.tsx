@@ -4,6 +4,7 @@ import { Play, RotateCcw } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -203,14 +204,17 @@ function MinesweeperPage() {
       b = revealAllMines(b);
       setBoard(b);
       setPhase("lost");
+      playSound("die");
       return;
     }
 
     b = floodReveal(b, r, c);
     setBoard(b);
+    playSound("click");
 
     if (checkWin(b, difficulty)) {
       setPhase("won");
+      playChord(["success", "win"]);
       persistBest(difficulty, time);
     }
   };
@@ -255,11 +259,13 @@ function MinesweeperPage() {
       b = revealAllMines(b);
       setBoard(b);
       setPhase("lost");
+      playSound("die");
       return;
     }
     setBoard(b);
     if (checkWin(b, difficulty)) {
       setPhase("won");
+      playChord(["success", "win"]);
       persistBest(difficulty, time);
     }
   };

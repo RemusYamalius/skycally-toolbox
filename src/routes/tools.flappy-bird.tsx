@@ -3,6 +3,7 @@ import { useEffect, useRef, useState } from "react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -40,10 +41,14 @@ type Phase = "idle" | "playing" | "dead";
 function FlappyBirdPage() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [score, setScore] = useState(0);
-  const [best, setBest] = useState<number>(() => {
-    if (typeof window === "undefined") return 0;
-    return Number(window.localStorage.getItem("flappy-best") || 0);
-  });
+  const [best, setBest] = useState<number>(0);
+
+  useEffect(() => {
+    try {
+      const v = Number(window.localStorage.getItem("flappy-best") || 0);
+      if (v > 0) setBest(v);
+    } catch { /* ignore */ }
+  }, []);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const birdRef = useRef<BirdState>({ y: H / 2, vy: 0 });
@@ -174,6 +179,7 @@ function FlappyBirdPage() {
         p.passed = true;
         scoreRef.current += 1;
         setScore(scoreRef.current);
+        playSound("score");
       }
     });
 
@@ -197,6 +203,8 @@ function FlappyBirdPage() {
     if (hit) {
       phaseRef.current = "dead";
       setPhase("dead");
+      playSound("hit");
+      setTimeout(() => playSound("die"), 200);
       if (scoreRef.current > bestRef.current) {
         bestRef.current = scoreRef.current;
         setBest(scoreRef.current);
@@ -229,8 +237,10 @@ function FlappyBirdPage() {
   const flap = () => {
     if (phaseRef.current === "playing") {
       birdRef.current.vy = FLAP_FORCE;
+      playSound("flap");
     } else {
       startGame();
+      playSound("flap");
     }
   };
 

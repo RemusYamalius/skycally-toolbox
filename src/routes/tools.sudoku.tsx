@@ -3,6 +3,7 @@ import { useCallback, useEffect, useState } from "react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -160,19 +161,27 @@ function SudokuPage() {
       const newGrid: Grid = userGrid.map((row) => [...row]);
       newGrid[r][c] = n === 0 ? null : newGrid[r][c] === n ? null : n;
       setUserGrid(newGrid);
+      playSound("click");
 
       const newErrors = emptyErrors();
+      let hasError = false;
       for (let row = 0; row < 9; row++)
         for (let col = 0; col < 9; col++)
-          if (newGrid[row][col] !== null && newGrid[row][col] !== solution[row][col])
+          if (newGrid[row][col] !== null && newGrid[row][col] !== solution[row][col]) {
             newErrors[row][col] = true;
+            hasError = true;
+          }
       setErrors(newErrors);
+      if (n !== 0 && newGrid[r][c] !== null && newGrid[r][c] !== solution[r][c]) {
+        playSound("wrong");
+      }
 
       const complete = newGrid.every((row, ri) =>
         row.every((val, ci) => val === solution[ri][ci]),
       );
       if (complete) {
         setPhase("won");
+        playChord(["success", "win"]);
         if (best[difficulty] === 0 || time < best[difficulty]) {
           const updated = { ...best, [difficulty]: time };
           setBest(updated);
@@ -183,6 +192,7 @@ function SudokuPage() {
           }
         }
       }
+      void hasError;
     },
     [selected, phase, given, noteMode, notes, userGrid, solution, best, difficulty, time],
   );
@@ -204,6 +214,7 @@ function SudokuPage() {
     );
     if (complete) {
       setPhase("won");
+      playChord(["success", "win"]);
       if (best[difficulty] === 0 || time < best[difficulty]) {
         const updated = { ...best, [difficulty]: time };
         setBest(updated);

@@ -4,6 +4,7 @@ import { Play, RefreshCw } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
@@ -248,11 +249,14 @@ function WordSearchPage() {
       });
       if (updated.every((pw) => pw.found)) {
         setPhase("won");
+        playChord(["allFound", "success"]);
         if (best[difficulty] === 0 || time < best[difficulty]) {
           const upd = { ...best, [difficulty]: time };
           setBest(upd);
           try { window.localStorage.setItem("wordsearch-best", JSON.stringify(upd)); } catch {}
         }
+      } else {
+        playSound("found");
       }
     }
   };

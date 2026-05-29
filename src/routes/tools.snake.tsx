@@ -4,6 +4,7 @@ import { Play, RotateCcw } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -71,6 +72,7 @@ function SnakePage() {
     stopLoop();
     setRunning(false);
     setDead(true);
+    playSound("fail");
   }, [stopLoop]);
 
   const tick = useCallback(() => {
@@ -99,6 +101,7 @@ function SnakePage() {
     if (head.x === f.x && head.y === f.y) {
       scoreRef.current += 10;
       setScore(scoreRef.current);
+      playSound("score");
       try {
         const stored = parseInt(localStorage.getItem("snake-best") || "0", 10) || 0;
         if (scoreRef.current > stored) {

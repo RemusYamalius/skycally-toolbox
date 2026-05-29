@@ -3,6 +3,7 @@ import { useCallback, useEffect, useRef, useState } from "react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -272,6 +273,8 @@ function TetrisPage() {
       const newBoard = placePiece(board, piece);
       const { board: clearedBoard, cleared } = clearLines(newBoard);
       boardRef.current = clearedBoard;
+      playSound("place");
+      if (cleared > 0) playSound("clear");
 
       const points = SCORE_TABLE[cleared] * levelRef.current;
       scoreRef.current += points;
@@ -297,6 +300,7 @@ function TetrisPage() {
       if (isColliding(clearedBoard, newPiece)) {
         pieceRef.current = null;
         setPhase("over");
+        playSound("lose");
         if (intervalRef.current) clearInterval(intervalRef.current);
         drawBoard();
         drawNextPiece();
@@ -406,6 +410,7 @@ function TetrisPage() {
         }
         case " ": {
           e.preventDefault();
+          playSound("tetrisDrop");
           let dropY = piece.y;
           while (!isColliding(boardRef.current, piece, 0, dropY - piece.y + 1)) dropY++;
           scoreRef.current += (dropY - piece.y) * 2;

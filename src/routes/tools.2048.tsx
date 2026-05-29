@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
@@ -144,6 +145,7 @@ function Game2048() {
       const { board: moved, score: gained, changed } = move(cur, dir);
       if (!changed) return cur;
       const withTile = addTile(moved);
+      playSound("click");
       setScore((s) => {
         const ns = s + gained;
         if (ns > best) {
@@ -156,10 +158,12 @@ function Game2048() {
       });
       if (!won && withTile.flat().some((v) => v === 2048)) {
         setWon(true);
+        playChord(["success", "win"]);
         toast.success("🎉 You reached 2048! Keep going for a higher score.");
       }
       if (!canMove(withTile)) {
         setGameOver(true);
+        playSound("fail");
         toast.error("Game over — no more moves!");
       }
       return withTile;

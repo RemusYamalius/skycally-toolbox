@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
@@ -87,6 +88,7 @@ function TypingSpeedPage() {
     }
   });
   const inputRef = useRef<HTMLTextAreaElement>(null);
+  const lastSoundRef = useRef<number>(0);
 
   const startGame = () => {
     const quotes = QUOTE_BANK[category];
@@ -118,6 +120,7 @@ function TypingSpeedPage() {
     const res: Result = { wpm, accuracy, correct, incorrect, duration };
     setResult(res);
     setPhase("done");
+    playChord(["finish", "success"]);
 
     if (wpm > (best[difficulty] || 0)) {
       const upd = { ...best, [difficulty]: wpm };
@@ -136,6 +139,7 @@ function TypingSpeedPage() {
       finishGame();
       return;
     }
+    if (timeLeft <= 5) playSound("tick");
     const t = setTimeout(() => setTimeLeft((s) => s - 1), 1000);
     return () => clearTimeout(t);
   }, [phase, started, timeLeft]);
@@ -144,6 +148,22 @@ function TypingSpeedPage() {
     if (!started) setStarted(true);
     if (timeLeft <= 0) return;
     const val = e.target.value;
+    const prevLen = input.length;
+    if (val.length > prevLen) {
+      const i = val.length - 1;
+      const now = Date.now();
+      if (val[i] === quote[i]) {
+        if (now - lastSoundRef.current >= 80) {
+          playSound("correct");
+          lastSoundRef.current = now;
+        }
+      } else {
+        if (now - lastSoundRef.current >= 80) {
+          playSound("wrong");
+          lastSoundRef.current = now;
+        }
+      }
+    }
     setInput(val);
     if (val === quote) {
       setTimeout(() => finishGame(), 0);

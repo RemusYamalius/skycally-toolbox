@@ -5,6 +5,7 @@ import { toast } from "sonner";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
@@ -131,11 +132,14 @@ function WordlePage() {
       return next;
     });
 
+    if (evals.some((s) => s === "correct")) playSound("correct");
+
     const isWin = guess === target;
     if (isWin) {
       setWon(true);
       setGameOver(true);
       setShowConfetti(true);
+      playChord(["success", "win"]);
       toast.success(`🎉 Brilliant! You got it in ${nextGuesses.length}/${MAX_TRIES}!`);
       const newStats: Stats = {
         played: stats.played + 1,
@@ -148,6 +152,7 @@ function WordlePage() {
       setTimeout(() => setShowConfetti(false), 3000);
     } else if (nextGuesses.length >= MAX_TRIES) {
       setGameOver(true);
+      playSound("fail");
       toast.error(`😔 The word was: ${target}`);
       const newStats: Stats = {
         played: stats.played + 1,
@@ -163,9 +168,10 @@ function WordlePage() {
   const handleKey = useCallback((k: string) => {
     if (gameOver) return;
     if (k === "ENTER") { submitGuess(); return; }
-    if (k === "BACK") { setCurrent((c) => c.slice(0, -1)); return; }
+    if (k === "BACK") { setCurrent((c) => c.slice(0, -1)); playSound("click"); return; }
     if (/^[A-Z]$/.test(k) && current.length < WORD_LEN) {
       setCurrent((c) => (c + k).slice(0, WORD_LEN));
+      playSound("click");
     }
   }, [current, submitGuess, gameOver]);
 

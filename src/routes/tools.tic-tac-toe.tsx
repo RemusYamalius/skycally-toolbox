@@ -4,6 +4,7 @@ import { RefreshCw, Eraser } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
@@ -109,7 +110,6 @@ function TicTacToePage() {
   const [winLine, setWinLine] = useState<number[] | null>(null);
   const [aiThinking, setAiThinking] = useState(false);
 
-  // Check winner after every board change
   useEffect(() => {
     const result = checkWinner(board);
     if (!result) return;
@@ -117,10 +117,12 @@ function TicTacToePage() {
       setWinner("draw");
       setWinLine(null);
       setScores((s) => ({ ...s, draws: s.draws + 1 }));
+      playSound("fail");
     } else {
       setWinner(result.winner);
       setWinLine(result.line);
       setScores((s) => ({ ...s, [result.winner]: s[result.winner] + 1 }));
+      playChord(["success", "win"]);
     }
   }, [board]);
 
@@ -151,6 +153,7 @@ function TicTacToePage() {
     next[i] = mark;
     setBoard(next);
     setIsX((v) => !v);
+    playSound("click");
   }, [board, isX, winner, mode]);
 
   const newGame = useCallback(() => {

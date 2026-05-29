@@ -4,6 +4,7 @@ import { RefreshCw, Play } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
@@ -85,6 +86,7 @@ function MemoryMatchPage() {
       const newFlipped = [...flipped, idx];
       setCards((prev) => prev.map((c, i) => (i === idx ? { ...c, flipped: true } : c)));
       setFlipped(newFlipped);
+      playSound("flip");
 
       if (newFlipped.length === 2) {
         const nextMoves = moves + 1;
@@ -105,6 +107,7 @@ function MemoryMatchPage() {
               if (newM === CARD_COUNT[difficulty] / 2) {
                 setWon(true);
                 setRunning(false);
+                playChord(["match", "success"]);
                 setBest((prev) => {
                   const cur = prev[difficulty];
                   const next = cur === 0 ? nextMoves : Math.min(cur, nextMoves);
@@ -118,6 +121,8 @@ function MemoryMatchPage() {
                   }
                   return updated;
                 });
+              } else {
+                playSound("match");
               }
               return newM;
             });
@@ -128,6 +133,7 @@ function MemoryMatchPage() {
               prev.map((c, i) => (i === a || i === b ? { ...c, flipped: false } : c)),
             );
             setFlipped([]);
+            playSound("noMatch");
           }, 800);
         }
       }

@@ -3,6 +3,7 @@ import { useEffect, useMemo, useRef, useState } from "react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
+import { playSound, playChord } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
@@ -633,19 +634,35 @@ function ChessPage() {
     const moves = getLegalMoves(state);
     if (moves.length === 0) {
       if (isInCheck(state, state.turn)) {
-        setResult(state.turn === "w" ? "b" : "w");
+        const winner = state.turn === "w" ? "b" : "w";
+        setResult(winner);
+        if (winner === "w") playChord(["win", "success"]);
+        else playSound("lose");
       } else {
         setResult("draw");
+        playSound("fail");
       }
       setPhase("ended");
       return true;
     }
     if (state.halfMove >= 100) {
       setResult("draw");
+      playSound("fail");
       setPhase("ended");
       return true;
     }
     return false;
+  };
+
+  const playMoveSound = (state: GameState, move: Move, wasCapture: boolean, opponent: Color) => {
+    const piece = state.board[move.fromR][move.fromC];
+    const isCastle = piece?.type === "K" && Math.abs(move.toC - move.fromC) === 2;
+    if (isCastle) playSound("castle");
+    else if (wasCapture) playSound("capture");
+    else playSound("move");
+    // check sound shortly after
+    const next = applyMove(state, move);
+    if (isInCheck(next, opponent)) setTimeout(() => playSound("check"), 120);
   };
 
   const doMove = (move: Move) => {
@@ -670,6 +687,8 @@ function ChessPage() {
       else setCapturedB((prev) => [...prev, captured.type]);
     }
     const newState = applyMove(gameState, move);
+    const wasCapture = !!captured || (piece?.type === "P" && !!gameState.enPassant && move.toR === gameState.enPassant[0] && move.toC === gameState.enPassant[1]);
+    playMoveSound(gameState, move, wasCapture, "b");
     setGameState(newState);
     setLastMove(move);
     setSelected(null);
@@ -707,6 +726,8 @@ function ChessPage() {
           else setCapturedB((prev) => [...prev, captured.type]);
         }
         const newState = applyMove(gameState, move);
+        const wasCapture = !!captured || (piece?.type === "P" && !!gameState.enPassant && move.toR === gameState.enPassant[0] && move.toC === gameState.enPassant[1]);
+        playMoveSound(gameState, move, wasCapture, "w");
         setGameState(newState);
         setLastMove(move);
         checkGameOver(newState);

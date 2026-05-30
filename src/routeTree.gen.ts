@@ -88,7 +88,6 @@ import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pd
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
 import { Route as ToolsChessRouteImport } from './routes/tools.chess'
-import { Route as ToolsArrowsGoRouteImport } from './routes/tools.arrows-go'
 import { Route as ToolsBusinessCardGeneratorRouteImport } from './routes/tools.business-card-generator'
 import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calculator'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
@@ -498,11 +497,6 @@ const ToolsCollageMakerRoute = ToolsCollageMakerRouteImport.update({
 const ToolsChessRoute = ToolsChessRouteImport.update({
   id: '/tools/chess',
   path: '/tools/chess',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsArrowsGoRoute = ToolsArrowsGoRouteImport.update({
-  id: '/tools/arrows-go',
-  path: '/tools/arrows-go',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsBusinessCardGeneratorRoute =

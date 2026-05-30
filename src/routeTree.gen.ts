@@ -84,6 +84,7 @@ import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-au
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
+import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
@@ -478,6 +479,11 @@ const ToolsDeletePdfPagesRoute = ToolsDeletePdfPagesRouteImport.update({
   path: '/tools/delete-pdf-pages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsConnectFourRoute = ToolsConnectFourRouteImport.update({
+  id: '/tools/connect-four',
+  path: '/tools/connect-four',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsCompressPdfRoute = ToolsCompressPdfRouteImport.update({
   id: '/tools/compress-pdf',
   path: '/tools/compress-pdf',
@@ -592,6 +598,7 @@ export interface FileRoutesByFullPath {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
@@ -686,6 +693,7 @@ export interface FileRoutesByTo {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
@@ -781,6 +789,7 @@ export interface FileRoutesById {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
@@ -877,6 +886,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/connect-four'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/document-scanner'
@@ -971,6 +981,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/connect-four'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/document-scanner'
@@ -1065,6 +1076,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/connect-four'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/document-scanner'
@@ -1160,6 +1172,7 @@ export interface RootRouteChildren {
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
+  ToolsConnectFourRoute: typeof ToolsConnectFourRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
@@ -1758,6 +1771,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsDeletePdfPagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/connect-four': {
+      id: '/tools/connect-four'
+      path: '/tools/connect-four'
+      fullPath: '/tools/connect-four'
+      preLoaderRoute: typeof ToolsConnectFourRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/compress-pdf': {
       id: '/tools/compress-pdf'
       path: '/tools/compress-pdf'
@@ -1905,6 +1925,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
+  ToolsConnectFourRoute: ToolsConnectFourRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,

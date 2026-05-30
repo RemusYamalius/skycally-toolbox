@@ -1,41 +1,63 @@
-## Plan — Add "Arrows GO!" Mini Game
+## Plan — Rewrite Arrows GO! as a Snake-Exit Puzzle
+
+Replace `src/routes/tools.arrows-go.tsx` entirely with a new game where the player taps "free" arrows (arrows with a clear path to the board edge) to slide them out snake-style, freeing space for others. Goal: clear all arrows from a shaped grid.
 
 ### Step 1 — `src/lib/tools.ts`
-- Add `ArrowRight` to the existing `lucide-react` import.
-- Insert new tool entry right after the `chess` entry:
-  ```ts
-  { slug: "arrows-go", name: "Arrows GO!", description: "Follow the arrows and visit every cell exactly once. Can you clear the board?", category: "minigames", icon: ArrowRight, path: "/tools/arrows-go" },
-  ```
+No changes — the `arrows-go` entry already exists.
 
-### Step 2 — `src/routes/tools.arrows-go.tsx`
-Create new route file mirroring the structure of `tools.chess.tsx`:
-- `createFileRoute("/tools/arrows-go")` with `head()` SEO meta.
-- Wrap UI in `ToolPageShell` (title "Arrows GO!", description as above).
-- Game engine per spec:
-  - Types `Dir`, `CellState`, `Cell`, `Level`.
-  - `ARROW_SYMBOL`, `DIR_DELTA` constants.
-  - 20 handcrafted `LEVELS` exactly as provided.
-  - State: `levelIndex`, `grid`, `pos`, `path`, `visitedCount`, `totalCells`, `phase`, `lives` (5), `hints` (3), `moves`, `bestMoves` (localStorage `arrowsgo-best`), `hintCell`.
-  - `initLevel`, `step`, `handleDead`, `useHint` per spec.
-  - Keyboard: Space/ArrowRight → step, R → reset, H → hint.
-  - SSR-safe localStorage read inside `useEffect` (like Flappy Bird fix).
-- UI:
-  - Top bar with hearts (lives), level label, progress count.
-  - Progress bar (`visitedCount / totalCells`).
-  - CSS grid board with arrow cells, current/visited/hint highlighting, dynamic `cellSize`.
-  - GO button (primary action), Hint button (shows remaining), Reset button.
-  - Level selector grid (1–20) showing current/cleared/locked styling using `bestMoves`.
-  - Win overlay (🎉 with Next Level / Replay, "🏆 Best!" badge when applicable).
-  - Game-Over overlay (💔 Try Again) when `lives <= 0`.
-- Sound effects via `@/lib/sound`: `click` on valid step + hint, `fail` on dead end, `playChord(["success","win"])` on win, `die` when lives hit 0.
-- Add `HowToUse` block with the 3 steps provided.
-- Add `RelatedTools` (matching chess pattern).
-- Add `ToolSeoContent` with provided title/description plus 2 body paragraphs and 4 FAQs (how to win, dead-end behavior, keyboard shortcuts, hint system).
+### Step 2 — `src/routes/tools.arrows-go.tsx` (full replacement)
 
-### Step 3 — Route tree
-- TanStack Router Vite plugin auto-regenerates `src/routeTree.gen.ts`; manually add the new route to keep types in sync (matching how previous mini-games were registered).
+Delete current contents and rebuild from scratch following the spec.
+
+**Types & constants**
+- `Dir`, `Arrow { id, dir, cells: [r,c][], exiting }`, `LevelDef`, `GridCell = -1 | 0 | number`.
+- `DELTA`, `ARROW_SYMBOL`, `S(rows)` shape helper.
+- `ARROW_COLORS` palette (10 tailwind color classes).
+
+**Level pack**
+- 15 handcrafted `LEVELS` exactly as provided in the prompt (square, diamond, plus, heart, arrow, star, T, anchor, butterfly, dog, trophy, 8×8 expert, etc.). Shapes built via `S([...])`.
+
+**Core logic**
+- `buildGrid(level, arrows)` — fills `-1` outside shape, `0` empty, `arrowId` on occupied cells.
+- `isFree(arrow, grid, level)` — walks from head in `dir`; free if every cell until exit is either outside shape or empty.
+- `initLevel(idx, currentLives=5)` — resets arrows, grid, phase, moves, exitingIds, hintArrowId.
+
+**State**
+- `levelIndex`, `arrows`, `grid`, `phase: "playing"|"won"`, `lives` (5), `hints` (3), `moves`, `hintArrowId`, `exitingIds: Set<number>`, `bestMoves` (localStorage `arrowsgo-best`, read SSR-safe inside `useEffect`).
+
+**Interaction**
+- `handleArrowClick(id)`:
+  - If not free → `playSound("fail")`, `lives--`; if 0 → `playSound("die")` (game-over overlay).
+  - If free → `playSound("correct")`, increment `moves`, mark arrow `exiting`, start `setInterval(80ms)` snake animation: each tick advances head by `DELTA`, drops tail; when all cells lie outside shape, clear interval, remove arrow, rebuild grid, `playSound("score")`. When `arrows.length===0` → `phase="won"`, `playChord(["success","win"])`, update `bestMoves` in localStorage.
+- `useHint()` — finds first free arrow, sets `hintArrowId` for 1500ms, decrements hints, `playSound("click")`.
+- Keyboard: `R` → reset current level (preserve lives), `H` → hint.
+
+**Rendering**
+- Top bar: 5 hearts (filled by `lives`), level label, `{arrows.length} left`.
+- Board: CSS grid `rows × cols`, dynamic `cellPx = min(floor(340/max(rows,cols)), 44)`. For each cell:
+  - Outside shape (`!level.shape[r][c]`) → empty spacer div.
+  - Inside, no arrow → `bg-card border-border` empty tile.
+  - Inside, has arrow → colored tile using `ARROW_COLORS[(arrowId-1)%10]`. Head cell shows `ARROW_SYMBOL[dir]`. Free arrows get `ring-2 ring-white/70 cursor-pointer scale-105 shadow-lg`. Exiting arrows get `opacity-60 scale-95`. Hint arrow gets `ring-4 ring-yellow-300 animate-pulse`.
+  - `arrowMeta` precomputed via `useMemo` mapping `"r-c" → {arrowId, isHead, isTail, dir, exiting}`.
+- Action row: Hint button (`💡 {hints}`, disabled at 0), Reset button.
+- Level selector: 15-button grid; current = primary, cleared (`bestMoves[id]`) = green tint, else card.
+- Keyboard hint line (`R` reset, `H` hint).
+
+**Overlays**
+- Win (`phase==="won" && lives>0`): 🎉, "Level Cleared!", moves, "🏆 Best!" badge if matched, Next/Replay buttons.
+- Game-over (`lives<=0`): 💔, "No Lives Left!", Try Again resets lives to 5.
+
+**SEO / shell**
+- `createFileRoute("/tools/arrows-go")` with `head: () => buildToolMeta(toolBySlug("arrows-go", tools))`.
+- Wrap in `ToolPageShell` (title "Arrows GO!", description from tools.ts).
+- `HowToUse` with the 3 provided steps (tap glowing arrow / slides out snake-style / clear all).
+- `RelatedTools currentSlug="arrows-go"`.
+- `ToolSeoContent` with title, description, 2 body paragraphs (~150–200 words total) and 4 FAQs: which arrow is free (glowing ring), wrong tap penalty, hint system, `R` to reset.
+
+### Step 3 — `src/routeTree.gen.ts`
+Already registered from previous version — no change.
 
 ### Notes
-- Pure JSX/CSS grid — no canvas, no new deps.
-- All design tokens via `bg-card`, `border-border`, `text-primary-foreground`, etc. — no raw colors.
-- English-only UI strings.
+- Pure JSX + CSS grid, no canvas, no new deps.
+- All colors via tailwind utility classes (arrow palette uses explicit colors as it's gameplay state, not theme chrome — same pattern as Tetris/Sudoku).
+- All UI strings English. SSR-safe localStorage. Sounds via `@/lib/sound`.

@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useState } from "react";
+import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -17,20 +17,31 @@ export const Route = createFileRoute("/tools/arrows-go")({
 
 // ============ Types ============
 type Dir = "U" | "D" | "L" | "R";
-type CellState = "empty" | "unvisited" | "visited" | "current" | "dead";
 
-interface Cell {
-  dir: Dir | null;
-  state: CellState;
+interface Arrow {
+  id: number;
+  dir: Dir;
+  cells: [number, number][]; // tail → head
+  exiting: boolean;
 }
 
-interface Level {
+interface LevelDef {
   id: number;
   label: string;
-  grid: (Dir | null)[][];
-  startR: number;
-  startC: number;
+  rows: number;
+  cols: number;
+  shape: boolean[][];
+  arrows: { dir: Dir; cells: [number, number][] }[];
 }
+
+type GridCell = number; // -1 outside, 0 empty, >0 arrowId
+
+const DELTA: Record<Dir, [number, number]> = {
+  U: [-1, 0],
+  D: [1, 0],
+  L: [0, -1],
+  R: [0, 1],
+};
 
 const ARROW_SYMBOL: Record<Dir, string> = {
   U: "↑",
@@ -39,49 +50,414 @@ const ARROW_SYMBOL: Record<Dir, string> = {
   R: "→",
 };
 
-const DIR_DELTA: Record<Dir, [number, number]> = {
-  U: [-1, 0],
-  D: [1, 0],
-  L: [0, -1],
-  R: [0, 1],
+const S = (rows: string[]): boolean[][] =>
+  rows.map((r) => r.split("").map((c) => c === "#"));
+
+const ARROW_COLORS = [
+  "bg-blue-500/80 text-white border-blue-400",
+  "bg-red-500/80 text-white border-red-400",
+  "bg-green-500/80 text-white border-green-400",
+  "bg-yellow-500/80 text-black border-yellow-400",
+  "bg-purple-500/80 text-white border-purple-400",
+  "bg-orange-500/80 text-white border-orange-400",
+  "bg-pink-500/80 text-white border-pink-400",
+  "bg-cyan-500/80 text-white border-cyan-400",
+  "bg-teal-500/80 text-white border-teal-400",
+  "bg-indigo-500/80 text-white border-indigo-400",
+];
+
+const LEVELS: LevelDef[] = [
+  {
+    id: 1, label: "Level 1", rows: 4, cols: 4,
+    shape: S(["####", "####", "####", "####"]),
+    arrows: [
+      { dir: "R", cells: [[0, 0], [0, 1]] },
+      { dir: "D", cells: [[0, 2], [1, 2]] },
+      { dir: "L", cells: [[0, 3]] },
+      { dir: "R", cells: [[1, 0]] },
+      { dir: "D", cells: [[1, 3], [2, 3]] },
+      { dir: "R", cells: [[2, 0]] },
+      { dir: "L", cells: [[2, 2]] },
+      { dir: "U", cells: [[3, 0], [2, 0]] },
+      { dir: "R", cells: [[3, 1], [3, 2]] },
+      { dir: "U", cells: [[3, 3]] },
+    ],
+  },
+  {
+    id: 2, label: "Level 2", rows: 5, cols: 5,
+    shape: S(["#####", "#####", "#####", "#####", "#####"]),
+    arrows: [
+      { dir: "R", cells: [[0, 0], [0, 1], [0, 2]] },
+      { dir: "D", cells: [[0, 3], [1, 3]] },
+      { dir: "L", cells: [[0, 4]] },
+      { dir: "U", cells: [[1, 0]] },
+      { dir: "R", cells: [[1, 1], [1, 2]] },
+      { dir: "D", cells: [[1, 4], [2, 4]] },
+      { dir: "L", cells: [[2, 0], [2, 1]] },
+      { dir: "D", cells: [[2, 2], [3, 2]] },
+      { dir: "R", cells: [[2, 3]] },
+      { dir: "L", cells: [[3, 1]] },
+      { dir: "R", cells: [[3, 3], [3, 4]] },
+      { dir: "U", cells: [[4, 0]] },
+      { dir: "R", cells: [[4, 1], [4, 2]] },
+      { dir: "L", cells: [[4, 4]] },
+    ],
+  },
+  {
+    id: 3, label: "Level 3", rows: 5, cols: 5,
+    shape: S(["..#..", ".###.", "#####", ".###.", "..#.."]),
+    arrows: [
+      { dir: "D", cells: [[0, 2], [1, 2]] },
+      { dir: "L", cells: [[1, 1]] },
+      { dir: "R", cells: [[1, 3]] },
+      { dir: "L", cells: [[2, 0], [2, 1]] },
+      { dir: "D", cells: [[2, 2], [3, 2]] },
+      { dir: "R", cells: [[2, 3], [2, 4]] },
+      { dir: "L", cells: [[3, 1]] },
+      { dir: "R", cells: [[3, 3]] },
+      { dir: "D", cells: [[4, 2]] },
+    ],
+  },
+  {
+    id: 4, label: "Level 4", rows: 5, cols: 5,
+    shape: S([".###.", ".###.", "#####", ".###.", ".###."]),
+    arrows: [
+      { dir: "D", cells: [[0, 1], [1, 1]] },
+      { dir: "U", cells: [[0, 2]] },
+      { dir: "D", cells: [[0, 3], [1, 3]] },
+      { dir: "L", cells: [[1, 2]] },
+      { dir: "L", cells: [[2, 0], [2, 1]] },
+      { dir: "R", cells: [[2, 3], [2, 4]] },
+      { dir: "D", cells: [[3, 1]] },
+      { dir: "R", cells: [[3, 2], [3, 3]] },
+      { dir: "U", cells: [[4, 1]] },
+      { dir: "D", cells: [[4, 2]] },
+      { dir: "U", cells: [[4, 3], [3, 3]] },
+    ],
+  },
+  {
+    id: 5, label: "Level 5", rows: 6, cols: 6,
+    shape: S([".##.##", "######", "######", ".####.", "..##..", "...#.."]),
+    arrows: [
+      { dir: "R", cells: [[0, 1]] },
+      { dir: "L", cells: [[0, 3], [0, 4]] },
+      { dir: "D", cells: [[1, 0], [2, 0]] },
+      { dir: "R", cells: [[1, 1], [1, 2]] },
+      { dir: "L", cells: [[1, 3], [1, 4]] },
+      { dir: "U", cells: [[1, 5], [0, 5]] },
+      { dir: "D", cells: [[2, 1], [3, 1]] },
+      { dir: "R", cells: [[2, 2]] },
+      { dir: "L", cells: [[2, 3]] },
+      { dir: "L", cells: [[2, 5]] },
+      { dir: "R", cells: [[3, 2], [3, 3]] },
+      { dir: "L", cells: [[3, 4]] },
+      { dir: "D", cells: [[4, 2]] },
+      { dir: "R", cells: [[4, 3]] },
+      { dir: "D", cells: [[5, 3]] },
+    ],
+  },
+  {
+    id: 6, label: "Level 6", rows: 5, cols: 7,
+    shape: S(["...#...", "..###..", "#######", "..###..", "...#..."]),
+    arrows: [
+      { dir: "U", cells: [[0, 3]] },
+      { dir: "L", cells: [[1, 2]] },
+      { dir: "R", cells: [[1, 4]] },
+      { dir: "L", cells: [[2, 0], [2, 1], [2, 2]] },
+      { dir: "U", cells: [[2, 3], [1, 3]] },
+      { dir: "R", cells: [[2, 4], [2, 5], [2, 6]] },
+      { dir: "L", cells: [[3, 2]] },
+      { dir: "R", cells: [[3, 4]] },
+      { dir: "D", cells: [[4, 3]] },
+    ],
+  },
+  {
+    id: 7, label: "Level 7", rows: 6, cols: 6,
+    shape: S(["######", "######", "######", "######", "######", "######"]),
+    arrows: [
+      { dir: "R", cells: [[0, 0], [0, 1], [0, 2]] },
+      { dir: "D", cells: [[0, 3], [1, 3]] },
+      { dir: "L", cells: [[0, 4], [0, 5]] },
+      { dir: "U", cells: [[1, 0]] },
+      { dir: "R", cells: [[1, 1], [1, 2]] },
+      { dir: "D", cells: [[1, 4], [2, 4]] },
+      { dir: "L", cells: [[1, 5]] },
+      { dir: "D", cells: [[2, 0], [3, 0]] },
+      { dir: "L", cells: [[2, 1], [2, 2], [2, 3]] },
+      { dir: "R", cells: [[2, 5]] },
+      { dir: "R", cells: [[3, 2], [3, 3]] },
+      { dir: "D", cells: [[3, 4], [4, 4]] },
+      { dir: "U", cells: [[3, 5]] },
+      { dir: "R", cells: [[4, 0], [4, 1]] },
+      { dir: "L", cells: [[4, 2], [4, 3]] },
+      { dir: "U", cells: [[4, 5]] },
+      { dir: "U", cells: [[5, 0]] },
+      { dir: "R", cells: [[5, 1], [5, 2], [5, 3]] },
+      { dir: "D", cells: [[5, 4]] },
+      { dir: "L", cells: [[5, 5]] },
+    ],
+  },
+  {
+    id: 8, label: "Level 8", rows: 7, cols: 7,
+    shape: S(["...#...", "..###..", "#######", "##.#.##", "#######", "..###..", "...#..."]),
+    arrows: [
+      { dir: "U", cells: [[0, 3]] },
+      { dir: "L", cells: [[1, 2]] },
+      { dir: "R", cells: [[1, 4]] },
+      { dir: "L", cells: [[2, 0], [2, 1], [2, 2]] },
+      { dir: "D", cells: [[2, 3], [3, 3]] },
+      { dir: "R", cells: [[2, 4], [2, 5], [2, 6]] },
+      { dir: "L", cells: [[3, 0], [3, 1]] },
+      { dir: "R", cells: [[3, 5], [3, 6]] },
+      { dir: "L", cells: [[4, 0], [4, 1], [4, 2]] },
+      { dir: "R", cells: [[4, 4], [4, 5], [4, 6]] },
+      { dir: "L", cells: [[5, 2]] },
+      { dir: "R", cells: [[5, 4]] },
+      { dir: "D", cells: [[6, 3]] },
+    ],
+  },
+  {
+    id: 9, label: "Level 9", rows: 5, cols: 7,
+    shape: S(["#######", "#######", "..###..", "..###..", "..###.."]),
+    arrows: [
+      { dir: "R", cells: [[0, 0], [0, 1], [0, 2]] },
+      { dir: "D", cells: [[0, 3], [1, 3]] },
+      { dir: "L", cells: [[0, 4], [0, 5], [0, 6]] },
+      { dir: "U", cells: [[1, 0]] },
+      { dir: "R", cells: [[1, 1], [1, 2]] },
+      { dir: "L", cells: [[1, 4], [1, 5]] },
+      { dir: "U", cells: [[1, 6]] },
+      { dir: "D", cells: [[2, 2], [3, 2]] },
+      { dir: "D", cells: [[2, 4], [3, 4]] },
+      { dir: "L", cells: [[3, 3]] },
+      { dir: "U", cells: [[4, 2]] },
+      { dir: "D", cells: [[4, 3]] },
+      { dir: "U", cells: [[4, 4]] },
+    ],
+  },
+  {
+    id: 10, label: "Level 10", rows: 7, cols: 6,
+    shape: S([".####.", ".####.", "######", ".####.", "#.##.#", "#.##.#", ".####."]),
+    arrows: [
+      { dir: "R", cells: [[0, 1], [0, 2]] },
+      { dir: "L", cells: [[0, 3], [0, 4]] },
+      { dir: "D", cells: [[1, 1], [2, 1]] },
+      { dir: "U", cells: [[1, 2]] },
+      { dir: "D", cells: [[1, 3], [2, 3]] },
+      { dir: "U", cells: [[1, 4]] },
+      { dir: "L", cells: [[2, 0]] },
+      { dir: "R", cells: [[2, 2]] },
+      { dir: "L", cells: [[2, 4]] },
+      { dir: "R", cells: [[2, 5]] },
+      { dir: "D", cells: [[3, 1], [4, 1]] },
+      { dir: "U", cells: [[3, 2]] },
+      { dir: "D", cells: [[3, 3], [4, 3]] },
+      { dir: "U", cells: [[3, 4]] },
+      { dir: "L", cells: [[4, 0]] },
+      { dir: "R", cells: [[4, 5]] },
+      { dir: "D", cells: [[5, 1], [6, 1]] },
+      { dir: "U", cells: [[5, 2]] },
+      { dir: "D", cells: [[5, 3], [6, 3]] },
+      { dir: "U", cells: [[5, 4]] },
+      { dir: "R", cells: [[6, 2]] },
+      { dir: "L", cells: [[6, 4]] },
+    ],
+  },
+  {
+    id: 11, label: "Level 11", rows: 7, cols: 7,
+    shape: S(["#######", "#######", "#######", "#######", "#######", "#######", "#######"]),
+    arrows: [
+      { dir: "R", cells: [[0, 0], [0, 1], [0, 2]] },
+      { dir: "D", cells: [[0, 3], [1, 3], [2, 3]] },
+      { dir: "L", cells: [[0, 4], [0, 5], [0, 6]] },
+      { dir: "U", cells: [[1, 0]] },
+      { dir: "R", cells: [[1, 1], [1, 2]] },
+      { dir: "L", cells: [[1, 4], [1, 5]] },
+      { dir: "U", cells: [[1, 6]] },
+      { dir: "D", cells: [[2, 0], [3, 0]] },
+      { dir: "L", cells: [[2, 1], [2, 2]] },
+      { dir: "R", cells: [[2, 4], [2, 5]] },
+      { dir: "U", cells: [[2, 6]] },
+      { dir: "R", cells: [[3, 1], [3, 2]] },
+      { dir: "L", cells: [[3, 4], [3, 5]] },
+      { dir: "D", cells: [[3, 6], [4, 6]] },
+      { dir: "U", cells: [[4, 0]] },
+      { dir: "D", cells: [[4, 1], [5, 1]] },
+      { dir: "R", cells: [[4, 2], [4, 3]] },
+      { dir: "L", cells: [[4, 4], [4, 5]] },
+      { dir: "D", cells: [[5, 0], [6, 0]] },
+      { dir: "R", cells: [[5, 3], [5, 4]] },
+      { dir: "U", cells: [[5, 5]] },
+      { dir: "L", cells: [[5, 6]] },
+      { dir: "R", cells: [[6, 1], [6, 2], [6, 3]] },
+      { dir: "L", cells: [[6, 4], [6, 5], [6, 6]] },
+    ],
+  },
+  {
+    id: 12, label: "Level 12", rows: 6, cols: 8,
+    shape: S(["##...##.", "####.###", "########", "########", "###.####", ".##...##"]),
+    arrows: [
+      { dir: "R", cells: [[0, 0], [0, 1]] },
+      { dir: "L", cells: [[0, 5], [0, 6]] },
+      { dir: "D", cells: [[1, 0], [2, 0]] },
+      { dir: "R", cells: [[1, 1], [1, 2], [1, 3]] },
+      { dir: "L", cells: [[1, 5], [1, 6], [1, 7]] },
+      { dir: "R", cells: [[2, 1], [2, 2]] },
+      { dir: "L", cells: [[2, 4], [2, 5]] },
+      { dir: "U", cells: [[2, 6]] },
+      { dir: "D", cells: [[2, 7], [3, 7]] },
+      { dir: "D", cells: [[3, 0], [4, 0]] },
+      { dir: "L", cells: [[3, 1], [3, 2], [3, 3]] },
+      { dir: "R", cells: [[3, 4], [3, 5], [3, 6]] },
+      { dir: "D", cells: [[4, 1], [5, 1]] },
+      { dir: "U", cells: [[4, 2]] },
+      { dir: "R", cells: [[4, 4]] },
+      { dir: "L", cells: [[4, 5]] },
+      { dir: "D", cells: [[4, 6], [5, 6]] },
+      { dir: "U", cells: [[4, 7]] },
+      { dir: "R", cells: [[5, 2]] },
+      { dir: "L", cells: [[5, 7]] },
+    ],
+  },
+  {
+    id: 13, label: "Level 13", rows: 7, cols: 8,
+    shape: S(["#####..#", "########", "########", "########", ".######.", ".##.##..", ".##.##.."]),
+    arrows: [
+      { dir: "R", cells: [[0, 0], [0, 1]] },
+      { dir: "D", cells: [[0, 2], [1, 2]] },
+      { dir: "L", cells: [[0, 3], [0, 4]] },
+      { dir: "D", cells: [[0, 7], [1, 7]] },
+      { dir: "D", cells: [[1, 0], [2, 0]] },
+      { dir: "R", cells: [[1, 1]] },
+      { dir: "R", cells: [[1, 3], [1, 4]] },
+      { dir: "L", cells: [[1, 5], [1, 6]] },
+      { dir: "U", cells: [[2, 1], [1, 1]] },
+      { dir: "R", cells: [[2, 2], [2, 3]] },
+      { dir: "L", cells: [[2, 4], [2, 5]] },
+      { dir: "D", cells: [[2, 6], [3, 6]] },
+      { dir: "D", cells: [[2, 7], [3, 7]] },
+      { dir: "L", cells: [[3, 0], [3, 1], [3, 2]] },
+      { dir: "R", cells: [[3, 3], [3, 4], [3, 5]] },
+      { dir: "D", cells: [[4, 1], [5, 1]] },
+      { dir: "R", cells: [[4, 2], [4, 3]] },
+      { dir: "L", cells: [[4, 4], [4, 5]] },
+      { dir: "D", cells: [[4, 6], [5, 6]] },
+      { dir: "D", cells: [[5, 2], [6, 2]] },
+      { dir: "D", cells: [[5, 4], [6, 4]] },
+      { dir: "D", cells: [[6, 1]] },
+      { dir: "L", cells: [[6, 5]] },
+    ],
+  },
+  {
+    id: 14, label: "Level 14", rows: 7, cols: 7,
+    shape: S(["#######", "#######", ".#####.", "..###..", "..###..", ".#####.", ".#####."]),
+    arrows: [
+      { dir: "R", cells: [[0, 0], [0, 1], [0, 2]] },
+      { dir: "D", cells: [[0, 3], [1, 3]] },
+      { dir: "L", cells: [[0, 4], [0, 5], [0, 6]] },
+      { dir: "U", cells: [[1, 0]] },
+      { dir: "R", cells: [[1, 1], [1, 2]] },
+      { dir: "L", cells: [[1, 4], [1, 5]] },
+      { dir: "U", cells: [[1, 6]] },
+      { dir: "D", cells: [[2, 1], [3, 1]] },
+      { dir: "R", cells: [[2, 2]] },
+      { dir: "L", cells: [[2, 4]] },
+      { dir: "U", cells: [[2, 5], [1, 5]] },
+      { dir: "U", cells: [[3, 2]] },
+      { dir: "D", cells: [[3, 3], [4, 3]] },
+      { dir: "U", cells: [[3, 4]] },
+      { dir: "R", cells: [[4, 2]] },
+      { dir: "L", cells: [[4, 4]] },
+      { dir: "D", cells: [[5, 1], [6, 1]] },
+      { dir: "R", cells: [[5, 2], [5, 3]] },
+      { dir: "L", cells: [[5, 4], [5, 5]] },
+      { dir: "R", cells: [[6, 2]] },
+      { dir: "U", cells: [[6, 3], [5, 3]] },
+      { dir: "L", cells: [[6, 4], [6, 5]] },
+    ],
+  },
+  {
+    id: 15, label: "Level 15", rows: 8, cols: 8,
+    shape: S(["########", "########", "########", "########", "########", "########", "########", "########"]),
+    arrows: [
+      { dir: "R", cells: [[0, 0], [0, 1], [0, 2]] },
+      { dir: "D", cells: [[0, 3], [1, 3], [2, 3]] },
+      { dir: "L", cells: [[0, 4], [0, 5]] },
+      { dir: "R", cells: [[0, 6], [0, 7]] },
+      { dir: "U", cells: [[1, 0]] },
+      { dir: "R", cells: [[1, 1], [1, 2]] },
+      { dir: "D", cells: [[1, 4], [2, 4]] },
+      { dir: "L", cells: [[1, 5], [1, 6]] },
+      { dir: "U", cells: [[1, 7]] },
+      { dir: "L", cells: [[2, 0], [2, 1], [2, 2]] },
+      { dir: "R", cells: [[2, 5], [2, 6], [2, 7]] },
+      { dir: "U", cells: [[3, 0]] },
+      { dir: "R", cells: [[3, 1], [3, 2]] },
+      { dir: "L", cells: [[3, 3], [3, 4]] },
+      { dir: "L", cells: [[3, 5], [3, 6]] },
+      { dir: "D", cells: [[3, 7], [4, 7]] },
+      { dir: "D", cells: [[4, 0], [5, 0]] },
+      { dir: "U", cells: [[4, 1]] },
+      { dir: "R", cells: [[4, 2], [4, 3]] },
+      { dir: "L", cells: [[4, 4], [4, 5]] },
+      { dir: "U", cells: [[4, 6]] },
+      { dir: "R", cells: [[5, 1], [5, 2], [5, 3]] },
+      { dir: "D", cells: [[5, 4], [6, 4]] },
+      { dir: "L", cells: [[5, 5], [5, 6], [5, 7]] },
+      { dir: "U", cells: [[6, 0]] },
+      { dir: "D", cells: [[6, 1], [7, 1]] },
+      { dir: "L", cells: [[6, 2], [6, 3]] },
+      { dir: "R", cells: [[6, 5], [6, 6]] },
+      { dir: "U", cells: [[6, 7]] },
+      { dir: "R", cells: [[7, 0]] },
+      { dir: "R", cells: [[7, 2], [7, 3], [7, 4]] },
+      { dir: "U", cells: [[7, 5]] },
+      { dir: "L", cells: [[7, 6], [7, 7]] },
+    ],
+  },
+];
+
+// ============ Helpers ============
+const buildGrid = (level: LevelDef, arrows: Arrow[]): GridCell[][] => {
+  const grid: GridCell[][] = Array.from({ length: level.rows }, (_, r) =>
+    Array.from({ length: level.cols }, (_, c) => (level.shape[r][c] ? 0 : -1)),
+  );
+  arrows.forEach((arrow) => {
+    arrow.cells.forEach(([r, c]) => {
+      if (r >= 0 && r < level.rows && c >= 0 && c < level.cols) {
+        grid[r][c] = arrow.id;
+      }
+    });
+  });
+  return grid;
 };
 
-const LEVELS: Level[] = [
-  { id: 1, label: "Level 1", startR: 0, startC: 0, grid: [["R","R","D"],["U","R","D"],["U","L","L"]] },
-  { id: 2, label: "Level 2", startR: 0, startC: 0, grid: [["D","R","D"],["D","U","U"],["R","R","U"]] },
-  { id: 3, label: "Level 3", startR: 0, startC: 0, grid: [["R","R","R","D"],["U","R","D","D"],["U","U","D","D"],["U","L","L","L"]] },
-  { id: 4, label: "Level 4", startR: 0, startC: 0, grid: [["D","R","D","L"],["D","U","D","U"],["R","R","U","U"],["R","U","L","L"]] },
-  { id: 5, label: "Level 5", startR: 0, startC: 0, grid: [["R","D","L","D"],["U","D","U","D"],["U","R","R","U"],["R","R","U","L"]] },
-  { id: 6, label: "Level 6", startR: 0, startC: 0, grid: [["R","R","R","R","D"],["U","R","R","D","D"],["U","U","D","D","D"],["U","U","D","L","L"],["U","L","L","L","L"]] },
-  { id: 7, label: "Level 7", startR: 0, startC: 0, grid: [["D","R","D","L","D"],["D","U","D","U","D"],["R","R","U","R","U"],["U","D","L","D","L"],["U","R","R","R","U"]] },
-  { id: 8, label: "Level 8", startR: 0, startC: 0, grid: [["R","D","L","D","L"],["U","D","U","D","U"],["U","R","R","U","L"],["U","D","L","D","L"],["U","R","R","R","U"]] },
-  { id: 9, label: "Level 9", startR: 0, startC: 0, grid: [["D","R","R","D","L"],["R","U","D","L","U"],["U","R","U","D","L"],["U","D","L","U","D"],["R","R","R","U","L"]] },
-  { id: 10, label: "Level 10", startR: 0, startC: 0, grid: [["R","R","D","L","D"],["U","D","D","U","D"],["U","R","U","L","D"],["U","D","L","D","L"],["U","R","R","R","U"]] },
-  { id: 11, label: "Level 11", startR: 0, startC: 0, grid: [["R","R","R","R","R","D"],["U","R","R","R","D","D"],["U","U","R","D","D","D"],["U","U","U","D","L","L"],["U","U","L","L","L","L"],["U","L","L","L","L","L"]] },
-  { id: 12, label: "Level 12", startR: 0, startC: 0, grid: [["D","R","R","D","L","D"],["D","U","D","D","U","D"],["R","R","U","R","R","U"],["U","D","L","U","D","L"],["U","D","R","R","U","L"],["U","R","U","L","L","L"]] },
-  { id: 13, label: "Level 13", startR: 0, startC: 0, grid: [["R","D","L","R","D","L"],["U","D","U","U","D","U"],["U","R","R","R","U","L"],["U","D","L","D","R","L"],["U","R","U","R","U","L"],["R","U","L","U","L","L"]] },
-  { id: 14, label: "Level 14", startR: 0, startC: 0, grid: [["D","R","D","L","D","L"],["R","U","D","U","D","U"],["U","L","U","D","U","L"],["U","D","R","U","L","D"],["U","R","U","L","D","D"],["R","R","R","R","U","L"]] },
-  { id: 15, label: "Level 15", startR: 0, startC: 0, grid: [["R","R","D","L","D","L"],["U","D","D","U","R","U"],["U","R","U","L","D","L"],["U","D","R","D","U","L"],["U","R","U","R","U","L"],["R","U","L","U","L","L"]] },
-  { id: 16, label: "Level 16", startR: 0, startC: 0, grid: [["R","R","R","R","R","R","D"],["U","R","R","R","R","D","D"],["U","U","R","R","D","D","D"],["U","U","U","D","D","D","L"],["U","U","L","L","D","L","L"],["U","L","L","L","L","L","L"],["U","L","L","L","L","L","L"]] },
-  { id: 17, label: "Level 17", startR: 0, startC: 0, grid: [["D","R","D","L","D","R","D"],["D","U","D","U","D","U","D"],["R","R","U","R","U","L","U"],["U","D","L","D","R","D","L"],["U","R","U","R","U","D","L"],["U","D","L","U","L","D","L"],["U","R","R","R","R","U","L"]] },
-  { id: 18, label: "Level 18", startR: 0, startC: 0, grid: [["R","D","L","R","R","D","L"],["U","D","U","U","D","D","U"],["U","R","R","R","U","R","U"],["U","D","L","D","L","D","L"],["U","R","U","R","U","D","L"],["U","D","L","U","L","D","L"],["U","R","R","R","R","U","L"]] },
-  { id: 19, label: "Level 19", startR: 0, startC: 0, grid: [["D","R","R","D","L","D","L"],["R","U","D","U","D","D","U"],["U","L","U","L","U","R","U"],["U","D","R","D","L","D","L"],["U","R","U","R","U","D","L"],["U","D","L","U","L","R","U"],["U","R","R","R","U","L","L"]] },
-  { id: 20, label: "Level 20", startR: 0, startC: 0, grid: [["R","D","L","D","R","D","L"],["U","D","U","R","U","D","U"],["U","R","R","U","L","U","L"],["U","D","L","D","R","D","L"],["U","R","U","R","U","D","L"],["U","D","L","U","L","R","U"],["U","R","R","D","L","U","L"]] },
-];
+const isFree = (arrow: Arrow, grid: GridCell[][], level: LevelDef): boolean => {
+  if (arrow.exiting) return false;
+  const head = arrow.cells[arrow.cells.length - 1];
+  const [dr, dc] = DELTA[arrow.dir];
+  let r = head[0] + dr;
+  let c = head[1] + dc;
+  while (r >= 0 && r < level.rows && c >= 0 && c < level.cols) {
+    if (!level.shape[r][c]) return true; // hit hole = path to exit
+    if (grid[r][c] !== 0) return false;
+    r += dr;
+    c += dc;
+  }
+  return true;
+};
 
 function ArrowsGoPage() {
   const [levelIndex, setLevelIndex] = useState(0);
-  const [grid, setGrid] = useState<Cell[][]>([]);
-  const [pos, setPos] = useState<[number, number]>([0, 0]);
-  const [, setPath] = useState<[number, number][]>([]);
-  const [visitedCount, setVisitedCount] = useState(0);
-  const [totalCells, setTotalCells] = useState(0);
-  const [phase, setPhase] = useState<"playing" | "won" | "dead">("playing");
+  const [arrows, setArrows] = useState<Arrow[]>([]);
+  const [grid, setGrid] = useState<GridCell[][]>([]);
+  const [phase, setPhase] = useState<"playing" | "won">("playing");
   const [lives, setLives] = useState(5);
   const [hints, setHints] = useState(3);
   const [moves, setMoves] = useState(0);
+  const [hintArrowId, setHintArrowId] = useState<number | null>(null);
   const [bestMoves, setBestMoves] = useState<Record<number, number>>({});
-  const [hintCell, setHintCell] = useState<[number, number] | null>(null);
+  const animatingRef = useRef(false);
 
   useEffect(() => {
     try {
@@ -90,138 +466,151 @@ function ArrowsGoPage() {
     } catch (_) { /* ignore */ }
   }, []);
 
-  const initLevel = useCallback((idx: number) => {
+  const initLevel = useCallback((idx: number, keepLives?: number) => {
     const level = LEVELS[idx];
-    const newGrid: Cell[][] = level.grid.map((row) =>
-      row.map((dir) => ({
-        dir,
-        state: dir === null ? ("empty" as CellState) : ("unvisited" as CellState),
-      })),
-    );
-    newGrid[level.startR][level.startC].state = "current";
-    const total = level.grid.flat().filter((d) => d !== null).length;
-    setGrid(newGrid);
-    setPos([level.startR, level.startC]);
-    setPath([[level.startR, level.startC]]);
-    setVisitedCount(1);
-    setTotalCells(total);
+    const newArrows: Arrow[] = level.arrows.map((a, i) => ({
+      id: i + 1,
+      dir: a.dir,
+      cells: a.cells.map((c) => [c[0], c[1]] as [number, number]),
+      exiting: false,
+    }));
+    setArrows(newArrows);
+    setGrid(buildGrid(level, newArrows));
     setPhase("playing");
+    setLives(keepLives ?? 5);
     setMoves(0);
-    setHints(3);
+    setHintArrowId(null);
+    animatingRef.current = false;
   }, []);
 
   useEffect(() => {
     initLevel(levelIndex);
-  }, [levelIndex, initLevel]);
-
-  const handleDead = useCallback(() => {
-    playSound("fail");
-    setLives((prev) => {
-      const newLives = prev - 1;
-      if (newLives <= 0) {
-        setPhase("dead");
-        playSound("die");
-      } else {
-        setPhase("dead");
-        setTimeout(() => {
-          const level = LEVELS[levelIndex];
-          const newGrid: Cell[][] = level.grid.map((row) =>
-            row.map((dir) => ({
-              dir,
-              state: dir === null ? ("empty" as CellState) : ("unvisited" as CellState),
-            })),
-          );
-          newGrid[level.startR][level.startC].state = "current";
-          const total = level.grid.flat().filter((d) => d !== null).length;
-          setGrid(newGrid);
-          setPos([level.startR, level.startC]);
-          setPath([[level.startR, level.startC]]);
-          setVisitedCount(1);
-          setTotalCells(total);
-          setPhase("playing");
-          setMoves(0);
-        }, 800);
-      }
-      return newLives;
-    });
+    // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [levelIndex]);
 
-  const step = useCallback(() => {
-    if (phase !== "playing") return;
+  const handleArrowClick = useCallback((arrowId: number) => {
+    if (phase !== "playing" || animatingRef.current) return;
     const level = LEVELS[levelIndex];
-    const [r, c] = pos;
-    const dir = level.grid[r][c];
-    if (!dir) return;
-    const [dr, dc] = DIR_DELTA[dir];
-    const nr = r + dr;
-    const nc = c + dc;
-    const rows = level.grid.length;
-    const cols = level.grid[0].length;
-    if (nr < 0 || nr >= rows || nc < 0 || nc >= cols || level.grid[nr][nc] === null) {
-      handleDead();
-      return;
-    }
-    if (grid[nr][nc].state === "visited" || grid[nr][nc].state === "current") {
-      handleDead();
-      return;
-    }
-    const newGrid = grid.map((row) => row.map((cell) => ({ ...cell })));
-    newGrid[r][c].state = "visited";
-    newGrid[nr][nc].state = "current";
-    const newVisited = visitedCount + 1;
-    setGrid(newGrid);
-    setPos([nr, nc]);
-    setPath((p) => [...p, [nr, nc]]);
-    setVisitedCount(newVisited);
-    setMoves((m) => m + 1);
-    playSound("click");
+    const arrow = arrows.find((a) => a.id === arrowId);
+    if (!arrow || arrow.exiting) return;
 
-    if (newVisited === totalCells) {
-      setPhase("won");
-      playChord(["success", "win"]);
-      const newMoves = moves + 1;
-      setBestMoves((prev) => {
-        const cur = prev[levelIndex + 1];
-        if (!cur || newMoves < cur) {
-          const upd = { ...prev, [levelIndex + 1]: newMoves };
-          try { localStorage.setItem("arrowsgo-best", JSON.stringify(upd)); } catch (_) { /* ignore */ }
-          return upd;
-        }
-        return prev;
+    if (!isFree(arrow, grid, level)) {
+      playSound("fail");
+      setLives((prev) => {
+        const nl = prev - 1;
+        if (nl <= 0) playSound("die");
+        return nl;
       });
+      return;
     }
-  }, [phase, levelIndex, pos, grid, visitedCount, totalCells, moves, handleDead]);
+
+    playSound("correct");
+    setMoves((m) => m + 1);
+    animatingRef.current = true;
+
+    const [dr, dc] = DELTA[arrow.dir];
+    let currentCells: [number, number][] = arrow.cells.map((c) => [c[0], c[1]]);
+
+    setArrows((prev) =>
+      prev.map((a) => (a.id === arrowId ? { ...a, exiting: true } : a)),
+    );
+
+    const interval = setInterval(() => {
+      const head = currentCells[currentCells.length - 1];
+      const newHead: [number, number] = [head[0] + dr, head[1] + dc];
+      currentCells = [...currentCells.slice(1), newHead];
+
+      const allOut = currentCells.every(
+        ([r, c]) =>
+          r < 0 || r >= level.rows || c < 0 || c >= level.cols || !level.shape[r][c],
+      );
+
+      setArrows((prev) => {
+        if (allOut) {
+          clearInterval(interval);
+          const remaining = prev.filter((a) => a.id !== arrowId);
+          setGrid(buildGrid(level, remaining));
+          if (remaining.length === 0) {
+            setPhase("won");
+            playChord(["success", "win"]);
+            setMoves((curMoves) => {
+              setBestMoves((bm) => {
+                const cur = bm[levelIndex + 1];
+                if (!cur || curMoves < cur) {
+                  const upd = { ...bm, [levelIndex + 1]: curMoves };
+                  try {
+                    localStorage.setItem("arrowsgo-best", JSON.stringify(upd));
+                  } catch (_) { /* ignore */ }
+                  return upd;
+                }
+                return bm;
+              });
+              return curMoves;
+            });
+          } else {
+            playSound("score");
+          }
+          animatingRef.current = false;
+          return remaining;
+        }
+        const updated = prev.map((a) =>
+          a.id === arrowId ? { ...a, cells: currentCells.map((c) => [c[0], c[1]] as [number, number]) } : a,
+        );
+        // rebuild grid with updated arrow positions (only in-bounds cells)
+        setGrid(buildGrid(level, updated));
+        return updated;
+      });
+    }, 80);
+  }, [phase, levelIndex, arrows, grid]);
 
   const useHint = useCallback(() => {
     if (hints <= 0 || phase !== "playing") return;
-    const [r, c] = pos;
-    const dir = LEVELS[levelIndex].grid[r][c];
-    if (!dir) return;
-    const [dr, dc] = DIR_DELTA[dir];
-    setHintCell([r + dr, c + dc]);
+    const level = LEVELS[levelIndex];
+    const free = arrows.find((a) => !a.exiting && isFree(a, grid, level));
+    if (!free) return;
+    setHintArrowId(free.id);
     setHints((h) => h - 1);
     playSound("click");
-    setTimeout(() => setHintCell(null), 1200);
-  }, [hints, phase, pos, levelIndex]);
+    setTimeout(() => setHintArrowId(null), 1500);
+  }, [hints, phase, levelIndex, arrows, grid]);
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.code === "Space" || e.code === "ArrowRight") {
-        e.preventDefault();
-        step();
-      }
-      if (e.code === "KeyR") initLevel(levelIndex);
+      if (e.code === "KeyR") initLevel(levelIndex, lives);
       if (e.code === "KeyH") useHint();
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [step, useHint, initLevel, levelIndex]);
+  }, [initLevel, levelIndex, lives, useHint]);
 
   const level = LEVELS[levelIndex];
-  const rows = level.grid.length;
-  const cols = level.grid[0].length;
-  const cellSize = Math.min(Math.floor(360 / Math.max(rows, cols)), 56);
-  const progress = totalCells > 0 ? (visitedCount / totalCells) * 100 : 0;
+  const cellPx = Math.min(Math.floor(380 / Math.max(level.rows, level.cols)), 48);
+
+  const arrowMeta = useMemo(() => {
+    const map: Record<string, { arrowId: number; isHead: boolean; isTail: boolean; dir: Dir; exiting: boolean }> = {};
+    arrows.forEach((arrow) => {
+      arrow.cells.forEach(([r, c], i) => {
+        if (r < 0 || r >= level.rows || c < 0 || c >= level.cols) return;
+        if (!level.shape[r][c]) return;
+        map[`${r}-${c}`] = {
+          arrowId: arrow.id,
+          isHead: i === arrow.cells.length - 1,
+          isTail: i === 0,
+          dir: arrow.dir,
+          exiting: arrow.exiting,
+        };
+      });
+    });
+    return map;
+  }, [arrows, level]);
+
+  const freeArrowIds = useMemo(() => {
+    const set = new Set<number>();
+    arrows.forEach((a) => {
+      if (!a.exiting && isFree(a, grid, level)) set.add(a.id);
+    });
+    return set;
+  }, [arrows, grid, level]);
 
   return (
     <ToolPageShell
@@ -246,52 +635,55 @@ function ArrowsGoPage() {
           </div>
           <span className="font-bold text-foreground text-sm">{level.label}</span>
           <span className="font-mono text-sm text-muted-foreground">
-            {visitedCount}/{totalCells}
+            {arrows.length} left
           </span>
-        </div>
-
-        {/* Progress bar */}
-        <div className="w-full max-w-md h-2 rounded-full bg-secondary overflow-hidden">
-          <div
-            className="h-full bg-primary transition-all duration-200"
-            style={{ width: `${progress}%` }}
-          />
         </div>
 
         {/* Board */}
         <div
           className="grid gap-1 p-3 rounded-2xl bg-card border border-border"
           style={{
-            gridTemplateColumns: `repeat(${cols}, ${cellSize}px)`,
-            gridTemplateRows: `repeat(${rows}, ${cellSize}px)`,
+            gridTemplateColumns: `repeat(${level.cols}, ${cellPx}px)`,
+            gridTemplateRows: `repeat(${level.rows}, ${cellPx}px)`,
           }}
         >
-          {grid.map((row, r) =>
-            row.map((cell, c) => {
-              if (cell.dir === null) {
-                return <div key={`${r}-${c}`} />;
+          {Array.from({ length: level.rows }, (_, r) =>
+            Array.from({ length: level.cols }, (_, c) => {
+              const inShape = level.shape[r][c];
+              const meta = arrowMeta[`${r}-${c}`];
+              if (!inShape) {
+                return <div key={`${r}-${c}`} className="bg-transparent" />;
               }
-              const isCurrent = cell.state === "current";
-              const isVisited = cell.state === "visited";
-              const isHint = hintCell?.[0] === r && hintCell?.[1] === c;
+              if (!meta) {
+                return (
+                  <div
+                    key={`${r}-${c}`}
+                    className="rounded border border-border bg-secondary/40"
+                  />
+                );
+              }
+              const isFreeArrow = freeArrowIds.has(meta.arrowId) && !meta.exiting;
+              const isHint = meta.arrowId === hintArrowId;
+              const colorClass = ARROW_COLORS[(meta.arrowId - 1) % ARROW_COLORS.length];
               return (
-                <div
+                <button
                   key={`${r}-${c}`}
+                  type="button"
+                  onClick={() => handleArrowClick(meta.arrowId)}
+                  disabled={meta.exiting}
                   className={cn(
-                    "flex items-center justify-center rounded-lg font-bold transition-all select-none border",
-                    isCurrent
-                      ? "bg-primary text-primary-foreground border-primary scale-105 shadow-lg"
-                      : isVisited
-                        ? "bg-primary/20 text-primary/70 border-primary/30"
-                        : isHint
-                          ? "bg-yellow-400/30 text-yellow-500 border-yellow-400 animate-pulse"
-                          : "bg-secondary text-foreground border-border",
-                    phase === "dead" && lives > 0 && "bg-red-500/30 border-red-500",
+                    "flex items-center justify-center rounded border font-bold transition-all duration-100 select-none",
+                    colorClass,
+                    isFreeArrow && "ring-2 ring-white/80 shadow-lg cursor-pointer",
+                    !isFreeArrow && !meta.exiting && "cursor-pointer opacity-90",
+                    meta.exiting && "opacity-60 scale-95",
+                    isHint && "ring-4 ring-yellow-300 animate-pulse",
                   )}
-                  style={{ fontSize: cellSize * 0.5 }}
+                  style={{ fontSize: cellPx * 0.55 }}
+                  aria-label={`Arrow ${meta.dir}`}
                 >
-                  {ARROW_SYMBOL[cell.dir]}
-                </div>
+                  {meta.isHead ? ARROW_SYMBOL[meta.dir] : ""}
+                </button>
               );
             }),
           )}
@@ -300,42 +692,28 @@ function ArrowsGoPage() {
         {/* Action buttons */}
         <div className="flex items-center gap-2 w-full max-w-md">
           <button
-            onClick={step}
-            disabled={phase !== "playing"}
-            className="flex-1 px-6 py-3 rounded-xl bg-primary text-primary-foreground font-bold text-lg hover:opacity-90 transition disabled:opacity-50"
-          >
-            GO →
-          </button>
-          <button
             onClick={useHint}
             disabled={hints <= 0 || phase !== "playing"}
-            className="px-4 py-3 rounded-xl border border-border font-bold text-foreground hover:bg-secondary transition disabled:opacity-50"
+            className="flex-1 px-4 py-2.5 rounded-xl border border-border font-bold text-foreground hover:bg-secondary transition disabled:opacity-50"
           >
-            💡 {hints}
+            💡 Hint ({hints})
           </button>
           <button
-            onClick={() => {
-              initLevel(levelIndex);
-              setLives(5);
-            }}
-            className="px-4 py-3 rounded-xl border border-border font-bold text-foreground hover:bg-secondary transition"
-            aria-label="Reset"
+            onClick={() => initLevel(levelIndex, lives > 0 ? lives : 5)}
+            className="flex-1 px-4 py-2.5 rounded-xl border border-border font-bold text-foreground hover:bg-secondary transition"
           >
-            ↺
+            ↺ Reset
           </button>
         </div>
 
         {/* Level selector */}
         <div className="w-full max-w-md">
           <p className="text-xs text-muted-foreground mb-2 text-center">Select level</p>
-          <div className="grid grid-cols-10 gap-1.5">
+          <div className="grid grid-cols-8 gap-1.5">
             {LEVELS.map((lv, i) => (
               <button
                 key={lv.id}
-                onClick={() => {
-                  setLevelIndex(i);
-                  setLives(5);
-                }}
+                onClick={() => setLevelIndex(i)}
                 className={cn(
                   "w-full aspect-square rounded-lg text-xs font-bold border transition",
                   i === levelIndex
@@ -352,39 +730,32 @@ function ArrowsGoPage() {
         </div>
 
         <p className="text-xs text-muted-foreground text-center mt-2">
-          Press <kbd className="px-1.5 py-0.5 rounded border border-border bg-secondary">Space</kbd> to go ·{" "}
-          <kbd className="px-1.5 py-0.5 rounded border border-border bg-secondary">H</kbd> for hint ·{" "}
+          Press <kbd className="px-1.5 py-0.5 rounded border border-border bg-secondary">H</kbd> for hint ·{" "}
           <kbd className="px-1.5 py-0.5 rounded border border-border bg-secondary">R</kbd> to reset
         </p>
       </div>
 
       {/* Win overlay */}
-      {phase === "won" && (
+      {phase === "won" && lives > 0 && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-card rounded-3xl p-8 text-center border border-border max-w-sm w-full">
             <p className="text-5xl mb-3">🎉</p>
             <p className="text-2xl font-black text-foreground mb-1">Level Cleared!</p>
             <p className="text-muted-foreground text-sm mb-2">Moves: {moves}</p>
             {bestMoves[levelIndex + 1] === moves && (
-              <p className="text-yellow-500 font-bold text-sm mb-4">🏆 New Best!</p>
+              <p className="text-yellow-500 font-bold text-sm mb-4">🏆 Best!</p>
             )}
             <div className="flex gap-2 justify-center mt-4">
               {levelIndex < LEVELS.length - 1 && (
                 <button
-                  onClick={() => {
-                    setLevelIndex((i) => i + 1);
-                    setLives(5);
-                  }}
+                  onClick={() => setLevelIndex((i) => i + 1)}
                   className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold hover:opacity-90 transition"
                 >
-                  Next Level →
+                  Next →
                 </button>
               )}
               <button
-                onClick={() => {
-                  initLevel(levelIndex);
-                  setLives(5);
-                }}
+                onClick={() => initLevel(levelIndex)}
                 className="px-6 py-2.5 rounded-xl border border-border text-foreground font-bold hover:bg-secondary transition"
               >
                 Replay
@@ -395,17 +766,14 @@ function ArrowsGoPage() {
       )}
 
       {/* Game over overlay */}
-      {phase === "dead" && lives <= 0 && (
+      {lives <= 0 && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-card rounded-3xl p-8 text-center border border-border max-w-sm w-full">
             <p className="text-5xl mb-3">💔</p>
             <p className="text-2xl font-black text-foreground mb-1">No Lives Left!</p>
-            <p className="text-muted-foreground text-sm mb-6">Take a breath and try again.</p>
+            <p className="text-muted-foreground text-sm mb-6">Plan your moves carefully next time.</p>
             <button
-              onClick={() => {
-                initLevel(levelIndex);
-                setLives(5);
-              }}
+              onClick={() => initLevel(levelIndex)}
               className="px-6 py-2.5 rounded-xl bg-primary text-primary-foreground font-bold hover:opacity-90 transition"
             >
               Try Again
@@ -416,9 +784,9 @@ function ArrowsGoPage() {
 
       <HowToUse
         steps={[
-          "Press GO or tap the glowing cell to follow the arrow to the next cell.",
-          "Your goal is to visit every cell on the board exactly once.",
-          "If you hit a visited cell or go out of bounds you lose a life — use hints wisely!",
+          "Tap any glowing arrow — glowing means it has a clear path to exit the shape.",
+          "The arrow will slide out snake-style, freeing space for other arrows behind it.",
+          "Clear all arrows from the board to complete the level — plan your order carefully!",
         ]}
       />
 
@@ -426,31 +794,31 @@ function ArrowsGoPage() {
 
       <ToolSeoContent
         title="Arrows GO! — Free Online Arrow Puzzle Game"
-        description="Play Arrows GO! online for free. Follow the arrows and clear every cell in 20 handcrafted levels. Logic puzzle with increasing difficulty!"
+        description="Play Arrows GO! online for free. Tap free arrows to slide them out of the shape. 15 handcrafted levels with increasing difficulty. No download needed!"
         body={[
-          "Arrows GO! is a minimalist logic puzzle where every cell on the board points in a fixed direction. Starting from the top-left tile, you follow the arrows step by step and try to visit every single cell exactly once. Each tap of the GO button moves you one square in the direction the current arrow points. Sounds simple — until a row of arrows sends you crashing into a tile you already visited or right off the edge of the board.",
-          "The game ships with 20 handcrafted levels that ramp up from gentle 3×3 warm-ups to brain-bending 7×7 expert puzzles. You have five lives per attempt and three hints per level that briefly highlight the next cell, so you can plan your route without spoiling the whole solution. Your best move count for each level is saved locally, so you can come back and try to beat your own personal record any time.",
+          "Arrows GO! is a satisfying logic puzzle where each colored arrow on a uniquely shaped board wants to leave the playing field. An arrow can only slide off when nothing is blocking its path in the direction it points — those arrows glow with a bright ring around them and are ready to be tapped. Once you tap a free arrow it slithers out snake-style, head first, freeing up the cells it occupied and often unlocking a chain of other arrows behind it. The challenge is finding the right order: clear the wrong arrow first and you'll lock yourself out of solving the puzzle.",
+          "The game ships with 15 handcrafted levels across nine different shapes — squares, diamonds, plus signs, hearts, arrows, stars, T-shapes, anchors, butterflies, dogs, trophies, and an 8×8 expert grid. You start each attempt with five lives and three hints per level. Tap a non-free arrow and you'll lose a life; tap the lightbulb to briefly highlight one arrow that's safe to clear. Your best move count is saved locally for every level, so you can come back and try to beat your own personal records.",
         ]}
         faqs={[
           {
-            question: "How do I win a level?",
+            question: "How do I know which arrow is free?",
             answer:
-              "You win when every cell on the board has been visited exactly once. The current cell glows, visited cells are dimmed, and a progress counter at the top shows how many tiles are left to clear.",
+              "Free arrows glow with a bright white ring around them. An arrow is free when nothing blocks its path between its head and the edge of the shape — empty cells and holes in the shape are both fine to pass through.",
           },
           {
-            question: "What happens if I hit a dead end?",
+            question: "What happens if I tap the wrong arrow?",
             answer:
-              "If the arrow you're standing on points off the board or into a cell you have already visited, you lose a life, the board flashes red, and the level resets so you can try a different opening move. Run out of lives and you'll see the game-over screen and start fresh with all five lives.",
-          },
-          {
-            question: "Are there keyboard shortcuts?",
-            answer:
-              "Yes — press Space or the right-arrow key to take a step, H to use a hint, and R to reset the current level. On mobile you can use the GO, hint, and reset buttons at the bottom of the board.",
+              "If you tap an arrow that's blocked by another arrow, you'll hear a buzz, lose one of your five lives, and the arrow stays put. Lose all five lives and the game-over screen appears so you can restart the level with a fresh set of lives.",
           },
           {
             question: "How does the hint system work?",
             answer:
-              "You start each level with three hints. Tapping the lightbulb briefly highlights the next cell your current arrow points to, so you can verify the move is safe before committing. Hints reset automatically every time you start or restart a level.",
+              "You start every level with three hints. Tap the lightbulb button (or press H on your keyboard) and one currently-free arrow will pulse with a yellow ring for a moment so you know it's safe to clear. Hints reset every time you start or restart a level.",
+          },
+          {
+            question: "Is there a keyboard shortcut to restart?",
+            answer:
+              "Yes — press R at any time to reset the current level while keeping your remaining lives. Use the level selector at the bottom of the board to jump to any unlocked level instantly.",
           },
         ]}
       />

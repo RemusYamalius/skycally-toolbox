@@ -596,7 +596,6 @@ export interface FileRoutesByFullPath {
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/chess': typeof ToolsChessRoute
-  '/tools/arrows-go': typeof ToolsArrowsGoRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
@@ -692,7 +691,6 @@ export interface FileRoutesByTo {
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/chess': typeof ToolsChessRoute
-  '/tools/arrows-go': typeof ToolsArrowsGoRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
@@ -789,7 +787,6 @@ export interface FileRoutesById {
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/chess': typeof ToolsChessRoute
-  '/tools/arrows-go': typeof ToolsArrowsGoRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
@@ -887,7 +884,6 @@ export interface FileRouteTypes {
     | '/tools/bmi-calculator'
     | '/tools/business-card-generator'
     | '/tools/chess'
-    | '/tools/arrows-go'
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
@@ -983,7 +979,6 @@ export interface FileRouteTypes {
     | '/tools/bmi-calculator'
     | '/tools/business-card-generator'
     | '/tools/chess'
-    | '/tools/arrows-go'
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
@@ -1079,7 +1074,6 @@ export interface FileRouteTypes {
     | '/tools/bmi-calculator'
     | '/tools/business-card-generator'
     | '/tools/chess'
-    | '/tools/arrows-go'
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
@@ -1176,7 +1170,6 @@ export interface RootRouteChildren {
   ToolsBmiCalculatorRoute: typeof ToolsBmiCalculatorRoute
   ToolsBusinessCardGeneratorRoute: typeof ToolsBusinessCardGeneratorRoute
   ToolsChessRoute: typeof ToolsChessRoute
-  ToolsArrowsGoRoute: typeof ToolsArrowsGoRoute
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
@@ -1806,13 +1799,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsChessRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/arrows-go': {
-      id: '/tools/arrows-go'
-      path: '/tools/arrows-go'
-      fullPath: '/tools/arrows-go'
-      preLoaderRoute: typeof ToolsArrowsGoRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/tools/business-card-generator': {
       id: '/tools/business-card-generator'
       path: '/tools/business-card-generator'
@@ -1937,7 +1923,6 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsBmiCalculatorRoute: ToolsBmiCalculatorRoute,
   ToolsBusinessCardGeneratorRoute: ToolsBusinessCardGeneratorRoute,
   ToolsChessRoute: ToolsChessRoute,
-  ToolsArrowsGoRoute: ToolsArrowsGoRoute,
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,

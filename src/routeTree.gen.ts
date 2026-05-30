@@ -84,6 +84,7 @@ import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-au
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
+import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
@@ -93,7 +94,6 @@ import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calcu
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
-import { Route as ToolsArrowsGoRouteImport } from './routes/tools.arrows-go'
 import { Route as ToolsAgeCalculatorRouteImport } from './routes/tools.age-calculator'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text-to-image'
@@ -479,6 +479,11 @@ const ToolsDeletePdfPagesRoute = ToolsDeletePdfPagesRouteImport.update({
   path: '/tools/delete-pdf-pages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsConnectFourRoute = ToolsConnectFourRouteImport.update({
+  id: '/tools/connect-four',
+  path: '/tools/connect-four',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsCompressPdfRoute = ToolsCompressPdfRouteImport.update({
   id: '/tools/compress-pdf',
   path: '/tools/compress-pdf',
@@ -523,11 +528,6 @@ const ToolsBackgroundBlurRoute = ToolsBackgroundBlurRouteImport.update({
 const ToolsAudioConverterRoute = ToolsAudioConverterRouteImport.update({
   id: '/tools/audio-converter',
   path: '/tools/audio-converter',
-  getParentRoute: () => rootRouteImport,
-} as any)
-const ToolsArrowsGoRoute = ToolsArrowsGoRouteImport.update({
-  id: '/tools/arrows-go',
-  path: '/tools/arrows-go',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsAgeCalculatorRoute = ToolsAgeCalculatorRouteImport.update({
@@ -589,7 +589,6 @@ export interface FileRoutesByFullPath {
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
-  '/tools/arrows-go': typeof ToolsArrowsGoRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
@@ -599,6 +598,7 @@ export interface FileRoutesByFullPath {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
@@ -684,7 +684,6 @@ export interface FileRoutesByTo {
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
-  '/tools/arrows-go': typeof ToolsArrowsGoRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
@@ -694,6 +693,7 @@ export interface FileRoutesByTo {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
@@ -780,7 +780,6 @@ export interface FileRoutesById {
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
-  '/tools/arrows-go': typeof ToolsArrowsGoRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
@@ -790,6 +789,7 @@ export interface FileRoutesById {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
+  '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
@@ -877,7 +877,6 @@ export interface FileRouteTypes {
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/age-calculator'
-    | '/tools/arrows-go'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
@@ -887,6 +886,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/connect-four'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/document-scanner'
@@ -972,7 +972,6 @@ export interface FileRouteTypes {
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/age-calculator'
-    | '/tools/arrows-go'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
@@ -982,6 +981,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/connect-four'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/document-scanner'
@@ -1067,7 +1067,6 @@ export interface FileRouteTypes {
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/age-calculator'
-    | '/tools/arrows-go'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/base64'
@@ -1077,6 +1076,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/compress-pdf'
+    | '/tools/connect-four'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/document-scanner'
@@ -1163,7 +1163,6 @@ export interface RootRouteChildren {
   ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsAgeCalculatorRoute: typeof ToolsAgeCalculatorRoute
-  ToolsArrowsGoRoute: typeof ToolsArrowsGoRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBase64Route: typeof ToolsBase64Route
@@ -1173,6 +1172,7 @@ export interface RootRouteChildren {
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
+  ToolsConnectFourRoute: typeof ToolsConnectFourRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
@@ -1771,6 +1771,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsDeletePdfPagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/connect-four': {
+      id: '/tools/connect-four'
+      path: '/tools/connect-four'
+      fullPath: '/tools/connect-four'
+      preLoaderRoute: typeof ToolsConnectFourRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/compress-pdf': {
       id: '/tools/compress-pdf'
       path: '/tools/compress-pdf'
@@ -1832,13 +1839,6 @@ declare module '@tanstack/react-router' {
       path: '/tools/audio-converter'
       fullPath: '/tools/audio-converter'
       preLoaderRoute: typeof ToolsAudioConverterRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/tools/arrows-go': {
-      id: '/tools/arrows-go'
-      path: '/tools/arrows-go'
-      fullPath: '/tools/arrows-go'
-      preLoaderRoute: typeof ToolsArrowsGoRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/age-calculator': {
@@ -1916,7 +1916,6 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsAgeCalculatorRoute: ToolsAgeCalculatorRoute,
-  ToolsArrowsGoRoute: ToolsArrowsGoRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBase64Route: ToolsBase64Route,
@@ -1926,6 +1925,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
+  ToolsConnectFourRoute: ToolsConnectFourRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,

@@ -1,4 +1,4 @@
-import { createFileRoute, useNavigate } from "@tanstack/react-router";
+import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
@@ -133,6 +133,15 @@ function ToolsPage() {
         </div>
       )}
       {list.length === 0 && <p className="text-center py-20 text-muted-foreground">No tools match your search.</p>}
+
+      {/* SEO: static crawlable index of every tool — visually hidden */}
+      <nav aria-label="All tools" className="sr-only">
+        <ul>
+          {tools.filter((t) => !t.hidden).map((t) => (
+            <li key={t.slug}><Link to={t.path}>{t.name}</Link></li>
+          ))}
+        </ul>
+      </nav>
     </div>
   );
 }

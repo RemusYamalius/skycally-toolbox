@@ -275,6 +275,15 @@ function HomePage() {
         {/* ADSENSE_ZONE: homepage-bottom-banner 728x90 */}
         <AdZone id="homepage-bottom-banner" size="728x90" />
       </div>
+
+      {/* SEO: static crawlable index of every tool — visually hidden */}
+      <nav aria-label="All tools" className="sr-only">
+        <ul>
+          {tools.filter((t) => !t.hidden).map((t) => (
+            <li key={t.slug}><Link to={t.path}>{t.name}</Link></li>
+          ))}
+        </ul>
+      </nav>
     </>
   );
 }

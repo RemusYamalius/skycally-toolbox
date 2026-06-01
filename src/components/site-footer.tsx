@@ -71,6 +71,14 @@ export function SiteFooter() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
           <p>© 2025 Skycally.com · <Link to="/privacy" className="hover:text-foreground">Privacy</Link> · <Link to="/terms" className="hover:text-foreground">Terms</Link> · <Link to="/contact" className="hover:text-foreground">Contact</Link></p>
           <p>Free online tools — no registration required</p>
+          <a href="https://fazier.com/launches/skycally.com" target="_blank" rel="noopener noreferrer">
+            <img
+              src="https://fazier.com/api/v1/public/badges/launch_badges.svg?badge_type=launched&theme=dark"
+              width={120}
+              alt="Launched on Fazier"
+              className="opacity-70 hover:opacity-100 transition-opacity"
+            />
+          </a>
         </div>
       </div>
     </footer>

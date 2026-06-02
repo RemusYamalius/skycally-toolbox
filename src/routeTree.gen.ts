@@ -101,6 +101,7 @@ import { Route as ToolsAddSubtitlesRouteImport } from './routes/tools.add-subtit
 import { Route as Tools2048RouteImport } from './routes/tools.2048'
 import { Route as BlogVideoToGifOnlineFreeRouteImport } from './routes/blog.video-to-gif-online-free'
 import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
+import { Route as BlogBestFreeOnlineToolsForDevelopers2025RouteImport } from './routes/blog.best-free-online-tools-for-developers-2025'
 import { Route as BlogBestFreeOnlineToolsForDesignersRouteImport } from './routes/blog.best-free-online-tools-for-designers'
 
 const TermsRoute = TermsRouteImport.update({
@@ -567,6 +568,12 @@ const BlogCompressPdfOnlineFreeRoute =
     path: '/blog/compress-pdf-online-free',
     getParentRoute: () => rootRouteImport,
   } as any)
+const BlogBestFreeOnlineToolsForDevelopers2025Route =
+  BlogBestFreeOnlineToolsForDevelopers2025RouteImport.update({
+    id: '/blog/best-free-online-tools-for-developers-2025',
+    path: '/blog/best-free-online-tools-for-developers-2025',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BlogBestFreeOnlineToolsForDesignersRoute =
   BlogBestFreeOnlineToolsForDesignersRouteImport.update({
     id: '/blog/best-free-online-tools-for-designers',
@@ -582,6 +589,7 @@ export interface FileRoutesByFullPath {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
+  '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
@@ -677,6 +685,7 @@ export interface FileRoutesByTo {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
+  '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
@@ -773,6 +782,7 @@ export interface FileRoutesById {
   '/sitemap.xml': typeof SitemapDotxmlRoute
   '/terms': typeof TermsRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
+  '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
@@ -870,6 +880,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/blog/best-free-online-tools-for-designers'
+    | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
@@ -965,6 +976,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/blog/best-free-online-tools-for-designers'
+    | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
@@ -1060,6 +1072,7 @@ export interface FileRouteTypes {
     | '/sitemap.xml'
     | '/terms'
     | '/blog/best-free-online-tools-for-designers'
+    | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
@@ -1156,6 +1169,7 @@ export interface RootRouteChildren {
   SitemapDotxmlRoute: typeof SitemapDotxmlRoute
   TermsRoute: typeof TermsRoute
   BlogBestFreeOnlineToolsForDesignersRoute: typeof BlogBestFreeOnlineToolsForDesignersRoute
+  BlogBestFreeOnlineToolsForDevelopers2025Route: typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
   BlogVideoToGifOnlineFreeRoute: typeof BlogVideoToGifOnlineFreeRoute
   Tools2048Route: typeof Tools2048Route
@@ -1890,6 +1904,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogCompressPdfOnlineFreeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/best-free-online-tools-for-developers-2025': {
+      id: '/blog/best-free-online-tools-for-developers-2025'
+      path: '/blog/best-free-online-tools-for-developers-2025'
+      fullPath: '/blog/best-free-online-tools-for-developers-2025'
+      preLoaderRoute: typeof BlogBestFreeOnlineToolsForDevelopers2025RouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/best-free-online-tools-for-designers': {
       id: '/blog/best-free-online-tools-for-designers'
       path: '/blog/best-free-online-tools-for-designers'
@@ -1909,6 +1930,8 @@ const rootRouteChildren: RootRouteChildren = {
   TermsRoute: TermsRoute,
   BlogBestFreeOnlineToolsForDesignersRoute:
     BlogBestFreeOnlineToolsForDesignersRoute,
+  BlogBestFreeOnlineToolsForDevelopers2025Route:
+    BlogBestFreeOnlineToolsForDevelopers2025Route,
   BlogCompressPdfOnlineFreeRoute: BlogCompressPdfOnlineFreeRoute,
   BlogVideoToGifOnlineFreeRoute: BlogVideoToGifOnlineFreeRoute,
   Tools2048Route: Tools2048Route,

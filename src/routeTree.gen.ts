@@ -93,6 +93,7 @@ import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-ma
 import { Route as ToolsChessRouteImport } from './routes/tools.chess'
 import { Route as ToolsBusinessCardGeneratorRouteImport } from './routes/tools.business-card-generator'
 import { Route as ToolsBubbleShooterRouteImport } from './routes/tools.bubble-shooter'
+import { Route as ToolsBreakoutRouteImport } from './routes/tools.breakout'
 import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calculator'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
@@ -529,6 +530,11 @@ const ToolsBubbleShooterRoute = ToolsBubbleShooterRouteImport.update({
   path: '/tools/bubble-shooter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsBreakoutRoute = ToolsBreakoutRouteImport.update({
+  id: '/tools/breakout',
+  path: '/tools/breakout',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsBmiCalculatorRoute = ToolsBmiCalculatorRouteImport.update({
   id: '/tools/bmi-calculator',
   path: '/tools/bmi-calculator',
@@ -619,6 +625,7 @@ export interface FileRoutesByFullPath {
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
+  '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/chess': typeof ToolsChessRoute
@@ -718,6 +725,7 @@ export interface FileRoutesByTo {
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
+  '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/chess': typeof ToolsChessRoute
@@ -818,6 +826,7 @@ export interface FileRoutesById {
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
+  '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
   '/tools/chess': typeof ToolsChessRoute
@@ -919,6 +928,7 @@ export interface FileRouteTypes {
     | '/tools/background-blur'
     | '/tools/base64'
     | '/tools/bmi-calculator'
+    | '/tools/breakout'
     | '/tools/bubble-shooter'
     | '/tools/business-card-generator'
     | '/tools/chess'
@@ -1018,6 +1028,7 @@ export interface FileRouteTypes {
     | '/tools/background-blur'
     | '/tools/base64'
     | '/tools/bmi-calculator'
+    | '/tools/breakout'
     | '/tools/bubble-shooter'
     | '/tools/business-card-generator'
     | '/tools/chess'
@@ -1117,6 +1128,7 @@ export interface FileRouteTypes {
     | '/tools/background-blur'
     | '/tools/base64'
     | '/tools/bmi-calculator'
+    | '/tools/breakout'
     | '/tools/bubble-shooter'
     | '/tools/business-card-generator'
     | '/tools/chess'
@@ -1217,6 +1229,7 @@ export interface RootRouteChildren {
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsBmiCalculatorRoute: typeof ToolsBmiCalculatorRoute
+  ToolsBreakoutRoute: typeof ToolsBreakoutRoute
   ToolsBubbleShooterRoute: typeof ToolsBubbleShooterRoute
   ToolsBusinessCardGeneratorRoute: typeof ToolsBusinessCardGeneratorRoute
   ToolsChessRoute: typeof ToolsChessRoute
@@ -1887,6 +1900,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsBubbleShooterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/breakout': {
+      id: '/tools/breakout'
+      path: '/tools/breakout'
+      fullPath: '/tools/breakout'
+      preLoaderRoute: typeof ToolsBreakoutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/bmi-calculator': {
       id: '/tools/bmi-calculator'
       path: '/tools/bmi-calculator'
@@ -2003,6 +2023,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBase64Route: ToolsBase64Route,
   ToolsBmiCalculatorRoute: ToolsBmiCalculatorRoute,
+  ToolsBreakoutRoute: ToolsBreakoutRoute,
   ToolsBubbleShooterRoute: ToolsBubbleShooterRoute,
   ToolsBusinessCardGeneratorRoute: ToolsBusinessCardGeneratorRoute,
   ToolsChessRoute: ToolsChessRoute,

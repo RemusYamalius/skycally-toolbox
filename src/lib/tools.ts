@@ -118,6 +118,7 @@ export const tools: Tool[] = [
   { slug: "sliding-puzzle", name: "Sliding Puzzle", description: "Slide numbered tiles into order in the fewest moves. 3×3, 4×4, or 5×5.", category: "minigames", icon: Grid2x2, path: "/tools/sliding-puzzle" },
   { slug: "whack-a-mole", name: "Whack-a-Mole", description: "Tap the moles before they disappear! Classic arcade reaction game.", category: "minigames", icon: Hammer, path: "/tools/whack-a-mole" },
   { slug: "bubble-shooter", name: "Bubble Shooter", description: "Aim, shoot, and pop colored bubbles. Match 3 or more before they reach the bottom!", category: "minigames", icon: Target, path: "/tools/bubble-shooter" },
+  { slug: "breakout", name: "Breakout", description: "Classic brick breaker — bounce the ball and clear all the bricks!", category: "minigames", icon: Rows3, path: "/tools/breakout" },
 ];
 
 

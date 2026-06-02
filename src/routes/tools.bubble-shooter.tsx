@@ -91,27 +91,17 @@ function buildInitialGrid(level: number): Grid {
   for (let r = 0; r < rows; r++) {
     const row: Cell[] = [];
     for (let c = 0; c < COLS; c++) {
-      // odd rows: leave last col empty to keep visual balance
-      if ((r % 2 === 1) && c === COLS - 1) {
-        row.push(null);
-      } else {
-        row.push(Math.random() < 0.85 ? randColor() : null);
-      }
+      row.push(Math.random() < 0.85 ? randColor() : null);
     }
     g.push(row);
   }
   return g;
 }
 
-function newTopRow(parityOffset: number, rowIndex: number): Cell[] {
-  const odd = (rowIndex + parityOffset) % 2 === 1;
+function newTopRow(): Cell[] {
   const row: Cell[] = [];
   for (let c = 0; c < COLS; c++) {
-    if (odd && c === COLS - 1) {
-      row.push(null);
-    } else {
-      row.push(randColor());
-    }
+    row.push(randColor());
   }
   return row;
 }

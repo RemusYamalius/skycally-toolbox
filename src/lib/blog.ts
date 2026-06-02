@@ -1,6 +1,7 @@
 import compressPdfThumb from "@/assets/blog-compress-pdf.png";
 import videoToGifThumb from "@/assets/blog-video-to-gif.png";
 import designersToolsThumb from "@/assets/blog-designers-tools.png";
+import developersToolsThumb from "@/assets/blog-developers-tools.png";
 
 export interface BlogPost {
   slug: string;
@@ -58,6 +59,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "remove-bg",
     thumbnail: designersToolsThumb,
     thumbnailAlt: "Remove Background tool interface",
+  },
+  {
+    slug: "best-free-online-tools-for-developers-2025",
+    path: "/blog/best-free-online-tools-for-developers-2025",
+    title: "Best Free Online Tools for Developers (2025)",
+    description:
+      "The best browser-based tools for developers in 2025 — free, no signup, no installs.",
+    category: "Developer Tools",
+    date: "2026-06-02",
+    dateLabel: "June 2, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "json-formatter",
+    thumbnail: developersToolsThumb,
+    thumbnailAlt: "JSON Formatter tool interface",
   },
 ];
 

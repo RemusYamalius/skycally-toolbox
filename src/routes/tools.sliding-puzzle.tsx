@@ -281,10 +281,9 @@ function SlidingPuzzlePage() {
 
       <HowToUse
         steps={[
-          "Pick a difficulty: Easy 3×3, Medium 4×4, or Hard 5×5.",
-          "Tap Shuffle to randomize the board — the timer starts on your first move.",
-          "Click a tile next to the empty space (or use arrow keys) to slide it into place.",
-          "Sort the tiles 1 through 15 (or higher) with the empty space in the bottom-right to win.",
+          "Pick a difficulty, then tap Shuffle to scramble the board.",
+          "Click a tile next to the empty space (or use arrow keys) to slide it.",
+          "Sort the tiles in order with the empty space in the bottom-right to win.",
         ]}
       />
 

@@ -1,26 +1,31 @@
-## Add Breakout (Brick Breaker)
+## Add Pac-Man mini game
 
-Mirror the Bubble Shooter implementation pattern.
+Mirror the Breakout / Bubble Shooter pattern.
 
-### 1. Create `src/routes/tools.breakout.tsx`
-- `createFileRoute("/tools/breakout")` with `buildPageMeta` head (title, description, og tags, canonical) + JSON-LD Game scripts block.
-- `ToolPageShell` title "Breakout", description "Break all the bricks before you run out of lives!"
+### 1. Create `src/routes/tools.pac-man.tsx`
+- `createFileRoute("/tools/pac-man")` with `buildPageMeta` head (title, description, og, canonical = `https://skycally.com/tools/pac-man`) + JSON-LD Game script.
+- `ToolPageShell` title "Pac-Man", subtitle "Eat all the dots and avoid the ghosts. Classic arcade fun!"
 - HTML5 `<canvas>` game:
-  - Paddle controlled by mouse move, arrow keys, and touch drag
-  - Ball with wall/paddle/brick collision and angle deflection based on paddle hit position
-  - Brick grid (e.g. 10 cols × 6 rows) with 3 tiers: red=3 hits/30pts, orange=2 hits/20pts, green=1 hit/10pts
-  - 3 lives, lives + score HUD, level counter
-  - Difficulty selector (Easy/Medium/Hard) → controls ball speed and paddle width
-  - Speed ramps up slightly per level; win → next level with faster ball
-  - Game over modal with restart; best score in `localStorage` (`breakout-best`)
-- Sections: `<HowToUse>` (3 steps), `<ToolSeoContent>` (title, desc, 2-3 body paragraphs ~150-200 words, 4 FAQs), `<RelatedTools currentSlug="breakout" />`
+  - Hand-crafted maze grid (~21 cols × 23 rows) with walls, dots, 4 power pellets
+  - Pac-Man entity with tile-based movement + smooth interpolation, mouth animation
+  - 4 ghosts (Blinky red, Pinky pink, Inky cyan, Clyde orange) — simple AI: Blinky chases, Pinky targets 4 tiles ahead, Inky/Clyde use semi-random/distance-based heuristics; reverse direction & turn blue when frightened
+  - Power pellet → 6s frightened mode; eating ghost = 200/400/800/1600 points; ghost respawns in pen
+  - Dot = 10 pts, power pellet = 50 pts; clear all dots → next level (ghost speed up)
+  - 3 lives, lose life on ghost contact, reset positions; game over modal
+  - Difficulty selector (Easy / Medium / Hard) → ghost speed multiplier
+  - HUD: Score • Lives • Level • Best (localStorage key `pac-man-best`)
+  - Controls: Arrow keys + WASD on desktop, swipe gestures on mobile (touchstart/touchend delta)
+- Sections: `<HowToUse>` (3 steps), `<ToolSeoContent>` (title, description, 2-3 body paragraphs ~150-200 words, 4 FAQs), `<RelatedTools currentSlug="pac-man" />`
 
 ### 2. Edit `src/lib/tools.ts`
-- Add lucide icon (reuse existing e.g. `Square` or add `Gamepad2` — already imported; use a non-duplicate one like `Boxes` — already used. Use `Grid2x2` — used. Add new icon `LayoutPanelTop` or reuse `Layers` — used. Use new import `Brick`? Not in lucide. Use `Rows3` → add to import.)
-- Append entry: `{ slug: "breakout", name: "Breakout", description: "Classic brick breaker — bounce the ball and clear all the bricks!", category: "minigames", icon: Rows3, path: "/tools/breakout" }`
+- Add `Ghost` to the lucide-react import
+- Append minigames entry:
+  ```ts
+  { slug: "pac-man", name: "Pac-Man", description: "Eat all the dots and avoid the ghosts in this classic arcade maze game!", category: "minigames", icon: Ghost, path: "/tools/pac-man" }
+  ```
 
 ### 3. Edit `src/lib/related-tools.ts`
-- Add `"breakout": ["flappy-bird", "snake", "bubble-shooter"]`
+- Add `"pac-man": ["snake", "breakout", "bubble-shooter"]`
 
 ### Auto-propagation
-Tools page Mini Games grid, footer Mini Games column, sitemap.xml, and the TanStack route tree all iterate over `tools` — new entry shows up everywhere.
+Tools index grid, footer Mini Games column, sitemap.xml, and the TanStack route tree iterate over `tools` — the new entry appears in all three automatically.

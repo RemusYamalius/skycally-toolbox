@@ -58,6 +58,7 @@ import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-te
 import { Route as ToolsPdfReaderRouteImport } from './routes/tools.pdf-reader'
 import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page-numbers'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
+import { Route as ToolsPacManRouteImport } from './routes/tools.pac-man'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
 import { Route as ToolsMinesweeperRouteImport } from './routes/tools.minesweeper'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
@@ -352,6 +353,11 @@ const ToolsPdfPageNumbersRoute = ToolsPdfPageNumbersRouteImport.update({
 const ToolsPasswordGeneratorRoute = ToolsPasswordGeneratorRouteImport.update({
   id: '/tools/password-generator',
   path: '/tools/password-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPacManRoute = ToolsPacManRouteImport.update({
+  id: '/tools/pac-man',
+  path: '/tools/pac-man',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsObjectDetectionRoute = ToolsObjectDetectionRouteImport.update({
@@ -661,6 +667,7 @@ export interface FileRoutesByFullPath {
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
+  '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
@@ -761,6 +768,7 @@ export interface FileRoutesByTo {
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
+  '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
@@ -862,6 +870,7 @@ export interface FileRoutesById {
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
+  '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
@@ -964,6 +973,7 @@ export interface FileRouteTypes {
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
     | '/tools/object-detection'
+    | '/tools/pac-man'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
@@ -1064,6 +1074,7 @@ export interface FileRouteTypes {
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
     | '/tools/object-detection'
+    | '/tools/pac-man'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
@@ -1164,6 +1175,7 @@ export interface FileRouteTypes {
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
     | '/tools/object-detection'
+    | '/tools/pac-man'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
@@ -1265,6 +1277,7 @@ export interface RootRouteChildren {
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsMinesweeperRoute: typeof ToolsMinesweeperRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
+  ToolsPacManRoute: typeof ToolsPacManRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPdfPageNumbersRoute: typeof ToolsPdfPageNumbersRoute
   ToolsPdfReaderRoute: typeof ToolsPdfReaderRoute
@@ -1653,6 +1666,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/password-generator'
       fullPath: '/tools/password-generator'
       preLoaderRoute: typeof ToolsPasswordGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/pac-man': {
+      id: '/tools/pac-man'
+      path: '/tools/pac-man'
+      fullPath: '/tools/pac-man'
+      preLoaderRoute: typeof ToolsPacManRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/object-detection': {
@@ -2059,6 +2079,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsMinesweeperRoute: ToolsMinesweeperRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
+  ToolsPacManRoute: ToolsPacManRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPdfPageNumbersRoute: ToolsPdfPageNumbersRoute,
   ToolsPdfReaderRoute: ToolsPdfReaderRoute,

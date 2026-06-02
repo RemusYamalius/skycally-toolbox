@@ -39,6 +39,7 @@ import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
 import { Route as ToolsSnakeRouteImport } from './routes/tools.snake'
+import { Route as ToolsSlidingPuzzleRouteImport } from './routes/tools.sliding-puzzle'
 import { Route as ToolsSleepCalculatorRouteImport } from './routes/tools.sleep-calculator'
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
@@ -252,6 +253,11 @@ const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
 const ToolsSnakeRoute = ToolsSnakeRouteImport.update({
   id: '/tools/snake',
   path: '/tools/snake',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSlidingPuzzleRoute = ToolsSlidingPuzzleRouteImport.update({
+  id: '/tools/sliding-puzzle',
+  path: '/tools/sliding-puzzle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSleepCalculatorRoute = ToolsSleepCalculatorRouteImport.update({
@@ -652,6 +658,7 @@ export interface FileRoutesByFullPath {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
+  '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
@@ -748,6 +755,7 @@ export interface FileRoutesByTo {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
+  '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
@@ -845,6 +853,7 @@ export interface FileRoutesById {
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
+  '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
@@ -943,6 +952,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
+    | '/tools/sliding-puzzle'
     | '/tools/snake'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
@@ -1039,6 +1049,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
+    | '/tools/sliding-puzzle'
     | '/tools/snake'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
@@ -1135,6 +1146,7 @@ export interface FileRouteTypes {
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
+    | '/tools/sliding-puzzle'
     | '/tools/snake'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
@@ -1232,6 +1244,7 @@ export interface RootRouteChildren {
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
   ToolsSleepCalculatorRoute: typeof ToolsSleepCalculatorRoute
+  ToolsSlidingPuzzleRoute: typeof ToolsSlidingPuzzleRoute
   ToolsSnakeRoute: typeof ToolsSnakeRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
@@ -1468,6 +1481,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/snake'
       fullPath: '/tools/snake'
       preLoaderRoute: typeof ToolsSnakeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/sliding-puzzle': {
+      id: '/tools/sliding-puzzle'
+      path: '/tools/sliding-puzzle'
+      fullPath: '/tools/sliding-puzzle'
+      preLoaderRoute: typeof ToolsSlidingPuzzleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/sleep-calculator': {
@@ -1994,6 +2014,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
   ToolsSleepCalculatorRoute: ToolsSleepCalculatorRoute,
+  ToolsSlidingPuzzleRoute: ToolsSlidingPuzzleRoute,
   ToolsSnakeRoute: ToolsSnakeRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
@@ -2022,12 +2043,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

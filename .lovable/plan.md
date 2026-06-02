@@ -1,35 +1,37 @@
-## Add new blog post: Best Free Online Tools for Developers (2025)
+# Add Sliding Puzzle Mini Game
 
-Follows the exact same pattern as the existing designers post.
+## Files to create
 
-### Files to create
+**`src/routes/tools.sliding-puzzle.tsx`** — new route mirroring `tools.memory-match.tsx` / `tools.sudoku.tsx`:
+- `createFileRoute("/tools/sliding-puzzle")` with `head: () => buildToolMeta(toolBySlug("sliding-puzzle", tools))` plus an extra `scripts` entry for the Game JSON-LD.
+- `<ToolPageShell title="Sliding Puzzle" description="Slide the tiles into the correct order. How few moves can you do it in?">`.
+- Game state: size selector (3/4/5), tile array, empty index, move counter, timer (starts on first move, stops on win, via `setInterval` ref).
+- Logic: click/tap a tile adjacent to the empty slot to swap; arrow-key support; Shuffle button generates a solvable random permutation (apply N random valid moves from solved state to guarantee solvability); win when tiles are in order.
+- Win overlay shows moves + formatted time; reset on size change or shuffle.
+- Visual style matches other minigames (rounded grid, `bg-secondary`, accent on hover, big numbers).
+- Ends with `<HowToUse>`, `<ToolSeoContent>` (4 FAQs), `<RelatedTools currentSlug="sliding-puzzle" />`.
 
-**1. `src/assets/blog-developers-tools.png`** — cover image generated via imagegen (developer-themed: JSON Formatter / code editor interface aesthetic, matching the visual style of the existing blog thumbnails).
+## Files to edit
 
-**2. `src/routes/blog.best-free-online-tools-for-developers-2025.tsx`** — new route file mirroring `blog.best-free-online-tools-for-designers.tsx`:
-- `createFileRoute("/blog/best-free-online-tools-for-developers-2025")`
-- `head()` with `buildPageMeta` + Article JSON-LD (datePublished/Modified `2026-06-02`)
-- `ArticlePage` component returning `<BlogPostLayout post={post}>` with the 8 tool sections (JSON Formatter, Base64, Hash Generator, Password Generator, URL Encoder, Markdown to HTML, UUID Generator, Link Shortener), each linking to its `/tools/*` route, plus "Why Browser-Based Tools Work for Developers" and FAQ sections — all written in the same `<h2>`/`<p>`/`<strong>` style as the designers post.
+**`src/lib/tools.ts`** — add entry in the minigames block:
+```ts
+{ slug: "sliding-puzzle", name: "Sliding Puzzle", description: "Slide numbered tiles into order in the fewest moves. 3×3, 4×4, or 5×5.", category: "minigames", icon: Grid3x3, path: "/tools/sliding-puzzle" }
+```
+(Import `Grid3x3` from lucide-react if not already.)
 
-### Files to edit
+**`src/lib/related-tools.ts`** — add:
+```ts
+"sliding-puzzle": ["sudoku", "memory-match", "minesweeper"],
+```
 
-**3. `src/lib/blog.ts`**
-- Import the new thumbnail: `import developersToolsThumb from "@/assets/blog-developers-tools.png";`
-- Append a new `BlogPost` entry to `blogPosts`:
-  - slug: `best-free-online-tools-for-developers-2025`
-  - path: `/blog/best-free-online-tools-for-developers-2025`
-  - title: `Best Free Online Tools for Developers (2025)`
-  - description: `The best browser-based tools for developers in 2025 — free, no signup, no installs.`
-  - category: `Developer Tools`
-  - date: `2026-06-02`, dateLabel: `June 2, 2026`
-  - author: `Skycally Team`
-  - ctaToolSlug: `json-formatter`
-  - thumbnail + alt
+## Automatic propagation
 
-### Automatic behavior (no extra work)
+- Mini Games section on `/tools`, footer Mini Games column, and `sitemap.xml` all iterate over `tools` filtered by category, so the new entry appears in all three with no further edits.
+- TanStack Router auto-regenerates `routeTree.gen.ts` from the new route file.
 
-- Blog index (`/blog`) already maps over `blogPosts`, so the new card appears automatically.
-- `BlogPostLayout` already renders the "Ready to try {ctaTool.name}?" CTA from `ctaToolSlug` (`json-formatter` → "Ready to try JSON Formatter?", links to `/tools/json-formatter`) and the "You might also like" section via `RelatedTools` based on the CTA tool's category/related logic. The user's requested related items (UUID / Hash / Password Generator) will surface naturally from the developer-tools category relations; no manual override needed.
-- Sitemap route already enumerates blog posts from `src/lib/blog.ts`, so the new URL is included automatically.
+## SEO specifics
 
-No other files need changes.
+- Title: `Sliding Puzzle — Free Online Game, No Download` (overrides default `buildToolMeta` title by passing custom meta via a small inline override in `head()`, or by using `buildPageMeta` directly to set the exact title + description requested).
+- Meta description: as provided in the prompt.
+- JSON-LD Game block as provided, injected via `scripts` in `head()`.
+- `ToolSeoContent` provides on-page SEO body + FAQs per project convention.

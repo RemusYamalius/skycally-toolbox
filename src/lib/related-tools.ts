@@ -67,6 +67,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "whack-a-mole": ["flappy-bird", "snake", "memory-match"],
   "bubble-shooter": ["snake", "flappy-bird", "memory-match"],
   "breakout": ["flappy-bird", "snake", "bubble-shooter"],
+  "pac-man": ["snake", "breakout", "bubble-shooter"],
 };
 
 export function getRelatedTools(slug: string): Tool[] {

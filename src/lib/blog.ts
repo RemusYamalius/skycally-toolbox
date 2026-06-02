@@ -1,6 +1,7 @@
 import compressPdfThumb from "@/assets/blog-compress-pdf.png";
 import videoToGifThumb from "@/assets/blog-video-to-gif.png";
 import designersToolsThumb from "@/assets/blog-designers-tools.png";
+import developersToolsThumb from "@/assets/blog-developers-tools.png";
 
 export interface BlogPost {
   slug: string;

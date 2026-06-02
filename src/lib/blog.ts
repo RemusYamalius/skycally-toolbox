@@ -60,6 +60,20 @@ export const blogPosts: BlogPost[] = [
     thumbnail: designersToolsThumb,
     thumbnailAlt: "Remove Background tool interface",
   },
+  {
+    slug: "best-free-online-tools-for-developers-2025",
+    path: "/blog/best-free-online-tools-for-developers-2025",
+    title: "Best Free Online Tools for Developers (2025)",
+    description:
+      "The best browser-based tools for developers in 2025 — free, no signup, no installs.",
+    category: "Developer Tools",
+    date: "2026-06-02",
+    dateLabel: "June 2, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "json-formatter",
+    thumbnail: developersToolsThumb,
+    thumbnailAlt: "JSON Formatter tool interface",
+  },
 ];
 
 export const getBlogPostBySlug = (slug: string) =>

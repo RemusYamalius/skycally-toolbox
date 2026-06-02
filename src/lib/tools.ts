@@ -116,6 +116,7 @@ export const tools: Tool[] = [
   { slug: "chess", name: "Chess", description: "Play chess against a smart AI opponent. Classic strategy game with full rules support!", category: "minigames", icon: Crown, path: "/tools/chess" },
   { slug: "connect-four", name: "Connect Four", description: "Drop discs and connect four in a row before the AI does. Classic strategy game!", category: "minigames", icon: Circle, path: "/tools/connect-four" },
   { slug: "sliding-puzzle", name: "Sliding Puzzle", description: "Slide numbered tiles into order in the fewest moves. 3×3, 4×4, or 5×5.", category: "minigames", icon: Grid2x2, path: "/tools/sliding-puzzle" },
+  { slug: "whack-a-mole", name: "Whack-a-Mole", description: "Tap the moles before they disappear! Classic arcade reaction game.", category: "minigames", icon: Hammer, path: "/tools/whack-a-mole" },
 ];
 
 

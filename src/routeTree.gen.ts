@@ -21,6 +21,7 @@ import { Route as ToolsWordleRouteImport } from './routes/tools.wordle'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordSearchRouteImport } from './routes/tools.word-search'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
+import { Route as ToolsWhackAMoleRouteImport } from './routes/tools.whack-a-mole'
 import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoMergerRouteImport } from './routes/tools.video-merger'
@@ -163,6 +164,11 @@ const ToolsWordSearchRoute = ToolsWordSearchRouteImport.update({
 const ToolsWordCounterRoute = ToolsWordCounterRouteImport.update({
   id: '/tools/word-counter',
   path: '/tools/word-counter',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsWhackAMoleRoute = ToolsWhackAMoleRouteImport.update({
+  id: '/tools/whack-a-mole',
+  path: '/tools/whack-a-mole',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsVideoTrimmerRoute = ToolsVideoTrimmerRouteImport.update({
@@ -677,6 +683,7 @@ export interface FileRoutesByFullPath {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -774,6 +781,7 @@ export interface FileRoutesByTo {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -872,6 +880,7 @@ export interface FileRoutesById {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -971,6 +980,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/whack-a-mole'
     | '/tools/word-counter'
     | '/tools/word-search'
     | '/tools/word-to-pdf'
@@ -1068,6 +1078,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/whack-a-mole'
     | '/tools/word-counter'
     | '/tools/word-search'
     | '/tools/word-to-pdf'
@@ -1165,6 +1176,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/whack-a-mole'
     | '/tools/word-counter'
     | '/tools/word-search'
     | '/tools/word-to-pdf'
@@ -1263,6 +1275,7 @@ export interface RootRouteChildren {
   ToolsVideoMergerRoute: typeof ToolsVideoMergerRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
   ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
+  ToolsWhackAMoleRoute: typeof ToolsWhackAMoleRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
   ToolsWordSearchRoute: typeof ToolsWordSearchRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
@@ -1355,6 +1368,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/word-counter'
       fullPath: '/tools/word-counter'
       preLoaderRoute: typeof ToolsWordCounterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/whack-a-mole': {
+      id: '/tools/whack-a-mole'
+      path: '/tools/whack-a-mole'
+      fullPath: '/tools/whack-a-mole'
+      preLoaderRoute: typeof ToolsWhackAMoleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/video-trimmer': {
@@ -2033,6 +2053,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsVideoMergerRoute: ToolsVideoMergerRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
   ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
+  ToolsWhackAMoleRoute: ToolsWhackAMoleRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,
   ToolsWordSearchRoute: ToolsWordSearchRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,

@@ -1,25 +1,10 @@
-## Add Fazier Launch Badge to Footer
+## Goal
+Add the provided Product Hunt launch badge to `src/components/site-footer.tsx`, placing it directly beside the existing Fazier badge in the bottom-right corner of the footer.
 
-Add the Fazier "Launched on" badge to `src/components/site-footer.tsx`, placed at the bottom of the footer alongside the existing copyright bar.
+## Change
+In `src/components/site-footer.tsx`, inside the bottom copyright `<div>` that already contains the Fazier badge, insert the supplied `<a><img>` Product Hunt badge element immediately adjacent to the Fazier badge. Use the exact `href`, `src`, `width`, `height`, and `alt` values provided by the user.
 
-**Placement:** Inside the bottom copyright `<div>` or just above it, right-aligned with existing footer text.
-
-**Badge variant:** Use `theme=dark` instead of `neutral` because the site renders in dark mode.
-
-**Code to insert:**
-```tsx
-<a
-  href="https://fazier.com/launches/skycally.com"
-  target="_blank"
-  rel="noopener noreferrer"
->
-  <img
-    src="https://fazier.com/api/v1/public/badges/launch_badges.svg?badge_type=launched&theme=dark"
-    width={120}
-    alt="Launched on Fazier"
-    className="opacity-70 hover:opacity-100 transition-opacity"
-  />
-</a>
-```
-
-No other footer content or styling will be changed.
+## Verification
+- Build passes without errors.
+- Both badges render in the bottom-right footer area.
+- No other footer content or styling is modified.

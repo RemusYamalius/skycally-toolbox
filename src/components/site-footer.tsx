@@ -71,14 +71,25 @@ export function SiteFooter() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-3 text-xs text-muted-foreground">
           <p>© 2025 Skycally.com · <Link to="/privacy" className="hover:text-foreground">Privacy</Link> · <Link to="/terms" className="hover:text-foreground">Terms</Link> · <Link to="/contact" className="hover:text-foreground">Contact</Link></p>
           <p>Free online tools — no registration required</p>
-          <a href="https://fazier.com/launches/skycally.com" target="_blank" rel="noopener noreferrer">
-            <img
-              src="https://fazier.com/api/v1/public/badges/launch_badges.svg?badge_type=launched&theme=dark"
-              width={120}
-              alt="Launched on Fazier"
-              className="opacity-70 hover:opacity-100 transition-opacity"
-            />
-          </a>
+          <div className="flex items-center gap-3">
+            <a href="https://fazier.com/launches/skycally.com" target="_blank" rel="noopener noreferrer">
+              <img
+                src="https://fazier.com/api/v1/public/badges/launch_badges.svg?badge_type=launched&theme=dark"
+                width={120}
+                alt="Launched on Fazier"
+                className="opacity-70 hover:opacity-100 transition-opacity"
+              />
+            </a>
+            <a href="https://www.producthunt.com/products/skycally?embed=true&utm_source=badge-featured&utm_medium=badge&utm_campaign=badge-skycally" target="_blank" rel="noopener noreferrer">
+              <img
+                src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1158564&theme=neutral&t=1780398527058"
+                width={250}
+                height={54}
+                alt="Skycally - 90+ free browser tools — no signup, no uploads, no limits | Product Hunt"
+                className="opacity-70 hover:opacity-100 transition-opacity"
+              />
+            </a>
+          </div>
         </div>
       </div>
     </footer>

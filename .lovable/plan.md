@@ -1,28 +1,32 @@
-## Add Whack-a-Mole Mini Game
+## Add Crossword Mini Game
 
 ### Files to create
 
-**`src/routes/tools.whack-a-mole.tsx`** — mirrors `tools.sliding-puzzle.tsx` / `tools.memory-match.tsx`:
-- `createFileRoute("/tools/whack-a-mole")` with `head()` using `buildPageMeta` (title: `Whack-a-Mole — Free Online Game, No Download`, description as provided) plus `scripts` entry for the Game JSON-LD block.
-- `<ToolPageShell title="Whack-a-Mole" description="Tap the moles before they disappear! How high can you score?">`.
-- Game state: difficulty (easy/medium/hard) controlling duration (30/20/15s) and mole show interval (~900/650/450ms), 9-hole grid, active mole index, score, misses, high score persisted via `sessionStorage`, timer.
-- Logic: on Start, schedule moles via `setInterval`; each mole stays visible briefly then auto-hides (counts as miss if not whacked). Click handler increments score and hides early. On timer end, show Game Over overlay with score, hits/misses, accuracy %, new high-score badge if beaten.
-- Visual style matches existing minigames: rounded grid cells with `bg-secondary`, accent color on active mole (emoji or simple SVG), big score/timer stats above grid, Start / Reset buttons.
-- Ends with `<HowToUse>`, `<ToolSeoContent>` (4 FAQs), `<RelatedTools currentSlug="whack-a-mole" />`.
+**`src/routes/tools.crossword.tsx`** — mirrors `tools.sliding-puzzle.tsx`:
+- `createFileRoute("/tools/crossword")` with `head()` using `buildPageMeta` (title: `Crossword Puzzle — Free Online Game, No Download`, description as provided) + `scripts` entry for Game JSON-LD.
+- `<ToolPageShell title="Crossword" description="Solve the clues across and down. Can you complete the puzzle?">`.
+- 3 hand-authored puzzles (small ~10×10 grids with mixed Across/Down words and short clues). Each puzzle: `{ size, grid: string[][] (uppercase letter or "." for block), clues: { across: {num, clue, row, col, answer}[], down: same } }`. Numbering derived at render time from grid.
+- State: current puzzle index, user letters 2D array, selected cell `{row,col}`, direction (`across`/`down`), timer, started flag, checked map (`correct`/`wrong`/`null` per cell), completed flag.
+- Interactions: click cell to select; clicking same cell toggles direction; typing letter fills + advances within current word; Backspace clears + steps back; arrow keys move within grid skipping blocks.
+- Selected word highlighted with `bg-primary/20`, active cell with `bg-primary/40`, blocks `bg-foreground` (black), correct cells green, wrong red.
+- Buttons: Check (sets per-cell verdicts), Reveal (fills solution), New Puzzle (rotates), Reset.
+- Completion detection: when all cells filled correctly → stop timer, show celebration banner.
+- Clue panel beside/below grid: two columns (Across / Down) listing numbered clues, current clue highlighted.
+- Ends with `<HowToUse>`, `<ToolSeoContent>` (4 FAQs), `<RelatedTools currentSlug="crossword" />`.
 
 ### Files to edit
 
 **`src/lib/tools.ts`** — add to minigames block:
 ```ts
-{ slug: "whack-a-mole", name: "Whack-a-Mole", description: "Tap the moles before they disappear! Classic arcade reaction game.", category: "minigames", icon: Hammer, path: "/tools/whack-a-mole" }
+{ slug: "crossword", name: "Crossword", description: "Classic crossword puzzles with Across and Down clues. Solve them right in your browser.", category: "minigames", icon: Grid3x3, path: "/tools/crossword" }
 ```
-(Import `Hammer` from `lucide-react`.)
+(Import `Grid3x3` from lucide-react.)
 
 **`src/lib/related-tools.ts`** — add:
 ```ts
-"whack-a-mole": ["flappy-bird", "snake", "memory-match"],
+"crossword": ["wordle", "hangman", "word-search"],
 ```
 
 ### Automatic propagation
 
-`/tools` Mini Games grid, footer Mini Games column, and `sitemap.xml` all iterate over `tools` filtered by category — new entry appears automatically. TanStack Router regenerates `routeTree.gen.ts`.
+`/tools` Mini Games grid, footer Mini Games column, and `sitemap.xml` iterate over `tools` filtered by category → new entry appears everywhere. TanStack Router regenerates `routeTree.gen.ts`.

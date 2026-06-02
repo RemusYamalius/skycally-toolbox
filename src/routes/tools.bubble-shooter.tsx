@@ -267,11 +267,9 @@ function BubbleShooterPage() {
     for (let r = 0; r < rowsToCheck; r++) {
       for (let c = 0; c < COLS; c++) {
         if (r < grid.length && grid[r][c]) continue;
-        // Skip the always-empty last cell of an odd row to avoid placing off-grid
-        const odd = (r + parityOffsetRef.current) % 2 === 1;
-        if (odd && c === COLS - 1) continue;
         const x = cellX(r, c, parityOffsetRef.current);
         const y = cellY(r);
+        if (x < R || x > W - R) continue; // would be off-canvas
         const d = (x - bx) ** 2 + (y - by) ** 2;
         // Must be adjacent to existing bubble OR be in top row
         const isAdjacent = r === 0 || neighbors(r, c, parityOffsetRef.current, Math.max(grid.length, r + 1)).some(([nr, nc]) => {
@@ -288,8 +286,7 @@ function BubbleShooterPage() {
     const grid = gridRef.current;
     while (grid.length <= r) {
       const row: Cell[] = [];
-      const odd = (grid.length + parityOffsetRef.current) % 2 === 1;
-      for (let i = 0; i < COLS; i++) row.push(odd && i === COLS - 1 ? null : null);
+      for (let i = 0; i < COLS; i++) row.push(null);
       grid.push(row);
     }
     grid[r][c] = color;
@@ -395,7 +392,7 @@ function BubbleShooterPage() {
     // Now old row index 0 should remain same parity. After flipping offset and unshifting:
     // new index 0 parity = (0 + newOffset) % 2; old index 0 parity = (0 + oldOffset) % 2.
     // We want old index 0 (now index 1) parity = (1 + newOffset) % 2 = (1 + 1 - oldOffset) % 2 = oldOffset. ✓
-    const newRow = newTopRow(parityOffsetRef.current, 0);
+    const newRow = newTopRow();
     grid.unshift(newRow);
   };
 

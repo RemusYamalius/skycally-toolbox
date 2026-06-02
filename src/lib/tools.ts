@@ -115,6 +115,7 @@ export const tools: Tool[] = [
   { slug: "flappy-bird", name: "Flappy Bird", description: "Tap to flap and fly through the pipes! How far can you go?", category: "minigames", icon: Bird, path: "/tools/flappy-bird" },
   { slug: "chess", name: "Chess", description: "Play chess against a smart AI opponent. Classic strategy game with full rules support!", category: "minigames", icon: Crown, path: "/tools/chess" },
   { slug: "connect-four", name: "Connect Four", description: "Drop discs and connect four in a row before the AI does. Classic strategy game!", category: "minigames", icon: Circle, path: "/tools/connect-four" },
+  { slug: "sliding-puzzle", name: "Sliding Puzzle", description: "Slide numbered tiles into order in the fewest moves. 3×3, 4×4, or 5×5.", category: "minigames", icon: Grid2x2, path: "/tools/sliding-puzzle" },
 ];
 
 

@@ -406,7 +406,7 @@ function NetworkSpeedTest() {
 
           <div className="mt-6 mb-2 relative">
             <SpeedGauge
-              mbps={phase === "download" ? live.download : phase === "done" ? results.download : 0}
+              mbps={phase === "download" ? live.download : phase === "done" || phase === "upload" ? results.download : 0}
               phase={phase}
               pingMs={results.ping}
             />

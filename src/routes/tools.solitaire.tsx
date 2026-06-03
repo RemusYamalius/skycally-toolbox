@@ -539,10 +539,6 @@ function Board({
       {/* Top row: stock, waste, foundations */}
       <div className="grid grid-cols-7 gap-1.5 sm:gap-2 mb-4">
         {/* Stock */}
-        <div
-          ref={setPileRef("W")} /* placeholder so layout stays in sync; reassigned next line for waste */
-          className="hidden"
-        />
         <div className="col-span-1">
           <PileSlot onClick={onStock}>
             {state.stock.length > 0 ? (

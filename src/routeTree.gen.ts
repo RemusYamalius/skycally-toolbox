@@ -63,6 +63,7 @@ import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsPacManRouteImport } from './routes/tools.pac-man'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
+import { Route as ToolsNetworkSpeedTestRouteImport } from './routes/tools.network-speed-test'
 import { Route as ToolsMinesweeperRouteImport } from './routes/tools.minesweeper'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMemoryMatchRouteImport } from './routes/tools.memory-match'
@@ -384,6 +385,11 @@ const ToolsObjectDetectionRoute = ToolsObjectDetectionRouteImport.update({
   path: '/tools/object-detection',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsNetworkSpeedTestRoute = ToolsNetworkSpeedTestRouteImport.update({
+  id: '/tools/network-speed-test',
+  path: '/tools/network-speed-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsMinesweeperRoute = ToolsMinesweeperRouteImport.update({
   id: '/tools/minesweeper',
   path: '/tools/minesweeper',
@@ -691,6 +697,7 @@ export interface FileRoutesByFullPath {
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
+  '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -796,6 +803,7 @@ export interface FileRoutesByTo {
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
+  '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -902,6 +910,7 @@ export interface FileRoutesById {
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
+  '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
@@ -1009,6 +1018,7 @@ export interface FileRouteTypes {
     | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
+    | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
     | '/tools/password-generator'
@@ -1114,6 +1124,7 @@ export interface FileRouteTypes {
     | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
+    | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
     | '/tools/password-generator'
@@ -1219,6 +1230,7 @@ export interface FileRouteTypes {
     | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
+    | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
     | '/tools/password-generator'
@@ -1325,6 +1337,7 @@ export interface RootRouteChildren {
   ToolsMemoryMatchRoute: typeof ToolsMemoryMatchRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsMinesweeperRoute: typeof ToolsMinesweeperRoute
+  ToolsNetworkSpeedTestRoute: typeof ToolsNetworkSpeedTestRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPacManRoute: typeof ToolsPacManRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
@@ -1755,6 +1768,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsObjectDetectionRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/network-speed-test': {
+      id: '/tools/network-speed-test'
+      path: '/tools/network-speed-test'
+      fullPath: '/tools/network-speed-test'
+      preLoaderRoute: typeof ToolsNetworkSpeedTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/minesweeper': {
       id: '/tools/minesweeper'
       path: '/tools/minesweeper'
@@ -2159,6 +2179,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsMemoryMatchRoute: ToolsMemoryMatchRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsMinesweeperRoute: ToolsMinesweeperRoute,
+  ToolsNetworkSpeedTestRoute: ToolsNetworkSpeedTestRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPacManRoute: ToolsPacManRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
@@ -2211,12 +2232,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

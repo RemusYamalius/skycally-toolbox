@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search, Keyboard, Bird, Crown, Circle, Hammer, Target, Rows3, Ghost, Spade, Puzzle, Pickaxe, Zap } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search, Keyboard, Bird, Crown, Circle, Hammer, Target, Rows3, Ghost, Spade, Puzzle, Pickaxe, Zap, Gauge } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
@@ -124,6 +124,7 @@ export const tools: Tool[] = [
   { slug: "mahjong", name: "Mahjong Solitaire", description: "Classic Mahjong Solitaire — match identical free tiles to clear the board!", category: "minigames", icon: Puzzle, path: "/tools/mahjong" },
   { slug: "tunnel-dash", name: "Tunnel Dash", description: "Dig tunnels, collect gems and drop rocks on enemies in this classic arcade digger!", category: "minigames", icon: Pickaxe, path: "/tools/tunnel-dash" },
   { slug: "pinball", name: "Pinball", description: "Classic arcade pinball with 3 tables, realistic physics, and full sound effects!", category: "minigames", icon: Zap, path: "/tools/pinball" },
+  { slug: "network-speed-test", name: "Network Speed Test", description: "Test your internet download, upload, ping and jitter speeds instantly.", category: "utility", icon: Gauge, path: "/tools/network-speed-test" },
 ];
 
 

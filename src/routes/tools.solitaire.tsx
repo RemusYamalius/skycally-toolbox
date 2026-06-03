@@ -134,6 +134,55 @@ function isWon(s: GameState): boolean {
   return s.foundations.every((f) => f.length === 13);
 }
 
+type Hint = { fromPile: Pile; cardId: string; toPile: Pile };
+
+function findHint(s: GameState): Hint | null {
+  // 1. Waste top -> foundation
+  if (s.waste.length) {
+    const c = s.waste[s.waste.length - 1];
+    for (let i = 0; i < 4; i++)
+      if (canPlaceOnFoundation(c, s.foundations[i]))
+        return { fromPile: "W", cardId: c.id, toPile: `F${i}` as Pile };
+  }
+  // 2. Tableau top -> foundation
+  for (let t = 0; t < 7; t++) {
+    const col = s.tableau[t];
+    if (!col.length) continue;
+    const c = col[col.length - 1];
+    if (!c.faceUp) continue;
+    for (let i = 0; i < 4; i++)
+      if (canPlaceOnFoundation(c, s.foundations[i]))
+        return { fromPile: `T${t}` as Pile, cardId: c.id, toPile: `F${i}` as Pile };
+  }
+  // 3. Waste -> tableau
+  if (s.waste.length) {
+    const c = s.waste[s.waste.length - 1];
+    for (let t = 0; t < 7; t++) {
+      const col = s.tableau[t];
+      const dest = col[col.length - 1];
+      if (canPlaceOnTableau(c, dest))
+        return { fromPile: "W", cardId: c.id, toPile: `T${t}` as Pile };
+    }
+  }
+  // 4. Tableau face-up sub-stack -> another tableau (reveals or empties)
+  for (let t = 0; t < 7; t++) {
+    const col = s.tableau[t];
+    const firstUp = col.findIndex((c) => c.faceUp);
+    if (firstUp < 0) continue;
+    const moving = col[firstUp];
+    if (moving.rank === 13 && firstUp === 0) continue; // king already at bottom
+    for (let d = 0; d < 7; d++) {
+      if (d === t) continue;
+      const dCol = s.tableau[d];
+      const dest = dCol[dCol.length - 1];
+      if (canPlaceOnTableau(moving, dest))
+        return { fromPile: `T${t}` as Pile, cardId: moving.id, toPile: `T${d}` as Pile };
+    }
+  }
+  return null;
+}
+
+
 // ---------- Component ----------
 function SolitairePage() {
   const [state, setState] = useState<GameState>(() => newGame());

@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Download, Activity, Waves, Play, RotateCw, X } from "lucide-react";
+import { Download, Upload, Activity, Waves, Play, RotateCw, X } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -17,12 +17,13 @@ export const Route = createFileRoute("/tools/network-speed-test")({
   component: NetworkSpeedTest,
 });
 
-type Phase = "idle" | "latency" | "download" | "done" | "error";
+type Phase = "idle" | "latency" | "download" | "upload" | "done" | "error";
 
 interface Results {
   ping: number;
   jitter: number;
   download: number;
+  upload: number;
 }
 
 const CF_DOWN = "https://speed.cloudflare.com/__down?bytes=";
@@ -131,6 +132,25 @@ async function measureDownload(
   return (totalBytes * 8) / totalSec / 1e6;
 }
 
+async function measureUploadSpeed(controller: AbortController): Promise<number> {
+  const sizeMB = 5;
+  const totalBytes = sizeMB * 1024 * 1024;
+  const bytes = new Uint8Array(totalBytes);
+  const CHUNK = 65536;
+  for (let off = 0; off < totalBytes; off += CHUNK) {
+    crypto.getRandomValues(bytes.subarray(off, Math.min(off + CHUNK, totalBytes)));
+  }
+  const t0 = performance.now();
+  await fetchWithRetry("https://speed-upload.skycally-tools.workers.dev", {
+    method: "POST",
+    body: bytes,
+    cache: "no-store",
+    signal: controller.signal,
+  });
+  const sec = (performance.now() - t0) / 1000;
+  return (sizeMB * 8) / sec;
+}
+
 const MAX_MBPS = 500;
 const ARC_START = 135; // degrees
 const ARC_END = 405; // 270° sweep
@@ -166,7 +186,6 @@ function SpeedGauge({
   const trackPath = arcPath(cx, cy, r, ARC_START, ARC_END);
 
   const ticks = Array.from({ length: 11 }, (_, i) => i * 50);
-  const showLatencyCenter = phase === "latency";
 
   return (
     <div className="relative" style={{ width: size, height: size * 0.85 }}>
@@ -236,16 +255,16 @@ function SpeedGauge({
 
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
         <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-          {showLatencyCenter ? "Latency" : "Download"}
+          {phase === "latency" ? "Latency" : phase === "upload" ? "Upload" : "Download"}
         </div>
         <div
           className="font-display text-6xl font-bold tabular-nums leading-none mt-2"
           style={{ color: "var(--cyan-brand)" }}
         >
-          {showLatencyCenter ? fmtMs(pingMs) : fmtMbps(clamped)}
+          {phase === "latency" ? fmtMs(pingMs) : phase === "upload" ? "…" : fmtMbps(clamped)}
         </div>
         <div className="text-sm text-muted-foreground mt-2">
-          {showLatencyCenter ? "ms" : "Mbps"}
+          {phase === "latency" ? "ms" : "Mbps"}
         </div>
       </div>
     </div>
@@ -301,16 +320,16 @@ function NetworkSpeedTest() {
   const tool = toolBySlug("network-speed-test", tools);
   const [phase, setPhase] = useState<Phase>("idle");
   const [, setProgress] = useState(0);
-  const [results, setResults] = useState<Results>({ ping: 0, jitter: 0, download: 0 });
+  const [results, setResults] = useState<Results>({ ping: 0, jitter: 0, download: 0, upload: 0 });
   const [live, setLive] = useState({ download: 0 });
   const [error, setError] = useState<string | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
 
-  const running = phase === "latency" || phase === "download";
+  const running = phase === "latency" || phase === "download" || phase === "upload";
 
   async function runTest() {
     setError(null);
-    setResults({ ping: 0, jitter: 0, download: 0 });
+    setResults({ ping: 0, jitter: 0, download: 0, upload: 0 });
     setLive({ download: 0 });
     setProgress(0);
     const controller = new AbortController();
@@ -319,17 +338,21 @@ function NetworkSpeedTest() {
     try {
       setPhase("latency");
       const { ping, jitter } = await measureLatency(controller, (pct) => {
-        setProgress(pct * 0.2);
+        setProgress(pct * 0.15);
       });
       setResults((r) => ({ ...r, ping, jitter }));
 
       setPhase("download");
       const download = await measureDownload(controller, (mbps, pct) => {
         setLive({ download: mbps });
-        setProgress(20 + pct * 0.8);
+        setProgress(15 + pct * 0.6);
       });
       setResults((r) => ({ ...r, download }));
       setLive({ download });
+
+      setPhase("upload");
+      const upload = await measureUploadSpeed(controller);
+      setResults((r) => ({ ...r, upload }));
 
       setProgress(100);
       setPhase("done");
@@ -356,11 +379,13 @@ function NetworkSpeedTest() {
       ? "Measuring latency…"
       : phase === "download"
         ? "Measuring download speed…"
-        : phase === "done"
-          ? "Test complete"
-          : phase === "error"
-            ? "Test failed"
-            : "Ready to test";
+        : phase === "upload"
+          ? "Testing upload…"
+          : phase === "done"
+            ? "Test complete"
+            : phase === "error"
+              ? "Test failed"
+              : "Ready to test";
 
   const displayDownload = phase === "download" ? live.download : results.download;
 
@@ -381,7 +406,7 @@ function NetworkSpeedTest() {
 
           <div className="mt-6 mb-2 relative">
             <SpeedGauge
-              mbps={phase === "download" ? live.download : phase === "done" ? results.download : 0}
+              mbps={phase === "download" ? live.download : phase === "done" || phase === "upload" ? results.download : 0}
               phase={phase}
               pingMs={results.ping}
             />
@@ -452,7 +477,7 @@ function NetworkSpeedTest() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-8">
           <MetricCard
             label="Download"
             value={fmtMbps(displayDownload)}
@@ -460,6 +485,14 @@ function NetworkSpeedTest() {
             color="var(--cyan-brand)"
             icon={Download}
             highlight={phase === "download"}
+          />
+          <MetricCard
+            label="Upload"
+            value={fmtMbps(results.upload)}
+            unit="Mbps"
+            color="var(--cyan-brand)"
+            icon={Upload}
+            highlight={phase === "upload"}
           />
           <MetricCard
             label="Ping"

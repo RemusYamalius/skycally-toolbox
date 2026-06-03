@@ -489,7 +489,7 @@ function SolitairePage() {
           {
             question: "Can I undo a move?",
             answer:
-              "Yes. The Undo button lets you reverse up to your last 3 moves, including drawing from the stock. Use it to recover from a misplay or to try a different line of play.",
+              "Yes. The Undo button reverts your previous moves one at a time, including drawing from the stock. Use it to recover from a misplay or try a different line.",
           },
           {
             question: "Does Solitaire work on mobile?",

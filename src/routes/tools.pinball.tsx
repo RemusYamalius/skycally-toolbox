@@ -50,8 +50,8 @@ const BUMPER_KICK = 7.5;
 const SLING_KICK = 6.5;
 const MAX_SPEED = 20;
 const FLIPPER_LEN = 64;
-const FLIPPER_REST = 0.45;   // radians from horizontal (downward angle)
-const FLIPPER_ACTIVE = -0.5; // up angle
+const FLIPPER_REST = -0.45;  // resting: tip angled downward (classic spread pose)
+const FLIPPER_ACTIVE = 0.55; // active: tip swung upward to strike the ball
 const FLIPPER_SPEED = 0.45;
 
 type TableId = "amazon" | "space" | "dragon";
@@ -651,9 +651,9 @@ function PinballPage() {
     if (lFlap.hit && lFlap.bx !== undefined) {
       ball.x = lFlap.bx; ball.y = lFlap.by!;
       ball.vx = lFlap.vx!; ball.vy = lFlap.vy!;
-      // angular kick when flipping up
-      if (flipperLRef.current < flipperLPrevRef.current) {
-        const kick = (flipperLPrevRef.current - flipperLRef.current) * 18;
+      // angular kick when flipping up (angle increasing from REST to ACTIVE)
+      if (flipperLRef.current > flipperLPrevRef.current) {
+        const kick = (flipperLRef.current - flipperLPrevRef.current) * 18;
         ball.vy -= kick;
         ball.vx += kick * 0.3;
       }
@@ -662,8 +662,8 @@ function PinballPage() {
     if (rFlap.hit && rFlap.bx !== undefined) {
       ball.x = rFlap.bx; ball.y = rFlap.by!;
       ball.vx = rFlap.vx!; ball.vy = rFlap.vy!;
-      if (flipperRRef.current < flipperRPrevRef.current) {
-        const kick = (flipperRPrevRef.current - flipperRRef.current) * 18;
+      if (flipperRRef.current > flipperRPrevRef.current) {
+        const kick = (flipperRRef.current - flipperRPrevRef.current) * 18;
         ball.vy -= kick;
         ball.vx -= kick * 0.3;
       }

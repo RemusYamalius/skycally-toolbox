@@ -1,12 +1,20 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
-import { RotateCcw, Undo2, Trophy } from "lucide-react";
+import { RotateCcw, Undo2, Trophy, Lightbulb } from "lucide-react";
 
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogDescription,
+} from "@/components/ui/dialog";
+
 
 const PATH = "/tools/solitaire";
 const TITLE = "Solitaire — Free Online Card Game, No Download";
@@ -126,6 +134,55 @@ function isWon(s: GameState): boolean {
   return s.foundations.every((f) => f.length === 13);
 }
 
+type Hint = { fromPile: Pile; cardId: string; toPile: Pile };
+
+function findHint(s: GameState): Hint | null {
+  // 1. Waste top -> foundation
+  if (s.waste.length) {
+    const c = s.waste[s.waste.length - 1];
+    for (let i = 0; i < 4; i++)
+      if (canPlaceOnFoundation(c, s.foundations[i]))
+        return { fromPile: "W", cardId: c.id, toPile: `F${i}` as Pile };
+  }
+  // 2. Tableau top -> foundation
+  for (let t = 0; t < 7; t++) {
+    const col = s.tableau[t];
+    if (!col.length) continue;
+    const c = col[col.length - 1];
+    if (!c.faceUp) continue;
+    for (let i = 0; i < 4; i++)
+      if (canPlaceOnFoundation(c, s.foundations[i]))
+        return { fromPile: `T${t}` as Pile, cardId: c.id, toPile: `F${i}` as Pile };
+  }
+  // 3. Waste -> tableau
+  if (s.waste.length) {
+    const c = s.waste[s.waste.length - 1];
+    for (let t = 0; t < 7; t++) {
+      const col = s.tableau[t];
+      const dest = col[col.length - 1];
+      if (canPlaceOnTableau(c, dest))
+        return { fromPile: "W", cardId: c.id, toPile: `T${t}` as Pile };
+    }
+  }
+  // 4. Tableau face-up sub-stack -> another tableau (reveals or empties)
+  for (let t = 0; t < 7; t++) {
+    const col = s.tableau[t];
+    const firstUp = col.findIndex((c) => c.faceUp);
+    if (firstUp < 0) continue;
+    const moving = col[firstUp];
+    if (moving.rank === 13 && firstUp === 0) continue; // king already at bottom
+    for (let d = 0; d < 7; d++) {
+      if (d === t) continue;
+      const dCol = s.tableau[d];
+      const dest = dCol[dCol.length - 1];
+      if (canPlaceOnTableau(moving, dest))
+        return { fromPile: `T${t}` as Pile, cardId: moving.id, toPile: `T${d}` as Pile };
+    }
+  }
+  return null;
+}
+
+
 // ---------- Component ----------
 function SolitairePage() {
   const [state, setState] = useState<GameState>(() => newGame());
@@ -135,6 +192,9 @@ function SolitairePage() {
   const [running, setRunning] = useState(true);
   const [bestTime, setBestTime] = useState<number | null>(null);
   const [won, setWon] = useState(false);
+  const [hint, setHint] = useState<Hint | null>(null);
+  const hintTimerRef = useRef<number | null>(null);
+
 
   useEffect(() => {
     const raw = localStorage.getItem("solitaire-best-time");
@@ -165,9 +225,33 @@ function SolitairePage() {
   const pushHistory = useCallback((prev: GameState) => {
     setHistory((h) => {
       const next = [...h, clone(prev)];
-      return next.slice(-3);
+      return next.slice(-50);
     });
   }, []);
+
+  const clearHint = useCallback(() => {
+    if (hintTimerRef.current != null) {
+      window.clearTimeout(hintTimerRef.current);
+      hintTimerRef.current = null;
+    }
+    setHint(null);
+  }, []);
+
+  const showHint = useCallback(() => {
+    const h = findHint(state);
+    if (!h) {
+      setHint(null);
+      return;
+    }
+    setHint(h);
+    if (hintTimerRef.current != null) window.clearTimeout(hintTimerRef.current);
+    hintTimerRef.current = window.setTimeout(() => setHint(null), 2200);
+  }, [state]);
+
+  useEffect(() => () => {
+    if (hintTimerRef.current != null) window.clearTimeout(hintTimerRef.current);
+  }, []);
+
 
   const apply = useCallback(
     (mutator: (draft: GameState) => boolean) => {
@@ -216,6 +300,7 @@ function SolitairePage() {
     setSeconds(0);
     setRunning(true);
     setWon(false);
+    clearHint();
   };
 
   const handleUndo = () => {
@@ -226,7 +311,9 @@ function SolitairePage() {
       setWon(false);
       return h.slice(0, -1);
     });
+    clearHint();
   };
+
 
   // Try auto-move card to a foundation
   const tryAutoFoundation = (from: Pile, cardId: string) => {
@@ -318,7 +405,13 @@ function SolitairePage() {
             disabled={history.length === 0}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-secondary/60 text-foreground border border-border hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Undo2 className="w-3.5 h-3.5" /> Undo ({history.length}/3)
+            <Undo2 className="w-3.5 h-3.5" /> Undo
+          </button>
+          <button
+            onClick={showHint}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-secondary/60 text-foreground border border-border hover:bg-secondary"
+          >
+            <Lightbulb className="w-3.5 h-3.5" /> Hint
           </button>
           <button
             onClick={handleNewGame}
@@ -331,16 +424,31 @@ function SolitairePage() {
         <Board
           state={state}
           onStock={handleStock}
-          onMove={tryMove}
-          onAuto={tryAutoFoundation}
+          onMove={(from, cardId, to) => {
+            clearHint();
+            return tryMove(from, cardId, to);
+          }}
+          onAuto={(from, cardId) => {
+            clearHint();
+            tryAutoFoundation(from, cardId);
+          }}
+          hint={hint}
         />
+      </div>
 
-        {won && (
-          <div className="mt-4 rounded-xl border border-yellow-500/40 bg-yellow-500/10 p-6 text-center">
-            <Trophy className="w-10 h-10 mx-auto text-yellow-400 mb-2" />
-            <p className="text-2xl font-black text-foreground mb-1">You Won!</p>
-            <p className="text-muted-foreground mb-1">Time: {formatTime(seconds)}</p>
-            <p className="text-muted-foreground mb-4">Moves: {state.moves}</p>
+      <Dialog open={won} onOpenChange={(o) => !o && setWon(false)}>
+        <DialogContent className="text-center">
+          <DialogHeader>
+            <div className="mx-auto mb-2 w-14 h-14 rounded-full bg-yellow-500/15 flex items-center justify-center">
+              <Trophy className="w-8 h-8 text-yellow-400" />
+            </div>
+            <DialogTitle className="text-center text-3xl font-black">You Won!</DialogTitle>
+            <DialogDescription className="text-center">
+              Time {formatTime(seconds)} · {state.moves} moves
+              {bestTime != null && seconds <= bestTime ? " · New best!" : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center">
             <button
               onClick={handleNewGame}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold"
@@ -348,8 +456,9 @@ function SolitairePage() {
               <RotateCcw className="w-4 h-4" /> Play Again
             </button>
           </div>
-        )}
-      </div>
+        </DialogContent>
+      </Dialog>
+
 
       <HowToUse
         steps={[
@@ -380,7 +489,7 @@ function SolitairePage() {
           {
             question: "Can I undo a move?",
             answer:
-              "Yes. The Undo button lets you reverse up to your last 3 moves, including drawing from the stock. Use it to recover from a misplay or to try a different line of play.",
+              "Yes. The Undo button reverts your previous moves one at a time, including drawing from the stock. Use it to recover from a misplay or try a different line.",
           },
           {
             question: "Does Solitaire work on mobile?",
@@ -426,12 +535,15 @@ function Board({
   onStock,
   onMove,
   onAuto,
+  hint,
 }: {
   state: GameState;
   onStock: () => void;
   onMove: (from: Pile, cardId: string, to: Pile) => boolean;
   onAuto: (from: Pile, cardId: string) => void;
+  hint: Hint | null;
 }) {
+
   const [drag, setDrag] = useState<DragData | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const [hoverPile, setHoverPile] = useState<Pile | null>(null);
@@ -563,6 +675,7 @@ function Board({
     z = 0,
   ) => {
     const draggable = c.faceUp;
+    const isHintCard = hint?.cardId === c.id;
     return (
       <div
         key={c.id}
@@ -579,13 +692,14 @@ function Board({
         }}
         className={`absolute left-0 right-0 mx-auto select-none touch-none ${
           draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default"
-        }`}
+        } ${isHintCard ? "ring-2 ring-yellow-400 rounded-md animate-pulse" : ""}`}
         style={{ top: offsetY, zIndex: z }}
       >
         <CardFace card={c} hidden={drag?.cards.some((x) => x.id === c.id) ?? false} />
       </div>
     );
   };
+
 
 
   return (
@@ -612,7 +726,7 @@ function Board({
         </div>
         {/* Waste */}
         <div className="col-span-1">
-          <PileSlot pileRef={setPileRef("W")} highlight={hoverPile === "W"}>
+          <PileSlot pileRef={setPileRef("W")} highlight={hoverPile === "W" || hint?.toPile === "W"}>
             {state.waste.length === 0 ? (
               <EmptySlot />
             ) : (
@@ -634,7 +748,7 @@ function Board({
           const f = state.foundations[i];
           return (
             <div key={p} className="col-span-1">
-              <PileSlot pileRef={setPileRef(p)} highlight={hoverPile === p}>
+              <PileSlot pileRef={setPileRef(p)} highlight={hoverPile === p || hint?.toPile === p}>
                 {f.length === 0 ? (
                   <EmptySlot label={SUIT_GLYPH[SUITS[i]]} />
                 ) : (
@@ -658,7 +772,7 @@ function Board({
               <div
                 ref={setPileRef(p)}
                 className={`relative w-full rounded-md border ${
-                  hoverPile === p ? "border-cyan-400 bg-cyan-500/10" : "border-border/40 bg-secondary/20"
+                  hoverPile === p || hint?.toPile === p ? "border-cyan-400 bg-cyan-500/10" : "border-border/40 bg-secondary/20"
                 }`}
                 style={{ minHeight: minH, aspectRatio: col.length <= 1 ? "5 / 7" : undefined }}
               >

@@ -405,7 +405,13 @@ function SolitairePage() {
             disabled={history.length === 0}
             className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-secondary/60 text-foreground border border-border hover:bg-secondary disabled:opacity-40 disabled:cursor-not-allowed"
           >
-            <Undo2 className="w-3.5 h-3.5" /> Undo ({history.length}/3)
+            <Undo2 className="w-3.5 h-3.5" /> Undo
+          </button>
+          <button
+            onClick={showHint}
+            className="inline-flex items-center gap-1.5 px-3 py-1.5 rounded-full text-xs font-bold bg-secondary/60 text-foreground border border-border hover:bg-secondary"
+          >
+            <Lightbulb className="w-3.5 h-3.5" /> Hint
           </button>
           <button
             onClick={handleNewGame}
@@ -418,16 +424,31 @@ function SolitairePage() {
         <Board
           state={state}
           onStock={handleStock}
-          onMove={tryMove}
-          onAuto={tryAutoFoundation}
+          onMove={(from, cardId, to) => {
+            clearHint();
+            return tryMove(from, cardId, to);
+          }}
+          onAuto={(from, cardId) => {
+            clearHint();
+            tryAutoFoundation(from, cardId);
+          }}
+          hint={hint}
         />
+      </div>
 
-        {won && (
-          <div className="mt-4 rounded-xl border border-yellow-500/40 bg-yellow-500/10 p-6 text-center">
-            <Trophy className="w-10 h-10 mx-auto text-yellow-400 mb-2" />
-            <p className="text-2xl font-black text-foreground mb-1">You Won!</p>
-            <p className="text-muted-foreground mb-1">Time: {formatTime(seconds)}</p>
-            <p className="text-muted-foreground mb-4">Moves: {state.moves}</p>
+      <Dialog open={won} onOpenChange={(o) => !o && setWon(false)}>
+        <DialogContent className="text-center">
+          <DialogHeader>
+            <div className="mx-auto mb-2 w-14 h-14 rounded-full bg-yellow-500/15 flex items-center justify-center">
+              <Trophy className="w-8 h-8 text-yellow-400" />
+            </div>
+            <DialogTitle className="text-center text-3xl font-black">You Won!</DialogTitle>
+            <DialogDescription className="text-center">
+              Time {formatTime(seconds)} · {state.moves} moves
+              {bestTime != null && seconds <= bestTime ? " · New best!" : ""}
+            </DialogDescription>
+          </DialogHeader>
+          <div className="flex justify-center">
             <button
               onClick={handleNewGame}
               className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold"
@@ -435,8 +456,9 @@ function SolitairePage() {
               <RotateCcw className="w-4 h-4" /> Play Again
             </button>
           </div>
-        )}
-      </div>
+        </DialogContent>
+      </Dialog>
+
 
       <HowToUse
         steps={[

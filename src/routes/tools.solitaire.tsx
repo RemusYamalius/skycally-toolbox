@@ -535,12 +535,15 @@ function Board({
   onStock,
   onMove,
   onAuto,
+  hint,
 }: {
   state: GameState;
   onStock: () => void;
   onMove: (from: Pile, cardId: string, to: Pile) => boolean;
   onAuto: (from: Pile, cardId: string) => void;
+  hint: Hint | null;
 }) {
+
   const [drag, setDrag] = useState<DragData | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const [hoverPile, setHoverPile] = useState<Pile | null>(null);

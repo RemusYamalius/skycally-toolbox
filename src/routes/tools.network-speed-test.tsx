@@ -477,7 +477,7 @@ function NetworkSpeedTest() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3 mt-8">
           <MetricCard
             label="Download"
             value={fmtMbps(displayDownload)}
@@ -485,6 +485,14 @@ function NetworkSpeedTest() {
             color="var(--cyan-brand)"
             icon={Download}
             highlight={phase === "download"}
+          />
+          <MetricCard
+            label="Upload"
+            value={fmtMbps(results.upload)}
+            unit="Mbps"
+            color="var(--cyan-brand)"
+            icon={Upload}
+            highlight={phase === "upload"}
           />
           <MetricCard
             label="Ping"

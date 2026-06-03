@@ -186,7 +186,6 @@ function SpeedGauge({
   const trackPath = arcPath(cx, cy, r, ARC_START, ARC_END);
 
   const ticks = Array.from({ length: 11 }, (_, i) => i * 50);
-  const showLatencyCenter = phase === "latency";
 
   return (
     <div className="relative" style={{ width: size, height: size * 0.85 }}>

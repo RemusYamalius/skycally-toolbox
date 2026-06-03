@@ -370,58 +370,42 @@ function NetworkSpeedTest() {
         <div className="flex flex-col items-center text-center">
           <div className="text-xs uppercase tracking-wider text-muted-foreground">{phaseLabel}</div>
 
-          <AnimatePresence mode="wait">
-            {phase === "idle" && (
+          <div className="mt-6 mb-2 relative">
+            <SpeedGauge
+              mbps={phase === "download" ? live.download : phase === "done" ? results.download : 0}
+              phase={phase}
+              pingMs={results.ping}
+            />
+            {phase === "done" && (
               <motion.div
-                key="idle"
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
-                exit={{ opacity: 0 }}
-                className="mt-6 mb-2"
+                className="absolute -top-2 right-2 w-10 h-10 rounded-full flex items-center justify-center font-display text-xl font-bold"
+                style={{
+                  background: "color-mix(in oklab, var(--green-brand) 20%, transparent)",
+                  border: "1px solid color-mix(in oklab, var(--green-brand) 50%, transparent)",
+                  color: "var(--green-brand)",
+                }}
               >
-                <div
-                  className="w-32 h-32 rounded-full flex items-center justify-center"
-                  style={{
-                    background:
-                      "radial-gradient(circle at 30% 30%, color-mix(in oklab, var(--cyan-brand) 25%, transparent), transparent 70%)",
-                    border: "1px solid color-mix(in oklab, var(--cyan-brand) 40%, transparent)",
-                  }}
-                >
-                  <Activity className="w-12 h-12" style={{ color: "var(--cyan-brand)" }} />
-                </div>
+                ✓
               </motion.div>
             )}
-
-            {running && (
+            {phase === "error" && (
               <motion.div
-                key="running"
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                exit={{ opacity: 0 }}
-                className="mt-6 mb-2"
-              >
-                <div className="font-display text-6xl font-bold tabular-nums" style={{ color: "var(--cyan-brand)" }}>
-                  {phase === "latency" ? fmtMs(results.ping || 0) : fmtMbps(live.download)}
-                </div>
-                <div className="text-sm text-muted-foreground mt-1">
-                  {phase === "latency" ? "ms" : "Mbps"}
-                </div>
-              </motion.div>
-            )}
-
-            {(phase === "done" || phase === "error") && (
-              <motion.div
-                key="done"
-                initial={{ opacity: 0, scale: 0.95 }}
+                initial={{ opacity: 0, scale: 0.6 }}
                 animate={{ opacity: 1, scale: 1 }}
-                className="mt-6 mb-2"
+                className="absolute -top-2 right-2 w-10 h-10 rounded-full flex items-center justify-center font-display text-xl font-bold"
+                style={{
+                  background: "color-mix(in oklab, var(--destructive) 20%, transparent)",
+                  border: "1px solid color-mix(in oklab, var(--destructive) 50%, transparent)",
+                  color: "var(--destructive)",
+                }}
               >
-                <div className="font-display text-5xl font-bold" style={{ color: "var(--green-brand)" }}>
-                  {phase === "done" ? "✓" : "!"}
-                </div>
+                !
               </motion.div>
             )}
-          </AnimatePresence>
+          </div>
+
 
           {(running || phase === "done") && (
             <div className="w-full max-w-md mt-4">

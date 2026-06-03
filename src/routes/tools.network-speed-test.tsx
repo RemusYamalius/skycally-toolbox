@@ -256,16 +256,16 @@ function SpeedGauge({
 
       <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
         <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
-          {showLatencyCenter ? "Latency" : "Download"}
+          {phase === "latency" ? "Latency" : phase === "upload" ? "Upload" : "Download"}
         </div>
         <div
           className="font-display text-6xl font-bold tabular-nums leading-none mt-2"
           style={{ color: "var(--cyan-brand)" }}
         >
-          {showLatencyCenter ? fmtMs(pingMs) : fmtMbps(clamped)}
+          {phase === "latency" ? fmtMs(pingMs) : phase === "upload" ? "…" : fmtMbps(clamped)}
         </div>
         <div className="text-sm text-muted-foreground mt-2">
-          {showLatencyCenter ? "ms" : "Mbps"}
+          {phase === "latency" ? "ms" : "Mbps"}
         </div>
       </div>
     </div>

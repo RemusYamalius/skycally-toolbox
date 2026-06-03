@@ -8,7 +8,7 @@ import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
-import { Progress } from "@/components/ui/progress";
+
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -300,7 +300,7 @@ function MetricCard({
 function NetworkSpeedTest() {
   const tool = toolBySlug("network-speed-test", tools);
   const [phase, setPhase] = useState<Phase>("idle");
-  const [progress, setProgress] = useState(0);
+  const [, setProgress] = useState(0);
   const [results, setResults] = useState<Results>({ ping: 0, jitter: 0, download: 0 });
   const [live, setLive] = useState({ download: 0 });
   const [error, setError] = useState<string | null>(null);
@@ -368,7 +368,16 @@ function NetworkSpeedTest() {
     <ToolPageShell title={tool.name} description={tool.description}>
       <div className="rounded-3xl border border-border bg-card/40 p-6 sm:p-8">
         <div className="flex flex-col items-center text-center">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground">{phaseLabel}</div>
+          <div
+            className={
+              phase === "done"
+                ? "text-sm font-semibold uppercase tracking-wider"
+                : "text-xs uppercase tracking-wider text-muted-foreground"
+            }
+            style={phase === "done" ? { color: "var(--green-brand)" } : undefined}
+          >
+            {phaseLabel}
+          </div>
 
           <div className="mt-6 mb-2 relative">
             <SpeedGauge
@@ -378,12 +387,25 @@ function NetworkSpeedTest() {
             />
             {phase === "done" && (
               <motion.div
-                initial={{ opacity: 0, scale: 0.6 }}
-                animate={{ opacity: 1, scale: 1 }}
-                className="absolute -top-2 right-2 w-10 h-10 rounded-full flex items-center justify-center font-display text-xl font-bold"
+                initial={{ opacity: 0, scale: 0.4 }}
+                animate={{
+                  opacity: 1,
+                  scale: [1, 1.08, 1],
+                  boxShadow: [
+                    "0 0 0 0 color-mix(in oklab, var(--green-brand) 45%, transparent), 0 0 30px 6px color-mix(in oklab, var(--green-brand) 30%, transparent)",
+                    "0 0 0 14px color-mix(in oklab, var(--green-brand) 0%, transparent), 0 0 45px 10px color-mix(in oklab, var(--green-brand) 40%, transparent)",
+                    "0 0 0 0 color-mix(in oklab, var(--green-brand) 45%, transparent), 0 0 30px 6px color-mix(in oklab, var(--green-brand) 30%, transparent)",
+                  ],
+                }}
+                transition={{
+                  opacity: { duration: 0.3 },
+                  scale: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                  boxShadow: { duration: 2, repeat: Infinity, ease: "easeInOut" },
+                }}
+                className="absolute -top-1 right-0 w-14 h-14 rounded-full flex items-center justify-center font-display text-2xl font-bold"
                 style={{
-                  background: "color-mix(in oklab, var(--green-brand) 20%, transparent)",
-                  border: "1px solid color-mix(in oklab, var(--green-brand) 50%, transparent)",
+                  background: "color-mix(in oklab, var(--green-brand) 22%, transparent)",
+                  border: "1px solid color-mix(in oklab, var(--green-brand) 60%, transparent)",
                   color: "var(--green-brand)",
                 }}
               >
@@ -405,13 +427,6 @@ function NetworkSpeedTest() {
               </motion.div>
             )}
           </div>
-
-
-          {(running || phase === "done") && (
-            <div className="w-full max-w-md mt-4">
-              <Progress value={progress} className="h-2" />
-            </div>
-          )}
 
           {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
 

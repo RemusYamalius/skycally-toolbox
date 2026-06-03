@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { Download, Activity, Waves, Play, RotateCw, X } from "lucide-react";
+import { Download, Upload, Activity, Waves, Play, RotateCw, X } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";

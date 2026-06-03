@@ -17,12 +17,13 @@ export const Route = createFileRoute("/tools/network-speed-test")({
   component: NetworkSpeedTest,
 });
 
-type Phase = "idle" | "latency" | "download" | "done" | "error";
+type Phase = "idle" | "latency" | "download" | "upload" | "done" | "error";
 
 interface Results {
   ping: number;
   jitter: number;
   download: number;
+  upload: number;
 }
 
 const CF_DOWN = "https://speed.cloudflare.com/__down?bytes=";

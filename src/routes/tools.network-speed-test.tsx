@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Download, Upload, Activity, Waves, Play, RotateCw, X } from "lucide-react";
+import { Download, Activity, Waves, Play, RotateCw, X } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -17,17 +17,15 @@ export const Route = createFileRoute("/tools/network-speed-test")({
   component: NetworkSpeedTest,
 });
 
-type Phase = "idle" | "latency" | "download" | "upload" | "done" | "error";
+type Phase = "idle" | "latency" | "download" | "done" | "error";
 
 interface Results {
   ping: number;
   jitter: number;
   download: number;
-  upload: number;
 }
 
 const CF_DOWN = "https://speed.cloudflare.com/__down?bytes=";
-const CF_UP = "https://speed.cloudflare.com/__up";
 
 function fmtMbps(v: number) {
   if (!v || !isFinite(v)) return "—";
@@ -90,9 +88,8 @@ async function measureDownload(
   controller: AbortController,
   onLive: (mbps: number, pct: number) => void,
 ) {
-  // Sizes in MB: warmup + measured passes
   const passes = [1, 10, 10, 25, 25];
-  let totalBytesPlanned = passes.reduce((a, b) => a + b, 0) * 1024 * 1024;
+  const totalBytesPlanned = passes.reduce((a, b) => a + b, 0) * 1024 * 1024;
   let bytesAcc = 0;
   const speeds: { bytes: number; seconds: number }[] = [];
 
@@ -126,101 +123,6 @@ async function measureDownload(
     }
     const sec = (performance.now() - t0) / 1000;
     if (i > 0) speeds.push({ bytes: received, seconds: sec });
-  }
-  // Use best 60% of measured passes (drop slowest)
-  speeds.sort((a, b) => b.bytes / b.seconds - a.bytes / a.seconds);
-  const keep = speeds.slice(0, Math.max(1, Math.ceil(speeds.length * 0.6)));
-  const totalBytes = keep.reduce((a, b) => a + b.bytes, 0);
-  const totalSec = keep.reduce((a, b) => a + b.seconds, 0);
-  return (totalBytes * 8) / totalSec / 1e6;
-}
-
-function uploadOnce(
-  payload: Uint8Array,
-  controller: AbortController,
-  onProgress: (loaded: number, elapsedSec: number) => void,
-): Promise<number> {
-  return new Promise((resolve, reject) => {
-    const xhr = new XMLHttpRequest();
-    const t0 = performance.now();
-    const onAbort = () => {
-      xhr.abort();
-      const err = new Error("Aborted");
-      (err as Error & { name: string }).name = "AbortError";
-      reject(err);
-    };
-    if (controller.signal.aborted) return onAbort();
-    controller.signal.addEventListener("abort", onAbort);
-
-    xhr.open("POST", CF_UP + "?r=" + Math.random(), true);
-    xhr.setRequestHeader("Content-Type", "application/octet-stream");
-    xhr.upload.onprogress = (e) => {
-      if (e.lengthComputable) onProgress(e.loaded, (performance.now() - t0) / 1000);
-    };
-    xhr.onload = () => {
-      controller.signal.removeEventListener("abort", onAbort);
-      if (xhr.status >= 200 && xhr.status < 400) {
-        resolve((performance.now() - t0) / 1000);
-      } else {
-        reject(new Error(`HTTP ${xhr.status}`));
-      }
-    };
-    xhr.onerror = () => {
-      controller.signal.removeEventListener("abort", onAbort);
-      reject(new Error("Network error during upload"));
-    };
-    xhr.ontimeout = () => reject(new Error("Upload timeout"));
-    // Send a Blob for broader compatibility
-    xhr.send(new Blob([payload.buffer as ArrayBuffer], { type: "application/octet-stream" }));
-  });
-}
-
-async function uploadOnceWithRetry(
-  payload: Uint8Array,
-  controller: AbortController,
-  onProgress: (loaded: number, elapsedSec: number) => void,
-  retries = 3,
-): Promise<number> {
-  let lastErr: unknown;
-  for (let attempt = 0; attempt <= retries; attempt++) {
-    try {
-      return await uploadOnce(payload, controller, onProgress);
-    } catch (err) {
-      const e = err as { name?: string };
-      if (e?.name === "AbortError") throw err;
-      lastErr = err;
-      if (attempt === retries) break;
-      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
-    }
-  }
-  throw lastErr instanceof Error ? lastErr : new Error("Upload failed");
-}
-
-async function measureUpload(
-  controller: AbortController,
-  onLive: (mbps: number, pct: number) => void,
-) {
-  const passes = [1, 8, 8, 8];
-  const totalPlanned = passes.reduce((a, b) => a + b, 0) * 1024 * 1024;
-  let bytesAccBefore = 0;
-  const speeds: { bytes: number; seconds: number }[] = [];
-
-  for (let i = 0; i < passes.length; i++) {
-    const sizeBytes = passes[i] * 1024 * 1024;
-    const payload = new Uint8Array(sizeBytes);
-    // Fill with pseudo-random data to defeat compression
-    for (let j = 0; j < sizeBytes; j += 1024) payload[j] = Math.floor(Math.random() * 256);
-
-    const startBytes = bytesAccBefore;
-    const sec = await uploadOnceWithRetry(payload, controller, (loaded, elapsed) => {
-      if (elapsed > 0.05) {
-        const mbps = (loaded * 8) / elapsed / 1e6;
-        onLive(mbps, Math.min(100, ((startBytes + loaded) / totalPlanned) * 100));
-      }
-    });
-    bytesAccBefore += sizeBytes;
-    if (i > 0 && sec > 0) speeds.push({ bytes: sizeBytes, seconds: sec });
-    onLive((sizeBytes * 8) / Math.max(sec, 0.001) / 1e6, Math.min(100, (bytesAccBefore / totalPlanned) * 100));
   }
   speeds.sort((a, b) => b.bytes / b.seconds - a.bytes / a.seconds);
   const keep = speeds.slice(0, Math.max(1, Math.ceil(speeds.length * 0.6)));
@@ -278,17 +180,17 @@ function NetworkSpeedTest() {
   const tool = toolBySlug("network-speed-test", tools);
   const [phase, setPhase] = useState<Phase>("idle");
   const [progress, setProgress] = useState(0);
-  const [results, setResults] = useState<Results>({ ping: 0, jitter: 0, download: 0, upload: 0 });
-  const [live, setLive] = useState({ download: 0, upload: 0 });
+  const [results, setResults] = useState<Results>({ ping: 0, jitter: 0, download: 0 });
+  const [live, setLive] = useState({ download: 0 });
   const [error, setError] = useState<string | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
 
-  const running = phase === "latency" || phase === "download" || phase === "upload";
+  const running = phase === "latency" || phase === "download";
 
   async function runTest() {
     setError(null);
-    setResults({ ping: 0, jitter: 0, download: 0, upload: 0 });
-    setLive({ download: 0, upload: 0 });
+    setResults({ ping: 0, jitter: 0, download: 0 });
+    setLive({ download: 0 });
     setProgress(0);
     const controller = new AbortController();
     controllerRef.current = controller;
@@ -296,25 +198,17 @@ function NetworkSpeedTest() {
     try {
       setPhase("latency");
       const { ping, jitter } = await measureLatency(controller, (pct) => {
-        setProgress(pct * 0.15);
+        setProgress(pct * 0.2);
       });
       setResults((r) => ({ ...r, ping, jitter }));
 
       setPhase("download");
       const download = await measureDownload(controller, (mbps, pct) => {
-        setLive((l) => ({ ...l, download: mbps }));
-        setProgress(15 + pct * 0.45);
+        setLive({ download: mbps });
+        setProgress(20 + pct * 0.8);
       });
       setResults((r) => ({ ...r, download }));
-      setLive((l) => ({ ...l, download }));
-
-      setPhase("upload");
-      const upload = await measureUpload(controller, (mbps, pct) => {
-        setLive((l) => ({ ...l, upload: mbps }));
-        setProgress(60 + pct * 0.4);
-      });
-      setResults((r) => ({ ...r, upload }));
-      setLive((l) => ({ ...l, upload }));
+      setLive({ download });
 
       setProgress(100);
       setPhase("done");
@@ -341,17 +235,13 @@ function NetworkSpeedTest() {
       ? "Measuring latency…"
       : phase === "download"
         ? "Measuring download speed…"
-        : phase === "upload"
-          ? "Measuring upload speed…"
-          : phase === "done"
-            ? "Test complete"
-            : phase === "error"
-              ? "Test failed"
-              : "Ready to test";
+        : phase === "done"
+          ? "Test complete"
+          : phase === "error"
+            ? "Test failed"
+            : "Ready to test";
 
-  const displayDownload =
-    phase === "download" ? live.download : results.download;
-  const displayUpload = phase === "upload" ? live.upload : results.upload;
+  const displayDownload = phase === "download" ? live.download : results.download;
 
   return (
     <ToolPageShell title={tool.name} description={tool.description}>
@@ -390,11 +280,7 @@ function NetworkSpeedTest() {
                 className="mt-6 mb-2"
               >
                 <div className="font-display text-6xl font-bold tabular-nums" style={{ color: "var(--cyan-brand)" }}>
-                  {phase === "latency"
-                    ? fmtMs(results.ping || 0)
-                    : phase === "download"
-                      ? fmtMbps(live.download)
-                      : fmtMbps(live.upload)}
+                  {phase === "latency" ? fmtMs(results.ping || 0) : fmtMbps(live.download)}
                 </div>
                 <div className="text-sm text-muted-foreground mt-1">
                   {phase === "latency" ? "ms" : "Mbps"}
@@ -422,9 +308,7 @@ function NetworkSpeedTest() {
             </div>
           )}
 
-          {error && (
-            <p className="mt-4 text-sm text-destructive">{error}</p>
-          )}
+          {error && <p className="mt-4 text-sm text-destructive">{error}</p>}
 
           <div className="mt-6 flex gap-3">
             {!running && (
@@ -448,7 +332,7 @@ function NetworkSpeedTest() {
           </div>
         </div>
 
-        <div className="grid grid-cols-1 sm:grid-cols-2 gap-3 mt-8">
+        <div className="grid grid-cols-1 sm:grid-cols-3 gap-3 mt-8">
           <MetricCard
             label="Download"
             value={fmtMbps(displayDownload)}
@@ -456,14 +340,6 @@ function NetworkSpeedTest() {
             color="var(--cyan-brand)"
             icon={Download}
             highlight={phase === "download"}
-          />
-          <MetricCard
-            label="Upload"
-            value={fmtMbps(displayUpload)}
-            unit="Mbps"
-            color="var(--violet-brand)"
-            icon={Upload}
-            highlight={phase === "upload"}
           />
           <MetricCard
             label="Ping"
@@ -491,17 +367,17 @@ function NetworkSpeedTest() {
       <HowToUse
         steps={[
           "Click Run Test to start measuring your connection",
-          "Wait about 20 seconds while we test latency, download and upload",
-          "Review your speed in the cards or run the test again any time",
+          "Wait about 15 seconds while we test latency and download speed",
+          "Review your download, ping and jitter results, or run the test again any time",
         ]}
       />
 
       <ToolSeoContent
-        title="Network Speed Test — Free Internet Speed & Bandwidth Test"
-        description="Free in-browser internet speed test that measures download, upload, ping and jitter against Cloudflare's global network in seconds."
+        title="Network Speed Test — Free Internet Download, Ping & Jitter Test"
+        description="Free in-browser internet speed test that measures download speed, ping and jitter against Cloudflare's global network in seconds."
         body={[
-          "Skycally's Network Speed Test gives you a quick, accurate picture of your internet connection without installing anything. It runs entirely in your browser and uses Cloudflare's worldwide anycast endpoints to measure real download throughput, real upload throughput, ping latency and jitter — the four numbers that actually predict how a connection will feel when you stream, game or join a video call.",
-          "Download and upload are reported in megabits per second (Mbps). Ping is the round-trip time to the nearest Cloudflare edge, measured in milliseconds. Jitter is the variation between successive ping samples — low jitter matters more than raw bandwidth for video conferencing and online gaming. For most home connections, anything above 25 Mbps down handles 4K streaming, and ping under 50 ms with single-digit jitter feels snappy.",
+          "Skycally's Network Speed Test gives you a quick, accurate picture of your internet connection without installing anything. It runs entirely in your browser and uses Cloudflare's worldwide anycast endpoints to measure real download throughput, ping latency and jitter — three numbers that predict how a connection will feel when you stream, game or join a video call.",
+          "Download is reported in megabits per second (Mbps). Ping is the round-trip time to the nearest Cloudflare edge, measured in milliseconds. Jitter is the variation between successive ping samples — low jitter matters more than raw bandwidth for video conferencing and online gaming. For most home connections, anything above 25 Mbps down handles 4K streaming, and ping under 50 ms with single-digit jitter feels snappy.",
           "Results vary based on Wi-Fi signal, the device you're using, time of day and other devices on your network. For the most accurate reading, close other tabs and apps, pause downloads, and run the test a couple of times. Nothing is uploaded, logged or stored — every test starts and ends in your browser.",
         ]}
         faqs={[
@@ -513,12 +389,12 @@ function NetworkSpeedTest() {
           {
             question: "What is a good internet speed?",
             answer:
-              "For a single user: 25+ Mbps download covers 4K streaming, 100+ Mbps is comfortable for most households, and 300+ Mbps is solid for heavy multi-user homes. Upload of 10+ Mbps handles HD video calls. Aim for ping under 50 ms and jitter under 10 ms for smooth gaming and video calls.",
+              "For a single user: 25+ Mbps download covers 4K streaming, 100+ Mbps is comfortable for most households, and 300+ Mbps is solid for heavy multi-user homes. Aim for ping under 50 ms and jitter under 10 ms for smooth gaming and video calls.",
           },
           {
-            question: "Why is my result lower than my ISP plan?",
+            question: "Why don't you measure upload speed?",
             answer:
-              "Common causes are Wi-Fi (especially older 2.4 GHz networks), distance from the router, VPNs, other devices using bandwidth, browser overhead, and the device's own network hardware. Run the test on Ethernet next to the modem to see numbers closest to your plan.",
+              "Reliable in-browser upload measurement requires a dedicated server endpoint with the right CORS headers. To keep this tool fast and dependency-free we focus on download, ping and jitter, which are the metrics that most affect everyday browsing, streaming and video calls.",
           },
           {
             question: "Do you store my test results or IP address?",

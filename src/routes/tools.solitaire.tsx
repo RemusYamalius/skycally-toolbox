@@ -192,6 +192,9 @@ function SolitairePage() {
   const [running, setRunning] = useState(true);
   const [bestTime, setBestTime] = useState<number | null>(null);
   const [won, setWon] = useState(false);
+  const [hint, setHint] = useState<Hint | null>(null);
+  const hintTimerRef = useRef<number | null>(null);
+
 
   useEffect(() => {
     const raw = localStorage.getItem("solitaire-best-time");

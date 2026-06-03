@@ -40,12 +40,35 @@ function fmtMs(v: number) {
   return v.toFixed(v >= 100 ? 0 : 1);
 }
 
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  retries = 3,
+  delay = 800,
+): Promise<Response> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res;
+    } catch (err) {
+      const e = err as { name?: string };
+      if (e?.name === "AbortError") throw err;
+      lastErr = err;
+      if (attempt === retries) break;
+      await new Promise((r) => setTimeout(r, delay * (attempt + 1)));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Network request failed");
+}
+
 async function measureLatency(controller: AbortController, onProgress: (pct: number) => void) {
   const samples: number[] = [];
   const N = 12;
   for (let i = 0; i < N; i++) {
     const t0 = performance.now();
-    const res = await fetch(CF_DOWN + "0&r=" + Math.random(), {
+    const res = await fetchWithRetry(CF_DOWN + "0&r=" + Math.random(), {
       cache: "no-store",
       signal: controller.signal,
     });

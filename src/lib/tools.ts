@@ -120,6 +120,7 @@ export const tools: Tool[] = [
   { slug: "bubble-shooter", name: "Bubble Shooter", description: "Aim, shoot, and pop colored bubbles. Match 3 or more before they reach the bottom!", category: "minigames", icon: Target, path: "/tools/bubble-shooter" },
   { slug: "breakout", name: "Breakout", description: "Classic brick breaker — bounce the ball and clear all the bricks!", category: "minigames", icon: Rows3, path: "/tools/breakout" },
   { slug: "pac-man", name: "Pac-Man", description: "Eat all the dots and avoid the ghosts in this classic arcade maze game!", category: "minigames", icon: Ghost, path: "/tools/pac-man" },
+  { slug: "solitaire", name: "Solitaire", description: "Classic Klondike Solitaire — move all cards to the foundations to win!", category: "minigames", icon: Spade, path: "/tools/solitaire" },
 ];
 
 

@@ -645,28 +645,27 @@ function PinballPage() {
       }
     }
 
-    // Flippers
+    // Flippers — kick magnitude scales with current angular velocity (set in step()).
+    const lAngVel = (flipperLRef.current - flipperLPrevRef.current); // per-frame
+    const rAngVel = (flipperRRef.current - flipperRPrevRef.current);
     const { lAnchor, rAnchor, lTip, rTip } = flipperEndpoints();
     const lFlap = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, lAnchor.x, lAnchor.y, lTip.x, lTip.y);
     if (lFlap.hit && lFlap.bx !== undefined) {
       ball.x = lFlap.bx; ball.y = lFlap.by!;
       ball.vx = lFlap.vx!; ball.vy = lFlap.vy!;
-      // angular kick when flipping up (angle increasing from REST to ACTIVE)
-      if (flipperLRef.current > flipperLPrevRef.current) {
-        const kick = (flipperLRef.current - flipperLPrevRef.current) * 18;
-        ball.vy -= kick;
-        ball.vx += kick * 0.3;
-      }
+      // Kick on upswing (angle increasing). Base impulse always present so a
+      // resting flipper still bounces the ball back, swinging flipper launches it.
+      const kick = Math.max(0, lAngVel) * 36 + 2.5;
+      ball.vy -= kick;
+      ball.vx += kick * 0.35;
     }
     const rFlap = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, rAnchor.x, rAnchor.y, rTip.x, rTip.y);
     if (rFlap.hit && rFlap.bx !== undefined) {
       ball.x = rFlap.bx; ball.y = rFlap.by!;
       ball.vx = rFlap.vx!; ball.vy = rFlap.vy!;
-      if (flipperRRef.current > flipperRPrevRef.current) {
-        const kick = (flipperRRef.current - flipperRPrevRef.current) * 18;
-        ball.vy -= kick;
-        ball.vx -= kick * 0.3;
-      }
+      const kick = Math.max(0, rAngVel) * 36 + 2.5;
+      ball.vy -= kick;
+      ball.vx -= kick * 0.35;
     }
   };
 

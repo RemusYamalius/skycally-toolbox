@@ -70,6 +70,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "pac-man": ["snake", "breakout", "bubble-shooter"],
   "solitaire": ["memory-match", "minesweeper", "sudoku"],
   "mahjong": ["sudoku", "memory-match", "sliding-puzzle"],
+  "tunnel-dash": ["snake", "pac-man", "breakout"],
 };
 
 export function getRelatedTools(slug: string): Tool[] {

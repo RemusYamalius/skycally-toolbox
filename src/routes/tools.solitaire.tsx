@@ -772,7 +772,7 @@ function Board({
               <div
                 ref={setPileRef(p)}
                 className={`relative w-full rounded-md border ${
-                  hoverPile === p ? "border-cyan-400 bg-cyan-500/10" : "border-border/40 bg-secondary/20"
+                  hoverPile === p || hint?.toPile === p ? "border-cyan-400 bg-cyan-500/10" : "border-border/40 bg-secondary/20"
                 }`}
                 style={{ minHeight: minH, aspectRatio: col.length <= 1 ? "5 / 7" : undefined }}
               >

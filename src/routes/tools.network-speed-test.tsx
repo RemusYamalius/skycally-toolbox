@@ -307,11 +307,11 @@ function NetworkSpeedTest() {
   const [error, setError] = useState<string | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
 
-  const running = phase === "latency" || phase === "download";
+  const running = phase === "latency" || phase === "download" || phase === "upload";
 
   async function runTest() {
     setError(null);
-    setResults({ ping: 0, jitter: 0, download: 0 });
+    setResults({ ping: 0, jitter: 0, download: 0, upload: 0 });
     setLive({ download: 0 });
     setProgress(0);
     const controller = new AbortController();
@@ -320,17 +320,21 @@ function NetworkSpeedTest() {
     try {
       setPhase("latency");
       const { ping, jitter } = await measureLatency(controller, (pct) => {
-        setProgress(pct * 0.2);
+        setProgress(pct * 0.15);
       });
       setResults((r) => ({ ...r, ping, jitter }));
 
       setPhase("download");
       const download = await measureDownload(controller, (mbps, pct) => {
         setLive({ download: mbps });
-        setProgress(20 + pct * 0.8);
+        setProgress(15 + pct * 0.6);
       });
       setResults((r) => ({ ...r, download }));
       setLive({ download });
+
+      setPhase("upload");
+      const upload = await measureUploadSpeed(controller);
+      setResults((r) => ({ ...r, upload }));
 
       setProgress(100);
       setPhase("done");

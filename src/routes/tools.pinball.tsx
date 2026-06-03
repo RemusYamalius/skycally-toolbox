@@ -526,10 +526,17 @@ function PinballPage() {
     if (ball.x > W - BALL_R - 8) { ball.x = W - BALL_R - 8; ball.vx = -ball.vx * WALL_REST; }
     if (ball.y < BALL_R + 8) { ball.y = BALL_R + 8; ball.vy = -ball.vy * WALL_REST; }
 
-    // Plunger lane wall (vertical at x = W - 28)
-    if (ball.x > W - 28 - BALL_R && ball.y < H - 130) {
-      // bounce back if entering from left while above lane top
-      ball.x = W - 28 - BALL_R; ball.vx = -Math.abs(ball.vx) * WALL_REST;
+    // Plunger lane wall (vertical at x = W - 28). Only blocks the ball when it
+    // approaches the wall from the playfield (left) side — never teleport a
+    // ball that's currently inside the lane (e.g. just after launch).
+    if (
+      ball.x > W - 28 - BALL_R &&
+      ball.x < W - 28 &&
+      ball.vx > 0 &&
+      ball.y < H - 130
+    ) {
+      ball.x = W - 28 - BALL_R;
+      ball.vx = -Math.abs(ball.vx) * WALL_REST;
     }
 
     // Sloped guide walls down to flippers (V shape)

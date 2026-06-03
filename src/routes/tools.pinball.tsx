@@ -551,6 +551,12 @@ function PinballPage() {
       const r = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, W - 30, H - 130, W - 130, H - 80);
       if (r.hit && r.bx !== undefined) { ball.x = r.bx; ball.y = r.by!; ball.vx = r.vx!; ball.vy = r.vy!; }
     }
+    // Plunger-lane deflector arch: redirects balls exiting the lane to the left,
+    // into the playfield. Segment from (W-8, 60) to (W-95, 14).
+    {
+      const r = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, W - 8, 60, W - 95, 14);
+      if (r.hit && r.bx !== undefined) { ball.x = r.bx; ball.y = r.by!; ball.vx = r.vx!; ball.vy = r.vy!; }
+    }
 
     // Bumpers (circles)
     for (const b of data.bumpers) {
@@ -783,6 +789,8 @@ function PinballPage() {
     ctx.beginPath();
     ctx.moveTo(8, H - 200); ctx.lineTo(130, H - 80);
     ctx.moveTo(W - 30, H - 130); ctx.lineTo(W - 130, H - 80);
+    // Plunger-lane deflector arch (top-right)
+    ctx.moveTo(W - 8, 60); ctx.lineTo(W - 95, 14);
     ctx.stroke();
 
     // Ramps

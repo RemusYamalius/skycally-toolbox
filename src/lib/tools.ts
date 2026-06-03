@@ -124,6 +124,7 @@ export const tools: Tool[] = [
   { slug: "mahjong", name: "Mahjong Solitaire", description: "Classic Mahjong Solitaire — match identical free tiles to clear the board!", category: "minigames", icon: Puzzle, path: "/tools/mahjong" },
   { slug: "tunnel-dash", name: "Tunnel Dash", description: "Dig tunnels, collect gems and drop rocks on enemies in this classic arcade digger!", category: "minigames", icon: Pickaxe, path: "/tools/tunnel-dash" },
   { slug: "pinball", name: "Pinball", description: "Classic arcade pinball with 3 tables, realistic physics, and full sound effects!", category: "minigames", icon: Zap, path: "/tools/pinball" },
+  { slug: "network-speed-test", name: "Network Speed Test", description: "Test your internet download, upload, ping and jitter speeds instantly.", category: "utility", icon: Gauge, path: "/tools/network-speed-test" },
 ];
 
 

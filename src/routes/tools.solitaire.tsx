@@ -225,9 +225,33 @@ function SolitairePage() {
   const pushHistory = useCallback((prev: GameState) => {
     setHistory((h) => {
       const next = [...h, clone(prev)];
-      return next.slice(-3);
+      return next.slice(-50);
     });
   }, []);
+
+  const clearHint = useCallback(() => {
+    if (hintTimerRef.current != null) {
+      window.clearTimeout(hintTimerRef.current);
+      hintTimerRef.current = null;
+    }
+    setHint(null);
+  }, []);
+
+  const showHint = useCallback(() => {
+    const h = findHint(state);
+    if (!h) {
+      setHint(null);
+      return;
+    }
+    setHint(h);
+    if (hintTimerRef.current != null) window.clearTimeout(hintTimerRef.current);
+    hintTimerRef.current = window.setTimeout(() => setHint(null), 2200);
+  }, [state]);
+
+  useEffect(() => () => {
+    if (hintTimerRef.current != null) window.clearTimeout(hintTimerRef.current);
+  }, []);
+
 
   const apply = useCallback(
     (mutator: (draft: GameState) => boolean) => {

@@ -171,7 +171,7 @@ function uploadOnce(
     };
     xhr.ontimeout = () => reject(new Error("Upload timeout"));
     // Send a Blob for broader compatibility
-    xhr.send(new Blob([payload], { type: "application/octet-stream" }));
+    xhr.send(new Blob([payload.buffer as ArrayBuffer], { type: "application/octet-stream" }));
   });
 }
 

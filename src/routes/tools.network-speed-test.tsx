@@ -40,12 +40,35 @@ function fmtMs(v: number) {
   return v.toFixed(v >= 100 ? 0 : 1);
 }
 
+async function fetchWithRetry(
+  url: string,
+  options: RequestInit,
+  retries = 3,
+  delay = 800,
+): Promise<Response> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      const res = await fetch(url, options);
+      if (!res.ok) throw new Error(`HTTP ${res.status}`);
+      return res;
+    } catch (err) {
+      const e = err as { name?: string };
+      if (e?.name === "AbortError") throw err;
+      lastErr = err;
+      if (attempt === retries) break;
+      await new Promise((r) => setTimeout(r, delay * (attempt + 1)));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Network request failed");
+}
+
 async function measureLatency(controller: AbortController, onProgress: (pct: number) => void) {
   const samples: number[] = [];
   const N = 12;
   for (let i = 0; i < N; i++) {
     const t0 = performance.now();
-    const res = await fetch(CF_DOWN + "0&r=" + Math.random(), {
+    const res = await fetchWithRetry(CF_DOWN + "0&r=" + Math.random(), {
       cache: "no-store",
       signal: controller.signal,
     });
@@ -76,7 +99,7 @@ async function measureDownload(
   for (let i = 0; i < passes.length; i++) {
     const sizeBytes = passes[i] * 1024 * 1024;
     const t0 = performance.now();
-    const res = await fetch(CF_DOWN + sizeBytes + "&r=" + Math.random(), {
+    const res = await fetchWithRetry(CF_DOWN + sizeBytes + "&r=" + Math.random(), {
       cache: "no-store",
       signal: controller.signal,
     });
@@ -112,33 +135,92 @@ async function measureDownload(
   return (totalBytes * 8) / totalSec / 1e6;
 }
 
+function uploadOnce(
+  payload: Uint8Array,
+  controller: AbortController,
+  onProgress: (loaded: number, elapsedSec: number) => void,
+): Promise<number> {
+  return new Promise((resolve, reject) => {
+    const xhr = new XMLHttpRequest();
+    const t0 = performance.now();
+    const onAbort = () => {
+      xhr.abort();
+      const err = new Error("Aborted");
+      (err as Error & { name: string }).name = "AbortError";
+      reject(err);
+    };
+    if (controller.signal.aborted) return onAbort();
+    controller.signal.addEventListener("abort", onAbort);
+
+    xhr.open("POST", CF_UP + "?r=" + Math.random(), true);
+    xhr.setRequestHeader("Content-Type", "application/octet-stream");
+    xhr.upload.onprogress = (e) => {
+      if (e.lengthComputable) onProgress(e.loaded, (performance.now() - t0) / 1000);
+    };
+    xhr.onload = () => {
+      controller.signal.removeEventListener("abort", onAbort);
+      if (xhr.status >= 200 && xhr.status < 400) {
+        resolve((performance.now() - t0) / 1000);
+      } else {
+        reject(new Error(`HTTP ${xhr.status}`));
+      }
+    };
+    xhr.onerror = () => {
+      controller.signal.removeEventListener("abort", onAbort);
+      reject(new Error("Network error during upload"));
+    };
+    xhr.ontimeout = () => reject(new Error("Upload timeout"));
+    // Send a Blob for broader compatibility
+    xhr.send(new Blob([payload.buffer as ArrayBuffer], { type: "application/octet-stream" }));
+  });
+}
+
+async function uploadOnceWithRetry(
+  payload: Uint8Array,
+  controller: AbortController,
+  onProgress: (loaded: number, elapsedSec: number) => void,
+  retries = 3,
+): Promise<number> {
+  let lastErr: unknown;
+  for (let attempt = 0; attempt <= retries; attempt++) {
+    try {
+      return await uploadOnce(payload, controller, onProgress);
+    } catch (err) {
+      const e = err as { name?: string };
+      if (e?.name === "AbortError") throw err;
+      lastErr = err;
+      if (attempt === retries) break;
+      await new Promise((r) => setTimeout(r, 800 * (attempt + 1)));
+    }
+  }
+  throw lastErr instanceof Error ? lastErr : new Error("Upload failed");
+}
+
 async function measureUpload(
   controller: AbortController,
   onLive: (mbps: number, pct: number) => void,
 ) {
   const passes = [1, 8, 8, 8];
   const totalPlanned = passes.reduce((a, b) => a + b, 0) * 1024 * 1024;
-  let bytesAcc = 0;
+  let bytesAccBefore = 0;
   const speeds: { bytes: number; seconds: number }[] = [];
 
   for (let i = 0; i < passes.length; i++) {
     const sizeBytes = passes[i] * 1024 * 1024;
     const payload = new Uint8Array(sizeBytes);
     // Fill with pseudo-random data to defeat compression
-    for (let j = 0; j < sizeBytes; j += 4096) payload[j] = Math.floor(Math.random() * 256);
+    for (let j = 0; j < sizeBytes; j += 1024) payload[j] = Math.floor(Math.random() * 256);
 
-    const t0 = performance.now();
-    await fetch(CF_UP, {
-      method: "POST",
-      body: payload,
-      cache: "no-store",
-      signal: controller.signal,
-      headers: { "Content-Type": "application/octet-stream" },
+    const startBytes = bytesAccBefore;
+    const sec = await uploadOnceWithRetry(payload, controller, (loaded, elapsed) => {
+      if (elapsed > 0.05) {
+        const mbps = (loaded * 8) / elapsed / 1e6;
+        onLive(mbps, Math.min(100, ((startBytes + loaded) / totalPlanned) * 100));
+      }
     });
-    const sec = (performance.now() - t0) / 1000;
-    bytesAcc += sizeBytes;
-    if (i > 0) speeds.push({ bytes: sizeBytes, seconds: sec });
-    onLive((sizeBytes * 8) / sec / 1e6, Math.min(100, (bytesAcc / totalPlanned) * 100));
+    bytesAccBefore += sizeBytes;
+    if (i > 0 && sec > 0) speeds.push({ bytes: sizeBytes, seconds: sec });
+    onLive((sizeBytes * 8) / Math.max(sec, 0.001) / 1e6, Math.min(100, (bytesAccBefore / totalPlanned) * 100));
   }
   speeds.sort((a, b) => b.bytes / b.seconds - a.bytes / a.seconds);
   const keep = speeds.slice(0, Math.max(1, Math.ceil(speeds.length * 0.6)));

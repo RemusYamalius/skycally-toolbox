@@ -436,8 +436,58 @@ function Board({
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const [hoverPile, setHoverPile] = useState<Pile | null>(null);
   const boardRef = useRef<HTMLDivElement | null>(null);
+  const tableauRef = useRef<HTMLDivElement | null>(null);
   const pileRefs = useRef<Map<Pile, HTMLDivElement>>(new Map());
   const lastTapRef = useRef<{ id: string; t: number } | null>(null);
+  const dragMovedRef = useRef(false);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const [colWidth, setColWidth] = useState(80);
+  const [maxColH, setMaxColH] = useState(560);
+
+  useLayoutEffect(() => {
+    const el = tableauRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const gap = 8; // approx for grid gap
+      const cw = Math.max(40, (w - 6 * gap) / 7);
+      setColWidth(cw);
+      const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+      setMaxColH(Math.max(280, Math.min(620, vh * 0.62)));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const cardH = (colWidth * 7) / 5;
+
+  const computeOffsets = useCallback(
+    (col: Card[]): number[] => {
+      if (col.length === 0) return [];
+      if (col.length === 1) return [0];
+      const maxOffset = Math.min(28, cardH * 0.32);
+      const minOffset = 4;
+      const avail = Math.max(0, maxColH - cardH);
+      const desired = avail / (col.length - 1);
+      const baseOffset = Math.max(minOffset, Math.min(maxOffset, desired));
+      const offsets: number[] = [0];
+      let cum = 0;
+      for (let i = 1; i < col.length; i++) {
+        const prevDown = !col[i - 1].faceUp;
+        cum += prevDown ? baseOffset * 0.5 : baseOffset;
+        offsets.push(cum);
+      }
+      return offsets;
+    },
+    [cardH, maxColH],
+  );
 
   const setPileRef = useCallback((p: Pile) => {
     return (el: HTMLDivElement | null) => {
@@ -461,36 +511,48 @@ function Board({
     cards: Card[],
   ) => {
     if (!cards.length) return;
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    dragMovedRef.current = false;
+    pointerStartRef.current = { x: e.clientX, y: e.clientY };
     setDrag({ from, cardId, cards });
     setDragPos({ x: e.clientX, y: e.clientY });
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (!drag) return;
+    if (pointerStartRef.current) {
+      const dx = e.clientX - pointerStartRef.current.x;
+      const dy = e.clientY - pointerStartRef.current.y;
+      if (dx * dx + dy * dy > 16) dragMovedRef.current = true;
+    }
     setDragPos({ x: e.clientX, y: e.clientY });
     setHoverPile(findDropTarget(e.clientX, e.clientY));
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
     if (!drag) return;
-    const target = findDropTarget(e.clientX, e.clientY);
-    if (target && target !== drag.from) {
-      onMove(drag.from, drag.cardId, target);
+    const moved = dragMovedRef.current;
+    const from = drag.from;
+    const cardId = drag.cardId;
+    if (moved) {
+      const target = findDropTarget(e.clientX, e.clientY);
+      if (target && target !== from) onMove(from, cardId, target);
+    } else {
+      // Treat as tap — detect double-tap for auto-foundation
+      const now = Date.now();
+      const last = lastTapRef.current;
+      if (last && last.id === cardId && now - last.t < 350) {
+        onAuto(from, cardId);
+        lastTapRef.current = null;
+      } else {
+        lastTapRef.current = { id: cardId, t: now };
+      }
     }
     setDrag(null);
     setDragPos(null);
     setHoverPile(null);
-  };
-
-  const handleCardTap = (from: Pile, cardId: string) => {
-    const now = Date.now();
-    if (lastTapRef.current && lastTapRef.current.id === cardId && now - lastTapRef.current.t < 350) {
-      onAuto(from, cardId);
-      lastTapRef.current = null;
-    } else {
-      lastTapRef.current = { id: cardId, t: now };
-    }
+    pointerStartRef.current = null;
+    dragMovedRef.current = false;
   };
 
   const renderCard = (
@@ -509,15 +571,12 @@ function Board({
           e.preventDefault();
           const idx = stackBelow.findIndex((x) => x.id === c.id);
           const cards = idx >= 0 ? stackBelow.slice(idx) : [c];
-          // Waste / foundation: only top card draggable as single
           if (from === "W" || from.startsWith("F")) {
             beginDrag(e, from, c.id, [c]);
           } else {
             beginDrag(e, from, c.id, cards);
           }
         }}
-        onDoubleClick={() => onAuto(from, c.id)}
-        onClick={() => handleCardTap(from, c.id)}
         className={`absolute left-0 right-0 mx-auto select-none touch-none ${
           draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default"
         }`}
@@ -527,6 +586,7 @@ function Board({
       </div>
     );
   };
+
 
   return (
     <div

@@ -131,6 +131,127 @@ async function measureDownload(
   return (totalBytes * 8) / totalSec / 1e6;
 }
 
+const MAX_MBPS = 500;
+const ARC_START = 135; // degrees
+const ARC_END = 405; // 270° sweep
+const ARC_RANGE = ARC_END - ARC_START;
+
+function polar(cx: number, cy: number, r: number, deg: number) {
+  const rad = ((deg - 90) * Math.PI) / 180;
+  return { x: cx + r * Math.cos(rad), y: cy + r * Math.sin(rad) };
+}
+
+function arcPath(cx: number, cy: number, r: number, startDeg: number, endDeg: number) {
+  const s = polar(cx, cy, r, startDeg);
+  const e = polar(cx, cy, r, endDeg);
+  const large = endDeg - startDeg > 180 ? 1 : 0;
+  return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
+}
+
+function SpeedGauge({
+  mbps,
+  phase,
+  pingMs,
+}: {
+  mbps: number;
+  phase: Phase;
+  pingMs: number;
+}) {
+  const size = 320;
+  const cx = size / 2;
+  const cy = size / 2;
+  const r = 130;
+  const clamped = Math.max(0, Math.min(MAX_MBPS, mbps));
+  const progress = clamped / MAX_MBPS;
+  const trackPath = arcPath(cx, cy, r, ARC_START, ARC_END);
+
+  const ticks = Array.from({ length: 11 }, (_, i) => i * 50);
+  const showLatencyCenter = phase === "latency";
+
+  return (
+    <div className="relative" style={{ width: size, height: size * 0.85 }}>
+      <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} className="overflow-visible">
+        <defs>
+          <linearGradient id="gaugeGrad" x1="0%" y1="0%" x2="100%" y2="0%">
+            <stop offset="0%" stopColor="var(--cyan-brand)" />
+            <stop offset="100%" stopColor="var(--violet-brand)" />
+          </linearGradient>
+        </defs>
+
+        {/* Track */}
+        <path
+          d={trackPath}
+          fill="none"
+          stroke="color-mix(in oklab, var(--border) 100%, transparent)"
+          strokeWidth={16}
+          strokeLinecap="round"
+        />
+
+        {/* Progress */}
+        <motion.path
+          d={trackPath}
+          fill="none"
+          stroke="url(#gaugeGrad)"
+          strokeWidth={16}
+          strokeLinecap="round"
+          initial={{ pathLength: 0 }}
+          animate={{ pathLength: progress }}
+          transition={{ type: "spring", stiffness: 60, damping: 20, mass: 0.6 }}
+          style={{ filter: "drop-shadow(0 0 8px color-mix(in oklab, var(--cyan-brand) 50%, transparent))" }}
+        />
+
+        {/* Ticks */}
+        {ticks.map((t, i) => {
+          const deg = ARC_START + (t / MAX_MBPS) * ARC_RANGE;
+          const inner = polar(cx, cy, r - 26, deg);
+          const outer = polar(cx, cy, r - 14, deg);
+          const label = polar(cx, cy, r - 42, deg);
+          return (
+            <g key={t}>
+              <line
+                x1={inner.x}
+                y1={inner.y}
+                x2={outer.x}
+                y2={outer.y}
+                stroke="var(--muted-foreground)"
+                strokeWidth={i % 2 === 0 ? 2 : 1}
+                opacity={i % 2 === 0 ? 0.7 : 0.4}
+              />
+              {i % 2 === 0 && (
+                <text
+                  x={label.x}
+                  y={label.y}
+                  textAnchor="middle"
+                  dominantBaseline="middle"
+                  fontSize={10}
+                  fill="var(--muted-foreground)"
+                >
+                  {t}
+                </text>
+              )}
+            </g>
+          );
+        })}
+      </svg>
+
+      <div className="absolute inset-0 flex flex-col items-center justify-center pointer-events-none">
+        <div className="text-[10px] uppercase tracking-[0.2em] text-muted-foreground">
+          {showLatencyCenter ? "Latency" : "Download"}
+        </div>
+        <div
+          className="font-display text-6xl font-bold tabular-nums leading-none mt-2"
+          style={{ color: "var(--cyan-brand)" }}
+        >
+          {showLatencyCenter ? fmtMs(pingMs) : fmtMbps(clamped)}
+        </div>
+        <div className="text-sm text-muted-foreground mt-2">
+          {showLatencyCenter ? "ms" : "Mbps"}
+        </div>
+      </div>
+    </div>
+  );
+}
+
 function MetricCard({
   label,
   value,

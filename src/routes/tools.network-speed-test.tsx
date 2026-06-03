@@ -380,11 +380,13 @@ function NetworkSpeedTest() {
       ? "Measuring latency…"
       : phase === "download"
         ? "Measuring download speed…"
-        : phase === "done"
-          ? "Test complete"
-          : phase === "error"
-            ? "Test failed"
-            : "Ready to test";
+        : phase === "upload"
+          ? "Testing upload…"
+          : phase === "done"
+            ? "Test complete"
+            : phase === "error"
+              ? "Test failed"
+              : "Ready to test";
 
   const displayDownload = phase === "download" ? live.download : results.download;
 

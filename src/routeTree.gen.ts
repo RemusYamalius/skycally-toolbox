@@ -39,6 +39,7 @@ import { Route as ToolsSudokuRouteImport } from './routes/tools.sudoku'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
+import { Route as ToolsSolitaireRouteImport } from './routes/tools.solitaire'
 import { Route as ToolsSnakeRouteImport } from './routes/tools.snake'
 import { Route as ToolsSlidingPuzzleRouteImport } from './routes/tools.sliding-puzzle'
 import { Route as ToolsSleepCalculatorRouteImport } from './routes/tools.sleep-calculator'
@@ -257,6 +258,11 @@ const ToolsSpinningWheelRoute = ToolsSpinningWheelRouteImport.update({
 const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
   id: '/tools/speech-to-text',
   path: '/tools/speech-to-text',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSolitaireRoute = ToolsSolitaireRouteImport.update({
+  id: '/tools/solitaire',
+  path: '/tools/solitaire',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSnakeRoute = ToolsSnakeRouteImport.update({
@@ -687,6 +693,7 @@ export interface FileRoutesByFullPath {
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
   '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
+  '/tools/solitaire': typeof ToolsSolitaireRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
@@ -788,6 +795,7 @@ export interface FileRoutesByTo {
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
   '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
+  '/tools/solitaire': typeof ToolsSolitaireRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
@@ -890,6 +898,7 @@ export interface FileRoutesById {
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
   '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
+  '/tools/solitaire': typeof ToolsSolitaireRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
@@ -993,6 +1002,7 @@ export interface FileRouteTypes {
     | '/tools/sleep-calculator'
     | '/tools/sliding-puzzle'
     | '/tools/snake'
+    | '/tools/solitaire'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
@@ -1094,6 +1104,7 @@ export interface FileRouteTypes {
     | '/tools/sleep-calculator'
     | '/tools/sliding-puzzle'
     | '/tools/snake'
+    | '/tools/solitaire'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
@@ -1195,6 +1206,7 @@ export interface FileRouteTypes {
     | '/tools/sleep-calculator'
     | '/tools/sliding-puzzle'
     | '/tools/snake'
+    | '/tools/solitaire'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
@@ -1297,6 +1309,7 @@ export interface RootRouteChildren {
   ToolsSleepCalculatorRoute: typeof ToolsSleepCalculatorRoute
   ToolsSlidingPuzzleRoute: typeof ToolsSlidingPuzzleRoute
   ToolsSnakeRoute: typeof ToolsSnakeRoute
+  ToolsSolitaireRoute: typeof ToolsSolitaireRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
@@ -1533,6 +1546,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/speech-to-text'
       fullPath: '/tools/speech-to-text'
       preLoaderRoute: typeof ToolsSpeechToTextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/solitaire': {
+      id: '/tools/solitaire'
+      path: '/tools/solitaire'
+      fullPath: '/tools/solitaire'
+      preLoaderRoute: typeof ToolsSolitaireRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/snake': {
@@ -2099,6 +2119,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSleepCalculatorRoute: ToolsSleepCalculatorRoute,
   ToolsSlidingPuzzleRoute: ToolsSlidingPuzzleRoute,
   ToolsSnakeRoute: ToolsSnakeRoute,
+  ToolsSolitaireRoute: ToolsSolitaireRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,

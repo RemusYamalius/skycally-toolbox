@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useMemo, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { RotateCcw, Undo2, Trophy } from "lucide-react";
 
 import { buildPageMeta, SITE_URL } from "@/lib/seo";

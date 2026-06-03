@@ -53,6 +53,7 @@ import { Route as ToolsRandomTeamMakerRouteImport } from './routes/tools.random-
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsProtectPdfRouteImport } from './routes/tools.protect-pdf'
+import { Route as ToolsPinballRouteImport } from './routes/tools.pinball'
 import { Route as ToolsPdfWatermarkRemoverRouteImport } from './routes/tools.pdf-watermark-remover'
 import { Route as ToolsPdfToWordRouteImport } from './routes/tools.pdf-to-word'
 import { Route as ToolsPdfToImagesRouteImport } from './routes/tools.pdf-to-images'
@@ -330,6 +331,11 @@ const ToolsQrGeneratorRoute = ToolsQrGeneratorRouteImport.update({
 const ToolsProtectPdfRoute = ToolsProtectPdfRouteImport.update({
   id: '/tools/protect-pdf',
   path: '/tools/protect-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPinballRoute = ToolsPinballRouteImport.update({
+  id: '/tools/pinball',
+  path: '/tools/pinball',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsPdfWatermarkRemoverRoute =
@@ -694,6 +700,7 @@ export interface FileRoutesByFullPath {
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
+  '/tools/pinball': typeof ToolsPinballRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -798,6 +805,7 @@ export interface FileRoutesByTo {
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
+  '/tools/pinball': typeof ToolsPinballRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -903,6 +911,7 @@ export interface FileRoutesById {
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
+  '/tools/pinball': typeof ToolsPinballRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -1009,6 +1018,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-to-images'
     | '/tools/pdf-to-word'
     | '/tools/pdf-watermark-remover'
+    | '/tools/pinball'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -1113,6 +1123,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-to-images'
     | '/tools/pdf-to-word'
     | '/tools/pdf-watermark-remover'
+    | '/tools/pinball'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -1217,6 +1228,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-to-images'
     | '/tools/pdf-to-word'
     | '/tools/pdf-watermark-remover'
+    | '/tools/pinball'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -1322,6 +1334,7 @@ export interface RootRouteChildren {
   ToolsPdfToImagesRoute: typeof ToolsPdfToImagesRoute
   ToolsPdfToWordRoute: typeof ToolsPdfToWordRoute
   ToolsPdfWatermarkRemoverRoute: typeof ToolsPdfWatermarkRemoverRoute
+  ToolsPinballRoute: typeof ToolsPinballRoute
   ToolsProtectPdfRoute: typeof ToolsProtectPdfRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
@@ -1670,6 +1683,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/protect-pdf'
       fullPath: '/tools/protect-pdf'
       preLoaderRoute: typeof ToolsProtectPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/pinball': {
+      id: '/tools/pinball'
+      path: '/tools/pinball'
+      fullPath: '/tools/pinball'
+      preLoaderRoute: typeof ToolsPinballRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/pdf-watermark-remover': {
@@ -2148,6 +2168,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsPdfToImagesRoute: ToolsPdfToImagesRoute,
   ToolsPdfToWordRoute: ToolsPdfToWordRoute,
   ToolsPdfWatermarkRemoverRoute: ToolsPdfWatermarkRemoverRoute,
+  ToolsPinballRoute: ToolsPinballRoute,
   ToolsProtectPdfRoute: ToolsProtectPdfRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,

@@ -1,35 +1,40 @@
-# Add Mahjong Solitaire Mini Game
+# Add Pinball Mini Game
 
-Mirror the pattern used by Solitaire, Pac-Man, and Breakout.
+Mirror the pattern used by Tunnel Dash, Solitaire, and Pac-Man.
 
 ## Files
 
-**Create `src/routes/tools.mahjong.tsx`**
-- `createFileRoute("/tools/mahjong")` with `buildPageMeta` (title, description, canonical, og:url) and JSON-LD Game script per spec.
-- `ToolPageShell` — title "Mahjong Solitaire", subtitle "Match identical free tiles to clear the board. Classic Mahjong Solitaire!".
-- Game implementation (React + CSS, DOM-based — better than canvas for click/tap tile matching):
-  - 144-tile set: 4 copies of 34 standard tile faces (Dots 1–9, Bamboo 1–9, Characters 1–9 — 4 each), plus Winds (E/S/W/N — 4 each), Dragons (Red/Green/White — 4 each), Flowers (4 unique, match any flower) and Seasons (4 unique, match any season).
-  - Classic Turtle layout (5 layers): hardcoded list of `{x, y, z}` tile slots producing the canonical turtle shape (144 slots).
-  - Tile freedom test: no tile occupying any of the 4 overlapping slots on layer `z+1`; AND no tile on the immediate left OR no tile on the immediate right at the same `z`.
-  - Click first free tile → highlight. Click second free matching tile → remove both. Clicking same tile again deselects. Invalid second click swaps selection.
-  - **Hint** button — scan free tiles for a matching pair, pulse-highlight both for ~1.5s. Optional small move penalty (no, just info).
-  - **Shuffle** button — reshuffle face IDs across remaining tile positions while keeping layout. Useful when no moves left.
-  - **New Game** — regenerates a solvable deal: shuffle deck, then build the layout by repeatedly placing pairs only on currently-free slots (guarantees solvability).
-  - **Auto-detect deadlock** → modal "No moves left — Shuffle or New Game".
-  - **Win detection** (0 tiles remaining) → win modal with time + moves.
-  - HUD: Moves, Timer (mm:ss), Pairs remaining, Best time persisted in `localStorage` (`mahjong-best-time`).
-  - Responsive: scale tile size based on container width; horizontal scroll on very small screens.
-  - Tile rendering: CSS-styled tiles with Unicode Mahjong glyphs (🀀–🀫) and subtle 3D bevel via box-shadow stacking for layer depth.
-- `<HowToUse>` block (3 steps: select a free tile, click its identical match, clear the board).
-- `<ToolSeoContent>` with SEO title, description, 2–3 paragraph body (~150–200 words on Mahjong Solitaire), 4 FAQs.
-- `<RelatedTools currentSlug="mahjong" />`.
+**Create `src/routes/tools.pinball.tsx`**
+- `createFileRoute("/tools/pinball")` with `buildPageMeta` (title "Pinball — Free Online Arcade Game, No Download", description, canonical, og:url) and JSON-LD Game schema per spec.
+- `ToolPageShell` — title "Pinball", subtitle "Choose your table and beat the high score. Classic arcade pinball!".
+- Canvas-based pinball engine (~640×900 playfield, scaled responsively):
+  - **Custom 2D physics** (no external lib): circle ball with gravity (~0.35 px/frame²), velocity integration, air friction (0.999), wall collisions with restitution (~0.7), bumper/slingshot kick impulses, flipper swept-arc collision using angular velocity to impart speed.
+  - **Flippers**: two rotating segments anchored near the bottom, rest angle ~25°, active angle ~-35°, angular speed tuned for snappy response and momentum.
+  - **3 tables**, each defined as a data object (walls, arcs, bumpers, slingshots, ramps, targets, plunger lane, drain gap, theme colors, label, special-mode trigger):
+    1. **Amazon Hunt** (default) — green/gold/brown, 3 bumpers, 2 ramps, 1 loop, 4 targets, 2 slingshots; clearing all 4 targets triggers "Amazon Bonus" multiball (2 extra balls for 15s).
+    2. **Space Odyssey** — dark blue/purple/neon, 3 bumpers, 2 ramps, rotating targets (orientation cycles), wormhole loop; hitting wormhole triggers "Hyperspace" (ball speed ×2 for 10s).
+    3. **Dragon's Lair** — red/orange/black, 4 bumpers, 3 ramps, dragon target, drawbridge that opens after 3 dragon hits → "Dragon Fire" massive bonus (+25000 × multiplier).
+  - **Table picker** above canvas (3 buttons with theme color swatches); switching resets the current game.
+  - **Game mechanics**: 3 balls, multiplier 1×→2×→3×→5× (steps on ramp/loop completions), end-of-ball bonus, in-session high score (`useRef`/`useState`, no persistence per spec — "saved in session"), tilt meter that fills on nudges (X / Space hold) and drains over time; over-tilt drains the ball + flashes "TILT"; "Shoot Again" awarded above a score threshold per ball.
+  - **Controls**:
+    - Desktop: Z / ArrowLeft = left flipper, / / ArrowRight = right flipper, Space = launch (hold to charge plunger power), X = nudge.
+    - Mobile: on-screen left/right flipper buttons (pointer events, large touch targets), tap plunger area to launch (drag down then release to charge), nudge button (or `devicemotion` shake when available, fall back to button).
+  - **Web Audio API** sound module (no external assets — synthesize on the fly):
+    - Flipper click (short noise burst + high-pass), launch spring (descending sawtooth sweep), bumper (square pop + decay), ramp swoosh (filtered noise sweep), target thud (low sine pluck), multiball fanfare (3-note major arpeggio), drain (descending tone + brief filtered noise "oh no"), high-score jingle (4-note motif), tilt buzz (50Hz square gated), "Shoot Again" (two-note rising chime).
+    - Per-table background loop (simple retro arpeggio pattern using oscillators with table-specific scale + tempo); starts on first user interaction (autoplay policy). Mute button in HUD.
+  - **Visual effects**: bumpers flash bright on hit (8-frame decay), targets light up persistently when cleared, score counter scales+pulses on big hits, full-canvas white flash on multiball, particle burst (8–12 short-lived dots) on bumper hits using table accent color, scrolling glow gradient on active ramps.
+  - **HUD overlay**: score, multiplier, balls remaining, current table name, high score, tilt meter bar, mute toggle, "New Game" button.
+  - **End-of-game modal**: final score, high-score celebration if beaten, "Play Again" + "Change Table" buttons.
+- `<HowToUse>` block (3 steps: launch the ball, control flippers, hit bumpers and targets for multipliers).
+- `<ToolSeoContent>` with SEO title, description, 2–3 paragraph body (~150–200 words on browser pinball), 4 FAQs (controls, tables, mobile support, sound).
+- `<RelatedTools currentSlug="pinball" />`.
 
 **Edit `src/lib/tools.ts`**
-- Add `Puzzle` (or reuse `Grid2x2`) to lucide imports — use `Puzzle` icon for Mahjong.
-- Append entry: `{ slug: "mahjong", name: "Mahjong Solitaire", description: "Classic Mahjong Solitaire — match identical free tiles to clear the board!", category: "minigames", icon: Puzzle, path: "/tools/mahjong" }`.
+- Add `Zap` (or reuse an existing arcade icon like `Joystick`) to lucide imports — use `Zap` for Pinball.
+- Append entry: `{ slug: "pinball", name: "Pinball", description: "Classic arcade pinball with 3 tables, realistic physics, and full sound effects!", category: "minigames", icon: Zap, path: "/tools/pinball" }`.
 
 **Edit `src/lib/related-tools.ts`**
-- Add `"mahjong": ["sudoku", "memory-match", "sliding-puzzle"]`.
+- Add `"pinball": ["breakout", "bubble-shooter", "pac-man"]`.
 
 ## Auto-propagation
-Tools index grid, footer Mini Games column, sitemap.xml, and TanStack route tree all iterate over `tools` → new entry appears in all three automatically.
+Tools index grid (Mini Games category), site footer Mini Games column, `sitemap.xml`, and TanStack route tree all iterate over `tools` → the new entry appears in all three automatically.

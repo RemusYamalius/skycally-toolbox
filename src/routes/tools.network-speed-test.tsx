@@ -302,7 +302,7 @@ function NetworkSpeedTest() {
   const tool = toolBySlug("network-speed-test", tools);
   const [phase, setPhase] = useState<Phase>("idle");
   const [, setProgress] = useState(0);
-  const [results, setResults] = useState<Results>({ ping: 0, jitter: 0, download: 0 });
+  const [results, setResults] = useState<Results>({ ping: 0, jitter: 0, download: 0, upload: 0 });
   const [live, setLive] = useState({ download: 0 });
   const [error, setError] = useState<string | null>(null);
   const controllerRef = useRef<AbortController | null>(null);

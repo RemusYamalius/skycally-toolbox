@@ -1,40 +1,26 @@
-# Add Pinball Mini Game
+## Pinball — fix blocked plunger lane and weak launch
 
-Mirror the pattern used by Tunnel Dash, Solitaire, and Pac-Man.
+The ball cannot leave the plunger lane because two walls close it off at the top, and the launch velocity is too low to reach the upper playfield even when the path is open.
 
-## Files
+### Root causes
 
-**Create `src/routes/tools.pinball.tsx`**
-- `createFileRoute("/tools/pinball")` with `buildPageMeta` (title "Pinball — Free Online Arcade Game, No Download", description, canonical, og:url) and JSON-LD Game schema per spec.
-- `ToolPageShell` — title "Pinball", subtitle "Choose your table and beat the high score. Classic arcade pinball!".
-- Canvas-based pinball engine (~640×900 playfield, scaled responsively):
-  - **Custom 2D physics** (no external lib): circle ball with gravity (~0.35 px/frame²), velocity integration, air friction (0.999), wall collisions with restitution (~0.7), bumper/slingshot kick impulses, flipper swept-arc collision using angular velocity to impart speed.
-  - **Flippers**: two rotating segments anchored near the bottom, rest angle ~25°, active angle ~-35°, angular speed tuned for snappy response and momentum.
-  - **3 tables**, each defined as a data object (walls, arcs, bumpers, slingshots, ramps, targets, plunger lane, drain gap, theme colors, label, special-mode trigger):
-    1. **Amazon Hunt** (default) — green/gold/brown, 3 bumpers, 2 ramps, 1 loop, 4 targets, 2 slingshots; clearing all 4 targets triggers "Amazon Bonus" multiball (2 extra balls for 15s).
-    2. **Space Odyssey** — dark blue/purple/neon, 3 bumpers, 2 ramps, rotating targets (orientation cycles), wormhole loop; hitting wormhole triggers "Hyperspace" (ball speed ×2 for 10s).
-    3. **Dragon's Lair** — red/orange/black, 4 bumpers, 3 ramps, dragon target, drawbridge that opens after 3 dragon hits → "Dragon Fire" massive bonus (+25000 × multiplier).
-  - **Table picker** above canvas (3 buttons with theme color swatches); switching resets the current game.
-  - **Game mechanics**: 3 balls, multiplier 1×→2×→3×→5× (steps on ramp/loop completions), end-of-ball bonus, in-session high score (`useRef`/`useState`, no persistence per spec — "saved in session"), tilt meter that fills on nudges (X / Space hold) and drains over time; over-tilt drains the ball + flashes "TILT"; "Shoot Again" awarded above a score threshold per ball.
-  - **Controls**:
-    - Desktop: Z / ArrowLeft = left flipper, / / ArrowRight = right flipper, Space = launch (hold to charge plunger power), X = nudge.
-    - Mobile: on-screen left/right flipper buttons (pointer events, large touch targets), tap plunger area to launch (drag down then release to charge), nudge button (or `devicemotion` shake when available, fall back to button).
-  - **Web Audio API** sound module (no external assets — synthesize on the fly):
-    - Flipper click (short noise burst + high-pass), launch spring (descending sawtooth sweep), bumper (square pop + decay), ramp swoosh (filtered noise sweep), target thud (low sine pluck), multiball fanfare (3-note major arpeggio), drain (descending tone + brief filtered noise "oh no"), high-score jingle (4-note motif), tilt buzz (50Hz square gated), "Shoot Again" (two-note rising chime).
-    - Per-table background loop (simple retro arpeggio pattern using oscillators with table-specific scale + tempo); starts on first user interaction (autoplay policy). Mute button in HUD.
-  - **Visual effects**: bumpers flash bright on hit (8-frame decay), targets light up persistently when cleared, score counter scales+pulses on big hits, full-canvas white flash on multiball, particle burst (8–12 short-lived dots) on bumper hits using table accent color, scrolling glow gradient on active ramps.
-  - **HUD overlay**: score, multiplier, balls remaining, current table name, high score, tilt meter bar, mute toggle, "New Game" button.
-  - **End-of-game modal**: final score, high-score celebration if beaten, "Play Again" + "Change Table" buttons.
-- `<HowToUse>` block (3 steps: launch the ball, control flippers, hit bumpers and targets for multipliers).
-- `<ToolSeoContent>` with SEO title, description, 2–3 paragraph body (~150–200 words on browser pinball), 4 FAQs (controls, tables, mobile support, sound).
-- `<RelatedTools currentSlug="pinball" />`.
+1. **Plunger lane wall** is drawn from `(W-28, 8)` to `(W-28, H-130)` — solid all the way to the top, so a ball rising through the lane has nowhere to exit into the playfield.
+2. **Right guide slope** goes from `(W-8, H-200)` to `(W-130, H-80)`. Its top point sits at `x = W-8`, which is *inside* the plunger lane (lane spans `x > W-28`). A ball moving up the lane hits this slope around `y ≈ H-190` and bounces straight back down.
+3. **Launch impulse** is `vy = -(7 + charge*7)` (max `-14`), and `MAX_SPEED = 16`. Max climb height with gravity `0.32` is `v²/(2g) ≈ 306px`, far short of the ~560px needed to reach the top bumpers.
 
-**Edit `src/lib/tools.ts`**
-- Add `Zap` (or reuse an existing arcade icon like `Joystick`) to lucide imports — use `Zap` for Pinball.
-- Append entry: `{ slug: "pinball", name: "Pinball", description: "Classic arcade pinball with 3 tables, realistic physics, and full sound effects!", category: "minigames", icon: Zap, path: "/tools/pinball" }`.
+### Changes in `src/routes/tools.pinball.tsx`
 
-**Edit `src/lib/related-tools.ts`**
-- Add `"pinball": ["breakout", "bubble-shooter", "pac-man"]`.
+1. **Open the top of the plunger lane (drawing, ~line 774-777)**: change the wall to start at `y = 70` instead of `y = 8`, leaving a ~70px gap at the top for the ball to arc over into the playfield.
 
-## Auto-propagation
-Tools index grid (Mini Games category), site footer Mini Games column, `sitemap.xml`, and TanStack route tree all iterate over `tools` → the new entry appears in all three automatically.
+2. **Move the right guide slope out of the lane (drawing, ~line 784)**: change endpoints from `(W-8, H-200) → (W-130, H-80)` to `(W-30, H-130) → (W-130, H-80)`. The slope now starts at the inner edge of the lane wall (just below where the lane wall ends), so it guides balls down to the right flipper without intruding into the plunger lane.
+
+3. **Update the matching collision segment (~line 550)**: pass the new endpoints `(W-30, H-130, W-130, H-80)` to `reflectCircleSegment` so collisions match the drawn geometry.
+
+4. **Update the lane-wall collision (~line 532-540)**: also require `ball.y > 70` so the wall only blocks within the drawn portion, allowing balls to cross over the top opening from either side.
+
+5. **Stronger launch (~line 910 and ~line 948)**:
+   - Keyboard launch: `ball.vy = -(11 + charge*8)` (range ~13..19).
+   - Mobile tap launch: `ball.vy = -18`.
+6. **Raise speed cap (~line 51)**: `MAX_SPEED = 20` so the per-step cap doesn't immediately throttle the launch back down. Bumper kick and gravity already self-regulate normal play.
+
+No other game logic, scoring, audio, theme, or layout changes.

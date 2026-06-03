@@ -48,7 +48,7 @@ const FRICTION = 0.998;
 const WALL_REST = 0.72;
 const BUMPER_KICK = 7.5;
 const SLING_KICK = 6.5;
-const MAX_SPEED = 16;
+const MAX_SPEED = 20;
 const FLIPPER_LEN = 64;
 const FLIPPER_REST = 0.45;   // radians from horizontal (downward angle)
 const FLIPPER_ACTIVE = -0.5; // up angle
@@ -533,6 +533,7 @@ function PinballPage() {
       ball.x > W - 28 - BALL_R &&
       ball.x < W - 28 &&
       ball.vx > 0 &&
+      ball.y > 70 &&
       ball.y < H - 130
     ) {
       ball.x = W - 28 - BALL_R;
@@ -545,9 +546,9 @@ function PinballPage() {
       const r = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, 8, H - 200, 130, H - 80);
       if (r.hit && r.bx !== undefined) { ball.x = r.bx; ball.y = r.by!; ball.vx = r.vx!; ball.vy = r.vy!; }
     }
-    // Right slope: from (W-8, H-200) to (W-130, H-80)
+    // Right slope: from (W-30, H-130) to (W-130, H-80) — kept clear of the plunger lane
     {
-      const r = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, W - 8, H - 200, W - 130, H - 80);
+      const r = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, W - 30, H - 130, W - 130, H - 80);
       if (r.hit && r.bx !== undefined) { ball.x = r.bx; ball.y = r.by!; ball.vx = r.vx!; ball.vy = r.vy!; }
     }
 
@@ -772,7 +773,7 @@ function PinballPage() {
     ctx.strokeStyle = theme.wallColor;
     ctx.lineWidth = 4;
     ctx.beginPath();
-    ctx.moveTo(W - 28, 8);
+    ctx.moveTo(W - 28, 70);
     ctx.lineTo(W - 28, H - 130);
     ctx.stroke();
 
@@ -781,7 +782,7 @@ function PinballPage() {
     ctx.strokeStyle = theme.wallColor;
     ctx.beginPath();
     ctx.moveTo(8, H - 200); ctx.lineTo(130, H - 80);
-    ctx.moveTo(W - 8, H - 200); ctx.lineTo(W - 130, H - 80);
+    ctx.moveTo(W - 30, H - 130); ctx.lineTo(W - 130, H - 80);
     ctx.stroke();
 
     // Ramps
@@ -907,7 +908,7 @@ function PinballPage() {
           const ball = ballsArrRef.current[0];
           if (ball && ball.stuck) {
             ball.stuck = false;
-            ball.vy = -(7 + charge * 7); // 8.75 .. 14
+            ball.vy = -(11 + charge * 8); // ~13 .. 19
             ball.vx = 0;
             soundRef.current.launch();
           }
@@ -945,7 +946,7 @@ function PinballPage() {
     const ball = ballsArrRef.current[0];
     if (ball && ball.stuck) {
       ball.stuck = false;
-      ball.vy = -13;
+      ball.vy = -18;
       ball.vx = 0;
       soundRef.current.launch();
     }

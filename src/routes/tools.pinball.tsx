@@ -945,7 +945,8 @@ function PinballPage() {
     const ball = ballsArrRef.current[0];
     if (ball && ball.stuck) {
       ball.stuck = false;
-      ball.vy = -16; ball.vx = -0.5;
+      ball.vy = -13;
+      ball.vx = 0;
       soundRef.current.launch();
     }
     onPlateRef.current = false;

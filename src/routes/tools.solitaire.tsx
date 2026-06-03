@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useLayoutEffect, useRef, useState } from "react";
 import { RotateCcw, Undo2, Trophy } from "lucide-react";
 
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
@@ -436,8 +436,58 @@ function Board({
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const [hoverPile, setHoverPile] = useState<Pile | null>(null);
   const boardRef = useRef<HTMLDivElement | null>(null);
+  const tableauRef = useRef<HTMLDivElement | null>(null);
   const pileRefs = useRef<Map<Pile, HTMLDivElement>>(new Map());
   const lastTapRef = useRef<{ id: string; t: number } | null>(null);
+  const dragMovedRef = useRef(false);
+  const pointerStartRef = useRef<{ x: number; y: number } | null>(null);
+
+  const [colWidth, setColWidth] = useState(80);
+  const [maxColH, setMaxColH] = useState(560);
+
+  useLayoutEffect(() => {
+    const el = tableauRef.current;
+    if (!el) return;
+    const update = () => {
+      const w = el.clientWidth;
+      const gap = 8; // approx for grid gap
+      const cw = Math.max(40, (w - 6 * gap) / 7);
+      setColWidth(cw);
+      const vh = typeof window !== "undefined" ? window.innerHeight : 800;
+      setMaxColH(Math.max(280, Math.min(620, vh * 0.62)));
+    };
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    window.addEventListener("resize", update);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", update);
+    };
+  }, []);
+
+  const cardH = (colWidth * 7) / 5;
+
+  const computeOffsets = useCallback(
+    (col: Card[]): number[] => {
+      if (col.length === 0) return [];
+      if (col.length === 1) return [0];
+      const maxOffset = Math.min(28, cardH * 0.32);
+      const minOffset = 4;
+      const avail = Math.max(0, maxColH - cardH);
+      const desired = avail / (col.length - 1);
+      const baseOffset = Math.max(minOffset, Math.min(maxOffset, desired));
+      const offsets: number[] = [0];
+      let cum = 0;
+      for (let i = 1; i < col.length; i++) {
+        const prevDown = !col[i - 1].faceUp;
+        cum += prevDown ? baseOffset * 0.5 : baseOffset;
+        offsets.push(cum);
+      }
+      return offsets;
+    },
+    [cardH, maxColH],
+  );
 
   const setPileRef = useCallback((p: Pile) => {
     return (el: HTMLDivElement | null) => {
@@ -461,36 +511,48 @@ function Board({
     cards: Card[],
   ) => {
     if (!cards.length) return;
-    (e.target as Element).setPointerCapture?.(e.pointerId);
+    e.currentTarget.setPointerCapture?.(e.pointerId);
+    dragMovedRef.current = false;
+    pointerStartRef.current = { x: e.clientX, y: e.clientY };
     setDrag({ from, cardId, cards });
     setDragPos({ x: e.clientX, y: e.clientY });
   };
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (!drag) return;
+    if (pointerStartRef.current) {
+      const dx = e.clientX - pointerStartRef.current.x;
+      const dy = e.clientY - pointerStartRef.current.y;
+      if (dx * dx + dy * dy > 16) dragMovedRef.current = true;
+    }
     setDragPos({ x: e.clientX, y: e.clientY });
     setHoverPile(findDropTarget(e.clientX, e.clientY));
   };
 
   const onPointerUp = (e: React.PointerEvent) => {
     if (!drag) return;
-    const target = findDropTarget(e.clientX, e.clientY);
-    if (target && target !== drag.from) {
-      onMove(drag.from, drag.cardId, target);
+    const moved = dragMovedRef.current;
+    const from = drag.from;
+    const cardId = drag.cardId;
+    if (moved) {
+      const target = findDropTarget(e.clientX, e.clientY);
+      if (target && target !== from) onMove(from, cardId, target);
+    } else {
+      // Treat as tap — detect double-tap for auto-foundation
+      const now = Date.now();
+      const last = lastTapRef.current;
+      if (last && last.id === cardId && now - last.t < 350) {
+        onAuto(from, cardId);
+        lastTapRef.current = null;
+      } else {
+        lastTapRef.current = { id: cardId, t: now };
+      }
     }
     setDrag(null);
     setDragPos(null);
     setHoverPile(null);
-  };
-
-  const handleCardTap = (from: Pile, cardId: string) => {
-    const now = Date.now();
-    if (lastTapRef.current && lastTapRef.current.id === cardId && now - lastTapRef.current.t < 350) {
-      onAuto(from, cardId);
-      lastTapRef.current = null;
-    } else {
-      lastTapRef.current = { id: cardId, t: now };
-    }
+    pointerStartRef.current = null;
+    dragMovedRef.current = false;
   };
 
   const renderCard = (
@@ -509,15 +571,12 @@ function Board({
           e.preventDefault();
           const idx = stackBelow.findIndex((x) => x.id === c.id);
           const cards = idx >= 0 ? stackBelow.slice(idx) : [c];
-          // Waste / foundation: only top card draggable as single
           if (from === "W" || from.startsWith("F")) {
             beginDrag(e, from, c.id, [c]);
           } else {
             beginDrag(e, from, c.id, cards);
           }
         }}
-        onDoubleClick={() => onAuto(from, c.id)}
-        onClick={() => handleCardTap(from, c.id)}
         className={`absolute left-0 right-0 mx-auto select-none touch-none ${
           draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default"
         }`}
@@ -527,6 +586,7 @@ function Board({
       </div>
     );
   };
+
 
   return (
     <div
@@ -587,11 +647,12 @@ function Board({
       </div>
 
       {/* Tableau */}
-      <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+      <div ref={tableauRef} className="grid grid-cols-7 gap-1.5 sm:gap-2">
         {state.tableau.map((col, i) => {
           const p: Pile = `T${i}` as Pile;
-          const offset = 18;
-          const minH = Math.max(96, 32 + col.length * offset);
+          const offsets = computeOffsets(col);
+          const lastOff = offsets.length ? offsets[offsets.length - 1] : 0;
+          const minH = Math.max(cardH || 96, lastOff + (cardH || 96));
           return (
             <div key={p} className="col-span-1">
               <div
@@ -604,7 +665,7 @@ function Board({
                 {col.length === 0 ? (
                   <EmptySlot />
                 ) : (
-                  col.map((c, idx) => renderCard(c, p, col, idx * offset, idx + 1))
+                  col.map((c, idx) => renderCard(c, p, col, offsets[idx], idx + 1))
                 )}
               </div>
             </div>
@@ -616,13 +677,16 @@ function Board({
       {drag && dragPos && (
         <div
           className="pointer-events-none fixed z-50"
-          style={{ left: dragPos.x - 28, top: dragPos.y - 36 }}
+          style={{ left: dragPos.x - (colWidth / 2), top: dragPos.y - 24, width: colWidth }}
         >
-          {drag.cards.map((c, i) => (
-            <div key={c.id} className="absolute" style={{ top: i * 18 }}>
-              <CardFace card={c} />
-            </div>
-          ))}
+          {drag.cards.map((c, i) => {
+            const previewOffset = Math.min(28, cardH * 0.32);
+            return (
+              <div key={c.id} className="absolute left-0 right-0" style={{ top: i * previewOffset }}>
+                <CardFace card={c} />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>
@@ -695,10 +759,18 @@ function CardFace({ card, hidden }: { card: Card; hidden?: boolean }) {
 function CardBack() {
   return (
     <div
-      className="w-full rounded-md border border-cyan-700 bg-gradient-to-br from-cyan-600 to-cyan-800 shadow-sm"
-      style={{ aspectRatio: "5 / 7" }}
+      className="w-full rounded-md border border-cyan-900 shadow-sm overflow-hidden p-1"
+      style={{ aspectRatio: "5 / 7", backgroundColor: "#0b3a4a" }}
     >
-      <div className="w-full h-full rounded-md border-2 border-cyan-300/30 m-0" />
+      <div
+        className="w-full h-full rounded-[3px]"
+        style={{
+          backgroundColor: "#0e4356",
+          backgroundImage:
+            "repeating-linear-gradient(45deg, rgba(34,211,238,0.28) 0 1.5px, transparent 1.5px 7px), repeating-linear-gradient(-45deg, rgba(34,211,238,0.28) 0 1.5px, transparent 1.5px 7px)",
+          border: "1.5px solid rgba(34,211,238,0.45)",
+        }}
+      />
     </div>
   );
 }

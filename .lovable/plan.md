@@ -1,26 +1,34 @@
-## Pinball — fix blocked plunger lane and weak launch
+# Fix Solitaire game
 
-The ball cannot leave the plunger lane because two walls close it off at the top, and the launch velocity is too low to reach the upper playfield even when the path is open.
+All changes are confined to `src/routes/tools.solitaire.tsx`.
 
-### Root causes
+## 1. Card overflow in tableau columns
 
-1. **Plunger lane wall** is drawn from `(W-28, 8)` to `(W-28, H-130)` — solid all the way to the top, so a ball rising through the lane has nowhere to exit into the playfield.
-2. **Right guide slope** goes from `(W-8, H-200)` to `(W-130, H-80)`. Its top point sits at `x = W-8`, which is *inside* the plunger lane (lane spans `x > W-28`). A ball moving up the lane hits this slope around `y ≈ H-190` and bounces straight back down.
-3. **Launch impulse** is `vy = -(7 + charge*7)` (max `-14`), and `MAX_SPEED = 16`. Max climb height with gravity `0.32` is `v²/(2g) ≈ 306px`, far short of the ~560px needed to reach the top bumpers.
+Today each tableau card is offset by a fixed `18px` and the column's `minHeight` grows linearly with the stack. With 13+ cards the column can exceed the viewport. Fix by measuring the available height per column and computing a dynamic offset.
 
-### Changes in `src/routes/tools.pinball.tsx`
+- Track the rendered column height with a `ResizeObserver` on the tableau wrapper.
+- For each column, compute `offset = clamp(6, 28, (availableH - CARD_H) / max(1, col.length - 1))`. Face-down cards get a tighter sub-offset (e.g. 0.45×) so flipped cards stay readable but hidden ones compress.
+- Use the computed offset both for positioning (`top: cumulativeOffset`) and for the column's `minHeight`, so the column never overflows the board.
+- Drag preview uses the same dynamic offset for visual consistency.
 
-1. **Open the top of the plunger lane (drawing, ~line 774-777)**: change the wall to start at `y = 70` instead of `y = 8`, leaving a ~70px gap at the top for the ball to arc over into the playfield.
+## 2. Card back pattern
 
-2. **Move the right guide slope out of the lane (drawing, ~line 784)**: change endpoints from `(W-8, H-200) → (W-130, H-80)` to `(W-30, H-130) → (W-130, H-80)`. The slope now starts at the inner edge of the lane wall (just below where the lane wall ends), so it guides balls down to the right flipper without intruding into the plunger lane.
+Replace the flat cyan gradient `CardBack` with a themed diamond/crosshatch pattern.
 
-3. **Update the matching collision segment (~line 550)**: pass the new endpoints `(W-30, H-130, W-130, H-80)` to `reflectCircleSegment` so collisions match the drawn geometry.
+- Dark teal base (`bg-slate-900` + subtle teal tint) with a repeating diagonal crosshatch built from two layered `repeating-linear-gradient`s in CSS (no image asset).
+- Inner rounded border in cyan/teal at low opacity to frame the pattern, matching the site's cyan accent.
 
-4. **Update the lane-wall collision (~line 532-540)**: also require `ball.y > 70` so the wall only blocks within the drawn portion, allowing balls to cross over the top opening from either side.
+## 3. Gameplay correctness
 
-5. **Stronger launch (~line 910 and ~line 948)**:
-   - Keyboard launch: `ball.vy = -(11 + charge*8)` (range ~13..19).
-   - Mobile tap launch: `ball.vy = -18`.
-6. **Raise speed cap (~line 51)**: `MAX_SPEED = 20` so the per-step cap doesn't immediately throttle the launch back down. Bumper kick and gravity already self-regulate normal play.
+- **Drag and drop smoothness:** capture pointer on the inner card element (not the wrapper) and use `setPointerCapture` on the same element that receives subsequent `pointermove`/`pointerup` so drags don't drop when the cursor leaves the card. Currently capture is set on `e.target` which can be a child span.
+- **Stacking rules:** `canPlaceOnTableau` already enforces alternating colors + descending rank — verified correct. Add a guard so dragging a multi-card stack from the waste/foundation is blocked (already true), and ensure only contiguous valid sub-stacks can be picked up from tableau (validate alternating-color descending within the dragged slice; otherwise pick from the deepest valid card down).
+- **Ace → foundation logic:** `canPlaceOnFoundation` is correct. Make `tryAutoFoundation` also work for the **waste** pile and for a tableau card that is the top of its column (already supported) — confirm by routing double-click and the auto button through the same path. Prefer the matching-suit foundation first.
+- **Double-click reliability:** the current `onClick`+`handleCardTap` 350 ms timer competes with the native `onDoubleClick` and the pointer-down drag start. Replace with a single approach: on `pointerup` without movement, record the tap; if a second tap on the same card arrives within 350 ms call `onAuto`. Remove the redundant `onDoubleClick` handler so behavior is consistent on touch and mouse.
+- **Auto-flip:** keep existing logic that flips the new top of each tableau column after every successful move.
 
-No other game logic, scoring, audio, theme, or layout changes.
+## Technical notes
+
+- No new dependencies.
+- Card dimensions inferred from the first rendered tableau slot's `getBoundingClientRect()`; recompute on resize and on state changes via `useLayoutEffect`.
+- Keep `aspectRatio: 5/7` for face/back so cards look identical in shape.
+- Keep all existing SEO, HUD, undo, and timer code untouched.

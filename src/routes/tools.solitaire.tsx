@@ -647,11 +647,12 @@ function Board({
       </div>
 
       {/* Tableau */}
-      <div className="grid grid-cols-7 gap-1.5 sm:gap-2">
+      <div ref={tableauRef} className="grid grid-cols-7 gap-1.5 sm:gap-2">
         {state.tableau.map((col, i) => {
           const p: Pile = `T${i}` as Pile;
-          const offset = 18;
-          const minH = Math.max(96, 32 + col.length * offset);
+          const offsets = computeOffsets(col);
+          const lastOff = offsets.length ? offsets[offsets.length - 1] : 0;
+          const minH = Math.max(cardH || 96, lastOff + (cardH || 96));
           return (
             <div key={p} className="col-span-1">
               <div
@@ -664,7 +665,7 @@ function Board({
                 {col.length === 0 ? (
                   <EmptySlot />
                 ) : (
-                  col.map((c, idx) => renderCard(c, p, col, idx * offset, idx + 1))
+                  col.map((c, idx) => renderCard(c, p, col, offsets[idx], idx + 1))
                 )}
               </div>
             </div>
@@ -676,13 +677,16 @@ function Board({
       {drag && dragPos && (
         <div
           className="pointer-events-none fixed z-50"
-          style={{ left: dragPos.x - 28, top: dragPos.y - 36 }}
+          style={{ left: dragPos.x - (colWidth / 2), top: dragPos.y - 24, width: colWidth }}
         >
-          {drag.cards.map((c, i) => (
-            <div key={c.id} className="absolute" style={{ top: i * 18 }}>
-              <CardFace card={c} />
-            </div>
-          ))}
+          {drag.cards.map((c, i) => {
+            const previewOffset = Math.min(28, cardH * 0.32);
+            return (
+              <div key={c.id} className="absolute left-0 right-0" style={{ top: i * previewOffset }}>
+                <CardFace card={c} />
+              </div>
+            );
+          })}
         </div>
       )}
     </div>

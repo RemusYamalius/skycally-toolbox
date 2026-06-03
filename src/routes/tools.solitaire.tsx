@@ -748,7 +748,7 @@ function Board({
           const f = state.foundations[i];
           return (
             <div key={p} className="col-span-1">
-              <PileSlot pileRef={setPileRef(p)} highlight={hoverPile === p}>
+              <PileSlot pileRef={setPileRef(p)} highlight={hoverPile === p || hint?.toPile === p}>
                 {f.length === 0 ? (
                   <EmptySlot label={SUIT_GLYPH[SUITS[i]]} />
                 ) : (

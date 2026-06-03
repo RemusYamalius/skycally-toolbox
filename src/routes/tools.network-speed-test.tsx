@@ -132,6 +132,25 @@ async function measureDownload(
   return (totalBytes * 8) / totalSec / 1e6;
 }
 
+async function measureUploadSpeed(controller: AbortController): Promise<number> {
+  const sizeMB = 5;
+  const totalBytes = sizeMB * 1024 * 1024;
+  const bytes = new Uint8Array(totalBytes);
+  const CHUNK = 65536;
+  for (let off = 0; off < totalBytes; off += CHUNK) {
+    crypto.getRandomValues(bytes.subarray(off, Math.min(off + CHUNK, totalBytes)));
+  }
+  const t0 = performance.now();
+  await fetchWithRetry("https://speed-upload.skycally-tools.workers.dev", {
+    method: "POST",
+    body: bytes,
+    cache: "no-store",
+    signal: controller.signal,
+  });
+  const sec = (performance.now() - t0) / 1000;
+  return (sizeMB * 8) / sec;
+}
+
 const MAX_MBPS = 500;
 const ARC_START = 135; // degrees
 const ARC_END = 405; // 270° sweep

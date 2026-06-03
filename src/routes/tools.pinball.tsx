@@ -45,14 +45,14 @@ const H = 640;
 const BALL_R = 9;
 const GRAVITY = 0.32;
 const FRICTION = 0.998;
-const WALL_REST = 0.72;
-const BUMPER_KICK = 7.5;
-const SLING_KICK = 6.5;
+const WALL_REST = 0.78;
+const BUMPER_KICK = 8.5;
+const SLING_KICK = 7;
 const MAX_SPEED = 20;
 const FLIPPER_LEN = 64;
 const FLIPPER_REST = -0.45;  // resting: tip angled downward (classic spread pose)
 const FLIPPER_ACTIVE = 0.55; // active: tip swung upward to strike the ball
-const FLIPPER_SPEED = 0.45;
+const FLIPPER_SPEED = 0.6;
 
 type TableId = "amazon" | "space" | "dragon";
 

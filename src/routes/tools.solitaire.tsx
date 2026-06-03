@@ -759,10 +759,18 @@ function CardFace({ card, hidden }: { card: Card; hidden?: boolean }) {
 function CardBack() {
   return (
     <div
-      className="w-full rounded-md border border-cyan-700 bg-gradient-to-br from-cyan-600 to-cyan-800 shadow-sm"
-      style={{ aspectRatio: "5 / 7" }}
+      className="w-full rounded-md border border-cyan-900 shadow-sm overflow-hidden p-1"
+      style={{ aspectRatio: "5 / 7", backgroundColor: "#0b3a4a" }}
     >
-      <div className="w-full h-full rounded-md border-2 border-cyan-300/30 m-0" />
+      <div
+        className="w-full h-full rounded-[3px]"
+        style={{
+          backgroundColor: "#0e4356",
+          backgroundImage:
+            "repeating-linear-gradient(45deg, rgba(34,211,238,0.28) 0 1.5px, transparent 1.5px 7px), repeating-linear-gradient(-45deg, rgba(34,211,238,0.28) 0 1.5px, transparent 1.5px 7px)",
+          border: "1.5px solid rgba(34,211,238,0.45)",
+        }}
+      />
     </div>
   );
 }

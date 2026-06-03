@@ -902,12 +902,13 @@ function PinballPage() {
       } else if (e.key === "/" || e.key === "ArrowRight") {
         keysRef.current.R = false; flipperRTargetRef.current = FLIPPER_REST;
       } else if (e.key === " ") {
-        if (onPlateRef.current && plungerRef.current > 0) {
+        if (onPlateRef.current) {
+          const charge = Math.max(plungerRef.current, 0.25);
           const ball = ballsArrRef.current[0];
           if (ball && ball.stuck) {
             ball.stuck = false;
-            ball.vy = -(8 + plungerRef.current * 14);
-            ball.vx = -0.5;
+            ball.vy = -(7 + charge * 7); // 8.75 .. 14
+            ball.vx = 0;
             soundRef.current.launch();
           }
           onPlateRef.current = false;

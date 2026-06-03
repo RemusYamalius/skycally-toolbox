@@ -45,14 +45,14 @@ const H = 640;
 const BALL_R = 9;
 const GRAVITY = 0.32;
 const FRICTION = 0.998;
-const WALL_REST = 0.72;
-const BUMPER_KICK = 7.5;
-const SLING_KICK = 6.5;
+const WALL_REST = 0.78;
+const BUMPER_KICK = 8.5;
+const SLING_KICK = 7;
 const MAX_SPEED = 20;
 const FLIPPER_LEN = 64;
 const FLIPPER_REST = -0.45;  // resting: tip angled downward (classic spread pose)
 const FLIPPER_ACTIVE = 0.55; // active: tip swung upward to strike the ball
-const FLIPPER_SPEED = 0.45;
+const FLIPPER_SPEED = 0.6;
 
 type TableId = "amazon" | "space" | "dragon";
 
@@ -645,28 +645,27 @@ function PinballPage() {
       }
     }
 
-    // Flippers
+    // Flippers — kick magnitude scales with current angular velocity (set in step()).
+    const lAngVel = (flipperLRef.current - flipperLPrevRef.current); // per-frame
+    const rAngVel = (flipperRRef.current - flipperRPrevRef.current);
     const { lAnchor, rAnchor, lTip, rTip } = flipperEndpoints();
     const lFlap = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, lAnchor.x, lAnchor.y, lTip.x, lTip.y);
     if (lFlap.hit && lFlap.bx !== undefined) {
       ball.x = lFlap.bx; ball.y = lFlap.by!;
       ball.vx = lFlap.vx!; ball.vy = lFlap.vy!;
-      // angular kick when flipping up (angle increasing from REST to ACTIVE)
-      if (flipperLRef.current > flipperLPrevRef.current) {
-        const kick = (flipperLRef.current - flipperLPrevRef.current) * 18;
-        ball.vy -= kick;
-        ball.vx += kick * 0.3;
-      }
+      // Kick on upswing (angle increasing). Base impulse always present so a
+      // resting flipper still bounces the ball back, swinging flipper launches it.
+      const kick = Math.max(0, lAngVel) * 36 + 2.5;
+      ball.vy -= kick;
+      ball.vx += kick * 0.35;
     }
     const rFlap = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, rAnchor.x, rAnchor.y, rTip.x, rTip.y);
     if (rFlap.hit && rFlap.bx !== undefined) {
       ball.x = rFlap.bx; ball.y = rFlap.by!;
       ball.vx = rFlap.vx!; ball.vy = rFlap.vy!;
-      if (flipperRRef.current > flipperRPrevRef.current) {
-        const kick = (flipperRRef.current - flipperRPrevRef.current) * 18;
-        ball.vy -= kick;
-        ball.vx -= kick * 0.3;
-      }
+      const kick = Math.max(0, rAngVel) * 36 + 2.5;
+      ball.vy -= kick;
+      ball.vx -= kick * 0.35;
     }
   };
 
@@ -727,7 +726,7 @@ function PinballPage() {
         const k = cap / Math.hypot(ball.vx, ball.vy);
         ball.vx *= k; ball.vy *= k;
       }
-      const substeps = 3;
+      const substeps = 5;
       for (let s = 0; s < substeps; s++) {
         ball.x += ball.vx / substeps;
         ball.y += ball.vy / substeps;
@@ -1019,6 +1018,13 @@ function PinballPage() {
               {THEMES[tid].name}
             </button>
           ))}
+          <button
+            onClick={() => newGame(table)}
+            className="px-3 py-1.5 rounded-full text-xs font-bold border bg-secondary/60 text-muted-foreground border-border hover:text-foreground inline-flex items-center gap-1"
+            aria-label="Restart game"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Restart
+          </button>
           <button
             onClick={() => setMuted((m) => !m)}
             className="px-3 py-1.5 rounded-full text-xs font-bold border bg-secondary/60 text-muted-foreground border-border hover:text-foreground inline-flex items-center gap-1"

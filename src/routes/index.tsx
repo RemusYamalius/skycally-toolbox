@@ -10,7 +10,7 @@ import { buildPageMeta } from "@/lib/seo";
 
 const HOME_META = buildPageMeta({
   title: "Skycally — Free Online Tools, No Signup Required",
-  description: "40+ free browser-based tools for images, videos, PDFs and more. No signup, no file uploads. Everything runs in your browser.",
+  description: "90+ free browser-based tools for images, videos, PDFs and more. No signup, no file uploads. Everything runs in your browser.",
   path: "/",
 });
 
@@ -117,7 +117,7 @@ function HomePage() {
               <span className="text-gradient">You Need.</span>
             </h1>
             <p className="mt-5 text-lg sm:text-xl text-white/70 max-w-2xl mx-auto">
-              50+ free browser-based tools. No signup, no uploads, no limits.
+              90+ free browser-based tools. No signup, no uploads, no limits.
             </p>
           </div>
 

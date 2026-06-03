@@ -675,6 +675,7 @@ function Board({
     z = 0,
   ) => {
     const draggable = c.faceUp;
+    const isHintCard = hint?.cardId === c.id;
     return (
       <div
         key={c.id}
@@ -691,13 +692,14 @@ function Board({
         }}
         className={`absolute left-0 right-0 mx-auto select-none touch-none ${
           draggable ? "cursor-grab active:cursor-grabbing" : "cursor-default"
-        }`}
+        } ${isHintCard ? "ring-2 ring-yellow-400 rounded-md animate-pulse" : ""}`}
         style={{ top: offsetY, zIndex: z }}
       >
         <CardFace card={c} hidden={drag?.cards.some((x) => x.id === c.id) ?? false} />
       </div>
     );
   };
+
 
 
   return (

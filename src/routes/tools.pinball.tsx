@@ -526,10 +526,17 @@ function PinballPage() {
     if (ball.x > W - BALL_R - 8) { ball.x = W - BALL_R - 8; ball.vx = -ball.vx * WALL_REST; }
     if (ball.y < BALL_R + 8) { ball.y = BALL_R + 8; ball.vy = -ball.vy * WALL_REST; }
 
-    // Plunger lane wall (vertical at x = W - 28)
-    if (ball.x > W - 28 - BALL_R && ball.y < H - 130) {
-      // bounce back if entering from left while above lane top
-      ball.x = W - 28 - BALL_R; ball.vx = -Math.abs(ball.vx) * WALL_REST;
+    // Plunger lane wall (vertical at x = W - 28). Only blocks the ball when it
+    // approaches the wall from the playfield (left) side — never teleport a
+    // ball that's currently inside the lane (e.g. just after launch).
+    if (
+      ball.x > W - 28 - BALL_R &&
+      ball.x < W - 28 &&
+      ball.vx > 0 &&
+      ball.y < H - 130
+    ) {
+      ball.x = W - 28 - BALL_R;
+      ball.vx = -Math.abs(ball.vx) * WALL_REST;
     }
 
     // Sloped guide walls down to flippers (V shape)
@@ -895,12 +902,13 @@ function PinballPage() {
       } else if (e.key === "/" || e.key === "ArrowRight") {
         keysRef.current.R = false; flipperRTargetRef.current = FLIPPER_REST;
       } else if (e.key === " ") {
-        if (onPlateRef.current && plungerRef.current > 0) {
+        if (onPlateRef.current) {
+          const charge = Math.max(plungerRef.current, 0.25);
           const ball = ballsArrRef.current[0];
           if (ball && ball.stuck) {
             ball.stuck = false;
-            ball.vy = -(8 + plungerRef.current * 14);
-            ball.vx = -0.5;
+            ball.vy = -(7 + charge * 7); // 8.75 .. 14
+            ball.vx = 0;
             soundRef.current.launch();
           }
           onPlateRef.current = false;
@@ -937,7 +945,8 @@ function PinballPage() {
     const ball = ballsArrRef.current[0];
     if (ball && ball.stuck) {
       ball.stuck = false;
-      ball.vy = -16; ball.vx = -0.5;
+      ball.vy = -13;
+      ball.vx = 0;
       soundRef.current.launch();
     }
     onPlateRef.current = false;

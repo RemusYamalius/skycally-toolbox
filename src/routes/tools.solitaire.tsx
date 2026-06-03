@@ -726,7 +726,7 @@ function Board({
         </div>
         {/* Waste */}
         <div className="col-span-1">
-          <PileSlot pileRef={setPileRef("W")} highlight={hoverPile === "W"}>
+          <PileSlot pileRef={setPileRef("W")} highlight={hoverPile === "W" || hint?.toPile === "W"}>
             {state.waste.length === 0 ? (
               <EmptySlot />
             ) : (

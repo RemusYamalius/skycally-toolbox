@@ -300,6 +300,7 @@ function SolitairePage() {
     setSeconds(0);
     setRunning(true);
     setWon(false);
+    clearHint();
   };
 
   const handleUndo = () => {
@@ -310,7 +311,9 @@ function SolitairePage() {
       setWon(false);
       return h.slice(0, -1);
     });
+    clearHint();
   };
+
 
   // Try auto-move card to a foundation
   const tryAutoFoundation = (from: Pile, cardId: string) => {

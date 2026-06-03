@@ -66,6 +66,7 @@ import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMemoryMatchRouteImport } from './routes/tools.memory-match'
 import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
+import { Route as ToolsMahjongRouteImport } from './routes/tools.mahjong'
 import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
 import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
@@ -396,6 +397,11 @@ const ToolsMarkdownToHtmlRoute = ToolsMarkdownToHtmlRouteImport.update({
   path: '/tools/markdown-to-html',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMahjongRoute = ToolsMahjongRouteImport.update({
+  id: '/tools/mahjong',
+  path: '/tools/mahjong',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsLoremIpsumRoute = ToolsLoremIpsumRouteImport.update({
   id: '/tools/lorem-ipsum',
   path: '/tools/lorem-ipsum',
@@ -667,6 +673,7 @@ export interface FileRoutesByFullPath {
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
+  '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
@@ -769,6 +776,7 @@ export interface FileRoutesByTo {
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
+  '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
@@ -872,6 +880,7 @@ export interface FileRoutesById {
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
+  '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
@@ -976,6 +985,7 @@ export interface FileRouteTypes {
     | '/tools/json-formatter'
     | '/tools/link-shortener'
     | '/tools/lorem-ipsum'
+    | '/tools/mahjong'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/memory-match'
@@ -1078,6 +1088,7 @@ export interface FileRouteTypes {
     | '/tools/json-formatter'
     | '/tools/link-shortener'
     | '/tools/lorem-ipsum'
+    | '/tools/mahjong'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/memory-match'
@@ -1180,6 +1191,7 @@ export interface FileRouteTypes {
     | '/tools/json-formatter'
     | '/tools/link-shortener'
     | '/tools/lorem-ipsum'
+    | '/tools/mahjong'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/memory-match'
@@ -1283,6 +1295,7 @@ export interface RootRouteChildren {
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
   ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
   ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
+  ToolsMahjongRoute: typeof ToolsMahjongRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
   ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
   ToolsMemoryMatchRoute: typeof ToolsMemoryMatchRoute
@@ -1737,6 +1750,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMarkdownToHtmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/mahjong': {
+      id: '/tools/mahjong'
+      path: '/tools/mahjong'
+      fullPath: '/tools/mahjong'
+      preLoaderRoute: typeof ToolsMahjongRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/lorem-ipsum': {
       id: '/tools/lorem-ipsum'
       path: '/tools/lorem-ipsum'
@@ -2093,6 +2113,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
   ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
   ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,
+  ToolsMahjongRoute: ToolsMahjongRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
   ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
   ToolsMemoryMatchRoute: ToolsMemoryMatchRoute,

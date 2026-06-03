@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search, Keyboard, Bird, Crown, Circle, Hammer, Target, Rows3, Ghost, Spade, Puzzle } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search, Keyboard, Bird, Crown, Circle, Hammer, Target, Rows3, Ghost, Spade, Puzzle, Pickaxe } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
@@ -122,6 +122,7 @@ export const tools: Tool[] = [
   { slug: "pac-man", name: "Pac-Man", description: "Eat all the dots and avoid the ghosts in this classic arcade maze game!", category: "minigames", icon: Ghost, path: "/tools/pac-man" },
   { slug: "solitaire", name: "Solitaire", description: "Classic Klondike Solitaire — move all cards to the foundations to win!", category: "minigames", icon: Spade, path: "/tools/solitaire" },
   { slug: "mahjong", name: "Mahjong Solitaire", description: "Classic Mahjong Solitaire — match identical free tiles to clear the board!", category: "minigames", icon: Puzzle, path: "/tools/mahjong" },
+  { slug: "tunnel-dash", name: "Tunnel Dash", description: "Dig tunnels, collect gems and drop rocks on enemies in this classic arcade digger!", category: "minigames", icon: Pickaxe, path: "/tools/tunnel-dash" },
 ];
 
 

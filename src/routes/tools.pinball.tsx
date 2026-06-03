@@ -726,7 +726,7 @@ function PinballPage() {
         const k = cap / Math.hypot(ball.vx, ball.vy);
         ball.vx *= k; ball.vy *= k;
       }
-      const substeps = 3;
+      const substeps = 5;
       for (let s = 0; s < substeps; s++) {
         ball.x += ball.vx / substeps;
         ball.y += ball.vy / substeps;
@@ -1018,6 +1018,13 @@ function PinballPage() {
               {THEMES[tid].name}
             </button>
           ))}
+          <button
+            onClick={() => newGame(table)}
+            className="px-3 py-1.5 rounded-full text-xs font-bold border bg-secondary/60 text-muted-foreground border-border hover:text-foreground inline-flex items-center gap-1"
+            aria-label="Restart game"
+          >
+            <RotateCcw className="w-3.5 h-3.5" /> Restart
+          </button>
           <button
             onClick={() => setMuted((m) => !m)}
             className="px-3 py-1.5 rounded-full text-xs font-bold border bg-secondary/60 text-muted-foreground border-border hover:text-foreground inline-flex items-center gap-1"

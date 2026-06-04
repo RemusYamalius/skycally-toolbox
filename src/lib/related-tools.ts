@@ -76,6 +76,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   // Utility
   "ip-address-lookup": ["network-speed-test", "qr-generator", "url-encoder"],
   "port-checker": ["ip-address-lookup", "network-speed-test", "qr-generator"],
+  "webrtc-leak-test": ["ip-address-lookup", "network-speed-test", "port-checker"],
 };
 
 export function getRelatedTools(slug: string): Tool[] {

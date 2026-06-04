@@ -53,6 +53,7 @@ import { Route as ToolsRandomTeamMakerRouteImport } from './routes/tools.random-
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsProtectPdfRouteImport } from './routes/tools.protect-pdf'
+import { Route as ToolsPortCheckerRouteImport } from './routes/tools.port-checker'
 import { Route as ToolsPinballRouteImport } from './routes/tools.pinball'
 import { Route as ToolsPdfWatermarkRemoverRouteImport } from './routes/tools.pdf-watermark-remover'
 import { Route as ToolsPdfToWordRouteImport } from './routes/tools.pdf-to-word'
@@ -333,6 +334,11 @@ const ToolsQrGeneratorRoute = ToolsQrGeneratorRouteImport.update({
 const ToolsProtectPdfRoute = ToolsProtectPdfRouteImport.update({
   id: '/tools/protect-pdf',
   path: '/tools/protect-pdf',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPortCheckerRoute = ToolsPortCheckerRouteImport.update({
+  id: '/tools/port-checker',
+  path: '/tools/port-checker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsPinballRoute = ToolsPinballRouteImport.update({
@@ -715,6 +721,7 @@ export interface FileRoutesByFullPath {
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
   '/tools/pinball': typeof ToolsPinballRoute
+  '/tools/port-checker': typeof ToolsPortCheckerRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -822,6 +829,7 @@ export interface FileRoutesByTo {
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
   '/tools/pinball': typeof ToolsPinballRoute
+  '/tools/port-checker': typeof ToolsPortCheckerRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -930,6 +938,7 @@ export interface FileRoutesById {
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
   '/tools/pinball': typeof ToolsPinballRoute
+  '/tools/port-checker': typeof ToolsPortCheckerRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -1039,6 +1048,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-to-word'
     | '/tools/pdf-watermark-remover'
     | '/tools/pinball'
+    | '/tools/port-checker'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -1146,6 +1156,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-to-word'
     | '/tools/pdf-watermark-remover'
     | '/tools/pinball'
+    | '/tools/port-checker'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -1253,6 +1264,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-to-word'
     | '/tools/pdf-watermark-remover'
     | '/tools/pinball'
+    | '/tools/port-checker'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -1361,6 +1373,7 @@ export interface RootRouteChildren {
   ToolsPdfToWordRoute: typeof ToolsPdfToWordRoute
   ToolsPdfWatermarkRemoverRoute: typeof ToolsPdfWatermarkRemoverRoute
   ToolsPinballRoute: typeof ToolsPinballRoute
+  ToolsPortCheckerRoute: typeof ToolsPortCheckerRoute
   ToolsProtectPdfRoute: typeof ToolsProtectPdfRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
@@ -1709,6 +1722,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/protect-pdf'
       fullPath: '/tools/protect-pdf'
       preLoaderRoute: typeof ToolsProtectPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/port-checker': {
+      id: '/tools/port-checker'
+      path: '/tools/port-checker'
+      fullPath: '/tools/port-checker'
+      preLoaderRoute: typeof ToolsPortCheckerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/pinball': {
@@ -2211,6 +2231,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsPdfToWordRoute: ToolsPdfToWordRoute,
   ToolsPdfWatermarkRemoverRoute: ToolsPdfWatermarkRemoverRoute,
   ToolsPinballRoute: ToolsPinballRoute,
+  ToolsPortCheckerRoute: ToolsPortCheckerRoute,
   ToolsProtectPdfRoute: ToolsProtectPdfRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,

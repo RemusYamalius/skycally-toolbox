@@ -22,6 +22,7 @@ import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordSearchRouteImport } from './routes/tools.word-search'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
 import { Route as ToolsWhackAMoleRouteImport } from './routes/tools.whack-a-mole'
+import { Route as ToolsWebrtcLeakTestRouteImport } from './routes/tools.webrtc-leak-test'
 import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoMergerRouteImport } from './routes/tools.video-merger'
@@ -179,6 +180,11 @@ const ToolsWordCounterRoute = ToolsWordCounterRouteImport.update({
 const ToolsWhackAMoleRoute = ToolsWhackAMoleRouteImport.update({
   id: '/tools/whack-a-mole',
   path: '/tools/whack-a-mole',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsWebrtcLeakTestRoute = ToolsWebrtcLeakTestRouteImport.update({
+  id: '/tools/webrtc-leak-test',
+  path: '/tools/webrtc-leak-test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsVideoTrimmerRoute = ToolsVideoTrimmerRouteImport.update({
@@ -753,6 +759,7 @@ export interface FileRoutesByFullPath {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-search': typeof ToolsWordSearchRoute
@@ -861,6 +868,7 @@ export interface FileRoutesByTo {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-search': typeof ToolsWordSearchRoute
@@ -970,6 +978,7 @@ export interface FileRoutesById {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
   '/tools/word-search': typeof ToolsWordSearchRoute
@@ -1080,6 +1089,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
     | '/tools/word-counter'
     | '/tools/word-search'
@@ -1188,6 +1198,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
     | '/tools/word-counter'
     | '/tools/word-search'
@@ -1296,6 +1307,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
     | '/tools/word-counter'
     | '/tools/word-search'
@@ -1405,6 +1417,7 @@ export interface RootRouteChildren {
   ToolsVideoMergerRoute: typeof ToolsVideoMergerRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
   ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
+  ToolsWebrtcLeakTestRoute: typeof ToolsWebrtcLeakTestRoute
   ToolsWhackAMoleRoute: typeof ToolsWhackAMoleRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
   ToolsWordSearchRoute: typeof ToolsWordSearchRoute
@@ -1505,6 +1518,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/whack-a-mole'
       fullPath: '/tools/whack-a-mole'
       preLoaderRoute: typeof ToolsWhackAMoleRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/webrtc-leak-test': {
+      id: '/tools/webrtc-leak-test'
+      path: '/tools/webrtc-leak-test'
+      fullPath: '/tools/webrtc-leak-test'
+      preLoaderRoute: typeof ToolsWebrtcLeakTestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/video-trimmer': {
@@ -2263,6 +2283,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsVideoMergerRoute: ToolsVideoMergerRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
   ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
+  ToolsWebrtcLeakTestRoute: ToolsWebrtcLeakTestRoute,
   ToolsWhackAMoleRoute: ToolsWhackAMoleRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,
   ToolsWordSearchRoute: ToolsWordSearchRoute,

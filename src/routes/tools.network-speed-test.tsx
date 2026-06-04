@@ -223,13 +223,15 @@ function SpeedGauge({
         <motion.path
           d={trackPath}
           fill="none"
-          stroke="url(#gaugeGrad)"
+          stroke={phase === "upload" ? "var(--violet-brand)" : "url(#gaugeGrad)"}
           strokeWidth={16}
           strokeLinecap="round"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: progress }}
           transition={{ type: "spring", stiffness: 60, damping: 20, mass: 0.6 }}
-          style={{ filter: "drop-shadow(0 0 8px color-mix(in oklab, var(--cyan-brand) 50%, transparent))" }}
+          style={{
+            filter: `drop-shadow(0 0 8px color-mix(in oklab, ${phase === "upload" ? "var(--violet-brand)" : "var(--cyan-brand)"} 50%, transparent))`,
+          }}
         />
 
         {/* Ticks */}

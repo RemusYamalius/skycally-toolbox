@@ -73,6 +73,7 @@ import { Route as ToolsMahjongRouteImport } from './routes/tools.mahjong'
 import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
 import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
+import { Route as ToolsIpAddressLookupRouteImport } from './routes/tools.ip-address-lookup'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
 import { Route as ToolsImageToSketchRouteImport } from './routes/tools.image-to-sketch'
@@ -435,6 +436,11 @@ const ToolsJsonFormatterRoute = ToolsJsonFormatterRouteImport.update({
   path: '/tools/json-formatter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsIpAddressLookupRoute = ToolsIpAddressLookupRouteImport.update({
+  id: '/tools/ip-address-lookup',
+  path: '/tools/ip-address-lookup',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsImageUpscalerRoute = ToolsImageUpscalerRouteImport.update({
   id: '/tools/image-upscaler',
   path: '/tools/image-upscaler',
@@ -688,6 +694,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
@@ -794,6 +801,7 @@ export interface FileRoutesByTo {
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
@@ -901,6 +909,7 @@ export interface FileRoutesById {
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
@@ -1009,6 +1018,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
     | '/tools/link-shortener'
     | '/tools/lorem-ipsum'
@@ -1115,6 +1125,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
     | '/tools/link-shortener'
     | '/tools/lorem-ipsum'
@@ -1221,6 +1232,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
     | '/tools/link-shortener'
     | '/tools/lorem-ipsum'
@@ -1328,6 +1340,7 @@ export interface RootRouteChildren {
   ToolsImageToSketchRoute: typeof ToolsImageToSketchRoute
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
+  ToolsIpAddressLookupRoute: typeof ToolsIpAddressLookupRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
   ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
   ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
@@ -1838,6 +1851,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsJsonFormatterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/ip-address-lookup': {
+      id: '/tools/ip-address-lookup'
+      path: '/tools/ip-address-lookup'
+      fullPath: '/tools/ip-address-lookup'
+      preLoaderRoute: typeof ToolsIpAddressLookupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/image-upscaler': {
       id: '/tools/image-upscaler'
       path: '/tools/image-upscaler'
@@ -2170,6 +2190,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageToSketchRoute: ToolsImageToSketchRoute,
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
+  ToolsIpAddressLookupRoute: ToolsIpAddressLookupRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
   ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
   ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,

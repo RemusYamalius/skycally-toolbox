@@ -93,6 +93,7 @@ import { Route as ToolsFlappyBirdRouteImport } from './routes/tools.flappy-bird'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
+import { Route as ToolsDnsLeakTestRouteImport } from './routes/tools.dns-leak-test'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
@@ -538,6 +539,11 @@ const ToolsDocumentScannerRoute = ToolsDocumentScannerRouteImport.update({
   path: '/tools/document-scanner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsDnsLeakTestRoute = ToolsDnsLeakTestRouteImport.update({
+  id: '/tools/dns-leak-test',
+  path: '/tools/dns-leak-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsDiceRollerRoute = ToolsDiceRollerRouteImport.update({
   id: '/tools/dice-roller',
   path: '/tools/dice-roller',
@@ -689,6 +695,7 @@ export interface FileRoutesByFullPath {
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
+  '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -798,6 +805,7 @@ export interface FileRoutesByTo {
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
+  '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -908,6 +916,7 @@ export interface FileRoutesById {
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
+  '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
@@ -1019,6 +1028,7 @@ export interface FileRouteTypes {
     | '/tools/connect-four'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
+    | '/tools/dns-leak-test'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -1128,6 +1138,7 @@ export interface FileRouteTypes {
     | '/tools/connect-four'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
+    | '/tools/dns-leak-test'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -1237,6 +1248,7 @@ export interface FileRouteTypes {
     | '/tools/connect-four'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
+    | '/tools/dns-leak-test'
     | '/tools/document-scanner'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
@@ -1347,6 +1359,7 @@ export interface RootRouteChildren {
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
+  ToolsDnsLeakTestRoute: typeof ToolsDnsLeakTestRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
@@ -2017,6 +2030,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsDocumentScannerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/dns-leak-test': {
+      id: '/tools/dns-leak-test'
+      path: '/tools/dns-leak-test'
+      fullPath: '/tools/dns-leak-test'
+      preLoaderRoute: typeof ToolsDnsLeakTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/dice-roller': {
       id: '/tools/dice-roller'
       path: '/tools/dice-roller'
@@ -2213,6 +2233,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsConnectFourRoute: ToolsConnectFourRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
+  ToolsDnsLeakTestRoute: ToolsDnsLeakTestRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,

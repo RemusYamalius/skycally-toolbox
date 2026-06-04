@@ -1,34 +1,31 @@
-### New Tool: WebRTC Leak Test at `/tools/webrtc-leak-test`
+## DNS & IP Leak Check Tool
 
-Create a browser-based WebRTC leak detection tool that runs entirely client-side, following the existing Skycally tool-page patterns.
+### Overview
+Build a new tool page at `/tools/dns-leak-test` titled **"DNS & IP Leak Check"** that honestly shows the user's public IP geolocation and lets them self-assess whether their connection matches their expected VPN location.
 
-#### Route file
-Create `src/routes/tools.webrtc-leak-test.tsx` with:
-- `createFileRoute('/tools/webrtc-leak-test')` with `buildToolMeta`
-- `ToolPageShell` wrapping the page
-- **On mount**: two parallel fetches
-  1. `fetch('https://api.ipify.org?format=json')` → public IP
-  2. `RTCPeerConnection` + `createDataChannel('')` + `createOffer` + `setLocalDescription`, then listen to `icecandidate` events on a STUN server (`stun:stun.l.google.com:19302`) to collect `srflx` and `host` candidates
-- Parse candidate strings with a regex to extract IP addresses; collect unique IPs from `srflx` candidates as the "WebRTC Detected IP(s)"
-- **Comparison logic**: if any WebRTC IP differs from the ipify public IP → red leak alert; if they match (or no WebRTC IPs found) → green safe badge
-- Display three info cards:
-  - Public IP (from ipify)
-  - WebRTC Detected IP(s) — list, or "None detected"
-  - Leak Status — large colored badge (green/red) with check/x icon
-- Show a brief explanation paragraph under the status: "WebRTC can reveal your real IP address even when using a VPN"
-- Add a "Run Test Again" button to re-trigger the detection
-- Include `HowToUse`, `ToolSeoContent` (title, description, 3 paragraphs, 4 FAQs), and `RelatedTools` as required by project conventions
-- All styling via semantic tokens (`bg-card`, `border-border`, `text-foreground`, etc.) to match the dark theme automatically
+### Page Structure
+- **ToolPageShell** with title "DNS & IP Leak Check" and standard description
+- **Status hero section**: green badge "Your connection appears secure ✓" or yellow badge "Your DNS may be leaking ⚠"
+- **Info cards** (3-column grid): Public IP, Detected Location (country + ISP + timezone), Leak Status
+- **VPN toggle section**: "Are you using a VPN?" checkbox + country `<select>` that appears when checked. Detected country compared against selected expected country.
+- **Honest disclaimer**: "For a complete DNS leak test, visit dnsleaktest.com" with link
+- **"Test Again" button** to re-fetch IP and geo data
+- **Standard components**: `HowToUse`, `ToolSeoContent` (with SEO title, description, 2-3 paragraph body, 4 FAQs), `RelatedTools`
+- **"No data is stored on our servers"** badge
 
-#### Tool registry
-- Add `{ slug: "webrtc-leak-test", name: "WebRTC Leak Test", description: "Check if WebRTC is leaking your real IP address behind a VPN.", category: "utility", icon: Shield, path: "/tools/webrtc-leak-test" }` to `src/lib/tools.ts`
-- Import `Shield` from `lucide-react` in the same import block
+### Data Flow
+1. On mount: `fetch('https://api.ipify.org?format=json')` → public IP
+2. Then: `fetch('https://ipapi.co/{IP}/json/')` → country, ISP, region, city, timezone
+3. User toggles VPN checkbox → selects expected country from dropdown
+4. Compare: detected country === expected country → green secure; mismatch → yellow warning
 
-#### Related tools
-- Add `"webrtc-leak-test"` entry in `src/lib/related-tools.ts` mapping to `["ip-address-lookup", "network-speed-test", "port-checker"]`
+### Design
+- Matches existing Skycally dark theme using semantic CSS tokens (`--green-brand`, `--orange-brand`, `--cyan-brand`, `--violet-brand`, `--card`, `--border`, etc.)
+- Uses same card styling, motion animations (`framer-motion`), and layout patterns as the WebRTC Leak Test page
 
-#### No backend
-Everything runs in the browser using public STUN and ipify APIs. No server functions, no database, no external proxies.
+### Tool Registry
+- Add tool entry to `src/lib/tools.ts`: slug `dns-leak-test`, name `DNS & IP Leak Check`, category `utility`, Shield icon
+- Add `dns-leak-test` mapping to `related-tools.ts` pointing to `ip-address-lookup`, `network-speed-test`, `webrtc-leak-test`
 
-#### SEO
-Use `buildToolMeta` for route `head()`. `ToolSeoContent` covers on-page SEO with keywords like "WebRTC leak test", "VPN leak detection", and "IP privacy".
+### No Backend
+Everything runs in the browser using public APIs. No server functions, no database.

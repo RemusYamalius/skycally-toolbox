@@ -2,6 +2,7 @@ import compressPdfThumb from "@/assets/blog-compress-pdf.png";
 import videoToGifThumb from "@/assets/blog-video-to-gif.png";
 import designersToolsThumb from "@/assets/blog-designers-tools.png";
 import developersToolsThumb from "@/assets/blog-developers-tools.png";
+import networkSpeedTestThumb from "@/assets/blog-network-speed-test.png";
 
 export interface BlogPost {
   slug: string;

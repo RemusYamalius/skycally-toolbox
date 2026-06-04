@@ -174,7 +174,7 @@ function ArticlePage() {
       <div className="mt-6">
         <Link
           to="/tools/network-speed-test"
-          className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold !text-primary-foreground no-underline transition hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold !text-primary-foreground !no-underline transition hover:opacity-90"
         >
           Run a free speed test <ArrowRight className="w-4 h-4" />
         </Link>

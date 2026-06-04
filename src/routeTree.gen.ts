@@ -115,6 +115,7 @@ import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text
 import { Route as ToolsAddSubtitlesRouteImport } from './routes/tools.add-subtitles'
 import { Route as Tools2048RouteImport } from './routes/tools.2048'
 import { Route as BlogVideoToGifOnlineFreeRouteImport } from './routes/blog.video-to-gif-online-free'
+import { Route as BlogHowToTestInternetSpeedOnlineFreeRouteImport } from './routes/blog.how-to-test-internet-speed-online-free'
 import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
 import { Route as BlogBestFreeOnlineToolsForDevelopers2025RouteImport } from './routes/blog.best-free-online-tools-for-developers-2025'
 import { Route as BlogBestFreeOnlineToolsForDesignersRouteImport } from './routes/blog.best-free-online-tools-for-designers'
@@ -652,6 +653,12 @@ const BlogVideoToGifOnlineFreeRoute =
     path: '/blog/video-to-gif-online-free',
     getParentRoute: () => rootRouteImport,
   } as any)
+const BlogHowToTestInternetSpeedOnlineFreeRoute =
+  BlogHowToTestInternetSpeedOnlineFreeRouteImport.update({
+    id: '/blog/how-to-test-internet-speed-online-free',
+    path: '/blog/how-to-test-internet-speed-online-free',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BlogCompressPdfOnlineFreeRoute =
   BlogCompressPdfOnlineFreeRouteImport.update({
     id: '/blog/compress-pdf-online-free',
@@ -681,6 +688,7 @@ export interface FileRoutesByFullPath {
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
+  '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -792,6 +800,7 @@ export interface FileRoutesByTo {
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
+  '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -904,6 +913,7 @@ export interface FileRoutesById {
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
+  '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1017,6 +1027,7 @@ export interface FileRouteTypes {
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
+    | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -1128,6 +1139,7 @@ export interface FileRouteTypes {
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
+    | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -1239,6 +1251,7 @@ export interface FileRouteTypes {
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
+    | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -1351,6 +1364,7 @@ export interface RootRouteChildren {
   BlogBestFreeOnlineToolsForDesignersRoute: typeof BlogBestFreeOnlineToolsForDesignersRoute
   BlogBestFreeOnlineToolsForDevelopers2025Route: typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
+  BlogHowToTestInternetSpeedOnlineFreeRoute: typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   BlogVideoToGifOnlineFreeRoute: typeof BlogVideoToGifOnlineFreeRoute
   Tools2048Route: typeof Tools2048Route
   ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
@@ -2197,6 +2211,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof BlogVideoToGifOnlineFreeRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/blog/how-to-test-internet-speed-online-free': {
+      id: '/blog/how-to-test-internet-speed-online-free'
+      path: '/blog/how-to-test-internet-speed-online-free'
+      fullPath: '/blog/how-to-test-internet-speed-online-free'
+      preLoaderRoute: typeof BlogHowToTestInternetSpeedOnlineFreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/blog/compress-pdf-online-free': {
       id: '/blog/compress-pdf-online-free'
       path: '/blog/compress-pdf-online-free'
@@ -2233,6 +2254,8 @@ const rootRouteChildren: RootRouteChildren = {
   BlogBestFreeOnlineToolsForDevelopers2025Route:
     BlogBestFreeOnlineToolsForDevelopers2025Route,
   BlogCompressPdfOnlineFreeRoute: BlogCompressPdfOnlineFreeRoute,
+  BlogHowToTestInternetSpeedOnlineFreeRoute:
+    BlogHowToTestInternetSpeedOnlineFreeRoute,
   BlogVideoToGifOnlineFreeRoute: BlogVideoToGifOnlineFreeRoute,
   Tools2048Route: Tools2048Route,
   ToolsAddSubtitlesRoute: ToolsAddSubtitlesRoute,

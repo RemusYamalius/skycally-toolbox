@@ -513,9 +513,9 @@ function NetworkSpeedTest() {
           />
           <MetricCard
             label="Upload"
-            value={fmtMbps(results.upload)}
+            value={fmtMbps(phase === "upload" ? live.upload : results.upload)}
             unit="Mbps"
-            color="var(--cyan-brand)"
+            color="var(--violet-brand)"
             icon={Upload}
             highlight={phase === "upload"}
           />

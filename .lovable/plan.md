@@ -1,35 +1,27 @@
-## New blog post: "How to Test Your Internet Speed Online — Free & No Signup Required"
+## Fixes to `blog.how-to-test-internet-speed-online-free.tsx` and assets
 
-Matches the existing blog post structure (compress-pdf, video-to-gif, designers-tools, developers-tools).
+### 1. CTA button text not visible (issue #1)
+The "Run a free speed test" `<Link>` is rendered inside a `<p>` whose parent prose styles apply `[&_a]:text-primary [&_a]:underline`. That overrides the button's `text-primary-foreground` and adds an underline that visually obscures the label.
+
+**Fix:** Move the CTA out of the `<p>` (use a `<div>` wrapper) and add `no-underline !text-primary-foreground` classes so the prose `[&_a]` rules can't override it.
+
+### 2. Light mode hides text (issue #2)
+The article body relies on `text-foreground/90`, which is correct, but a quick audit of the page in light mode is needed. Suspect cause: nothing in the post is hard-coded dark, but the surrounding tool/hero links may use tokens with insufficient contrast. After switching to light mode in the preview I'll patch any element that uses a token reading as near-background (likely the table header `bg-card` text or the CTA aside). I will only adjust classes on this blog page — no theme token changes.
+
+### 3. Broken image under "How to Test Your Speed with Skycally" (issue #3)
+The Pinterest URL (`pinterest.com/pin/...`) is an HTML page, not an image, so the `<img>` shows broken. Replace with a real bundled asset — the uploaded screenshot of the Network Speed Test result page — keeping the alt text `"Network Speed Test - Skycally"`.
+
+### 4. Replace main article (hero) image with the uploaded screenshot (issue #4)
+Save the user-uploaded image as `src/assets/blog-network-speed-test.png` (overwriting the previously generated illustration). Both the hero thumbnail (via `blog.ts` import) and the inline image from issue #3 will reference this same file, so the hero and the in-article screenshot match.
 
 ### Files
 
-1. **`src/assets/blog-network-speed-test.png`** (new, generated via imagegen) — thumbnail in the same screenshot style as other blog hero images. Shows the Skycally Network Speed Test UI with download/upload/ping/jitter readouts on the dark theme.
+1. `src/assets/blog-network-speed-test.png` — overwrite with `user-uploads://image-17.png` (the attached screenshot).
+2. `src/routes/blog.how-to-test-internet-speed-online-free.tsx`
+   - Replace the broken `<img src="https://www.pinterest.com/...">` with `<img src={networkSpeedTestThumb} ... />` (import added).
+   - Refactor the closing CTA: wrap `<Link>` in a `<div className="mt-6">` instead of `<p>`, add `no-underline !text-primary-foreground` to the Link className.
+   - Apply any small light-mode contrast fixes discovered during preview verification (scoped to this file).
+3. No changes to `blog.ts`, `BlogPostLayout`, or other posts.
 
-2. **`src/lib/blog.ts`** — append new `BlogPost` entry:
-   - `slug: "how-to-test-internet-speed-online-free"`
-   - `path: "/blog/how-to-test-internet-speed-online-free"`
-   - `title`, `description`, `category: "Network Tools"` (sentence-case to match the existing pattern — the UI uppercases it via CSS), `date: "2026-06-04"`, `dateLabel: "June 4, 2026"`
-   - `author: "Skycally Team"`, `ctaToolSlug: "network-speed-test"`
-   - `thumbnail` import, `thumbnailAlt: "Network Speed Test tool interface"`
-
-3. **`src/routes/blog.how-to-test-internet-speed-online-free.tsx`** (new) — same shape as `blog.compress-pdf-online-free.tsx`:
-   - `createFileRoute("/blog/how-to-test-internet-speed-online-free")`
-   - `head()` returns `buildPageMeta(...)` + `og:type: article` + JSON-LD Article schema
-   - `<BlogPostLayout post={post}>` wraps the content
-   - Content sections (h2 + p/ul/ol, no inline styles — uses BlogPostLayout's prose styles):
-     1. **What Is an Internet Speed Test?** — paragraph + ul defining Download, Upload, Ping, Jitter
-     2. **Why Your Internet Speed Matters** — intro paragraph + HTML `<table>` (Activity | Recommended Speed): HD Streaming 5 Mbps, 4K Streaming 25 Mbps, Video Calls 3 Mbps, Online Gaming 10 Mbps, Working From Home 25+ Mbps. Table gets minimal Tailwind classes to render on the dark theme since the layout's prose styles don't target tables.
-     3. **How to Test Your Speed with Skycally** — ordered list (Open the tool → Click Run Test → Wait ~15s → View results), with link `<a href="/tools/network-speed-test">`. Immediately after the ol, an `<img src="https://www.pinterest.com/pin/1100356121480435073" alt="Network Speed Test - Skycally" />` per user request.
-     4. **Understanding Your Results** — h3/h4-grouped paragraphs for Download (good/bad), Upload, Ping (<30 ms great), Jitter (<10 ms great)
-     5. **Tips to Improve Your Internet Speed** — 5-item `<ol>`: restart router, use 5 GHz / wired, move closer to router, close bandwidth-heavy apps, upgrade plan or contact ISP
-     6. **Why Use Skycally's Speed Test?** — `<ul>` (no signup, runs in browser, powered by Cloudflare, accurate ping/jitter, fully free) ending with `<Link to="/tools/network-speed-test">` styled CTA button matching the `BlogPostLayout` CTA aside style
-
-### Untouched
-
-- Existing posts and `BlogPostLayout` component are NOT modified.
-- `routeTree.gen.ts` regenerates automatically from the new route file.
-
-### Notes
-
-- The Pinterest URL the user provided (`pinterest.com/pin/...`) is an HTML page, not an image asset, so it will render as a broken image in browsers. I'll wire it in exactly as requested per the user's instruction, but flag this in the closing message so they can swap it for a direct image URL if desired.
+### Verification
+After edits, open the post in the preview, toggle the theme to light, and confirm: button label visible, all paragraphs/headings readable, both images render, hero matches the uploaded screenshot.

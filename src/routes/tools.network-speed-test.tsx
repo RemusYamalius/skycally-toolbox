@@ -345,7 +345,7 @@ function NetworkSpeedTest() {
   async function runTest() {
     setError(null);
     setResults({ ping: 0, jitter: 0, download: 0, upload: 0 });
-    setLive({ download: 0 });
+    setLive({ download: 0, upload: 0 });
     setProgress(0);
     const controller = new AbortController();
     controllerRef.current = controller;
@@ -359,14 +359,16 @@ function NetworkSpeedTest() {
 
       setPhase("download");
       const download = await measureDownload(controller, (mbps, pct) => {
-        setLive({ download: mbps });
+        setLive((l) => ({ ...l, download: mbps }));
         setProgress(15 + pct * 0.6);
       });
       setResults((r) => ({ ...r, download }));
-      setLive({ download });
+      setLive((l) => ({ ...l, download }));
 
       setPhase("upload");
-      const upload = await measureUploadSpeed(controller);
+      const upload = await measureUploadSpeed(controller, (mbps) => {
+        setLive((l) => ({ ...l, upload: mbps }));
+      });
       setResults((r) => ({ ...r, upload }));
 
       setProgress(100);

@@ -397,7 +397,7 @@ function NetworkSpeedTest() {
       : phase === "download"
         ? "Measuring download speed…"
         : phase === "upload"
-          ? "Testing upload…"
+          ? "Measuring upload speed…"
           : phase === "done"
             ? "Test complete"
             : phase === "error"

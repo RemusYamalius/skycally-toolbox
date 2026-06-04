@@ -411,10 +411,9 @@ function SshKeyGeneratorPage() {
 
       <HowToUse
         steps={[
-          "Choose a key type — Ed25519 is recommended for new keys; RSA is best for legacy compatibility.",
+          "Choose a key type — Ed25519 is recommended; RSA is best for legacy compatibility.",
           "Add an optional comment (typically your email or user@hostname) to label the key.",
-          "Click Generate Key Pair — everything happens locally in your browser.",
-          "Copy or download both keys. Add the public key to your server or GitHub; keep the private key safe and never share it.",
+          "Click Generate Key Pair — everything happens locally in your browser, then copy or download both keys.",
         ]}
       />
 

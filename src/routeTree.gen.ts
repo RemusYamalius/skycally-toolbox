@@ -38,6 +38,7 @@ import { Route as ToolsTicTacToeRouteImport } from './routes/tools.tic-tac-toe'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsTetrisRouteImport } from './routes/tools.tetris'
 import { Route as ToolsSudokuRouteImport } from './routes/tools.sudoku'
+import { Route as ToolsSshKeyGeneratorRouteImport } from './routes/tools.ssh-key-generator'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
@@ -261,6 +262,11 @@ const ToolsTetrisRoute = ToolsTetrisRouteImport.update({
 const ToolsSudokuRoute = ToolsSudokuRouteImport.update({
   id: '/tools/sudoku',
   path: '/tools/sudoku',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSshKeyGeneratorRoute = ToolsSshKeyGeneratorRouteImport.update({
+  id: '/tools/ssh-key-generator',
+  path: '/tools/ssh-key-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSplitPdfRoute = ToolsSplitPdfRouteImport.update({
@@ -751,6 +757,7 @@ export interface FileRoutesByFullPath {
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
+  '/tools/ssh-key-generator': typeof ToolsSshKeyGeneratorRoute
   '/tools/sudoku': typeof ToolsSudokuRoute
   '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
@@ -861,6 +868,7 @@ export interface FileRoutesByTo {
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
+  '/tools/ssh-key-generator': typeof ToolsSshKeyGeneratorRoute
   '/tools/sudoku': typeof ToolsSudokuRoute
   '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
@@ -972,6 +980,7 @@ export interface FileRoutesById {
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
+  '/tools/ssh-key-generator': typeof ToolsSshKeyGeneratorRoute
   '/tools/sudoku': typeof ToolsSudokuRoute
   '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
@@ -1084,6 +1093,7 @@ export interface FileRouteTypes {
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
+    | '/tools/ssh-key-generator'
     | '/tools/sudoku'
     | '/tools/tetris'
     | '/tools/text-to-speech'
@@ -1194,6 +1204,7 @@ export interface FileRouteTypes {
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
+    | '/tools/ssh-key-generator'
     | '/tools/sudoku'
     | '/tools/tetris'
     | '/tools/text-to-speech'
@@ -1304,6 +1315,7 @@ export interface FileRouteTypes {
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
+    | '/tools/ssh-key-generator'
     | '/tools/sudoku'
     | '/tools/tetris'
     | '/tools/text-to-speech'
@@ -1415,6 +1427,7 @@ export interface RootRouteChildren {
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
+  ToolsSshKeyGeneratorRoute: typeof ToolsSshKeyGeneratorRoute
   ToolsSudokuRoute: typeof ToolsSudokuRoute
   ToolsTetrisRoute: typeof ToolsTetrisRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
@@ -1643,6 +1656,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/sudoku'
       fullPath: '/tools/sudoku'
       preLoaderRoute: typeof ToolsSudokuRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/ssh-key-generator': {
+      id: '/tools/ssh-key-generator'
+      path: '/tools/ssh-key-generator'
+      fullPath: '/tools/ssh-key-generator'
+      preLoaderRoute: typeof ToolsSshKeyGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/split-pdf': {
@@ -2289,6 +2309,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
+  ToolsSshKeyGeneratorRoute: ToolsSshKeyGeneratorRoute,
   ToolsSudokuRoute: ToolsSudokuRoute,
   ToolsTetrisRoute: ToolsTetrisRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,

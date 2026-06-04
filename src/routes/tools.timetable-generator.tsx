@@ -13,7 +13,6 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
-  ShieldCheck,
   Globe2,
 } from "lucide-react";
 

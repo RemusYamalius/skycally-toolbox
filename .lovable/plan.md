@@ -1,31 +1,37 @@
-## DNS & IP Leak Check Tool
+## SSH Key Generator — /tools/ssh-key-generator
 
-### Overview
-Build a new tool page at `/tools/dns-leak-test` titled **"DNS & IP Leak Check"** that honestly shows the user's public IP geolocation and lets them self-assess whether their connection matches their expected VPN location.
+A new utility tool that generates SSH key pairs entirely in the browser. No backend, no uploads.
 
-### Page Structure
-- **ToolPageShell** with title "DNS & IP Leak Check" and standard description
-- **Status hero section**: green badge "Your connection appears secure ✓" or yellow badge "Your DNS may be leaking ⚠"
-- **Info cards** (3-column grid): Public IP, Detected Location (country + ISP + timezone), Leak Status
-- **VPN toggle section**: "Are you using a VPN?" checkbox + country `<select>` that appears when checked. Detected country compared against selected expected country.
-- **Honest disclaimer**: "For a complete DNS leak test, visit dnsleaktest.com" with link
-- **"Test Again" button** to re-fetch IP and geo data
-- **Standard components**: `HowToUse`, `ToolSeoContent` (with SEO title, description, 2-3 paragraph body, 4 FAQs), `RelatedTools`
-- **"No data is stored on our servers"** badge
+### Files
 
-### Data Flow
-1. On mount: `fetch('https://api.ipify.org?format=json')` → public IP
-2. Then: `fetch('https://ipapi.co/{IP}/json/')` → country, ISP, region, city, timezone
-3. User toggles VPN checkbox → selects expected country from dropdown
-4. Compare: detected country === expected country → green secure; mismatch → yellow warning
+1. **`src/routes/tools.ssh-key-generator.tsx`** (new) — full page
+2. **`src/lib/tools.ts`** — register tool (KeyRound icon, `utility` category)
+3. **`src/lib/related-tools.ts`** — link to `password-generator`, `hash-generator`, `uuid-generator`
 
-### Design
-- Matches existing Skycally dark theme using semantic CSS tokens (`--green-brand`, `--orange-brand`, `--cyan-brand`, `--violet-brand`, `--card`, `--border`, etc.)
-- Uses same card styling, motion animations (`framer-motion`), and layout patterns as the WebRTC Leak Test page
+### UI (matches Skycally dark theme via existing tokens + ToolPageShell)
 
-### Tool Registry
-- Add tool entry to `src/lib/tools.ts`: slug `dns-leak-test`, name `DNS & IP Leak Check`, category `utility`, Shield icon
-- Add `dns-leak-test` mapping to `related-tools.ts` pointing to `ip-address-lookup`, `network-speed-test`, `webrtc-leak-test`
+- **Options card**
+  - Key type select: `Ed25519 (recommended)`, `RSA 2048`, `RSA 3072`, `RSA 4096`
+  - Comment input (default `user@hostname`)
+  - "Generate Key Pair" button (shows spinner while working)
+- **Warning banner** (orange tone): "⚠ Never share your private key. Save it securely immediately."
+- **Result panels** (shown after generation)
+  - Public Key box — monospace, Copy button, "ssh-…" one-line OpenSSH format
+  - Private Key box — monospace, Copy button, red border + "PRIVATE — keep secret" label, OpenSSH PEM format
+  - "Download Keys" button → saves `id_<type>.pub` and `id_<type>` as `.txt` via Blob download
+- **Explanation section** (after results / inside ToolPageShell)
+  - What is SSH? / Public vs Private key / How to add to GitHub & servers (short paragraphs)
+- Standard `HowToUse`, `ToolSeoContent`, `RelatedTools` blocks
+- "No data is stored on our servers — keys are generated locally in your browser" badge (extends the shell's existing badge with a short note shown above results)
 
-### No Backend
-Everything runs in the browser using public APIs. No server functions, no database.
+### Crypto approach (all client-side)
+
+- **Ed25519**: `window.crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign","verify"])`, then export raw public key + PKCS8 private key. Encode to OpenSSH wire format manually (small helper: length-prefixed `ssh-ed25519` string + 32-byte pubkey, base64; private key in OpenSSH `-----BEGIN OPENSSH PRIVATE KEY-----` block).
+- **RSA**: load `node-forge` from CDN via existing `src/lib/cdnScript.ts` `loadScript` helper (`https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js`). Use `forge.pki.rsa.generateKeyPair({ bits, workers: -1 })` then `forge.ssh.publicKeyToOpenSSH(pub, comment)` and `forge.ssh.privateKeyToOpenSSH(priv)`.
+- Ed25519 browser support fallback: if `crypto.subtle.generateKey` throws on Ed25519 (older browsers), fall back to forge's ed25519 module from the same CDN bundle.
+
+### Notes
+
+- Pure frontend work — no server function, no env vars, no DB.
+- Follows existing tool-page conventions (ToolPageShell + HowToUse + ToolSeoContent + RelatedTools).
+- English-only copy throughout.

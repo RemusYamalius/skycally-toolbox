@@ -75,6 +75,20 @@ export const blogPosts: BlogPost[] = [
     thumbnail: developersToolsThumb,
     thumbnailAlt: "JSON Formatter tool interface",
   },
+  {
+    slug: "how-to-test-internet-speed-online-free",
+    path: "/blog/how-to-test-internet-speed-online-free",
+    title: "How to Test Your Internet Speed Online — Free & No Signup Required",
+    description:
+      "Check your download speed, upload speed, ping, and jitter instantly in your browser — no apps, no signup, completely free.",
+    category: "Network Tools",
+    date: "2026-06-04",
+    dateLabel: "June 4, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "network-speed-test",
+    thumbnail: networkSpeedTestThumb,
+    thumbnailAlt: "Network Speed Test tool interface",
+  },
 ];
 
 export const getBlogPostBySlug = (slug: string) =>

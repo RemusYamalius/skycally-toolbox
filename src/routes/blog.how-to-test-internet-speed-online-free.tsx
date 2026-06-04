@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { BlogPostLayout } from "@/components/blog-post-layout";
 import { getBlogPostBySlug } from "@/lib/blog";
 import { buildPageMeta } from "@/lib/seo";
+import networkSpeedTestThumb from "@/assets/blog-network-speed-test.png";
 
 const post = getBlogPostBySlug("how-to-test-internet-speed-online-free")!;
 

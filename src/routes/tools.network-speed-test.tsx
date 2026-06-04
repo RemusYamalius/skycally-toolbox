@@ -132,23 +132,36 @@ async function measureDownload(
   return (totalBytes * 8) / totalSec / 1e6;
 }
 
-async function measureUploadSpeed(controller: AbortController): Promise<number> {
-  const sizeMB = 5;
-  const totalBytes = sizeMB * 1024 * 1024;
-  const bytes = new Uint8Array(totalBytes);
-  const CHUNK = 65536;
-  for (let off = 0; off < totalBytes; off += CHUNK) {
-    crypto.getRandomValues(bytes.subarray(off, Math.min(off + CHUNK, totalBytes)));
+async function measureUploadSpeed(
+  controller: AbortController,
+  onLive: (mbps: number) => void,
+): Promise<number> {
+  const CHUNK_MB = 1;
+  const CHUNKS = 5;
+  const chunkBytes = CHUNK_MB * 1024 * 1024;
+  const buf = new Uint8Array(chunkBytes);
+  for (let off = 0; off < chunkBytes; off += 65536) {
+    crypto.getRandomValues(buf.subarray(off, Math.min(off + 65536, chunkBytes)));
   }
-  const t0 = performance.now();
-  await fetchWithRetry("https://speed-upload.skycally-tools.workers.dev", {
-    method: "POST",
-    body: bytes,
-    cache: "no-store",
-    signal: controller.signal,
-  });
-  const sec = (performance.now() - t0) / 1000;
-  return (sizeMB * 8) / sec;
+  const samples: { bytes: number; sec: number }[] = [];
+  for (let i = 0; i < CHUNKS; i++) {
+    const t0 = performance.now();
+    await fetchWithRetry("https://speed-upload.skycally-tools.workers.dev", {
+      method: "POST",
+      body: buf,
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    const sec = (performance.now() - t0) / 1000;
+    samples.push({ bytes: chunkBytes, sec });
+    const totalBytes = samples.reduce((a, s) => a + s.bytes, 0);
+    const totalSec = samples.reduce((a, s) => a + s.sec, 0);
+    onLive((totalBytes * 8) / totalSec / 1e6);
+    if (i < CHUNKS - 1) await new Promise((r) => setTimeout(r, 150));
+  }
+  const totalBytes = samples.reduce((a, s) => a + s.bytes, 0);
+  const totalSec = samples.reduce((a, s) => a + s.sec, 0);
+  return (totalBytes * 8) / totalSec / 1e6;
 }
 
 const MAX_MBPS = 500;
@@ -210,13 +223,15 @@ function SpeedGauge({
         <motion.path
           d={trackPath}
           fill="none"
-          stroke="url(#gaugeGrad)"
+          stroke={phase === "upload" ? "var(--violet-brand)" : "url(#gaugeGrad)"}
           strokeWidth={16}
           strokeLinecap="round"
           initial={{ pathLength: 0 }}
           animate={{ pathLength: progress }}
           transition={{ type: "spring", stiffness: 60, damping: 20, mass: 0.6 }}
-          style={{ filter: "drop-shadow(0 0 8px color-mix(in oklab, var(--cyan-brand) 50%, transparent))" }}
+          style={{
+            filter: `drop-shadow(0 0 8px color-mix(in oklab, ${phase === "upload" ? "var(--violet-brand)" : "var(--cyan-brand)"} 50%, transparent))`,
+          }}
         />
 
         {/* Ticks */}
@@ -259,9 +274,9 @@ function SpeedGauge({
         </div>
         <div
           className="font-display text-6xl font-bold tabular-nums leading-none mt-2"
-          style={{ color: "var(--cyan-brand)" }}
+          style={{ color: phase === "upload" ? "var(--violet-brand)" : "var(--cyan-brand)" }}
         >
-          {phase === "latency" ? fmtMs(pingMs) : phase === "upload" ? "…" : fmtMbps(clamped)}
+          {phase === "latency" ? fmtMs(pingMs) : fmtMbps(clamped)}
         </div>
         <div className="text-sm text-muted-foreground mt-2">
           {phase === "latency" ? "ms" : "Mbps"}
@@ -321,7 +336,7 @@ function NetworkSpeedTest() {
   const [phase, setPhase] = useState<Phase>("idle");
   const [, setProgress] = useState(0);
   const [results, setResults] = useState<Results>({ ping: 0, jitter: 0, download: 0, upload: 0 });
-  const [live, setLive] = useState({ download: 0 });
+  const [live, setLive] = useState({ download: 0, upload: 0 });
   const [error, setError] = useState<string | null>(null);
   const controllerRef = useRef<AbortController | null>(null);
 
@@ -330,7 +345,7 @@ function NetworkSpeedTest() {
   async function runTest() {
     setError(null);
     setResults({ ping: 0, jitter: 0, download: 0, upload: 0 });
-    setLive({ download: 0 });
+    setLive({ download: 0, upload: 0 });
     setProgress(0);
     const controller = new AbortController();
     controllerRef.current = controller;
@@ -344,14 +359,16 @@ function NetworkSpeedTest() {
 
       setPhase("download");
       const download = await measureDownload(controller, (mbps, pct) => {
-        setLive({ download: mbps });
+        setLive((l) => ({ ...l, download: mbps }));
         setProgress(15 + pct * 0.6);
       });
       setResults((r) => ({ ...r, download }));
-      setLive({ download });
+      setLive((l) => ({ ...l, download }));
 
       setPhase("upload");
-      const upload = await measureUploadSpeed(controller);
+      const upload = await measureUploadSpeed(controller, (mbps) => {
+        setLive((l) => ({ ...l, upload: mbps }));
+      });
       setResults((r) => ({ ...r, upload }));
 
       setProgress(100);
@@ -380,7 +397,7 @@ function NetworkSpeedTest() {
       : phase === "download"
         ? "Measuring download speed…"
         : phase === "upload"
-          ? "Testing upload…"
+          ? "Measuring upload speed…"
           : phase === "done"
             ? "Test complete"
             : phase === "error"
@@ -406,7 +423,15 @@ function NetworkSpeedTest() {
 
           <div className="mt-6 mb-2 relative">
             <SpeedGauge
-              mbps={phase === "download" ? live.download : phase === "done" || phase === "upload" ? results.download : 0}
+              mbps={
+                phase === "download"
+                  ? live.download
+                  : phase === "upload"
+                    ? live.upload
+                    : phase === "done"
+                      ? results.upload
+                      : 0
+              }
               phase={phase}
               pingMs={results.ping}
             />
@@ -488,9 +513,9 @@ function NetworkSpeedTest() {
           />
           <MetricCard
             label="Upload"
-            value={fmtMbps(results.upload)}
+            value={fmtMbps(phase === "upload" ? live.upload : results.upload)}
             unit="Mbps"
-            color="var(--cyan-brand)"
+            color="var(--violet-brand)"
             icon={Upload}
             highlight={phase === "upload"}
           />

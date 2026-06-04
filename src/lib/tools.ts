@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search, Keyboard, Bird, Crown, Circle, Hammer, Target, Rows3, Ghost, Spade, Puzzle, Pickaxe, Zap, Gauge, Globe, Network, Wifi } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search, Keyboard, Bird, Crown, Circle, Hammer, Target, Rows3, Ghost, Spade, Puzzle, Pickaxe, Zap, Gauge, Globe, Network, Wifi, KeyRound } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
@@ -129,6 +129,7 @@ export const tools: Tool[] = [
   { slug: "port-checker", name: "Port Checker", description: "Check whether a port is open on any host. Quick test for common ports right in your browser.", category: "utility", icon: Network, path: "/tools/port-checker" },
   { slug: "webrtc-leak-test", name: "WebRTC Leak Test", description: "Check if WebRTC is leaking your real IP address behind a VPN.", category: "utility", icon: Wifi, path: "/tools/webrtc-leak-test" },
   { slug: "dns-leak-test", name: "DNS & IP Leak Check", description: "Check your public IP, detected country and ISP — and compare with your expected VPN location.", category: "utility", icon: Shield, path: "/tools/dns-leak-test" },
+  { slug: "ssh-key-generator", name: "SSH Key Generator", description: "Generate Ed25519 or RSA SSH key pairs entirely in your browser — no backend, no uploads.", category: "utility", icon: KeyRound, path: "/tools/ssh-key-generator" },
 ];
 
 

@@ -78,6 +78,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "port-checker": ["ip-address-lookup", "network-speed-test", "qr-generator"],
   "webrtc-leak-test": ["ip-address-lookup", "network-speed-test", "port-checker"],
   "dns-leak-test": ["ip-address-lookup", "webrtc-leak-test", "port-checker"],
+  "ssh-key-generator": ["password-generator", "hash-generator", "uuid-generator"],
 };
 
 export function getRelatedTools(slug: string): Tool[] {

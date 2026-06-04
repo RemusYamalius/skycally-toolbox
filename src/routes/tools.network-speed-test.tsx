@@ -272,9 +272,9 @@ function SpeedGauge({
         </div>
         <div
           className="font-display text-6xl font-bold tabular-nums leading-none mt-2"
-          style={{ color: "var(--cyan-brand)" }}
+          style={{ color: phase === "upload" ? "var(--violet-brand)" : "var(--cyan-brand)" }}
         >
-          {phase === "latency" ? fmtMs(pingMs) : phase === "upload" ? "…" : fmtMbps(clamped)}
+          {phase === "latency" ? fmtMs(pingMs) : fmtMbps(clamped)}
         </div>
         <div className="text-sm text-muted-foreground mt-2">
           {phase === "latency" ? "ms" : "Mbps"}

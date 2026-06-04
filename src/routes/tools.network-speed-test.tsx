@@ -132,23 +132,36 @@ async function measureDownload(
   return (totalBytes * 8) / totalSec / 1e6;
 }
 
-async function measureUploadSpeed(controller: AbortController): Promise<number> {
-  const sizeMB = 5;
-  const totalBytes = sizeMB * 1024 * 1024;
-  const bytes = new Uint8Array(totalBytes);
-  const CHUNK = 65536;
-  for (let off = 0; off < totalBytes; off += CHUNK) {
-    crypto.getRandomValues(bytes.subarray(off, Math.min(off + CHUNK, totalBytes)));
+async function measureUploadSpeed(
+  controller: AbortController,
+  onLive: (mbps: number) => void,
+): Promise<number> {
+  const CHUNK_MB = 1;
+  const CHUNKS = 5;
+  const chunkBytes = CHUNK_MB * 1024 * 1024;
+  const buf = new Uint8Array(chunkBytes);
+  for (let off = 0; off < chunkBytes; off += 65536) {
+    crypto.getRandomValues(buf.subarray(off, Math.min(off + 65536, chunkBytes)));
   }
-  const t0 = performance.now();
-  await fetchWithRetry("https://speed-upload.skycally-tools.workers.dev", {
-    method: "POST",
-    body: bytes,
-    cache: "no-store",
-    signal: controller.signal,
-  });
-  const sec = (performance.now() - t0) / 1000;
-  return (sizeMB * 8) / sec;
+  const samples: { bytes: number; sec: number }[] = [];
+  for (let i = 0; i < CHUNKS; i++) {
+    const t0 = performance.now();
+    await fetchWithRetry("https://speed-upload.skycally-tools.workers.dev", {
+      method: "POST",
+      body: buf,
+      cache: "no-store",
+      signal: controller.signal,
+    });
+    const sec = (performance.now() - t0) / 1000;
+    samples.push({ bytes: chunkBytes, sec });
+    const totalBytes = samples.reduce((a, s) => a + s.bytes, 0);
+    const totalSec = samples.reduce((a, s) => a + s.sec, 0);
+    onLive((totalBytes * 8) / totalSec / 1e6);
+    if (i < CHUNKS - 1) await new Promise((r) => setTimeout(r, 150));
+  }
+  const totalBytes = samples.reduce((a, s) => a + s.bytes, 0);
+  const totalSec = samples.reduce((a, s) => a + s.sec, 0);
+  return (totalBytes * 8) / totalSec / 1e6;
 }
 
 const MAX_MBPS = 500;

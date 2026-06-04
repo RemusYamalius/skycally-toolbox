@@ -3,6 +3,7 @@ import { ArrowRight } from "lucide-react";
 import { BlogPostLayout } from "@/components/blog-post-layout";
 import { getBlogPostBySlug } from "@/lib/blog";
 import { buildPageMeta } from "@/lib/seo";
+import networkSpeedTestThumb from "@/assets/blog-network-speed-test.png";
 
 const post = getBlogPostBySlug("how-to-test-internet-speed-online-free")!;
 
@@ -113,7 +114,7 @@ function ArticlePage() {
         <li>Read your results — each metric is shown in its own card with a clear value</li>
       </ol>
       <img
-        src="https://www.pinterest.com/pin/1100356121480435073"
+        src={networkSpeedTestThumb}
         alt="Network Speed Test - Skycally"
         className="my-8 w-full rounded-2xl border border-border"
         loading="lazy"
@@ -170,14 +171,14 @@ function ArticlePage() {
         <li><strong>Measures ping and jitter</strong>, not just download speed — so you get the full picture</li>
         <li><strong>100% free, with no ads in the test</strong></li>
       </ul>
-      <p>
+      <div className="mt-6">
         <Link
           to="/tools/network-speed-test"
-          className="mt-2 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground no-underline transition hover:opacity-90"
+          className="inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold !text-primary-foreground !no-underline transition hover:opacity-90"
         >
           Run a free speed test <ArrowRight className="w-4 h-4" />
         </Link>
-      </p>
+      </div>
     </BlogPostLayout>
   );
 }

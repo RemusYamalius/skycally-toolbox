@@ -13,7 +13,6 @@ import {
   ChevronLeft,
   ChevronRight,
   AlertTriangle,
-  ShieldCheck,
   Globe2,
 } from "lucide-react";
 
@@ -709,12 +708,8 @@ function TimetableGeneratorPage() {
       `}</style>
 
       <div dir={isRTL ? "rtl" : "ltr"} className="space-y-6">
-        {/* No-storage badge + language selector */}
+        {/* Language selector */}
         <div className={`flex flex-wrap items-center gap-3 ${isRTL ? "flex-row-reverse" : ""}`}>
-          <div className="inline-flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-3 py-1.5 text-xs text-muted-foreground">
-            <ShieldCheck className="w-3.5 h-3.5" style={{ color: "var(--green-brand)" }} />
-            {t.noStored}
-          </div>
           <div className={`relative ${isRTL ? "mr-auto" : "ml-auto"}`}>
             <Button variant="outline" size="sm" onClick={() => setLangOpen((o) => !o)} className="gap-2">
               <Globe2 className="w-4 h-4" />

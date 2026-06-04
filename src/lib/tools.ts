@@ -128,6 +128,7 @@ export const tools: Tool[] = [
   { slug: "ip-address-lookup", name: "IP Address Lookup", description: "Look up any IP address to see its country, city, ISP, timezone and coordinates.", category: "utility", icon: Globe, path: "/tools/ip-address-lookup" },
   { slug: "port-checker", name: "Port Checker", description: "Check whether a port is open on any host. Quick test for common ports right in your browser.", category: "utility", icon: Network, path: "/tools/port-checker" },
   { slug: "webrtc-leak-test", name: "WebRTC Leak Test", description: "Check if WebRTC is leaking your real IP address behind a VPN.", category: "utility", icon: Wifi, path: "/tools/webrtc-leak-test" },
+  { slug: "dns-leak-test", name: "DNS & IP Leak Check", description: "Check your public IP, detected country and ISP — and compare with your expected VPN location.", category: "utility", icon: Shield, path: "/tools/dns-leak-test" },
 ];
 
 

@@ -2,6 +2,7 @@ import compressPdfThumb from "@/assets/blog-compress-pdf.png";
 import videoToGifThumb from "@/assets/blog-video-to-gif.png";
 import designersToolsThumb from "@/assets/blog-designers-tools.png";
 import developersToolsThumb from "@/assets/blog-developers-tools.png";
+import networkSpeedTestThumb from "@/assets/blog-network-speed-test.png";
 
 export interface BlogPost {
   slug: string;
@@ -73,6 +74,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "json-formatter",
     thumbnail: developersToolsThumb,
     thumbnailAlt: "JSON Formatter tool interface",
+  },
+  {
+    slug: "how-to-test-internet-speed-online-free",
+    path: "/blog/how-to-test-internet-speed-online-free",
+    title: "How to Test Your Internet Speed Online — Free & No Signup Required",
+    description:
+      "Check your download speed, upload speed, ping, and jitter instantly in your browser — no apps, no signup, completely free.",
+    category: "Network Tools",
+    date: "2026-06-04",
+    dateLabel: "June 4, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "network-speed-test",
+    thumbnail: networkSpeedTestThumb,
+    thumbnailAlt: "Network Speed Test tool interface",
   },
 ];
 

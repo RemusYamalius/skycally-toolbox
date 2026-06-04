@@ -1,37 +1,35 @@
-## SSH Key Generator — /tools/ssh-key-generator
+## New blog post: "How to Test Your Internet Speed Online — Free & No Signup Required"
 
-A new utility tool that generates SSH key pairs entirely in the browser. No backend, no uploads.
+Matches the existing blog post structure (compress-pdf, video-to-gif, designers-tools, developers-tools).
 
 ### Files
 
-1. **`src/routes/tools.ssh-key-generator.tsx`** (new) — full page
-2. **`src/lib/tools.ts`** — register tool (KeyRound icon, `utility` category)
-3. **`src/lib/related-tools.ts`** — link to `password-generator`, `hash-generator`, `uuid-generator`
+1. **`src/assets/blog-network-speed-test.png`** (new, generated via imagegen) — thumbnail in the same screenshot style as other blog hero images. Shows the Skycally Network Speed Test UI with download/upload/ping/jitter readouts on the dark theme.
 
-### UI (matches Skycally dark theme via existing tokens + ToolPageShell)
+2. **`src/lib/blog.ts`** — append new `BlogPost` entry:
+   - `slug: "how-to-test-internet-speed-online-free"`
+   - `path: "/blog/how-to-test-internet-speed-online-free"`
+   - `title`, `description`, `category: "Network Tools"` (sentence-case to match the existing pattern — the UI uppercases it via CSS), `date: "2026-06-04"`, `dateLabel: "June 4, 2026"`
+   - `author: "Skycally Team"`, `ctaToolSlug: "network-speed-test"`
+   - `thumbnail` import, `thumbnailAlt: "Network Speed Test tool interface"`
 
-- **Options card**
-  - Key type select: `Ed25519 (recommended)`, `RSA 2048`, `RSA 3072`, `RSA 4096`
-  - Comment input (default `user@hostname`)
-  - "Generate Key Pair" button (shows spinner while working)
-- **Warning banner** (orange tone): "⚠ Never share your private key. Save it securely immediately."
-- **Result panels** (shown after generation)
-  - Public Key box — monospace, Copy button, "ssh-…" one-line OpenSSH format
-  - Private Key box — monospace, Copy button, red border + "PRIVATE — keep secret" label, OpenSSH PEM format
-  - "Download Keys" button → saves `id_<type>.pub` and `id_<type>` as `.txt` via Blob download
-- **Explanation section** (after results / inside ToolPageShell)
-  - What is SSH? / Public vs Private key / How to add to GitHub & servers (short paragraphs)
-- Standard `HowToUse`, `ToolSeoContent`, `RelatedTools` blocks
-- "No data is stored on our servers — keys are generated locally in your browser" badge (extends the shell's existing badge with a short note shown above results)
+3. **`src/routes/blog.how-to-test-internet-speed-online-free.tsx`** (new) — same shape as `blog.compress-pdf-online-free.tsx`:
+   - `createFileRoute("/blog/how-to-test-internet-speed-online-free")`
+   - `head()` returns `buildPageMeta(...)` + `og:type: article` + JSON-LD Article schema
+   - `<BlogPostLayout post={post}>` wraps the content
+   - Content sections (h2 + p/ul/ol, no inline styles — uses BlogPostLayout's prose styles):
+     1. **What Is an Internet Speed Test?** — paragraph + ul defining Download, Upload, Ping, Jitter
+     2. **Why Your Internet Speed Matters** — intro paragraph + HTML `<table>` (Activity | Recommended Speed): HD Streaming 5 Mbps, 4K Streaming 25 Mbps, Video Calls 3 Mbps, Online Gaming 10 Mbps, Working From Home 25+ Mbps. Table gets minimal Tailwind classes to render on the dark theme since the layout's prose styles don't target tables.
+     3. **How to Test Your Speed with Skycally** — ordered list (Open the tool → Click Run Test → Wait ~15s → View results), with link `<a href="/tools/network-speed-test">`. Immediately after the ol, an `<img src="https://www.pinterest.com/pin/1100356121480435073" alt="Network Speed Test - Skycally" />` per user request.
+     4. **Understanding Your Results** — h3/h4-grouped paragraphs for Download (good/bad), Upload, Ping (<30 ms great), Jitter (<10 ms great)
+     5. **Tips to Improve Your Internet Speed** — 5-item `<ol>`: restart router, use 5 GHz / wired, move closer to router, close bandwidth-heavy apps, upgrade plan or contact ISP
+     6. **Why Use Skycally's Speed Test?** — `<ul>` (no signup, runs in browser, powered by Cloudflare, accurate ping/jitter, fully free) ending with `<Link to="/tools/network-speed-test">` styled CTA button matching the `BlogPostLayout` CTA aside style
 
-### Crypto approach (all client-side)
+### Untouched
 
-- **Ed25519**: `window.crypto.subtle.generateKey({ name: "Ed25519" }, true, ["sign","verify"])`, then export raw public key + PKCS8 private key. Encode to OpenSSH wire format manually (small helper: length-prefixed `ssh-ed25519` string + 32-byte pubkey, base64; private key in OpenSSH `-----BEGIN OPENSSH PRIVATE KEY-----` block).
-- **RSA**: load `node-forge` from CDN via existing `src/lib/cdnScript.ts` `loadScript` helper (`https://cdn.jsdelivr.net/npm/node-forge@1.3.1/dist/forge.min.js`). Use `forge.pki.rsa.generateKeyPair({ bits, workers: -1 })` then `forge.ssh.publicKeyToOpenSSH(pub, comment)` and `forge.ssh.privateKeyToOpenSSH(priv)`.
-- Ed25519 browser support fallback: if `crypto.subtle.generateKey` throws on Ed25519 (older browsers), fall back to forge's ed25519 module from the same CDN bundle.
+- Existing posts and `BlogPostLayout` component are NOT modified.
+- `routeTree.gen.ts` regenerates automatically from the new route file.
 
 ### Notes
 
-- Pure frontend work — no server function, no env vars, no DB.
-- Follows existing tool-page conventions (ToolPageShell + HowToUse + ToolSeoContent + RelatedTools).
-- English-only copy throughout.
+- The Pinterest URL the user provided (`pinterest.com/pin/...`) is an HTML page, not an image asset, so it will render as a broken image in browsers. I'll wire it in exactly as requested per the user's instruction, but flag this in the closing message so they can swap it for a direct image URL if desired.

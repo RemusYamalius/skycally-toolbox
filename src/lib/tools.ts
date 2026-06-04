@@ -130,6 +130,7 @@ export const tools: Tool[] = [
   { slug: "webrtc-leak-test", name: "WebRTC Leak Test", description: "Check if WebRTC is leaking your real IP address behind a VPN.", category: "utility", icon: Wifi, path: "/tools/webrtc-leak-test" },
   { slug: "dns-leak-test", name: "DNS & IP Leak Check", description: "Check your public IP, detected country and ISP — and compare with your expected VPN location.", category: "utility", icon: Shield, path: "/tools/dns-leak-test" },
   { slug: "ssh-key-generator", name: "SSH Key Generator", description: "Generate Ed25519 or RSA SSH key pairs entirely in your browser — no backend, no uploads.", category: "utility", icon: KeyRound, path: "/tools/ssh-key-generator" },
+  { slug: "timetable-generator", name: "School Timetable Generator", description: "Build school timetables in 10 languages, with logo, classes, teachers, and PDF/Excel export.", category: "utility", icon: CalendarDays, path: "/tools/timetable-generator" },
 ];
 
 

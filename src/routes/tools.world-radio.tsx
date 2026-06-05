@@ -262,7 +262,8 @@ function WorldRadioPage() {
           apiFetch<Country[]>("/countries"),
         ]);
         if (!alive) return;
-        setStations(top.filter(s => s.url_resolved));
+        const filtered = top.filter(s => s.url_resolved && !PINNED_IDS.has(s.stationuuid));
+        setStations([...PINNED_STATIONS, ...filtered]);
         setCountries(cs.filter(c => c.stationcount > 5).sort((a, b) => a.name.localeCompare(b.name)));
       } catch (e) {
         toast.error("Failed to load radio stations");

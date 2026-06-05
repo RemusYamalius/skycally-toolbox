@@ -466,6 +466,9 @@ function WorldRadioPage() {
       return true;
     });
     out = [...out].sort((a, b) => {
+      const ap = isPinned(a.stationuuid) ? 1 : 0;
+      const bp = isPinned(b.stationuuid) ? 1 : 0;
+      if (ap !== bp) return bp - ap;
       if (sort === "name") return a.name.localeCompare(b.name);
       if (sort === "bitrate") return (b.bitrate ?? 0) - (a.bitrate ?? 0);
       return (b.votes ?? 0) - (a.votes ?? 0);

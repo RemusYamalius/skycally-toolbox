@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { Play, Pause, Heart, Loader2, Search, Radio as RadioIcon, Volume2, MapPin } from "lucide-react";
+import { Play, Pause, Heart, Loader2, Search, Radio as RadioIcon, Volume2, MapPin, Star } from "lucide-react";
 import { toast } from "sonner";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";

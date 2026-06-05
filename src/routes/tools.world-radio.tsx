@@ -263,6 +263,7 @@ function WorldRadioPage() {
       mapRef.current = map;
       clusterRef.current = L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 50 });
       map.addLayer(clusterRef.current);
+      setTimeout(() => { try { map.invalidateSize(); } catch {} }, 100);
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(
@@ -272,8 +273,13 @@ function WorldRadioPage() {
         );
       }
     })();
+    const onResize = () => { try { mapRef.current?.invalidateSize(); } catch {} };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
     return () => {
       cancelled = true;
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
       if (mapRef.current) { try { mapRef.current.remove(); } catch {} mapRef.current = null; }
     };
   }, []);
@@ -443,9 +449,9 @@ function WorldRadioPage() {
         .leaflet-container { background: #0a0a0a; }
       `}</style>
 
-      <div className="grid gap-4 md:grid-cols-[2fr_3fr] pb-28">
+      <div className="grid gap-4 grid-cols-1 md:grid-cols-[40fr_60fr] lg:grid-cols-[35fr_65fr] pb-28 max-w-full overflow-x-hidden">
         {/* Left panel */}
-        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card/50 p-3 md:order-1 order-2 md:h-[70vh]">
+        <div className="flex flex-col gap-3 rounded-xl border border-border bg-card/50 p-3 md:order-1 order-2 min-w-0 md:h-[60vh] lg:h-[75vh]">
           <div className="flex gap-2 text-sm">
             <button onClick={() => setTab("all")} className={`flex-1 py-2 rounded-md border transition-colors ${tab === "all" ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}>All Stations</button>
             <button onClick={() => setTab("fav")} className={`flex-1 py-2 rounded-md border transition-colors ${tab === "fav" ? "border-primary bg-primary/10 text-foreground" : "border-border text-muted-foreground hover:text-foreground"}`}>Favourites ({favs.length})</button>
@@ -453,40 +459,40 @@ function WorldRadioPage() {
 
           <div className="relative">
             <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-            <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search name, country, genre..." className="pl-9" />
+            <Input value={query} onChange={e => setQuery(e.target.value)} placeholder="Search name, country, genre..." className="pl-9 w-full" />
           </div>
 
-          <div className="grid grid-cols-2 gap-2">
+          <div className="grid grid-cols-1 sm:grid-cols-2 gap-2">
             <Select value={country || "all"} onValueChange={v => setCountry(v === "all" ? "" : v)}>
-              <SelectTrigger><SelectValue placeholder="Country" /></SelectTrigger>
+              <SelectTrigger className="w-full min-w-0"><SelectValue placeholder="Country" /></SelectTrigger>
               <SelectContent className="max-h-64">
                 <SelectItem value="all">All countries</SelectItem>
                 {countries.map(c => <SelectItem key={c.iso_3166_1} value={c.iso_3166_1}>{c.name}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={tag || "all"} onValueChange={v => setTag(v === "all" ? "" : v)}>
-              <SelectTrigger><SelectValue placeholder="Genre" /></SelectTrigger>
+              <SelectTrigger className="w-full min-w-0"><SelectValue placeholder="Genre" /></SelectTrigger>
               <SelectContent>
                 <SelectItem value="all">All genres</SelectItem>
                 {TAGS.filter(Boolean).map(t => <SelectItem key={t} value={t}>{t[0].toUpperCase() + t.slice(1)}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={language || "all"} onValueChange={v => setLanguage(v === "all" ? "" : v)}>
-              <SelectTrigger><SelectValue placeholder="Language" /></SelectTrigger>
+              <SelectTrigger className="w-full min-w-0"><SelectValue placeholder="Language" /></SelectTrigger>
               <SelectContent className="max-h-64">
                 <SelectItem value="all">All languages</SelectItem>
                 {languageOptions.map(l => <SelectItem key={l} value={l}>{l}</SelectItem>)}
               </SelectContent>
             </Select>
             <Select value={sort} onValueChange={setSort}>
-              <SelectTrigger><SelectValue /></SelectTrigger>
+              <SelectTrigger className="w-full min-w-0"><SelectValue /></SelectTrigger>
               <SelectContent>
                 {SORTS.map(s => <SelectItem key={s.value} value={s.value}>Sort: {s.label}</SelectItem>)}
               </SelectContent>
             </Select>
           </div>
 
-          <div className="flex-1 overflow-y-auto -mx-1 px-1 space-y-1.5 min-h-[300px]">
+          <div className="flex-1 overflow-y-auto -mx-1 px-1 space-y-1.5 min-h-[300px] max-h-[calc(100vh-45vh-9rem)] md:max-h-none">
             {loading && <div className="flex justify-center py-10"><Loader2 className="w-6 h-6 animate-spin text-muted-foreground" /></div>}
             {!loading && visible.length === 0 && (
               <div className="text-center py-10 text-sm text-muted-foreground">No stations found</div>
@@ -527,7 +533,7 @@ function WorldRadioPage() {
         </div>
 
         {/* Map */}
-        <div className="rounded-xl border border-border overflow-hidden md:order-2 order-1 h-[50vh] md:h-[70vh]">
+        <div className="rounded-xl border border-border overflow-hidden md:order-2 order-1 min-w-0 h-[45vh] md:h-[60vh] lg:min-h-[75vh] lg:h-[75vh]">
           <div ref={mapElRef} className="w-full h-full" />
         </div>
       </div>

@@ -431,6 +431,13 @@ function WorldRadioPage() {
 
   const onAudioError = () => {
     if (!current) return;
+    const isHttp = current.url_resolved.startsWith("http://");
+    if (isHttp && typeof window !== "undefined" && window.location.protocol === "https:") {
+      toast.error(`This stream uses HTTP — try opening it directly: ${current.url_resolved}`);
+      setPlaying(false);
+      setBuffering(false);
+      return;
+    }
     if (!retryRef.current) {
       retryRef.current = true;
       setTimeout(() => {

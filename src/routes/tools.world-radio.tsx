@@ -576,7 +576,12 @@ function WorldRadioPage() {
                     ) : <RadioIcon className="w-4 h-4 text-muted-foreground" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{s.name}</div>
+                    <div className="text-sm font-medium truncate flex items-center gap-1">
+                      {isPinned(s.stationuuid) && (
+                        <Star className="w-3.5 h-3.5 fill-current text-yellow-400 shrink-0" aria-label="Featured" />
+                      )}
+                      <span className="truncate">{s.name}</span>
+                    </div>
                     <div className="text-xs text-muted-foreground truncate">
                       {flagEmoji(s.countrycode)} {s.country || "Unknown"} · {(s.tags ?? "").split(",")[0] || "—"}
                     </div>

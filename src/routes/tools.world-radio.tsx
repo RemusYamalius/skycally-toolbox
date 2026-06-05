@@ -181,7 +181,7 @@ function WorldRadioPage() {
     (async () => {
       try {
         const [top, cs] = await Promise.all([
-          apiFetch<Station[]>("/stations/topvote/200"),
+          apiFetch<Station[]>("/stations/topvote/300"),
           apiFetch<Country[]>("/countries"),
         ]);
         if (!alive) return;

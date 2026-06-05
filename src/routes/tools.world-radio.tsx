@@ -336,9 +336,10 @@ function WorldRadioPage() {
   useEffect(() => {
     if (!country) return;
     let alive = true;
+    setFetching(true);
     (async () => {
       try {
-        const found = await apiFetch<Station[]>(`/stations/bycountrycodeexact/${country}?limit=500&hidebroken=true&order=votes&reverse=true`);
+        const found = await apiFetch<Station[]>(`/stations/bycountrycodeexact/${country}?limit=1000&hidebroken=true&order=votes&reverse=true`);
         if (!alive) return;
         setStations(prev => {
           const seen = new Set(prev.map(s => s.stationuuid));
@@ -346,9 +347,30 @@ function WorldRadioPage() {
           return fresh.length ? [...prev, ...fresh] : prev;
         });
       } catch {}
+      finally { if (alive) setFetching(false); }
     })();
     return () => { alive = false; };
   }, [country]);
+
+  // Fetch more stations when a genre/tag filter is selected
+  useEffect(() => {
+    if (!tag) return;
+    let alive = true;
+    setFetching(true);
+    (async () => {
+      try {
+        const found = await apiFetch<Station[]>(`/stations/bytag/${encodeURIComponent(tag)}?limit=1000&hidebroken=true&order=votes&reverse=true`);
+        if (!alive) return;
+        setStations(prev => {
+          const seen = new Set(prev.map(s => s.stationuuid));
+          const fresh = found.filter(s => s.url_resolved && !seen.has(s.stationuuid));
+          return fresh.length ? [...prev, ...fresh] : prev;
+        });
+      } catch {}
+      finally { if (alive) setFetching(false); }
+    })();
+    return () => { alive = false; };
+  }, [tag]);
 
   const playStation = useCallback((s: Station) => {
     setCurrent(s);

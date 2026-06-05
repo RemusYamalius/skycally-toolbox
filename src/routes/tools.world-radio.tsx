@@ -182,6 +182,7 @@ function WorldRadioPage() {
   const [stations, setStations] = useState<Station[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const [query, setQuery] = useState("");
   const [country, setCountry] = useState("");
   const [tag, setTag] = useState("");
@@ -226,7 +227,7 @@ function WorldRadioPage() {
     (async () => {
       try {
         const [top, cs] = await Promise.all([
-          apiFetch<Station[]>("/stations/topvote/1000"),
+          apiFetch<Station[]>("/stations/topvote/3000"),
           apiFetch<Country[]>("/countries"),
         ]);
         if (!alive) return;
@@ -335,9 +336,10 @@ function WorldRadioPage() {
   useEffect(() => {
     if (!country) return;
     let alive = true;
+    setFetching(true);
     (async () => {
       try {
-        const found = await apiFetch<Station[]>(`/stations/bycountrycodeexact/${country}?limit=500&hidebroken=true&order=votes&reverse=true`);
+        const found = await apiFetch<Station[]>(`/stations/bycountrycodeexact/${country}?limit=1000&hidebroken=true&order=votes&reverse=true`);
         if (!alive) return;
         setStations(prev => {
           const seen = new Set(prev.map(s => s.stationuuid));
@@ -345,9 +347,30 @@ function WorldRadioPage() {
           return fresh.length ? [...prev, ...fresh] : prev;
         });
       } catch {}
+      finally { if (alive) setFetching(false); }
     })();
     return () => { alive = false; };
   }, [country]);
+
+  // Fetch more stations when a genre/tag filter is selected
+  useEffect(() => {
+    if (!tag) return;
+    let alive = true;
+    setFetching(true);
+    (async () => {
+      try {
+        const found = await apiFetch<Station[]>(`/stations/bytag/${encodeURIComponent(tag)}?limit=1000&hidebroken=true&order=votes&reverse=true`);
+        if (!alive) return;
+        setStations(prev => {
+          const seen = new Set(prev.map(s => s.stationuuid));
+          const fresh = found.filter(s => s.url_resolved && !seen.has(s.stationuuid));
+          return fresh.length ? [...prev, ...fresh] : prev;
+        });
+      } catch {}
+      finally { if (alive) setFetching(false); }
+    })();
+    return () => { alive = false; };
+  }, [tag]);
 
   const playStation = useCallback((s: Station) => {
     setCurrent(s);
@@ -533,8 +556,16 @@ function WorldRadioPage() {
         </div>
 
         {/* Map */}
-        <div className="rounded-xl border border-border overflow-hidden md:order-2 order-1 min-w-0 h-[45vh] md:h-[60vh] lg:min-h-[75vh] lg:h-[75vh]">
+        <div className="relative rounded-xl border border-border overflow-hidden md:order-2 order-1 min-w-0 h-[45vh] md:h-[60vh] lg:min-h-[75vh] lg:h-[75vh]">
           <div ref={mapElRef} className="w-full h-full" />
+          {(loading || fetching) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-[1px] pointer-events-none z-[400]">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-card/80 border border-border text-sm text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading stations...
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

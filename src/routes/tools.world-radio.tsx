@@ -556,8 +556,16 @@ function WorldRadioPage() {
         </div>
 
         {/* Map */}
-        <div className="rounded-xl border border-border overflow-hidden md:order-2 order-1 min-w-0 h-[45vh] md:h-[60vh] lg:min-h-[75vh] lg:h-[75vh]">
+        <div className="relative rounded-xl border border-border overflow-hidden md:order-2 order-1 min-w-0 h-[45vh] md:h-[60vh] lg:min-h-[75vh] lg:h-[75vh]">
           <div ref={mapElRef} className="w-full h-full" />
+          {(loading || fetching) && (
+            <div className="absolute inset-0 flex items-center justify-center bg-background/40 backdrop-blur-[1px] pointer-events-none z-[400]">
+              <div className="flex items-center gap-2 px-3 py-2 rounded-md bg-card/80 border border-border text-sm text-muted-foreground">
+                <Loader2 className="w-4 h-4 animate-spin" />
+                Loading stations...
+              </div>
+            </div>
+          )}
         </div>
       </div>
 

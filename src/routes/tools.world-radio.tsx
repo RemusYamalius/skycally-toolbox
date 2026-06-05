@@ -320,6 +320,7 @@ function WorldRadioPage() {
       fillOpacity: 0.15,
       weight: 2,
       className: "wr-pulse-ring",
+      interactive: false,
     }).addTo(mapRef.current);
     try { mapRef.current.flyTo(coords, Math.max(mapRef.current.getZoom(), 5), { duration: 0.8 }); } catch {}
   }, [current]);

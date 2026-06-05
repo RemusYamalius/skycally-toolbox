@@ -272,8 +272,13 @@ function WorldRadioPage() {
         );
       }
     })();
+    const onResize = () => { try { mapRef.current?.invalidateSize(); } catch {} };
+    window.addEventListener("resize", onResize);
+    window.addEventListener("orientationchange", onResize);
     return () => {
       cancelled = true;
+      window.removeEventListener("resize", onResize);
+      window.removeEventListener("orientationchange", onResize);
       if (mapRef.current) { try { mapRef.current.remove(); } catch {} mapRef.current = null; }
     };
   }, []);

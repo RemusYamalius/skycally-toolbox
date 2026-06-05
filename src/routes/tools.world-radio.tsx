@@ -51,6 +51,37 @@ const SORTS = [
   { value: "bitrate", label: "Bitrate" },
 ];
 
+const PINNED_STATIONS: Station[] = [
+  {
+    stationuuid: "pinned-tarab-radio-ma",
+    name: "إذاعة الطرب العربي (Tarab Radio)",
+    url_resolved: "https://stream.zeno.fm/fy8achbq97zuv",
+    url: "https://stream.zeno.fm/fy8achbq97zuv",
+    country: "Morocco",
+    countrycode: "MA",
+    geo_lat: 33.9716,
+    geo_long: -6.8498,
+    tags: "arabic, classical, tarab",
+    favicon: "https://www.tarabradio.ma/favicon.ico",
+    votes: 9999,
+  },
+  {
+    stationuuid: "pinned-rotana-tarab-jo",
+    name: "روتانا طرب الأردن (Rotana Tarab Jordan)",
+    url_resolved: "http://45.63.116.205:8000/stream3",
+    url: "http://45.63.116.205:8000/stream3",
+    country: "Jordan",
+    countrycode: "JO",
+    geo_lat: 31.9539,
+    geo_long: 35.9106,
+    tags: "arabic, music, oldies, jordan",
+    favicon: "https://www.rotanaradio.jo/favicon.ico",
+    votes: 9998,
+  },
+];
+const PINNED_IDS = new Set(PINNED_STATIONS.map(s => s.stationuuid));
+const isPinned = (uuid: string) => PINNED_IDS.has(uuid);
+
 function flagEmoji(cc?: string) {
   if (!cc || cc.length !== 2) return "🏳️";
   const A = 0x1f1e6;

@@ -68,8 +68,8 @@ const PINNED_STATIONS: Station[] = [
   {
     stationuuid: "pinned-rotana-tarab-jo",
     name: "روتانا طرب الأردن (Rotana Tarab Jordan)",
-    url_resolved: "http://45.63.116.205:8000/stream3",
-    url: "http://45.63.116.205:8000/stream3",
+    url_resolved: "https://stream.zeno.fm/rotana-tarab",
+    url: "https://stream.zeno.fm/rotana-tarab",
     country: "Jordan",
     countrycode: "JO",
     geo_lat: 31.9539,
@@ -431,13 +431,6 @@ function WorldRadioPage() {
 
   const onAudioError = () => {
     if (!current) return;
-    const isHttp = current.url_resolved.startsWith("http://");
-    if (isHttp && typeof window !== "undefined" && window.location.protocol === "https:") {
-      toast.error(`This stream uses HTTP — try opening it directly: ${current.url_resolved}`);
-      setPlaying(false);
-      setBuffering(false);
-      return;
-    }
     if (!retryRef.current) {
       retryRef.current = true;
       setTimeout(() => {

@@ -154,8 +154,8 @@ function getStationCoords(s: Station): [number, number] | null {
   if (cc && CAPITALS[cc]) {
     const [clat, clng] = CAPITALS[cc];
     const h = hashStr(s.stationuuid);
-    const jLat = (((h & 0xffff) / 0xffff) - 0.5) * 0.8;
-    const jLng = ((((h >>> 16) & 0xffff) / 0xffff) - 0.5) * 0.8;
+    const jLat = (((h & 0xffff) / 0xffff) - 0.5) * 1.0;
+    const jLng = ((((h >>> 16) & 0xffff) / 0xffff) - 0.5) * 1.0;
     return [clat + jLat, clng + jLng];
   }
   return null;

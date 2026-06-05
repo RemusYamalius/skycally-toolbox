@@ -263,6 +263,7 @@ function WorldRadioPage() {
       mapRef.current = map;
       clusterRef.current = L.markerClusterGroup({ chunkedLoading: true, maxClusterRadius: 50 });
       map.addLayer(clusterRef.current);
+      setTimeout(() => { try { map.invalidateSize(); } catch {} }, 100);
 
       if (navigator.geolocation) {
         navigator.geolocation.getCurrentPosition(

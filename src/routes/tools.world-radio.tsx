@@ -527,7 +527,7 @@ function WorldRadioPage() {
         </div>
 
         {/* Map */}
-        <div className="rounded-xl border border-border overflow-hidden md:order-2 order-1 h-[50vh] md:h-[70vh]">
+        <div className="rounded-xl border border-border overflow-hidden md:order-2 order-1 min-w-0 h-[45vh] md:h-[60vh] lg:min-h-[75vh] lg:h-[75vh]">
           <div ref={mapElRef} className="w-full h-full" />
         </div>
       </div>

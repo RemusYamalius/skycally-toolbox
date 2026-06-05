@@ -182,6 +182,7 @@ function WorldRadioPage() {
   const [stations, setStations] = useState<Station[]>([]);
   const [countries, setCountries] = useState<Country[]>([]);
   const [loading, setLoading] = useState(true);
+  const [fetching, setFetching] = useState(false);
   const [query, setQuery] = useState("");
   const [country, setCountry] = useState("");
   const [tag, setTag] = useState("");

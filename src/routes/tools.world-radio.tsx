@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState, useCallback } from "react";
-import { Play, Pause, Heart, Loader2, Search, Radio as RadioIcon, Volume2, MapPin } from "lucide-react";
+import { Play, Pause, Heart, Loader2, Search, Radio as RadioIcon, Volume2, MapPin, Star } from "lucide-react";
 import { toast } from "sonner";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
@@ -50,6 +50,37 @@ const SORTS = [
   { value: "name", label: "Name" },
   { value: "bitrate", label: "Bitrate" },
 ];
+
+const PINNED_STATIONS: Station[] = [
+  {
+    stationuuid: "pinned-tarab-radio-ma",
+    name: "إذاعة الطرب العربي (Tarab Radio)",
+    url_resolved: "https://stream.zeno.fm/fy8achbq97zuv",
+    url: "https://stream.zeno.fm/fy8achbq97zuv",
+    country: "Morocco",
+    countrycode: "MA",
+    geo_lat: 33.9716,
+    geo_long: -6.8498,
+    tags: "arabic, classical, tarab",
+    favicon: "https://www.tarabradio.ma/favicon.ico",
+    votes: 9999,
+  },
+  {
+    stationuuid: "pinned-rotana-tarab-jo",
+    name: "روتانا طرب الأردن (Rotana Tarab Jordan)",
+    url_resolved: "http://45.63.116.205:8000/stream3",
+    url: "http://45.63.116.205:8000/stream3",
+    country: "Jordan",
+    countrycode: "JO",
+    geo_lat: 31.9539,
+    geo_long: 35.9106,
+    tags: "arabic, music, oldies, jordan",
+    favicon: "https://www.rotanaradio.jo/favicon.ico",
+    votes: 9998,
+  },
+];
+const PINNED_IDS = new Set(PINNED_STATIONS.map(s => s.stationuuid));
+const isPinned = (uuid: string) => PINNED_IDS.has(uuid);
 
 function flagEmoji(cc?: string) {
   if (!cc || cc.length !== 2) return "🏳️";
@@ -231,7 +262,8 @@ function WorldRadioPage() {
           apiFetch<Country[]>("/countries"),
         ]);
         if (!alive) return;
-        setStations(top.filter(s => s.url_resolved));
+        const filtered = top.filter(s => s.url_resolved && !PINNED_IDS.has(s.stationuuid));
+        setStations([...PINNED_STATIONS, ...filtered]);
         setCountries(cs.filter(c => c.stationcount > 5).sort((a, b) => a.name.localeCompare(b.name)));
       } catch (e) {
         toast.error("Failed to load radio stations");
@@ -399,6 +431,13 @@ function WorldRadioPage() {
 
   const onAudioError = () => {
     if (!current) return;
+    const isHttp = current.url_resolved.startsWith("http://");
+    if (isHttp && typeof window !== "undefined" && window.location.protocol === "https:") {
+      toast.error(`This stream uses HTTP — try opening it directly: ${current.url_resolved}`);
+      setPlaying(false);
+      setBuffering(false);
+      return;
+    }
     if (!retryRef.current) {
       retryRef.current = true;
       setTimeout(() => {
@@ -427,6 +466,9 @@ function WorldRadioPage() {
       return true;
     });
     out = [...out].sort((a, b) => {
+      const ap = isPinned(a.stationuuid) ? 1 : 0;
+      const bp = isPinned(b.stationuuid) ? 1 : 0;
+      if (ap !== bp) return bp - ap;
       if (sort === "name") return a.name.localeCompare(b.name);
       if (sort === "bitrate") return (b.bitrate ?? 0) - (a.bitrate ?? 0);
       return (b.votes ?? 0) - (a.votes ?? 0);
@@ -534,7 +576,12 @@ function WorldRadioPage() {
                     ) : <RadioIcon className="w-4 h-4 text-muted-foreground" />}
                   </div>
                   <div className="flex-1 min-w-0">
-                    <div className="text-sm font-medium truncate">{s.name}</div>
+                    <div className="text-sm font-medium truncate flex items-center gap-1">
+                      {isPinned(s.stationuuid) && (
+                        <Star className="w-3.5 h-3.5 fill-current text-yellow-400 shrink-0" aria-label="Featured" />
+                      )}
+                      <span className="truncate">{s.name}</span>
+                    </div>
                     <div className="text-xs text-muted-foreground truncate">
                       {flagEmoji(s.countrycode)} {s.country || "Unknown"} · {(s.tags ?? "").split(",")[0] || "—"}
                     </div>

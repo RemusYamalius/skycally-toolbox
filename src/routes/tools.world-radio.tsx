@@ -474,7 +474,7 @@ function WorldRadioPage() {
         ]}
       />
 
-      <RelatedTools slug="world-radio" />
+      <RelatedTools currentSlug="world-radio" />
     </ToolPageShell>
   );
 }

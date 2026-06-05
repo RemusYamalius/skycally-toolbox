@@ -17,6 +17,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as ToolsWorldRadioRouteImport } from './routes/tools.world-radio'
 import { Route as ToolsWordleRouteImport } from './routes/tools.wordle'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordSearchRouteImport } from './routes/tools.word-search'
@@ -159,6 +160,11 @@ const ToolsIndexRoute = ToolsIndexRouteImport.update({
 const BlogIndexRoute = BlogIndexRouteImport.update({
   id: '/blog/',
   path: '/blog/',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsWorldRadioRoute = ToolsWorldRadioRouteImport.update({
+  id: '/tools/world-radio',
+  path: '/tools/world-radio',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsWordleRoute = ToolsWordleRouteImport.update({
@@ -794,6 +800,7 @@ export interface FileRoutesByFullPath {
   '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
+  '/tools/world-radio': typeof ToolsWorldRadioRoute
   '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -907,6 +914,7 @@ export interface FileRoutesByTo {
   '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
+  '/tools/world-radio': typeof ToolsWorldRadioRoute
   '/blog': typeof BlogIndexRoute
   '/tools': typeof ToolsIndexRoute
 }
@@ -1021,6 +1029,7 @@ export interface FileRoutesById {
   '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
+  '/tools/world-radio': typeof ToolsWorldRadioRoute
   '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -1136,6 +1145,7 @@ export interface FileRouteTypes {
     | '/tools/word-search'
     | '/tools/word-to-pdf'
     | '/tools/wordle'
+    | '/tools/world-radio'
     | '/blog/'
     | '/tools/'
   fileRoutesByTo: FileRoutesByTo
@@ -1249,6 +1259,7 @@ export interface FileRouteTypes {
     | '/tools/word-search'
     | '/tools/word-to-pdf'
     | '/tools/wordle'
+    | '/tools/world-radio'
     | '/blog'
     | '/tools'
   id:
@@ -1362,6 +1373,7 @@ export interface FileRouteTypes {
     | '/tools/word-search'
     | '/tools/word-to-pdf'
     | '/tools/wordle'
+    | '/tools/world-radio'
     | '/blog/'
     | '/tools/'
   fileRoutesById: FileRoutesById
@@ -1476,6 +1488,7 @@ export interface RootRouteChildren {
   ToolsWordSearchRoute: typeof ToolsWordSearchRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
   ToolsWordleRoute: typeof ToolsWordleRoute
+  ToolsWorldRadioRoute: typeof ToolsWorldRadioRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
@@ -1536,6 +1549,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/world-radio': {
+      id: '/tools/world-radio'
+      path: '/tools/world-radio'
+      fullPath: '/tools/world-radio'
+      preLoaderRoute: typeof ToolsWorldRadioRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/wordle': {
@@ -2375,6 +2395,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsWordSearchRoute: ToolsWordSearchRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
   ToolsWordleRoute: ToolsWordleRoute,
+  ToolsWorldRadioRoute: ToolsWorldRadioRoute,
   BlogIndexRoute: BlogIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }

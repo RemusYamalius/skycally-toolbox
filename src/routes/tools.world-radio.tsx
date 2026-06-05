@@ -239,10 +239,11 @@ function WorldRadioPage() {
     if (!L || !mapRef.current || !clusterRef.current) return;
     clusterRef.current.clearLayers();
     markersByIdRef.current.clear();
-    const geo = stations.filter(s => typeof s.geo_lat === "number" && typeof s.geo_long === "number" && s.geo_lat && s.geo_long);
-    geo.forEach(s => {
+    stations.forEach(s => {
+      const coords = getStationCoords(s);
+      if (!coords) return;
       const radius = Math.max(3, Math.min(10, Math.log((s.votes ?? 0) + 1) * 1.5));
-      const m = L.circleMarker([s.geo_lat as number, s.geo_long as number], {
+      const m = L.circleMarker(coords, {
         radius,
         color: ACCENT,
         fillColor: ACCENT,
@@ -264,8 +265,10 @@ function WorldRadioPage() {
     const L = (window as any).L;
     if (!L || !mapRef.current) return;
     if (pulseRef.current) { try { mapRef.current.removeLayer(pulseRef.current); } catch {} pulseRef.current = null; }
-    if (!current || !current.geo_lat || !current.geo_long) return;
-    pulseRef.current = L.circle([current.geo_lat, current.geo_long], {
+    if (!current) return;
+    const coords = getStationCoords(current);
+    if (!coords) return;
+    pulseRef.current = L.circle(coords, {
       radius: 60000,
       color: ACCENT,
       fillColor: ACCENT,
@@ -273,8 +276,26 @@ function WorldRadioPage() {
       weight: 2,
       className: "wr-pulse-ring",
     }).addTo(mapRef.current);
-    try { mapRef.current.flyTo([current.geo_lat, current.geo_long], Math.max(mapRef.current.getZoom(), 5), { duration: 0.8 }); } catch {}
+    try { mapRef.current.flyTo(coords, Math.max(mapRef.current.getZoom(), 5), { duration: 0.8 }); } catch {}
   }, [current]);
+
+  // Fetch more stations when a country filter is selected
+  useEffect(() => {
+    if (!country) return;
+    let alive = true;
+    (async () => {
+      try {
+        const found = await apiFetch<Station[]>(`/stations/bycountrycodeexact/${country}?limit=500&hidebroken=true&order=votes&reverse=true`);
+        if (!alive) return;
+        setStations(prev => {
+          const seen = new Set(prev.map(s => s.stationuuid));
+          const fresh = found.filter(s => s.url_resolved && !seen.has(s.stationuuid));
+          return fresh.length ? [...prev, ...fresh] : prev;
+        });
+      } catch {}
+    })();
+    return () => { alive = false; };
+  }, [country]);
 
   const playStation = useCallback((s: Station) => {
     setCurrent(s);

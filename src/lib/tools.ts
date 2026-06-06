@@ -133,6 +133,7 @@ export const tools: Tool[] = [
   { slug: "ssh-key-generator", name: "SSH Key Generator", description: "Generate Ed25519 or RSA SSH key pairs entirely in your browser — no backend, no uploads.", category: "utility", icon: KeyRound, path: "/tools/ssh-key-generator" },
   { slug: "timetable-generator", name: "School Timetable Generator", description: "Build school timetables in 10 languages, with logo, classes, teachers, and PDF/Excel export.", category: "utility", icon: CalendarDays, path: "/tools/timetable-generator" },
   { slug: "youtube-comment-analyzer", name: "YouTube Comment Analyzer", description: "Fetch and analyze YouTube comments — sentiment, top comments, word cloud.", category: "ai", icon: MessageSquare, path: "/tools/youtube-comment-analyzer" },
+  { slug: "weather-checker", name: "Weather Checker", description: "Check live weather and 7-day forecast for any city.", category: "utility", icon: CloudSun, path: "/tools/weather-checker" },
 ];
 
 

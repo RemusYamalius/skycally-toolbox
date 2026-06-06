@@ -338,8 +338,7 @@ function YouTubeCommentAnalyzer() {
 
       <HowToUse steps={[
         "Paste any YouTube video URL or video ID into the input.",
-        "Click Analyze to fetch up to 100 comments.",
-        "Review the overview, sentiment, top comments, and word cloud.",
+        "Click Analyze to fetch up to 100 comments and review the overview, sentiment, and top comments.",
         "Click any word in the cloud to filter comments containing it.",
       ]} />
       <RelatedTools currentSlug="youtube-comment-analyzer" />

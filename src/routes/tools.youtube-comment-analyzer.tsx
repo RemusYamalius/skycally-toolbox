@@ -348,8 +348,7 @@ function YouTubeCommentAnalyzer() {
         description={"Analyze YouTube video comments instantly — get sentiment breakdown, top comments by likes, most active commenters, and a word cloud."}
         body={[
           "The YouTube Comment Analyzer fetches up to 100 comments from any public YouTube video and turns them into actionable insights. Paste a YouTube link or video ID and instantly see how viewers are reacting — the overall sentiment, who is commenting the most, and which words dominate the conversation.",
-          "Sentiment is detected from common positive and negative keywords and emojis, then displayed as colored progress bars. The top 5 comments by like count surface the responses that other viewers found most valuable, while the word cloud highlights the topics being discussed. Click any word to filter the comments containing it.",
-          "All analysis happens locally in your browser. The tool only relays the video ID through a lightweight proxy to fetch the public comment thread — no comments, accounts, or personal data are stored on our servers.",
+          "Sentiment is detected from common positive and negative keywords and emojis, then displayed as colored progress bars. The top 5 comments by like count surface the responses that other viewers found most valuable, while the word cloud highlights the topics being discussed. Click any word to filter the comments containing it. All analysis happens locally in your browser — the tool only relays the video ID through a lightweight proxy to fetch the public comment thread, and no comments, accounts, or personal data are stored on our servers.",
         ]}
         faqs={[
           { question: "How many comments are analyzed?", answer: "Up to 100 top-level comments per video — the most relevant ones returned by YouTube's public API." },

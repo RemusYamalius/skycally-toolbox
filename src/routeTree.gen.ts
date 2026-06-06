@@ -17,6 +17,7 @@ import { Route as AboutRouteImport } from './routes/about'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as ToolsYoutubeCommentAnalyzerRouteImport } from './routes/tools.youtube-comment-analyzer'
 import { Route as ToolsWorldRadioRouteImport } from './routes/tools.world-radio'
 import { Route as ToolsWordleRouteImport } from './routes/tools.wordle'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
@@ -162,6 +163,12 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsYoutubeCommentAnalyzerRoute =
+  ToolsYoutubeCommentAnalyzerRouteImport.update({
+    id: '/tools/youtube-comment-analyzer',
+    path: '/tools/youtube-comment-analyzer',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsWorldRadioRoute = ToolsWorldRadioRouteImport.update({
   id: '/tools/world-radio',
   path: '/tools/world-radio',
@@ -801,6 +808,7 @@ export interface FileRoutesByFullPath {
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
   '/tools/world-radio': typeof ToolsWorldRadioRoute
+  '/tools/youtube-comment-analyzer': typeof ToolsYoutubeCommentAnalyzerRoute
   '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -915,6 +923,7 @@ export interface FileRoutesByTo {
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
   '/tools/world-radio': typeof ToolsWorldRadioRoute
+  '/tools/youtube-comment-analyzer': typeof ToolsYoutubeCommentAnalyzerRoute
   '/blog': typeof BlogIndexRoute
   '/tools': typeof ToolsIndexRoute
 }
@@ -1030,6 +1039,7 @@ export interface FileRoutesById {
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
   '/tools/world-radio': typeof ToolsWorldRadioRoute
+  '/tools/youtube-comment-analyzer': typeof ToolsYoutubeCommentAnalyzerRoute
   '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
 }
@@ -1146,6 +1156,7 @@ export interface FileRouteTypes {
     | '/tools/word-to-pdf'
     | '/tools/wordle'
     | '/tools/world-radio'
+    | '/tools/youtube-comment-analyzer'
     | '/blog/'
     | '/tools/'
   fileRoutesByTo: FileRoutesByTo
@@ -1260,6 +1271,7 @@ export interface FileRouteTypes {
     | '/tools/word-to-pdf'
     | '/tools/wordle'
     | '/tools/world-radio'
+    | '/tools/youtube-comment-analyzer'
     | '/blog'
     | '/tools'
   id:
@@ -1374,6 +1386,7 @@ export interface FileRouteTypes {
     | '/tools/word-to-pdf'
     | '/tools/wordle'
     | '/tools/world-radio'
+    | '/tools/youtube-comment-analyzer'
     | '/blog/'
     | '/tools/'
   fileRoutesById: FileRoutesById
@@ -1489,6 +1502,7 @@ export interface RootRouteChildren {
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
   ToolsWordleRoute: typeof ToolsWordleRoute
   ToolsWorldRadioRoute: typeof ToolsWorldRadioRoute
+  ToolsYoutubeCommentAnalyzerRoute: typeof ToolsYoutubeCommentAnalyzerRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
 }
@@ -1549,6 +1563,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/youtube-comment-analyzer': {
+      id: '/tools/youtube-comment-analyzer'
+      path: '/tools/youtube-comment-analyzer'
+      fullPath: '/tools/youtube-comment-analyzer'
+      preLoaderRoute: typeof ToolsYoutubeCommentAnalyzerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/world-radio': {
@@ -2396,6 +2417,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
   ToolsWordleRoute: ToolsWordleRoute,
   ToolsWorldRadioRoute: ToolsWorldRadioRoute,
+  ToolsYoutubeCommentAnalyzerRoute: ToolsYoutubeCommentAnalyzerRoute,
   BlogIndexRoute: BlogIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,
 }

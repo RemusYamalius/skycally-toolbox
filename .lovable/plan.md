@@ -1,33 +1,51 @@
 ## Goal
-Make sure every station in the list also appears on the map, by falling back to the country's capital coordinates when the Radio Browser API doesn't return GPS data, and by fetching more stations.
+Add a new tool page **YouTube Comment Analyzer** at `/tools/youtube-comment-analyzer` that fetches comments from the existing Cloudflare Worker (`https://youtube-comments-proxy.skycally-tools.workers.dev`) and shows overview, sentiment, top comments, and a word cloud. Fully client-side, no backend changes.
 
-## Changes (single file: `src/routes/tools.world-radio.tsx`)
+## Files
 
-### 1. Capital-coordinates lookup
-Add a module-level constant mapping ISO 3166-1 alpha-2 country codes → `[lat, lng]` for ~60 most common countries in the Radio Browser catalog (US, GB, DE, FR, ES, IT, NL, BE, PT, IE, PL, CZ, AT, CH, SE, NO, DK, FI, GR, RO, HU, RU, UA, TR, BR, AR, MX, CL, CO, PE, VE, CA, AU, NZ, JP, KR, CN, IN, ID, TH, VN, PH, MY, SG, PK, BD, SA, AE, IL, EG, MA, DZ, TN, ZA, NG, KE, GH, ET, etc.) — using each country's capital lat/lng.
+### 1. New route: `src/routes/tools.youtube-comment-analyzer.tsx`
+Standard tool route, mirrors the structure of `tools.sentiment-analysis.tsx`:
+- `createFileRoute("/tools/youtube-comment-analyzer")` with `head: () => buildToolMeta(toolBySlug(...))`.
+- Wraps content in `ToolPageShell` (title + description), ends with `HowToUse`, `RelatedTools`, and `ToolSeoContent` (title with keywords, ~150-200 word body, 4 FAQs) per project rules.
+- All UI text in English; dark theme via existing semantic tokens; uses `Input`, `Button`, `Card`, `Progress`, `Skeleton`, `Badge`, `sonner` toast.
 
+#### State
+`url`, `videoId`, `loading`, `error`, `comments[]`, `filterWord`.
+
+#### Logic (pure helpers inside the file)
+- `extractVideoId(input)` — regex against `youtube.com/watch?v=`, `youtu.be/`, `youtube.com/shorts/`, or a bare 11-char ID. Returns `null` on failure.
+- `fetchComments(videoId)` — `GET {WORKER_URL}?videoId={id}&maxResults=100`. Maps response into `{author, text, likes, publishedAt}`. Distinguishes HTTP 403/"disabled" from generic failures so we can show the right toast message.
+- `analyze(comments)` returns:
+  - **Overview**: total, most active commenter (group by author, max count), avg length, total likes (sum).
+  - **Sentiment**: per-comment classify against the keyword/emoji lists from the spec (case-insensitive, word-boundary for letters, direct includes for emojis). Tally Positive/Neutral/Negative → percentages.
+  - **Top 5** by likes (stable sort desc).
+  - **Word cloud**: tokenize (`/[\p{L}\p{N}']+/gu`, lowercase), drop stopwords (built-in ~50-word list) and words shorter than 3 chars, count, take top 20. Font size mapped linearly between `0.8rem` and `2rem` by frequency.
+
+#### UI sections (in this order, inside `ToolPageShell`)
+1. Input row: `Input` for URL/ID + `Button` "Analyze". Disabled while loading. Error message under input.
+2. Loading: `Skeleton` rows + spinner.
+3. Results (only when `comments.length > 0`):
+   - **Overview cards**: 4 `Card`s in a responsive grid (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`).
+   - **Sentiment**: three labeled `Progress` bars (green/muted/red via semantic tokens) with percentages.
+   - **Top comments**: list of 5 cards with author, text, likes, formatted date.
+   - **Word cloud**: flex-wrap of buttons; click sets `filterWord`. When set, show a filtered comments list below with a "Clear filter" chip.
+4. "No data is stored on our servers" badge is provided automatically by `ToolPageShell`.
+
+#### Error handling (toast + inline message)
+- Invalid URL → "Please enter a valid YouTube URL"
+- Disabled comments (worker returns 403 / `commentsDisabled`) → "Comments are disabled for this video"
+- Any other failure → "Could not fetch comments, please try again"
+
+### 2. `src/lib/tools.ts`
+Append one entry to the `tools` array:
 ```ts
-const CAPITALS: Record<string, [number, number]> = {
-  US: [38.9072, -77.0369], GB: [51.5074, -0.1278], DE: [52.52, 13.405], ...
-};
+{ slug: "youtube-comment-analyzer", name: "YouTube Comment Analyzer",
+  description: "Fetch and analyze comments from any YouTube video — sentiment, top comments, word cloud.",
+  category: "ai", icon: MessageSquare, path: "/tools/youtube-comment-analyzer" }
 ```
-
-### 2. Helper `getStationCoords(s)`
-Returns `[lat, lng] | null`:
-- If `geo_lat` and `geo_long` are valid non-zero numbers → use them.
-- Else if `s.countrycode` is in `CAPITALS` → return capital coords (with tiny deterministic jitter based on `stationuuid` hash, ±0.4°, so multiple stations in the same country don't stack on one pixel).
-- Else → `null` (omitted from map, still shown in list).
-
-### 3. Marker effect
-Replace the current `stations.filter(s => geo_lat && geo_long)` block with a loop using `getStationCoords(s)`; only stations returning `null` are skipped on the map. List rendering stays unchanged so all stations remain visible in the left panel.
-
-### 4. Pulse effect
-Update the "current station" pulse to also use `getStationCoords(current)` instead of reading `geo_lat`/`geo_long` directly, so the pulse + `flyTo` work for fallback-positioned stations too.
-
-### 5. Fetch limits
-- Initial load (no country selected): change `/stations/topvote/200` → `/stations/topvote/300`.
-- New effect: when `country` changes to a non-empty value, fetch `/stations/bycountrycodeexact/{country}?limit=500&hidebroken=true&order=votes&reverse=true` and merge results into `stations` (dedupe by `stationuuid`). When cleared, no extra fetch — existing top list remains.
+Add `MessageSquare` to the existing `lucide-react` import.
 
 ## Out of scope
-- No styling, layout, player, favourites, SEO, or copy changes.
-- No new dependencies.
+- No backend, no edge function, no env vars, no DB.
+- No edits to existing routes/components beyond the single `tools.ts` registration line.
+- No new dependencies — uses existing shadcn UI, lucide-react, sonner, framer-motion.

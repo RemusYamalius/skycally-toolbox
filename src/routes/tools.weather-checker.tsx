@@ -212,28 +212,25 @@ function WeatherChecker() {
           transition={{ duration: 0.3 }}
           className="mt-8 rounded-2xl border border-border bg-card/50 p-6"
         >
-          <div className="flex items-start justify-between gap-4 flex-wrap">
-            <div>
-              <h2 className="font-display text-2xl font-bold">
-                {data.name}
-                {data.country ? `, ${data.country}` : ""}
-              </h2>
-              <p className="text-sm text-muted-foreground mt-1">{cur.label}</p>
+          <div className="text-center">
+            <h2 className="font-display text-2xl font-bold">
+              {data.name}
+              {data.country ? `, ${data.country}` : ""}
+            </h2>
+            <div className="mt-4 text-6xl sm:text-7xl font-display font-bold tracking-tight">
+              {Math.round(data.current.temp)}°C
             </div>
-            <div className="text-6xl leading-none" aria-hidden>
-              {cur.emoji}
+            <div className="mt-3 flex items-center justify-center gap-2">
+              <span className="text-4xl leading-none" aria-hidden>{cur.emoji}</span>
+              <span className="text-base text-muted-foreground">{cur.label}</span>
             </div>
           </div>
 
-          <div className="mt-4 text-5xl sm:text-6xl font-display font-bold tracking-tight">
-            {Math.round(data.current.temp)}°C
-          </div>
-
-          <div className="mt-6 grid grid-cols-2 sm:grid-cols-4 gap-3">
-            <StatTile icon={<Thermometer className="w-4 h-4" />} label="Feels like" value={`${Math.round(data.current.feels)}°C`} />
+          <div className="mt-6 grid grid-cols-2 gap-3">
+            <StatTile icon={<Thermometer className="w-4 h-4" />} label="Feels Like" value={`${Math.round(data.current.feels)}°C`} />
             <StatTile icon={<Droplets className="w-4 h-4" />} label="Humidity" value={`${data.current.humidity}%`} />
-            <StatTile icon={<Wind className="w-4 h-4" />} label="Wind" value={`${Math.round(data.current.wind)} km/h`} />
-            <StatTile icon={<CloudRain className="w-4 h-4" />} label="Precip" value={`${data.current.precip}%`} />
+            <StatTile icon={<Wind className="w-4 h-4" />} label="Wind Speed" value={`${Math.round(data.current.wind)} km/h`} />
+            <StatTile icon={<CloudRain className="w-4 h-4" />} label="Precipitation" value={`${data.current.precip}%`} />
           </div>
         </motion.div>
       )}

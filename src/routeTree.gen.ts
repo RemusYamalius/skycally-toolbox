@@ -25,6 +25,7 @@ import { Route as ToolsWordSearchRouteImport } from './routes/tools.word-search'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
 import { Route as ToolsWhackAMoleRouteImport } from './routes/tools.whack-a-mole'
 import { Route as ToolsWebrtcLeakTestRouteImport } from './routes/tools.webrtc-leak-test'
+import { Route as ToolsWeatherCheckerRouteImport } from './routes/tools.weather-checker'
 import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoMergerRouteImport } from './routes/tools.video-merger'
@@ -202,6 +203,11 @@ const ToolsWhackAMoleRoute = ToolsWhackAMoleRouteImport.update({
 const ToolsWebrtcLeakTestRoute = ToolsWebrtcLeakTestRouteImport.update({
   id: '/tools/webrtc-leak-test',
   path: '/tools/webrtc-leak-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsWeatherCheckerRoute = ToolsWeatherCheckerRouteImport.update({
+  id: '/tools/weather-checker',
+  path: '/tools/weather-checker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsVideoTrimmerRoute = ToolsVideoTrimmerRouteImport.update({
@@ -801,6 +807,7 @@ export interface FileRoutesByFullPath {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/weather-checker': typeof ToolsWeatherCheckerRoute
   '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
@@ -916,6 +923,7 @@ export interface FileRoutesByTo {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/weather-checker': typeof ToolsWeatherCheckerRoute
   '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
@@ -1032,6 +1040,7 @@ export interface FileRoutesById {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/weather-checker': typeof ToolsWeatherCheckerRoute
   '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
@@ -1149,6 +1158,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/weather-checker'
     | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
     | '/tools/word-counter'
@@ -1264,6 +1274,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/weather-checker'
     | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
     | '/tools/word-counter'
@@ -1379,6 +1390,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/weather-checker'
     | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
     | '/tools/word-counter'
@@ -1495,6 +1507,7 @@ export interface RootRouteChildren {
   ToolsVideoMergerRoute: typeof ToolsVideoMergerRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
   ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
+  ToolsWeatherCheckerRoute: typeof ToolsWeatherCheckerRoute
   ToolsWebrtcLeakTestRoute: typeof ToolsWebrtcLeakTestRoute
   ToolsWhackAMoleRoute: typeof ToolsWhackAMoleRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
@@ -1619,6 +1632,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/webrtc-leak-test'
       fullPath: '/tools/webrtc-leak-test'
       preLoaderRoute: typeof ToolsWebrtcLeakTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/weather-checker': {
+      id: '/tools/weather-checker'
+      path: '/tools/weather-checker'
+      fullPath: '/tools/weather-checker'
+      preLoaderRoute: typeof ToolsWeatherCheckerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/video-trimmer': {
@@ -2410,6 +2430,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsVideoMergerRoute: ToolsVideoMergerRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
   ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
+  ToolsWeatherCheckerRoute: ToolsWeatherCheckerRoute,
   ToolsWebrtcLeakTestRoute: ToolsWebrtcLeakTestRoute,
   ToolsWhackAMoleRoute: ToolsWhackAMoleRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,
@@ -2424,12 +2445,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

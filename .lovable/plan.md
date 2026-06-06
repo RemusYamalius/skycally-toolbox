@@ -1,51 +1,37 @@
-## Goal
-Add a new tool page **YouTube Comment Analyzer** at `/tools/youtube-comment-analyzer` that fetches comments from the existing Cloudflare Worker (`https://youtube-comments-proxy.skycally-tools.workers.dev`) and shows overview, sentiment, top comments, and a word cloud. Fully client-side, no backend changes.
+# Weather Checker tool
 
-## Files
+## New files
+- `src/routes/tools.weather-checker.tsx` — new route, mirrors `tools.network-speed-test.tsx` structure: `createFileRoute` with `head()` (title, description, canonical, og tags), `ToolPageShell` (title "Weather Checker", subtitle), `HowToUse` (3 steps), `ToolSeoContent` (H2, ~150-200 word body, 4 FAQs from spec), and `RelatedTools` showing IP Address Lookup, Network Speed Test, World Radio.
 
-### 1. New route: `src/routes/tools.youtube-comment-analyzer.tsx`
-Standard tool route, mirrors the structure of `tools.sentiment-analysis.tsx`:
-- `createFileRoute("/tools/youtube-comment-analyzer")` with `head: () => buildToolMeta(toolBySlug(...))`.
-- Wraps content in `ToolPageShell` (title + description), ends with `HowToUse`, `RelatedTools`, and `ToolSeoContent` (title with keywords, ~150-200 word body, 4 FAQs) per project rules.
-- All UI text in English; dark theme via existing semantic tokens; uses `Input`, `Button`, `Card`, `Progress`, `Skeleton`, `Badge`, `sonner` toast.
+## Tool registration
+- `src/lib/tools.ts` — add `CloudSun` to lucide import, append entry:
+  - slug: `weather-checker`, name: `Weather Checker`, description: `Check live weather and 7-day forecast for any city.`, category: `utility`, icon: `CloudSun`, path: `/tools/weather-checker`.
 
-#### State
-`url`, `videoId`, `loading`, `error`, `comments[]`, `filterWord`.
+## Implementation details
 
-#### Logic (pure helpers inside the file)
-- `extractVideoId(input)` — regex against `youtube.com/watch?v=`, `youtu.be/`, `youtube.com/shorts/`, or a bare 11-char ID. Returns `null` on failure.
-- `fetchComments(videoId)` — `GET {WORKER_URL}?videoId={id}&maxResults=100`. Maps response into `{author, text, likes, publishedAt}`. Distinguishes HTTP 403/"disabled" from generic failures so we can show the right toast message.
-- `analyze(comments)` returns:
-  - **Overview**: total, most active commenter (group by author, max count), avg length, total likes (sum).
-  - **Sentiment**: per-comment classify against the keyword/emoji lists from the spec (case-insensitive, word-boundary for letters, direct includes for emojis). Tally Positive/Neutral/Negative → percentages.
-  - **Top 5** by likes (stable sort desc).
-  - **Word cloud**: tokenize (`/[\p{L}\p{N}']+/gu`, lowercase), drop stopwords (built-in ~50-word list) and words shorter than 3 chars, count, take top 20. Font size mapped linearly between `0.8rem` and `2rem` by frequency.
+**State:** `city` (input), `loading`, `error`, `data` (current + 7-day forecast + resolved name/country).
 
-#### UI sections (in this order, inside `ToolPageShell`)
-1. Input row: `Input` for URL/ID + `Button` "Analyze". Disabled while loading. Error message under input.
-2. Loading: `Skeleton` rows + spinner.
-3. Results (only when `comments.length > 0`):
-   - **Overview cards**: 4 `Card`s in a responsive grid (`grid-cols-1 sm:grid-cols-2 lg:grid-cols-4`).
-   - **Sentiment**: three labeled `Progress` bars (green/muted/red via semantic tokens) with percentages.
-   - **Top comments**: list of 5 cards with author, text, likes, formatted date.
-   - **Word cloud**: flex-wrap of buttons; click sets `filterWord`. When set, show a filtered comments list below with a "Clear filter" chip.
-4. "No data is stored on our servers" badge is provided automatically by `ToolPageShell`.
+**On mount:** try `navigator.geolocation.getCurrentPosition` (with timeout). If granted, reverse-search via Open-Meteo geocoding using lat/lon → city name; if denied/failed, default to `London`. Either way auto-fetch once.
 
-#### Error handling (toast + inline message)
-- Invalid URL → "Please enter a valid YouTube URL"
-- Disabled comments (worker returns 403 / `commentsDisabled`) → "Comments are disabled for this video"
-- Any other failure → "Could not fetch comments, please try again"
+**Search flow:**
+1. `GET https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en&format=json` — if `results` empty → error "City not found. Please try another name."
+2. `GET https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=7`
+3. On network failure → "Could not fetch weather, please try again."
 
-### 2. `src/lib/tools.ts`
-Append one entry to the `tools` array:
-```ts
-{ slug: "youtube-comment-analyzer", name: "YouTube Comment Analyzer",
-  description: "Fetch and analyze comments from any YouTube video — sentiment, top comments, word cloud.",
-  category: "ai", icon: MessageSquare, path: "/tools/youtube-comment-analyzer" }
-```
-Add `MessageSquare` to the existing `lucide-react` import.
+**WMO mapping helper:** pure function `wmoInfo(code)` → `{ label, emoji }` per the spec table; fallback `{ "Unknown", "🌡️" }`.
+
+**UI (inside ToolPageShell, English-only, semantic tokens):**
+- Search row: `Input` (placeholder "Enter a city…", Enter submits) + `Button` "Check Weather" (shows spinner when loading).
+- Error message under input when present.
+- Current weather `Card`:
+  - Header: `{name}, {country}` + large emoji.
+  - Large temperature `{Math.round(temp)}°C` + condition label.
+  - Grid of 4 stat tiles: Feels like, Humidity, Wind (km/h), Precip chance — each with a Lucide icon (`Thermometer`, `Droplets`, `Wind`, `CloudRain`).
+- 7-day forecast: horizontal `overflow-x-auto` row of 7 small cards: weekday short name (from `daily.time[i]` in tz), emoji, `max° / min°`, rain `%`.
+
+**SEO content:** ToolSeoContent body and FAQs taken verbatim from the spec.
+
+**No backend, no new dependencies, no env vars.** All requests are direct browser fetches to Open-Meteo (CORS-enabled, no key).
 
 ## Out of scope
-- No backend, no edge function, no env vars, no DB.
-- No edits to existing routes/components beyond the single `tools.ts` registration line.
-- No new dependencies — uses existing shadcn UI, lucide-react, sonner, framer-motion.
+No edits to other routes or shared components. `routeTree.gen.ts` regenerates automatically.

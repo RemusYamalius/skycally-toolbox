@@ -90,6 +90,7 @@ import { Route as ToolsImageFiltersRouteImport } from './routes/tools.image-filt
 import { Route as ToolsImageCropperRouteImport } from './routes/tools.image-cropper'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
+import { Route as ToolsHolidayCheckerRouteImport } from './routes/tools.holiday-checker'
 import { Route as ToolsHashGeneratorRouteImport } from './routes/tools.hash-generator'
 import { Route as ToolsHangmanRouteImport } from './routes/tools.hangman'
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
@@ -531,6 +532,11 @@ const ToolsImageCompressorRoute = ToolsImageCompressorRouteImport.update({
   path: '/tools/image-compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsHolidayCheckerRoute = ToolsHolidayCheckerRouteImport.update({
+  id: '/tools/holiday-checker',
+  path: '/tools/holiday-checker',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsHashGeneratorRoute = ToolsHashGeneratorRouteImport.update({
   id: '/tools/hash-generator',
   path: '/tools/hash-generator',
@@ -743,6 +749,7 @@ export interface FileRoutesByFullPath {
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
+  '/tools/holiday-checker': typeof ToolsHolidayCheckerRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-cropper': typeof ToolsImageCropperRoute
@@ -859,6 +866,7 @@ export interface FileRoutesByTo {
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
+  '/tools/holiday-checker': typeof ToolsHolidayCheckerRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-cropper': typeof ToolsImageCropperRoute
@@ -976,6 +984,7 @@ export interface FileRoutesById {
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
+  '/tools/holiday-checker': typeof ToolsHolidayCheckerRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-cropper': typeof ToolsImageCropperRoute
@@ -1094,6 +1103,7 @@ export interface FileRouteTypes {
     | '/tools/hand-gesture'
     | '/tools/hangman'
     | '/tools/hash-generator'
+    | '/tools/holiday-checker'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-cropper'
@@ -1210,6 +1220,7 @@ export interface FileRouteTypes {
     | '/tools/hand-gesture'
     | '/tools/hangman'
     | '/tools/hash-generator'
+    | '/tools/holiday-checker'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-cropper'
@@ -1326,6 +1337,7 @@ export interface FileRouteTypes {
     | '/tools/hand-gesture'
     | '/tools/hangman'
     | '/tools/hash-generator'
+    | '/tools/holiday-checker'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-cropper'
@@ -1443,6 +1455,7 @@ export interface RootRouteChildren {
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
   ToolsHangmanRoute: typeof ToolsHangmanRoute
   ToolsHashGeneratorRoute: typeof ToolsHashGeneratorRoute
+  ToolsHolidayCheckerRoute: typeof ToolsHolidayCheckerRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
   ToolsImageCropperRoute: typeof ToolsImageCropperRoute
@@ -2089,6 +2102,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsImageCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/holiday-checker': {
+      id: '/tools/holiday-checker'
+      path: '/tools/holiday-checker'
+      fullPath: '/tools/holiday-checker'
+      preLoaderRoute: typeof ToolsHolidayCheckerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/hash-generator': {
       id: '/tools/hash-generator'
       path: '/tools/hash-generator'
@@ -2366,6 +2386,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsHandGestureRoute: ToolsHandGestureRoute,
   ToolsHangmanRoute: ToolsHangmanRoute,
   ToolsHashGeneratorRoute: ToolsHashGeneratorRoute,
+  ToolsHolidayCheckerRoute: ToolsHolidayCheckerRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
   ToolsImageCropperRoute: ToolsImageCropperRoute,
@@ -2445,12 +2466,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

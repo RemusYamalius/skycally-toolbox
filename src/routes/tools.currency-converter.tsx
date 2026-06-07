@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeftRight, Loader2 } from "lucide-react";
+import { ArrowLeftRight, Check, ChevronsUpDown, Loader2 } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -10,12 +10,18 @@ import { HowToUse } from "@/components/how-to-use";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+  Popover,
+  PopoverContent,
+  PopoverTrigger,
+} from "@/components/ui/popover";
+import {
+  Command,
+  CommandEmpty,
+  CommandInput,
+  CommandItem,
+  CommandList,
+} from "@/components/ui/command";
+import { cn } from "@/lib/utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -94,8 +100,8 @@ function CurrencyConverter() {
   const [amount, setAmount] = useState<string>("1");
   const [from, setFrom] = useState("USD");
   const [to, setTo] = useState("EUR");
-  const [fromQuery, setFromQuery] = useState("");
-  const [toQuery, setToQuery] = useState("");
+  const [fromOpen, setFromOpen] = useState(false);
+  const [toOpen, setToOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rates, setRates] = useState<RatesResponse | null>(null);
@@ -141,22 +147,6 @@ function CurrencyConverter() {
     return Object.keys(rates.conversion_rates).sort();
   }, [rates]);
 
-  const fromOptions = useMemo(() => {
-    const q = fromQuery.trim().toLowerCase();
-    if (!q) return allCodes;
-    return allCodes.filter(
-      (c) => c.toLowerCase().includes(q) || nameFor(c).toLowerCase().includes(q),
-    );
-  }, [allCodes, fromQuery]);
-
-  const toOptions = useMemo(() => {
-    const q = toQuery.trim().toLowerCase();
-    if (!q) return allCodes;
-    return allCodes.filter(
-      (c) => c.toLowerCase().includes(q) || nameFor(c).toLowerCase().includes(q),
-    );
-  }, [allCodes, toQuery]);
-
   const numAmount = Number(amount);
   const validAmount = isFinite(numAmount) && numAmount > 0;
   const rate = rates?.conversion_rates?.[to];
@@ -192,28 +182,49 @@ function CurrencyConverter() {
         <div className="grid gap-3 sm:grid-cols-[1fr_auto_1fr] items-end">
           <div className="grid gap-1.5">
             <label className="text-xs uppercase tracking-wide text-muted-foreground">From</label>
-            <Input
-              value={fromQuery}
-              onChange={(e) => setFromQuery(e.target.value)}
-              placeholder="Search currency…"
-            />
-            <Select value={from} onValueChange={setFrom}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent className="max-h-72">
-                {fromOptions.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-muted-foreground">No matches</div>
-                ) : (
-                  fromOptions.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      <span className="mr-2">{flagFor(c)}</span>
-                      {c} — {nameFor(c)}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+            <Popover open={fromOpen} onOpenChange={setFromOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={fromOpen}
+                  className="w-full justify-between font-normal"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>{flagFor(from)}</span>
+                    <span>{from} — {nameFor(from)}</span>
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search currency…" />
+                  <CommandList className="max-h-72">
+                    <CommandEmpty>No currencies found</CommandEmpty>
+                    {allCodes.map((c) => (
+                      <CommandItem
+                        key={c}
+                        value={`${c} ${nameFor(c)}`}
+                        onSelect={() => {
+                          setFrom(c);
+                          setFromOpen(false);
+                        }}
+                      >
+                        <span className="mr-2">{flagFor(c)}</span>
+                        {c} — {nameFor(c)}
+                        <Check
+                          className={cn(
+                            "ml-auto h-4 w-4",
+                            from === c ? "opacity-100" : "opacity-0",
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
 
           <div className="flex sm:flex-col items-center justify-center pb-1">
@@ -231,28 +242,49 @@ function CurrencyConverter() {
 
           <div className="grid gap-1.5">
             <label className="text-xs uppercase tracking-wide text-muted-foreground">To</label>
-            <Input
-              value={toQuery}
-              onChange={(e) => setToQuery(e.target.value)}
-              placeholder="Search currency…"
-            />
-            <Select value={to} onValueChange={setTo}>
-              <SelectTrigger>
-                <SelectValue placeholder="Select currency" />
-              </SelectTrigger>
-              <SelectContent className="max-h-72">
-                {toOptions.length === 0 ? (
-                  <div className="px-3 py-2 text-sm text-muted-foreground">No matches</div>
-                ) : (
-                  toOptions.map((c) => (
-                    <SelectItem key={c} value={c}>
-                      <span className="mr-2">{flagFor(c)}</span>
-                      {c} — {nameFor(c)}
-                    </SelectItem>
-                  ))
-                )}
-              </SelectContent>
-            </Select>
+            <Popover open={toOpen} onOpenChange={setToOpen}>
+              <PopoverTrigger asChild>
+                <Button
+                  variant="outline"
+                  role="combobox"
+                  aria-expanded={toOpen}
+                  className="w-full justify-between font-normal"
+                >
+                  <span className="flex items-center gap-2">
+                    <span>{flagFor(to)}</span>
+                    <span>{to} — {nameFor(to)}</span>
+                  </span>
+                  <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
+                </Button>
+              </PopoverTrigger>
+              <PopoverContent className="w-full p-0" align="start">
+                <Command>
+                  <CommandInput placeholder="Search currency…" />
+                  <CommandList className="max-h-72">
+                    <CommandEmpty>No currencies found</CommandEmpty>
+                    {allCodes.map((c) => (
+                      <CommandItem
+                        key={c}
+                        value={`${c} ${nameFor(c)}`}
+                        onSelect={() => {
+                          setTo(c);
+                          setToOpen(false);
+                        }}
+                      >
+                        <span className="mr-2">{flagFor(c)}</span>
+                        {c} — {nameFor(c)}
+                        <Check
+                          className={cn(
+                            "ml-auto h-4 w-4",
+                            to === c ? "opacity-100" : "opacity-0",
+                          )}
+                        />
+                      </CommandItem>
+                    ))}
+                  </CommandList>
+                </Command>
+              </PopoverContent>
+            </Popover>
           </div>
         </div>
 

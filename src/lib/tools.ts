@@ -134,6 +134,7 @@ export const tools: Tool[] = [
   { slug: "timetable-generator", name: "School Timetable Generator", description: "Build school timetables in 10 languages, with logo, classes, teachers, and PDF/Excel export.", category: "utility", icon: CalendarDays, path: "/tools/timetable-generator" },
   { slug: "youtube-comment-analyzer", name: "YouTube Comment Analyzer", description: "Fetch and analyze YouTube comments — sentiment, top comments, word cloud.", category: "ai", icon: MessageSquare, path: "/tools/youtube-comment-analyzer" },
   { slug: "weather-checker", name: "Weather Checker", description: "Check live weather and 7-day forecast for any city.", category: "utility", icon: CloudSun, path: "/tools/weather-checker" },
+  { slug: "holiday-checker", name: "Holiday Checker", description: "Find public holidays for any country instantly.", category: "utility", icon: Calendar, path: "/tools/holiday-checker" },
 ];
 
 

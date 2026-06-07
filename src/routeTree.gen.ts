@@ -102,6 +102,7 @@ import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.documen
 import { Route as ToolsDnsLeakTestRouteImport } from './routes/tools.dns-leak-test'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
+import { Route as ToolsCountryInfoRouteImport } from './routes/tools.country-info'
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
@@ -592,6 +593,11 @@ const ToolsDeletePdfPagesRoute = ToolsDeletePdfPagesRouteImport.update({
   path: '/tools/delete-pdf-pages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsCountryInfoRoute = ToolsCountryInfoRouteImport.update({
+  id: '/tools/country-info',
+  path: '/tools/country-info',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsConnectFourRoute = ToolsConnectFourRouteImport.update({
   id: '/tools/connect-four',
   path: '/tools/connect-four',
@@ -738,6 +744,7 @@ export interface FileRoutesByFullPath {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
+  '/tools/country-info': typeof ToolsCountryInfoRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
@@ -855,6 +862,7 @@ export interface FileRoutesByTo {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
+  '/tools/country-info': typeof ToolsCountryInfoRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
@@ -973,6 +981,7 @@ export interface FileRoutesById {
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
+  '/tools/country-info': typeof ToolsCountryInfoRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
@@ -1092,6 +1101,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
+    | '/tools/country-info'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
@@ -1209,6 +1219,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
+    | '/tools/country-info'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
@@ -1326,6 +1337,7 @@ export interface FileRouteTypes {
     | '/tools/color-palette'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
+    | '/tools/country-info'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
@@ -1444,6 +1456,7 @@ export interface RootRouteChildren {
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
+  ToolsCountryInfoRoute: typeof ToolsCountryInfoRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDnsLeakTestRoute: typeof ToolsDnsLeakTestRoute
@@ -2186,6 +2199,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsDeletePdfPagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/country-info': {
+      id: '/tools/country-info'
+      path: '/tools/country-info'
+      fullPath: '/tools/country-info'
+      preLoaderRoute: typeof ToolsCountryInfoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/connect-four': {
       id: '/tools/connect-four'
       path: '/tools/connect-four'
@@ -2375,6 +2395,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsConnectFourRoute: ToolsConnectFourRoute,
+  ToolsCountryInfoRoute: ToolsCountryInfoRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDnsLeakTestRoute: ToolsDnsLeakTestRoute,

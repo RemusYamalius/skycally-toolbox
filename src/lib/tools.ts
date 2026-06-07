@@ -135,6 +135,7 @@ export const tools: Tool[] = [
   { slug: "youtube-comment-analyzer", name: "YouTube Comment Analyzer", description: "Fetch and analyze YouTube comments — sentiment, top comments, word cloud.", category: "ai", icon: MessageSquare, path: "/tools/youtube-comment-analyzer" },
   { slug: "weather-checker", name: "Weather Checker", description: "Check live weather and 7-day forecast for any city.", category: "utility", icon: CloudSun, path: "/tools/weather-checker" },
   { slug: "holiday-checker", name: "Holiday Checker", description: "Find public holidays for any country instantly.", category: "utility", icon: Calendar, path: "/tools/holiday-checker" },
+  { slug: "country-info", name: "Country Info", description: "Explore facts and data for every country in the world.", category: "utility", icon: Globe, path: "/tools/country-info" },
 ];
 
 

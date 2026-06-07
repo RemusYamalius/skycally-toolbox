@@ -102,6 +102,7 @@ import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.documen
 import { Route as ToolsDnsLeakTestRouteImport } from './routes/tools.dns-leak-test'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
+import { Route as ToolsCurrencyConverterRouteImport } from './routes/tools.currency-converter'
 import { Route as ToolsCountryInfoRouteImport } from './routes/tools.country-info'
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
@@ -593,6 +594,11 @@ const ToolsDeletePdfPagesRoute = ToolsDeletePdfPagesRouteImport.update({
   path: '/tools/delete-pdf-pages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsCurrencyConverterRoute = ToolsCurrencyConverterRouteImport.update({
+  id: '/tools/currency-converter',
+  path: '/tools/currency-converter',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsCountryInfoRoute = ToolsCountryInfoRouteImport.update({
   id: '/tools/country-info',
   path: '/tools/country-info',
@@ -745,6 +751,7 @@ export interface FileRoutesByFullPath {
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
+  '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
@@ -863,6 +870,7 @@ export interface FileRoutesByTo {
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
+  '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
@@ -982,6 +990,7 @@ export interface FileRoutesById {
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
+  '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
@@ -1102,6 +1111,7 @@ export interface FileRouteTypes {
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
+    | '/tools/currency-converter'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
@@ -1220,6 +1230,7 @@ export interface FileRouteTypes {
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
+    | '/tools/currency-converter'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
@@ -1338,6 +1349,7 @@ export interface FileRouteTypes {
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
+    | '/tools/currency-converter'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
@@ -1457,6 +1469,7 @@ export interface RootRouteChildren {
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
   ToolsCountryInfoRoute: typeof ToolsCountryInfoRoute
+  ToolsCurrencyConverterRoute: typeof ToolsCurrencyConverterRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDnsLeakTestRoute: typeof ToolsDnsLeakTestRoute
@@ -2199,6 +2212,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsDeletePdfPagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/currency-converter': {
+      id: '/tools/currency-converter'
+      path: '/tools/currency-converter'
+      fullPath: '/tools/currency-converter'
+      preLoaderRoute: typeof ToolsCurrencyConverterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/country-info': {
       id: '/tools/country-info'
       path: '/tools/country-info'
@@ -2396,6 +2416,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsConnectFourRoute: ToolsConnectFourRoute,
   ToolsCountryInfoRoute: ToolsCountryInfoRoute,
+  ToolsCurrencyConverterRoute: ToolsCurrencyConverterRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDnsLeakTestRoute: ToolsDnsLeakTestRoute,

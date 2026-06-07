@@ -1,4 +1,4 @@
-import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search, Keyboard, Bird, Crown, Circle, Hammer, Target, Rows3, Ghost, Spade, Puzzle, Pickaxe, Zap, Gauge, Globe, Network, Wifi, KeyRound, Radio, MessageSquare, CloudSun, Calendar } from "lucide-react";
+import { Download, Image as ImageIcon, FileText, Scissors, FileType, Combine, Minimize2, FileImage, QrCode, ScanLine, ScanText, Sparkles, Volume2, Mic, Film, Lock, Code2, Type, Braces, Palette, Wand2, Stamp, Pencil, FileCode, Monitor, Music, Video, AudioLines, Aperture, ScanFace, Hand, Boxes, Brain, Maximize2, Crop, LayoutGrid, Laugh, CreditCard, Captions, FileMinus, Layers, RotateCw, ScanSearch, FileSearch, FilePen, FileX, Shield, FileOutput, Link, Clock, Moon, Calculator, Activity, CalendarDays, Link2, AlignLeft, Fingerprint, Hash, Shuffle, Users, Gamepad2, Flame, Dices, Joystick, Grid2x2, X, Crosshair, BookOpen, Bomb, Search, Keyboard, Bird, Crown, Circle, Hammer, Target, Rows3, Ghost, Spade, Puzzle, Pickaxe, Zap, Gauge, Globe, Network, Wifi, KeyRound, Radio, MessageSquare, CloudSun, Calendar, ArrowLeftRight } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
 export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
@@ -136,6 +136,7 @@ export const tools: Tool[] = [
   { slug: "weather-checker", name: "Weather Checker", description: "Check live weather and 7-day forecast for any city.", category: "utility", icon: CloudSun, path: "/tools/weather-checker" },
   { slug: "holiday-checker", name: "Holiday Checker", description: "Find public holidays for any country instantly.", category: "utility", icon: Calendar, path: "/tools/holiday-checker" },
   { slug: "country-info", name: "Country Info", description: "Explore facts and data for every country in the world.", category: "utility", icon: Globe, path: "/tools/country-info" },
+  { slug: "currency-converter", name: "Currency Converter", description: "Convert between 170+ currencies with live exchange rates.", category: "utility", icon: ArrowLeftRight, path: "/tools/currency-converter" },
 ];
 
 

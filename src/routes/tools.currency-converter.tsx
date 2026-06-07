@@ -100,8 +100,8 @@ function CurrencyConverter() {
   const [amount, setAmount] = useState<string>("1");
   const [from, setFrom] = useState("USD");
   const [to, setTo] = useState("EUR");
-  const [fromQuery, setFromQuery] = useState("");
-  const [toQuery, setToQuery] = useState("");
+  const [fromOpen, setFromOpen] = useState(false);
+  const [toOpen, setToOpen] = useState(false);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [rates, setRates] = useState<RatesResponse | null>(null);
@@ -146,22 +146,6 @@ function CurrencyConverter() {
     if (!rates?.conversion_rates) return [] as string[];
     return Object.keys(rates.conversion_rates).sort();
   }, [rates]);
-
-  const fromOptions = useMemo(() => {
-    const q = fromQuery.trim().toLowerCase();
-    if (!q) return allCodes;
-    return allCodes.filter(
-      (c) => c.toLowerCase().includes(q) || nameFor(c).toLowerCase().includes(q),
-    );
-  }, [allCodes, fromQuery]);
-
-  const toOptions = useMemo(() => {
-    const q = toQuery.trim().toLowerCase();
-    if (!q) return allCodes;
-    return allCodes.filter(
-      (c) => c.toLowerCase().includes(q) || nameFor(c).toLowerCase().includes(q),
-    );
-  }, [allCodes, toQuery]);
 
   const numAmount = Number(amount);
   const validAmount = isFinite(numAmount) && numAmount > 0;

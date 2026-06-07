@@ -1,37 +1,44 @@
-# Weather Checker tool
+## Holiday Checker tool
 
-## New files
-- `src/routes/tools.weather-checker.tsx` — new route, mirrors `tools.network-speed-test.tsx` structure: `createFileRoute` with `head()` (title, description, canonical, og tags), `ToolPageShell` (title "Weather Checker", subtitle), `HowToUse` (3 steps), `ToolSeoContent` (H2, ~150-200 word body, 4 FAQs from spec), and `RelatedTools` showing IP Address Lookup, Network Speed Test, World Radio.
+### New files
+- `src/routes/tools.holiday-checker.tsx` — new route mirroring `tools.weather-checker.tsx` structure: `createFileRoute` + `head()` (title, description, canonical, og tags), `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`.
 
-## Tool registration
-- `src/lib/tools.ts` — add `CloudSun` to lucide import, append entry:
-  - slug: `weather-checker`, name: `Weather Checker`, description: `Check live weather and 7-day forecast for any city.`, category: `utility`, icon: `CloudSun`, path: `/tools/weather-checker`.
+### Tool registration
+- `src/lib/tools.ts` — add `Calendar` to lucide import (if not present), append entry:
+  - slug: `holiday-checker`, name: `Holiday Checker`, description: `Find public holidays for any country instantly.`, category: `utility`, icon: `Calendar`, path: `/tools/holiday-checker`, tags: `holidays, calendar, country, public holiday`.
 
-## Implementation details
+### Implementation details
 
-**State:** `city` (input), `loading`, `error`, `data` (current + 7-day forecast + resolved name/country).
+**State:** `countries` (list from API), `countryCode` (selected, default user locale or `US`), `year` (2025 | 2026, default current year clamped), `loading`, `error`, `holidays` (fetched list), `query` (country search filter).
 
-**On mount:** try `navigator.geolocation.getCurrentPosition` (with timeout). If granted, reverse-search via Open-Meteo geocoding using lat/lon → city name; if denied/failed, default to `London`. Either way auto-fetch once.
+**On mount:** fetch `https://date.nager.at/api/v3/AvailableCountries` once → store sorted alphabetically by name. Auto-fetch holidays for default country + current year.
 
 **Search flow:**
-1. `GET https://geocoding-api.open-meteo.com/v1/search?name={city}&count=1&language=en&format=json` — if `results` empty → error "City not found. Please try another name."
-2. `GET https://api.open-meteo.com/v1/forecast?latitude={lat}&longitude={lon}&current=temperature_2m,relative_humidity_2m,apparent_temperature,weather_code,wind_speed_10m,precipitation_probability&daily=weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max&timezone=auto&forecast_days=7`
-3. On network failure → "Could not fetch weather, please try again."
+1. `GET https://date.nager.at/api/v3/PublicHolidays/{year}/{countryCode}` → array of `{ date, localName, name, countryCode, types: string[], global, ... }`.
+2. On network failure → "Could not fetch holidays, please try again."
 
-**WMO mapping helper:** pure function `wmoInfo(code)` → `{ label, emoji }` per the spec table; fallback `{ "Unknown", "🌡️" }`.
+**Helpers:**
+- `flagEmoji(code)` — convert ISO-2 country code to regional indicator emoji (pure function).
+- `formatLongDate(iso)` → `"Monday, 9 June 2026"` via `toLocaleDateString("en-GB", { weekday, day, month, year })`.
+- `daysFromToday(iso)` → integer; label as "Today!" if 0, "in N days" if positive, past otherwise.
+- `nextHoliday(list)` → first holiday with date ≥ today.
 
-**UI (inside ToolPageShell, English-only, semantic tokens):**
-- Search row: `Input` (placeholder "Enter a city…", Enter submits) + `Button` "Check Weather" (shows spinner when loading).
-- Error message under input when present.
-- Current weather `Card`:
-  - Header: `{name}, {country}` + large emoji.
-  - Large temperature `{Math.round(temp)}°C` + condition label.
-  - Grid of 4 stat tiles: Feels like, Humidity, Wind (km/h), Precip chance — each with a Lucide icon (`Thermometer`, `Droplets`, `Wind`, `CloudRain`).
-- 7-day forecast: horizontal `overflow-x-auto` row of 7 small cards: weekday short name (from `daily.time[i]` in tz), emoji, `max° / min°`, rain `%`.
+**UI (inside ToolPageShell):**
+- Controls row (flex/grid): country combobox (Input filter + scrollable list rendering `{flag} {name}`), Year select (`Select` with 2025/2026), `Button` "Check Holidays" with spinner.
+- Error message below controls when present.
+- Results section (when holidays loaded):
+  - Summary bar `Card`: country flag + name • total count • year.
+  - Next Holiday banner: accent-tinted `Card` (`--cyan-brand` mix bg) — name, formatted date, "in X days" / "Today!".
+  - Holidays list: rows with Date / Weekday / Name / Type badge (Public/Optional from `types[0]`). Next upcoming row gets accent bg; past holidays `opacity-50`.
+  - Footer: `"X holidays in {Country} — {Year}"`.
 
-**SEO content:** ToolSeoContent body and FAQs taken verbatim from the spec.
+**SEO content:** `ToolSeoContent` with H2 "Public Holiday Checker — National Holidays for Every Country", 3 paragraphs from spec, 4 FAQs verbatim.
 
-**No backend, no new dependencies, no env vars.** All requests are direct browser fetches to Open-Meteo (CORS-enabled, no key).
+**HowToUse steps:** "Pick a country from the dropdown.", "Choose a year (2025 or 2026).", "Click Check Holidays to see the full list and the next upcoming holiday."
 
-## Out of scope
+**RelatedTools:** uses `currentSlug="holiday-checker"` — the existing `getRelatedTools` picks from same category. (Spec asks for Weather Checker, Age Calculator, World Radio — these are all utility tools so the default related component will work; no changes to related-tools logic.)
+
+**No backend, no new dependencies, no env vars.** All direct browser fetches to Nager.Date (CORS-enabled, no key).
+
+### Out of scope
 No edits to other routes or shared components. `routeTree.gen.ts` regenerates automatically.

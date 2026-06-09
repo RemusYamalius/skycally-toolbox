@@ -1,44 +1,64 @@
-## Holiday Checker tool
+# Space Shooter + Reusable Mobile Controls
 
-### New files
-- `src/routes/tools.holiday-checker.tsx` — new route mirroring `tools.weather-checker.tsx` structure: `createFileRoute` + `head()` (title, description, canonical, og tags), `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`.
+## Part 1 — Space Shooter game
 
-### Tool registration
-- `src/lib/tools.ts` — add `Calendar` to lucide import (if not present), append entry:
-  - slug: `holiday-checker`, name: `Holiday Checker`, description: `Find public holidays for any country instantly.`, category: `utility`, icon: `Calendar`, path: `/tools/holiday-checker`, tags: `holidays, calendar, country, public holiday`.
+**Route:** `/tools/space-shooter` (matches existing game convention; tools list uses `/tools/*` paths, not `/games/*`).
 
-### Implementation details
+**Files:**
+- `src/routes/tools.space-shooter.tsx` — new route with head() (title, meta description, canonical = `https://skycally.com/tools/space-shooter`, og tags).
+- `src/components/games/space-shooter/SpaceShooterGame.tsx` — canvas game component.
+- Register entry in `src/lib/tools.ts` under `minigames` category with Rocket icon, slug `space-shooter`.
 
-**State:** `countries` (list from API), `countryCode` (selected, default user locale or `US`), `year` (2025 | 2026, default current year clamped), `loading`, `error`, `holidays` (fetched list), `query` (country search filter).
+**Page structure** (follows existing game pages):
+- `ToolPageShell` with H1 "Space Shooter" + subtitle "Destroy alien ships and survive the galaxy attack!" + "No signup required" badge.
+- Game canvas (max-w 480px desktop, full width mobile).
+- Desktop controls hint: "← → to move • Space to shoot".
+- Mobile controls overlay (joystick bottom-left, fire button bottom-right, AUTO 🔥 toggle above canvas).
+- `HowToUse` block.
+- `ToolSeoContent` with H2, 3 paragraphs (~80 words each), 4 FAQs as specified.
+- `RelatedTools` showing Snake, 2048, Wordle.
 
-**On mount:** fetch `https://date.nager.at/api/v3/AvailableCountries` once → store sorted alphabetically by name. Auto-fetch holidays for default country + current year.
+**Canvas game engine** (single rAF loop):
+- Player ship bottom-center, left/right move, shoot upward, 3 lives, invincibility flash after hit.
+- Enemy grid 5×3, left/right drift, descend on edge bounce, random downward bullets.
+- Player bullets cyan, enemy bullets red/orange. AABB collision.
+- Score (+10 per enemy), wave counter (faster each wave), lives icons — all rendered inside canvas.
+- Parallax star background, occasional nebula sprite drawn procedurally.
+- Particle explosion on hit, brief red flash when player loses life.
+- Start screen ("SPACE SHOOTER" + Tap/Space to start + brief instructions), Game Over screen (final score, wave, Play Again button — hit-test inside canvas).
+- High score persisted to `localStorage` (key `space-shooter:high`).
 
-**Search flow:**
-1. `GET https://date.nager.at/api/v3/PublicHolidays/{year}/{countryCode}` → array of `{ date, localName, name, countryCode, types: string[], global, ... }`.
-2. On network failure → "Could not fetch holidays, please try again."
+**Input:**
+- Keyboard: ArrowLeft/A, ArrowRight/D, Space (with key-repeat throttled to ~150ms per shot).
+- Touch: virtual joystick (outer 80px, thumb 35px) + fire button (80px, ⚡ icon, hold = auto-repeat 200ms) + AUTO toggle pill (default ON, fires every 300ms). Touch handlers use `touchstart/touchmove/touchend` with `preventDefault` on the joystick/fire zones so canvas swipes don't conflict.
+- Mobile controls only rendered when `'ontouchstart' in window`. Opacity 0.75.
 
-**Helpers:**
-- `flagEmoji(code)` — convert ISO-2 country code to regional indicator emoji (pure function).
-- `formatLongDate(iso)` → `"Monday, 9 June 2026"` via `toLocaleDateString("en-GB", { weekday, day, month, year })`.
-- `daysFromToday(iso)` → integer; label as "Today!" if 0, "in N days" if positive, past otherwise.
-- `nextHoliday(list)` → first holiday with date ≥ today.
+## Part 2 — Reusable MobileControls component
 
-**UI (inside ToolPageShell):**
-- Controls row (flex/grid): country combobox (Input filter + scrollable list rendering `{flag} {name}`), Year select (`Select` with 2025/2026), `Button` "Check Holidays" with spinner.
-- Error message below controls when present.
-- Results section (when holidays loaded):
-  - Summary bar `Card`: country flag + name • total count • year.
-  - Next Holiday banner: accent-tinted `Card` (`--cyan-brand` mix bg) — name, formatted date, "in X days" / "Today!".
-  - Holidays list: rows with Date / Weekday / Name / Type badge (Public/Optional from `types[0]`). Next upcoming row gets accent bg; past holidays `opacity-50`.
-  - Footer: `"X holidays in {Country} — {Year}"`.
+**File:** `src/components/games/MobileControls.tsx`
 
-**SEO content:** `ToolSeoContent` with H2 "Public Holiday Checker — National Holidays for Every Country", 3 paragraphs from spec, 4 FAQs verbatim.
+Exposes:
+- `<MobileDpad onChange={(dir) => void} variant="4way" | "horizontal" />` — emits `'up'|'down'|'left'|'right'|null`.
+- `<MobileActionButton label icon onPress onRelease />` — touch hold support.
+- `<MobileControls>` wrapper that auto-hides when no touch capability.
 
-**HowToUse steps:** "Pick a country from the dropdown.", "Choose a year (2025 or 2026).", "Click Check Holidays to see the full list and the next upcoming holiday."
+**Applied to existing keyboard-driven games:**
+- Snake (4-way dpad)
+- Tetris (4-way + rotate button)
+- 2048 (swipe is already supported via touch; add 4-way dpad for parity)
+- Pac-Man (4-way)
+- Breakout (horizontal dpad)
+- Flappy Bird (single tap button — already touch-friendly; skip if already mobile-OK)
+- Tunnel Dash (4-way)
+- Pinball (left/right flipper buttons)
 
-**RelatedTools:** uses `currentSlug="holiday-checker"` — the existing `getRelatedTools` picks from same category. (Spec asks for Weather Checker, Age Calculator, World Radio — these are all utility tools so the default related component will work; no changes to related-tools logic.)
+For each: import MobileControls, render below the canvas, dispatch synthetic key events or call existing input handlers. No business-logic changes — only adds a touch input surface alongside existing keyboard handling.
 
-**No backend, no new dependencies, no env vars.** All direct browser fetches to Nager.Date (CORS-enabled, no key).
+## Verification
+- Visit `/tools/space-shooter` in preview at desktop + mobile viewports; confirm gameplay, controls, SEO content.
+- Quick check each updated keyboard game still works with keyboard and now responds to on-screen controls in mobile viewport.
 
-### Out of scope
-No edits to other routes or shared components. `routeTree.gen.ts` regenerates automatically.
+## Technical notes
+- Canvas uses `requestAnimationFrame` with delta-time; logical resolution 480×640, CSS-scaled to container width preserving aspect ratio.
+- All UI text English only (per project rule).
+- Tools list entry uses Rocket from lucide-react.

@@ -72,6 +72,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "mahjong": ["sudoku", "memory-match", "sliding-puzzle"],
   "tunnel-dash": ["snake", "pac-man", "breakout"],
   "pinball": ["breakout", "bubble-shooter", "pac-man"],
+  "space-shooter": ["snake", "2048", "wordle"],
 
   // Utility
   "ip-address-lookup": ["network-speed-test", "qr-generator", "url-encoder"],

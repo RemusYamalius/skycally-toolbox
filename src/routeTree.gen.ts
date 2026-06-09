@@ -46,6 +46,7 @@ import { Route as ToolsSshKeyGeneratorRouteImport } from './routes/tools.ssh-key
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-text'
+import { Route as ToolsSpaceShooterRouteImport } from './routes/tools.space-shooter'
 import { Route as ToolsSolitaireRouteImport } from './routes/tools.solitaire'
 import { Route as ToolsSnakeRouteImport } from './routes/tools.snake'
 import { Route as ToolsSlidingPuzzleRouteImport } from './routes/tools.sliding-puzzle'
@@ -311,6 +312,11 @@ const ToolsSpinningWheelRoute = ToolsSpinningWheelRouteImport.update({
 const ToolsSpeechToTextRoute = ToolsSpeechToTextRouteImport.update({
   id: '/tools/speech-to-text',
   path: '/tools/speech-to-text',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSpaceShooterRoute = ToolsSpaceShooterRouteImport.update({
+  id: '/tools/space-shooter',
+  path: '/tools/space-shooter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSolitaireRoute = ToolsSolitaireRouteImport.update({
@@ -808,6 +814,7 @@ export interface FileRoutesByFullPath {
   '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
   '/tools/solitaire': typeof ToolsSolitaireRoute
+  '/tools/space-shooter': typeof ToolsSpaceShooterRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
@@ -927,6 +934,7 @@ export interface FileRoutesByTo {
   '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
   '/tools/solitaire': typeof ToolsSolitaireRoute
+  '/tools/space-shooter': typeof ToolsSpaceShooterRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
@@ -1047,6 +1055,7 @@ export interface FileRoutesById {
   '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
   '/tools/solitaire': typeof ToolsSolitaireRoute
+  '/tools/space-shooter': typeof ToolsSpaceShooterRoute
   '/tools/speech-to-text': typeof ToolsSpeechToTextRoute
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
@@ -1168,6 +1177,7 @@ export interface FileRouteTypes {
     | '/tools/sliding-puzzle'
     | '/tools/snake'
     | '/tools/solitaire'
+    | '/tools/space-shooter'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
@@ -1287,6 +1297,7 @@ export interface FileRouteTypes {
     | '/tools/sliding-puzzle'
     | '/tools/snake'
     | '/tools/solitaire'
+    | '/tools/space-shooter'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
@@ -1406,6 +1417,7 @@ export interface FileRouteTypes {
     | '/tools/sliding-puzzle'
     | '/tools/snake'
     | '/tools/solitaire'
+    | '/tools/space-shooter'
     | '/tools/speech-to-text'
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
@@ -1526,6 +1538,7 @@ export interface RootRouteChildren {
   ToolsSlidingPuzzleRoute: typeof ToolsSlidingPuzzleRoute
   ToolsSnakeRoute: typeof ToolsSnakeRoute
   ToolsSolitaireRoute: typeof ToolsSolitaireRoute
+  ToolsSpaceShooterRoute: typeof ToolsSpaceShooterRoute
   ToolsSpeechToTextRoute: typeof ToolsSpeechToTextRoute
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
@@ -1818,6 +1831,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/speech-to-text'
       fullPath: '/tools/speech-to-text'
       preLoaderRoute: typeof ToolsSpeechToTextRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/space-shooter': {
+      id: '/tools/space-shooter'
+      path: '/tools/space-shooter'
+      fullPath: '/tools/space-shooter'
+      preLoaderRoute: typeof ToolsSpaceShooterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/solitaire': {
@@ -2473,6 +2493,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSlidingPuzzleRoute: ToolsSlidingPuzzleRoute,
   ToolsSnakeRoute: ToolsSnakeRoute,
   ToolsSolitaireRoute: ToolsSolitaireRoute,
+  ToolsSpaceShooterRoute: ToolsSpaceShooterRoute,
   ToolsSpeechToTextRoute: ToolsSpeechToTextRoute,
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
@@ -2508,12 +2529,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

@@ -261,7 +261,7 @@ function WordProcessor() {
       const m = text.match(/<body[^>]*>([\s\S]*?)<\/body>/i);
       if (editorRef.current) editorRef.current.innerHTML = m ? m[1] : text;
     } else if (name.endsWith(".docx")) {
-      const mammoth = await import("mammoth/mammoth.browser");
+      const mammoth: any = await import(/* @vite-ignore */ "mammoth/mammoth.browser");
       const buf = await file.arrayBuffer();
       const res = await (mammoth as any).convertToHtml({ arrayBuffer: buf });
       if (editorRef.current) editorRef.current.innerHTML = res.value || "<p><br/></p>";

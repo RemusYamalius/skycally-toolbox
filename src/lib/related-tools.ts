@@ -61,6 +61,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "word-counter": ["markdown-to-html", "json-formatter", "text-to-speech"],
   "json-formatter": ["base64", "markdown-to-html", "word-counter"],
   "markdown-to-html": ["word-counter", "json-formatter", "add-text-to-image"],
+  "word-processor": ["currency-converter", "weather-checker", "text-to-speech"],
 
   // Mini Games
   "sliding-puzzle": ["sudoku", "memory-match", "minesweeper"],

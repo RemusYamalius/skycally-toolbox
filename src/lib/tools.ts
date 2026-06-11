@@ -138,7 +138,7 @@ export const tools: Tool[] = [
   { slug: "holiday-checker", name: "Holiday Checker", description: "Find public holidays for any country instantly.", category: "utility", icon: Calendar, path: "/tools/holiday-checker" },
   { slug: "country-info", name: "Country Info", description: "Explore facts and data for every country in the world.", category: "utility", icon: Globe, path: "/tools/country-info" },
   { slug: "currency-converter", name: "Currency Converter", description: "Convert between 170+ currencies with live exchange rates.", category: "utility", icon: ArrowLeftRight, path: "/tools/currency-converter" },
-  { slug: "word-processor", name: "Word Processor", description: "Full-featured online word processor, no signup needed.", category: "text", categories: ["text", "pdf"], icon: FileText, path: "/tools/word-processor" },
+  { slug: "word-processor", name: "Word Processor", description: "Write and format documents free in your browser. No Google account, no Microsoft account needed. Supports Arabic RTL, exports to PDF and Word.", category: "text", categories: ["text", "pdf"], icon: FileText, path: "/tools/word-processor" },
 ];
 
 

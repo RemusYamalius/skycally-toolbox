@@ -1,64 +1,107 @@
-# Online Word Processor — /tools/word-processor
+# Rebuild `/tools/word-processor`
 
-A browser-only, Microsoft Word-style document editor. No uploads, no backend.
+Full rewrite of `src/routes/tools.word-processor.tsx` using **TipTap** as the editor core. All other tool-page conventions (`ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools`) stay intact.
 
-## Scope
+## Files changed
 
-Single route file `src/routes/tools.word-processor.tsx` using the standard `ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools` structure, plus registration in `src/lib/tools.ts` and `src/lib/related-tools.ts`.
+- `src/routes/tools.word-processor.tsx` — full rewrite (single file, local sub-components)
+- `package.json` — add TipTap deps (keep `mammoth`, `docx`)
+- `src/lib/tools.ts` — update tool description + SEO copy for new title/meta
+- `.lovable/plan.md` — replace with this plan
 
-## Files changed/created
+## Dependencies to add
 
-1. `src/routes/tools.word-processor.tsx` — new route (the editor lives here, split into local sub-components in the same file to stay consistent with other tool pages).
-2. `src/lib/tools.ts` — register new tool (utility category, FileText icon, slug `word-processor`).
-3. `src/lib/related-tools.ts` — map: `word-processor → [currency-converter, weather-checker, text-to-speech]` and add reverse links where natural.
-
-(Existing tool category labels are `utility`, `text`, etc. — there is no "Document Tools" category. I'll place it under `text` since it best matches an editor, with the requested name "Word Processor".)
+```
+@tiptap/react @tiptap/pm @tiptap/starter-kit
+@tiptap/extension-underline @tiptap/extension-text-style
+@tiptap/extension-color @tiptap/extension-highlight
+@tiptap/extension-font-family @tiptap/extension-text-align
+@tiptap/extension-subscript @tiptap/extension-superscript
+@tiptap/extension-table @tiptap/extension-table-row
+@tiptap/extension-table-cell @tiptap/extension-table-header
+@tiptap/extension-image @tiptap/extension-horizontal-rule
+@tiptap/extension-link @tiptap/extension-placeholder
+```
+Custom TipTap extensions written inline: `FontSize`, `LineHeight`, `Direction` (RTL/LTR), `PageBreak` node (renders `<hr class="page-break">`).
 
 ## Editor architecture
 
-- `contentEditable` div as the editing surface, using `document.execCommand` for formatting (bold/italic/underline/strike/sub/sup/foreColor/hiliteColor/justifyLeft|Center|Right|Full/insertOrderedList/insertUnorderedList/indent/outdent/insertHorizontalRule/removeFormat/undo/redo/fontName/fontSize).
-- Multi-page illusion: render a stack of `<div class="page">` (A4 by default) with white background, drop shadow, fixed CSS size in `mm`, on a gray canvas. Auto-pagination is implemented by measuring content overflow with `ResizeObserver` and splitting on page-break boundaries (best-effort; manual Insert Page Break also supported via a styled `<hr class="page-break">` that triggers a new page).
-- Rulers: simple SVG/divs above and to the left of the page showing cm marks (toggle cm/in).
-- Status bar: fixed at the bottom of the editor card showing Page X of Y, words, chars (with/without spaces), line:col (derived from selection), LTR/RTL, zoom.
-- Zoom: CSS `transform: scale()` on the page stack, 50–200%.
-- Auto-save: `localStorage` key `wp:doc` every 30s + on blur; restore on mount.
+- Single TipTap `EditorContent` rendered inside a CSS-scaled `.wp-page` (A4: 794×1123px, 2.54cm padding, white background, black text — forced with `!important` to override dark mode).
+- **Pagination** = pure CSS columns trick: TipTap content renders inside one tall element styled with `column-width: 754px; column-gap: 24px; column-fill: auto; height: <Npages × 1123>px`. Each "column" visually becomes one A4 page (white card + shadow drawn via repeating linear-gradient background on the wrapping `.wp-canvas`). Page count derived from `editor.view.dom.scrollHeight / 1123` via `ResizeObserver`. Manual `PageBreak` node inserts `break-before: column`.
+  - Fallback if the columns approach proves fragile during build: render a stack of N fixed-height `.wp-page` divs as a visual backdrop behind a single absolutely-positioned editor surface. Decision made in code; user-facing behavior identical.
+- Outer wrapper: `.wp-canvas` — `bg-[#d0d0d0]`, `overflow-y:auto`, `height: calc(100vh - 220px)`, gray gap 24px (16px on mobile).
+- **Dark mode safety**: `.wp-page { background:#fff !important; color:#1a1a1a !important; }` and all descendant text inherits. Only the canvas background and toolbar follow theme.
+- **Mobile**: `@media (max-width: 768px)` wraps `.wp-page` in `transform: scale(var(--wp-scale))` where `--wp-scale = min(1, (100vw - 32px) / 794)`, set via `ResizeObserver` on the canvas.
 
-## Toolbar (ribbon)
+## Rulers
 
-Implemented as 6 grouped rows inside a sticky toolbar component. Each control wraps `execCommand` or sets inline style on the current selection/block.
+- `TopRuler` component: 794px wide × 24px tall, `#e8e8e8`, SVG with ticks every 0.5cm, numbers every 1cm, draggable gray margin handles (left/right) that update editor padding state.
+- `LeftRuler`: 24px wide × 1123px tall, same style, height-aware.
+- cm/inch toggle in toolbar (state).
+- Show/hide toggle in toolbar (state, default visible).
+- Optional faint blue margin guide lines on the page (toggleable).
 
-- Row 1 File: New, Open (.txt/.html parsed inline; .docx via dynamic `import("mammoth")` → HTML), Save .txt, Export PDF (`window.print()` with print stylesheet that hides UI and shows only `.page`), Export .docx (dynamic `import("docx")` building Document from current HTML — paragraphs + runs; tables/images best-effort), Print.
-- Row 2 Font: family dropdown (Google Fonts loaded via a single injected `<link>` to `fonts.googleapis.com` with all requested families), size (6–96), B/I/U/Strike/Sub/Sup, text color, highlight color, clear formatting.
-- Row 3 Paragraph: align L/C/R/J, RTL/LTR toggles (set `direction` on block), bullet styles dropdown (8 variants — via `list-style-type` on the inserted `<ul>`), numbered list dropdown (7 variants — via `list-style-type` on `<ol>`), increase/decrease indent, line spacing (Single/1.15 default/1.5/2/2.5/3/custom), space before/after, paragraph border presets.
-- Row 4 Insert: heading style dropdown (Normal/H1–H4/Title/Subtitle/Quote), table grid picker 1×1–10×10 (+ contextual table toolbar that appears when caret is inside a table: add/remove rows & columns, merge/split via colspan/rowspan, border style, bg color), Insert Image (file → dataURL → resizable+floatable `<img>`), Horizontal Rule, Page Break, Special Characters picker (curated grid), Insert Date/Time.
-- Row 5 Layout: page size (A4 default, A3, A5, Letter, Legal — sets CSS mm dimensions), orientation (Portrait/Landscape — swap w/h), margins (Normal/Narrow/Wide/Custom), columns (1/2/3 — CSS `column-count` on the page), page background color.
-- Row 6 Review: Undo, Redo, Find & Replace modal (regex-free, case-insensitive toggle, Replace / Replace All on the contentEditable text), Word Count modal with detailed stats, Spell Check toggle (`spellcheck` attribute), Read Aloud (Web Speech API `speechSynthesis`), editor dark mode toggle (only the editor chrome; page stays white).
+## Toolbar (ribbon — 6 rows)
+
+Every control is wired directly to a TipTap chain command, guaranteeing it works:
+
+- **Row 1 File**: New, Open (.txt/.html/.docx via dynamic `mammoth`), Save .txt, Export PDF (`window.print()`), Export .docx (dynamic `docx`), Print, **Templates** (opens modal).
+- **Row 2 Font**: family dropdown (Google Fonts injected once via `<link>`), size 6–96 (custom `FontSize` mark), B / I / U / Strike / Sub / Sup, text color, highlight color, clear formatting.
+- **Row 3 Paragraph**: align L/C/R/J, RTL/LTR (custom `Direction` attr on block), 8 bullet styles + 7 numbered styles via `list-style-type` on the active list node, indent +/-, line spacing dropdown (1/1.15/1.5/2/2.5/3), space before/after (custom block attrs), border presets (apply class to current block).
+- **Row 4 Insert**: heading H1–H4 + Title/Subtitle/Quote, table grid picker 1×1–10×10 + contextual table toolbar (add/remove row/col, merge/split, bg color), image upload (file → dataURL), horizontal rule, page break, special characters picker grid, insert date/time.
+- **Row 5 Layout**: page size (A4/A3/A5/Letter/Legal → swap CSS `--wp-w/--wp-h`), orientation, margins preset, columns (1/2/3 via CSS `column-count` on `.wp-page-inner`), page bg.
+- **Row 6 Review**: Undo, Redo, Find & Replace modal (regex-free, case toggle, Replace / Replace All operating on `editor.state.doc`), Word Count modal, Spell Check toggle (`spellcheck` attr on editor DOM), Read Aloud (`speechSynthesis`), editor dark mode (chrome only — page stays white), Rulers toggle, cm/inch toggle.
+
+All controls are real `<button>` elements with `min-h-9 min-w-9` for mobile touch.
+
+## Hero banner
+
+Above toolbar, dismissible (state + `localStorage` key `wp:hero_dismissed`):
+
+```
+✨ No Google account. No Microsoft account. Just open and write.
+```
+
+Subtle `bg-[color-mix(in_oklab,var(--cyan-brand)_10%,transparent)]` strip with an `X` button.
+
+## Auto-save indicator
+
+In toolbar status bar, three states cycling:
+- `Saving…` (spinner) when a debounced write is in flight
+- `💾 Auto-saved` + green dot after success
+- Timestamp tooltip on hover
+
+Save every 30s on a timer + on every `onUpdate` debounced (1.5s). Key: `skycally_word_doc` (also keep legacy `wp:doc` for migration).
+
+## Templates modal
+
+Triggered by Row 1 "Templates" button. 4 cards:
+1. **CV / Resume**
+2. **Cover Letter**
+3. **Invoice** (uses a real TipTap table)
+4. **Essay**
+
+Each is a hard-coded HTML string loaded via `editor.commands.setContent(html)`. If editor has content, show confirmation dialog first.
 
 ## Keyboard shortcuts
 
-Single `keydown` listener on the editor: Ctrl/Cmd + B/I/U/Z/Y/A/C/X/V/F/H/P/S/L/E/R/J wired to corresponding actions. Default browser behavior used where it already matches (C/X/V/A); others are intercepted with `preventDefault`.
+TipTap covers Ctrl/Cmd+B/I/U/Z/Y by default. Add custom: Ctrl+S → download .txt, Ctrl+P → print, Ctrl+F → open Find modal, Ctrl+H → open Find & Replace modal.
 
-## Dependencies
+## SEO updates
 
-Add as runtime imports (dynamic where possible to keep first paint fast):
-- `mammoth` — .docx → HTML on open.
-- `docx` — HTML → .docx on export.
+- Route `head()`:
+  - Title: `Free Online Word Processor — No Signup, No Microsoft Account | Skycally`
+  - Description: `Write and format documents free in your browser. No Google account, no Microsoft account needed. Supports Arabic RTL, exports to PDF and Word. Try Skycally's free word processor now.`
+  - Canonical: `https://skycally.com/tools/word-processor`
+- `ToolPageShell` title becomes `Free Online Word Processor — Write Anywhere, No Account Needed`.
+- `ToolSeoContent` body paragraphs and FAQs naturally include all 6 target keywords.
 
-Both are pure-JS and edge-safe (used only in the browser). No server functions needed.
+## Notes / tradeoffs
 
-## SEO content
+- TipTap (~80KB gzip) is loaded eagerly because it IS the page. `mammoth` and `docx` stay dynamic.
+- True mid-paragraph pagination across columns is a CSS approximation; manual page break is exact. Acceptable for a browser-only Word-style editor.
+- `.docx` export covers paragraphs, headings, lists, tables, images, basic marks. Complex CSS (multi-column, custom borders) does not round-trip.
+- Forcing `.wp-page` to white in dark mode is intentional — matches every real document editor.
+- No backend, no network calls, no account.
 
-Inside `ToolPageShell` after `HowToUse`, render `<ToolSeoContent>` with the 3-paragraph body and the 4 FAQs from the spec. Add the 5th FAQ ("Does it work offline?") so we have 5 — `ToolSeoContent` accepts an array.
-
-Head meta via `buildToolMeta(toolBySlug("word-processor", tools))`. Confirm `seo.ts` builds canonical from slug → `/tools/word-processor`; if not, the route's `head()` will override with title/description/canonical exactly as specified.
-
-## Related Tools
-
-`<RelatedTools currentSlug="word-processor" />` shows the 3 listed: currency-converter, weather-checker, text-to-speech.
-
-## Notes / Tradeoffs
-
-- `execCommand` is deprecated but remains the only practical cross-browser way to build a rich editor without a 100KB+ framework (Slate/Lexical/TipTap). All major browsers still implement it.
-- True multi-page flow-pagination (splitting a paragraph across pages mid-line) is not feasible without a layout engine. We approximate: each `.page` is a fixed-height container; when content height exceeds it, we auto-append a new `.page` and visually overflow content into it via `overflow: visible` + a page-break separator line. Manual Page Break is exact.
-- `.docx` export covers text, formatting, headings, lists, tables, and images; complex CSS (multi-column, custom borders) may not round-trip perfectly.
-- Auto-save stores HTML in `localStorage` only — no network calls ever.
+Ask me anything before I switch to build mode, otherwise approve and I'll implement.

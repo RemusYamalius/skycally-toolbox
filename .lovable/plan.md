@@ -1,107 +1,70 @@
-# Rebuild `/tools/word-processor`
+# Weather Checker — Add Hourly, UV/AQI, Sun Times, Map
 
-Full rewrite of `src/routes/tools.word-processor.tsx` using **TipTap** as the editor core. All other tool-page conventions (`ToolPageShell` + `HowToUse` + `ToolSeoContent` + `RelatedTools`) stay intact.
+Single-file change: `src/routes/tools.weather-checker.tsx`. Keep existing design, layout, and helpers intact; extend types, fetcher, and JSX.
 
-## Files changed
+## Data layer
 
-- `src/routes/tools.word-processor.tsx` — full rewrite (single file, local sub-components)
-- `package.json` — add TipTap deps (keep `mammoth`, `docx`)
-- `src/lib/tools.ts` — update tool description + SEO copy for new title/meta
-- `.lovable/plan.md` — replace with this plan
+Extend `fetchForecast(lat, lon)` URL:
+- add `&hourly=temperature_2m,weather_code,precipitation_probability`
+- add `&forecast_hours=24`
+- extend daily to `weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset`
 
-## Dependencies to add
-
+Add `fetchAirQuality(lat, lon)`:
 ```
-@tiptap/react @tiptap/pm @tiptap/starter-kit
-@tiptap/extension-underline @tiptap/extension-text-style
-@tiptap/extension-color @tiptap/extension-highlight
-@tiptap/extension-font-family @tiptap/extension-text-align
-@tiptap/extension-subscript @tiptap/extension-superscript
-@tiptap/extension-table @tiptap/extension-table-row
-@tiptap/extension-table-cell @tiptap/extension-table-header
-@tiptap/extension-image @tiptap/extension-horizontal-rule
-@tiptap/extension-link @tiptap/extension-placeholder
+https://air-quality-api.open-meteo.com/v1/air-quality
+  ?latitude={lat}&longitude={lon}&current=european_aqi&timezone=auto
 ```
-Custom TipTap extensions written inline: `FontSize`, `LineHeight`, `Direction` (RTL/LTR), `PageBreak` node (renders `<hr class="page-break">`).
+Wrap in try/catch; AQI is optional (don't fail the whole load if it errors).
 
-## Editor architecture
+Run forecast + AQI in parallel via `Promise.all`. Preserve the returned `timezone` from the forecast response and pass it to time formatters so sunrise/sunset and hourly times render in the city's local time.
 
-- Single TipTap `EditorContent` rendered inside a CSS-scaled `.wp-page` (A4: 794×1123px, 2.54cm padding, white background, black text — forced with `!important` to override dark mode).
-- **Pagination** = pure CSS columns trick: TipTap content renders inside one tall element styled with `column-width: 754px; column-gap: 24px; column-fill: auto; height: <Npages × 1123>px`. Each "column" visually becomes one A4 page (white card + shadow drawn via repeating linear-gradient background on the wrapping `.wp-canvas`). Page count derived from `editor.view.dom.scrollHeight / 1123` via `ResizeObserver`. Manual `PageBreak` node inserts `break-before: column`.
-  - Fallback if the columns approach proves fragile during build: render a stack of N fixed-height `.wp-page` divs as a visual backdrop behind a single absolutely-positioned editor surface. Decision made in code; user-facing behavior identical.
-- Outer wrapper: `.wp-canvas` — `bg-[#d0d0d0]`, `overflow-y:auto`, `height: calc(100vh - 220px)`, gray gap 24px (16px on mobile).
-- **Dark mode safety**: `.wp-page { background:#fff !important; color:#1a1a1a !important; }` and all descendant text inherits. Only the canvas background and toolbar follow theme.
-- **Mobile**: `@media (max-width: 768px)` wraps `.wp-page` in `transform: scale(var(--wp-scale))` where `--wp-scale = min(1, (100vw - 32px) / 794)`, set via `ResizeObserver` on the canvas.
+## Type extensions
 
-## Rulers
-
-- `TopRuler` component: 794px wide × 24px tall, `#e8e8e8`, SVG with ticks every 0.5cm, numbers every 1cm, draggable gray margin handles (left/right) that update editor padding state.
-- `LeftRuler`: 24px wide × 1123px tall, same style, height-aware.
-- cm/inch toggle in toolbar (state).
-- Show/hide toggle in toolbar (state, default visible).
-- Optional faint blue margin guide lines on the page (toggleable).
-
-## Toolbar (ribbon — 6 rows)
-
-Every control is wired directly to a TipTap chain command, guaranteeing it works:
-
-- **Row 1 File**: New, Open (.txt/.html/.docx via dynamic `mammoth`), Save .txt, Export PDF (`window.print()`), Export .docx (dynamic `docx`), Print, **Templates** (opens modal).
-- **Row 2 Font**: family dropdown (Google Fonts injected once via `<link>`), size 6–96 (custom `FontSize` mark), B / I / U / Strike / Sub / Sup, text color, highlight color, clear formatting.
-- **Row 3 Paragraph**: align L/C/R/J, RTL/LTR (custom `Direction` attr on block), 8 bullet styles + 7 numbered styles via `list-style-type` on the active list node, indent +/-, line spacing dropdown (1/1.15/1.5/2/2.5/3), space before/after (custom block attrs), border presets (apply class to current block).
-- **Row 4 Insert**: heading H1–H4 + Title/Subtitle/Quote, table grid picker 1×1–10×10 + contextual table toolbar (add/remove row/col, merge/split, bg color), image upload (file → dataURL), horizontal rule, page break, special characters picker grid, insert date/time.
-- **Row 5 Layout**: page size (A4/A3/A5/Letter/Legal → swap CSS `--wp-w/--wp-h`), orientation, margins preset, columns (1/2/3 via CSS `column-count` on `.wp-page-inner`), page bg.
-- **Row 6 Review**: Undo, Redo, Find & Replace modal (regex-free, case toggle, Replace / Replace All operating on `editor.state.doc`), Word Count modal, Spell Check toggle (`spellcheck` attr on editor DOM), Read Aloud (`speechSynthesis`), editor dark mode (chrome only — page stays white), Rulers toggle, cm/inch toggle.
-
-All controls are real `<button>` elements with `min-h-9 min-w-9` for mobile touch.
-
-## Hero banner
-
-Above toolbar, dismissible (state + `localStorage` key `wp:hero_dismissed`):
-
-```
-✨ No Google account. No Microsoft account. Just open and write.
+```ts
+interface HourlyEntry { time: string; code: number; temp: number; precip: number }
+interface WeatherData {
+  // existing fields…
+  timezone: string;
+  current: { …existing, uvMax: number, sunrise: string, sunset: string };
+  hourly: HourlyEntry[];
+  aqi: number | null;
+  lat: number; lon: number;
+}
 ```
 
-Subtle `bg-[color-mix(in_oklab,var(--cyan-brand)_10%,transparent)]` strip with an `X` button.
+Store `lat`/`lon` on `data` so the map iframe can read them.
 
-## Auto-save indicator
+## Helpers (new, small)
 
-In toolbar status bar, three states cycling:
-- `Saving…` (spinner) when a debounced write is in flight
-- `💾 Auto-saved` + green dot after success
-- Timestamp tooltip on hover
+- `uvInfo(uv)` → `{ emoji, label }` per the 5 tiers (0-2 Low … 11+ Extreme).
+- `aqiInfo(aqi)` → 6 tiers (Good → Extremely Poor).
+- `formatTimeInTz(iso, tz)` → `HH:mm` via `toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit", timeZone: tz })`.
 
-Save every 30s on a timer + on every `onUpdate` debounced (1.5s). Key: `skycally_word_doc` (also keep legacy `wp:doc` for migration).
+## JSX additions (in this order, between existing sections)
 
-## Templates modal
+1. Inside the existing current-weather grid (`grid-cols-2`), append four more `StatTile`s:
+   - Sunrise (🌅) — `formatTimeInTz(current.sunrise, timezone)`
+   - Sunset (🌇) — `formatTimeInTz(current.sunset, timezone)`
+   - UV Index — `${uvMax} ${uvInfo.emoji} ${uvInfo.label}`
+   - Air Quality — `${aqi} ${aqiInfo.emoji} ${aqiInfo.label}` (or `"—"` when null)
 
-Triggered by Row 1 "Templates" button. 4 cards:
-1. **CV / Resume**
-2. **Cover Letter**
-3. **Invoice** (uses a real TipTap table)
-4. **Essay**
+2. New "24-Hour Forecast" section placed BEFORE the existing "7-Day Forecast" section. Same `flex gap-3 overflow-x-auto` strip, with narrower cards (`w-20`), showing time, emoji, temp, precip%.
 
-Each is a hard-coded HTML string loaded via `editor.commands.setContent(html)`. If editor has content, show confirmation dialog first.
+3. New "City Map" section placed AFTER the 7-day strip and BEFORE `HowToUse`:
+   - Heading: `📍 {data.name} on the map`
+   - `<iframe>` with `src` built from `bbox=lon-0.1,lat-0.1,lon+0.1,lat+0.1&layer=mapnik&marker=lat,lon`
+   - Styled with `w-full h-[200px] rounded-xl border border-border`
+   - `loading="lazy"`, `title="{city} map"`
 
-## Keyboard shortcuts
+## SEO
 
-TipTap covers Ctrl/Cmd+B/I/U/Z/Y by default. Add custom: Ctrl+S → download .txt, Ctrl+P → print, Ctrl+F → open Find modal, Ctrl+H → open Find & Replace modal.
+Update `<ToolSeoContent>`:
+- New description: "Check live weather for any city — current conditions, 24-hour forecast, 7-day outlook, UV index, air quality, sunrise and sunset times. Free, no signup."
+- Rewrite the 3 body paragraphs to naturally include: uv index checker free, air quality index online, sunrise sunset times, hourly weather forecast free, weather checker no signup.
+- Keep FAQs; add nothing new unless trimming.
 
-## SEO updates
+The route `head()` is generated by `buildToolMeta` from `tools.ts`. Update the `weather-checker` entry's `description` in `src/lib/tools.ts` to the new sentence so the `<meta name="description">` reflects the new copy (canonical/title unchanged).
 
-- Route `head()`:
-  - Title: `Free Online Word Processor — No Signup, No Microsoft Account | Skycally`
-  - Description: `Write and format documents free in your browser. No Google account, no Microsoft account needed. Supports Arabic RTL, exports to PDF and Word. Try Skycally's free word processor now.`
-  - Canonical: `https://skycally.com/tools/word-processor`
-- `ToolPageShell` title becomes `Free Online Word Processor — Write Anywhere, No Account Needed`.
-- `ToolSeoContent` body paragraphs and FAQs naturally include all 6 target keywords.
+## Out of scope
 
-## Notes / tradeoffs
-
-- TipTap (~80KB gzip) is loaded eagerly because it IS the page. `mammoth` and `docx` stay dynamic.
-- True mid-paragraph pagination across columns is a CSS approximation; manual page break is exact. Acceptable for a browser-only Word-style editor.
-- `.docx` export covers paragraphs, headings, lists, tables, images, basic marks. Complex CSS (multi-column, custom borders) does not round-trip.
-- Forcing `.wp-page` to white in dark mode is intentional — matches every real document editor.
-- No backend, no network calls, no account.
-
-Ask me anything before I switch to build mode, otherwise approve and I'll implement.
+No design system changes, no new components, no new dependencies, no router changes.

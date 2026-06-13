@@ -44,8 +44,8 @@ interface CountryDetail {
   borders?: string[];
 }
 
-const COUNTRIES_URL =
-  "https://restcountries.com/v3.1/all?fields=name,flags,cca2,cca3";
+const PROXY_BASE = "https://country-proxy.skycally-tools.workers.dev/";
+const COUNTRIES_URL = `${PROXY_BASE}?type=all`;
 
 function formatNumber(n?: number) {
   if (n == null) return "—";

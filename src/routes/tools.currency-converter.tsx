@@ -115,6 +115,7 @@ function CurrencyConverter() {
   const [error, setError] = useState<string | null>(null);
   const [rates, setRates] = useState<RatesResponse | null>(null);
   const [quickRates, setQuickRates] = useState<Record<string, RatesResponse>>({});
+  const [history, setHistory] = useState<{ date: string; rate: number }[] | null>(null);
 
   async function loadRates(base: string) {
     setLoading(true);

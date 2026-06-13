@@ -152,6 +152,40 @@ function CurrencyConverter() {
     })();
   }, []);
 
+  // 7-day rate history
+  useEffect(() => {
+    if (from === to) {
+      setHistory(null);
+      return;
+    }
+    let cancelled = false;
+    const today = new Date();
+    const past = new Date();
+    past.setDate(past.getDate() - 7);
+    const iso = (d: Date) => d.toISOString().slice(0, 10);
+    const url = `https://api.frankfurter.app/${iso(past)}..${iso(today)}?from=${from}&to=${to}`;
+    fetch(url)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data: { rates?: Record<string, Record<string, number>> }) => {
+        if (cancelled) return;
+        if (!data.rates) {
+          setHistory(null);
+          return;
+        }
+        const points = Object.entries(data.rates)
+          .map(([date, obj]) => ({ date, rate: obj?.[to] }))
+          .filter((p): p is { date: string; rate: number } => typeof p.rate === "number")
+          .sort((a, b) => a.date.localeCompare(b.date));
+        setHistory(points.length >= 2 ? points : null);
+      })
+      .catch(() => {
+        if (!cancelled) setHistory(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [from, to]);
+
   const allCodes = useMemo(() => {
     if (!rates?.conversion_rates) return [] as string[];
     return Object.keys(rates.conversion_rates).sort();

@@ -1,70 +1,66 @@
-# Weather Checker — Add Hourly, UV/AQI, Sun Times, Map
+# Plan
 
-Single-file change: `src/routes/tools.weather-checker.tsx`. Keep existing design, layout, and helpers intact; extend types, fetcher, and JSX.
+Two independent, surgical updates. No design changes, no router changes, no new tools list edits.
 
-## Data layer
+---
 
-Extend `fetchForecast(lat, lon)` URL:
-- add `&hourly=temperature_2m,weather_code,precipitation_probability`
-- add `&forecast_hours=24`
-- extend daily to `weather_code,temperature_2m_max,temperature_2m_min,precipitation_probability_max,uv_index_max,sunrise,sunset`
+## Part 1 — Country Info: switch to Cloudflare Worker proxy
 
-Add `fetchAirQuality(lat, lon)`:
+**File:** `src/routes/tools.country-info.tsx`
+
+Replace every direct `https://restcountries.com/...` fetch with the new Worker:
+
+- `COUNTRIES_URL` (all countries for the dropdown):
+  `https://country-proxy.skycally-tools.workers.dev/?type=all`
+- `loadByName(name)`:
+  `https://country-proxy.skycally-tools.workers.dev/?type=name&query={encodeURIComponent(name)}`
+- `loadByCode(cca3)` — the Worker spec only documents `type=all` and `type=name`. To keep the "click a border / pick from list" flow working without restcountries.com, resolve the click by looking up the country name in the already-loaded `allCountries` list (we have `cca3 → name`) and call `loadByName(name)` instead of hitting `/alpha`.
+- `loadBorders(codes)` — same pattern: map each border `cca3` to its `{ name, flag }` from `allCountries` locally. No network call. Border chips still show flag + name and still trigger `loadByCode` on click.
+
+UI, layout, styles, copy, SEO content, FAQs: unchanged.
+
+---
+
+## Part 2 — Currency Converter: disclaimer, 7-day chart, SEO refresh
+
+**File:** `src/routes/tools.currency-converter.tsx` only. Existing converter, swap, quick-conversions grid: untouched.
+
+### 2a. Disclaimer line in the result card
+
+Inside the result card, directly after the "Last updated" line, add:
+
 ```
-https://air-quality-api.open-meteo.com/v1/air-quality
-  ?latitude={lat}&longitude={lon}&current=european_aqi&timezone=auto
-```
-Wrap in try/catch; AQI is optional (don't fail the whole load if it errors).
-
-Run forecast + AQI in parallel via `Promise.all`. Preserve the returned `timezone` from the forecast response and pass it to time formatters so sunrise/sunset and hourly times render in the city's local time.
-
-## Type extensions
-
-```ts
-interface HourlyEntry { time: string; code: number; temp: number; precip: number }
-interface WeatherData {
-  // existing fields…
-  timezone: string;
-  current: { …existing, uvMax: number, sunrise: string, sunset: string };
-  hourly: HourlyEntry[];
-  aqi: number | null;
-  lat: number; lon: number;
-}
+Rates updated daily. For real-time trading rates, consult your bank or broker directly.
 ```
 
-Store `lat`/`lon` on `data` so the map iframe can read them.
+Rendered in `text-xs text-muted-foreground mt-1`.
 
-## Helpers (new, small)
+### 2b. 7-Day Rate History chart
 
-- `uvInfo(uv)` → `{ emoji, label }` per the 5 tiers (0-2 Low … 11+ Extreme).
-- `aqiInfo(aqi)` → 6 tiers (Good → Extremely Poor).
-- `formatTimeInTz(iso, tz)` → `HH:mm` via `toLocaleTimeString("en-GB", { hour:"2-digit", minute:"2-digit", timeZone: tz })`.
+New section placed **after** the Quick Conversions grid and **before** `HowToUse`.
 
-## JSX additions (in this order, between existing sections)
+- Title: `7-Day Rate History` (same `font-display text-lg font-bold mb-3` styling as Quick Conversions).
+- Data source: `https://api.frankfurter.app/{start}..{end}?from={FROM}&to={TO}` where `start = today − 7 days`, `end = today` (ISO `YYYY-MM-DD`, UTC).
+- Fetch effect keyed on `[from, to]`. On success, store `{ date, rate }[]` sorted ascending. On any error or empty payload, set state to `null` so the whole section unmounts (no error UI).
+- Render with **Recharts** (already in the project — verify; if missing, plan flips to a tiny inline SVG line chart to avoid adding deps). Components: `ResponsiveContainer` (height 220, width 100% — responsive on mobile), `LineChart`, `CartesianGrid` (subtle), `XAxis` formatted as `Mon, Tue, …` via `toLocaleDateString('en-US', { weekday:'short' })`, `YAxis` with auto domain and 4-decimal tick formatter, `Tooltip` showing exact rate (6 sig figs) + full date (`Mon, Jun 9`), and a single `<Line>` with `stroke="#00D4FF"`, `strokeWidth={2}`, `dot={false}`, `activeDot`.
+- Card wrapper: `rounded-2xl border border-border bg-card/40 p-4 sm:p-6`. Tooltip uses inline styles matching dark theme (`background: var(--card)`, `border: 1px solid var(--border)`, `color: var(--foreground)`).
+- Caption below chart: `Powered by Frankfurter API` — `text-[10px] uppercase tracking-wide text-muted-foreground mt-2 text-center`.
+- Section visibility: only render when `history` state has ≥2 points. No loading spinner, no error toast.
 
-1. Inside the existing current-weather grid (`grid-cols-2`), append four more `StatTile`s:
-   - Sunrise (🌅) — `formatTimeInTz(current.sunrise, timezone)`
-   - Sunset (🌇) — `formatTimeInTz(current.sunset, timezone)`
-   - UV Index — `${uvMax} ${uvInfo.emoji} ${uvInfo.label}`
-   - Air Quality — `${aqi} ${aqiInfo.emoji} ${aqiInfo.label}` (or `"—"` when null)
+### 2c. SEO content rewrite
 
-2. New "24-Hour Forecast" section placed BEFORE the existing "7-Day Forecast" section. Same `flex gap-3 overflow-x-auto` strip, with narrower cards (`w-20`), showing time, emoji, temp, precip%.
+Replace the `<ToolSeoContent>` props with the exact copy from the brief:
 
-3. New "City Map" section placed AFTER the 7-day strip and BEFORE `HowToUse`:
-   - Heading: `📍 {data.name} on the map`
-   - `<iframe>` with `src` built from `bbox=lon-0.1,lat-0.1,lon+0.1,lat+0.1&layer=mapnik&marker=lat,lon`
-   - Styled with `w-full h-[200px] rounded-xl border border-border`
-   - `loading="lazy"`, `title="{city} map"`
+- `title`: `Currency Converter — Free Live Exchange Rate Tool`
+- `description`: keep existing one-liner (covers the section subtitle) — the brief gives 3 body paragraphs, not a new description; keep current description text.
+- `body`: the 3 paragraphs from the brief, verbatim.
+- `faqs`: the 5 Q/A pairs from the brief, verbatim.
 
-## SEO
+`src/lib/tools.ts` `currency-converter` entry: left unchanged (meta description already aligns; brief doesn't request a meta change).
 
-Update `<ToolSeoContent>`:
-- New description: "Check live weather for any city — current conditions, 24-hour forecast, 7-day outlook, UV index, air quality, sunrise and sunset times. Free, no signup."
-- Rewrite the 3 body paragraphs to naturally include: uv index checker free, air quality index online, sunrise sunset times, hourly weather forecast free, weather checker no signup.
-- Keep FAQs; add nothing new unless trimming.
-
-The route `head()` is generated by `buildToolMeta` from `tools.ts`. Update the `weather-checker` entry's `description` in `src/lib/tools.ts` to the new sentence so the `<meta name="description">` reflects the new copy (canonical/title unchanged).
+---
 
 ## Out of scope
 
-No design system changes, no new components, no new dependencies, no router changes.
+- No changes to `src/lib/tools.ts`, router, or related-tools list.
+- No new dependencies unless Recharts is already absent — in which case I will confirm with you before adding it (fallback: minimal inline SVG line chart).

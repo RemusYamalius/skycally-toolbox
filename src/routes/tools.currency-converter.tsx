@@ -2,6 +2,15 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeftRight, Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import {
+  CartesianGrid,
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -106,6 +115,7 @@ function CurrencyConverter() {
   const [error, setError] = useState<string | null>(null);
   const [rates, setRates] = useState<RatesResponse | null>(null);
   const [quickRates, setQuickRates] = useState<Record<string, RatesResponse>>({});
+  const [history, setHistory] = useState<{ date: string; rate: number }[] | null>(null);
 
   async function loadRates(base: string) {
     setLoading(true);
@@ -141,6 +151,40 @@ function CurrencyConverter() {
       setQuickRates(out);
     })();
   }, []);
+
+  // 7-day rate history
+  useEffect(() => {
+    if (from === to) {
+      setHistory(null);
+      return;
+    }
+    let cancelled = false;
+    const today = new Date();
+    const past = new Date();
+    past.setDate(past.getDate() - 7);
+    const iso = (d: Date) => d.toISOString().slice(0, 10);
+    const url = `https://api.frankfurter.app/${iso(past)}..${iso(today)}?from=${from}&to=${to}`;
+    fetch(url)
+      .then((r) => (r.ok ? r.json() : Promise.reject()))
+      .then((data: { rates?: Record<string, Record<string, number>> }) => {
+        if (cancelled) return;
+        if (!data.rates) {
+          setHistory(null);
+          return;
+        }
+        const points = Object.entries(data.rates)
+          .map(([date, obj]) => ({ date, rate: obj?.[to] }))
+          .filter((p): p is { date: string; rate: number } => typeof p.rate === "number")
+          .sort((a, b) => a.date.localeCompare(b.date));
+        setHistory(points.length >= 2 ? points : null);
+      })
+      .catch(() => {
+        if (!cancelled) setHistory(null);
+      });
+    return () => {
+      cancelled = true;
+    };
+  }, [from, to]);
 
   const allCodes = useMemo(() => {
     if (!rates?.conversion_rates) return [] as string[];
@@ -337,6 +381,9 @@ function CurrencyConverter() {
                 Last updated: {rates.time_last_update_utc}
               </div>
             )}
+            <div className="mt-1 text-xs text-muted-foreground">
+              Rates updated daily. For real-time trading rates, consult your bank or broker directly.
+            </div>
           </motion.div>
         )}
       </div>
@@ -375,6 +422,67 @@ function CurrencyConverter() {
         </div>
       </section>
 
+      {/* 7-Day Rate History */}
+      {history && history.length >= 2 && (
+        <section className="mt-10">
+          <h2 className="font-display text-lg font-bold mb-3">7-Day Rate History</h2>
+          <div className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6">
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={history} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  stroke="var(--muted-foreground)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(d: string) =>
+                    new Date(d).toLocaleDateString("en-US", { weekday: "short" })
+                  }
+                />
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  width={60}
+                  domain={["auto", "auto"]}
+                  tickFormatter={(v: number) => v.toFixed(4)}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--card)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    color: "var(--foreground)",
+                    fontSize: 12,
+                  }}
+                  labelFormatter={(d: string) =>
+                    new Date(d).toLocaleDateString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                  formatter={(v: number) => [`${v.toPrecision(6)} ${to}`, `1 ${from}`]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="rate"
+                  stroke="#00D4FF"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 4, fill: "#00D4FF" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="mt-2 text-center text-[10px] uppercase tracking-wide text-muted-foreground">
+              Powered by Frankfurter API
+            </div>
+          </div>
+        </section>
+      )}
+
       <HowToUse
         steps={[
           "Enter an amount and pick the currency you're converting from.",
@@ -387,30 +495,35 @@ function CurrencyConverter() {
         title="Currency Converter — Free Live Exchange Rate Tool"
         description="Convert any amount between 170+ world currencies using live exchange rates. Free, instant, no signup required."
         body={[
-          "Currency Converter is a free online tool that lets you convert any amount between more than 170 world currencies using live exchange rates updated daily. Type the amount, pick a source and target currency, and you instantly see the converted value along with the exchange rate and its inverse — perfect for quick checks while travelling, shopping abroad, or working with international clients.",
-          "The tool is powered by ExchangeRate-API, which sources rates from trusted financial data providers and refreshes them every 24 hours. Rates reflect mid-market values, the same reference used by news outlets and currency websites, so you always get an accurate, up-to-date snapshot of the global currency market without juggling multiple sources.",
-          "Whether you are a traveller planning a budget, an online shopper comparing prices across stores, a freelancer receiving international payments, or simply someone curious about how far your money goes abroad, the Currency Converter gives you a fast, reliable answer in one click. No signup, no tracking, no clutter — just clean numbers, ready to use.",
+          "Convert any amount between 170+ world currencies using live exchange rates — free, instant, no signup required. Type the amount, select your currencies, and get the converted value along with the mid-market rate and its inverse in one click. Rates are updated every 24 hours from trusted financial data providers, making this tool ideal for quick reference checks throughout your day.",
+          "The 7-day rate history chart lets you see how a currency pair has moved over the past week, giving you useful context before making decisions. Whether you are tracking USD to MAD, EUR to GBP, or any of 170+ pairs, the chart updates automatically with every conversion. Note that rates shown are mid-market reference rates — actual transfer rates from banks or services may include fees and spreads.",
+          "From travellers checking hotel prices abroad to freelancers invoicing international clients and finance professionals monitoring currency exposure, the Currency Converter serves a wide range of daily needs. Everything runs in your browser — no data is logged, no account is needed, and no tracking occurs. Just clean, reliable numbers whenever you need them.",
         ]}
         faqs={[
           {
             question: "How often are the exchange rates updated?",
             answer:
-              "Rates are updated every 24 hours from financial data providers. For real-time trading rates, consult your bank or broker directly.",
+              "Rates are updated every 24 hours. For real-time trading rates, always consult your bank or broker directly.",
+          },
+          {
+            question: "What is the 7-day rate history chart?",
+            answer:
+              "It shows how the selected currency pair has moved over the past 7 days, powered by the Frankfurter API. It updates automatically with each conversion.",
           },
           {
             question: "How many currencies are supported?",
             answer:
-              "Over 170 world currencies are supported, including major currencies, emerging market currencies, and several regional currencies.",
+              "Over 170 world currencies are supported, including major, emerging market, and regional currencies.",
           },
           {
             question: "Are the rates accurate?",
             answer:
-              "Rates are sourced from ExchangeRate-API and reflect mid-market rates. They are accurate for reference purposes but may differ slightly from bank or card transaction rates due to fees and spreads.",
+              "Rates reflect mid-market values from ExchangeRate-API — accurate for reference but may differ from bank transaction rates due to fees and spreads.",
           },
           {
             question: "Do you store my conversion history?",
             answer:
-              "No. Every conversion is calculated directly in your browser. Nothing is logged or stored on our servers.",
+              "No. All calculations happen in your browser. Nothing is logged or stored on our servers.",
           },
         ]}
       />

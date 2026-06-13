@@ -44,8 +44,8 @@ interface CountryDetail {
   borders?: string[];
 }
 
-const COUNTRIES_URL =
-  "https://restcountries.com/v3.1/all?fields=name,flags,cca2,cca3";
+const PROXY_BASE = "https://country-proxy.skycally-tools.workers.dev/";
+const COUNTRIES_URL = `${PROXY_BASE}?type=all`;
 
 function formatNumber(n?: number) {
   if (n == null) return "—";
@@ -99,7 +99,7 @@ function CountryInfo() {
     setError(null);
     try {
       const res = await fetch(
-        `https://restcountries.com/v3.1/name/${encodeURIComponent(q)}?fullText=false`,
+        `${PROXY_BASE}?type=name&query=${encodeURIComponent(q)}`,
       );
       if (!res.ok) {
         setCountry(null);
@@ -122,53 +122,33 @@ function CountryInfo() {
   }
 
   async function loadByCode(cca3: string) {
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(
-        `https://restcountries.com/v3.1/alpha/${encodeURIComponent(cca3)}`,
-      );
-      if (!res.ok) throw new Error();
-      const data: CountryDetail[] = await res.json();
-      const c = data[0];
-      setCountry(c);
-      await loadBorders(c.borders ?? []);
-      if (typeof window !== "undefined") {
-        window.scrollTo({ top: 0, behavior: "smooth" });
-      }
-    } catch {
+    const match = allCountries.find((c) => c.cca3 === cca3);
+    if (!match) {
       setError("Could not load that country, please try again.");
-    } finally {
-      setLoading(false);
+      return;
+    }
+    await loadByName(match.name);
+    if (typeof window !== "undefined") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
 
-  async function loadBorders(codes: string[]) {
-    if (codes.length === 0) {
+  function loadBorders(codes: string[]) {
+    if (codes.length === 0 || allCountries.length === 0) {
       setBorderNames([]);
       return;
     }
-    try {
-      const res = await fetch(
-        `https://restcountries.com/v3.1/alpha?codes=${codes.join(",")}&fields=name,cca3,flags`,
-      );
-      if (!res.ok) {
-        setBorderNames([]);
-        return;
-      }
-      const data: any[] = await res.json();
-      setBorderNames(
-        data
-          .map((d) => ({
-            cca3: d.cca3,
-            common: d.name?.common ?? d.cca3,
-            flag: d.flags?.svg ?? d.flags?.png ?? "",
-          }))
-          .sort((a, b) => a.common.localeCompare(b.common)),
-      );
-    } catch {
-      setBorderNames([]);
-    }
+    const map = new Map(allCountries.map((c) => [c.cca3, c]));
+    setBorderNames(
+      codes
+        .map((code) => {
+          const c = map.get(code);
+          return c
+            ? { cca3: c.cca3, common: c.name, flag: c.flag }
+            : { cca3: code, common: code, flag: "" };
+        })
+        .sort((a, b) => a.common.localeCompare(b.common)),
+    );
   }
 
   // Load a default on mount when list is ready

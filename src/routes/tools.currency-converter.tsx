@@ -422,6 +422,67 @@ function CurrencyConverter() {
         </div>
       </section>
 
+      {/* 7-Day Rate History */}
+      {history && history.length >= 2 && (
+        <section className="mt-10">
+          <h2 className="font-display text-lg font-bold mb-3">7-Day Rate History</h2>
+          <div className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6">
+            <ResponsiveContainer width="100%" height={220}>
+              <LineChart data={history} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                <XAxis
+                  dataKey="date"
+                  stroke="var(--muted-foreground)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  tickFormatter={(d: string) =>
+                    new Date(d).toLocaleDateString("en-US", { weekday: "short" })
+                  }
+                />
+                <YAxis
+                  stroke="var(--muted-foreground)"
+                  fontSize={11}
+                  tickLine={false}
+                  axisLine={false}
+                  width={60}
+                  domain={["auto", "auto"]}
+                  tickFormatter={(v: number) => v.toFixed(4)}
+                />
+                <Tooltip
+                  contentStyle={{
+                    background: "var(--card)",
+                    border: "1px solid var(--border)",
+                    borderRadius: 8,
+                    color: "var(--foreground)",
+                    fontSize: 12,
+                  }}
+                  labelFormatter={(d: string) =>
+                    new Date(d).toLocaleDateString("en-US", {
+                      weekday: "short",
+                      month: "short",
+                      day: "numeric",
+                    })
+                  }
+                  formatter={(v: number) => [`${v.toPrecision(6)} ${to}`, `1 ${from}`]}
+                />
+                <Line
+                  type="monotone"
+                  dataKey="rate"
+                  stroke="#00D4FF"
+                  strokeWidth={2}
+                  dot={false}
+                  activeDot={{ r: 4, fill: "#00D4FF" }}
+                />
+              </LineChart>
+            </ResponsiveContainer>
+            <div className="mt-2 text-center text-[10px] uppercase tracking-wide text-muted-foreground">
+              Powered by Frankfurter API
+            </div>
+          </div>
+        </section>
+      )}
+
       <HowToUse
         steps={[
           "Enter an amount and pick the currency you're converting from.",

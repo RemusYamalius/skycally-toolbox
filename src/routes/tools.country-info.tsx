@@ -99,7 +99,7 @@ function CountryInfo() {
     setError(null);
     try {
       const res = await fetch(
-        `https://restcountries.com/v3.1/name/${encodeURIComponent(q)}?fullText=false`,
+        `${PROXY_BASE}?type=name&query=${encodeURIComponent(q)}`,
       );
       if (!res.ok) {
         setCountry(null);

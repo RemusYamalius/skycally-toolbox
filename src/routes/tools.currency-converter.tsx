@@ -381,6 +381,9 @@ function CurrencyConverter() {
                 Last updated: {rates.time_last_update_utc}
               </div>
             )}
+            <div className="mt-1 text-xs text-muted-foreground">
+              Rates updated daily. For real-time trading rates, consult your bank or broker directly.
+            </div>
           </motion.div>
         )}
       </div>

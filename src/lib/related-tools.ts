@@ -63,6 +63,9 @@ export const relatedToolsMap: Record<string, string[]> = {
   "markdown-to-html": ["word-counter", "json-formatter", "add-text-to-image"],
   "word-processor": ["currency-converter", "weather-checker", "text-to-speech"],
 
+  // Finance / Travel
+  "currency-converter": ["holiday-checker", "weather-checker", "country-info"],
+
   // Mini Games
   "sliding-puzzle": ["sudoku", "memory-match", "minesweeper"],
   "whack-a-mole": ["flappy-bird", "snake", "memory-match"],

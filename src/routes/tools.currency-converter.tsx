@@ -495,30 +495,35 @@ function CurrencyConverter() {
         title="Currency Converter — Free Live Exchange Rate Tool"
         description="Convert any amount between 170+ world currencies using live exchange rates. Free, instant, no signup required."
         body={[
-          "Currency Converter is a free online tool that lets you convert any amount between more than 170 world currencies using live exchange rates updated daily. Type the amount, pick a source and target currency, and you instantly see the converted value along with the exchange rate and its inverse — perfect for quick checks while travelling, shopping abroad, or working with international clients.",
-          "The tool is powered by ExchangeRate-API, which sources rates from trusted financial data providers and refreshes them every 24 hours. Rates reflect mid-market values, the same reference used by news outlets and currency websites, so you always get an accurate, up-to-date snapshot of the global currency market without juggling multiple sources.",
-          "Whether you are a traveller planning a budget, an online shopper comparing prices across stores, a freelancer receiving international payments, or simply someone curious about how far your money goes abroad, the Currency Converter gives you a fast, reliable answer in one click. No signup, no tracking, no clutter — just clean numbers, ready to use.",
+          "Convert any amount between 170+ world currencies using live exchange rates — free, instant, no signup required. Type the amount, select your currencies, and get the converted value along with the mid-market rate and its inverse in one click. Rates are updated every 24 hours from trusted financial data providers, making this tool ideal for quick reference checks throughout your day.",
+          "The 7-day rate history chart lets you see how a currency pair has moved over the past week, giving you useful context before making decisions. Whether you are tracking USD to MAD, EUR to GBP, or any of 170+ pairs, the chart updates automatically with every conversion. Note that rates shown are mid-market reference rates — actual transfer rates from banks or services may include fees and spreads.",
+          "From travellers checking hotel prices abroad to freelancers invoicing international clients and finance professionals monitoring currency exposure, the Currency Converter serves a wide range of daily needs. Everything runs in your browser — no data is logged, no account is needed, and no tracking occurs. Just clean, reliable numbers whenever you need them.",
         ]}
         faqs={[
           {
             question: "How often are the exchange rates updated?",
             answer:
-              "Rates are updated every 24 hours from financial data providers. For real-time trading rates, consult your bank or broker directly.",
+              "Rates are updated every 24 hours. For real-time trading rates, always consult your bank or broker directly.",
+          },
+          {
+            question: "What is the 7-day rate history chart?",
+            answer:
+              "It shows how the selected currency pair has moved over the past 7 days, powered by the Frankfurter API. It updates automatically with each conversion.",
           },
           {
             question: "How many currencies are supported?",
             answer:
-              "Over 170 world currencies are supported, including major currencies, emerging market currencies, and several regional currencies.",
+              "Over 170 world currencies are supported, including major, emerging market, and regional currencies.",
           },
           {
             question: "Are the rates accurate?",
             answer:
-              "Rates are sourced from ExchangeRate-API and reflect mid-market rates. They are accurate for reference purposes but may differ slightly from bank or card transaction rates due to fees and spreads.",
+              "Rates reflect mid-market values from ExchangeRate-API — accurate for reference but may differ from bank transaction rates due to fees and spreads.",
           },
           {
             question: "Do you store my conversion history?",
             answer:
-              "No. Every conversion is calculated directly in your browser. Nothing is logged or stored on our servers.",
+              "No. All calculations happen in your browser. Nothing is logged or stored on our servers.",
           },
         ]}
       />

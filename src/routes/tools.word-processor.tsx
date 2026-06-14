@@ -185,6 +185,9 @@ const SPECIAL_CHARS = [
 // ---------- Page / margin constants ----------
 const PAGE_WIDTH_PX = 794; // A4 width @ 96dpi
 const DEFAULT_PAGE_HEIGHT_PX = 1123; // A4 height @ 96dpi
+const PAGE_UNIT_PX = DEFAULT_PAGE_HEIGHT_PX; // alias: the height of one printable page
+const PAGE_GAP_PX = 40; // visual gap drawn between consecutive pages (Word-style)
+const PAGE_CYCLE_PX = PAGE_UNIT_PX + PAGE_GAP_PX; // one page + the gap that follows it
 const PX_PER_CM = 37.8;
 const PX_PER_IN = 96;
 const DEFAULT_MARGIN = 96;
@@ -193,6 +196,14 @@ const DEFAULT_MARGINS = { top: DEFAULT_MARGIN, right: DEFAULT_MARGIN, bottom: DE
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max);
+}
+
+function isLightColor(hex: string): boolean {
+  const c = hex.replace("#", "");
+  const r = parseInt(c.substring(0, 2), 16);
+  const g = parseInt(c.substring(2, 4), 16);
+  const b = parseInt(c.substring(4, 6), 16);
+  return (r * 299 + g * 587 + b * 114) / 1000 > 150;
 }
 
 function pxToUnitLabel(px: number, unit: "cm" | "in") {
@@ -323,6 +334,28 @@ const PageBreak = TiptapNode.create({
   },
 });
 
+// The page forces a dark default text color with `!important` (so the page stays
+// readable no matter the site's light/dark theme). That same rule was silently
+// overriding the Color extension's inline `style="color: ..."`. Re-emitting the
+// color with `!important` lets the user's chosen color win again, while the
+// stored attribute value (read by the .docx exporter) is unchanged.
+const TextColor = Color.extend({
+  addGlobalAttributes() {
+    return [
+      {
+        types: ["textStyle"],
+        attributes: {
+          color: {
+            default: null,
+            parseHTML: (el: HTMLElement) => el.style.color || null,
+            renderHTML: (attrs: any) => (attrs.color ? { style: `color: ${attrs.color} !important` } : {}),
+          },
+        },
+      },
+    ];
+  },
+});
+
 // ---------- Templates ----------
 const TEMPLATES: Record<string, string> = {
   blank: `<p></p>`,
@@ -448,9 +481,8 @@ function Editor4U() {
   const [findOpen, setFindOpen] = useState(false);
   const [templatesOpen, setTemplatesOpen] = useState(false);
   const [scale, setScale] = useState(1);
-  const [pageHeight, setPageHeight] = useState(DEFAULT_PAGE_HEIGHT_PX);
+  const [pageMinHeight, setPageMinHeight] = useState(PAGE_UNIT_PX);
   const canvasRef = useRef<HTMLDivElement>(null);
-  const pageRef = useRef<HTMLDivElement>(null);
 
   // Page margins (px) — persisted so a writer's preferred layout sticks around
   const [margins, setMargins] = useState<{ top: number; right: number; bottom: number; left: number }>(() => {
@@ -489,7 +521,7 @@ function Editor4U() {
       StarterKit.configure({ heading: { levels: [1, 2, 3, 4] } }),
       Underline,
       TextStyle,
-      Color,
+      TextColor,
       Highlight.configure({ multicolor: true }),
       FontFamily.configure({ types: ["textStyle"] }),
       TextAlign.configure({ types: ["heading", "paragraph"] }),
@@ -565,18 +597,23 @@ function Editor4U() {
     return () => ro.disconnect();
   }, []);
 
-  // Track real page height so the left ruler always spans the full document
+  // Snap the page height to whole "page + gap" units based on the editor's
+  // real content height, so the page background and the ruler can render
+  // discrete, Word-like pages instead of one endless sheet.
   useEffect(() => {
-    if (!pageRef.current) return;
+    if (!editor) return;
+    const contentEl = editor.view.dom as HTMLElement;
     const update = () => {
-      if (!pageRef.current) return;
-      setPageHeight(Math.max(DEFAULT_PAGE_HEIGHT_PX, pageRef.current.offsetHeight));
+      const contentHeight = contentEl.scrollHeight;
+      const total = margins.top + contentHeight + margins.bottom;
+      const segments = Math.max(1, Math.ceil((total + PAGE_GAP_PX) / PAGE_CYCLE_PX));
+      setPageMinHeight(segments * PAGE_UNIT_PX + (segments - 1) * PAGE_GAP_PX);
     };
     update();
     const ro = new ResizeObserver(update);
-    ro.observe(pageRef.current);
+    ro.observe(contentEl);
     return () => ro.disconnect();
-  }, [editor]);
+  }, [editor, margins.top, margins.bottom]);
 
   // Keyboard shortcuts: Ctrl+S, Ctrl+P, Ctrl+F, Ctrl+H
   useEffect(() => {
@@ -661,14 +698,14 @@ function Editor4U() {
                 marginTop={margins.top}
                 marginBottom={margins.bottom}
                 scale={scale}
-                height={pageHeight}
+                height={pageMinHeight}
                 onChange={(patch) => updateMargins(patch)}
               />
             )}
             <div
               className="wp-page"
-              ref={pageRef}
               style={{
+                minHeight: pageMinHeight,
                 paddingTop: margins.top,
                 paddingRight: margins.right,
                 paddingBottom: margins.bottom,
@@ -1178,6 +1215,7 @@ function Toolbar({
           }
         >
           <ColorGrid
+            current={editor.getAttributes("textStyle").color}
             onPick={(c) => {
               editor.chain().focus().setColor(c).run();
               setColorOpen(false);
@@ -1195,6 +1233,7 @@ function Toolbar({
           }
         >
           <ColorGrid
+            current={editor.getAttributes("highlight").color}
             onPick={(c) => {
               editor.chain().focus().toggleHighlight({ color: c }).run();
               setHlOpen(false);
@@ -1570,17 +1609,25 @@ function Popover({
   );
 }
 
-function ColorGrid({ onPick }: { onPick: (c: string) => void }) {
+function ColorGrid({ onPick, current }: { onPick: (c: string) => void; current?: string | null }) {
   return (
-    <div className="grid grid-cols-8 gap-1">
-      {COLORS.map((c) => (
-        <button
-          key={c}
-          onClick={() => onPick(c)}
-          className="w-6 h-6 rounded border border-border"
-          style={{ background: c }}
-        />
-      ))}
+    <div className="grid grid-cols-6 gap-1.5 p-1">
+      {COLORS.map((c) => {
+        const isActive = !!current && current.toLowerCase() === c.toLowerCase();
+        return (
+          <button
+            key={c}
+            onClick={() => onPick(c)}
+            title={c}
+            className="relative w-7 h-7 rounded-md ring-1 ring-inset ring-black/15 transition-transform hover:scale-110 hover:ring-2 hover:ring-[var(--cyan-brand)]"
+            style={{ background: c }}
+          >
+            {isActive && (
+              <Check className="w-4 h-4 absolute inset-0 m-auto" style={{ color: isLightColor(c) ? "#000" : "#fff" }} />
+            )}
+          </button>
+        );
+      })}
     </div>
   );
 }
@@ -1740,22 +1787,23 @@ function LeftRuler({
   onChange: (patch: { top?: number; bottom?: number }) => void;
 }) {
   const step = unit === "cm" ? PX_PER_CM : PX_PER_IN;
-  const total = Math.ceil(height / step);
-  const ticks: number[] = [];
-  for (let i = 0; i <= total * 2; i++) ticks.push(i);
+  const ticksPerPage = Math.ceil(PAGE_UNIT_PX / step);
+  // `height` is built from whole "page + gap" units (see pageMinHeight), so this recovers
+  // the exact page count without any rounding drift.
+  const pages = Math.max(1, Math.round((height + PAGE_GAP_PX) / PAGE_CYCLE_PX));
 
-  return (
-    <div className="wp-ruler-v" style={{ width: 24, height }}>
-      {ticks.map((i) => {
+  const renderTicks = (pageTop: number) => (
+    <>
+      {Array.from({ length: ticksPerPage * 2 + 1 }).map((_, i) => {
         const half = i % 2 === 1;
         const y = (i / 2) * step;
-        if (y > height) return null;
+        if (y > PAGE_UNIT_PX) return null;
         return (
           <div
             key={i}
             style={{
               position: "absolute",
-              top: y,
+              top: pageTop + y,
               left: half ? 14 : 8,
               height: 1,
               width: half ? 6 : 12,
@@ -1764,36 +1812,73 @@ function LeftRuler({
           />
         );
       })}
-      {Array.from({ length: total + 1 }).map((_, i) => {
-        if (i * step > height) return null;
+      {Array.from({ length: ticksPerPage + 1 }).map((_, i) => {
+        if (i * step > PAGE_UNIT_PX) return null;
         return (
-          <div key={`l${i}`} style={{ position: "absolute", top: i * step - 4, left: 2, fontSize: 9, color: "#333" }}>
+          <div
+            key={`l${i}`}
+            style={{ position: "absolute", top: pageTop + i * step - 4, left: 2, fontSize: 9, color: "#333" }}
+          >
             {i}
           </div>
         );
       })}
+    </>
+  );
 
-      <div className="wp-ruler-margin-v" style={{ top: 0, height: marginTop }} />
-      <div className="wp-ruler-margin-v" style={{ top: height - marginBottom, height: marginBottom }} />
+  return (
+    <div className="wp-ruler-v" style={{ width: 24, height }}>
+      {Array.from({ length: pages }).map((_, p) => {
+        const pageTop = p * PAGE_CYCLE_PX;
+        const isFirst = p === 0;
+        const isLast = p === pages - 1;
+        return (
+          <div key={p}>
+            {renderTicks(pageTop)}
 
-      <MarginHandle
-        orientation="y"
-        position={marginTop}
-        scale={scale}
-        title={`Top margin: ${pxToUnitLabel(marginTop, unit)} — drag to adjust`}
-        onDrag={(delta) =>
-          onChange({ top: clamp(Math.round(marginTop + delta), MIN_MARGIN, height - marginBottom - 100) })
-        }
-      />
-      <MarginHandle
-        orientation="y"
-        position={height - marginBottom}
-        scale={scale}
-        title={`Bottom margin: ${pxToUnitLabel(marginBottom, unit)} — drag to adjust`}
-        onDrag={(delta) =>
-          onChange({ bottom: clamp(Math.round(marginBottom - delta), MIN_MARGIN, height - marginTop - 100) })
-        }
-      />
+            {/* Margin shading repeats on every page for visual consistency... */}
+            <div className="wp-ruler-margin-v" style={{ top: pageTop, height: marginTop }} />
+            <div
+              className="wp-ruler-margin-v"
+              style={{ top: pageTop + PAGE_UNIT_PX - marginBottom, height: marginBottom }}
+            />
+
+            {/* ...but only the very first/last margin is actually draggable —
+                it's the one that maps to .wp-page's real padding. */}
+            {isFirst && (
+              <MarginHandle
+                orientation="y"
+                position={pageTop + marginTop}
+                scale={scale}
+                title={`Top margin: ${pxToUnitLabel(marginTop, unit)} — drag to adjust`}
+                onDrag={(delta) =>
+                  onChange({ top: clamp(Math.round(marginTop + delta), MIN_MARGIN, PAGE_UNIT_PX - marginBottom - 100) })
+                }
+              />
+            )}
+            {isLast && (
+              <MarginHandle
+                orientation="y"
+                position={pageTop + PAGE_UNIT_PX - marginBottom}
+                scale={scale}
+                title={`Bottom margin: ${pxToUnitLabel(marginBottom, unit)} — drag to adjust`}
+                onDrag={(delta) =>
+                  onChange({
+                    bottom: clamp(Math.round(marginBottom - delta), MIN_MARGIN, PAGE_UNIT_PX - marginTop - 100),
+                  })
+                }
+              />
+            )}
+
+            {/* Gap to the next page, labeled like Word's page separator */}
+            {!isLast && (
+              <div className="wp-ruler-gap" style={{ top: pageTop + PAGE_UNIT_PX, height: PAGE_GAP_PX }}>
+                <span className="wp-ruler-page-label">{p + 2}</span>
+              </div>
+            )}
+          </div>
+        );
+      })}
     </div>
   );
 }
@@ -2029,18 +2114,27 @@ const WP_CSS = `
 .wp-ruler-handle:hover, .wp-ruler-handle:active { opacity: 0.8; }
 .wp-ruler-handle-v { position: absolute; cursor: ns-resize; background: var(--cyan-brand); opacity: 0.4; border-radius: 2px; z-index: 5; }
 .wp-ruler-handle-v:hover, .wp-ruler-handle-v:active { opacity: 0.8; }
+.wp-ruler-gap { position: absolute; left: 0; right: 0; background: #dcdcdc; display: flex; align-items: center; justify-content: center; }
+.wp-ruler-page-label { font-size: 8px; color: #999; font-family: sans-serif; user-select: none; }
 
 .wp-page {
-  width: 794px; min-height: 1123px;
-  background: #ffffff !important;
+  width: 794px;
+  background-color: #ffffff !important;
   color: #1a1a1a !important;
   box-shadow: 0 2px 12px rgba(0,0,0,0.15);
   margin-top: 8px;
   font-family: Georgia, "Times New Roman", serif;
   font-size: 12pt; line-height: 1.5;
-  background-image: repeating-linear-gradient(to bottom, transparent 0, transparent 931px, #d0d0d0 931px, #d0d0d0 955px);
-  background-size: 100% 1123px;
-  background-attachment: local;
+  background-image: repeating-linear-gradient(
+    to bottom,
+    #ffffff 0px,
+    #ffffff ${PAGE_UNIT_PX}px,
+    #bbbbbb ${PAGE_UNIT_PX + 10}px,
+    #dcdcdc ${PAGE_UNIT_PX + 10}px,
+    #dcdcdc ${PAGE_UNIT_PX + 30}px,
+    #ffffff ${PAGE_CYCLE_PX}px
+  );
+  background-size: 100% ${PAGE_CYCLE_PX}px;
 }
 .wp-page, .wp-page * { color: #1a1a1a !important; }
 .wp-page a { color: #0066cc !important; }

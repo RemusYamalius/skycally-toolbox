@@ -2,15 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ArrowLeftRight, Check, ChevronsUpDown, Loader2 } from "lucide-react";
-import {
-  CartesianGrid,
-  Line,
-  LineChart,
-  ResponsiveContainer,
-  Tooltip,
-  XAxis,
-  YAxis,
-} from "recharts";
+import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -18,18 +10,8 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Popover,
-  PopoverContent,
-  PopoverTrigger,
-} from "@/components/ui/popover";
-import {
-  Command,
-  CommandEmpty,
-  CommandInput,
-  CommandItem,
-  CommandList,
-} from "@/components/ui/command";
+import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
+import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
@@ -41,24 +23,69 @@ export const Route = createFileRoute("/tools/currency-converter")({
 });
 
 const CURRENCY_NAMES: Record<string, string> = {
-  USD: "US Dollar", EUR: "Euro", GBP: "British Pound", JPY: "Japanese Yen",
-  CAD: "Canadian Dollar", AUD: "Australian Dollar", CHF: "Swiss Franc",
-  CNY: "Chinese Yuan", INR: "Indian Rupee", MXN: "Mexican Peso",
-  BRL: "Brazilian Real", KRW: "South Korean Won", SAR: "Saudi Riyal",
-  AED: "UAE Dirham", EGP: "Egyptian Pound", MAD: "Moroccan Dirham",
-  DZD: "Algerian Dinar", TND: "Tunisian Dinar", TRY: "Turkish Lira",
-  RUB: "Russian Ruble", SGD: "Singapore Dollar", HKD: "Hong Kong Dollar",
-  NOK: "Norwegian Krone", SEK: "Swedish Krona", DKK: "Danish Krone",
-  PLN: "Polish Zloty", ZAR: "South African Rand", NGN: "Nigerian Naira",
-  KES: "Kenyan Shilling", GHS: "Ghanaian Cedi",
+  USD: "US Dollar",
+  EUR: "Euro",
+  GBP: "British Pound",
+  JPY: "Japanese Yen",
+  CAD: "Canadian Dollar",
+  AUD: "Australian Dollar",
+  CHF: "Swiss Franc",
+  CNY: "Chinese Yuan",
+  INR: "Indian Rupee",
+  MXN: "Mexican Peso",
+  BRL: "Brazilian Real",
+  KRW: "South Korean Won",
+  SAR: "Saudi Riyal",
+  AED: "UAE Dirham",
+  EGP: "Egyptian Pound",
+  MAD: "Moroccan Dirham",
+  DZD: "Algerian Dinar",
+  TND: "Tunisian Dinar",
+  TRY: "Turkish Lira",
+  RUB: "Russian Ruble",
+  SGD: "Singapore Dollar",
+  HKD: "Hong Kong Dollar",
+  NOK: "Norwegian Krone",
+  SEK: "Swedish Krona",
+  DKK: "Danish Krone",
+  PLN: "Polish Zloty",
+  ZAR: "South African Rand",
+  NGN: "Nigerian Naira",
+  KES: "Kenyan Shilling",
+  GHS: "Ghanaian Cedi",
 };
 
 const CURRENCY_FLAGS: Record<string, string> = {
-  USD: "🇺🇸", EUR: "🇪🇺", GBP: "🇬🇧", JPY: "🇯🇵", CAD: "🇨🇦", AUD: "🇦🇺",
-  CHF: "🇨🇭", CNY: "🇨🇳", INR: "🇮🇳", MXN: "🇲🇽", BRL: "🇧🇷", KRW: "🇰🇷",
-  SAR: "🇸🇦", AED: "🇦🇪", EGP: "🇪🇬", MAD: "🇲🇦", DZD: "🇩🇿", TND: "🇹🇳",
-  TRY: "🇹🇷", RUB: "🇷🇺", SGD: "🇸🇬", HKD: "🇭🇰", NOK: "🇳🇴", SEK: "🇸🇪",
-  DKK: "🇩🇰", PLN: "🇵🇱", ZAR: "🇿🇦", NGN: "🇳🇬", KES: "🇰🇪", GHS: "🇬🇭",
+  USD: "🇺🇸",
+  EUR: "🇪🇺",
+  GBP: "🇬🇧",
+  JPY: "🇯🇵",
+  CAD: "🇨🇦",
+  AUD: "🇦🇺",
+  CHF: "🇨🇭",
+  CNY: "🇨🇳",
+  INR: "🇮🇳",
+  MXN: "🇲🇽",
+  BRL: "🇧🇷",
+  KRW: "🇰🇷",
+  SAR: "🇸🇦",
+  AED: "🇦🇪",
+  EGP: "🇪🇬",
+  MAD: "🇲🇦",
+  DZD: "🇩🇿",
+  TND: "🇹🇳",
+  TRY: "🇹🇷",
+  RUB: "🇷🇺",
+  SGD: "🇸🇬",
+  HKD: "🇭🇰",
+  NOK: "🇳🇴",
+  SEK: "🇸🇪",
+  DKK: "🇩🇰",
+  PLN: "🇵🇱",
+  ZAR: "🇿🇦",
+  NGN: "🇳🇬",
+  KES: "🇰🇪",
+  GHS: "🇬🇭",
 };
 
 function flagFor(code: string) {
@@ -70,8 +97,12 @@ function nameFor(code: string) {
 }
 
 const QUICK_PAIRS: Array<[string, string]> = [
-  ["USD", "EUR"], ["USD", "GBP"], ["USD", "MAD"],
-  ["EUR", "USD"], ["GBP", "USD"], ["USD", "JPY"],
+  ["USD", "EUR"],
+  ["USD", "GBP"],
+  ["USD", "MAD"],
+  ["EUR", "USD"],
+  ["GBP", "USD"],
+  ["USD", "JPY"],
 ];
 
 interface RatesResponse {
@@ -86,9 +117,7 @@ const ratesCache = new Map<string, RatesResponse>();
 async function fetchRates(base: string): Promise<RatesResponse> {
   const cached = ratesCache.get(base);
   if (cached) return cached;
-  const res = await fetch(
-    `https://currency-proxy.skycally-tools.workers.dev?base=${encodeURIComponent(base)}`,
-  );
+  const res = await fetch(`https://currency-proxy.skycally-tools.workers.dev?base=${encodeURIComponent(base)}`);
   if (!res.ok) throw new Error("rates");
   const data = (await res.json()) as RatesResponse;
   if (!data.conversion_rates) throw new Error("rates");
@@ -168,7 +197,7 @@ function CurrencyConverter() {
       const past = new Date();
       past.setDate(past.getDate() - 7);
       const iso = (d: Date) => d.toISOString().slice(0, 10);
-      const url = `https://api.frankfurter.app/${iso(past)}..${iso(today)}?from=${from}&to=${to}`;
+      const url = `https://api.frankfurter.dev/${iso(past)}..${iso(today)}?from=${from}&to=${to}`;
       fetch(url)
         .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then((data: { rates?: Record<string, Record<string, number>> }) => {
@@ -214,10 +243,7 @@ function CurrencyConverter() {
   }
 
   return (
-    <ToolPageShell
-      title="Currency Converter"
-      description="Convert between 170+ currencies with live exchange rates."
-    >
+    <ToolPageShell title="Currency Converter" description="Convert between 170+ currencies with live exchange rates.">
       <div className="grid gap-4">
         {/* Amount */}
         <div className="grid gap-1.5">
@@ -247,7 +273,9 @@ function CurrencyConverter() {
                 >
                   <span className="flex items-center gap-2">
                     <span>{flagFor(from)}</span>
-                    <span>{from} — {nameFor(from)}</span>
+                    <span>
+                      {from} — {nameFor(from)}
+                    </span>
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -268,12 +296,7 @@ function CurrencyConverter() {
                       >
                         <span className="mr-2">{flagFor(c)}</span>
                         {c} — {nameFor(c)}
-                        <Check
-                          className={cn(
-                            "ml-auto h-4 w-4",
-                            from === c ? "opacity-100" : "opacity-0",
-                          )}
-                        />
+                        <Check className={cn("ml-auto h-4 w-4", from === c ? "opacity-100" : "opacity-0")} />
                       </CommandItem>
                     ))}
                   </CommandList>
@@ -307,7 +330,9 @@ function CurrencyConverter() {
                 >
                   <span className="flex items-center gap-2">
                     <span>{flagFor(to)}</span>
-                    <span>{to} — {nameFor(to)}</span>
+                    <span>
+                      {to} — {nameFor(to)}
+                    </span>
                   </span>
                   <ChevronsUpDown className="ml-2 h-4 w-4 shrink-0 opacity-50" />
                 </Button>
@@ -328,12 +353,7 @@ function CurrencyConverter() {
                       >
                         <span className="mr-2">{flagFor(c)}</span>
                         {c} — {nameFor(c)}
-                        <Check
-                          className={cn(
-                            "ml-auto h-4 w-4",
-                            to === c ? "opacity-100" : "opacity-0",
-                          )}
-                        />
+                        <Check className={cn("ml-auto h-4 w-4", to === c ? "opacity-100" : "opacity-0")} />
                       </CommandItem>
                     ))}
                   </CommandList>
@@ -377,20 +397,20 @@ function CurrencyConverter() {
             </div>
             <div className="font-display text-3xl sm:text-4xl font-bold break-words">
               <span className="mr-2">{flagFor(from)}</span>
-              {formatNumber(numAmount)} {from} ={" "}
-              <span className="mr-2">{flagFor(to)}</span>
+              {formatNumber(numAmount)} {from} = <span className="mr-2">{flagFor(to)}</span>
               {formatNumber(result)} {to}
             </div>
             <div className="mt-3 text-sm text-muted-foreground">
               1 {from} = {formatNumber(rate)} {to}
               {inverseRate !== null && (
-                <> · 1 {to} = {formatNumber(inverseRate)} {from}</>
+                <>
+                  {" "}
+                  · 1 {to} = {formatNumber(inverseRate)} {from}
+                </>
               )}
             </div>
             {rates.time_last_update_utc && (
-              <div className="mt-2 text-xs text-muted-foreground">
-                Last updated: {rates.time_last_update_utc}
-              </div>
+              <div className="mt-2 text-xs text-muted-foreground">Last updated: {rates.time_last_update_utc}</div>
             )}
             <div className="mt-1 text-xs text-muted-foreground">
               Rates updated daily. For real-time trading rates, consult your bank or broker directly.
@@ -407,15 +427,11 @@ function CurrencyConverter() {
             const r = quickRates[b]?.conversion_rates?.[q];
             const ts = quickRates[b]?.time_last_update_utc;
             return (
-              <div
-                key={`${b}-${q}`}
-                className="rounded-xl border border-border bg-card/40 p-4"
-              >
+              <div key={`${b}-${q}`} className="rounded-xl border border-border bg-card/40 p-4">
                 <div className="flex items-center justify-between gap-2">
                   <div className="text-sm font-medium">
                     <span className="mr-1">{flagFor(b)}</span>
-                    {b} <span className="text-muted-foreground">→</span>{" "}
-                    <span className="mr-1">{flagFor(q)}</span>
+                    {b} <span className="text-muted-foreground">→</span> <span className="mr-1">{flagFor(q)}</span>
                     {q}
                   </div>
                 </div>
@@ -423,9 +439,7 @@ function CurrencyConverter() {
                   {r ? `1 ${b} = ${formatNumber(r)} ${q}` : "—"}
                 </div>
                 {ts && (
-                  <div className="mt-1 text-[10px] uppercase tracking-wide text-muted-foreground">
-                    Updated {ts}
-                  </div>
+                  <div className="mt-1 text-[10px] uppercase tracking-wide text-muted-foreground">Updated {ts}</div>
                 )}
               </div>
             );
@@ -448,9 +462,7 @@ function CurrencyConverter() {
                     fontSize={11}
                     tickLine={false}
                     axisLine={false}
-                    tickFormatter={(d: string) =>
-                      new Date(d).toLocaleDateString("en-US", { weekday: "short" })
-                    }
+                    tickFormatter={(d: string) => new Date(d).toLocaleDateString("en-US", { weekday: "short" })}
                   />
                   <YAxis
                     stroke="var(--muted-foreground)"
@@ -537,8 +549,7 @@ function CurrencyConverter() {
           },
           {
             question: "Do you store my conversion history?",
-            answer:
-              "No. All calculations happen in your browser. Nothing is logged or stored on our servers.",
+            answer: "No. All calculations happen in your browser. Nothing is logged or stored on our servers.",
           },
         ]}
       />

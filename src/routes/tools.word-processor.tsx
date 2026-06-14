@@ -6,7 +6,7 @@ import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { useEditor, EditorContent, Editor, Extension } from "@tiptap/react";
-import { Node } from "@tiptap/core";
+import { Node as TiptapNode } from "@tiptap/core";
 import { StarterKit } from "@tiptap/starter-kit";
 import { Underline } from "@tiptap/extension-underline";
 import { TextStyle } from "@tiptap/extension-text-style";
@@ -310,7 +310,7 @@ const Direction = Extension.create({
 
 // A real, atomic page-break node. Inserted as { type: "pageBreak" } so TipTap
 // keeps its identity (a plain <hr class="..."> loses custom attributes on parse).
-const PageBreak = Node.create({
+const PageBreak = TiptapNode.create({
   name: "pageBreak",
   group: "block",
   atom: true,

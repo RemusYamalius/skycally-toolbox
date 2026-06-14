@@ -197,7 +197,7 @@ function CurrencyConverter() {
       const past = new Date();
       past.setDate(past.getDate() - 7);
       const iso = (d: Date) => d.toISOString().slice(0, 10);
-      const url = `https://api.frankfurter.dev/v1/${iso(past)}..${iso(today)}?from=${from}&to=${to}`;
+      const url = `https://api.frankfurter.dev/v1/${iso(past)}..${iso(today)}?base=${from}&symbols=${to}`;
       fetch(url)
         .then((r) => (r.ok ? r.json() : Promise.reject()))
         .then((data: { rates?: Record<string, Record<string, number>> }) => {

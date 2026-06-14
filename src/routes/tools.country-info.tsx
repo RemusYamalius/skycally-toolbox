@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { Loader2, Search, MapPin } from "lucide-react";
+import { Search, MapPin } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -11,166 +11,102 @@ import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
+import COUNTRIES from "@/data/countries.json";
 
 export const Route = createFileRoute("/tools/country-info")({
   head: () => buildToolMeta(toolBySlug("country-info", tools)),
   component: CountryInfo,
 });
 
-interface CountryListItem {
-  name: string;
+interface CountryRecord {
   cca2: string;
   cca3: string;
-  flag: string;
-}
-
-interface CountryDetail {
   name: { common: string; official: string };
-  flags: { svg: string; png: string; alt?: string };
-  cca2: string;
-  cca3: string;
-  capital?: string[];
-  region?: string;
-  subregion?: string;
-  population?: number;
-  area?: number;
-  currencies?: Record<string, { name: string; symbol?: string }>;
-  languages?: Record<string, string>;
-  tld?: string[];
-  idd?: { root?: string; suffixes?: string[] };
-  car?: { side?: string };
-  timezones?: string[];
-  maps?: { googleMaps?: string };
-  borders?: string[];
+  flagEmoji: string;
+  flagSvg: string;
+  capital: string[];
+  region: string;
+  subregion: string;
+  population: number;
+  area: number;
+  currencies: Record<string, { name: string; symbol?: string }>;
+  languages: Record<string, string>;
+  tld: string[];
+  callingCode: string;
+  drivingSide: string;
+  timezones: string[];
+  borders: string[];
 }
 
-const PROXY_BASE = "https://country-proxy.skycally-tools.workers.dev/";
-const COUNTRIES_URL = `${PROXY_BASE}?type=all`;
+const ALL: CountryRecord[] = (COUNTRIES as CountryRecord[])
+  .slice()
+  .sort((a, b) => a.name.common.localeCompare(b.name.common));
+
+const BY_CCA3 = new Map(ALL.map((c) => [c.cca3, c]));
 
 function formatNumber(n?: number) {
-  if (n == null) return "—";
+  if (!n) return "—";
   return n.toLocaleString("en-US");
 }
 
-function callingCode(c: CountryDetail) {
-  const root = c.idd?.root ?? "";
-  const suffix = c.idd?.suffixes?.[0] ?? "";
-  return root + suffix || "—";
+function googleMapsUrl(c: CountryRecord) {
+  return `https://www.google.com/maps/place/${encodeURIComponent(c.name.common)}`;
 }
 
 function CountryInfo() {
-  const [allCountries, setAllCountries] = useState<CountryListItem[]>([]);
   const [query, setQuery] = useState("");
   const [search, setSearch] = useState("");
-  const [loading, setLoading] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const [country, setCountry] = useState<CountryDetail | null>(null);
-  const [borderNames, setBorderNames] = useState<
-    { cca3: string; common: string; flag: string }[]
-  >([]);
+  const [country, setCountry] = useState<CountryRecord | null>(null);
 
-  useEffect(() => {
-    let cancelled = false;
-    fetch(COUNTRIES_URL)
-      .then((r) => r.json())
-      .then((data: any[]) => {
-        if (cancelled) return;
-        const list: CountryListItem[] = data
-          .map((c) => ({
-            name: c.name?.common ?? "",
-            cca2: c.cca2 ?? "",
-            cca3: c.cca3 ?? "",
-            flag: c.flags?.svg ?? c.flags?.png ?? "",
-          }))
-          .filter((c) => c.name)
-          .sort((a, b) => a.name.localeCompare(b.name));
-        setAllCountries(list);
-      })
-      .catch(() => {});
-    return () => {
-      cancelled = true;
-    };
-  }, []);
-
-  async function loadByName(name: string) {
-    const q = name.trim();
+  function selectByName(name: string) {
+    const q = name.trim().toLowerCase();
     if (!q) return;
-    setLoading(true);
-    setError(null);
-    try {
-      const res = await fetch(
-        `${PROXY_BASE}?type=name&query=${encodeURIComponent(q)}`,
-      );
-      if (!res.ok) {
-        setCountry(null);
-        setBorderNames([]);
-        setError("Country not found. Please try another name.");
-        return;
-      }
-      const data: CountryDetail[] = await res.json();
-      const c =
-        data.find(
-          (d) => d.name.common.toLowerCase() === q.toLowerCase(),
-        ) ?? data[0];
-      setCountry(c);
-      await loadBorders(c.borders ?? []);
-    } catch {
+    const c =
+      ALL.find((x) => x.name.common.toLowerCase() === q) ??
+      ALL.find((x) => x.name.official.toLowerCase() === q) ??
+      ALL.find((x) => x.name.common.toLowerCase().includes(q));
+    if (!c) {
       setError("Country not found. Please try another name.");
-    } finally {
-      setLoading(false);
-    }
-  }
-
-  async function loadByCode(cca3: string) {
-    const match = allCountries.find((c) => c.cca3 === cca3);
-    if (!match) {
-      setError("Could not load that country, please try again.");
       return;
     }
-    await loadByName(match.name);
+    setError(null);
+    setCountry(c);
+  }
+
+  function selectByCode(cca3: string) {
+    const c = BY_CCA3.get(cca3);
+    if (!c) return;
+    setError(null);
+    setCountry(c);
     if (typeof window !== "undefined") {
       window.scrollTo({ top: 0, behavior: "smooth" });
     }
   }
 
-  function loadBorders(codes: string[]) {
-    if (codes.length === 0 || allCountries.length === 0) {
-      setBorderNames([]);
-      return;
-    }
-    const map = new Map(allCountries.map((c) => [c.cca3, c]));
-    setBorderNames(
-      codes
-        .map((code) => {
-          const c = map.get(code);
-          return c
-            ? { cca3: c.cca3, common: c.name, flag: c.flag }
-            : { cca3: code, common: code, flag: "" };
-        })
-        .sort((a, b) => a.common.localeCompare(b.common)),
-    );
-  }
-
-  // Load a default on mount when list is ready
   useEffect(() => {
-    if (allCountries.length > 0 && !country && !loading) {
-      void loadByName("Morocco");
-    }
+    if (!country) selectByName("Morocco");
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [allCountries.length]);
+  }, []);
 
   function onSubmit(e: React.FormEvent) {
     e.preventDefault();
-    void loadByName(search);
+    selectByName(search);
   }
 
   const filtered = useMemo(() => {
     const q = query.trim().toLowerCase();
-    if (!q) return allCountries.slice(0, 50);
-    return allCountries
-      .filter((c) => c.name.toLowerCase().includes(q))
-      .slice(0, 50);
-  }, [allCountries, query]);
+    if (!q) return ALL.slice(0, 50);
+    return ALL.filter((c) => c.name.common.toLowerCase().includes(q)).slice(0, 50);
+  }, [query]);
+
+  const borderList = useMemo(() => {
+    if (!country) return [];
+    return country.borders
+      .map((code) => BY_CCA3.get(code))
+      .filter((c): c is CountryRecord => !!c)
+      .sort((a, b) => a.name.common.localeCompare(b.name.common));
+  }, [country]);
 
   const currencies = country?.currencies
     ? Object.entries(country.currencies)
@@ -194,12 +130,8 @@ function CountryInfo() {
           placeholder="Type a country name, e.g. Morocco"
           className="flex-1"
         />
-        <Button type="submit" disabled={loading} className="gap-2">
-          {loading ? (
-            <Loader2 className="w-4 h-4 animate-spin" />
-          ) : (
-            <Search className="w-4 h-4" />
-          )}
+        <Button type="submit" className="gap-2">
+          <Search className="w-4 h-4" />
           Search
         </Button>
       </form>
@@ -219,38 +151,35 @@ function CountryInfo() {
             <button
               key={c.cca3}
               type="button"
-              onClick={() => void loadByCode(c.cca3)}
+              onClick={() => selectByCode(c.cca3)}
               className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm hover:bg-secondary/50 transition-colors"
             >
-              {c.flag && (
+              {c.flagSvg && (
                 <img
-                  src={c.flag}
+                  src={c.flagSvg}
                   alt=""
+                  loading="lazy"
                   className="w-6 h-4 object-cover rounded-sm border border-border"
                 />
               )}
-              <span>{c.name}</span>
+              <span>{c.name.common}</span>
             </button>
           ))}
           {filtered.length === 0 && (
-            <p className="px-3 py-4 text-sm text-muted-foreground">
-              No matches.
-            </p>
+            <p className="px-3 py-4 text-sm text-muted-foreground">No matches.</p>
           )}
         </div>
       </div>
 
       {error && (
-        <p
-          className="mt-4 text-sm"
-          style={{ color: "var(--orange-brand)" }}
-        >
+        <p className="mt-4 text-sm" style={{ color: "var(--orange-brand)" }}>
           {error}
         </p>
       )}
 
       {country && (
         <motion.div
+          key={country.cca3}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
@@ -258,13 +187,13 @@ function CountryInfo() {
         >
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             <img
-              src={country.flags.svg}
-              alt={country.flags.alt ?? `Flag of ${country.name.common}`}
+              src={country.flagSvg}
+              alt={`Flag of ${country.name.common}`}
               className="w-40 h-auto rounded-lg border border-border shadow-sm"
             />
             <div className="flex-1">
               <h2 className="font-display text-3xl font-bold tracking-tight">
-                {country.name.common}
+                {country.flagEmoji} {country.name.common}
               </h2>
               <p className="text-sm text-muted-foreground mt-1">
                 {country.name.official}
@@ -280,16 +209,8 @@ function CountryInfo() {
           </div>
 
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
-            <InfoTile
-              icon="🏛️"
-              label="Capital"
-              value={country.capital?.join(", ") || "—"}
-            />
-            <InfoTile
-              icon="👥"
-              label="Population"
-              value={formatNumber(country.population)}
-            />
+            <InfoTile icon="🏛️" label="Capital" value={country.capital.join(", ") || "—"} />
+            <InfoTile icon="👥" label="Population" value={formatNumber(country.population)} />
             <InfoTile
               icon="📐"
               label="Area"
@@ -300,70 +221,62 @@ function CountryInfo() {
             <InfoTile
               icon="🌐"
               label="Top-Level Domain"
-              value={country.tld?.join(", ") || "—"}
+              value={country.tld.join(", ") || "—"}
             />
-            <InfoTile icon="📞" label="Calling Code" value={callingCode(country)} />
+            <InfoTile icon="📞" label="Calling Code" value={country.callingCode || "—"} />
             <InfoTile
               icon="🚗"
               label="Driving Side"
               value={
-                country.car?.side
-                  ? country.car.side.charAt(0).toUpperCase() +
-                    country.car.side.slice(1)
+                country.drivingSide
+                  ? country.drivingSide.charAt(0).toUpperCase() + country.drivingSide.slice(1)
                   : "—"
               }
             />
             <InfoTile
               icon="⏰"
               label="Timezones"
-              value={country.timezones?.join(", ") || "—"}
+              value={country.timezones.join(", ") || "—"}
             />
             <InfoTile
               icon="🗺️"
               label="Google Maps"
               value={
-                country.maps?.googleMaps ? (
-                  <a
-                    href={country.maps.googleMaps}
-                    target="_blank"
-                    rel="noreferrer"
-                    className="underline"
-                    style={{ color: "var(--cyan-brand)" }}
-                  >
-                    View on Maps
-                  </a>
-                ) : (
-                  "—"
-                )
+                <a
+                  href={googleMapsUrl(country)}
+                  target="_blank"
+                  rel="noreferrer"
+                  className="underline"
+                  style={{ color: "var(--cyan-brand)" }}
+                >
+                  View on Maps
+                </a>
               }
             />
           </div>
 
           <div className="mt-6">
-            <h3 className="font-display text-base font-bold mb-3">
-              Bordering Countries
-            </h3>
-            {borderNames.length === 0 ? (
-              <p className="text-sm text-muted-foreground">
-                No bordering countries
-              </p>
+            <h3 className="font-display text-base font-bold mb-3">Bordering Countries</h3>
+            {borderList.length === 0 ? (
+              <p className="text-sm text-muted-foreground">No bordering countries</p>
             ) : (
               <div className="flex flex-wrap gap-2">
-                {borderNames.map((b) => (
+                {borderList.map((b) => (
                   <button
                     key={b.cca3}
                     type="button"
-                    onClick={() => void loadByCode(b.cca3)}
+                    onClick={() => selectByCode(b.cca3)}
                     className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1.5 text-xs hover:bg-secondary/60 transition-colors"
                   >
-                    {b.flag && (
+                    {b.flagSvg && (
                       <img
-                        src={b.flag}
+                        src={b.flagSvg}
                         alt=""
+                        loading="lazy"
                         className="w-4 h-3 object-cover rounded-sm"
                       />
                     )}
-                    {b.common}
+                    {b.name.common}
                   </button>
                 ))}
               </div>
@@ -375,7 +288,7 @@ function CountryInfo() {
       <HowToUse
         steps={[
           "Type a country name in the search box, or pick one from the dropdown list.",
-          "Click Search to load the country's full profile — flag, capital, population, currency and more.",
+          "The country's full profile loads instantly — flag, capital, population, currency and more.",
           "Click any bordering country chip to instantly explore its neighbors.",
         ]}
       />
@@ -385,7 +298,7 @@ function CountryInfo() {
         description="Instant facts, flags, and data for every country in the world. Free, no signup, runs in your browser."
         body={[
           "Country Info gives you instant access to facts about any of the 250 countries and territories recognized in the world. Type a country name or pick from the list and you immediately see the flag, capital, official name, population, area, currency, official languages, calling code, top-level domain, driving side, timezones, and a direct link to Google Maps — all on one clean card. Nothing is uploaded, nothing is stored, and no signup is required.",
-          "The tool is powered by the REST Countries API, a community-maintained dataset that aggregates official country information from the World Bank, the United Nations, and other public sources. The dataset is updated regularly so figures like population, currency, and capital reflect the latest published values. Every lookup goes directly from your browser to the API, so results appear in under a second.",
+          "The entire dataset is bundled directly into the app, so every lookup is instant — no API calls, no loading spinners, and no risk of an outside service going down. The data is compiled from open public sources including the mledoze/countries project and other community-maintained references covering every UN member state and territory.",
           "Country Info is useful for students researching world geography, travelers planning a trip, trivia and quiz players checking answers, language learners exploring official languages, and anyone simply curious about the world. The bordering-country chips also make it easy to hop between neighbors — pick one and you instantly land on its profile, perfect for exploring an entire region in just a few clicks.",
         ]}
         faqs={[
@@ -397,7 +310,7 @@ function CountryInfo() {
           {
             question: "Where does the data come from?",
             answer:
-              "Data is sourced from the REST Countries API, which aggregates information from the World Bank, UN, and other official sources.",
+              "Data is compiled from open public datasets (including mledoze/countries) and bundled directly with the app — no external API is used.",
           },
           {
             question: "Can I search in languages other than English?",
@@ -407,7 +320,7 @@ function CountryInfo() {
           {
             question: "Is the population data up to date?",
             answer:
-              "Population figures are based on the latest available data in the REST Countries API, typically updated annually.",
+              "Population figures reflect the most recent values from the bundled dataset. For real-time statistics, consult official national sources.",
           },
         ]}
       />

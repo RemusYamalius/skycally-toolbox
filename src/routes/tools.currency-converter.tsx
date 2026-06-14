@@ -154,39 +154,48 @@ function CurrencyConverter() {
     })();
   }, []);
 
-  // 7-day rate history
+  // 7-day rate history — fetch on currency change AND on debounced amount change
   useEffect(() => {
     if (from === to) {
       setHistory(null);
+      setHistoryLoading(false);
       return;
     }
     let cancelled = false;
-    const today = new Date();
-    const past = new Date();
-    past.setDate(past.getDate() - 7);
-    const iso = (d: Date) => d.toISOString().slice(0, 10);
-    const url = `https://api.frankfurter.app/${iso(past)}..${iso(today)}?from=${from}&to=${to}`;
-    fetch(url)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data: { rates?: Record<string, Record<string, number>> }) => {
-        if (cancelled) return;
-        if (!data.rates) {
-          setHistory(null);
-          return;
-        }
-        const points = Object.entries(data.rates)
-          .map(([date, obj]) => ({ date, rate: obj?.[to] }))
-          .filter((p): p is { date: string; rate: number } => typeof p.rate === "number")
-          .sort((a, b) => a.date.localeCompare(b.date));
-        setHistory(points.length >= 2 ? points : null);
-      })
-      .catch(() => {
-        if (!cancelled) setHistory(null);
-      });
+    const timer = setTimeout(() => {
+      setHistoryLoading(true);
+      const today = new Date();
+      const past = new Date();
+      past.setDate(past.getDate() - 7);
+      const iso = (d: Date) => d.toISOString().slice(0, 10);
+      const url = `https://api.frankfurter.app/${iso(past)}..${iso(today)}?from=${from}&to=${to}`;
+      fetch(url)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((data: { rates?: Record<string, Record<string, number>> }) => {
+          if (cancelled) return;
+          if (!data.rates) {
+            setHistory((prev) => prev);
+            setHistoryLoading(false);
+            return;
+          }
+          const points = Object.entries(data.rates)
+            .map(([date, obj]) => ({ date, rate: obj?.[to] }))
+            .filter((p): p is { date: string; rate: number } => typeof p.rate === "number")
+            .sort((a, b) => a.date.localeCompare(b.date));
+          setHistory(points.length >= 2 ? points : null);
+          setHistoryLoading(false);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          // Keep previous data if any; otherwise leave null so section hides silently.
+          setHistoryLoading(false);
+        });
+    }, 500);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
-  }, [from, to]);
+  }, [from, to, amount]);
 
   const allCodes = useMemo(() => {
     if (!rates?.conversion_rates) return [] as string[];

@@ -1,66 +1,83 @@
 # Plan
 
-Two independent, surgical updates. No design changes, no router changes, no new tools list edits.
+Two independent fixes. No design changes.
 
 ---
 
-## Part 1 — Country Info: switch to Cloudflare Worker proxy
+## Part 1 — Currency Converter: always-visible 7-Day Rate History
 
-**File:** `src/routes/tools.country-info.tsx`
+**File:** `src/routes/tools.currency-converter.tsx`
 
-Replace every direct `https://restcountries.com/...` fetch with the new Worker:
+The chart is already wired to `[from, to]` but only renders when `history.length >= 2`. On mount with `USD → EUR` it should fetch immediately and show a skeleton while loading, never disappearing on user interaction.
 
-- `COUNTRIES_URL` (all countries for the dropdown):
-  `https://country-proxy.skycally-tools.workers.dev/?type=all`
-- `loadByName(name)`:
-  `https://country-proxy.skycally-tools.workers.dev/?type=name&query={encodeURIComponent(name)}`
-- `loadByCode(cca3)` — the Worker spec only documents `type=all` and `type=name`. To keep the "click a border / pick from list" flow working without restcountries.com, resolve the click by looking up the country name in the already-loaded `allCountries` list (we have `cca3 → name`) and call `loadByName(name)` instead of hitting `/alpha`.
-- `loadBorders(codes)` — same pattern: map each border `cca3` to its `{ name, flag }` from `allCountries` locally. No network call. Border chips still show flag + name and still trigger `loadByCode` on click.
+Changes:
+1. **State model**: replace `history: Points[] | null` with `history: Points[] | null` + `historyLoading: boolean`. Initial state: `history = null`, `historyLoading = true` (so skeleton shows on first paint).
+2. **Fetch trigger**: keep the existing `useEffect` keyed on `[from, to]` (currency changes already trigger it). Add a **debounced effect on `amount`** (500ms) that re-runs the same fetch — even though Frankfurter doesn't depend on amount, the brief requires re-fetching on amount change. Implementation: a single shared `fetchHistory(from, to)` function called by both effects; the amount effect uses `setTimeout` + cleanup for the 500ms debounce.
+3. **On mount**: the `[from, to]` effect already fires on mount with defaults `USD → EUR`, satisfying "fetch immediately on mount."
+4. **Loading skeleton**: while `historyLoading` is true and `history` is null, render the section with a `<Skeleton className="h-[220px] w-full rounded-xl" />` (already-imported `src/components/ui/skeleton.tsx`) in place of the chart. Title "7-Day Rate History" + Frankfurter caption still visible.
+5. **Always visible after first successful load**: section only unmounts if the very first fetch fails AND we have no data. To match the brief ("hide silently if API fails"): if fetch fails and `history` is still null, unmount the section. If a previous fetch succeeded, keep showing the last chart (don't flash to empty on a transient error).
+6. **Same-currency case** (`from === to`): keep current behavior — set history to null, no skeleton, section hidden (a flat line at 1.0 is not useful).
+7. **Placement**: section already sits between Quick Conversions and `HowToUse`/SEO — unchanged.
+8. **Convert button**: stays as-is (manual re-fetch of rates); chart no longer depends on it.
 
-UI, layout, styles, copy, SEO content, FAQs: unchanged.
+No new dependencies. Recharts and Skeleton already imported elsewhere in the project.
 
 ---
 
-## Part 2 — Currency Converter: disclaimer, 7-day chart, SEO refresh
+## Part 2 — Country Info: bundled local dataset, zero external API
 
-**File:** `src/routes/tools.currency-converter.tsx` only. Existing converter, swap, quick-conversions grid: untouched.
+**Goal:** remove every network call (REST Countries + the `country-proxy.skycally-tools.workers.dev` Worker) so the page renders instantly from a static JSON file.
 
-### 2a. Disclaimer line in the result card
+### 2a. Generate `src/data/countries.json`
 
-Inside the result card, directly after the "Last updated" line, add:
+Source: **mledoze/countries** (public-domain, MIT, ~250 entries) — the same dataset REST Countries is built on. I'll download `countries.json` from the upstream repo via a one-off `code--exec` step during build mode and post-process it into the exact shape the tool needs, so we don't ship unused fields. Output schema per entry:
 
+```ts
+{
+  cca2: string;          // "MA"
+  cca3: string;          // "MAR" (kept for border-code lookups)
+  name: { common: string; official: string };
+  flagEmoji: string;     // "🇲🇦"
+  flagSvg: string;       // "https://flagcdn.com/w320/ma.png" (lowercase cca2)
+  capital: string[];
+  region: string;
+  subregion: string;
+  population: number;
+  area: number;          // km²
+  currencies: Record<string, { name: string; symbol?: string }>;
+  languages: Record<string, string>;
+  tld: string[];
+  callingCode: string;   // pre-joined "+212"
+  drivingSide: "left" | "right" | "";
+  timezones: string[];
+  borders: string[];     // array of cca3 codes (mledoze native format)
+}
 ```
-Rates updated daily. For real-time trading rates, consult your bank or broker directly.
-```
 
-Rendered in `text-xs text-muted-foreground mt-1`.
+All 250 entries. File committed to the repo, ~300–400 KB JSON.
 
-### 2b. 7-Day Rate History chart
+### 2b. Rewrite `src/routes/tools.country-info.tsx`
 
-New section placed **after** the Quick Conversions grid and **before** `HowToUse`.
+- Remove `PROXY_BASE`, `COUNTRIES_URL`, `loadByName`, the mount fetch, the `loading` spinner, and the `error` state's API-related branches.
+- Import the JSON statically: `import COUNTRIES from "@/data/countries.json";`
+- Build `allCountries` once with `useMemo` from `COUNTRIES`, sorted by `name.common`.
+- Default selection: still "Morocco" on first render — instant, no async.
+- Search (`onSubmit`) and dropdown click: pure local filter/lookup, set `country` state synchronously. No spinner.
+- Borders: lookup by `cca3` against the in-memory map (this already works in the current code; I'll keep that logic, just sourced from local data).
+- Flag rendering: use `flagSvg` for the big flag and border chips. Emoji available as a fallback.
+- Error state: only shown if user searches a string that matches no country (purely local "not found"). Wording: "Country not found. Please try another name."
+- Remove the `Loader2` spinner from the Search button — the lookup is synchronous.
+- UI, layout, SEO copy, FAQs, `RelatedTools`, `HowToUse`: unchanged.
 
-- Title: `7-Day Rate History` (same `font-display text-lg font-bold mb-3` styling as Quick Conversions).
-- Data source: `https://api.frankfurter.app/{start}..{end}?from={FROM}&to={TO}` where `start = today − 7 days`, `end = today` (ISO `YYYY-MM-DD`, UTC).
-- Fetch effect keyed on `[from, to]`. On success, store `{ date, rate }[]` sorted ascending. On any error or empty payload, set state to `null` so the whole section unmounts (no error UI).
-- Render with **Recharts** (already in the project — verify; if missing, plan flips to a tiny inline SVG line chart to avoid adding deps). Components: `ResponsiveContainer` (height 220, width 100% — responsive on mobile), `LineChart`, `CartesianGrid` (subtle), `XAxis` formatted as `Mon, Tue, …` via `toLocaleDateString('en-US', { weekday:'short' })`, `YAxis` with auto domain and 4-decimal tick formatter, `Tooltip` showing exact rate (6 sig figs) + full date (`Mon, Jun 9`), and a single `<Line>` with `stroke="#00D4FF"`, `strokeWidth={2}`, `dot={false}`, `activeDot`.
-- Card wrapper: `rounded-2xl border border-border bg-card/40 p-4 sm:p-6`. Tooltip uses inline styles matching dark theme (`background: var(--card)`, `border: 1px solid var(--border)`, `color: var(--foreground)`).
-- Caption below chart: `Powered by Frankfurter API` — `text-[10px] uppercase tracking-wide text-muted-foreground mt-2 text-center`.
-- Section visibility: only render when `history` state has ≥2 points. No loading spinner, no error toast.
+### 2c. Cleanup
 
-### 2c. SEO content rewrite
-
-Replace the `<ToolSeoContent>` props with the exact copy from the brief:
-
-- `title`: `Currency Converter — Free Live Exchange Rate Tool`
-- `description`: keep existing one-liner (covers the section subtitle) — the brief gives 3 body paragraphs, not a new description; keep current description text.
-- `body`: the 3 paragraphs from the brief, verbatim.
-- `faqs`: the 5 Q/A pairs from the brief, verbatim.
-
-`src/lib/tools.ts` `currency-converter` entry: left unchanged (meta description already aligns; brief doesn't request a meta change).
+- Confirm no other file references `country-proxy.skycally-tools.workers.dev` or `restcountries.com` (quick `rg`). Remove any stragglers.
+- `src/lib/tools.ts` entry for `country-info`: unchanged.
 
 ---
 
 ## Out of scope
 
-- No changes to `src/lib/tools.ts`, router, or related-tools list.
-- No new dependencies unless Recharts is already absent — in which case I will confirm with you before adding it (fallback: minimal inline SVG line chart).
+- No router changes, no `tools.ts` changes, no related-tools list changes.
+- No new npm dependencies.
+- Currency Converter UI (inputs, swap, Convert button, Quick Conversions, SEO): untouched aside from the chart-section swap described above.

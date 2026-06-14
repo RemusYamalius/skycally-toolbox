@@ -33,6 +33,7 @@ import {
 import { cn } from "@/lib/utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
+import { Skeleton } from "@/components/ui/skeleton";
 
 export const Route = createFileRoute("/tools/currency-converter")({
   head: () => buildToolMeta(toolBySlug("currency-converter", tools)),
@@ -116,6 +117,7 @@ function CurrencyConverter() {
   const [rates, setRates] = useState<RatesResponse | null>(null);
   const [quickRates, setQuickRates] = useState<Record<string, RatesResponse>>({});
   const [history, setHistory] = useState<{ date: string; rate: number }[] | null>(null);
+  const [historyLoading, setHistoryLoading] = useState<boolean>(true);
 
   async function loadRates(base: string) {
     setLoading(true);
@@ -152,39 +154,48 @@ function CurrencyConverter() {
     })();
   }, []);
 
-  // 7-day rate history
+  // 7-day rate history — fetch on currency change AND on debounced amount change
   useEffect(() => {
     if (from === to) {
       setHistory(null);
+      setHistoryLoading(false);
       return;
     }
     let cancelled = false;
-    const today = new Date();
-    const past = new Date();
-    past.setDate(past.getDate() - 7);
-    const iso = (d: Date) => d.toISOString().slice(0, 10);
-    const url = `https://api.frankfurter.app/${iso(past)}..${iso(today)}?from=${from}&to=${to}`;
-    fetch(url)
-      .then((r) => (r.ok ? r.json() : Promise.reject()))
-      .then((data: { rates?: Record<string, Record<string, number>> }) => {
-        if (cancelled) return;
-        if (!data.rates) {
-          setHistory(null);
-          return;
-        }
-        const points = Object.entries(data.rates)
-          .map(([date, obj]) => ({ date, rate: obj?.[to] }))
-          .filter((p): p is { date: string; rate: number } => typeof p.rate === "number")
-          .sort((a, b) => a.date.localeCompare(b.date));
-        setHistory(points.length >= 2 ? points : null);
-      })
-      .catch(() => {
-        if (!cancelled) setHistory(null);
-      });
+    const timer = setTimeout(() => {
+      setHistoryLoading(true);
+      const today = new Date();
+      const past = new Date();
+      past.setDate(past.getDate() - 7);
+      const iso = (d: Date) => d.toISOString().slice(0, 10);
+      const url = `https://api.frankfurter.app/${iso(past)}..${iso(today)}?from=${from}&to=${to}`;
+      fetch(url)
+        .then((r) => (r.ok ? r.json() : Promise.reject()))
+        .then((data: { rates?: Record<string, Record<string, number>> }) => {
+          if (cancelled) return;
+          if (!data.rates) {
+            setHistory((prev) => prev);
+            setHistoryLoading(false);
+            return;
+          }
+          const points = Object.entries(data.rates)
+            .map(([date, obj]) => ({ date, rate: obj?.[to] }))
+            .filter((p): p is { date: string; rate: number } => typeof p.rate === "number")
+            .sort((a, b) => a.date.localeCompare(b.date));
+          setHistory(points.length >= 2 ? points : null);
+          setHistoryLoading(false);
+        })
+        .catch(() => {
+          if (cancelled) return;
+          // Keep previous data if any; otherwise leave null so section hides silently.
+          setHistoryLoading(false);
+        });
+    }, 500);
     return () => {
       cancelled = true;
+      clearTimeout(timer);
     };
-  }, [from, to]);
+  }, [from, to, amount]);
 
   const allCodes = useMemo(() => {
     if (!rates?.conversion_rates) return [] as string[];
@@ -423,59 +434,63 @@ function CurrencyConverter() {
       </section>
 
       {/* 7-Day Rate History */}
-      {history && history.length >= 2 && (
+      {from !== to && (historyLoading || (history && history.length >= 2)) && (
         <section className="mt-10">
           <h2 className="font-display text-lg font-bold mb-3">7-Day Rate History</h2>
           <div className="rounded-2xl border border-border bg-card/40 p-4 sm:p-6">
-            <ResponsiveContainer width="100%" height={220}>
-              <LineChart data={history} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
-                <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
-                <XAxis
-                  dataKey="date"
-                  stroke="var(--muted-foreground)"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={false}
-                  tickFormatter={(d: string) =>
-                    new Date(d).toLocaleDateString("en-US", { weekday: "short" })
-                  }
-                />
-                <YAxis
-                  stroke="var(--muted-foreground)"
-                  fontSize={11}
-                  tickLine={false}
-                  axisLine={false}
-                  width={60}
-                  domain={["auto", "auto"]}
-                  tickFormatter={(v: number) => v.toFixed(4)}
-                />
-                <Tooltip
-                  contentStyle={{
-                    background: "var(--card)",
-                    border: "1px solid var(--border)",
-                    borderRadius: 8,
-                    color: "var(--foreground)",
-                    fontSize: 12,
-                  }}
-                  labelFormatter={(d: string) =>
-                    new Date(d).toLocaleDateString("en-US", {
-                      weekday: "short",
-                      month: "short",
-                      day: "numeric",
-                    })
-                  }
-                  formatter={(v: number) => [`${v.toPrecision(6)} ${to}`, `1 ${from}`]}
-                />
-                <Line
-                  type="monotone"
-                  dataKey="rate"
-                  stroke="#00D4FF"
-                  strokeWidth={2}
-                  dot={false}
-                  activeDot={{ r: 4, fill: "#00D4FF" }}
-                />
-              </LineChart>
-            </ResponsiveContainer>
+            {history && history.length >= 2 ? (
+              <ResponsiveContainer width="100%" height={220}>
+                <LineChart data={history} margin={{ top: 8, right: 12, left: 0, bottom: 0 }}>
+                  <CartesianGrid stroke="var(--border)" strokeDasharray="3 3" vertical={false} />
+                  <XAxis
+                    dataKey="date"
+                    stroke="var(--muted-foreground)"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    tickFormatter={(d: string) =>
+                      new Date(d).toLocaleDateString("en-US", { weekday: "short" })
+                    }
+                  />
+                  <YAxis
+                    stroke="var(--muted-foreground)"
+                    fontSize={11}
+                    tickLine={false}
+                    axisLine={false}
+                    width={60}
+                    domain={["auto", "auto"]}
+                    tickFormatter={(v: number) => v.toFixed(4)}
+                  />
+                  <Tooltip
+                    contentStyle={{
+                      background: "var(--card)",
+                      border: "1px solid var(--border)",
+                      borderRadius: 8,
+                      color: "var(--foreground)",
+                      fontSize: 12,
+                    }}
+                    labelFormatter={(d: string) =>
+                      new Date(d).toLocaleDateString("en-US", {
+                        weekday: "short",
+                        month: "short",
+                        day: "numeric",
+                      })
+                    }
+                    formatter={(v: number) => [`${v.toPrecision(6)} ${to}`, `1 ${from}`]}
+                  />
+                  <Line
+                    type="monotone"
+                    dataKey="rate"
+                    stroke="#00D4FF"
+                    strokeWidth={2}
+                    dot={false}
+                    activeDot={{ r: 4, fill: "#00D4FF" }}
+                  />
+                </LineChart>
+              </ResponsiveContainer>
+            ) : (
+              <Skeleton className="h-[220px] w-full rounded-xl" />
+            )}
             <div className="mt-2 text-center text-[10px] uppercase tracking-wide text-muted-foreground">
               Powered by Frankfurter API
             </div>

@@ -203,7 +203,7 @@ function CurrencyConverter() {
         .then((data: { rates?: Record<string, Record<string, number>> }) => {
           if (cancelled) return;
           if (!data.rates) {
-            setHistory((prev) => prev);
+            setHistory(null);
             setHistoryLoading(false);
             return;
           }

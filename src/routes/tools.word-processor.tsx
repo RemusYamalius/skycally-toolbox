@@ -727,7 +727,7 @@ function Toolbar({
     } else if (name.endsWith(".html") || name.endsWith(".htm")) {
       editor.commands.setContent(await f.text());
     } else if (name.endsWith(".docx")) {
-      const mammoth: any = await import("mammoth/mammoth.browser");
+      const mammoth: any = await import("mammoth");
       const buf = await f.arrayBuffer();
       const r = await mammoth.convertToHtml({ arrayBuffer: buf });
       editor.commands.setContent(r.value || "<p></p>");

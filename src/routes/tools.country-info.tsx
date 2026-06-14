@@ -38,7 +38,7 @@ interface CountryRecord {
   borders: string[];
 }
 
-const ALL: CountryRecord[] = (COUNTRIES as CountryRecord[])
+const ALL: CountryRecord[] = (COUNTRIES as unknown as CountryRecord[])
   .slice()
   .sort((a, b) => a.name.common.localeCompare(b.name.common));
 

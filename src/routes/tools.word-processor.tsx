@@ -62,6 +62,8 @@ import {
   ZoomIn,
   ZoomOut,
   Paintbrush,
+  Maximize2,
+  Minimize2,
 } from "lucide-react";
 
 export const Route = createFileRoute("/tools/word-processor")({
@@ -550,6 +552,17 @@ function Editor4U() {
   }, []);
   const scale = fitScale * (zoomPercent / 100);
   const [painterFormat, setPainterFormat] = useState<PainterFormat | null>(null);
+
+  // Fullscreen workspace mode — covers the whole viewport, exits on Escape
+  const [isFullscreen, setIsFullscreen] = useState(false);
+  useEffect(() => {
+    if (!isFullscreen) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsFullscreen(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isFullscreen]);
   const painterApplyingRef = useRef(false);
   const [pageMinHeight, setPageMinHeight] = useState(PAGE_UNIT_PX);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -730,7 +743,7 @@ function Editor4U() {
   if (!editor) return <div className="h-[600px] rounded-2xl bg-secondary/50 animate-pulse" />;
 
   return (
-    <div className="wp-root">
+    <div className={`wp-root${isFullscreen ? " wp-fullscreen" : ""}`}>
       <style>{WP_CSS}</style>
 
       {heroVisible && (
@@ -766,6 +779,8 @@ function Editor4U() {
         onZoomChange={updateZoom}
         painterArmed={!!painterFormat}
         onTogglePainter={() => setPainterFormat((cur) => (cur ? null : capturePainterFormat(editor)))}
+        isFullscreen={isFullscreen}
+        onToggleFullscreen={() => setIsFullscreen((v) => !v)}
       />
 
       <div className="wp-canvas" ref={canvasRef}>
@@ -836,6 +851,8 @@ function Toolbar({
   onZoomChange,
   painterArmed,
   onTogglePainter,
+  isFullscreen,
+  onToggleFullscreen,
 }: {
   editor: Editor;
   saveState: "idle" | "saving" | "saved" | "error";
@@ -851,6 +868,8 @@ function Toolbar({
   onZoomChange: (v: number) => void;
   painterArmed: boolean;
   onTogglePainter: () => void;
+  isFullscreen: boolean;
+  onToggleFullscreen: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
@@ -1701,6 +1720,13 @@ function Toolbar({
         >
           <ZoomIn className="w-4 h-4" />
         </button>
+        <button
+          className={active(isFullscreen)}
+          onClick={onToggleFullscreen}
+          title={isFullscreen ? "Exit fullscreen (Esc)" : "Expand to fullscreen"}
+        >
+          {isFullscreen ? <Minimize2 className="w-4 h-4" /> : <Maximize2 className="w-4 h-4" />}
+        </button>
       </div>
     </div>
   );
@@ -2245,6 +2271,15 @@ function loadImageDims(src: string, maxWidth: number): Promise<{ width: number; 
 // ---------- CSS ----------
 const WP_CSS = `
 .wp-root { width: 100%; }
+.wp-fullscreen {
+  position: fixed; inset: 0; z-index: 1000;
+  background: var(--background);
+  padding: 12px;
+  display: flex; flex-direction: column;
+  overflow: hidden;
+}
+.wp-fullscreen .wp-hero { display: none; }
+.wp-fullscreen .wp-canvas { flex: 1; height: auto !important; min-height: 0; }
 .wp-hero {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   background: color-mix(in oklab, var(--cyan-brand) 12%, transparent);

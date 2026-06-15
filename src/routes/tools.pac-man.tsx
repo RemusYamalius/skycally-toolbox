@@ -686,7 +686,19 @@ function PacManPage() {
             </div>
           )}
         </div>
+
+        {/* Mobile D-Pad */}
+        <div className="md:hidden mt-5">
+          <DPad
+            onDirection={(d) => {
+              const dir = d as "up" | "down" | "left" | "right";
+              pacRef.current.nextDir = dir;
+              if (pacRef.current.dir === "none") pacRef.current.dir = dir;
+            }}
+          />
+        </div>
       </div>
+
 
       <HowToUse steps={[
         "Pick your difficulty — Easy keeps ghosts slow, Hard makes them sprint.",

@@ -7,6 +7,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
+import { FlipperZone, PadButton } from "@/components/game-controls";
 
 const PATH = "/tools/pinball";
 const TITLE = "Pinball — Free Online Arcade Game, No Download";

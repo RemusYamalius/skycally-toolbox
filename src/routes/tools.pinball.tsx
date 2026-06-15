@@ -1095,29 +1095,19 @@ function PinballPage() {
           )}
         </div>
 
-        {/* Touch controls */}
-        <div className="max-w-[420px] mx-auto mt-4 grid grid-cols-4 gap-2 sm:hidden">
-          <button
-            onPointerDown={(e) => { e.preventDefault(); pressLeft(true); }}
-            onPointerUp={() => pressLeft(false)}
-            onPointerLeave={() => pressLeft(false)}
-            className="col-span-1 py-4 rounded-xl bg-secondary border border-border font-bold text-foreground active:bg-secondary/70 touch-none"
-          >Left</button>
-          <button
-            onClick={tapLaunch}
-            className="col-span-1 py-4 rounded-xl bg-secondary border border-border font-bold text-foreground active:bg-secondary/70"
-          >Launch</button>
-          <button
-            onClick={tapNudge}
-            className="col-span-1 py-4 rounded-xl bg-secondary border border-border font-bold text-foreground active:bg-secondary/70"
-          >Nudge</button>
-          <button
-            onPointerDown={(e) => { e.preventDefault(); pressRight(true); }}
-            onPointerUp={() => pressRight(false)}
-            onPointerLeave={() => pressRight(false)}
-            className="col-span-1 py-4 rounded-xl bg-secondary border border-border font-bold text-foreground active:bg-secondary/70 touch-none"
-          >Right</button>
+        {/* Mobile touch controls */}
+        <div className="sm:hidden mt-4 space-y-2">
+          <div className="grid grid-cols-2 gap-2">
+            <PadButton onPress={tapLaunch} className="h-14 text-sm">🚀 LAUNCH</PadButton>
+            <PadButton onPress={tapNudge} className="h-14 text-sm">↕ NUDGE</PadButton>
+          </div>
+          <div className="grid grid-cols-2 gap-2">
+            <FlipperZone side="left" onPress={() => pressLeft(true)} onRelease={() => pressLeft(false)} />
+            <FlipperZone side="right" onPress={() => pressRight(true)} onRelease={() => pressRight(false)} />
+          </div>
+          <p className="text-[11px] text-muted-foreground text-center pt-1">Hold the flipper zones — they're full-width for easy thumb reach.</p>
         </div>
+
 
         <p className="text-xs text-muted-foreground text-center mt-4">
           Desktop: Z / ← left flipper · / / → right flipper · Space launch (hold to charge) · X nudge

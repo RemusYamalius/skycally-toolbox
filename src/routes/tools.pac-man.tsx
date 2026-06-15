@@ -8,6 +8,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
+import { DPad } from "@/components/game-controls";
 
 const PATH = "/tools/pac-man";
 const TITLE = "Pac-Man — Free Online Game, No Download";

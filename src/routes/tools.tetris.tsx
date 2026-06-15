@@ -8,6 +8,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
+import { DPad, PadButton } from "@/components/game-controls";
 
 export const Route = createFileRoute("/tools/tetris")({
   head: () => buildToolMeta(toolBySlug("tetris", tools)),

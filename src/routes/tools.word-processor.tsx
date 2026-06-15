@@ -989,7 +989,10 @@ function Toolbar({
               break;
             case "textStyle": {
               const a = m.attrs || {};
-              if (a.color) props.color = String(a.color).replace("#", "").toUpperCase();
+              if (a.color) {
+                const hex = cssColorToHex(a.color);
+                if (hex) props.color = hex;
+              }
               if (a.fontSize) {
                 const n = parseFloat(a.fontSize);
                 if (!isNaN(n)) props.size = Math.round(n * 2); // pt -> half-points
@@ -2229,26 +2232,66 @@ function speak(editor: Editor) {
 
 // Maps an arbitrary highlight hex color to the closest color docx's
 // limited TextRun#highlight palette supports.
-function hexToDocxHighlight(hex?: string): string {
+// Normalizes any CSS color string (#hex, #fff, rgb()/rgba(), or named colors)
+// into a 6-digit uppercase hex string without "#" — what docx's TextRun expects.
+function cssColorToHex(input?: string): string | undefined {
+  if (!input) return undefined;
+  const v = String(input).trim();
+
+  let m = v.match(/^#?([0-9a-fA-F]{6})$/);
+  if (m) return m[1].toUpperCase();
+
+  m = v.match(/^#?([0-9a-fA-F]{3})$/);
+  if (m) {
+    const [r, g, b] = m[1].split("");
+    return (r + r + g + g + b + b).toUpperCase();
+  }
+
+  const toHex = (n: string) =>
+    Math.max(0, Math.min(255, parseInt(n, 10)))
+      .toString(16)
+      .padStart(2, "0");
+
+  m = v.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+  if (m) return (toHex(m[1]) + toHex(m[2]) + toHex(m[3])).toUpperCase();
+
+  // Fallback for named CSS colors (e.g. "red") via the DOM
+  if (typeof document !== "undefined") {
+    try {
+      const el = document.createElement("div");
+      el.style.color = v;
+      if (!el.style.color) return undefined;
+      document.body.appendChild(el);
+      const computed = getComputedStyle(el).color;
+      document.body.removeChild(el);
+      const m2 = computed.match(/rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i);
+      if (m2) return (toHex(m2[1]) + toHex(m2[2]) + toHex(m2[3])).toUpperCase();
+    } catch {}
+  }
+  return undefined;
+}
+
+function hexToDocxHighlight(color?: string): string {
+  const hex = cssColorToHex(color);
   if (!hex) return "yellow";
   const map: Record<string, string> = {
-    "#ffff00": "yellow",
-    "#00cc00": "green",
-    "#00ff00": "green",
-    "#00ffff": "cyan",
-    "#ff00ff": "magenta",
-    "#9900ff": "magenta",
-    "#0066ff": "blue",
-    "#ff0000": "red",
-    "#cc0000": "red",
-    "#ff9900": "yellow",
-    "#cccccc": "lightGray",
-    "#999999": "darkGray",
-    "#666666": "darkGray",
-    "#000000": "black",
-    "#ffffff": "white",
+    FFFF00: "yellow",
+    "00CC00": "green",
+    "00FF00": "green",
+    "00FFFF": "cyan",
+    FF00FF: "magenta",
+    "9900FF": "magenta",
+    "0066FF": "blue",
+    FF0000: "red",
+    CC0000: "red",
+    FF9900: "yellow",
+    CCCCCC: "lightGray",
+    "999999": "darkGray",
+    "666666": "darkGray",
+    "000000": "black",
+    FFFFFF: "white",
   };
-  return map[hex.toLowerCase()] || "yellow";
+  return map[hex] || "yellow";
 }
 
 function dataUrlImageType(dataUrl: string): string {
@@ -2405,6 +2448,7 @@ const WP_CSS = `
     min-height: 0 !important; height: auto !important;
   }
   .wp-fullscreen { position: static !important; inset: auto !important; padding: 0 !important; overflow: visible !important; }
+  .wp-editor-content { min-height: 0 !important; }
   .wp-ruler-h, .wp-ruler-v, .wp-toolbar, .wp-hero { display: none !important; }
   .wp-page-break::after { display: none !important; }
 }

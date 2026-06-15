@@ -10,6 +10,7 @@ import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
+import { DPad } from "@/components/game-controls";
 
 export const Route = createFileRoute("/tools/snake")({
   head: () => buildToolMeta(toolBySlug("snake", tools)),
@@ -282,15 +283,16 @@ function SnakePage() {
         </div>
 
         {/* On-screen D-pad */}
-        <div className="grid grid-cols-3 gap-1 w-36 mx-auto mt-4 select-none">
-          <div />
-          <button onClick={() => changeDir("UP")} className={cn("aspect-square rounded-lg bg-secondary border border-border text-foreground font-bold hover:bg-secondary/70 active:bg-secondary/50")}>▲</button>
-          <div />
-          <button onClick={() => changeDir("LEFT")} className={cn("aspect-square rounded-lg bg-secondary border border-border text-foreground font-bold hover:bg-secondary/70 active:bg-secondary/50")}>◄</button>
-          <button onClick={() => changeDir("DOWN")} className={cn("aspect-square rounded-lg bg-secondary border border-border text-foreground font-bold hover:bg-secondary/70 active:bg-secondary/50")}>▼</button>
-          <button onClick={() => changeDir("RIGHT")} className={cn("aspect-square rounded-lg bg-secondary border border-border text-foreground font-bold hover:bg-secondary/70 active:bg-secondary/50")}>►</button>
+        <div className="md:hidden mt-5">
+          <DPad
+            onDirection={(d) => {
+              const map = { up: "UP", down: "DOWN", left: "LEFT", right: "RIGHT" } as const;
+              changeDir(map[d]);
+            }}
+          />
         </div>
       </div>
+
 
       <HowToUse steps={[
         "Press Start and use arrow keys or WASD to move the snake.",

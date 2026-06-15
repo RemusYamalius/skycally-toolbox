@@ -8,6 +8,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
+import { DPad, PadButton } from "@/components/game-controls";
 
 export const Route = createFileRoute("/tools/tetris")({
   head: () => buildToolMeta(toolBySlug("tetris", tools)),
@@ -551,57 +552,49 @@ function TetrisPage() {
       </div>
 
       {/* Mobile on-screen controls */}
-      <div className="flex flex-col items-center gap-2 mt-6 lg:hidden">
-        <button
-          onTouchStart={(e) => {
-            e.preventDefault();
-            const p = pieceRef.current; if (!p || phase !== "playing") return;
-            const r = { ...p, rotation: p.rotation + 1 };
-            if (!isColliding(boardRef.current, r)) pieceRef.current = r;
+      <div className="flex flex-col items-center gap-3 mt-6 lg:hidden">
+        <DPad
+          repeatMs={120}
+          initialDelayMs={180}
+          enabled={{ up: true, left: true, right: true, down: true }}
+          onDirection={(dir) => {
+            const p = pieceRef.current;
+            if (!p || phase !== "playing") return;
+            if (dir === "up") {
+              const r = { ...p, rotation: p.rotation + 1 };
+              if (!isColliding(boardRef.current, r)) pieceRef.current = r;
+            } else if (dir === "left") {
+              if (!isColliding(boardRef.current, p, -1)) pieceRef.current = { ...p, x: p.x - 1 };
+            } else if (dir === "right") {
+              if (!isColliding(boardRef.current, p, 1)) pieceRef.current = { ...p, x: p.x + 1 };
+            } else if (dir === "down") {
+              if (!isColliding(boardRef.current, p, 0, 1)) {
+                pieceRef.current = { ...p, y: p.y + 1 };
+                scoreRef.current += 1;
+                setScore(scoreRef.current);
+              }
+            }
             drawBoard();
           }}
-          className="w-14 h-14 rounded-xl bg-card border border-border text-xl flex items-center justify-center active:bg-secondary"
-          aria-label="Rotate"
+        />
+        <PadButton
+          onPress={() => {
+            const p = pieceRef.current;
+            if (!p || phase !== "playing") return;
+            let dy = p.y;
+            while (!isColliding(boardRef.current, p, 0, dy - p.y + 1)) dy++;
+            scoreRef.current += (dy - p.y) * 2;
+            pieceRef.current = { ...p, y: dy };
+            setScore(scoreRef.current);
+            tick();
+          }}
+          aria-label="Hard drop"
+          className="w-40 h-14 text-sm bg-primary text-primary-foreground border-primary"
         >
-          🔄
-        </button>
-        <div className="flex gap-2">
-          <button
-            onTouchStart={(e) => {
-              e.preventDefault();
-              const p = pieceRef.current; if (!p || phase !== "playing") return;
-              if (!isColliding(boardRef.current, p, -1)) pieceRef.current = { ...p, x: p.x - 1 };
-              drawBoard();
-            }}
-            className="w-14 h-14 rounded-xl bg-card border border-border text-xl flex items-center justify-center active:bg-secondary"
-            aria-label="Left"
-          >◄</button>
-          <button
-            onTouchStart={(e) => {
-              e.preventDefault();
-              const p = pieceRef.current; if (!p || phase !== "playing") return;
-              let dy = p.y;
-              while (!isColliding(boardRef.current, p, 0, dy - p.y + 1)) dy++;
-              scoreRef.current += (dy - p.y) * 2;
-              pieceRef.current = { ...p, y: dy };
-              setScore(scoreRef.current);
-              tick();
-            }}
-            className="w-14 h-14 rounded-xl bg-primary text-primary-foreground text-xl flex items-center justify-center"
-            aria-label="Hard drop"
-          >▼▼</button>
-          <button
-            onTouchStart={(e) => {
-              e.preventDefault();
-              const p = pieceRef.current; if (!p || phase !== "playing") return;
-              if (!isColliding(boardRef.current, p, 1)) pieceRef.current = { ...p, x: p.x + 1 };
-              drawBoard();
-            }}
-            className="w-14 h-14 rounded-xl bg-card border border-border text-xl flex items-center justify-center active:bg-secondary"
-            aria-label="Right"
-          >►</button>
-        </div>
+          ▼▼ HARD DROP
+        </PadButton>
       </div>
+
 
       <HowToUse steps={[
         "Use arrow keys to move and rotate pieces — Space for instant drop.",

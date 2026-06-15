@@ -1,83 +1,54 @@
-# Plan
+# Improve Mobile Controls for Mini Games
 
-Two independent fixes. No design changes.
+The user reports that several mini games work great on desktop but are hard to control on mobile (Tetris, Pinball, Pac-Man, and others). Audit shows most games already have *some* touch handler, but quality varies: tiny buttons, swipe-only with no on-screen pad, no auto-repeat for hold, ghost touches scrolling the page, etc.
 
----
+## Scope (games to upgrade)
 
-## Part 1 — Currency Converter: always-visible 7-Day Rate History
+Keyboard-driven games that need mobile-friendly controls:
 
-**File:** `src/routes/tools.currency-converter.tsx`
+1. **Tetris** — has small on-screen buttons; needs bigger, properly spaced D-pad + Rotate/Drop, hold-to-repeat for left/right/soft-drop, prevent page scroll.
+2. **Pinball** — has left/right flipper buttons; enlarge them, lock them to fixed bottom-left / bottom-right zones spanning full half-width so any thumb press triggers, add launch button.
+3. **Pac-Man** — swipe only; add a visible 4-way D-pad overlay below the canvas for users who prefer tapping over swiping, keep swipe as alt.
+4. **Snake** — same treatment: visible 4-way D-pad on mobile.
+5. **Flappy Bird** — already tap-to-flap; just ensure the whole canvas area is the tap target and page doesn't scroll while playing.
+6. **Space Shooter** — add on-screen left/right/fire buttons (hold-to-repeat fire).
+7. **Breakout** — add a wide drag strip / left+right hold buttons under the canvas; ensure paddle follows finger drag on the canvas itself.
+8. **Tunnel Dash** — add left/right hold buttons.
+9. **2048** — swipe already works but is finicky; tighten swipe threshold and add a small 4-arrow pad fallback.
 
-The chart is already wired to `[from, to]` but only renders when `history.length >= 2`. On mount with `USD → EUR` it should fetch immediately and show a skeleton while loading, never disappearing on user interaction.
+## Shared approach
 
-Changes:
-1. **State model**: replace `history: Points[] | null` with `history: Points[] | null` + `historyLoading: boolean`. Initial state: `history = null`, `historyLoading = true` (so skeleton shows on first paint).
-2. **Fetch trigger**: keep the existing `useEffect` keyed on `[from, to]` (currency changes already trigger it). Add a **debounced effect on `amount`** (500ms) that re-runs the same fetch — even though Frankfurter doesn't depend on amount, the brief requires re-fetching on amount change. Implementation: a single shared `fetchHistory(from, to)` function called by both effects; the amount effect uses `setTimeout` + cleanup for the 500ms debounce.
-3. **On mount**: the `[from, to]` effect already fires on mount with defaults `USD → EUR`, satisfying "fetch immediately on mount."
-4. **Loading skeleton**: while `historyLoading` is true and `history` is null, render the section with a `<Skeleton className="h-[220px] w-full rounded-xl" />` (already-imported `src/components/ui/skeleton.tsx`) in place of the chart. Title "7-Day Rate History" + Frankfurter caption still visible.
-5. **Always visible after first successful load**: section only unmounts if the very first fetch fails AND we have no data. To match the brief ("hide silently if API fails"): if fetch fails and `history` is still null, unmount the section. If a previous fetch succeeded, keep showing the last chart (don't flash to empty on a transient error).
-6. **Same-currency case** (`from === to`): keep current behavior — set history to null, no skeleton, section hidden (a flat line at 1.0 is not useful).
-7. **Placement**: section already sits between Quick Conversions and `HowToUse`/SEO — unchanged.
-8. **Convert button**: stays as-is (manual re-fetch of rates); chart no longer depends on it.
+Create one reusable component `src/components/game-controls.tsx` exporting:
 
-No new dependencies. Recharts and Skeleton already imported elsewhere in the project.
+- `<DPad onDirection={(dir) => ...} onRelease?={...} />` — 4-way pad with hold-to-repeat (configurable interval), `touch-none`, `pointerdown`/`pointerup`/`pointercancel`, `e.preventDefault()` to stop scroll.
+- `<ActionButton label icon onPress onRelease repeatMs?>` — single button with optional hold-repeat.
+- `<TouchZone side="left|right" onPress onRelease>` — full-half-width invisible flipper zone for pinball-style games.
 
----
+All buttons:
+- Min 56×56 px tap target.
+- `touch-action: none` and `user-select: none`.
+- `pointerdown` (not `touchstart`) so it works with stylus/mouse too.
+- Visible only on `md:hidden` (mobile/tablet); desktop keeps keyboard.
 
-## Part 2 — Country Info: bundled local dataset, zero external API
+Each game's mobile control block is rendered just below its canvas inside the existing layout, so the SEO/HowToUse sections stay untouched.
 
-**Goal:** remove every network call (REST Countries + the `country-proxy.skycally-tools.workers.dev` Worker) so the page renders instantly from a static JSON file.
+## Per-game edits
 
-### 2a. Generate `src/data/countries.json`
-
-Source: **mledoze/countries** (public-domain, MIT, ~250 entries) — the same dataset REST Countries is built on. I'll download `countries.json` from the upstream repo via a one-off `code--exec` step during build mode and post-process it into the exact shape the tool needs, so we don't ship unused fields. Output schema per entry:
-
-```ts
-{
-  cca2: string;          // "MA"
-  cca3: string;          // "MAR" (kept for border-code lookups)
-  name: { common: string; official: string };
-  flagEmoji: string;     // "🇲🇦"
-  flagSvg: string;       // "https://flagcdn.com/w320/ma.png" (lowercase cca2)
-  capital: string[];
-  region: string;
-  subregion: string;
-  population: number;
-  area: number;          // km²
-  currencies: Record<string, { name: string; symbol?: string }>;
-  languages: Record<string, string>;
-  tld: string[];
-  callingCode: string;   // pre-joined "+212"
-  drivingSide: "left" | "right" | "";
-  timezones: string[];
-  borders: string[];     // array of cca3 codes (mledoze native format)
-}
-```
-
-All 250 entries. File committed to the repo, ~300–400 KB JSON.
-
-### 2b. Rewrite `src/routes/tools.country-info.tsx`
-
-- Remove `PROXY_BASE`, `COUNTRIES_URL`, `loadByName`, the mount fetch, the `loading` spinner, and the `error` state's API-related branches.
-- Import the JSON statically: `import COUNTRIES from "@/data/countries.json";`
-- Build `allCountries` once with `useMemo` from `COUNTRIES`, sorted by `name.common`.
-- Default selection: still "Morocco" on first render — instant, no async.
-- Search (`onSubmit`) and dropdown click: pure local filter/lookup, set `country` state synchronously. No spinner.
-- Borders: lookup by `cca3` against the in-memory map (this already works in the current code; I'll keep that logic, just sourced from local data).
-- Flag rendering: use `flagSvg` for the big flag and border chips. Emoji available as a fallback.
-- Error state: only shown if user searches a string that matches no country (purely local "not found"). Wording: "Country not found. Please try another name."
-- Remove the `Loader2` spinner from the Search button — the lookup is synchronous.
-- UI, layout, SEO copy, FAQs, `RelatedTools`, `HowToUse`: unchanged.
-
-### 2c. Cleanup
-
-- Confirm no other file references `country-proxy.skycally-tools.workers.dev` or `restcountries.com` (quick `rg`). Remove any stragglers.
-- `src/lib/tools.ts` entry for `country-info`: unchanged.
-
----
+For every game above:
+1. Replace its current ad-hoc touch buttons (or add a new block where missing) with the shared `<DPad>` / `<ActionButton>` / `<TouchZone>`.
+2. Wire callbacks to the same internal move/rotate/fire functions the keyboard handlers already call (no game-logic changes).
+3. Add `touch-action: none` to the canvas wrapper while the game is running to stop page scroll during play.
+4. Keep all desktop keyboard behavior unchanged.
+5. Update FAQ/HowToUse text only where it currently says "swipe only" to mention the on-screen pad.
 
 ## Out of scope
 
-- No router changes, no `tools.ts` changes, no related-tools list changes.
-- No new npm dependencies.
-- Currency Converter UI (inputs, swap, Convert button, Quick Conversions, SEO): untouched aside from the chart-section swap described above.
+- No changes to game logic, scoring, or visuals.
+- No changes to non-keyboard tools.
+- No new dependencies.
+- No router / SEO / related-tools changes.
+
+## Verification
+
+- Build passes.
+- Preview each updated game on mobile viewport (487px): controls visible, big enough, page doesn't scroll while pressing, hold-to-repeat works for Tetris left/right and Space Shooter fire.

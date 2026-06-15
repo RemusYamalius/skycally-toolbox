@@ -1,5 +1,5 @@
 interface Props {
-  steps: [string, string, string];
+  steps: string[];
 }
 
 export function HowToUse({ steps }: Props) {

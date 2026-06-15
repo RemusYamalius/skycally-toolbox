@@ -59,6 +59,9 @@ import {
   ArrowLeftRight,
   FileSearch,
   RotateCcw,
+  ZoomIn,
+  ZoomOut,
+  Paintbrush,
 } from "lucide-react";
 
 export const Route = createFileRoute("/tools/word-processor")({
@@ -193,6 +196,8 @@ const PX_PER_IN = 96;
 const DEFAULT_MARGIN = 96;
 const MIN_MARGIN = 24;
 const DEFAULT_MARGINS = { top: DEFAULT_MARGIN, right: DEFAULT_MARGIN, bottom: DEFAULT_MARGIN, left: DEFAULT_MARGIN };
+const ZOOM_PRESETS = [25, 50, 75, 100, 125, 150, 200];
+const DEFAULT_ZOOM = 100;
 
 function clamp(v: number, min: number, max: number) {
   return Math.min(Math.max(v, min), max);
@@ -209,6 +214,52 @@ function isLightColor(hex: string): boolean {
 function pxToUnitLabel(px: number, unit: "cm" | "in") {
   const v = unit === "cm" ? px / PX_PER_CM : px / PX_PER_IN;
   return `${v.toFixed(2)} ${unit}`;
+}
+
+// ---------- Format Painter ----------
+type PainterFormat = {
+  bold: boolean;
+  italic: boolean;
+  underline: boolean;
+  strike: boolean;
+  subscript: boolean;
+  superscript: boolean;
+  color: string | null;
+  fontFamily: string | null;
+  fontSize: string | null;
+  highlight: string | null;
+};
+
+function capturePainterFormat(editor: Editor): PainterFormat {
+  const ts = editor.getAttributes("textStyle") as any;
+  const hl = editor.isActive("highlight") ? (editor.getAttributes("highlight") as any)?.color : null;
+  return {
+    bold: editor.isActive("bold"),
+    italic: editor.isActive("italic"),
+    underline: editor.isActive("underline"),
+    strike: editor.isActive("strike"),
+    subscript: editor.isActive("subscript"),
+    superscript: editor.isActive("superscript"),
+    color: ts?.color || null,
+    fontFamily: ts?.fontFamily || null,
+    fontSize: ts?.fontSize || null,
+    highlight: hl || null,
+  };
+}
+
+function applyPainterFormat(editor: Editor, fmt: PainterFormat) {
+  let chain: any = editor.chain().focus();
+  chain = fmt.bold ? chain.setBold() : chain.unsetBold();
+  chain = fmt.italic ? chain.setItalic() : chain.unsetItalic();
+  chain = fmt.underline ? chain.setUnderline() : chain.unsetUnderline();
+  chain = fmt.strike ? chain.setStrike() : chain.unsetStrike();
+  chain = fmt.subscript ? chain.setSubscript() : chain.unsetSubscript();
+  chain = fmt.superscript ? chain.setSuperscript() : chain.unsetSuperscript();
+  chain = fmt.color ? chain.setColor(fmt.color) : chain.unsetColor();
+  chain = fmt.fontFamily ? chain.setFontFamily(fmt.fontFamily) : chain.unsetFontFamily();
+  chain = fmt.fontSize ? chain.setFontSize(fmt.fontSize) : chain.unsetFontSize();
+  chain = fmt.highlight ? chain.setHighlight({ color: fmt.highlight }) : chain.unsetHighlight();
+  chain.run();
 }
 
 // ---------- Custom extensions ----------
@@ -480,7 +531,26 @@ function Editor4U() {
   const [unit, setUnit] = useState<"cm" | "in">("cm");
   const [findOpen, setFindOpen] = useState(false);
   const [templatesOpen, setTemplatesOpen] = useState(false);
-  const [scale, setScale] = useState(1);
+  const [fitScale, setFitScale] = useState(1);
+  const [zoomPercent, setZoomPercent] = useState<number>(() => {
+    try {
+      const saved = typeof localStorage !== "undefined" ? localStorage.getItem("wp:zoom") : null;
+      if (saved) {
+        const n = parseInt(saved, 10);
+        if (!isNaN(n) && ZOOM_PRESETS.includes(n)) return n;
+      }
+    } catch {}
+    return DEFAULT_ZOOM;
+  });
+  const updateZoom = useCallback((next: number) => {
+    setZoomPercent(next);
+    try {
+      localStorage.setItem("wp:zoom", String(next));
+    } catch {}
+  }, []);
+  const scale = fitScale * (zoomPercent / 100);
+  const [painterFormat, setPainterFormat] = useState<PainterFormat | null>(null);
+  const painterApplyingRef = useRef(false);
   const [pageMinHeight, setPageMinHeight] = useState(PAGE_UNIT_PX);
   const canvasRef = useRef<HTMLDivElement>(null);
 
@@ -589,7 +659,7 @@ function Editor4U() {
       if (!canvasRef.current) return;
       const w = canvasRef.current.clientWidth;
       const target = Math.min(1, (w - 32) / PAGE_WIDTH_PX);
-      setScale(target);
+      setFitScale(target);
     };
     updateScale();
     const ro = new ResizeObserver(updateScale);
@@ -615,9 +685,13 @@ function Editor4U() {
     return () => ro.disconnect();
   }, [editor, margins.top, margins.bottom]);
 
-  // Keyboard shortcuts: Ctrl+S, Ctrl+P, Ctrl+F, Ctrl+H
+  // Keyboard shortcuts: Ctrl+S, Ctrl+P, Ctrl+F, Ctrl+H, Escape (stop Format Painter)
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape" && painterFormat) {
+        setPainterFormat(null);
+        return;
+      }
       const meta = e.ctrlKey || e.metaKey;
       if (!meta) return;
       const k = e.key.toLowerCase();
@@ -634,7 +708,24 @@ function Editor4U() {
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
-  }, [editor]);
+  }, [editor, painterFormat]);
+
+  // Format Painter: while a format is "picked up", apply it to the next selection
+  useEffect(() => {
+    if (!editor || !painterFormat) return;
+    const handler = () => {
+      if (painterApplyingRef.current) return;
+      const { from, to } = editor.state.selection;
+      if (from === to) return;
+      painterApplyingRef.current = true;
+      applyPainterFormat(editor, painterFormat);
+      painterApplyingRef.current = false;
+    };
+    editor.on("selectionUpdate", handler);
+    return () => {
+      editor.off("selectionUpdate", handler);
+    };
+  }, [editor, painterFormat]);
 
   if (!editor) return <div className="h-[600px] rounded-2xl bg-secondary/50 animate-pulse" />;
 
@@ -670,6 +761,10 @@ function Editor4U() {
         onFind={() => setFindOpen(true)}
         onTemplates={() => setTemplatesOpen(true)}
         onResetMargins={resetMargins}
+        zoomPercent={zoomPercent}
+        onZoomChange={updateZoom}
+        painterArmed={!!painterFormat}
+        onTogglePainter={() => setPainterFormat((cur) => (cur ? null : capturePainterFormat(editor)))}
       />
 
       <div className="wp-canvas" ref={canvasRef}>
@@ -703,7 +798,7 @@ function Editor4U() {
               />
             )}
             <div
-              className="wp-page"
+              className={`wp-page${painterFormat ? " wp-painting" : ""}`}
               style={{
                 minHeight: pageMinHeight,
                 paddingTop: margins.top,
@@ -735,6 +830,10 @@ function Toolbar({
   onFind,
   onTemplates,
   onResetMargins,
+  zoomPercent,
+  onZoomChange,
+  painterArmed,
+  onTogglePainter,
 }: {
   editor: Editor;
   saveState: "idle" | "saving" | "saved" | "error";
@@ -745,6 +844,10 @@ function Toolbar({
   onFind: () => void;
   onTemplates: () => void;
   onResetMargins: () => void;
+  zoomPercent: number;
+  onZoomChange: (v: number) => void;
+  painterArmed: boolean;
+  onTogglePainter: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
@@ -1248,6 +1351,14 @@ function Toolbar({
         >
           <Eraser className="w-4 h-4" />
         </button>
+
+        <button
+          className={active(painterArmed)}
+          onClick={onTogglePainter}
+          title="Format Painter — pick up formatting here, then select text elsewhere to apply it. Click again (or Esc) to stop."
+        >
+          <Paintbrush className="w-4 h-4" />
+        </button>
       </div>
 
       {/* Row 3: Paragraph */}
@@ -1539,6 +1650,38 @@ function Toolbar({
           <Check className="w-4 h-4" />
           Spell
         </button>
+
+        <div className="wp-spacer" />
+
+        <button
+          className={btn}
+          onClick={() => onZoomChange(ZOOM_PRESETS[Math.max(0, ZOOM_PRESETS.indexOf(zoomPercent) - 1)])}
+          title="Zoom out"
+        >
+          <ZoomOut className="w-4 h-4" />
+        </button>
+        <select
+          className="wp-select"
+          style={{ width: 76 }}
+          value={zoomPercent}
+          onChange={(e) => onZoomChange(parseInt(e.target.value, 10))}
+          title="Zoom level (page only — toolbar stays the same size)"
+        >
+          {ZOOM_PRESETS.map((p) => (
+            <option key={p} value={p}>
+              {p}%
+            </option>
+          ))}
+        </select>
+        <button
+          className={btn}
+          onClick={() =>
+            onZoomChange(ZOOM_PRESETS[Math.min(ZOOM_PRESETS.length - 1, ZOOM_PRESETS.indexOf(zoomPercent) + 1)])
+          }
+          title="Zoom in"
+        >
+          <ZoomIn className="w-4 h-4" />
+        </button>
       </div>
     </div>
   );
@@ -1610,24 +1753,40 @@ function Popover({
 }
 
 function ColorGrid({ onPick, current }: { onPick: (c: string) => void; current?: string | null }) {
+  const customValue = current && /^#[0-9a-fA-F]{6}$/.test(current) ? current : "#000000";
   return (
-    <div className="grid grid-cols-6 gap-1.5 p-1">
-      {COLORS.map((c) => {
-        const isActive = !!current && current.toLowerCase() === c.toLowerCase();
-        return (
-          <button
-            key={c}
-            onClick={() => onPick(c)}
-            title={c}
-            className="relative w-7 h-7 rounded-md ring-1 ring-inset ring-black/15 transition-transform hover:scale-110 hover:ring-2 hover:ring-[var(--cyan-brand)]"
-            style={{ background: c }}
-          >
-            {isActive && (
-              <Check className="w-4 h-4 absolute inset-0 m-auto" style={{ color: isLightColor(c) ? "#000" : "#fff" }} />
-            )}
-          </button>
-        );
-      })}
+    <div>
+      <div className="grid grid-cols-6 gap-1.5 p-1">
+        {COLORS.map((c) => {
+          const isActive = !!current && current.toLowerCase() === c.toLowerCase();
+          return (
+            <button
+              key={c}
+              onClick={() => onPick(c)}
+              title={c}
+              className="relative w-7 h-7 rounded-md ring-1 ring-inset ring-black/15 transition-transform hover:scale-110 hover:ring-2 hover:ring-[var(--cyan-brand)]"
+              style={{ background: c }}
+            >
+              {isActive && (
+                <Check
+                  className="w-4 h-4 absolute inset-0 m-auto"
+                  style={{ color: isLightColor(c) ? "#000" : "#fff" }}
+                />
+              )}
+            </button>
+          );
+        })}
+      </div>
+      <label className="flex items-center gap-2 mt-2 pt-2 px-1 border-t border-border cursor-pointer">
+        <input
+          type="color"
+          value={customValue}
+          onChange={(e) => onPick(e.target.value)}
+          className="w-7 h-7 rounded border border-border bg-transparent p-0 cursor-pointer"
+          title="Pick any custom color"
+        />
+        <span className="text-xs text-muted-foreground">Custom color…</span>
+      </label>
     </div>
   );
 }
@@ -2150,6 +2309,7 @@ const WP_CSS = `
   font-family: sans-serif; letter-spacing: 0.5px;
 }
 .wp-editor-content { min-height: 800px; outline: none; }
+.wp-painting .wp-editor-content, .wp-painting .wp-editor-content * { cursor: copy; }
 .wp-editor-content p { margin: 0 0 8px; }
 .wp-editor-content h1 { font-size: 24pt; font-weight: 700; margin: 16px 0 12px; }
 .wp-editor-content h2 { font-size: 18pt; font-weight: 700; margin: 14px 0 10px; }

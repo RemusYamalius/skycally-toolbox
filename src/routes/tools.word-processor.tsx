@@ -761,6 +761,7 @@ function Editor4U() {
         onFind={() => setFindOpen(true)}
         onTemplates={() => setTemplatesOpen(true)}
         onResetMargins={resetMargins}
+        margins={margins}
         zoomPercent={zoomPercent}
         onZoomChange={updateZoom}
         painterArmed={!!painterFormat}
@@ -830,6 +831,7 @@ function Toolbar({
   onFind,
   onTemplates,
   onResetMargins,
+  margins,
   zoomPercent,
   onZoomChange,
   painterArmed,
@@ -844,6 +846,7 @@ function Toolbar({
   onFind: () => void;
   onTemplates: () => void;
   onResetMargins: () => void;
+  margins: { top: number; right: number; bottom: number; left: number };
   zoomPercent: number;
   onZoomChange: (v: number) => void;
   painterArmed: boolean;
@@ -1162,7 +1165,23 @@ function Toolbar({
             },
           ],
         },
-        sections: [{ children: children.length ? children : [new Paragraph("")] }],
+        sections: [
+          {
+            properties: {
+              page: {
+                // A4 in twips (1px = 15 twips at 96dpi, 1440 twips = 1in)
+                size: { width: 11906, height: 16838 },
+                margin: {
+                  top: Math.round(margins.top * 15),
+                  right: Math.round(margins.right * 15),
+                  bottom: Math.round(margins.bottom * 15),
+                  left: Math.round(margins.left * 15),
+                },
+              },
+            },
+            children: children.length ? children : [new Paragraph("")],
+          },
+        ],
       });
 
       const blob = await Packer.toBlob(doc);
@@ -2325,11 +2344,15 @@ const WP_CSS = `
 .wp-editor-content hr { border: none; border-top: 1px solid #ccc; margin: 12px 0; }
 
 @media print {
+  @page { size: A4; margin: 0; }
   body * { visibility: hidden !important; }
   .wp-canvas, .wp-canvas * { visibility: visible !important; }
-  .wp-canvas { background: white !important; height: auto !important; overflow: visible !important; padding: 0 !important; }
+  .wp-canvas { background: white !important; height: auto !important; min-height: 0 !important; overflow: visible !important; padding: 0 !important; }
   .wp-stage { transform: none !important; }
-  .wp-page { box-shadow: none !important; margin: 0 !important; background-image: none !important; }
+  .wp-page {
+    box-shadow: none !important; margin: 0 !important; background-image: none !important;
+    min-height: 0 !important; height: auto !important;
+  }
   .wp-ruler-h, .wp-ruler-v, .wp-toolbar, .wp-hero { display: none !important; }
   .wp-page-break::after { display: none !important; }
 }

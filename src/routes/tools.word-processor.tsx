@@ -1171,48 +1171,64 @@ function Toolbar({
           style: { paragraph: { indent: { left: 720 * (lvl + 1), hanging: 260 } } },
         }));
 
-      const doc = new Document({
-        numbering: {
-          config: [
-            {
-              reference: "wp-bullet",
-              levels: numberingLevels(LevelFormat.BULLET, (lvl) => (lvl % 2 === 0 ? "•" : "◦")),
-            },
-            {
-              reference: "wp-number",
-              levels: numberingLevels(LevelFormat.DECIMAL, (lvl) => `%${lvl + 1}.`),
-            },
-          ],
-        },
-        sections: [
+      const numberingConfig = {
+        config: [
           {
-            properties: {
-              page: {
-                // A4 in twips (1px = 15 twips at 96dpi, 1440 twips = 1in)
-                size: { width: 11906, height: 16838 },
-                margin: {
-                  top: Math.round(margins.top * 15),
-                  right: Math.round(margins.right * 15),
-                  bottom: Math.round(margins.bottom * 15),
-                  left: Math.round(margins.left * 15),
-                },
-              },
-            },
-            children: children.length ? children : [new Paragraph("")],
+            reference: "wp-bullet",
+            levels: numberingLevels(LevelFormat.BULLET, (lvl) => (lvl % 2 === 0 ? "•" : "◦")),
+          },
+          {
+            reference: "wp-number",
+            levels: numberingLevels(LevelFormat.DECIMAL, (lvl) => `%${lvl + 1}.`),
           },
         ],
-      });
+      };
+      const sectionChildren = children.length ? children : [new Paragraph("")];
 
-      const blob = await Packer.toBlob(doc);
+      let blob: Blob;
+      try {
+        // Try with explicit A4 page size + margins matching the editor
+        const doc = new Document({
+          numbering: numberingConfig,
+          sections: [
+            {
+              properties: {
+                page: {
+                  // A4 in twips (1px = 15 twips at 96dpi, 1440 twips = 1in)
+                  size: { width: 11906, height: 16838 },
+                  margin: {
+                    top: Math.round(margins.top * 15),
+                    right: Math.round(margins.right * 15),
+                    bottom: Math.round(margins.bottom * 15),
+                    left: Math.round(margins.left * 15),
+                  },
+                },
+              },
+              children: sectionChildren,
+            },
+          ],
+        });
+        blob = await Packer.toBlob(doc);
+      } catch (a4Err) {
+        // Fall back to default page setup if the A4 page properties aren't supported
+        console.warn("A4-sized .docx export failed, falling back to default page setup:", a4Err);
+        const doc = new Document({
+          numbering: numberingConfig,
+          sections: [{ children: sectionChildren }],
+        });
+        blob = await Packer.toBlob(doc);
+      }
+
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
       a.download = "document.docx";
       a.click();
       URL.revokeObjectURL(url);
-    } catch (err) {
+    } catch (err: any) {
       console.error(err);
-      alert("Could not export the document. Please try again.");
+      const detail = err?.message ? ` (${err.message})` : "";
+      alert(`Could not export the document${detail}. Please try again.`);
     } finally {
       setExporting(false);
     }
@@ -2388,6 +2404,7 @@ const WP_CSS = `
     box-shadow: none !important; margin: 0 !important; background-image: none !important;
     min-height: 0 !important; height: auto !important;
   }
+  .wp-fullscreen { position: static !important; inset: auto !important; padding: 0 !important; overflow: visible !important; }
   .wp-ruler-h, .wp-ruler-v, .wp-toolbar, .wp-hero { display: none !important; }
   .wp-page-break::after { display: none !important; }
 }

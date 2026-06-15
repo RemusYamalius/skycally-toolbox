@@ -10,6 +10,7 @@ import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
+import { DPad } from "@/components/game-controls";
 
 export const Route = createFileRoute("/tools/snake")({
   head: () => buildToolMeta(toolBySlug("snake", tools)),

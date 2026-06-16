@@ -2426,17 +2426,36 @@ const WP_CSS = `
 .wp-editor-content img { max-width: 100%; height: auto; }
 .wp-editor-content hr { border: none; border-top: 1px solid #ccc; margin: 12px 0; }
 
+@media (min-width: 1024px) {
+  .wp-toolbar .wp-row { gap: 8px; }
+  .wp-toolbar .wp-row-justify { justify-content: space-between; }
+  .wp-toolbar .wp-row-justify > .wp-btn,
+  .wp-toolbar .wp-row-justify > .wp-select { flex: 0 0 auto; }
+}
+
 @media print {
   @page { size: A4; margin: 0; }
+  html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; }
   body * { visibility: hidden !important; }
   .wp-canvas, .wp-canvas * { visibility: visible !important; }
-  .wp-canvas { background: white !important; height: auto !important; min-height: 0 !important; overflow: visible !important; padding: 0 !important; }
-  .wp-stage { transform: none !important; }
+  .wp-canvas {
+    position: absolute !important;
+    top: 0 !important; left: 0 !important; right: 0 !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    height: auto !important; min-height: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important; margin: 0 !important;
+  }
+  .wp-stage { transform: none !important; width: auto !important; margin: 0 auto !important; }
   .wp-page {
-    box-shadow: none !important; margin: 0 !important; background-image: none !important;
+    box-shadow: none !important; margin: 0 auto !important; background-image: none !important;
     min-height: 0 !important; height: auto !important;
   }
+  .wp-editor-content { min-height: 0 !important; }
   .wp-ruler-h, .wp-ruler-v, .wp-toolbar, .wp-hero { display: none !important; }
+  .wp-page .wp-page-break { page-break-after: always; }
   .wp-page-break::after { display: none !important; }
 }
 `;
+

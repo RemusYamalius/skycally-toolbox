@@ -230,6 +230,7 @@ const clearLines = (board: Board): { board: Board; cleared: number } => {
 function TetrisPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement>(null);
+  const nextCanvasMobileRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
 
   const boardRef = useRef<Board>(createEmptyBoard());
@@ -369,33 +370,32 @@ function TetrisPage() {
   }, [cellSize]);
 
   const drawNextPiece = useCallback(() => {
-    const canvas = nextCanvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const size = nextSize;
-
-    ctx.fillStyle = "#0d0d1a";
-    ctx.fillRect(0, 0, size, size);
-
-    const type = nextPieceRef.current;
-    const shape = getShape(type, 0);
-    const cs = Math.floor(size / 5);
-    const offsetX = (size - shape[0].length * cs) / 2;
-    const offsetY = (size - shape.length * cs) / 2;
-
-    shape.forEach((row, r) => {
-      row.forEach((cell, c) => {
-        if (cell) {
-          const x = offsetX + c * cs;
-          const y = offsetY + r * cs;
-          ctx.fillStyle = COLORS[type];
-          ctx.fillRect(x + 1, y + 1, cs - 2, cs - 2);
-          ctx.fillStyle = "rgba(255,255,255,0.28)";
-          ctx.fillRect(x + 1, y + 1, cs - 2, 3);
-        }
+    const drawOn = (canvas: HTMLCanvasElement | null, size: number) => {
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      ctx.fillStyle = "#0d0d1a";
+      ctx.fillRect(0, 0, size, size);
+      const type = nextPieceRef.current;
+      const shape = getShape(type, 0);
+      const cs = Math.floor(size / 5);
+      const offsetX = (size - shape[0].length * cs) / 2;
+      const offsetY = (size - shape.length * cs) / 2;
+      shape.forEach((row, r) => {
+        row.forEach((cell, c) => {
+          if (cell) {
+            const x = offsetX + c * cs;
+            const y = offsetY + r * cs;
+            ctx.fillStyle = COLORS[type];
+            ctx.fillRect(x + 1, y + 1, cs - 2, cs - 2);
+            ctx.fillStyle = "rgba(255,255,255,0.28)";
+            ctx.fillRect(x + 1, y + 1, cs - 2, 3);
+          }
+        });
       });
-    });
+    };
+    drawOn(nextCanvasRef.current, 100);
+    drawOn(nextCanvasMobileRef.current, nextSize);
   }, [nextSize]);
 
   // Re-draw when cellSize changes
@@ -620,103 +620,141 @@ function TetrisPage() {
     </div>
   );
 
+  // ── Board canvas (shared) ──
+  const BoardCanvas = () => (
+    <div className="relative">
+      <canvas
+        ref={canvasRef}
+        width={canvasW}
+        height={canvasH}
+        className="rounded-xl border-2 border-border block touch-none"
+        style={{ width: canvasW, height: canvasH }}
+        onTouchStart={handleTouchStart}
+        onTouchEnd={handleTouchEnd}
+      />
+
+      {phase === "idle" && (
+        <div className="absolute inset-0 bg-black/80 rounded-xl flex flex-col items-center justify-center gap-3 p-4">
+          <p className="text-4xl">🧱</p>
+          <p className="text-white font-black text-2xl tracking-widest">TETRIS</p>
+          <p className="text-white/50 text-[11px] text-center leading-relaxed">
+            Arrows to move · Up/X rotate · Space drop
+          </p>
+          <button
+            onClick={startGame}
+            className="mt-1 px-7 py-2.5 bg-primary text-primary-foreground rounded-xl font-black text-base hover:opacity-90 transition"
+          >
+            ▶ Play
+          </button>
+          {best > 0 && <p className="text-yellow-400 text-xs">🏆 Best: {best}</p>}
+        </div>
+      )}
+
+      {phase === "paused" && (
+        <div className="absolute inset-0 bg-black/80 rounded-xl flex flex-col items-center justify-center gap-4">
+          <p className="text-white font-black text-xl">⏸ PAUSED</p>
+          <button
+            onClick={togglePause}
+            className="px-6 py-2 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition"
+          >
+            ▶ Resume
+          </button>
+        </div>
+      )}
+
+      {phase === "over" && (
+        <div className="absolute inset-0 bg-black/85 rounded-xl flex flex-col items-center justify-center gap-2.5 p-4">
+          <p className="text-3xl">💀</p>
+          <p className="text-white font-black text-xl">GAME OVER</p>
+          <p className="text-white/60 text-sm">Score: {score}</p>
+          {score >= best && score > 0 && <p className="text-yellow-400 font-bold text-sm">🏆 New Best!</p>}
+          <button
+            onClick={startGame}
+            className="mt-1 px-6 py-2 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition"
+          >
+            🔄 Play Again
+          </button>
+        </div>
+      )}
+    </div>
+  );
+
   return (
     <ToolPageShell
       title="Tetris"
       description="Stack falling blocks and clear lines in the ultimate classic arcade game!"
     >
-      {/* ── Main game layout ── */}
-      <div ref={containerRef} className="flex flex-col lg:flex-row gap-4 items-start justify-center select-none">
-        {/* ─ Mobile: side panel + board side by side ─ */}
-        <div className="flex flex-row lg:flex-col gap-3 w-full lg:w-auto lg:order-2">
-          {/* Side panel — vertical on desktop, compact column on mobile */}
-          <div className="flex flex-col gap-2 w-20 lg:w-36 shrink-0">
-            <StatBox label="Score" value={score} />
-            <StatBox label="Best" value={best} color="text-yellow-400" />
-            <StatBox label="Level" value={level} color="text-primary" />
-            <StatBox label="Lines" value={lines} />
+      {/* ══ DESKTOP layout (lg+): board left, side panel right — identical to original ══ */}
+      <div ref={containerRef} className="hidden lg:flex flex-row gap-6 items-start justify-center select-none">
+        {/* Board */}
+        <BoardCanvas />
 
-            {/* Next piece */}
-            <div className="bg-card border border-border rounded-lg p-2 text-center">
-              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-none mb-1">
-                Next
-              </p>
-              <canvas
-                ref={nextCanvasRef}
-                width={nextSize}
-                height={nextSize}
-                className="mx-auto rounded"
-                style={{ width: nextSize, height: nextSize }}
-              />
-            </div>
-
-            {phase === "playing" && (
-              <button
-                onClick={togglePause}
-                className="w-full px-2 py-1.5 rounded-lg border border-border bg-card text-foreground text-xs font-bold hover:bg-secondary transition"
-              >
-                ⏸ Pause
-              </button>
-            )}
+        {/* Side panel */}
+        <div className="flex flex-col gap-3 w-40">
+          <div className="bg-card border border-border rounded-xl p-3 text-center">
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Score</p>
+            <p className="text-xl font-black text-foreground">{score}</p>
           </div>
+          <div className="bg-card border border-border rounded-xl p-3 text-center">
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Best</p>
+            <p className="text-xl font-black text-yellow-400">{best}</p>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-3 text-center">
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Level</p>
+            <p className="text-xl font-black text-primary">{level}</p>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-3 text-center">
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Lines</p>
+            <p className="text-xl font-black text-foreground">{lines}</p>
+          </div>
+          <div className="bg-card border border-border rounded-xl p-3 text-center">
+            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-2">Next</p>
+            <canvas ref={nextCanvasRef} width={100} height={100} className="mx-auto rounded-lg" />
+          </div>
+          {phase === "playing" && (
+            <button
+              onClick={togglePause}
+              className="w-full px-3 py-2 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-secondary transition"
+            >
+              ⏸ Pause
+            </button>
+          )}
+        </div>
+      </div>
 
-          {/* ─ Board ─ */}
-          <div className="relative">
+      {/* ══ MOBILE layout (<lg): side panel + board side by side, controls below ══ */}
+      <div className="flex lg:hidden flex-row gap-3 w-full items-start select-none">
+        {/* Side panel — compact column */}
+        <div className="flex flex-col gap-2 w-20 shrink-0">
+          <StatBox label="Score" value={score} />
+          <StatBox label="Best" value={best} color="text-yellow-400" />
+          <StatBox label="Level" value={level} color="text-primary" />
+          <StatBox label="Lines" value={lines} />
+          <div className="bg-card border border-border rounded-lg p-2 text-center">
+            <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-none mb-1">
+              Next
+            </p>
             <canvas
-              ref={canvasRef}
-              width={canvasW}
-              height={canvasH}
-              className="rounded-xl border-2 border-border block touch-none"
-              style={{ width: canvasW, height: canvasH }}
-              onTouchStart={handleTouchStart}
-              onTouchEnd={handleTouchEnd}
+              ref={nextCanvasMobileRef}
+              width={nextSize}
+              height={nextSize}
+              className="mx-auto rounded"
+              style={{ width: nextSize, height: nextSize }}
             />
-
-            {/* Overlays */}
-            {phase === "idle" && (
-              <div className="absolute inset-0 bg-black/80 rounded-xl flex flex-col items-center justify-center gap-3 p-4">
-                <p className="text-4xl">🧱</p>
-                <p className="text-white font-black text-2xl tracking-widest">TETRIS</p>
-                <p className="text-white/50 text-[11px] text-center leading-relaxed">
-                  Arrows to move · Up/X rotate · Space drop
-                </p>
-                <button
-                  onClick={startGame}
-                  className="mt-1 px-7 py-2.5 bg-primary text-primary-foreground rounded-xl font-black text-base hover:opacity-90 transition"
-                >
-                  ▶ Play
-                </button>
-                {best > 0 && <p className="text-yellow-400 text-xs">🏆 Best: {best}</p>}
-              </div>
-            )}
-
-            {phase === "paused" && (
-              <div className="absolute inset-0 bg-black/80 rounded-xl flex flex-col items-center justify-center gap-4">
-                <p className="text-white font-black text-xl">⏸ PAUSED</p>
-                <button
-                  onClick={togglePause}
-                  className="px-6 py-2 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition"
-                >
-                  ▶ Resume
-                </button>
-              </div>
-            )}
-
-            {phase === "over" && (
-              <div className="absolute inset-0 bg-black/85 rounded-xl flex flex-col items-center justify-center gap-2.5 p-4">
-                <p className="text-3xl">💀</p>
-                <p className="text-white font-black text-xl">GAME OVER</p>
-                <p className="text-white/60 text-sm">Score: {score}</p>
-                {score >= best && score > 0 && <p className="text-yellow-400 font-bold text-sm">🏆 New Best!</p>}
-                <button
-                  onClick={startGame}
-                  className="mt-1 px-6 py-2 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition"
-                >
-                  🔄 Play Again
-                </button>
-              </div>
-            )}
           </div>
+          {phase === "playing" && (
+            <button
+              onClick={togglePause}
+              className="w-full px-2 py-1.5 rounded-lg border border-border bg-card text-foreground text-[10px] font-bold hover:bg-secondary transition"
+            >
+              ⏸ Pause
+            </button>
+          )}
+        </div>
+
+        {/* Board — takes remaining width */}
+        <div className="flex-1 min-w-0">
+          <BoardCanvas />
         </div>
       </div>
 

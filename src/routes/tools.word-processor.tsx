@@ -964,7 +964,35 @@ function Toolbar({
         justify: AlignmentType.JUSTIFIED,
       };
 
-      const marksToRunProps = (marks: any[] = [], rtl: boolean) => {
+      const sanitizeFont = (v: any): string | undefined => {
+        if (typeof v !== "string") return undefined;
+        const first = v.split(",")[0]?.trim().replace(/^["']|["']$/g, "");
+        if (!first) return undefined;
+        const generic = new Set(["serif", "sans-serif", "monospace", "cursive", "fantasy", "system-ui", "ui-serif", "ui-sans-serif", "ui-monospace"]);
+        if (generic.has(first.toLowerCase())) return undefined;
+        return first;
+      };
+      const sanitizeHex = (v: any): string | undefined => {
+        if (typeof v !== "string") return undefined;
+        let s = v.trim();
+        const rgb = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i.exec(s);
+        if (rgb) {
+          const toHex = (n: string) => Math.max(0, Math.min(255, parseInt(n, 10))).toString(16).padStart(2, "0");
+          return (toHex(rgb[1]) + toHex(rgb[2]) + toHex(rgb[3])).toUpperCase();
+        }
+        if (s.startsWith("#")) s = s.slice(1);
+        if (/^[0-9a-fA-F]{3}$/.test(s)) s = s.split("").map((c) => c + c).join("");
+        if (/^[0-9a-fA-F]{6}$/.test(s)) return s.toUpperCase();
+        return undefined;
+      };
+      const sanitizeSizeHalfPoints = (v: any): number | undefined => {
+        if (v == null) return undefined;
+        const n = parseFloat(String(v));
+        if (!isFinite(n) || n <= 0) return undefined;
+        return Math.max(2, Math.min(800, Math.round(n * 2)));
+      };
+
+      const marksToRunProps = (marks: any[] = [], rtl: boolean, safeMode = false) => {
         const props: any = {};
         if (rtl) props.rightToLeft = true;
         for (const m of marks) {
@@ -988,18 +1016,23 @@ function Toolbar({
               props.superScript = true;
               break;
             case "textStyle": {
+              if (safeMode) break;
               const a = m.attrs || {};
-              if (a.color) props.color = String(a.color).replace("#", "").toUpperCase();
-              if (a.fontSize) {
-                const n = parseFloat(a.fontSize);
-                if (!isNaN(n)) props.size = Math.round(n * 2); // pt -> half-points
-              }
-              if (a.fontFamily) props.font = a.fontFamily;
+              const color = sanitizeHex(a.color);
+              if (color) props.color = color;
+              const size = sanitizeSizeHalfPoints(a.fontSize);
+              if (size) props.size = size;
+              const font = sanitizeFont(a.fontFamily);
+              if (font) props.font = font;
               break;
             }
             case "highlight": {
+              if (safeMode) break;
               const a = m.attrs || {};
-              props.highlight = hexToDocxHighlight(a.color);
+              try {
+                const hl = hexToDocxHighlight(a.color);
+                if (hl) props.highlight = hl;
+              } catch {}
               break;
             }
           }
@@ -1007,11 +1040,16 @@ function Toolbar({
         return props;
       };
 
+      let safeMode = false;
       const inlineToRuns = (content: any[] = [], rtl: boolean): any[] => {
         const runs: any[] = [];
         for (const node of content) {
           if (node.type === "text") {
-            runs.push(new TextRun({ text: node.text || "", ...marksToRunProps(node.marks, rtl) }));
+            try {
+              runs.push(new TextRun({ text: node.text || "", ...marksToRunProps(node.marks, rtl, safeMode) }));
+            } catch {
+              runs.push(new TextRun({ text: node.text || "" }));
+            }
           } else if (node.type === "hardBreak") {
             runs.push(new TextRun({ text: "", break: 1 }));
           }

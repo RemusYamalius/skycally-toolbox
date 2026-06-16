@@ -1448,7 +1448,7 @@ function Toolbar({
       </div>
 
       {/* Row 3: Paragraph */}
-      <div className="wp-row">
+      <div className="wp-row wp-row-justify">
         <button
           className={active(editor.isActive({ textAlign: "left" }))}
           onClick={() => editor.chain().focus().setTextAlign("left").run()}

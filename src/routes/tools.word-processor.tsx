@@ -1696,7 +1696,7 @@ function Toolbar({
       </div>
 
       {/* Row 5: Review */}
-      <div className="wp-row">
+      <div className="wp-row wp-row-justify">
         <button className={btn} onClick={() => editor.chain().focus().undo().run()} title="Undo (Ctrl+Z)">
           <Undo2 className="w-4 h-4" />
         </button>

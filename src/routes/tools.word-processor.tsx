@@ -1319,7 +1319,7 @@ function Toolbar({
       </div>
 
       {/* Row 2: Font */}
-      <div className="wp-row">
+      <div className="wp-row wp-row-justify">
         <select
           className="wp-select"
           style={{ width: 160 }}

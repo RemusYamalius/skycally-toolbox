@@ -15,11 +15,9 @@ export const Route = createFileRoute("/tools/tetris")({
   component: TetrisPage,
 });
 
+// ─── Constants ───────────────────────────────────────────────────────────────
 const COLS = 10;
 const ROWS = 20;
-const CELL = 30;
-const CANVAS_W = COLS * CELL;
-const CANVAS_H = ROWS * CELL;
 
 const COLORS: Record<string, string> = {
   I: "#00f0f0",
@@ -33,37 +31,128 @@ const COLORS: Record<string, string> = {
 
 const TETROMINOES: Record<string, number[][][]> = {
   I: [
-    [[0,0,0,0],[1,1,1,1],[0,0,0,0],[0,0,0,0]],
-    [[0,0,1,0],[0,0,1,0],[0,0,1,0],[0,0,1,0]],
-    [[0,0,0,0],[0,0,0,0],[1,1,1,1],[0,0,0,0]],
-    [[0,1,0,0],[0,1,0,0],[0,1,0,0],[0,1,0,0]],
+    [
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ],
+    [
+      [0, 0, 1, 0],
+      [0, 0, 1, 0],
+      [0, 0, 1, 0],
+      [0, 0, 1, 0],
+    ],
+    [
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+      [1, 1, 1, 1],
+      [0, 0, 0, 0],
+    ],
+    [
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+      [0, 1, 0, 0],
+    ],
   ],
-  O: [[[0,1,1,0],[0,1,1,0],[0,0,0,0],[0,0,0,0]]],
+  O: [
+    [
+      [0, 1, 1, 0],
+      [0, 1, 1, 0],
+      [0, 0, 0, 0],
+      [0, 0, 0, 0],
+    ],
+  ],
   T: [
-    [[0,1,0],[1,1,1],[0,0,0]],
-    [[1,0],[1,1],[1,0]],
-    [[1,1,1],[0,1,0],[0,0,0]],
-    [[0,1],[1,1],[0,1]],
+    [
+      [0, 1, 0],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+    [
+      [1, 0],
+      [1, 1],
+      [1, 0],
+    ],
+    [
+      [1, 1, 1],
+      [0, 1, 0],
+      [0, 0, 0],
+    ],
+    [
+      [0, 1],
+      [1, 1],
+      [0, 1],
+    ],
   ],
   S: [
-    [[0,1,1],[1,1,0],[0,0,0]],
-    [[1,0],[1,1],[0,1]],
+    [
+      [0, 1, 1],
+      [1, 1, 0],
+      [0, 0, 0],
+    ],
+    [
+      [1, 0],
+      [1, 1],
+      [0, 1],
+    ],
   ],
   Z: [
-    [[1,1,0],[0,1,1],[0,0,0]],
-    [[0,1],[1,1],[1,0]],
+    [
+      [1, 1, 0],
+      [0, 1, 1],
+      [0, 0, 0],
+    ],
+    [
+      [0, 1],
+      [1, 1],
+      [1, 0],
+    ],
   ],
   J: [
-    [[1,0,0],[1,1,1],[0,0,0]],
-    [[1,1],[1,0],[1,0]],
-    [[1,1,1],[0,0,1],[0,0,0]],
-    [[0,1],[0,1],[1,1]],
+    [
+      [1, 0, 0],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+    [
+      [1, 1],
+      [1, 0],
+      [1, 0],
+    ],
+    [
+      [1, 1, 1],
+      [0, 0, 1],
+      [0, 0, 0],
+    ],
+    [
+      [0, 1],
+      [0, 1],
+      [1, 1],
+    ],
   ],
   L: [
-    [[0,0,1],[1,1,1],[0,0,0]],
-    [[1,0],[1,0],[1,1]],
-    [[1,1,1],[1,0,0],[0,0,0]],
-    [[1,1],[0,1],[0,1]],
+    [
+      [0, 0, 1],
+      [1, 1, 1],
+      [0, 0, 0],
+    ],
+    [
+      [1, 0],
+      [1, 0],
+      [1, 1],
+    ],
+    [
+      [1, 1, 1],
+      [1, 0, 0],
+      [0, 0, 0],
+    ],
+    [
+      [1, 1],
+      [0, 1],
+      [0, 1],
+    ],
   ],
 };
 
@@ -78,14 +167,13 @@ interface Piece {
 }
 
 const PIECE_TYPES = Object.keys(TETROMINOES) as PieceType[];
-const LEVEL_SPEEDS = [800,720,630,550,470,380,300,220,130,100,80,80,80,70,70,70,50,50,50,30];
+const LEVEL_SPEEDS = [800, 720, 630, 550, 470, 380, 300, 220, 130, 100, 80, 80, 80, 70, 70, 70, 50, 50, 50, 30];
 const SCORE_TABLE = [0, 100, 300, 500, 800];
 
-const createEmptyBoard = (): Board =>
-  Array.from({ length: ROWS }, () => Array<string | null>(COLS).fill(null));
+// ─── Pure helpers ─────────────────────────────────────────────────────────────
+const createEmptyBoard = (): Board => Array.from({ length: ROWS }, () => Array<string | null>(COLS).fill(null));
 
-const randomPiece = (): PieceType =>
-  PIECE_TYPES[Math.floor(Math.random() * PIECE_TYPES.length)];
+const randomPiece = (): PieceType => PIECE_TYPES[Math.floor(Math.random() * PIECE_TYPES.length)];
 
 const getShape = (type: PieceType, rotation: number): number[][] => {
   const rots = TETROMINOES[type];
@@ -138,9 +226,12 @@ const clearLines = (board: Board): { board: Board; cleared: number } => {
   return { board: [...empty, ...kept], cleared };
 };
 
+// ─── Component ────────────────────────────────────────────────────────────────
 function TetrisPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const nextCanvasRef = useRef<HTMLCanvasElement>(null);
+  const containerRef = useRef<HTMLDivElement>(null);
+
   const boardRef = useRef<Board>(createEmptyBoard());
   const pieceRef = useRef<Piece | null>(null);
   const nextPieceRef = useRef<PieceType>(randomPiece());
@@ -149,32 +240,65 @@ function TetrisPage() {
   const levelRef = useRef(1);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
+  // Responsive cell size: fills available width
+  const [cellSize, setCellSize] = useState(30);
+
   const [score, setScore] = useState(0);
   const [lines, setLines] = useState(0);
   const [level, setLevel] = useState(1);
   const [best, setBest] = useState(0);
   const [phase, setPhase] = useState<"idle" | "playing" | "paused" | "over">("idle");
 
-  // Load best
+  // ── Load best ──
   useEffect(() => {
     if (typeof window === "undefined") return;
     try {
       const stored = parseInt(localStorage.getItem("tetris-best") || "0", 10);
       if (!isNaN(stored)) setBest(stored);
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, []);
 
-  const drawCell = (ctx: CanvasRenderingContext2D, c: number, r: number, color: string) => {
-    const x = c * CELL;
-    const y = r * CELL;
+  // ── Responsive sizing: compute cell size so board fits inside container ──
+  useEffect(() => {
+    const compute = () => {
+      if (!containerRef.current) return;
+      const isMobile = window.innerWidth < 1024;
+      if (isMobile) {
+        // On mobile: board takes full width minus side panel (≈80px) and some padding
+        const available = containerRef.current.clientWidth - 88 - 16; // side panel + gap
+        const cell = Math.floor(available / COLS);
+        setCellSize(Math.max(16, Math.min(cell, 32)));
+      } else {
+        // Desktop: limit board height to 72vh
+        const maxH = window.innerHeight * 0.72;
+        const cellByH = Math.floor(maxH / ROWS);
+        setCellSize(Math.min(cellByH, 34));
+      }
+    };
+    compute();
+    window.addEventListener("resize", compute);
+    return () => window.removeEventListener("resize", compute);
+  }, []);
+
+  // ── Canvas dimensions derived from cellSize ──
+  const canvasW = COLS * cellSize;
+  const canvasH = ROWS * cellSize;
+  const nextSize = cellSize * 4;
+
+  // ── Draw helpers ──
+  const drawCell = (ctx: CanvasRenderingContext2D, c: number, r: number, color: string, cell: number) => {
+    const x = c * cell;
+    const y = r * cell;
     ctx.fillStyle = color;
-    ctx.fillRect(x + 1, y + 1, CELL - 2, CELL - 2);
-    ctx.fillStyle = "rgba(255,255,255,0.3)";
-    ctx.fillRect(x + 1, y + 1, CELL - 2, 4);
-    ctx.fillRect(x + 1, y + 1, 4, CELL - 2);
-    ctx.fillStyle = "rgba(0,0,0,0.3)";
-    ctx.fillRect(x + 1, y + CELL - 5, CELL - 2, 4);
-    ctx.fillRect(x + CELL - 5, y + 1, 4, CELL - 2);
+    ctx.fillRect(x + 1, y + 1, cell - 2, cell - 2);
+    ctx.fillStyle = "rgba(255,255,255,0.28)";
+    ctx.fillRect(x + 1, y + 1, cell - 2, Math.max(3, cell * 0.13));
+    ctx.fillRect(x + 1, y + 1, Math.max(3, cell * 0.13), cell - 2);
+    ctx.fillStyle = "rgba(0,0,0,0.25)";
+    ctx.fillRect(x + 1, y + cell - Math.max(4, cell * 0.15), cell - 2, Math.max(4, cell * 0.15));
+    ctx.fillRect(x + cell - Math.max(4, cell * 0.15), y + 1, Math.max(4, cell * 0.15), cell - 2);
   };
 
   const drawBoard = useCallback(() => {
@@ -182,84 +306,103 @@ function TetrisPage() {
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
+    const cell = cellSize;
+    const w = COLS * cell;
+    const h = ROWS * cell;
 
-    ctx.fillStyle = "#1a1a2e";
-    ctx.fillRect(0, 0, CANVAS_W, CANVAS_H);
+    ctx.fillStyle = "#0d0d1a";
+    ctx.fillRect(0, 0, w, h);
 
-    ctx.strokeStyle = "rgba(255,255,255,0.05)";
+    // Grid lines
+    ctx.strokeStyle = "rgba(255,255,255,0.04)";
     ctx.lineWidth = 0.5;
     for (let r = 1; r < ROWS; r++) {
-      ctx.beginPath(); ctx.moveTo(0, r * CELL); ctx.lineTo(CANVAS_W, r * CELL); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(0, r * cell);
+      ctx.lineTo(w, r * cell);
+      ctx.stroke();
     }
     for (let c = 1; c < COLS; c++) {
-      ctx.beginPath(); ctx.moveTo(c * CELL, 0); ctx.lineTo(c * CELL, CANVAS_H); ctx.stroke();
+      ctx.beginPath();
+      ctx.moveTo(c * cell, 0);
+      ctx.lineTo(c * cell, h);
+      ctx.stroke();
     }
 
+    // Board cells
     boardRef.current.forEach((row, r) => {
       row.forEach((color, c) => {
-        if (color) drawCell(ctx, c, r, color);
+        if (color) drawCell(ctx, c, r, color, cell);
       });
     });
 
     const piece = pieceRef.current;
     if (piece) {
-      // Ghost piece
+      // Ghost
       let ghostY = piece.y;
       while (!isColliding(boardRef.current, piece, 0, ghostY - piece.y + 1)) ghostY++;
       const shape = getShape(piece.type, piece.rotation);
-      shape.forEach((row, r) => {
-        row.forEach((cell, c) => {
-          if (cell) {
-            const x = (piece.x + c) * CELL;
-            const y = (ghostY + r) * CELL;
-            ctx.strokeStyle = COLORS[piece.type];
-            ctx.globalAlpha = 0.4;
-            ctx.lineWidth = 2;
-            ctx.strokeRect(x + 2, y + 2, CELL - 4, CELL - 4);
-            ctx.globalAlpha = 1;
-          }
+      if (ghostY !== piece.y) {
+        shape.forEach((row, r) => {
+          row.forEach((cv, c) => {
+            if (cv) {
+              const x = (piece.x + c) * cell;
+              const y = (ghostY + r) * cell;
+              ctx.strokeStyle = COLORS[piece.type];
+              ctx.globalAlpha = 0.35;
+              ctx.lineWidth = 1.5;
+              ctx.strokeRect(x + 2, y + 2, cell - 4, cell - 4);
+              ctx.globalAlpha = 1;
+            }
+          });
         });
-      });
-
+      }
+      // Active piece
       shape.forEach((row, r) => {
-        row.forEach((cell, c) => {
-          if (cell && piece.y + r >= 0) {
-            drawCell(ctx, piece.x + c, piece.y + r, COLORS[piece.type]);
+        row.forEach((cv, c) => {
+          if (cv && piece.y + r >= 0) {
+            drawCell(ctx, piece.x + c, piece.y + r, COLORS[piece.type], cell);
           }
         });
       });
     }
-  }, []);
+  }, [cellSize]);
 
   const drawNextPiece = useCallback(() => {
     const canvas = nextCanvasRef.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
-    const size = 100;
+    const size = nextSize;
 
-    ctx.fillStyle = "#1a1a2e";
+    ctx.fillStyle = "#0d0d1a";
     ctx.fillRect(0, 0, size, size);
 
     const type = nextPieceRef.current;
     const shape = getShape(type, 0);
-    const cellSize = 22;
-    const offsetX = (size - shape[0].length * cellSize) / 2;
-    const offsetY = (size - shape.length * cellSize) / 2;
+    const cs = Math.floor(size / 5);
+    const offsetX = (size - shape[0].length * cs) / 2;
+    const offsetY = (size - shape.length * cs) / 2;
 
     shape.forEach((row, r) => {
       row.forEach((cell, c) => {
         if (cell) {
-          const x = offsetX + c * cellSize;
-          const y = offsetY + r * cellSize;
+          const x = offsetX + c * cs;
+          const y = offsetY + r * cs;
           ctx.fillStyle = COLORS[type];
-          ctx.fillRect(x + 1, y + 1, cellSize - 2, cellSize - 2);
-          ctx.fillStyle = "rgba(255,255,255,0.3)";
-          ctx.fillRect(x + 1, y + 1, cellSize - 2, 3);
+          ctx.fillRect(x + 1, y + 1, cs - 2, cs - 2);
+          ctx.fillStyle = "rgba(255,255,255,0.28)";
+          ctx.fillRect(x + 1, y + 1, cs - 2, 3);
         }
       });
     });
-  }, []);
+  }, [nextSize]);
+
+  // Re-draw when cellSize changes
+  useEffect(() => {
+    drawBoard();
+    drawNextPiece();
+  }, [cellSize, drawBoard, drawNextPiece]);
 
   const tickRef = useRef<() => void>(() => {});
 
@@ -290,7 +433,11 @@ function TetrisPage() {
         const storedBest = parseInt(localStorage.getItem("tetris-best") || "0", 10) || 0;
         if (scoreRef.current > storedBest) {
           setBest(scoreRef.current);
-          try { localStorage.setItem("tetris-best", String(scoreRef.current)); } catch { /* noop */ }
+          try {
+            localStorage.setItem("tetris-best", String(scoreRef.current));
+          } catch {
+            /* noop */
+          }
         }
       }
 
@@ -318,7 +465,9 @@ function TetrisPage() {
     drawNextPiece();
   }, [drawBoard, drawNextPiece]);
 
-  useEffect(() => { tickRef.current = tick; }, [tick]);
+  useEffect(() => {
+    tickRef.current = tick;
+  }, [tick]);
 
   const startGame = () => {
     boardRef.current = createEmptyBoard();
@@ -328,7 +477,9 @@ function TetrisPage() {
     const type = randomPiece();
     pieceRef.current = spawnPiece(type);
     nextPieceRef.current = randomPiece();
-    setScore(0); setLines(0); setLevel(1);
+    setScore(0);
+    setLines(0);
+    setLevel(1);
     setPhase("playing");
     if (intervalRef.current) clearInterval(intervalRef.current);
     intervalRef.current = setInterval(() => tickRef.current(), LEVEL_SPEEDS[0]);
@@ -347,19 +498,14 @@ function TetrisPage() {
     }
   };
 
-  // Initial draw
-  useEffect(() => {
-    drawBoard();
-    drawNextPiece();
-  }, [drawBoard, drawNextPiece]);
-
-  useEffect(() => {
-    return () => {
+  useEffect(
+    () => () => {
       if (intervalRef.current) clearInterval(intervalRef.current);
-    };
-  }, []);
+    },
+    [],
+  );
 
-  // Keyboard
+  // ── Keyboard ──
   useEffect(() => {
     const handler = (e: KeyboardEvent) => {
       if (phase === "paused" && (e.key === "p" || e.key === "P" || e.key === "Escape")) {
@@ -372,14 +518,10 @@ function TetrisPage() {
 
       switch (e.key) {
         case "ArrowLeft":
-          if (!isColliding(boardRef.current, piece, -1)) {
-            pieceRef.current = { ...piece, x: piece.x - 1 };
-          }
+          if (!isColliding(boardRef.current, piece, -1)) pieceRef.current = { ...piece, x: piece.x - 1 };
           break;
         case "ArrowRight":
-          if (!isColliding(boardRef.current, piece, 1)) {
-            pieceRef.current = { ...piece, x: piece.x + 1 };
-          }
+          if (!isColliding(boardRef.current, piece, 1)) pieceRef.current = { ...piece, x: piece.x + 1 };
           break;
         case "ArrowDown":
           if (!isColliding(boardRef.current, piece, 0, 1)) {
@@ -392,21 +534,17 @@ function TetrisPage() {
         case "x":
         case "X": {
           const rotated = { ...piece, rotation: piece.rotation + 1 };
-          if (!isColliding(boardRef.current, rotated)) {
-            pieceRef.current = rotated;
-          } else if (!isColliding(boardRef.current, { ...rotated, x: rotated.x + 1 })) {
+          if (!isColliding(boardRef.current, rotated)) pieceRef.current = rotated;
+          else if (!isColliding(boardRef.current, { ...rotated, x: rotated.x + 1 }))
             pieceRef.current = { ...rotated, x: rotated.x + 1 };
-          } else if (!isColliding(boardRef.current, { ...rotated, x: rotated.x - 1 })) {
+          else if (!isColliding(boardRef.current, { ...rotated, x: rotated.x - 1 }))
             pieceRef.current = { ...rotated, x: rotated.x - 1 };
-          }
           break;
         }
         case "z":
         case "Z": {
           const rotatedCCW = { ...piece, rotation: piece.rotation - 1 };
-          if (!isColliding(boardRef.current, rotatedCCW)) {
-            pieceRef.current = rotatedCCW;
-          }
+          if (!isColliding(boardRef.current, rotatedCCW)) pieceRef.current = rotatedCCW;
           break;
         }
         case " ": {
@@ -433,7 +571,7 @@ function TetrisPage() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [phase]);
 
-  // Touch
+  // ── Touch swipe on canvas ──
   const touchStartRef = useRef<{ x: number; y: number; time: number } | null>(null);
 
   const handleTouchStart = (e: React.TouchEvent) => {
@@ -455,7 +593,7 @@ function TetrisPage() {
       if (!isColliding(boardRef.current, rotated)) pieceRef.current = rotated;
     } else if (Math.abs(dx) > Math.abs(dy)) {
       const dir = dx > 0 ? 1 : -1;
-      const steps = Math.min(Math.round(Math.abs(dx) / 30), 5);
+      const steps = Math.min(Math.round(Math.abs(dx) / cellSize), 5);
       let newX = piece.x;
       for (let i = 0; i < steps; i++) {
         if (!isColliding(boardRef.current, { ...piece, x: newX + dir })) newX += dir;
@@ -474,95 +612,128 @@ function TetrisPage() {
     drawBoard();
   };
 
+  // ── Stat box ──
+  const StatBox = ({ label, value, color }: { label: string; value: number; color?: string }) => (
+    <div className="bg-card border border-border rounded-lg p-2 text-center">
+      <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-none mb-1">{label}</p>
+      <p className={`text-base font-black leading-none ${color ?? "text-foreground"}`}>{value}</p>
+    </div>
+  );
+
   return (
-    <ToolPageShell title="Tetris" description="Stack falling blocks and clear lines in the ultimate classic arcade game!">
-      <div className="flex flex-col lg:flex-row gap-6 items-start justify-center">
-        <div className="relative mx-auto">
-          <canvas
-            ref={canvasRef}
-            width={CANVAS_W}
-            height={CANVAS_H}
-            className="rounded-xl border-2 border-border block touch-none"
-            style={{ maxHeight: "70vh", width: "auto" }}
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
-          />
+    <ToolPageShell
+      title="Tetris"
+      description="Stack falling blocks and clear lines in the ultimate classic arcade game!"
+    >
+      {/* ── Main game layout ── */}
+      <div ref={containerRef} className="flex flex-col lg:flex-row gap-4 items-start justify-center select-none">
+        {/* ─ Mobile: side panel + board side by side ─ */}
+        <div className="flex flex-row lg:flex-col gap-3 w-full lg:w-auto lg:order-2">
+          {/* Side panel — vertical on desktop, compact column on mobile */}
+          <div className="flex flex-col gap-2 w-20 lg:w-36 shrink-0">
+            <StatBox label="Score" value={score} />
+            <StatBox label="Best" value={best} color="text-yellow-400" />
+            <StatBox label="Level" value={level} color="text-primary" />
+            <StatBox label="Lines" value={lines} />
 
-          {phase === "idle" && (
-            <div className="absolute inset-0 bg-black/80 rounded-xl flex flex-col items-center justify-center gap-4 p-4">
-              <p className="text-5xl">🧱</p>
-              <p className="text-white font-black text-3xl">TETRIS</p>
-              <p className="text-white/60 text-xs text-center">Arrows to move • Up/X rotate • Space drop</p>
-              <button onClick={startGame} className="px-8 py-3 bg-primary text-primary-foreground rounded-xl font-black text-lg hover:opacity-90 transition">
-                ▶ Play
-              </button>
-              {best > 0 && <p className="text-yellow-400 text-sm">🏆 Best: {best}</p>}
+            {/* Next piece */}
+            <div className="bg-card border border-border rounded-lg p-2 text-center">
+              <p className="text-[10px] text-muted-foreground font-bold uppercase tracking-wider leading-none mb-1">
+                Next
+              </p>
+              <canvas
+                ref={nextCanvasRef}
+                width={nextSize}
+                height={nextSize}
+                className="mx-auto rounded"
+                style={{ width: nextSize, height: nextSize }}
+              />
             </div>
-          )}
 
-          {phase === "paused" && (
-            <div className="absolute inset-0 bg-black/80 rounded-xl flex flex-col items-center justify-center gap-4">
-              <p className="text-white font-black text-2xl">⏸ PAUSED</p>
-              <button onClick={togglePause} className="px-6 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition">
-                ▶ Resume
+            {phase === "playing" && (
+              <button
+                onClick={togglePause}
+                className="w-full px-2 py-1.5 rounded-lg border border-border bg-card text-foreground text-xs font-bold hover:bg-secondary transition"
+              >
+                ⏸ Pause
               </button>
-            </div>
-          )}
+            )}
+          </div>
 
-          {phase === "over" && (
-            <div className="absolute inset-0 bg-black/85 rounded-xl flex flex-col items-center justify-center gap-3 p-4">
-              <p className="text-4xl">💀</p>
-              <p className="text-white font-black text-2xl">GAME OVER</p>
-              <p className="text-white/70">Score: {score}</p>
-              {score >= best && score > 0 && <p className="text-yellow-400 font-bold">🏆 New Best!</p>}
-              <button onClick={startGame} className="px-6 py-2.5 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition mt-2">
-                🔄 Play Again
-              </button>
-            </div>
-          )}
-        </div>
+          {/* ─ Board ─ */}
+          <div className="relative">
+            <canvas
+              ref={canvasRef}
+              width={canvasW}
+              height={canvasH}
+              className="rounded-xl border-2 border-border block touch-none"
+              style={{ width: canvasW, height: canvasH }}
+              onTouchStart={handleTouchStart}
+              onTouchEnd={handleTouchEnd}
+            />
 
-        <div className="flex flex-row flex-wrap lg:flex-col gap-3 w-full lg:w-40">
-          <div className="flex-1 min-w-[80px] lg:flex-none bg-card border border-border rounded-xl p-3 text-center">
-            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Score</p>
-            <p className="text-xl font-black text-foreground">{score}</p>
+            {/* Overlays */}
+            {phase === "idle" && (
+              <div className="absolute inset-0 bg-black/80 rounded-xl flex flex-col items-center justify-center gap-3 p-4">
+                <p className="text-4xl">🧱</p>
+                <p className="text-white font-black text-2xl tracking-widest">TETRIS</p>
+                <p className="text-white/50 text-[11px] text-center leading-relaxed">
+                  Arrows to move · Up/X rotate · Space drop
+                </p>
+                <button
+                  onClick={startGame}
+                  className="mt-1 px-7 py-2.5 bg-primary text-primary-foreground rounded-xl font-black text-base hover:opacity-90 transition"
+                >
+                  ▶ Play
+                </button>
+                {best > 0 && <p className="text-yellow-400 text-xs">🏆 Best: {best}</p>}
+              </div>
+            )}
+
+            {phase === "paused" && (
+              <div className="absolute inset-0 bg-black/80 rounded-xl flex flex-col items-center justify-center gap-4">
+                <p className="text-white font-black text-xl">⏸ PAUSED</p>
+                <button
+                  onClick={togglePause}
+                  className="px-6 py-2 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition"
+                >
+                  ▶ Resume
+                </button>
+              </div>
+            )}
+
+            {phase === "over" && (
+              <div className="absolute inset-0 bg-black/85 rounded-xl flex flex-col items-center justify-center gap-2.5 p-4">
+                <p className="text-3xl">💀</p>
+                <p className="text-white font-black text-xl">GAME OVER</p>
+                <p className="text-white/60 text-sm">Score: {score}</p>
+                {score >= best && score > 0 && <p className="text-yellow-400 font-bold text-sm">🏆 New Best!</p>}
+                <button
+                  onClick={startGame}
+                  className="mt-1 px-6 py-2 bg-primary text-primary-foreground rounded-xl font-bold hover:opacity-90 transition"
+                >
+                  🔄 Play Again
+                </button>
+              </div>
+            )}
           </div>
-          <div className="flex-1 min-w-[80px] lg:flex-none bg-card border border-border rounded-xl p-3 text-center">
-            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Best</p>
-            <p className="text-xl font-black text-yellow-400">{best}</p>
-          </div>
-          <div className="flex-1 min-w-[80px] lg:flex-none bg-card border border-border rounded-xl p-3 text-center">
-            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Level</p>
-            <p className="text-xl font-black text-primary">{level}</p>
-          </div>
-          <div className="flex-1 min-w-[80px] lg:flex-none bg-card border border-border rounded-xl p-3 text-center">
-            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider">Lines</p>
-            <p className="text-xl font-black text-foreground">{lines}</p>
-          </div>
-          <div className="w-full lg:w-auto bg-card border border-border rounded-xl p-3 text-center">
-            <p className="text-xs text-muted-foreground font-bold uppercase tracking-wider mb-2">Next</p>
-            <canvas ref={nextCanvasRef} width={100} height={100} className="mx-auto rounded-lg" />
-          </div>
-          {phase === "playing" && (
-            <button onClick={togglePause} className="w-full px-3 py-2 rounded-xl border border-border bg-card text-foreground text-xs font-bold hover:bg-secondary transition">
-              ⏸ Pause
-            </button>
-          )}
         </div>
       </div>
 
-      {/* Mobile on-screen controls */}
-      <div className="flex flex-col items-center gap-3 mt-6 lg:hidden">
+      {/* ── Mobile on-screen controls — below board, same screen on most phones ── */}
+      <div className="flex flex-col items-center gap-2 mt-4 lg:hidden">
         <DPad
-          repeatMs={120}
-          initialDelayMs={180}
+          repeatMs={100}
+          initialDelayMs={160}
           enabled={{ up: true, left: true, right: true, down: true }}
-          onDirection={(dir) => {
+          onDirection={(dir: "up" | "down" | "left" | "right") => {
             const p = pieceRef.current;
             if (!p || phase !== "playing") return;
             if (dir === "up") {
               const r = { ...p, rotation: p.rotation + 1 };
               if (!isColliding(boardRef.current, r)) pieceRef.current = r;
+              else if (!isColliding(boardRef.current, { ...r, x: r.x + 1 })) pieceRef.current = { ...r, x: r.x + 1 };
+              else if (!isColliding(boardRef.current, { ...r, x: r.x - 1 })) pieceRef.current = { ...r, x: r.x - 1 };
             } else if (dir === "left") {
               if (!isColliding(boardRef.current, p, -1)) pieceRef.current = { ...p, x: p.x - 1 };
             } else if (dir === "right") {
@@ -589,31 +760,65 @@ function TetrisPage() {
             tick();
           }}
           aria-label="Hard drop"
-          className="w-40 h-14 text-sm bg-primary text-primary-foreground border-primary"
+          className="w-36 h-12 text-sm bg-primary text-primary-foreground border-primary"
         >
           ▼▼ HARD DROP
         </PadButton>
       </div>
 
+      {/* ── How to use ── */}
+      <HowToUse
+        steps={[
+          "Use the arrow keys to move pieces left, right, or down. Press Up or X to rotate clockwise.",
+          "Press Space for an instant hard drop — the piece falls straight to the bottom.",
+          "Clear complete horizontal lines to score points. The more lines at once, the bigger the bonus!",
+          "On mobile: tap the board to rotate, swipe left/right to move, swipe down to drop. Use the D-Pad buttons below the board.",
+        ]}
+      />
 
-      <HowToUse steps={[
-        "Use arrow keys to move and rotate pieces — Space for instant drop.",
-        "Clear complete horizontal lines to score points and level up.",
-        "On mobile: tap to rotate, swipe left/right to move, swipe down to drop!",
-      ]} />
+      {/* ── Related games ── */}
       <RelatedTools currentSlug="tetris" />
+
+      {/* ── SEO content ── */}
       <ToolSeoContent
-        title="Tetris — Free Online Classic Block Game"
-        description="Play Tetris online for free. Stack blocks, clear lines and level up. Full keyboard controls and mobile touch support!"
+        title="Tetris Online — Free Classic Block Game, No Download"
+        description="Play Tetris free in your browser. Stack blocks, clear lines and level up endlessly. Full keyboard and mobile touch support — no download, no account needed."
         body={[
-          "Tetris is one of the most iconic video games ever created. Stack falling tetrominoes, clear complete lines and keep going as long as you can — the speed increases with every level!",
-          "Skycally's Tetris includes all 7 classic pieces, ghost piece preview, hard drop, wall kicks for smooth rotation, and a next piece display. Works on desktop with keyboard and on mobile with touch controls.",
+          "Tetris is the most iconic puzzle game ever made. First released in 1984, it has been played by hundreds of millions of people worldwide. The goal is simple: rotate and position falling tetrominoes to fill complete horizontal lines, which then disappear and earn you points. As you clear more lines, the level increases and the blocks fall faster — making every game a thrilling race against speed.",
+          "Skycally's free online Tetris includes all 7 classic tetrominoes (I, O, T, S, Z, J, L), a ghost piece that shows exactly where your block will land, hard drop for instant placement, wall kick rotation for tight spaces, and a next piece preview so you can plan ahead. Your best score is saved automatically in your browser.",
+          "No download, no account, no ads interrupting your game. Play Tetris directly in your browser on any device — desktop, tablet, or mobile phone. The controls adapt automatically: keyboard on desktop, touch swipes and on-screen buttons on mobile.",
         ]}
         faqs={[
-          { question: "How do I rotate pieces?", answer: "Press the Up arrow or X key to rotate clockwise. Use Z to rotate counter-clockwise. On mobile, tap the screen or use the rotate button." },
-          { question: "What is the ghost piece?", answer: "The ghost piece shows where your current tetromino will land if dropped straight down — it helps you aim more accurately." },
-          { question: "How does scoring work?", answer: "Clear 1 line = 100pts × level, 2 lines = 300pts, 3 lines = 500pts, 4 lines (Tetris!) = 800pts. Soft drop adds 1pt per row, hard drop adds 2pts per row." },
-          { question: "Does speed increase?", answer: "Yes! Every 10 lines cleared increases the level by 1, which speeds up the falling pieces. The game gets significantly faster after level 10." },
+          {
+            question: "How do I play Tetris online?",
+            answer:
+              "Use the left/right arrow keys to move pieces, Up or X to rotate clockwise, Z to rotate counter-clockwise, Down to soft drop, and Space for an instant hard drop. On mobile, tap the board to rotate and use the D-Pad buttons below.",
+          },
+          {
+            question: "What is the ghost piece in Tetris?",
+            answer:
+              "The ghost piece is a transparent outline that shows exactly where your current tetromino will land if you drop it straight down. It helps you place pieces more accurately without guessing.",
+          },
+          {
+            question: "How does scoring work in Tetris?",
+            answer:
+              "Clearing 1 line gives 100 × level points, 2 lines = 300 × level, 3 lines = 500 × level, and 4 lines (a 'Tetris!') = 800 × level. Soft drop (Down arrow) adds 1 point per row, hard drop (Space) adds 2 points per row.",
+          },
+          {
+            question: "Does the game get faster?",
+            answer:
+              "Yes! Every 10 lines cleared increases the level by 1, which speeds up how fast pieces fall. The game starts at a comfortable pace and becomes a genuine challenge from level 10 onward.",
+          },
+          {
+            question: "Does Tetris work on mobile?",
+            answer:
+              "Yes, fully. Tap the board to rotate a piece, swipe left or right to move it, and swipe down for a hard drop. You can also use the on-screen D-Pad and Hard Drop button that appears below the board on mobile.",
+          },
+          {
+            question: "Is this Tetris game free?",
+            answer:
+              "Completely free — no download, no sign-up, and no account required. Just open the page and play instantly.",
+          },
         ]}
       />
     </ToolPageShell>

@@ -1596,7 +1596,7 @@ function Toolbar({
       </div>
 
       {/* Row 4: Insert */}
-      <div className="wp-row">
+      <div className="wp-row wp-row-justify">
         <Popover
           open={tableOpen}
           setOpen={setTableOpen}

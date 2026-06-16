@@ -1198,50 +1198,51 @@ function Toolbar({
         return out;
       };
 
-      const children = walkBlocks(json.content || []);
-
-      const numberingLevels = (format: any, textFn: (lvl: number) => string) =>
-        [0, 1, 2, 3, 4].map((lvl) => ({
-          level: lvl,
-          format,
-          text: textFn(lvl),
-          alignment: AlignmentType.LEFT,
-          style: { paragraph: { indent: { left: 720 * (lvl + 1), hanging: 260 } } },
-        }));
-
-      const doc = new Document({
-        numbering: {
-          config: [
+      const buildDoc = () => {
+        const children = walkBlocks(json.content || []);
+        return new Document({
+          numbering: {
+            config: [
+              {
+                reference: "wp-bullet",
+                levels: numberingLevels(LevelFormat.BULLET, (lvl) => (lvl % 2 === 0 ? "•" : "◦")),
+              },
+              {
+                reference: "wp-number",
+                levels: numberingLevels(LevelFormat.DECIMAL, (lvl) => `%${lvl + 1}.`),
+              },
+            ],
+          },
+          sections: [
             {
-              reference: "wp-bullet",
-              levels: numberingLevels(LevelFormat.BULLET, (lvl) => (lvl % 2 === 0 ? "•" : "◦")),
-            },
-            {
-              reference: "wp-number",
-              levels: numberingLevels(LevelFormat.DECIMAL, (lvl) => `%${lvl + 1}.`),
-            },
-          ],
-        },
-        sections: [
-          {
-            properties: {
-              page: {
-                // A4 in twips (1px = 15 twips at 96dpi, 1440 twips = 1in)
-                size: { width: 11906, height: 16838 },
-                margin: {
-                  top: Math.round(margins.top * 15),
-                  right: Math.round(margins.right * 15),
-                  bottom: Math.round(margins.bottom * 15),
-                  left: Math.round(margins.left * 15),
+              properties: {
+                page: {
+                  // A4 in twips (1px = 15 twips at 96dpi, 1440 twips = 1in)
+                  size: { width: 11906, height: 16838 },
+                  margin: {
+                    top: Math.round(margins.top * 15),
+                    right: Math.round(margins.right * 15),
+                    bottom: Math.round(margins.bottom * 15),
+                    left: Math.round(margins.left * 15),
+                  },
                 },
               },
+              children: children.length ? children : [new Paragraph("")],
             },
-            children: children.length ? children : [new Paragraph("")],
-          },
-        ],
-      });
+          ],
+        });
+      };
 
-      const blob = await Packer.toBlob(doc);
+      let blob: Blob;
+      try {
+        blob = await Packer.toBlob(buildDoc());
+      } catch (packErr) {
+        // Safe-mode fallback: strip styling marks (color/font/size/highlight)
+        // so the user always gets a downloadable .docx even with exotic input.
+        console.warn("[word-processor] docx export hit an error, retrying in safe mode", packErr);
+        safeMode = true;
+        blob = await Packer.toBlob(buildDoc());
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -1249,12 +1250,12 @@ function Toolbar({
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error(err);
-      alert("Could not export the document. Please try again.");
+      console.error("[word-processor] docx export failed", err);
     } finally {
       setExporting(false);
     }
   };
+
 
   const btn = "wp-btn";
   const active = (on: boolean) => `${btn}${on ? " wp-btn-active" : ""}`;

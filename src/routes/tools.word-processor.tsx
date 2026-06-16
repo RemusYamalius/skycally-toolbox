@@ -1198,6 +1198,15 @@ function Toolbar({
         return out;
       };
 
+      const numberingLevels = (format: any, textFn: (lvl: number) => string) =>
+        [0, 1, 2, 3, 4].map((lvl) => ({
+          level: lvl,
+          format,
+          text: textFn(lvl),
+          alignment: AlignmentType.LEFT,
+          style: { paragraph: { indent: { left: 720 * (lvl + 1), hanging: 260 } } },
+        }));
+
       const buildDoc = () => {
         const children = walkBlocks(json.content || []);
         return new Document({

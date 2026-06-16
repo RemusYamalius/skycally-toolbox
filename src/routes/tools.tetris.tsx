@@ -220,7 +220,9 @@ const clearLines = (board: Board): { board: Board; cleared: number } => {
 
 // ─── Component ────────────────────────────────────────────────────────────────
 function TetrisPage() {
-  const canvasRef = useRef<HTMLCanvasElement>(null);
+  // Separate canvas refs for desktop and mobile boards
+  const canvasDesktopRef = useRef<HTMLCanvasElement>(null);
+  const canvasMobileRef = useRef<HTMLCanvasElement>(null);
   // Two separate next-piece canvases: one for desktop, one for mobile
   const nextDesktopRef = useRef<HTMLCanvasElement>(null);
   const nextMobileRef = useRef<HTMLCanvasElement>(null);
@@ -296,60 +298,62 @@ function TetrisPage() {
   };
 
   const drawBoard = useCallback(() => {
-    const canvas = canvasRef.current;
-    if (!canvas) return;
-    const ctx = canvas.getContext("2d");
-    if (!ctx) return;
-    const cs = cellSize;
-    const w = COLS * cs,
-      h = ROWS * cs;
+    const paint = (canvas: HTMLCanvasElement | null, cs: number) => {
+      if (!canvas) return;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) return;
+      const w = COLS * cs,
+        h = ROWS * cs;
 
-    ctx.fillStyle = "#0d0d1a";
-    ctx.fillRect(0, 0, w, h);
-    ctx.strokeStyle = "rgba(255,255,255,0.04)";
-    ctx.lineWidth = 0.5;
-    for (let r = 1; r < ROWS; r++) {
-      ctx.beginPath();
-      ctx.moveTo(0, r * cs);
-      ctx.lineTo(w, r * cs);
-      ctx.stroke();
-    }
-    for (let c = 1; c < COLS; c++) {
-      ctx.beginPath();
-      ctx.moveTo(c * cs, 0);
-      ctx.lineTo(c * cs, h);
-      ctx.stroke();
-    }
+      ctx.fillStyle = "#0d0d1a";
+      ctx.fillRect(0, 0, w, h);
+      ctx.strokeStyle = "rgba(255,255,255,0.04)";
+      ctx.lineWidth = 0.5;
+      for (let r = 1; r < ROWS; r++) {
+        ctx.beginPath();
+        ctx.moveTo(0, r * cs);
+        ctx.lineTo(w, r * cs);
+        ctx.stroke();
+      }
+      for (let c = 1; c < COLS; c++) {
+        ctx.beginPath();
+        ctx.moveTo(c * cs, 0);
+        ctx.lineTo(c * cs, h);
+        ctx.stroke();
+      }
 
-    boardRef.current.forEach((row, r) =>
-      row.forEach((color, c) => {
-        if (color) drawCell(ctx, c, r, color, cs);
-      }),
-    );
+      boardRef.current.forEach((row, r) =>
+        row.forEach((color, c) => {
+          if (color) drawCell(ctx, c, r, color, cs);
+        }),
+      );
 
-    const piece = pieceRef.current;
-    if (piece) {
-      let ghostY = piece.y;
-      while (!isColliding(boardRef.current, piece, 0, ghostY - piece.y + 1)) ghostY++;
-      const shape = getShape(piece.type, piece.rotation);
-      if (ghostY !== piece.y) {
+      const piece = pieceRef.current;
+      if (piece) {
+        let ghostY = piece.y;
+        while (!isColliding(boardRef.current, piece, 0, ghostY - piece.y + 1)) ghostY++;
+        const shape = getShape(piece.type, piece.rotation);
+        if (ghostY !== piece.y) {
+          shape.forEach((row, r) =>
+            row.forEach((cv, c) => {
+              if (!cv) return;
+              ctx.strokeStyle = COLORS[piece.type];
+              ctx.globalAlpha = 0.35;
+              ctx.lineWidth = 1.5;
+              ctx.strokeRect((piece.x + c) * cs + 2, (ghostY + r) * cs + 2, cs - 4, cs - 4);
+              ctx.globalAlpha = 1;
+            }),
+          );
+        }
         shape.forEach((row, r) =>
           row.forEach((cv, c) => {
-            if (!cv) return;
-            ctx.strokeStyle = COLORS[piece.type];
-            ctx.globalAlpha = 0.35;
-            ctx.lineWidth = 1.5;
-            ctx.strokeRect((piece.x + c) * cs + 2, (ghostY + r) * cs + 2, cs - 4, cs - 4);
-            ctx.globalAlpha = 1;
+            if (cv && piece.y + r >= 0) drawCell(ctx, piece.x + c, piece.y + r, COLORS[piece.type], cs);
           }),
         );
       }
-      shape.forEach((row, r) =>
-        row.forEach((cv, c) => {
-          if (cv && piece.y + r >= 0) drawCell(ctx, piece.x + c, piece.y + r, COLORS[piece.type], cs);
-        }),
-      );
-    }
+    };
+    paint(canvasDesktopRef.current, DESKTOP_CELL);
+    paint(canvasMobileRef.current, cellSize);
   }, [cellSize]);
 
   const drawNext = useCallback(() => {
@@ -668,12 +672,10 @@ function TetrisPage() {
         {/* Board */}
         <div className="relative">
           <canvas
-            ref={canvasRef}
+            ref={canvasDesktopRef}
             width={COLS * DESKTOP_CELL}
             height={ROWS * DESKTOP_CELL}
             className="rounded-xl border-2 border-border block touch-none"
-            onTouchStart={handleTouchStart}
-            onTouchEnd={handleTouchEnd}
           />
           <Overlay />
         </div>
@@ -740,7 +742,7 @@ function TetrisPage() {
         <div ref={boardColRef} className="flex-1 min-w-0">
           <div className="relative" style={{ width: canvasW, height: canvasH }}>
             <canvas
-              ref={canvasRef}
+              ref={canvasMobileRef}
               width={canvasW}
               height={canvasH}
               className="rounded-xl border-2 border-border block touch-none"

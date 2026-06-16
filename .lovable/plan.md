@@ -1,54 +1,96 @@
-# Improve Mobile Controls for Mini Games
+# Word Processor — 3 targeted fixes
 
-The user reports that several mini games work great on desktop but are hard to control on mobile (Tetris, Pinball, Pac-Man, and others). Audit shows most games already have *some* touch handler, but quality varies: tiny buttons, swipe-only with no on-screen pad, no auto-repeat for hold, ghost touches scrolling the page, etc.
+All edits stay inside `src/routes/tools.word-processor.tsx`. No other file or feature is touched.
 
-## Scope (games to upgrade)
+---
 
-Keyboard-driven games that need mobile-friendly controls:
+## Fix 1 — DOCX export must never silently refuse
 
-1. **Tetris** — has small on-screen buttons; needs bigger, properly spaced D-pad + Rotate/Drop, hold-to-repeat for left/right/soft-drop, prevent page scroll.
-2. **Pinball** — has left/right flipper buttons; enlarge them, lock them to fixed bottom-left / bottom-right zones spanning full half-width so any thumb press triggers, add launch button.
-3. **Pac-Man** — swipe only; add a visible 4-way D-pad overlay below the canvas for users who prefer tapping over swiping, keep swipe as alt.
-4. **Snake** — same treatment: visible 4-way D-pad on mobile.
-5. **Flappy Bird** — already tap-to-flap; just ensure the whole canvas area is the tap target and page doesn't scroll while playing.
-6. **Space Shooter** — add on-screen left/right/fire buttons (hold-to-repeat fire).
-7. **Breakout** — add a wide drag strip / left+right hold buttons under the canvas; ensure paddle follows finger drag on the canvas itself.
-8. **Tunnel Dash** — add left/right hold buttons.
-9. **2048** — swipe already works but is finicky; tighten swipe threshold and add a small 4-arrow pad fallback.
+**Root cause (most likely):** `marksToRunProps` passes raw values straight into the `docx` library:
+- `fontFamily` often comes from the editor as a CSS stack like `Georgia, "Times New Roman", serif` → invalid `<w:rFonts>` → Packer throws.
+- `color` may arrive as `rgb(...)`, a named color, or a malformed `#xyz` → invalid hex.
+- `fontSize` parsed value can be `NaN`/non-finite for odd inputs.
+- `highlight` lookup falls through to `"yellow"` which is fine, but an `rgb(...)` highlight makes `hex.toLowerCase()` produce a non-matching key (still fine, defaults to yellow) — kept as-is.
 
-## Shared approach
+**Changes inside `exportDocx`:**
+1. Add small sanitizers used by `marksToRunProps`:
+   - `sanitizeFont(v)` → take first family, strip quotes/whitespace, drop generic keywords (`serif`, `sans-serif`, `monospace`, `cursive`, `fantasy`), return `undefined` if empty.
+   - `sanitizeHex(v)` → accept `#rgb`/`#rrggbb` only, expand short form, return 6-char uppercase or `undefined`. For `rgb(r,g,b)` convert to hex.
+   - `sanitizeSizePt(v)` → parse number, clamp 1–400, return `undefined` if invalid.
+2. Use the sanitizers; only set `props.font`/`props.color`/`props.size` when defined.
+3. Wrap the final `Packer.toBlob(doc)` call in a try/catch. On failure, retry once with a **safe-mode** rebuild that strips `textStyle`/`highlight` marks (keeps bold/italic/underline/strike/sub/super and structure). This guarantees the user always gets a `.docx`.
+4. Replace the `alert(...)` failure path with a console error only (kept as a last-resort safety net — should now be unreachable for normal content).
 
-Create one reusable component `src/components/game-controls.tsx` exporting:
+No change to image handling, list numbering, page size, or margins.
 
-- `<DPad onDirection={(dir) => ...} onRelease?={...} />` — 4-way pad with hold-to-repeat (configurable interval), `touch-none`, `pointerdown`/`pointerup`/`pointercancel`, `e.preventDefault()` to stop scroll.
-- `<ActionButton label icon onPress onRelease repeatMs?>` — single button with optional hold-repeat.
-- `<TouchZone side="left|right" onPress onRelease>` — full-half-width invisible flipper zone for pinball-style games.
+---
 
-All buttons:
-- Min 56×56 px tap target.
-- `touch-action: none` and `user-select: none`.
-- `pointerdown` (not `touchstart`) so it works with stylus/mouse too.
-- Visible only on `md:hidden` (mobile/tablet); desktop keeps keyboard.
+## Fix 2 — Print/PDF shows 6 duplicated pages
 
-Each game's mobile control block is rendered just below its canvas inside the existing layout, so the SEO/HowToUse sections stay untouched.
+**Root cause:** the print CSS uses `visibility: hidden` on everything outside `.wp-canvas`. `visibility:hidden` **preserves layout**, so the (now invisible) hero, ad zones, SEO block, FAQ, related tools, and footer keep occupying their full height — that empty space is what renders as the extra A4 pages after the real document. The repeating content the user sees is actually the same canvas printed once followed by blank padded pages produced by hidden siblings.
 
-## Per-game edits
+**Change (in the `@media print` block only):** pull the canvas out of normal flow so siblings' reserved space stops creating pages.
 
-For every game above:
-1. Replace its current ad-hoc touch buttons (or add a new block where missing) with the shared `<DPad>` / `<ActionButton>` / `<TouchZone>`.
-2. Wire callbacks to the same internal move/rotate/fire functions the keyboard handlers already call (no game-logic changes).
-3. Add `touch-action: none` to the canvas wrapper while the game is running to stop page scroll during play.
-4. Keep all desktop keyboard behavior unchanged.
-5. Update FAQ/HowToUse text only where it currently says "swipe only" to mention the on-screen pad.
+```css
+@media print {
+  @page { size: A4; margin: 0; }
+  html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
+  body * { visibility: hidden !important; }
+  .wp-canvas, .wp-canvas * { visibility: visible !important; }
+  .wp-canvas {
+    position: absolute !important;
+    inset: 0 auto auto 0 !important;
+    width: 100% !important;
+    background: white !important;
+    height: auto !important;
+    min-height: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important;
+    margin: 0 !important;
+  }
+  .wp-stage { transform: none !important; width: auto !important; margin: 0 !important; }
+  .wp-page {
+    box-shadow: none !important; margin: 0 auto !important; background-image: none !important;
+    min-height: 0 !important; height: auto !important; width: 100% !important;
+  }
+  .wp-editor-content { min-height: 0 !important; }
+  .wp-ruler-h, .wp-ruler-v, .wp-toolbar, .wp-hero { display: none !important; }
+  .wp-page-break { page-break-after: always; }
+  .wp-page-break::after { display: none !important; }
+}
+```
 
-## Out of scope
+The page now prints exactly the pages required by the document content (1 page in the user's example, more when real page-breaks or overflow exist).
 
-- No changes to game logic, scoring, or visuals.
-- No changes to non-keyboard tools.
-- No new dependencies.
-- No router / SEO / related-tools changes.
+---
 
-## Verification
+## Fix 3 — Toolbar distributes across the full width on desktop
 
-- Build passes.
-- Preview each updated game on mobile viewport (487px): controls visible, big enough, page doesn't scroll while pressing, hold-to-repeat works for Tetris left/right and Space Shooter fire.
+Currently every row is `flex-wrap` + left-aligned, leaving the right half empty on wide screens. Fix purely in CSS, desktop only (≥ 1024 px); mobile/tablet keep current behavior so nothing breaks.
+
+Add to `WP_CSS`:
+
+```css
+@media (min-width: 1024px) {
+  .wp-toolbar .wp-row { gap: 8px; }
+  /* Push the SaveBadge / right-side cluster fully to the right */
+  .wp-toolbar .wp-row .wp-spacer { flex: 1 1 auto; }
+  /* Let the long selects (Font / Size / Zoom) and button groups breathe */
+  .wp-toolbar .wp-row > .wp-select { flex: 0 1 auto; }
+  .wp-toolbar .wp-row > .wp-btn { flex: 0 0 auto; }
+  /* Distribute buttons so groups span the full row instead of bunching left */
+  .wp-toolbar .wp-row { justify-content: flex-start; }
+  .wp-toolbar .wp-row.wp-row-justify { justify-content: space-between; }
+}
+```
+
+Then, in the JSX, add the `wp-row-justify` modifier class to the four content rows (Font, Paragraph, Insert, Review) — the File row already uses a `wp-spacer` + SaveBadge layout, so it keeps `wp-row` only. The justify-between rule spreads the existing buttons evenly across the full toolbar width on desktop while preserving order, sizes, and active states. Below 1024 px nothing changes.
+
+No new buttons added, none removed, no handlers changed.
+
+---
+
+## Out of scope (explicitly unchanged)
+- Editor extensions, content model, autosave, templates, find/replace, painter, rulers, margins, fullscreen, zoom.
+- SEO block, HowToUse, related tools, route metadata.
+- Mobile toolbar layout.

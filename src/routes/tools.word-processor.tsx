@@ -964,7 +964,35 @@ function Toolbar({
         justify: AlignmentType.JUSTIFIED,
       };
 
-      const marksToRunProps = (marks: any[] = [], rtl: boolean) => {
+      const sanitizeFont = (v: any): string | undefined => {
+        if (typeof v !== "string") return undefined;
+        const first = v.split(",")[0]?.trim().replace(/^["']|["']$/g, "");
+        if (!first) return undefined;
+        const generic = new Set(["serif", "sans-serif", "monospace", "cursive", "fantasy", "system-ui", "ui-serif", "ui-sans-serif", "ui-monospace"]);
+        if (generic.has(first.toLowerCase())) return undefined;
+        return first;
+      };
+      const sanitizeHex = (v: any): string | undefined => {
+        if (typeof v !== "string") return undefined;
+        let s = v.trim();
+        const rgb = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i.exec(s);
+        if (rgb) {
+          const toHex = (n: string) => Math.max(0, Math.min(255, parseInt(n, 10))).toString(16).padStart(2, "0");
+          return (toHex(rgb[1]) + toHex(rgb[2]) + toHex(rgb[3])).toUpperCase();
+        }
+        if (s.startsWith("#")) s = s.slice(1);
+        if (/^[0-9a-fA-F]{3}$/.test(s)) s = s.split("").map((c) => c + c).join("");
+        if (/^[0-9a-fA-F]{6}$/.test(s)) return s.toUpperCase();
+        return undefined;
+      };
+      const sanitizeSizeHalfPoints = (v: any): number | undefined => {
+        if (v == null) return undefined;
+        const n = parseFloat(String(v));
+        if (!isFinite(n) || n <= 0) return undefined;
+        return Math.max(2, Math.min(800, Math.round(n * 2)));
+      };
+
+      const marksToRunProps = (marks: any[] = [], rtl: boolean, safeMode = false) => {
         const props: any = {};
         if (rtl) props.rightToLeft = true;
         for (const m of marks) {
@@ -988,18 +1016,23 @@ function Toolbar({
               props.superScript = true;
               break;
             case "textStyle": {
+              if (safeMode) break;
               const a = m.attrs || {};
-              if (a.color) props.color = String(a.color).replace("#", "").toUpperCase();
-              if (a.fontSize) {
-                const n = parseFloat(a.fontSize);
-                if (!isNaN(n)) props.size = Math.round(n * 2); // pt -> half-points
-              }
-              if (a.fontFamily) props.font = a.fontFamily;
+              const color = sanitizeHex(a.color);
+              if (color) props.color = color;
+              const size = sanitizeSizeHalfPoints(a.fontSize);
+              if (size) props.size = size;
+              const font = sanitizeFont(a.fontFamily);
+              if (font) props.font = font;
               break;
             }
             case "highlight": {
+              if (safeMode) break;
               const a = m.attrs || {};
-              props.highlight = hexToDocxHighlight(a.color);
+              try {
+                const hl = hexToDocxHighlight(a.color);
+                if (hl) props.highlight = hl;
+              } catch {}
               break;
             }
           }
@@ -1007,11 +1040,16 @@ function Toolbar({
         return props;
       };
 
+      let safeMode = false;
       const inlineToRuns = (content: any[] = [], rtl: boolean): any[] => {
         const runs: any[] = [];
         for (const node of content) {
           if (node.type === "text") {
-            runs.push(new TextRun({ text: node.text || "", ...marksToRunProps(node.marks, rtl) }));
+            try {
+              runs.push(new TextRun({ text: node.text || "", ...marksToRunProps(node.marks, rtl, safeMode) }));
+            } catch {
+              runs.push(new TextRun({ text: node.text || "" }));
+            }
           } else if (node.type === "hardBreak") {
             runs.push(new TextRun({ text: "", break: 1 }));
           }
@@ -1160,8 +1198,6 @@ function Toolbar({
         return out;
       };
 
-      const children = walkBlocks(json.content || []);
-
       const numberingLevels = (format: any, textFn: (lvl: number) => string) =>
         [0, 1, 2, 3, 4].map((lvl) => ({
           level: lvl,
@@ -1171,39 +1207,51 @@ function Toolbar({
           style: { paragraph: { indent: { left: 720 * (lvl + 1), hanging: 260 } } },
         }));
 
-      const doc = new Document({
-        numbering: {
-          config: [
+      const buildDoc = () => {
+        const children = walkBlocks(json.content || []);
+        return new Document({
+          numbering: {
+            config: [
+              {
+                reference: "wp-bullet",
+                levels: numberingLevels(LevelFormat.BULLET, (lvl) => (lvl % 2 === 0 ? "•" : "◦")),
+              },
+              {
+                reference: "wp-number",
+                levels: numberingLevels(LevelFormat.DECIMAL, (lvl) => `%${lvl + 1}.`),
+              },
+            ],
+          },
+          sections: [
             {
-              reference: "wp-bullet",
-              levels: numberingLevels(LevelFormat.BULLET, (lvl) => (lvl % 2 === 0 ? "•" : "◦")),
-            },
-            {
-              reference: "wp-number",
-              levels: numberingLevels(LevelFormat.DECIMAL, (lvl) => `%${lvl + 1}.`),
-            },
-          ],
-        },
-        sections: [
-          {
-            properties: {
-              page: {
-                // A4 in twips (1px = 15 twips at 96dpi, 1440 twips = 1in)
-                size: { width: 11906, height: 16838 },
-                margin: {
-                  top: Math.round(margins.top * 15),
-                  right: Math.round(margins.right * 15),
-                  bottom: Math.round(margins.bottom * 15),
-                  left: Math.round(margins.left * 15),
+              properties: {
+                page: {
+                  // A4 in twips (1px = 15 twips at 96dpi, 1440 twips = 1in)
+                  size: { width: 11906, height: 16838 },
+                  margin: {
+                    top: Math.round(margins.top * 15),
+                    right: Math.round(margins.right * 15),
+                    bottom: Math.round(margins.bottom * 15),
+                    left: Math.round(margins.left * 15),
+                  },
                 },
               },
+              children: children.length ? children : [new Paragraph("")],
             },
-            children: children.length ? children : [new Paragraph("")],
-          },
-        ],
-      });
+          ],
+        });
+      };
 
-      const blob = await Packer.toBlob(doc);
+      let blob: Blob;
+      try {
+        blob = await Packer.toBlob(buildDoc());
+      } catch (packErr) {
+        // Safe-mode fallback: strip styling marks (color/font/size/highlight)
+        // so the user always gets a downloadable .docx even with exotic input.
+        console.warn("[word-processor] docx export hit an error, retrying in safe mode", packErr);
+        safeMode = true;
+        blob = await Packer.toBlob(buildDoc());
+      }
       const url = URL.createObjectURL(blob);
       const a = document.createElement("a");
       a.href = url;
@@ -1211,12 +1259,12 @@ function Toolbar({
       a.click();
       URL.revokeObjectURL(url);
     } catch (err) {
-      console.error(err);
-      alert("Could not export the document. Please try again.");
+      console.error("[word-processor] docx export failed", err);
     } finally {
       setExporting(false);
     }
   };
+
 
   const btn = "wp-btn";
   const active = (on: boolean) => `${btn}${on ? " wp-btn-active" : ""}`;
@@ -1271,7 +1319,7 @@ function Toolbar({
       </div>
 
       {/* Row 2: Font */}
-      <div className="wp-row">
+      <div className="wp-row wp-row-justify">
         <select
           className="wp-select"
           style={{ width: 160 }}
@@ -1400,7 +1448,7 @@ function Toolbar({
       </div>
 
       {/* Row 3: Paragraph */}
-      <div className="wp-row">
+      <div className="wp-row wp-row-justify">
         <button
           className={active(editor.isActive({ textAlign: "left" }))}
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
@@ -1548,7 +1596,7 @@ function Toolbar({
       </div>
 
       {/* Row 4: Insert */}
-      <div className="wp-row">
+      <div className="wp-row wp-row-justify">
         <Popover
           open={tableOpen}
           setOpen={setTableOpen}
@@ -1648,7 +1696,7 @@ function Toolbar({
       </div>
 
       {/* Row 5: Review */}
-      <div className="wp-row">
+      <div className="wp-row wp-row-justify">
         <button className={btn} onClick={() => editor.chain().focus().undo().run()} title="Undo (Ctrl+Z)">
           <Undo2 className="w-4 h-4" />
         </button>
@@ -2378,17 +2426,36 @@ const WP_CSS = `
 .wp-editor-content img { max-width: 100%; height: auto; }
 .wp-editor-content hr { border: none; border-top: 1px solid #ccc; margin: 12px 0; }
 
+@media (min-width: 1024px) {
+  .wp-toolbar .wp-row { gap: 8px; }
+  .wp-toolbar .wp-row-justify { justify-content: space-between; }
+  .wp-toolbar .wp-row-justify > .wp-btn,
+  .wp-toolbar .wp-row-justify > .wp-select { flex: 0 0 auto; }
+}
+
 @media print {
   @page { size: A4; margin: 0; }
+  html, body { margin: 0 !important; padding: 0 !important; background: #ffffff !important; }
   body * { visibility: hidden !important; }
   .wp-canvas, .wp-canvas * { visibility: visible !important; }
-  .wp-canvas { background: white !important; height: auto !important; min-height: 0 !important; overflow: visible !important; padding: 0 !important; }
-  .wp-stage { transform: none !important; }
+  .wp-canvas {
+    position: absolute !important;
+    top: 0 !important; left: 0 !important; right: 0 !important;
+    width: 100% !important;
+    background: #ffffff !important;
+    height: auto !important; min-height: 0 !important;
+    overflow: visible !important;
+    padding: 0 !important; margin: 0 !important;
+  }
+  .wp-stage { transform: none !important; width: auto !important; margin: 0 auto !important; }
   .wp-page {
-    box-shadow: none !important; margin: 0 !important; background-image: none !important;
+    box-shadow: none !important; margin: 0 auto !important; background-image: none !important;
     min-height: 0 !important; height: auto !important;
   }
+  .wp-editor-content { min-height: 0 !important; }
   .wp-ruler-h, .wp-ruler-v, .wp-toolbar, .wp-hero { display: none !important; }
+  .wp-page .wp-page-break { page-break-after: always; }
   .wp-page-break::after { display: none !important; }
 }
 `;
+

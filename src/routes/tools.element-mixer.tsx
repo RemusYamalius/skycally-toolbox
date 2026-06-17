@@ -713,8 +713,8 @@ const EM_CSS = `
 /* Periodic table grid */
 .em-table {
   display: grid;
-  grid-template-columns: repeat(18, minmax(46px, 1fr));
-  grid-auto-rows: 56px;
+  grid-template-columns: repeat(18, minmax(52px, 1fr));
+  grid-auto-rows: 60px;
   gap: 4px;
   min-width: 920px;
 }

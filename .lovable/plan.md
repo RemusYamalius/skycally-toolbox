@@ -1,96 +1,71 @@
-# Word Processor — 3 targeted fixes
+# Plan — Element Mixer (/tools/element-mixer)
 
-All edits stay inside `src/routes/tools.word-processor.tsx`. No other file or feature is touched.
+A self-contained chemistry sandbox tool. All data hardcoded, no new dependencies, dark theme via CSS variables, fully responsive.
 
----
+## Files to create
 
-## Fix 1 — DOCX export must never silently refuse
+1. `src/data/elements.ts` — full 118-element dataset (symbol, atomic number, mass, name, category, group/period for grid placement, real-world examples).
+2. `src/data/compounds.ts` — hardcoded compound database (all formulas from the spec: H2O, CO2, O2, H2, N2, NaCl, CaCO3, MgO, KCl, SiO2, Fe2O3, Al2O3, HCl, H2SO4, NaOH, NH3, HNO3, CH4, C2H5OH, C6H12O6, C12H22O11, C3H8, C8H18, H2O2, NO2, SO2, N2O, Fe3O4, TiO2, NaHCO3, CaF2, PbS, AgCl, ZnO, MnO2, Na2CO3, KNO3, C, Si, Au, Ag). Each entry: canonical formula key, name, description, fun fact, animation type, discovery category.
+3. `src/routes/tools.element-mixer.tsx` — the page route.
+4. `src/lib/element-mixer/formula.ts` — small helpers: build canonical formula from `{symbol: count}` map (Hill order for organics: C, H, then alphabetical; otherwise alphabetical by symbol), lookup against compounds DB, generate "unknown compound" description heuristics.
 
-**Root cause (most likely):** `marksToRunProps` passes raw values straight into the `docx` library:
-- `fontFamily` often comes from the editor as a CSS stack like `Georgia, "Times New Roman", serif` → invalid `<w:rFonts>` → Packer throws.
-- `color` may arrive as `rgb(...)`, a named color, or a malformed `#xyz` → invalid hex.
-- `fontSize` parsed value can be `NaN`/non-finite for odd inputs.
-- `highlight` lookup falls through to `"yellow"` which is fine, but an `rgb(...)` highlight makes `hex.toLowerCase()` produce a non-matching key (still fine, defaults to yellow) — kept as-is.
+## Files to edit
 
-**Changes inside `exportDocx`:**
-1. Add small sanitizers used by `marksToRunProps`:
-   - `sanitizeFont(v)` → take first family, strip quotes/whitespace, drop generic keywords (`serif`, `sans-serif`, `monospace`, `cursive`, `fantasy`), return `undefined` if empty.
-   - `sanitizeHex(v)` → accept `#rgb`/`#rrggbb` only, expand short form, return 6-char uppercase or `undefined`. For `rgb(r,g,b)` convert to hex.
-   - `sanitizeSizePt(v)` → parse number, clamp 1–400, return `undefined` if invalid.
-2. Use the sanitizers; only set `props.font`/`props.color`/`props.size` when defined.
-3. Wrap the final `Packer.toBlob(doc)` call in a try/catch. On failure, retry once with a **safe-mode** rebuild that strips `textStyle`/`highlight` marks (keeps bold/italic/underline/strike/sub/super and structure). This guarantees the user always gets a `.docx`.
-4. Replace the `alert(...)` failure path with a console error only (kept as a last-resort safety net — should now be unreachable for normal content).
+- `src/lib/tools.ts` — add tool entry. Note: project doesn't have a "Science" category; map to `utility` (with `categories: ["utility","games"]` so it appears alongside fun tools). Icon: `FlaskConical` from lucide-react (already-installed pkg). Slug/name/description as specified.
+- `src/lib/related-tools.ts` — add `"element-mixer": ["age-calculator", "bmi-calculator", "wordle", "sudoku"]` (max 3 used by component — keep first 3; current map uses 3, will match convention).
 
-No change to image handling, list numbering, page size, or margins.
+## Route structure (mirrors other tools)
 
----
-
-## Fix 2 — Print/PDF shows 6 duplicated pages
-
-**Root cause:** the print CSS uses `visibility: hidden` on everything outside `.wp-canvas`. `visibility:hidden` **preserves layout**, so the (now invisible) hero, ad zones, SEO block, FAQ, related tools, and footer keep occupying their full height — that empty space is what renders as the extra A4 pages after the real document. The repeating content the user sees is actually the same canvas printed once followed by blank padded pages produced by hidden siblings.
-
-**Change (in the `@media print` block only):** pull the canvas out of normal flow so siblings' reserved space stops creating pages.
-
-```css
-@media print {
-  @page { size: A4; margin: 0; }
-  html, body { margin: 0 !important; padding: 0 !important; background: white !important; }
-  body * { visibility: hidden !important; }
-  .wp-canvas, .wp-canvas * { visibility: visible !important; }
-  .wp-canvas {
-    position: absolute !important;
-    inset: 0 auto auto 0 !important;
-    width: 100% !important;
-    background: white !important;
-    height: auto !important;
-    min-height: 0 !important;
-    overflow: visible !important;
-    padding: 0 !important;
-    margin: 0 !important;
-  }
-  .wp-stage { transform: none !important; width: auto !important; margin: 0 !important; }
-  .wp-page {
-    box-shadow: none !important; margin: 0 auto !important; background-image: none !important;
-    min-height: 0 !important; height: auto !important; width: 100% !important;
-  }
-  .wp-editor-content { min-height: 0 !important; }
-  .wp-ruler-h, .wp-ruler-v, .wp-toolbar, .wp-hero { display: none !important; }
-  .wp-page-break { page-break-after: always; }
-  .wp-page-break::after { display: none !important; }
-}
+```tsx
+createFileRoute("/tools/element-mixer")({
+  head: () => ({ meta: buildToolMeta(toolBySlug("element-mixer")!) }),
+  component: ElementMixerPage,
+});
 ```
 
-The page now prints exactly the pages required by the document content (1 page in the user's example, more when real page-breaks or overflow exist).
+Page body inside `<ToolPageShell title="Element Mixer" description="...">`:
+1. Discovery progress bar (`X / N compounds discovered`, per-category breakdown w/ emoji chips).
+2. Filter buttons (All | Metals | Non-Metals | Noble Gases | Lanthanides | Actinides).
+3. Periodic table grid — CSS grid 18 cols × 9 rows + 2 rows for lanthanides/actinides. Mobile: horizontal scroll wrapper (`overflow-x-auto`) with min-width. Each cell = button (keyboard accessible) showing symbol, atomic #, mass; category color tint via inline `--cat-color` var; hover tooltip via title or popover with examples.
+4. Mixer panel — list of selected element cards (max 6), each with +/- 1–10 counter; large glowing "MIX ⚗️" button; "Clear" button.
+5. Result panel — formula (subscripts via `<sub>`); if known → name, description, uses, fun fact, animation; if unknown → heuristic-generated description + "Unknown Territory" badge; "NEW DISCOVERY!" if first time; Share button (copy to clipboard).
+6. `<HowToUse />` with the 4 steps from spec.
+7. `<ToolSeoContent />` with title/description/body/FAQs from spec.
+8. `<RelatedTools currentSlug="element-mixer" />`.
 
----
+## State & persistence
 
-## Fix 3 — Toolbar distributes across the full width on desktop
+- `useState`: `selected: Record<symbol, count>`, `result: { formula, known, data } | null`, `activeFilter`.
+- `localStorage` key `skycally.element-mixer.discovered` → `string[]` of formula keys ever found. Used to compute progress + first-time-discovery flag.
 
-Currently every row is `flex-wrap` + left-aligned, leaving the right half empty on wide screens. Fix purely in CSS, desktop only (≥ 1024 px); mobile/tablet keep current behavior so nothing breaks.
+## Unknown-compound heuristic (in `formula.ts`)
 
-Add to `WP_CSS`:
+Given the set of element categories present, pick the first matching rule:
+- contains noble gas → "Highly unstable — noble gases rarely bond…"
+- contains heavy metal (Z > 80, non-noble) → "Extremely dense and toxic…"
+- only C + H (and ratio sane) → "Could be an unknown hydrocarbon…"
+- metals + oxygen only → "An exotic oxide not yet synthesized…"
+- default → "Theoretical compound — its properties would depend on the bond geometry…"
+Prefix with: "🪐 Not found in nature... or is it?"
 
-```css
-@media (min-width: 1024px) {
-  .wp-toolbar .wp-row { gap: 8px; }
-  /* Push the SaveBadge / right-side cluster fully to the right */
-  .wp-toolbar .wp-row .wp-spacer { flex: 1 1 auto; }
-  /* Let the long selects (Font / Size / Zoom) and button groups breathe */
-  .wp-toolbar .wp-row > .wp-select { flex: 0 1 auto; }
-  .wp-toolbar .wp-row > .wp-btn { flex: 0 0 auto; }
-  /* Distribute buttons so groups span the full row instead of bunching left */
-  .wp-toolbar .wp-row { justify-content: flex-start; }
-  .wp-toolbar .wp-row.wp-row-justify { justify-content: space-between; }
-}
-```
+## Animations (CSS only, scoped via a `<style>` block in the route)
 
-Then, in the JSX, add the `wp-row-justify` modifier class to the four content rows (Font, Paragraph, Insert, Review) — the File row already uses a `wp-spacer` + SaveBadge layout, so it keeps `wp-row` only. The justify-between rule spreads the existing buttons evenly across the full toolbar width on desktop while preserving order, sizes, and active states. Below 1024 px nothing changes.
+Eight keyframe animations matching the spec names (calm, bubble, explosion, crystal, glow, flame, sparkle, danger). Result panel renders a `<div class={`em-anim em-anim-${type}`}/>` overlay behind the compound text. Pure CSS — no libs.
 
-No new buttons added, none removed, no handlers changed.
+## Visual identity
 
----
+- Card surfaces `bg-card`, borders `border-border`, text `text-foreground`, primary actions `bg-primary`.
+- Element category colors stored as CSS custom properties in the scoped style block: noble-gas purple, alkali-metal red, alkaline-earth orange, transition-metal cyan, post-transition slate, metalloid teal, nonmetal yellow, halogen green, lanthanide pink, actinide magenta. Each cell sets `style={{ "--cat": catColor }}` and uses `background: color-mix(in oklab, var(--cat) 14%, var(--card))` + hover glow `box-shadow: 0 0 18px var(--cat)`.
+- Subtle grid background on the table container via repeating linear-gradient.
 
-## Out of scope (explicitly unchanged)
-- Editor extensions, content model, autosave, templates, find/replace, painter, rulers, margins, fullscreen, zoom.
-- SEO block, HowToUse, related tools, route metadata.
-- Mobile toolbar layout.
+## Accessibility & responsiveness
+
+- Each element cell is a `<button>` with `aria-label="Hydrogen, atomic number 1"`. Tab order follows DOM; arrow-key navigation handled by a single `onKeyDown` on the table that moves focus between cells (group/period math).
+- Periodic table wrapper: `overflow-x-auto` with `min-width: 920px` on the grid so mobile gets horizontal scroll exactly as spec.
+- Mixer + Result stack vertically under the table on `<lg` screens; side-by-side on `lg+`.
+
+## Out of scope
+
+- No real bond-geometry chemistry (mixing is name-lookup only).
+- No new npm packages.
+- No changes to other tools or shared components beyond the two registry files.

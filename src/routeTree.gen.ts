@@ -100,6 +100,7 @@ import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time
 import { Route as ToolsFlappyBirdRouteImport } from './routes/tools.flappy-bird'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
+import { Route as ToolsElementMixerRouteImport } from './routes/tools.element-mixer'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
 import { Route as ToolsDnsLeakTestRouteImport } from './routes/tools.dns-leak-test'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
@@ -586,6 +587,11 @@ const ToolsExtractAudioRoute = ToolsExtractAudioRouteImport.update({
   path: '/tools/extract-audio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsElementMixerRoute = ToolsElementMixerRouteImport.update({
+  id: '/tools/element-mixer',
+  path: '/tools/element-mixer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsDocumentScannerRoute = ToolsDocumentScannerRouteImport.update({
   id: '/tools/document-scanner',
   path: '/tools/document-scanner',
@@ -768,6 +774,7 @@ export interface FileRoutesByFullPath {
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
+  '/tools/element-mixer': typeof ToolsElementMixerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
@@ -889,6 +896,7 @@ export interface FileRoutesByTo {
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
+  '/tools/element-mixer': typeof ToolsElementMixerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
@@ -1011,6 +1019,7 @@ export interface FileRoutesById {
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
+  '/tools/element-mixer': typeof ToolsElementMixerRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
@@ -1134,6 +1143,7 @@ export interface FileRouteTypes {
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
+    | '/tools/element-mixer'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/flappy-bird'
@@ -1255,6 +1265,7 @@ export interface FileRouteTypes {
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
+    | '/tools/element-mixer'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/flappy-bird'
@@ -1376,6 +1387,7 @@ export interface FileRouteTypes {
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
+    | '/tools/element-mixer'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/flappy-bird'
@@ -1498,6 +1510,7 @@ export interface RootRouteChildren {
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDnsLeakTestRoute: typeof ToolsDnsLeakTestRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
+  ToolsElementMixerRoute: typeof ToolsElementMixerRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
   ToolsFlappyBirdRoute: typeof ToolsFlappyBirdRoute
@@ -2224,6 +2237,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsExtractAudioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/element-mixer': {
+      id: '/tools/element-mixer'
+      path: '/tools/element-mixer'
+      fullPath: '/tools/element-mixer'
+      preLoaderRoute: typeof ToolsElementMixerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/document-scanner': {
       id: '/tools/document-scanner'
       path: '/tools/document-scanner'
@@ -2461,6 +2481,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDnsLeakTestRoute: ToolsDnsLeakTestRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
+  ToolsElementMixerRoute: ToolsElementMixerRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
   ToolsFlappyBirdRoute: ToolsFlappyBirdRoute,
@@ -2550,12 +2571,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

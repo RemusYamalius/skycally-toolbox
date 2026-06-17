@@ -86,6 +86,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "ssh-key-generator": ["password-generator", "hash-generator", "uuid-generator"],
   "timetable-generator": ["age-calculator", "qr-generator", "word-to-pdf"],
   "world-radio": ["network-speed-test", "ip-address-lookup", "qr-generator"],
+  "element-mixer": ["age-calculator", "bmi-calculator", "wordle"],
 };
 
 export function getRelatedTools(slug: string): Tool[] {

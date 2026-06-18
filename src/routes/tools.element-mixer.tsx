@@ -465,6 +465,14 @@ function ElementMixerPage() {
                 <RotateCcw className="w-3 h-3" /> Reset
               </button>
             )}
+            <button
+              onClick={() => setIsMuted((v) => !v)}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition"
+              title={isMuted ? "Unmute sounds" : "Mute sounds"}
+              aria-label={isMuted ? "Unmute sounds" : "Mute sounds"}
+            >
+              {isMuted ? "🔇" : "🔊"}
+            </button>
           </div>
         </div>
 

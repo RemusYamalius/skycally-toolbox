@@ -284,6 +284,8 @@ function ElementMixerPage() {
   const [isMixing, setIsMixing] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showQuickMore, setShowQuickMore] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const playSound = (fn: () => void) => { if (!isMuted) fn(); };
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -302,7 +304,10 @@ function ElementMixerPage() {
       if (Object.keys(cur).length >= MAX_ELEMENTS) return cur;
       return { ...cur, [symbol]: 1 };
     });
-  }, []);
+    const el = ELEMENT_BY_SYMBOL[symbol];
+    const isMetal = ["alkali","alkaline-earth","transition","post-transition","lanthanide","actinide"].includes(el?.category as string);
+    playSound(isMetal ? sounds.metalClick : sounds.bubblePop);
+  }, [isMuted]);
 
   const changeCount = (symbol: string, delta: number) => {
     setSelected((cur) => {
@@ -313,6 +318,7 @@ function ElementMixerPage() {
       }
       return { ...cur, [symbol]: Math.min(MAX_COUNT, next) };
     });
+    playSound(sounds.tick);
   };
 
   const clearAll = () => {
@@ -324,13 +330,15 @@ function ElementMixerPage() {
   const doMix = () => {
     if (isMixing || Object.keys(selected).length === 0) return;
     setIsMixing(true);
+    playSound(sounds.mixing);
     setTimeout(() => {
       const r = mix(selected);
       setIsMixing(false);
       if (!r) return;
       setResult(r);
       const tag = r.known ? `known:${r.key}` : `unknown:${r.key}`;
-      if (!discovered.has(tag)) {
+      const wasNew = !discovered.has(tag);
+      if (wasNew) {
         const next = new Set(discovered);
         next.add(tag);
         setDiscovered(next);
@@ -338,6 +346,13 @@ function ElementMixerPage() {
         setIsNewDiscovery(true);
       } else {
         setIsNewDiscovery(false);
+      }
+      if (wasNew) {
+        playSound(sounds.discovery);
+      } else if (r.known) {
+        playSound(["danger","explosion"].includes(r.animation) ? sounds.dangerBuzz : sounds.successDing);
+      } else {
+        playSound(sounds.mystery);
       }
       // Scroll to result on mobile
       setTimeout(() => {

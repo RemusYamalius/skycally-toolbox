@@ -64,6 +64,9 @@ import {
   Paintbrush,
   Maximize2,
   Minimize2,
+  Mic,
+  MicOff,
+  BookOpen,
 } from "lucide-react";
 
 export const Route = createFileRoute("/tools/word-processor")({
@@ -563,6 +566,32 @@ function Editor4U() {
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
   }, [isFullscreen]);
+
+  // ── Reading Mode: hides toolbar, shows clean page only ──
+  const [isReadingMode, setIsReadingMode] = useState(false);
+  useEffect(() => {
+    if (!isReadingMode) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") setIsReadingMode(false);
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [isReadingMode]);
+
+  // ── Voice Typing ──
+  const [isListening, setIsListening] = useState(false);
+  const [voiceLang, setVoiceLang] = useState("en-US");
+  const [showVoicePopup, setShowVoicePopup] = useState(false);
+  const recognitionRef = useRef<any>(null);
+
+  const stopListening = useCallback(() => {
+    recognitionRef.current?.stop();
+    setIsListening(false);
+  }, []);
+
+  // ── Live Word Count ──
+  const [liveWordCount, setLiveWordCount] = useState({ words: 0, chars: 0 });
+
   const painterApplyingRef = useRef(false);
   const [pageMinHeight, setPageMinHeight] = useState(PAGE_UNIT_PX);
   const canvasRef = useRef<HTMLDivElement>(null);
@@ -740,10 +769,60 @@ function Editor4U() {
     };
   }, [editor, painterFormat]);
 
+  // ── Voice Typing: startListening needs editor ──
+  const startListening = useCallback(
+    (lang: string) => {
+      const SpeechRecognition = (window as any).SpeechRecognition || (window as any).webkitSpeechRecognition;
+      if (!SpeechRecognition) {
+        alert("Voice typing is not supported in this browser. Try Chrome or Edge.");
+        return;
+      }
+      const rec = new SpeechRecognition();
+      rec.lang = lang;
+      rec.continuous = true;
+      rec.interimResults = false;
+      rec.onresult = (e: any) => {
+        const text = e.results[e.results.length - 1][0].transcript;
+        if (editor)
+          editor
+            .chain()
+            .focus()
+            .insertContent(text + " ")
+            .run();
+      };
+      rec.onerror = () => {
+        setIsListening(false);
+      };
+      rec.onend = () => {
+        setIsListening(false);
+      };
+      rec.start();
+      recognitionRef.current = rec;
+      setIsListening(true);
+      setShowVoicePopup(false);
+    },
+    [editor],
+  );
+
+  // ── Live Word Count effect ──
+  useEffect(() => {
+    if (!editor) return;
+    const update = () => {
+      const text = editor.getText();
+      const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+      setLiveWordCount({ words, chars: text.length });
+    };
+    editor.on("update", update);
+    update();
+    return () => {
+      editor.off("update", update);
+    };
+  }, [editor]);
+
   if (!editor) return <div className="h-[600px] rounded-2xl bg-secondary/50 animate-pulse" />;
 
   return (
-    <div className={`wp-root${isFullscreen ? " wp-fullscreen" : ""}`}>
+    <div className={`wp-root${isFullscreen ? " wp-fullscreen" : ""}${isReadingMode ? " wp-reading-mode" : ""}`}>
       <style>{WP_CSS}</style>
 
       {heroVisible && (
@@ -781,6 +860,16 @@ function Editor4U() {
         onTogglePainter={() => setPainterFormat((cur) => (cur ? null : capturePainterFormat(editor)))}
         isFullscreen={isFullscreen}
         onToggleFullscreen={() => setIsFullscreen((v) => !v)}
+        isReadingMode={isReadingMode}
+        onToggleReadingMode={() => setIsReadingMode((v) => !v)}
+        isListening={isListening}
+        onToggleVoice={() => {
+          if (isListening) {
+            stopListening();
+          } else {
+            setShowVoicePopup(true);
+          }
+        }}
       />
 
       <div className="wp-canvas" ref={canvasRef}>
@@ -831,6 +920,54 @@ function Editor4U() {
 
       {findOpen && <FindReplace editor={editor} onClose={() => setFindOpen(false)} />}
       {templatesOpen && <TemplatesModal editor={editor} onClose={() => setTemplatesOpen(false)} />}
+
+      {/* ── Voice Typing language popup ── */}
+      {showVoicePopup && (
+        <div className="wp-overlay" onClick={() => setShowVoicePopup(false)}>
+          <div className="wp-popup" onClick={(e) => e.stopPropagation()}>
+            <p className="wp-popup-title">🎤 Voice Typing — Select Language</p>
+            {[
+              { code: "en-US", label: "English (US)" },
+              { code: "en-GB", label: "English (UK)" },
+              { code: "ar-SA", label: "العربية" },
+              { code: "fr-FR", label: "Français" },
+              { code: "es-ES", label: "Español" },
+              { code: "de-DE", label: "Deutsch" },
+              { code: "zh-CN", label: "中文 (普通话)" },
+              { code: "pt-BR", label: "Português (BR)" },
+            ].map(({ code, label }) => (
+              <button
+                key={code}
+                className={`wp-popup-item${voiceLang === code ? " wp-popup-item--active" : ""}`}
+                onClick={() => {
+                  setVoiceLang(code);
+                  startListening(code);
+                }}
+              >
+                {label}
+              </button>
+            ))}
+            <button className="wp-popup-cancel" onClick={() => setShowVoicePopup(false)}>
+              Cancel
+            </button>
+          </div>
+        </div>
+      )}
+
+      {/* ── Live Word Count Bar ── */}
+      {!isReadingMode && (
+        <div className="wp-word-bar">
+          <span>{liveWordCount.words.toLocaleString()} words</span>
+          <span className="wp-word-bar-sep">·</span>
+          <span>{liveWordCount.chars.toLocaleString()} characters</span>
+          {isListening && (
+            <>
+              <span className="wp-word-bar-sep">·</span>
+              <span className="wp-word-bar-listening">🎤 Listening…</span>
+            </>
+          )}
+        </div>
+      )}
     </div>
   );
 }
@@ -853,6 +990,10 @@ function Toolbar({
   onTogglePainter,
   isFullscreen,
   onToggleFullscreen,
+  isReadingMode,
+  onToggleReadingMode,
+  isListening,
+  onToggleVoice,
 }: {
   editor: Editor;
   saveState: "idle" | "saving" | "saved" | "error";
@@ -870,6 +1011,10 @@ function Toolbar({
   onTogglePainter: () => void;
   isFullscreen: boolean;
   onToggleFullscreen: () => void;
+  isReadingMode: boolean;
+  onToggleReadingMode: () => void;
+  isListening: boolean;
+  onToggleVoice: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
@@ -966,9 +1111,22 @@ function Toolbar({
 
       const sanitizeFont = (v: any): string | undefined => {
         if (typeof v !== "string") return undefined;
-        const first = v.split(",")[0]?.trim().replace(/^["']|["']$/g, "");
+        const first = v
+          .split(",")[0]
+          ?.trim()
+          .replace(/^["']|["']$/g, "");
         if (!first) return undefined;
-        const generic = new Set(["serif", "sans-serif", "monospace", "cursive", "fantasy", "system-ui", "ui-serif", "ui-sans-serif", "ui-monospace"]);
+        const generic = new Set([
+          "serif",
+          "sans-serif",
+          "monospace",
+          "cursive",
+          "fantasy",
+          "system-ui",
+          "ui-serif",
+          "ui-sans-serif",
+          "ui-monospace",
+        ]);
         if (generic.has(first.toLowerCase())) return undefined;
         return first;
       };
@@ -977,11 +1135,18 @@ function Toolbar({
         let s = v.trim();
         const rgb = /^rgba?\(\s*(\d+)\s*,\s*(\d+)\s*,\s*(\d+)/i.exec(s);
         if (rgb) {
-          const toHex = (n: string) => Math.max(0, Math.min(255, parseInt(n, 10))).toString(16).padStart(2, "0");
+          const toHex = (n: string) =>
+            Math.max(0, Math.min(255, parseInt(n, 10)))
+              .toString(16)
+              .padStart(2, "0");
           return (toHex(rgb[1]) + toHex(rgb[2]) + toHex(rgb[3])).toUpperCase();
         }
         if (s.startsWith("#")) s = s.slice(1);
-        if (/^[0-9a-fA-F]{3}$/.test(s)) s = s.split("").map((c) => c + c).join("");
+        if (/^[0-9a-fA-F]{3}$/.test(s))
+          s = s
+            .split("")
+            .map((c) => c + c)
+            .join("");
         if (/^[0-9a-fA-F]{6}$/.test(s)) return s.toUpperCase();
         return undefined;
       };
@@ -1264,7 +1429,6 @@ function Toolbar({
       setExporting(false);
     }
   };
-
 
   const btn = "wp-btn";
   const active = (on: boolean) => `${btn}${on ? " wp-btn-active" : ""}`;
@@ -1713,6 +1877,20 @@ function Toolbar({
         </button>
         <button className={btn} onClick={() => speak(editor)} title="Read aloud">
           <Volume2 className="w-4 h-4" />
+        </button>
+        <button
+          className={active(isListening)}
+          onClick={onToggleVoice}
+          title={isListening ? "Stop voice typing" : "Voice typing"}
+        >
+          {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
+        </button>
+        <button
+          className={active(isReadingMode)}
+          onClick={onToggleReadingMode}
+          title={isReadingMode ? "Exit reading mode (Esc)" : "Reading mode — focus on content"}
+        >
+          <BookOpen className="w-4 h-4" />
         </button>
         <button className={active(showRulers)} onClick={() => setShowRulers(!showRulers)} title="Toggle rulers">
           <Ruler className="w-4 h-4" />
@@ -2328,6 +2506,87 @@ const WP_CSS = `
 }
 .wp-fullscreen .wp-hero { display: none; }
 .wp-fullscreen .wp-canvas { flex: 1; height: auto !important; min-height: 0; }
+
+/* ── Reading Mode ── */
+.wp-reading-mode .wp-toolbar,
+.wp-reading-mode .wp-hero,
+.wp-reading-mode .wp-ruler-h,
+.wp-reading-mode .wp-ruler-v { display: none !important; }
+.wp-reading-mode .wp-canvas {
+  background: var(--background) !important;
+  padding: 32px 0 !important;
+}
+.wp-reading-mode .wp-page {
+  max-width: 680px;
+  margin: 0 auto !important;
+  box-shadow: none !important;
+  background-image: none !important;
+}
+.wp-reading-mode .wp-editor-content {
+  font-size: 17px !important;
+  line-height: 1.8 !important;
+}
+
+/* ── Voice popup ── */
+.wp-overlay {
+  position: fixed; inset: 0; z-index: 999;
+  background: rgba(0,0,0,0.45);
+  display: flex; align-items: center; justify-content: center;
+}
+.wp-popup {
+  background: var(--card);
+  border: 1px solid var(--border);
+  border-radius: 16px;
+  padding: 24px;
+  min-width: 240px;
+  display: flex; flex-direction: column; gap: 8px;
+  box-shadow: 0 24px 48px rgba(0,0,0,0.4);
+}
+.wp-popup-title {
+  font-weight: 700; font-size: 14px;
+  margin-bottom: 4px; color: var(--foreground);
+}
+.wp-popup-item {
+  display: block; width: 100%; text-align: left;
+  padding: 9px 14px; border-radius: 10px;
+  border: 1px solid transparent;
+  font-size: 13px; color: var(--foreground);
+  background: transparent; cursor: pointer;
+  transition: background 120ms ease, border-color 120ms ease;
+}
+.wp-popup-item:hover { background: var(--secondary); }
+.wp-popup-item--active {
+  background: color-mix(in oklab, var(--primary) 18%, var(--card));
+  border-color: var(--primary);
+  color: var(--primary);
+}
+.wp-popup-cancel {
+  margin-top: 4px; padding: 8px 14px; border-radius: 10px;
+  border: 1px solid var(--border); font-size: 13px;
+  color: var(--muted-foreground); background: transparent;
+  cursor: pointer; transition: background 120ms;
+  text-align: center;
+}
+.wp-popup-cancel:hover { background: var(--secondary); }
+
+/* ── Live Word Count Bar ── */
+.wp-word-bar {
+  display: flex; align-items: center; gap: 8px;
+  padding: 5px 14px;
+  font-size: 11px; color: var(--muted-foreground);
+  border-top: 1px solid var(--border);
+  background: color-mix(in oklab, var(--card) 90%, transparent);
+  user-select: none;
+}
+.wp-word-bar-sep { opacity: 0.4; }
+.wp-word-bar-listening {
+  color: var(--primary);
+  animation: wp-blink 1.2s ease-in-out infinite;
+}
+@keyframes wp-blink {
+  0%, 100% { opacity: 1; }
+  50% { opacity: 0.4; }
+}
 .wp-hero {
   display: flex; align-items: center; justify-content: space-between; gap: 8px;
   background: color-mix(in oklab, var(--cyan-brand) 12%, transparent);
@@ -2343,6 +2602,7 @@ const WP_CSS = `
   padding: 6px; margin-bottom: 10px; display: flex; flex-direction: column; gap: 4px;
 }
 .wp-row { display: flex; flex-wrap: wrap; align-items: center; gap: 4px; }
+.wp-row-justify { justify-content: space-between; }
 .wp-spacer { flex: 1; }
 .wp-btn {
   display: inline-flex; align-items: center; gap: 4px;
@@ -2458,4 +2718,3 @@ const WP_CSS = `
   .wp-page-break::after { display: none !important; }
 }
 `;
-

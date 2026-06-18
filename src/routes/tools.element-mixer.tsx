@@ -32,6 +32,121 @@ export const Route = createFileRoute("/tools/element-mixer")({
   component: ElementMixerPage,
 });
 
+// ── Web Audio sound engine ──────────────────────────────────────────────────
+const audioCtx = (() => {
+  let ctx: AudioContext | null = null;
+  return () => {
+    if (!ctx) ctx = new (window.AudioContext || (window as any).webkitAudioContext)();
+    return ctx;
+  };
+})();
+
+const sounds = {
+  metalClick: () => {
+    const ctx = audioCtx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = "sine"; o.frequency.setValueAtTime(1200, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.08);
+    g.gain.setValueAtTime(0.3, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
+    o.start(); o.stop(ctx.currentTime + 0.1);
+  },
+  bubblePop: () => {
+    const ctx = audioCtx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = "sine"; o.frequency.setValueAtTime(400, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.12);
+    g.gain.setValueAtTime(0.2, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
+    o.start(); o.stop(ctx.currentTime + 0.15);
+  },
+  tick: () => {
+    const ctx = audioCtx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = "square"; o.frequency.setValueAtTime(800, ctx.currentTime);
+    g.gain.setValueAtTime(0.08, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
+    o.start(); o.stop(ctx.currentTime + 0.04);
+  },
+  mixing: () => {
+    const ctx = audioCtx();
+    for (let i = 0; i < 6; i++) {
+      setTimeout(() => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine";
+        o.frequency.setValueAtTime(200 + Math.random() * 300, ctx.currentTime);
+        o.frequency.exponentialRampToValueAtTime(100 + Math.random() * 150, ctx.currentTime + 0.1);
+        g.gain.setValueAtTime(0.12, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
+        o.start(); o.stop(ctx.currentTime + 0.12);
+      }, i * 90);
+    }
+  },
+  successDing: () => {
+    const ctx = audioCtx();
+    [523, 659, 784].forEach((freq, i) => {
+      setTimeout(() => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine"; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.25, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
+        o.start(); o.stop(ctx.currentTime + 0.35);
+      }, i * 100);
+    });
+  },
+  dangerBuzz: () => {
+    const ctx = audioCtx();
+    const o = ctx.createOscillator();
+    const g = ctx.createGain();
+    o.connect(g); g.connect(ctx.destination);
+    o.type = "sawtooth"; o.frequency.setValueAtTime(150, ctx.currentTime);
+    o.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.3);
+    g.gain.setValueAtTime(0.2, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
+    o.start(); o.stop(ctx.currentTime + 0.3);
+  },
+  discovery: () => {
+    const ctx = audioCtx();
+    [392, 523, 659, 784, 1047].forEach((freq, i) => {
+      setTimeout(() => {
+        const o = ctx.createOscillator();
+        const g = ctx.createGain();
+        o.connect(g); g.connect(ctx.destination);
+        o.type = "sine"; o.frequency.value = freq;
+        g.gain.setValueAtTime(0.3, ctx.currentTime);
+        g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
+        o.start(); o.stop(ctx.currentTime + 0.4);
+      }, i * 80);
+    });
+  },
+  mystery: () => {
+    const ctx = audioCtx();
+    const o = ctx.createOscillator();
+    const lfo = ctx.createOscillator();
+    const lfoGain = ctx.createGain();
+    const g = ctx.createGain();
+    lfo.connect(lfoGain); lfoGain.connect(o.frequency);
+    o.connect(g); g.connect(ctx.destination);
+    o.type = "sine"; o.frequency.value = 300;
+    lfo.type = "sine"; lfo.frequency.value = 5;
+    lfoGain.gain.value = 80;
+    g.gain.setValueAtTime(0.2, ctx.currentTime);
+    g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
+    lfo.start(); o.start();
+    lfo.stop(ctx.currentTime + 0.8); o.stop(ctx.currentTime + 0.8);
+  },
+};
+
 // ─── Constants ────────────────────────────────────────────────────────────────
 const STORAGE_KEY = "skycally.element-mixer.discovered";
 const MAX_ELEMENTS = 6;
@@ -169,6 +284,8 @@ function ElementMixerPage() {
   const [isMixing, setIsMixing] = useState(false);
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showQuickMore, setShowQuickMore] = useState(false);
+  const [isMuted, setIsMuted] = useState(false);
+  const playSound = (fn: () => void) => { if (!isMuted) fn(); };
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -187,7 +304,10 @@ function ElementMixerPage() {
       if (Object.keys(cur).length >= MAX_ELEMENTS) return cur;
       return { ...cur, [symbol]: 1 };
     });
-  }, []);
+    const el = ELEMENT_BY_SYMBOL[symbol];
+    const isMetal = ["alkali","alkaline-earth","transition","post-transition","lanthanide","actinide"].includes(el?.category as string);
+    playSound(isMetal ? sounds.metalClick : sounds.bubblePop);
+  }, [isMuted]);
 
   const changeCount = (symbol: string, delta: number) => {
     setSelected((cur) => {
@@ -198,6 +318,7 @@ function ElementMixerPage() {
       }
       return { ...cur, [symbol]: Math.min(MAX_COUNT, next) };
     });
+    playSound(sounds.tick);
   };
 
   const clearAll = () => {
@@ -209,13 +330,15 @@ function ElementMixerPage() {
   const doMix = () => {
     if (isMixing || Object.keys(selected).length === 0) return;
     setIsMixing(true);
+    playSound(sounds.mixing);
     setTimeout(() => {
       const r = mix(selected);
       setIsMixing(false);
       if (!r) return;
       setResult(r);
       const tag = r.known ? `known:${r.key}` : `unknown:${r.key}`;
-      if (!discovered.has(tag)) {
+      const wasNew = !discovered.has(tag);
+      if (wasNew) {
         const next = new Set(discovered);
         next.add(tag);
         setDiscovered(next);
@@ -223,6 +346,13 @@ function ElementMixerPage() {
         setIsNewDiscovery(true);
       } else {
         setIsNewDiscovery(false);
+      }
+      if (wasNew) {
+        playSound(sounds.discovery);
+      } else if (r.known) {
+        playSound(["danger","explosion"].includes(r.animation) ? sounds.dangerBuzz : sounds.successDing);
+      } else {
+        playSound(sounds.mystery);
       }
       // Scroll to result on mobile
       setTimeout(() => {
@@ -335,6 +465,14 @@ function ElementMixerPage() {
                 <RotateCcw className="w-3 h-3" /> Reset
               </button>
             )}
+            <button
+              onClick={() => setIsMuted((v) => !v)}
+              className="flex items-center gap-1 text-xs text-muted-foreground hover:text-foreground transition"
+              title={isMuted ? "Unmute sounds" : "Mute sounds"}
+              aria-label={isMuted ? "Unmute sounds" : "Mute sounds"}
+            >
+              {isMuted ? "🔇" : "🔊"}
+            </button>
           </div>
         </div>
 

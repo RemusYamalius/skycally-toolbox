@@ -1,71 +1,52 @@
-# Plan — Element Mixer (/tools/element-mixer)
+## Plan: Element Mixer Improvements
 
-A self-contained chemistry sandbox tool. All data hardcoded, no new dependencies, dark theme via CSS variables, fully responsive.
+### Improvement 1 — Sound Effects for Element Mixer
 
-## Files to create
+**File:** `src/routes/tools.element-mixer.tsx`
 
-1. `src/data/elements.ts` — full 118-element dataset (symbol, atomic number, mass, name, category, group/period for grid placement, real-world examples).
-2. `src/data/compounds.ts` — hardcoded compound database (all formulas from the spec: H2O, CO2, O2, H2, N2, NaCl, CaCO3, MgO, KCl, SiO2, Fe2O3, Al2O3, HCl, H2SO4, NaOH, NH3, HNO3, CH4, C2H5OH, C6H12O6, C12H22O11, C3H8, C8H18, H2O2, NO2, SO2, N2O, Fe3O4, TiO2, NaHCO3, CaF2, PbS, AgCl, ZnO, MnO2, Na2CO3, KNO3, C, Si, Au, Ag). Each entry: canonical formula key, name, description, fun fact, animation type, discovery category.
-3. `src/routes/tools.element-mixer.tsx` — the page route.
-4. `src/lib/element-mixer/formula.ts` — small helpers: build canonical formula from `{symbol: count}` map (Hill order for organics: C, H, then alphabetical; otherwise alphabetical by symbol), lookup against compounds DB, generate "unknown compound" description heuristics.
+Add a self-contained Web Audio API sound engine inside the component. No external files, no npm packages, no imports needed.
 
-## Files to edit
+1. **Sound engine** — Insert the `audioCtx` lazy singleton + `sounds` object (metalClick, bubblePop, tick, mixing, successDing, dangerBuzz, discovery, mystery) after the imports block and before the constants.
 
-- `src/lib/tools.ts` — add tool entry. Note: project doesn't have a "Science" category; map to `utility` (with `categories: ["utility","games"]` so it appears alongside fun tools). Icon: `FlaskConical` from lucide-react (already-installed pkg). Slug/name/description as specified.
-- `src/lib/related-tools.ts` — add `"element-mixer": ["age-calculator", "bmi-calculator", "wordle", "sudoku"]` (max 3 used by component — keep first 3; current map uses 3, will match convention).
+2. **State & helper** — Add `const [isMuted, setIsMuted] = useState(false);` and `const playSound = (fn: () => void) => { if (!isMuted) fn(); };` inside `ElementMixerPage`.
 
-## Route structure (mirrors other tools)
+3. **Mute button** — Add a 🔊/🔇 toggle button next to the Reset button in the Discovery progress header.
 
-```tsx
-createFileRoute("/tools/element-mixer")({
-  head: () => ({ meta: buildToolMeta(toolBySlug("element-mixer")!) }),
-  component: ElementMixerPage,
-});
+4. **Wire interactions:**
+   - **addElement** — After `setSelected`, look up the element category. If metal (alkali, alkaline-earth, transition, post-transition, lanthanide, actinide) → `sounds.metalClick()`, else → `sounds.bubblePop()`.
+   - **changeCount** — After `setSelected`, play `sounds.tick()`.
+   - **doMix** — Inside the `setTimeout` callback, right after `setIsMixing(true)` and before `mix()`, play `sounds.mixing()`.
+   - **Result reveal** — After computing `wasNew` (local boolean before `setIsNewDiscovery`), play:
+     - `sounds.discovery()` if `wasNew`
+     - `sounds.dangerBuzz()` if `r.known` and `r.animation` is `"danger"` or `"explosion"`
+     - `sounds.successDing()` if `r.known` and not dangerous
+     - `sounds.mystery()` if unknown compound
+
+### Improvement 2 — Fix Tool Card Colors
+
+**File:** `src/lib/tools.ts`
+
+The Element Mixer card is green, but because it has `categories: ["utility", "games"]`, it also renders in the Games section where every neighbor is purple (`var(--violet-brand)`). The card itself pulls color from `tool.category` ("utility" → green), creating a mismatch in the Games section.
+
+**Surgical fix:** Remove `"games"` from the `categories` array on the Element Mixer entry so it only appears in the Utility Tools section. This eliminates the cross-category mismatch without touching any other tool, the ToolCard component, or category colors.
+
+Before:
+```typescript
+{ slug: "element-mixer", ..., category: "utility", categories: ["utility", "games"], ... }
 ```
 
-Page body inside `<ToolPageShell title="Element Mixer" description="...">`:
-1. Discovery progress bar (`X / N compounds discovered`, per-category breakdown w/ emoji chips).
-2. Filter buttons (All | Metals | Non-Metals | Noble Gases | Lanthanides | Actinides).
-3. Periodic table grid — CSS grid 18 cols × 9 rows + 2 rows for lanthanides/actinides. Mobile: horizontal scroll wrapper (`overflow-x-auto`) with min-width. Each cell = button (keyboard accessible) showing symbol, atomic #, mass; category color tint via inline `--cat-color` var; hover tooltip via title or popover with examples.
-4. Mixer panel — list of selected element cards (max 6), each with +/- 1–10 counter; large glowing "MIX ⚗️" button; "Clear" button.
-5. Result panel — formula (subscripts via `<sub>`); if known → name, description, uses, fun fact, animation; if unknown → heuristic-generated description + "Unknown Territory" badge; "NEW DISCOVERY!" if first time; Share button (copy to clipboard).
-6. `<HowToUse />` with the 4 steps from spec.
-7. `<ToolSeoContent />` with title/description/body/FAQs from spec.
-8. `<RelatedTools currentSlug="element-mixer" />`.
+After:
+```typescript
+{ slug: "element-mixer", ..., category: "utility", ... }
+```
 
-## State & persistence
+This keeps Element Mixer in the Utility Tools section alongside QR Generator, Currency Converter, etc. — all using the same green `var(--green-brand)` color from `categoryMeta.utility`.
 
-- `useState`: `selected: Record<symbol, count>`, `result: { formula, known, data } | null`, `activeFilter`.
-- `localStorage` key `skycally.element-mixer.discovered` → `string[]` of formula keys ever found. Used to compute progress + first-time-discovery flag.
+---
 
-## Unknown-compound heuristic (in `formula.ts`)
-
-Given the set of element categories present, pick the first matching rule:
-- contains noble gas → "Highly unstable — noble gases rarely bond…"
-- contains heavy metal (Z > 80, non-noble) → "Extremely dense and toxic…"
-- only C + H (and ratio sane) → "Could be an unknown hydrocarbon…"
-- metals + oxygen only → "An exotic oxide not yet synthesized…"
-- default → "Theoretical compound — its properties would depend on the bond geometry…"
-Prefix with: "🪐 Not found in nature... or is it?"
-
-## Animations (CSS only, scoped via a `<style>` block in the route)
-
-Eight keyframe animations matching the spec names (calm, bubble, explosion, crystal, glow, flame, sparkle, danger). Result panel renders a `<div class={`em-anim em-anim-${type}`}/>` overlay behind the compound text. Pure CSS — no libs.
-
-## Visual identity
-
-- Card surfaces `bg-card`, borders `border-border`, text `text-foreground`, primary actions `bg-primary`.
-- Element category colors stored as CSS custom properties in the scoped style block: noble-gas purple, alkali-metal red, alkaline-earth orange, transition-metal cyan, post-transition slate, metalloid teal, nonmetal yellow, halogen green, lanthanide pink, actinide magenta. Each cell sets `style={{ "--cat": catColor }}` and uses `background: color-mix(in oklab, var(--cat) 14%, var(--card))` + hover glow `box-shadow: 0 0 18px var(--cat)`.
-- Subtle grid background on the table container via repeating linear-gradient.
-
-## Accessibility & responsiveness
-
-- Each element cell is a `<button>` with `aria-label="Hydrogen, atomic number 1"`. Tab order follows DOM; arrow-key navigation handled by a single `onKeyDown` on the table that moves focus between cells (group/period math).
-- Periodic table wrapper: `overflow-x-auto` with `min-width: 920px` on the grid so mobile gets horizontal scroll exactly as spec.
-- Mixer + Result stack vertically under the table on `<lg` screens; side-by-side on `lg+`.
-
-## Out of scope
-
-- No real bond-geometry chemistry (mixing is name-lookup only).
-- No new npm packages.
-- No changes to other tools or shared components beyond the two registry files.
+**Constraints respected:**
+- No new npm packages
+- No external audio files
+- No routing or ToolPageShell changes
+- No game logic, compounds DB, or CSS animation changes
+- Mute state is session-only (no localStorage)

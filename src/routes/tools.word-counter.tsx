@@ -1,81 +1,362 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
-import { useState, useMemo } from "react";
+import { useState, useMemo, useCallback } from "react";
+import { Copy, Trash2, ClipboardPaste, BarChart2 } from "lucide-react";
+import { toast } from "sonner";
+
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
-
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/word-counter")({
   head: () => buildToolMeta(toolBySlug("word-counter", tools)),
-  component: WordCounter,
+  component: WordCounterPage,
 });
 
-function WordCounter() {
+// ─── Helpers ──────────────────────────────────────────────────────────────────
+
+/** Returns the top N most frequent words (ignoring stop-words & short words) */
+const STOP_WORDS = new Set([
+  "the",
+  "a",
+  "an",
+  "and",
+  "or",
+  "but",
+  "in",
+  "on",
+  "at",
+  "to",
+  "for",
+  "of",
+  "with",
+  "by",
+  "from",
+  "is",
+  "it",
+  "its",
+  "was",
+  "are",
+  "be",
+  "been",
+  "has",
+  "have",
+  "had",
+  "do",
+  "does",
+  "did",
+  "will",
+  "would",
+  "could",
+  "should",
+  "may",
+  "might",
+  "this",
+  "that",
+  "these",
+  "those",
+  "i",
+  "you",
+  "he",
+  "she",
+  "we",
+  "they",
+  "my",
+  "your",
+  "his",
+  "her",
+  "our",
+  "their",
+  "not",
+  "no",
+  "so",
+  "if",
+  "as",
+  "up",
+  "out",
+  "about",
+  "into",
+  "than",
+  "then",
+  "there",
+  "when",
+  "where",
+  "who",
+  "which",
+  "what",
+  "how",
+]);
+
+function topWords(text: string, n = 10): Array<{ word: string; count: number }> {
+  if (!text.trim()) return [];
+  const freq: Record<string, number> = {};
+  const words = text.toLowerCase().match(/\b[a-záéíóúàèìòùäëïöüâêîôûçñ']{3,}\b/g) || [];
+  for (const w of words) {
+    if (!STOP_WORDS.has(w)) freq[w] = (freq[w] ?? 0) + 1;
+  }
+  return Object.entries(freq)
+    .sort((a, b) => b[1] - a[1])
+    .slice(0, n)
+    .map(([word, count]) => ({ word, count }));
+}
+
+// ─── Main component ───────────────────────────────────────────────────────────
+function WordCounterPage() {
   const [text, setText] = useState("");
+  const [showTopWords, setShowTopWords] = useState(false);
 
   const stats = useMemo(() => {
-    const words = text.trim() === "" ? 0 : text.trim().split(/\s+/).length;
+    const trimmed = text.trim();
+    const words = trimmed === "" ? 0 : trimmed.split(/\s+/).length;
     const chars = text.length;
-    const charsNoSpaces = text.replace(/\s/g, "").length;
-    const sentences = text.trim() === "" ? 0 : text.split(/[.!?]+/).filter((s) => s.trim()).length;
-    const paragraphs = text.trim() === "" ? 0 : text.split(/\n+/).filter((p) => p.trim()).length;
-    const readingTime = Math.ceil(words / 200);
-    return { words, chars, charsNoSpaces, sentences, paragraphs, readingTime };
+    const charsNoSp = text.replace(/\s/g, "").length;
+    const sentences =
+      trimmed === "" ? 0 : (text.match(/[^.!?]*[.!?]+/g) || []).filter((s) => s.trim().length > 0).length;
+    const paragraphs = trimmed === "" ? 0 : text.split(/\n{2,}|\n/).filter((p) => p.trim().length > 0).length;
+    const lines = trimmed === "" ? 0 : text.split(/\n/).length;
+    // Reading: 238 wpm (silent adult average), Speaking: 130 wpm
+    const readMin = Math.max(1, Math.ceil(words / 238));
+    const speakMin = Math.max(1, Math.ceil(words / 130));
+    const uniqueWords = trimmed === "" ? 0 : new Set(trimmed.toLowerCase().match(/\b\w+\b/g) || []).size;
+    const avgWordLen = words === 0 ? 0 : (charsNoSp / words).toFixed(1);
+    return { words, chars, charsNoSp, sentences, paragraphs, lines, readMin, speakMin, uniqueWords, avgWordLen };
   }, [text]);
 
-  const clear = () => setText("");
-  const copy = () => navigator.clipboard.writeText(text);
+  const top = useMemo(() => (showTopWords ? topWords(text) : []), [text, showTopWords]);
+
+  const clear = () => {
+    setText("");
+    setShowTopWords(false);
+  };
+
+  const copy = useCallback(async () => {
+    if (!text) return;
+    try {
+      await navigator.clipboard.writeText(text);
+      toast.success("Copied to clipboard!");
+    } catch {
+      toast.error("Copy failed — try selecting manually.");
+    }
+  }, [text]);
+
+  const paste = useCallback(async () => {
+    try {
+      const t = await navigator.clipboard.readText();
+      setText(t);
+      toast.success("Text pasted!");
+    } catch {
+      toast.error("Paste failed — try Ctrl+V in the text area.");
+    }
+  }, []);
+
+  // Primary stats (always shown)
+  const primary = [
+    { label: "Words", value: stats.words.toLocaleString(), color: "text-cyan-400" },
+    { label: "Characters", value: stats.chars.toLocaleString(), color: "text-violet-400" },
+    { label: "No Spaces", value: stats.charsNoSp.toLocaleString(), color: "text-blue-400" },
+    { label: "Sentences", value: stats.sentences.toLocaleString(), color: "text-emerald-400" },
+    { label: "Paragraphs", value: stats.paragraphs.toLocaleString(), color: "text-amber-400" },
+    { label: "Lines", value: stats.lines.toLocaleString(), color: "text-pink-400" },
+  ];
+
+  // Secondary stats
+  const secondary = [
+    { label: "Read Time", value: `~${stats.readMin} min`, hint: "at 238 wpm" },
+    { label: "Speak Time", value: `~${stats.speakMin} min`, hint: "at 130 wpm" },
+    { label: "Unique Words", value: stats.uniqueWords.toLocaleString(), hint: "" },
+    { label: "Avg Word Len", value: `${stats.avgWordLen} chars`, hint: "" },
+  ];
 
   return (
-    <ToolPageShell title="Word Counter" description="Count words, characters, sentences and estimate reading time.">
-      <div className="space-y-5">
-        <div className="grid grid-cols-3 gap-3">
-          {[
-            { label: "Words", value: stats.words },
-            { label: "Characters", value: stats.chars },
-            { label: "No Spaces", value: stats.charsNoSpaces },
-            { label: "Sentences", value: stats.sentences },
-            { label: "Paragraphs", value: stats.paragraphs },
-            { label: "Read Time", value: `${stats.readingTime} min` },
-          ].map(({ label, value }) => (
-            <div key={label} className="bg-card border border-border rounded-2xl p-4 text-center">
-              <p className="text-2xl font-bold text-cyan-400 font-mono">{value}</p>
-              <p className="text-xs text-muted-foreground mt-1">{label}</p>
+    <ToolPageShell
+      title="Word Counter"
+      description="Count words, characters, sentences, paragraphs and reading time — updates live as you type."
+    >
+      <div className="space-y-4">
+        {/* ── Primary stats ── */}
+        <div className="grid grid-cols-3 sm:grid-cols-6 gap-2.5">
+          {primary.map(({ label, value, color }) => (
+            <div key={label} className="bg-card border border-border rounded-2xl p-3 text-center">
+              <p className={`text-2xl font-bold font-mono ${color}`}>{value}</p>
+              <p className="text-[11px] text-muted-foreground mt-1 leading-tight">{label}</p>
             </div>
           ))}
         </div>
 
-        <div className="bg-card border border-border rounded-2xl p-4">
-          <div className="flex justify-between items-center mb-3">
-            <span className="text-xs text-muted-foreground uppercase tracking-wider">Your Text</span>
-            <div className="flex gap-3">
-              <button onClick={copy} className="text-xs text-muted-foreground hover:text-cyan-400 transition-colors">Copy</button>
-              <button onClick={clear} className="text-xs text-muted-foreground hover:text-red-400 transition-colors">Clear</button>
+        {/* ── Secondary stats ── */}
+        <div className="grid grid-cols-2 sm:grid-cols-4 gap-2.5">
+          {secondary.map(({ label, value, hint }) => (
+            <div key={label} className="bg-card border border-border rounded-xl p-3 text-center">
+              <p className="text-lg font-bold text-foreground font-mono">{value}</p>
+              <p className="text-[11px] text-muted-foreground mt-0.5 leading-tight">{label}</p>
+              {hint && <p className="text-[9px] text-muted-foreground/60 mt-0.5">{hint}</p>}
+            </div>
+          ))}
+        </div>
+
+        {/* ── Textarea ── */}
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
+          <div className="flex items-center justify-between px-4 py-2.5 border-b border-border">
+            <span className="text-xs text-muted-foreground font-medium uppercase tracking-wider">Your Text</span>
+            <div className="flex items-center gap-1">
+              <button
+                onClick={paste}
+                title="Paste from clipboard"
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-secondary transition"
+              >
+                <ClipboardPaste className="w-3.5 h-3.5" /> Paste
+              </button>
+              <button
+                onClick={copy}
+                title="Copy text"
+                disabled={!text}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-foreground hover:bg-secondary transition disabled:opacity-40"
+              >
+                <Copy className="w-3.5 h-3.5" /> Copy
+              </button>
+              <button
+                onClick={clear}
+                title="Clear text"
+                disabled={!text}
+                className="inline-flex items-center gap-1.5 px-2.5 py-1.5 rounded-lg text-xs text-muted-foreground hover:text-red-400 hover:bg-red-400/10 transition disabled:opacity-40"
+              >
+                <Trash2 className="w-3.5 h-3.5" /> Clear
+              </button>
             </div>
           </div>
           <textarea
             value={text}
             onChange={(e) => setText(e.target.value)}
-            placeholder="Start typing or paste your text here..."
-            className="w-full bg-transparent text-foreground placeholder:text-muted-foreground/60 resize-none outline-none text-sm min-h-[280px] leading-relaxed"
+            placeholder="Start typing or paste your text here — stats update in real time..."
+            className="w-full bg-transparent text-foreground placeholder:text-muted-foreground/50 resize-none outline-none text-sm min-h-[300px] leading-relaxed p-4"
+            spellCheck
+            aria-label="Text input for word counting"
           />
+          {/* Live word count foot bar */}
+          {text && (
+            <div className="px-4 py-2 border-t border-border bg-secondary/30 text-xs text-muted-foreground flex flex-wrap gap-x-4 gap-y-1">
+              <span>
+                <span className="text-foreground font-semibold">{stats.words.toLocaleString()}</span> words
+              </span>
+              <span>
+                <span className="text-foreground font-semibold">{stats.chars.toLocaleString()}</span> characters
+              </span>
+              <span>
+                <span className="text-foreground font-semibold">{stats.sentences.toLocaleString()}</span> sentences
+              </span>
+            </div>
+          )}
+        </div>
+
+        {/* ── Top words ── */}
+        <div className="bg-card border border-border rounded-2xl overflow-hidden">
+          <button
+            onClick={() => setShowTopWords((v) => !v)}
+            className="w-full flex items-center justify-between px-4 py-3 hover:bg-secondary/50 transition"
+          >
+            <span className="inline-flex items-center gap-2 text-sm font-medium">
+              <BarChart2 className="w-4 h-4 text-cyan-400" /> Top Words
+              {stats.words > 0 && <span className="text-xs text-muted-foreground">(excluding common stop words)</span>}
+            </span>
+            <span className="text-xs text-muted-foreground">{showTopWords ? "Hide ▲" : "Show ▼"}</span>
+          </button>
+
+          {showTopWords && (
+            <div className="px-4 pb-4">
+              {top.length === 0 ? (
+                <p className="text-sm text-muted-foreground py-2">No significant words found yet.</p>
+              ) : (
+                <div className="space-y-2">
+                  {top.map(({ word, count }, i) => {
+                    const pct = Math.round((count / top[0].count) * 100);
+                    return (
+                      <div key={word} className="flex items-center gap-3">
+                        <span className="w-5 text-xs text-muted-foreground text-right shrink-0">{i + 1}</span>
+                        <div className="flex-1 min-w-0">
+                          <div className="flex items-center justify-between mb-0.5">
+                            <span className="text-sm font-medium truncate">{word}</span>
+                            <span className="text-xs text-muted-foreground ml-2 shrink-0">×{count}</span>
+                          </div>
+                          <div className="h-1.5 rounded-full bg-secondary overflow-hidden">
+                            <div
+                              className="h-full bg-cyan-500 rounded-full transition-all duration-300"
+                              style={{ width: `${pct}%` }}
+                            />
+                          </div>
+                        </div>
+                      </div>
+                    );
+                  })}
+                </div>
+              )}
+            </div>
+          )}
         </div>
       </div>
 
-      <HowToUse steps={[
-        "Paste or type your text into the box.",
-        "Stats update live: words, characters, sentences, paragraphs and reading time.",
-        "Use Copy or Clear to manage your text.",
-      ]} />
-          <RelatedTools currentSlug="word-counter" />
-          <ToolSeoContent
-        title="Free Word Counter — Count Words, Characters & Reading Time"
-        description="Skycally's Word Counter gives you instant statistics about any text: word count, character count (with and without spaces), sentence count, paragraph count, and estimated reading time. It updates in real-time as you type or paste text. Perfect for writers, students, and content creators. Free, no signup required."
-        body={[]}
-        faqs={[{"question":"Does the counter update in real-time?","answer":"Yes, all statistics update instantly as you type or paste text."},{"question":"How is reading time calculated?","answer":"Reading time is estimated based on an average reading speed of 200 words per minute."},{"question":"Is there a character or word limit?","answer":"There is no limit — paste as much text as you need."},{"question":"Can I count words in languages other than English?","answer":"Yes, the word counter works with any language that uses spaces between words."},{"question":"Is my text stored or sent anywhere?","answer":"No. Everything runs locally in your browser."}]}
+      <HowToUse
+        steps={[
+          "Type or paste your text into the box — all stats update instantly as you type.",
+          "The primary row shows Words, Characters, Characters without Spaces, Sentences, Paragraphs and Lines.",
+          "The secondary row shows estimated Reading Time (238 wpm), Speaking Time (130 wpm), Unique Word count and Average Word Length.",
+          "Click 'Top Words' to reveal the most frequent meaningful words in your text, with a visual frequency bar.",
+        ]}
+      />
+
+      <RelatedTools currentSlug="word-counter" />
+
+      <ToolSeoContent
+        title="Free Word Counter — Count Words, Characters, Sentences & Reading Time Online"
+        description="Instantly count words, characters (with and without spaces), sentences, paragraphs and lines in any text. Estimates reading time and speaking time. Updates live as you type. Free, no signup, no limit."
+        body={[
+          "Skycally's Word Counter gives you a complete picture of any text in real time. Paste an essay, blog post, email, speech or tweet and instantly see the word count, character count (with and without spaces), sentence count, paragraph count, line count, estimated silent reading time, estimated speaking time, unique word count and average word length — all updating as you type, with no button to press. The tool works entirely in your browser and never sends your text to any server.",
+          "Writers use word counters to hit publication targets — a standard news article runs 400–800 words, a blog post 1,000–2,500 words, a short story 1,000–7,500 words, and a novel 80,000+ words. Academic and professional writing platforms impose strict word or character limits: Twitter/X allows 280 characters per post, LinkedIn recommendations cap at 3,000 characters, and most university essays specify a word count range. Skycally's counter covers all these cases at once. The 'Top Words' feature also surfaces your most-used terms, which doubles as a basic keyword density tool for SEO writers.",
+          "Reading time is calculated at 238 words per minute — the average silent reading speed for adult English readers, based on research published in the journal Reading and Writing. Speaking time uses 130 words per minute, the pace recommended for presentations and podcasts to be clearly understood. Both estimates are approximations and vary by content complexity and individual reader speed, but they give a reliable starting point for planning speeches, video scripts and blog posts.",
+        ]}
+        faqs={[
+          {
+            question: "Does the word counter update in real time?",
+            answer:
+              "Yes. Every stat — words, characters, sentences, paragraphs, lines, reading time, speaking time, unique words and average word length — updates instantly as you type or paste text. There is no submit button.",
+          },
+          {
+            question: "How is reading time calculated?",
+            answer:
+              "Reading time is estimated at 238 words per minute, which is the average silent reading speed for adults according to research published in the journal Reading and Writing (2019). So a 500-word article takes approximately 2 minutes to read.",
+          },
+          {
+            question: "How is speaking time calculated?",
+            answer:
+              "Speaking time uses 130 words per minute — the recommended pace for presentations, speeches and podcasts to be clearly understood by an audience. A 1,300-word speech would take roughly 10 minutes to deliver at that pace.",
+          },
+          {
+            question: "Is there a word or character limit?",
+            answer:
+              "No. Paste as much text as you need — the counter handles novels, research papers, and large documents. Performance stays smooth because all counting happens locally in your browser without any server round-trips.",
+          },
+          {
+            question: "Does it count words in other languages?",
+            answer:
+              "Yes, for any language that separates words with spaces — including French, Spanish, Arabic, German, Portuguese and more. Languages without spaces between words (such as Chinese, Japanese and Thai) will not return an accurate word count, though the character count will still be correct.",
+          },
+          {
+            question: "What does the 'Top Words' feature do?",
+            answer:
+              "Top Words shows the 10 most frequently used meaningful words in your text, ranked by count with a visual bar. Common words like 'the', 'a', 'and' are filtered out automatically. This is useful for checking keyword density in SEO content or spotting overused words in your writing.",
+          },
+          {
+            question: "Is my text saved or sent to a server?",
+            answer:
+              "No. The word counter runs entirely in your browser. Your text is never uploaded, stored, or sent anywhere. You can even use it offline once the page has loaded.",
+          },
+          {
+            question: "How does this compare to Microsoft Word's word counter?",
+            answer:
+              "Results are very close. Microsoft Word counts contractions (like 'don't') as one word — so does Skycally's counter. Minor differences can occur with hyphenated words or punctuation-heavy text, but for standard prose the counts will match.",
+          },
+        ]}
       />
     </ToolPageShell>
   );

@@ -34,9 +34,22 @@ const formatTime = (s: number) =>
     .toString()
     .padStart(2, "0")}:${(s % 60).toString().padStart(2, "0")}`;
 
-const getBestMimeType = () => {
-  const types = ["video/webm;codecs=vp9,opus", "video/webm;codecs=vp8,opus", "video/webm", "video/mp4"];
-  return types.find((t) => MediaRecorder.isTypeSupported(t)) || "";
+const getBestMimeType = (): string => {
+  const candidates = [
+    "video/mp4;codecs=avc1.42E01E,mp4a.40.2", // H.264+AAC — best VLC/player compat
+    "video/mp4",
+    "video/webm;codecs=vp8,opus", // VP8 — VLC 2.x+
+    "video/webm;codecs=vp8",
+    "video/webm;codecs=vp9,opus", // VP9 — VLC 3.x+
+    "video/webm;codecs=vp9",
+    "video/webm",
+  ];
+  return candidates.find((t) => MediaRecorder.isTypeSupported(t)) ?? "";
+};
+
+const getFileExtension = (mime: string) => {
+  if (mime.startsWith("video/mp4")) return "mp4";
+  return "webm";
 };
 
 type RecState = "idle" | "recording" | "paused" | "stopped";
@@ -46,6 +59,7 @@ function ScreenRecorderDesktop() {
   const [state, setState] = useState<RecState>("idle");
   const [duration, setDuration] = useState(0);
   const [videoUrl, setVideoUrl] = useState("");
+  const [mimeUsed, setMimeUsed] = useState("");
   const [withAudio, setWithAudio] = useState(true);
   const [quality, setQuality] = useState<"720" | "1080">("1080");
 
@@ -67,6 +81,7 @@ function ScreenRecorderDesktop() {
 
       chunksRef.current = [];
       const mime = getBestMimeType();
+      setMimeUsed(mime);
       const recorder = new MediaRecorder(stream, mime ? { mimeType: mime } : undefined);
 
       recorder.ondataavailable = (e) => {
@@ -117,9 +132,10 @@ function ScreenRecorderDesktop() {
 
   const download = () => {
     if (!videoUrl) return;
+    const ext = getFileExtension(mimeUsed);
     const a = document.createElement("a");
     a.href = videoUrl;
-    a.download = `screen-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.webm`;
+    a.download = `screen-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.${ext}`;
     a.click();
   };
 
@@ -127,15 +143,18 @@ function ScreenRecorderDesktop() {
     setVideoUrl("");
     setState("idle");
     setDuration(0);
+    setMimeUsed("");
   };
 
   useEffect(() => () => clearTimer(), []);
+
+  const ext = getFileExtension(mimeUsed);
 
   return (
     <div className="space-y-4">
       {/* Options row — only shown when idle */}
       {state === "idle" && (
-        <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
+        <div className="rounded-2xl border border-border bg-card p-4 space-y-4">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Recording Options</p>
           <div className="flex flex-wrap gap-3">
             {/* Audio toggle */}
@@ -165,10 +184,26 @@ function ScreenRecorderDesktop() {
             ))}
           </div>
 
-          {/* Browser dialog hint */}
-          <div className="rounded-xl bg-secondary/50 border border-border p-3 text-xs text-muted-foreground">
-            💡 After clicking Start, your browser will show a dialog asking <strong>which screen, window or tab</strong>{" "}
-            to share. Choose one and confirm.
+          {/* What to record — guide */}
+          <div>
+            <p className="text-xs font-semibold text-muted-foreground mb-2">What can you record?</p>
+            <div className="grid grid-cols-3 gap-2">
+              {[
+                { icon: "🖥️", label: "Entire Screen", desc: "Everything visible on your monitor" },
+                { icon: "🪟", label: "App Window", desc: "One specific application window" },
+                { icon: "🗂️", label: "Browser Tab", desc: "A single tab — great for web demos" },
+              ].map((opt) => (
+                <div key={opt.label} className="rounded-xl border border-border bg-secondary/30 p-3 text-center">
+                  <p className="text-xl mb-1">{opt.icon}</p>
+                  <p className="text-xs font-semibold">{opt.label}</p>
+                  <p className="text-[10px] text-muted-foreground mt-0.5">{opt.desc}</p>
+                </div>
+              ))}
+            </div>
+            <p className="text-xs text-muted-foreground mt-2">
+              💡 After clicking Start, your browser will ask you to choose one of the above. Select it and click{" "}
+              <strong>Share</strong>.
+            </p>
           </div>
         </div>
       )}
@@ -254,8 +289,14 @@ function ScreenRecorderDesktop() {
                 onClick={download}
                 className="w-full py-3.5 rounded-xl bg-gradient-to-r from-green-500 to-emerald-600 text-white font-semibold hover:opacity-90 transition shadow-lg shadow-green-500/20 flex items-center justify-center gap-2"
               >
-                <Download className="w-4 h-4" /> Download Recording (.webm)
+                <Download className="w-4 h-4" /> Download Recording (.{ext})
               </button>
+              {ext === "webm" && (
+                <p className="text-xs text-muted-foreground text-center">
+                  💡 WebM plays in Chrome & Firefox. To open in VLC or Windows Media Player, convert to MP4 using our{" "}
+                  <strong>Video Converter</strong> tool.
+                </p>
+              )}
               <button
                 onClick={reset}
                 className="w-full py-2.5 rounded-xl border border-border text-muted-foreground hover:bg-secondary hover:text-foreground transition flex items-center justify-center gap-2 text-sm"
@@ -301,6 +342,7 @@ function CameraRecorderMobile() {
   const [state, setState] = useState<RecState>("idle");
   const [duration, setDuration] = useState(0);
   const [videoUrl, setVideoUrl] = useState("");
+  const [mimeUsed, setMimeUsed] = useState("");
   const [facingMode, setFacingMode] = useState<"user" | "environment">("user");
   const [withAudio, setWithAudio] = useState(true);
 
@@ -349,6 +391,7 @@ function CameraRecorderMobile() {
     if (!streamRef.current) return;
     chunksRef.current = [];
     const mime = getBestMimeType();
+    setMimeUsed(mime);
     const recorder = new MediaRecorder(streamRef.current, mime ? { mimeType: mime } : undefined);
     recorder.ondataavailable = (e) => {
       if (e.data.size > 0) chunksRef.current.push(e.data);
@@ -373,9 +416,10 @@ function CameraRecorderMobile() {
 
   const download = () => {
     if (!videoUrl) return;
+    const ext = getFileExtension(mimeUsed);
     const a = document.createElement("a");
     a.href = videoUrl;
-    a.download = `camera-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.webm`;
+    a.download = `camera-${new Date().toISOString().slice(0, 19).replace(/:/g, "-")}.${ext}`;
     a.click();
   };
 
@@ -383,6 +427,7 @@ function CameraRecorderMobile() {
     setVideoUrl("");
     setState("idle");
     setDuration(0);
+    setMimeUsed("");
     startPreview(facingMode);
   };
 

@@ -60,7 +60,7 @@ function ScreenRecorderDesktop() {
   const [duration, setDuration] = useState(0);
   const [videoUrl, setVideoUrl] = useState("");
   const [mimeUsed, setMimeUsed] = useState("");
-  const [withAudio, setWithAudio] = useState(true);
+  const [audioMode, setAudioMode] = useState<"none" | "system" | "mic" | "both">("both");
   const [quality, setQuality] = useState<"720" | "1080">("1080");
 
   const recorderRef = useRef<MediaRecorder | null>(null);
@@ -74,10 +74,29 @@ function ScreenRecorderDesktop() {
 
   const start = async () => {
     try {
-      const stream = await navigator.mediaDevices.getDisplayMedia({
+      // ── Screen stream (with or without system audio) ──
+      const displayStream = await navigator.mediaDevices.getDisplayMedia({
         video: { frameRate: 30, height: parseInt(quality) as any },
-        audio: withAudio,
+        audio: audioMode === "system" || audioMode === "both",
       });
+
+      // ── Microphone stream (if needed) ──
+      let micStream: MediaStream | null = null;
+      if (audioMode === "mic" || audioMode === "both") {
+        try {
+          micStream = await navigator.mediaDevices.getUserMedia({ audio: true, video: false });
+        } catch {
+          toast.error("Microphone access denied — recording without mic.");
+        }
+      }
+
+      // ── Merge tracks ──
+      const tracks: MediaStreamTrack[] = [
+        ...displayStream.getVideoTracks(),
+        ...displayStream.getAudioTracks(),
+        ...(micStream ? micStream.getAudioTracks() : []),
+      ];
+      const stream = new MediaStream(tracks);
 
       chunksRef.current = [];
       const mime = getBestMimeType();
@@ -88,13 +107,14 @@ function ScreenRecorderDesktop() {
         if (e.data.size > 0) chunksRef.current.push(e.data);
       };
       recorder.onstop = () => {
-        stream.getTracks().forEach((t) => t.stop());
+        displayStream.getTracks().forEach((t) => t.stop());
+        micStream?.getTracks().forEach((t) => t.stop());
         const blob = new Blob(chunksRef.current, { type: mime || "video/webm" });
         setVideoUrl(URL.createObjectURL(blob));
         setState("stopped");
         clearTimer();
       };
-      stream.getVideoTracks()[0].onended = () => {
+      displayStream.getVideoTracks()[0].onended = () => {
         if (recorder.state !== "inactive") recorder.stop();
       };
 
@@ -156,32 +176,55 @@ function ScreenRecorderDesktop() {
       {state === "idle" && (
         <div className="rounded-2xl border border-border bg-card p-4 space-y-4">
           <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Recording Options</p>
-          <div className="flex flex-wrap gap-3">
-            {/* Audio toggle */}
-            <button
-              onClick={() => setWithAudio((v) => !v)}
-              className={`flex items-center gap-2 px-3 py-2 rounded-xl border text-sm transition ${
-                withAudio ? "border-cyan-400 bg-cyan-400/10 text-foreground" : "border-border text-muted-foreground"
-              }`}
-            >
-              {withAudio ? <Mic className="w-4 h-4" /> : <MicOff className="w-4 h-4" />}
-              {withAudio ? "Audio On" : "Audio Off"}
-            </button>
+          <div className="space-y-3">
+            {/* Audio mode */}
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Audio Source</p>
+              <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
+                {(
+                  [
+                    { id: "none", icon: "🔇", label: "No Audio", desc: "Silent recording" },
+                    { id: "system", icon: "🖥️", label: "System Audio", desc: "Computer sounds only" },
+                    { id: "mic", icon: "🎙️", label: "Microphone", desc: "Your voice only" },
+                    { id: "both", icon: "🎙️+🖥️", label: "Mic + System", desc: "Best for tutorials" },
+                  ] as const
+                ).map(({ id, icon, label, desc }) => (
+                  <button
+                    key={id}
+                    onClick={() => setAudioMode(id)}
+                    className={`flex flex-col items-center gap-1 px-2 py-2.5 rounded-xl border text-xs transition ${
+                      audioMode === id
+                        ? "border-cyan-400 bg-cyan-400/10 text-foreground"
+                        : "border-border text-muted-foreground hover:border-foreground/30"
+                    }`}
+                  >
+                    <span className="text-base">{icon}</span>
+                    <span className="font-semibold leading-tight text-center">{label}</span>
+                    <span className="text-[9px] opacity-60 leading-tight text-center">{desc}</span>
+                  </button>
+                ))}
+              </div>
+            </div>
 
             {/* Quality */}
-            {(["720", "1080"] as const).map((q) => (
-              <button
-                key={q}
-                onClick={() => setQuality(q)}
-                className={`px-3 py-2 rounded-xl border text-sm transition ${
-                  quality === q
-                    ? "border-cyan-400 bg-cyan-400/10 text-foreground"
-                    : "border-border text-muted-foreground"
-                }`}
-              >
-                {q}p
-              </button>
-            ))}
+            <div>
+              <p className="text-xs font-semibold text-muted-foreground mb-2">Quality</p>
+              <div className="flex gap-2">
+                {(["720", "1080"] as const).map((q) => (
+                  <button
+                    key={q}
+                    onClick={() => setQuality(q)}
+                    className={`px-4 py-2 rounded-xl border text-sm transition ${
+                      quality === q
+                        ? "border-cyan-400 bg-cyan-400/10 text-foreground"
+                        : "border-border text-muted-foreground"
+                    }`}
+                  >
+                    {q}p
+                  </button>
+                ))}
+              </div>
+            </div>
           </div>
 
           {/* What to record — guide */}

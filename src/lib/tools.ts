@@ -84,6 +84,7 @@ export const tools: Tool[] = [
   { slug: "pdf-page-numbers", name: "Add Page Numbers to PDF", description: "Add page numbers to any PDF with custom position and style.", category: "pdf", icon: FilePen, path: "/tools/pdf-page-numbers" },
   { slug: "protect-pdf", name: "Protect PDF", description: "Add a password to your PDF to prevent unauthorized access.", category: "pdf", icon: Shield, path: "/tools/protect-pdf" },
   { slug: "pdf-reader", name: "PDF Reader", description: "View and read PDF files directly in your browser.", category: "pdf", icon: FileSearch, path: "/tools/pdf-reader" },
+  { slug: "file-viewer", name: "File Viewer", description: "Open and view Word, Excel, PDF, TXT, Markdown and CSV files instantly in your browser. No upload, no account, no download required.", category: "utility", categories: ["utility", "pdf", "text"], icon: FolderOpen, path: "/tools/file-viewer" },
   { slug: "spinning-wheel", name: "Spinning Wheel", description: "Spin a customizable wheel to make random decisions. Add your own options.", category: "games", icon: RotateCw, path: "/tools/spinning-wheel" },
 
   { slug: "link-shortener", name: "Link Shortener", description: "Shorten any URL and generate a QR code for it instantly.", category: "utility", icon: Link, path: "/tools/link-shortener" },

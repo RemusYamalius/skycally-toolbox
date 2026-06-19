@@ -3,6 +3,7 @@ import { tools, type Tool } from "./tools";
 // Map of tool slug -> 3 related tool slugs.
 // Names not present in the registry are normalized to the closest existing slug.
 export const relatedToolsMap: Record<string, string[]> = {
+  "file-viewer": ["pdf-to-word", "word-processor", "pdf-reader", "pdf-text-extractor", "image-to-text"],
   // AI
   "background-blur": ["face-landmarks", "hand-gesture", "remove-bg"],
   "face-landmarks": ["background-blur", "hand-gesture", "object-detection"],

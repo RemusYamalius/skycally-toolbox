@@ -1252,12 +1252,21 @@ function ResultCard({
       }
     >
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div
-        className={`font-display font-bold mt-1 leading-none truncate min-w-0 ${sizeClass}`}
-        style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
-      >
-        {value}
-        {hint && <span className="text-xs font-normal ml-1 opacity-70">{hint}</span>}
+      <div className="flex items-baseline gap-1 mt-1 min-w-0">
+        <div
+          className={`font-display font-bold leading-none truncate min-w-0 ${sizeClass}`}
+          style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
+        >
+          {value}
+        </div>
+        {hint && (
+          <span
+            className="text-xs font-normal opacity-70 shrink-0"
+            style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
+          >
+            {hint}
+          </span>
+        )}
       </div>
     </div>
   );

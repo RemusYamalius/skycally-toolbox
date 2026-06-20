@@ -1,19 +1,8 @@
-import type {
-  AmortRow,
-  CarInputs,
-  CarResult,
-  LoanResult,
-  MortgageInputs,
-  MortgageResult,
-} from "./types";
+import type { AmortRow, CarInputs, CarResult, LoanResult, MortgageInputs, MortgageResult } from "./types";
 
 const round2 = (n: number) => Math.round(n * 100) / 100;
 
-export function calcMonthlyPayment(
-  principal: number,
-  annualRatePct: number,
-  months: number,
-): number {
+export function calcMonthlyPayment(principal: number, annualRatePct: number, months: number): number {
   if (principal <= 0 || months <= 0) return 0;
   const r = annualRatePct / 100 / 12;
   if (r === 0) return principal / months;
@@ -21,11 +10,7 @@ export function calcMonthlyPayment(
   return (principal * r * pow) / (pow - 1);
 }
 
-export function calcAmortization(
-  principal: number,
-  annualRatePct: number,
-  months: number,
-): AmortRow[] {
+export function calcAmortization(principal: number, annualRatePct: number, months: number): AmortRow[] {
   if (principal <= 0 || months <= 0) return [];
   const r = annualRatePct / 100 / 12;
   const payment = calcMonthlyPayment(principal, annualRatePct, months);
@@ -52,11 +37,7 @@ export function calcAmortization(
   return rows;
 }
 
-export function calcLoan(
-  principal: number,
-  annualRatePct: number,
-  months: number,
-): LoanResult {
+export function calcLoan(principal: number, annualRatePct: number, months: number): LoanResult {
   const schedule = calcAmortization(principal, annualRatePct, months);
   const monthlyPayment = calcMonthlyPayment(principal, annualRatePct, months);
   const totalInterest = schedule.reduce((s, r) => s + r.interest, 0);
@@ -73,26 +54,19 @@ export function calcMortgage(inputs: MortgageInputs): MortgageResult {
   const base = calcLoan(inputs.principal, inputs.annualRatePct, inputs.months);
   const monthlyTax = inputs.propertyTaxYearly / 12;
   const monthlyInsurance = inputs.insuranceYearly / 12;
-  const monthlyPmi = inputs.applyPmi
-    ? (inputs.principal * (inputs.pmiRatePct / 100)) / 12
-    : 0;
+  const monthlyPmi = inputs.applyPmi ? (inputs.principal * (inputs.pmiRatePct / 100)) / 12 : 0;
   return {
     ...base,
     monthlyTax: round2(monthlyTax),
     monthlyInsurance: round2(monthlyInsurance),
     monthlyPmi: round2(monthlyPmi),
-    totalMonthly: round2(
-      base.monthlyPayment + monthlyTax + monthlyInsurance + monthlyPmi,
-    ),
+    totalMonthly: round2(base.monthlyPayment + monthlyTax + monthlyInsurance + monthlyPmi),
   };
 }
 
 export function calcCarLoan(inputs: CarInputs): CarResult {
   const taxedPrice = inputs.vehiclePrice * (1 + inputs.salesTaxPct / 100);
-  const financed = Math.max(
-    0,
-    taxedPrice - inputs.downPayment - inputs.tradeIn,
-  );
+  const financed = Math.max(0, taxedPrice - inputs.downPayment - inputs.tradeIn);
   const base = calcLoan(financed, inputs.annualRatePct, inputs.months);
   return {
     ...base,
@@ -149,13 +123,17 @@ export function calcExtraPaymentSavings(
 
 export function formatCurrency(value: number, code: string): string {
   try {
-    return new Intl.NumberFormat(undefined, {
+    return new Intl.NumberFormat("en-US", {
       style: "currency",
       currency: code,
       maximumFractionDigits: 2,
     }).format(isFinite(value) ? value : 0);
   } catch {
-    return `${value.toFixed(2)} ${code}`;
+    const sym =
+      { USD: "$", EUR: "€", GBP: "£", MAD: "د.م.", SAR: "ر.س", AED: "د.إ", INR: "₹", BRL: "R$", CAD: "C$", AUD: "A$" }[
+        code
+      ] ?? code;
+    return `${sym}${value.toFixed(2)}`;
   }
 }
 

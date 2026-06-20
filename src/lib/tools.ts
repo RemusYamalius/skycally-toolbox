@@ -141,6 +141,10 @@ export const tools: Tool[] = [
   { slug: "currency-converter", name: "Currency Converter", description: "Convert between 170+ currencies with live exchange rates.", category: "utility", icon: ArrowLeftRight, path: "/tools/currency-converter" },
   { slug: "word-processor", name: "Word Processor", description: "Write and format documents free in your browser. No Google account, no Microsoft account needed. Supports Arabic RTL, exports to PDF and Word.", category: "text", categories: ["text", "pdf"], icon: FileText, path: "/tools/word-processor" },
   { slug: "element-mixer", name: "Element Mixer", description: "Mix chemical elements and discover real or imaginary compounds in your personal virtual lab.", category: "utility", icon: FlaskConical, path: "/tools/element-mixer" },
+  { slug: "loan-calculator", name: "Loan Calculator", description: "Calculate monthly payments, total interest and amortization for any loan.", category: "utility", icon: Calculator, path: "/tools/loan-calculator" },
+  { slug: "emi-calculator", name: "EMI Calculator", description: "Calculate Equated Monthly Installment for personal, home and vehicle loans.", category: "utility", icon: Calculator, path: "/tools/emi-calculator" },
+  { slug: "mortgage-calculator", name: "Mortgage Calculator", description: "Calculate mortgage payments with PITI: principal, interest, tax, insurance and PMI.", category: "utility", icon: Calculator, path: "/tools/mortgage-calculator" },
+  { slug: "car-loan-calculator", name: "Car Loan Calculator", description: "Calculate auto loan payments including sales tax, down payment and trade-in value.", category: "utility", icon: Calculator, path: "/tools/car-loan-calculator" },
 ];
 
 

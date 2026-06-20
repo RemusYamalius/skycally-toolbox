@@ -23,11 +23,16 @@ function categorize(bmi: number) {
 }
 
 function ScaleBar({ bmi }: { bmi: number }) {
-  // Map BMI 10..40 to 0..100%
   const pct = Math.max(0, Math.min(100, ((bmi - 10) / 30) * 100));
   return (
     <div className="mt-5">
-      <div className="relative h-3 rounded-full overflow-hidden" style={{ background: "linear-gradient(to right, #3b82f6 0%, #3b82f6 28%, var(--green-brand) 28%, var(--green-brand) 50%, #f59e0b 50%, #f59e0b 67%, #ef4444 67%, #ef4444 100%)" }}>
+      <div
+        className="relative h-3 rounded-full overflow-hidden"
+        style={{
+          background:
+            "linear-gradient(to right, #3b82f6 0%, #3b82f6 28%, var(--green-brand) 28%, var(--green-brand) 50%, #f59e0b 50%, #f59e0b 67%, #ef4444 67%, #ef4444 100%)",
+        }}
+      >
         <div
           className="absolute top-1/2 -translate-y-1/2 -translate-x-1/2 w-4 h-4 rounded-full bg-foreground border-2 border-background shadow"
           style={{ left: `${pct}%` }}
@@ -45,9 +50,7 @@ function ScaleBar({ bmi }: { bmi: number }) {
 }
 
 function Result({ bmi }: { bmi: number | null }) {
-  if (bmi === null) {
-    return <p className="text-sm text-muted-foreground">Enter your details to see your BMI.</p>;
-  }
+  if (bmi === null) return <p className="text-sm text-muted-foreground">Enter your details to see your BMI.</p>;
   const cat = categorize(bmi);
   return (
     <>
@@ -130,7 +133,14 @@ function BmiCalculator() {
                 </div>
                 <div>
                   <label className="block text-sm font-medium mb-2">Height (in)</label>
-                  <Input type="number" min="0" max="11" value={inch} onChange={(e) => setInch(e.target.value)} className="text-lg" />
+                  <Input
+                    type="number"
+                    min="0"
+                    max="11"
+                    value={inch}
+                    onChange={(e) => setInch(e.target.value)}
+                    className="text-lg"
+                  />
                 </div>
               </div>
             </div>
@@ -141,25 +151,63 @@ function BmiCalculator() {
         </TabsContent>
       </Tabs>
 
-      <HowToUse steps={[
-        "Choose Metric (kg/cm) or Imperial (lb/ft+in)",
-        "Enter your weight and height",
-        "Read your BMI value, category and where you sit on the scale",
-      ]} />
+      <HowToUse
+        steps={[
+          "Choose Metric (kg/cm) or Imperial (lb/ft+in).",
+          "Enter your weight and height.",
+          "Read your BMI value, category and where you sit on the color scale.",
+        ]}
+      />
 
       <ToolSeoContent
-        title="BMI Calculator — Body Mass Index in Metric & Imperial"
-        description="Free BMI calculator that instantly tells you your Body Mass Index, category and where you fall on the healthy weight scale."
+        title="BMI Calculator — Body Mass Index, Metric & Imperial"
+        description="Free BMI calculator. Enter your weight and height in metric or imperial units and instantly see your Body Mass Index, WHO category and color-coded scale position. No signup."
         body={[
-          "Skycally's BMI Calculator computes your Body Mass Index from your weight and height in either metric or imperial units. BMI is a quick screening tool used by health professionals to estimate whether someone is underweight, at a healthy weight, overweight or obese, based on the relationship between mass and height.",
-          "After you enter your numbers, the calculator shows your BMI to one decimal, classifies it using the standard WHO categories (Underweight <18.5, Normal 18.5–24.9, Overweight 25–29.9, Obese ≥30), and plots your position on a color-coded scale so you can see at a glance how close you are to neighboring categories.",
-          "BMI is a useful starting point, but it doesn't account for muscle mass, bone density, age or body composition. Athletes and very muscular people often score 'overweight' despite being healthy. Treat the result as a guideline and talk to a healthcare professional for a complete assessment.",
+          "BMI (Body Mass Index) is calculated by dividing your weight in kilograms by the square of your height in metres: BMI = kg ÷ m². In imperial units, the formula is BMI = (lb ÷ in²) × 703. The World Health Organization uses four standard categories: Underweight (below 18.5), Normal weight (18.5–24.9), Overweight (25–29.9), and Obese (30 and above).",
+          "Skycally's BMI Calculator supports both metric and imperial inputs, shows your result to one decimal place, and plots your position on a color-coded scale so you can instantly see how close you are to the boundaries of each category. The calculation updates live as you type — no button to press.",
+          "BMI is a useful screening tool but has important limitations. It does not measure body fat directly and does not account for muscle mass, bone density, age, sex, or ethnicity. Athletes and bodybuilders often score 'overweight' despite having very low body fat. Older adults may have a 'normal' BMI with high body fat. Always consult a healthcare professional for a complete assessment.",
         ]}
         faqs={[
-          { question: "What is a healthy BMI?", answer: "The WHO considers a BMI of 18.5 to 24.9 as the normal/healthy range for most adults." },
-          { question: "Is BMI accurate for athletes?", answer: "Not always. Muscle weighs more than fat, so very muscular people can have a high BMI without excess body fat." },
-          { question: "Does BMI work for children?", answer: "No. Children and teens use age- and sex-specific BMI percentiles instead of the adult categories." },
-          { question: "Is my data saved?", answer: "No. Everything is calculated in your browser and never sent anywhere." },
+          {
+            question: "What is a healthy BMI?",
+            answer:
+              "The WHO defines a healthy adult BMI as 18.5 to 24.9. Below 18.5 is underweight, 25–29.9 is overweight, and 30 or above is obese. These thresholds apply to most adults but may not be appropriate for all ethnicities — some health organizations use lower thresholds for South and East Asian populations.",
+          },
+          {
+            question: "What is the BMI formula?",
+            answer:
+              "In metric: BMI = weight (kg) ÷ height (m)². In imperial: BMI = (weight (lb) ÷ height (in)²) × 703. For example, a person weighing 70 kg at 1.75 m has a BMI of 70 ÷ (1.75²) = 22.9.",
+          },
+          {
+            question: "Is BMI accurate for athletes and muscular people?",
+            answer:
+              "No. Muscle is denser than fat, so heavily muscular people often score 'overweight' or even 'obese' on the BMI scale despite having very low body fat. For athletes, body composition measurements like DEXA scans or skinfold tests are more meaningful.",
+          },
+          {
+            question: "Does BMI work for children and teens?",
+            answer:
+              "Standard BMI categories apply only to adults (20+). For children and teens, BMI is interpreted using age- and sex-specific percentile charts (BMI-for-age), since body composition changes significantly during development.",
+          },
+          {
+            question: "Can I have a normal BMI but still be unhealthy?",
+            answer:
+              "Yes. 'Normal weight obesity' — a normal BMI with high body fat — is associated with metabolic risk. Conversely, some people with a slightly elevated BMI are metabolically healthy. BMI is a screening tool, not a diagnosis.",
+          },
+          {
+            question: "How can I lower my BMI?",
+            answer:
+              "BMI decreases when you reduce weight (fat mass) relative to your height. A combination of caloric deficit diet and regular physical activity is the evidence-based approach. Consult a doctor or registered dietitian before making significant lifestyle changes.",
+          },
+          {
+            question: "Is my data sent to a server?",
+            answer:
+              "No. All calculations run instantly in your browser. Your weight and height are never transmitted, stored, or logged anywhere.",
+          },
+          {
+            question: "What is the difference between BMI and body fat percentage?",
+            answer:
+              "BMI is an indirect estimate based only on height and weight. Body fat percentage measures the actual proportion of fat in your body. A normal BMI person can have high body fat, and a high BMI person (like an athlete) can have low body fat. Body fat percentage requires measurements like DEXA, hydrostatic weighing, or skinfold calipers.",
+          },
         ]}
       />
 

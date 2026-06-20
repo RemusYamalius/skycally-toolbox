@@ -130,9 +130,7 @@ function MarkdownToHtml() {
                   key={t}
                   onClick={() => setTab(t)}
                   className={`px-4 py-1.5 rounded-lg text-xs font-medium transition-all ${
-                    tab === t
-                      ? "bg-cyan-500 text-black"
-                      : "text-muted-foreground hover:text-foreground"
+                    tab === t ? "bg-cyan-500 text-black" : "text-muted-foreground hover:text-foreground"
                   }`}
                 >
                   {t === "preview" ? "Preview" : "HTML"}
@@ -162,18 +160,68 @@ function MarkdownToHtml() {
           </div>
         </div>
       </div>
-      <HowToUse steps={[
-        "Type or paste your Markdown into the editor.",
-        "See the live preview or switch to the HTML tab.",
-        "Copy the HTML or download it as an .html file.",
-      ]} />
-          <RelatedTools currentSlug="markdown-to-html" />
-          <ToolSeoContent
-        title="Free Markdown to HTML Converter — Live Preview"
-        description="Skycally's Markdown to HTML converter transforms Markdown text into clean, valid HTML instantly. A live preview shows how your content will look, and you can switch to the raw HTML view at any time. Download the result as a complete HTML file. Perfect for developers, bloggers, and technical writers."
-        body={[]}
-        faqs={[{"question":"What Markdown syntax is supported?","answer":"Headings, bold, italic, links, images, lists, blockquotes, inline code, and horizontal rules."},{"question":"Can I preview the rendered HTML?","answer":"Yes, the Preview tab shows a live styled preview that updates as you type."},{"question":"Can I download the result?","answer":"Yes, download a complete HTML file with your converted content."},{"question":"Is there a character limit?","answer":"No limit — convert documents of any length."},{"question":"Is my content sent to a server?","answer":"No. Conversion runs entirely in your browser."}]}
+
+      <HowToUse
+        steps={[
+          "Type or paste your Markdown into the editor on the left.",
+          "See a live styled preview on the right, or switch to the HTML tab to see the raw output.",
+          "Copy the HTML to clipboard or download it as a complete .html file.",
+        ]}
       />
+
+      <ToolSeoContent
+        title="Free Markdown to HTML Converter — Live Preview Online"
+        description="Convert Markdown to clean, valid HTML instantly with a live preview. Supports headings, bold, italic, lists, links, images, code, blockquotes and more. Runs in your browser — no upload, no signup."
+        body={[
+          "Markdown is a lightweight markup language widely used by developers, bloggers, and technical writers to write formatted content using plain text. This converter transforms Markdown syntax into clean, valid HTML instantly — with a live preview that updates as you type, so you can see exactly how your content will look in a browser.",
+          "The tool supports the most common Markdown elements: headings (H1–H3), bold and italic text, unordered and ordered lists, inline code, blockquotes, horizontal rules, hyperlinks, and images. The Preview tab renders the HTML with styled typography, while the HTML tab shows the raw output ready to paste into any webpage or CMS.",
+          "Markdown is the standard format for README files on GitHub, documentation sites (GitBook, Docusaurus), blogging platforms (Ghost, Hashnode), and note-taking apps (Obsidian, Notion). Converting Markdown to HTML is a common workflow for publishing content from these platforms to custom websites or email templates.",
+        ]}
+        faqs={[
+          {
+            question: "What Markdown syntax is supported?",
+            answer:
+              "Headings (# H1, ## H2, ### H3), bold (**text**), italic (*text*), bold+italic (***text***), inline code (`code`), blockquotes (> text), unordered lists (- item), ordered lists (1. item), horizontal rules (---), hyperlinks ([text](url)), and images (![alt](url)).",
+          },
+          {
+            question: "Does it show a live preview?",
+            answer:
+              "Yes. The Preview tab on the right updates in real time as you type in the Markdown editor. It renders headings, lists, code, links, and other elements with styled typography so you can see exactly how the output will look.",
+          },
+          {
+            question: "Can I download the result as an HTML file?",
+            answer:
+              "Yes. Click Download .html to save a complete HTML document (with DOCTYPE and body tags) containing your converted content. You can open it directly in any browser or paste the body content into your website.",
+          },
+          {
+            question: "What is Markdown used for?",
+            answer:
+              "Markdown is used for README files on GitHub, documentation (Docusaurus, GitBook), blog posts (Ghost, Hashnode, Dev.to), note-taking (Obsidian, Notion), and forum posts (Reddit, Stack Overflow). It lets you write formatted content without touching HTML directly.",
+          },
+          {
+            question: "Is my content sent to a server?",
+            answer:
+              "No. All conversion happens locally in your browser using JavaScript string processing. Your text never leaves your device.",
+          },
+          {
+            question: "Does it support code blocks (triple backtick)?",
+            answer:
+              "Currently the tool supports inline code using single backticks. Full fenced code block support (triple backtick with syntax highlighting) is a planned enhancement.",
+          },
+          {
+            question: "Can I use this for email templates?",
+            answer:
+              "You can convert your Markdown to HTML and use the output as a base for email templates. Note that email clients have limited CSS support, so you may need to add inline styles before sending. The raw HTML output from the HTML tab is a good starting point.",
+          },
+          {
+            question: "Is there a character or document length limit?",
+            answer:
+              "No. There is no enforced limit. You can convert documents of any length — the conversion runs entirely in your browser and is near-instant even for large files.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="markdown-to-html" />
     </ToolPageShell>
   );
 }

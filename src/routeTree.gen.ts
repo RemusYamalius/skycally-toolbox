@@ -73,6 +73,7 @@ import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.passw
 import { Route as ToolsPacManRouteImport } from './routes/tools.pac-man'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
 import { Route as ToolsNetworkSpeedTestRouteImport } from './routes/tools.network-speed-test'
+import { Route as ToolsMortgageCalculatorRouteImport } from './routes/tools.mortgage-calculator'
 import { Route as ToolsMinesweeperRouteImport } from './routes/tools.minesweeper'
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMemoryMatchRouteImport } from './routes/tools.memory-match'
@@ -80,6 +81,7 @@ import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-gene
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
 import { Route as ToolsMahjongRouteImport } from './routes/tools.mahjong'
 import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
+import { Route as ToolsLoanCalculatorRouteImport } from './routes/tools.loan-calculator'
 import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsIpAddressLookupRouteImport } from './routes/tools.ip-address-lookup'
@@ -101,6 +103,7 @@ import { Route as ToolsFlappyBirdRouteImport } from './routes/tools.flappy-bird'
 import { Route as ToolsFileViewerRouteImport } from './routes/tools.file-viewer'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
+import { Route as ToolsEmiCalculatorRouteImport } from './routes/tools.emi-calculator'
 import { Route as ToolsElementMixerRouteImport } from './routes/tools.element-mixer'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
 import { Route as ToolsDnsLeakTestRouteImport } from './routes/tools.dns-leak-test'
@@ -113,6 +116,7 @@ import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pd
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
 import { Route as ToolsChessRouteImport } from './routes/tools.chess'
+import { Route as ToolsCarLoanCalculatorRouteImport } from './routes/tools.car-loan-calculator'
 import { Route as ToolsBusinessCardGeneratorRouteImport } from './routes/tools.business-card-generator'
 import { Route as ToolsBubbleShooterRouteImport } from './routes/tools.bubble-shooter'
 import { Route as ToolsBreakoutRouteImport } from './routes/tools.breakout'
@@ -453,6 +457,11 @@ const ToolsNetworkSpeedTestRoute = ToolsNetworkSpeedTestRouteImport.update({
   path: '/tools/network-speed-test',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMortgageCalculatorRoute = ToolsMortgageCalculatorRouteImport.update({
+  id: '/tools/mortgage-calculator',
+  path: '/tools/mortgage-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsMinesweeperRoute = ToolsMinesweeperRouteImport.update({
   id: '/tools/minesweeper',
   path: '/tools/minesweeper',
@@ -486,6 +495,11 @@ const ToolsMahjongRoute = ToolsMahjongRouteImport.update({
 const ToolsLoremIpsumRoute = ToolsLoremIpsumRouteImport.update({
   id: '/tools/lorem-ipsum',
   path: '/tools/lorem-ipsum',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsLoanCalculatorRoute = ToolsLoanCalculatorRouteImport.update({
+  id: '/tools/loan-calculator',
+  path: '/tools/loan-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsLinkShortenerRoute = ToolsLinkShortenerRouteImport.update({
@@ -593,6 +607,11 @@ const ToolsExtractAudioRoute = ToolsExtractAudioRouteImport.update({
   path: '/tools/extract-audio',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsEmiCalculatorRoute = ToolsEmiCalculatorRouteImport.update({
+  id: '/tools/emi-calculator',
+  path: '/tools/emi-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsElementMixerRoute = ToolsElementMixerRouteImport.update({
   id: '/tools/element-mixer',
   path: '/tools/element-mixer',
@@ -651,6 +670,11 @@ const ToolsCollageMakerRoute = ToolsCollageMakerRouteImport.update({
 const ToolsChessRoute = ToolsChessRouteImport.update({
   id: '/tools/chess',
   path: '/tools/chess',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsCarLoanCalculatorRoute = ToolsCarLoanCalculatorRouteImport.update({
+  id: '/tools/car-loan-calculator',
+  path: '/tools/car-loan-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsBusinessCardGeneratorRoute =
@@ -769,6 +793,7 @@ export interface FileRoutesByFullPath {
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
+  '/tools/car-loan-calculator': typeof ToolsCarLoanCalculatorRoute
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
@@ -781,6 +806,7 @@ export interface FileRoutesByFullPath {
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/element-mixer': typeof ToolsElementMixerRoute
+  '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/file-viewer': typeof ToolsFileViewerRoute
@@ -802,6 +828,7 @@ export interface FileRoutesByFullPath {
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
+  '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
@@ -809,6 +836,7 @@ export interface FileRoutesByFullPath {
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
+  '/tools/mortgage-calculator': typeof ToolsMortgageCalculatorRoute
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
@@ -892,6 +920,7 @@ export interface FileRoutesByTo {
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
+  '/tools/car-loan-calculator': typeof ToolsCarLoanCalculatorRoute
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
@@ -904,6 +933,7 @@ export interface FileRoutesByTo {
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/element-mixer': typeof ToolsElementMixerRoute
+  '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/file-viewer': typeof ToolsFileViewerRoute
@@ -925,6 +955,7 @@ export interface FileRoutesByTo {
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
+  '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
@@ -932,6 +963,7 @@ export interface FileRoutesByTo {
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
+  '/tools/mortgage-calculator': typeof ToolsMortgageCalculatorRoute
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
@@ -1016,6 +1048,7 @@ export interface FileRoutesById {
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
+  '/tools/car-loan-calculator': typeof ToolsCarLoanCalculatorRoute
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
@@ -1028,6 +1061,7 @@ export interface FileRoutesById {
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/element-mixer': typeof ToolsElementMixerRoute
+  '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
   '/tools/file-viewer': typeof ToolsFileViewerRoute
@@ -1049,6 +1083,7 @@ export interface FileRoutesById {
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
+  '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
@@ -1056,6 +1091,7 @@ export interface FileRoutesById {
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
+  '/tools/mortgage-calculator': typeof ToolsMortgageCalculatorRoute
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
@@ -1141,6 +1177,7 @@ export interface FileRouteTypes {
     | '/tools/breakout'
     | '/tools/bubble-shooter'
     | '/tools/business-card-generator'
+    | '/tools/car-loan-calculator'
     | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
@@ -1153,6 +1190,7 @@ export interface FileRouteTypes {
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
     | '/tools/element-mixer'
+    | '/tools/emi-calculator'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/file-viewer'
@@ -1174,6 +1212,7 @@ export interface FileRouteTypes {
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
     | '/tools/link-shortener'
+    | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
     | '/tools/mahjong'
     | '/tools/markdown-to-html'
@@ -1181,6 +1220,7 @@ export interface FileRouteTypes {
     | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
+    | '/tools/mortgage-calculator'
     | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
@@ -1264,6 +1304,7 @@ export interface FileRouteTypes {
     | '/tools/breakout'
     | '/tools/bubble-shooter'
     | '/tools/business-card-generator'
+    | '/tools/car-loan-calculator'
     | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
@@ -1276,6 +1317,7 @@ export interface FileRouteTypes {
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
     | '/tools/element-mixer'
+    | '/tools/emi-calculator'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/file-viewer'
@@ -1297,6 +1339,7 @@ export interface FileRouteTypes {
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
     | '/tools/link-shortener'
+    | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
     | '/tools/mahjong'
     | '/tools/markdown-to-html'
@@ -1304,6 +1347,7 @@ export interface FileRouteTypes {
     | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
+    | '/tools/mortgage-calculator'
     | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
@@ -1387,6 +1431,7 @@ export interface FileRouteTypes {
     | '/tools/breakout'
     | '/tools/bubble-shooter'
     | '/tools/business-card-generator'
+    | '/tools/car-loan-calculator'
     | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
@@ -1399,6 +1444,7 @@ export interface FileRouteTypes {
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
     | '/tools/element-mixer'
+    | '/tools/emi-calculator'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
     | '/tools/file-viewer'
@@ -1420,6 +1466,7 @@ export interface FileRouteTypes {
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
     | '/tools/link-shortener'
+    | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
     | '/tools/mahjong'
     | '/tools/markdown-to-html'
@@ -1427,6 +1474,7 @@ export interface FileRouteTypes {
     | '/tools/memory-match'
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
+    | '/tools/mortgage-calculator'
     | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
@@ -1511,6 +1559,7 @@ export interface RootRouteChildren {
   ToolsBreakoutRoute: typeof ToolsBreakoutRoute
   ToolsBubbleShooterRoute: typeof ToolsBubbleShooterRoute
   ToolsBusinessCardGeneratorRoute: typeof ToolsBusinessCardGeneratorRoute
+  ToolsCarLoanCalculatorRoute: typeof ToolsCarLoanCalculatorRoute
   ToolsChessRoute: typeof ToolsChessRoute
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
@@ -1523,6 +1572,7 @@ export interface RootRouteChildren {
   ToolsDnsLeakTestRoute: typeof ToolsDnsLeakTestRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsElementMixerRoute: typeof ToolsElementMixerRoute
+  ToolsEmiCalculatorRoute: typeof ToolsEmiCalculatorRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
   ToolsFileViewerRoute: typeof ToolsFileViewerRoute
@@ -1544,6 +1594,7 @@ export interface RootRouteChildren {
   ToolsIpAddressLookupRoute: typeof ToolsIpAddressLookupRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
   ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
+  ToolsLoanCalculatorRoute: typeof ToolsLoanCalculatorRoute
   ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
   ToolsMahjongRoute: typeof ToolsMahjongRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
@@ -1551,6 +1602,7 @@ export interface RootRouteChildren {
   ToolsMemoryMatchRoute: typeof ToolsMemoryMatchRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsMinesweeperRoute: typeof ToolsMinesweeperRoute
+  ToolsMortgageCalculatorRoute: typeof ToolsMortgageCalculatorRoute
   ToolsNetworkSpeedTestRoute: typeof ToolsNetworkSpeedTestRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPacManRoute: typeof ToolsPacManRoute
@@ -2061,6 +2113,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsNetworkSpeedTestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/mortgage-calculator': {
+      id: '/tools/mortgage-calculator'
+      path: '/tools/mortgage-calculator'
+      fullPath: '/tools/mortgage-calculator'
+      preLoaderRoute: typeof ToolsMortgageCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/minesweeper': {
       id: '/tools/minesweeper'
       path: '/tools/minesweeper'
@@ -2108,6 +2167,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/lorem-ipsum'
       fullPath: '/tools/lorem-ipsum'
       preLoaderRoute: typeof ToolsLoremIpsumRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/loan-calculator': {
+      id: '/tools/loan-calculator'
+      path: '/tools/loan-calculator'
+      fullPath: '/tools/loan-calculator'
+      preLoaderRoute: typeof ToolsLoanCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/link-shortener': {
@@ -2257,6 +2323,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsExtractAudioRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/emi-calculator': {
+      id: '/tools/emi-calculator'
+      path: '/tools/emi-calculator'
+      fullPath: '/tools/emi-calculator'
+      preLoaderRoute: typeof ToolsEmiCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/element-mixer': {
       id: '/tools/element-mixer'
       path: '/tools/element-mixer'
@@ -2339,6 +2412,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/chess'
       fullPath: '/tools/chess'
       preLoaderRoute: typeof ToolsChessRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/car-loan-calculator': {
+      id: '/tools/car-loan-calculator'
+      path: '/tools/car-loan-calculator'
+      fullPath: '/tools/car-loan-calculator'
+      preLoaderRoute: typeof ToolsCarLoanCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/business-card-generator': {
@@ -2490,6 +2570,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsBreakoutRoute: ToolsBreakoutRoute,
   ToolsBubbleShooterRoute: ToolsBubbleShooterRoute,
   ToolsBusinessCardGeneratorRoute: ToolsBusinessCardGeneratorRoute,
+  ToolsCarLoanCalculatorRoute: ToolsCarLoanCalculatorRoute,
   ToolsChessRoute: ToolsChessRoute,
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
@@ -2502,6 +2583,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsDnsLeakTestRoute: ToolsDnsLeakTestRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsElementMixerRoute: ToolsElementMixerRoute,
+  ToolsEmiCalculatorRoute: ToolsEmiCalculatorRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
   ToolsFileViewerRoute: ToolsFileViewerRoute,
@@ -2523,6 +2605,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsIpAddressLookupRoute: ToolsIpAddressLookupRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
   ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
+  ToolsLoanCalculatorRoute: ToolsLoanCalculatorRoute,
   ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,
   ToolsMahjongRoute: ToolsMahjongRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
@@ -2530,6 +2613,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsMemoryMatchRoute: ToolsMemoryMatchRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsMinesweeperRoute: ToolsMinesweeperRoute,
+  ToolsMortgageCalculatorRoute: ToolsMortgageCalculatorRoute,
   ToolsNetworkSpeedTestRoute: ToolsNetworkSpeedTestRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPacManRoute: ToolsPacManRoute,
@@ -2592,12 +2676,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

@@ -4,6 +4,10 @@ import { tools, type Tool } from "./tools";
 // Names not present in the registry are normalized to the closest existing slug.
 export const relatedToolsMap: Record<string, string[]> = {
   "file-viewer": ["pdf-to-word", "word-processor", "pdf-reader", "pdf-text-extractor", "image-to-text"],
+  "loan-calculator": ["emi-calculator", "mortgage-calculator", "car-loan-calculator", "tip-calculator", "currency-converter"],
+  "emi-calculator": ["loan-calculator", "mortgage-calculator", "car-loan-calculator", "tip-calculator", "currency-converter"],
+  "mortgage-calculator": ["loan-calculator", "emi-calculator", "car-loan-calculator", "tip-calculator", "currency-converter"],
+  "car-loan-calculator": ["loan-calculator", "emi-calculator", "mortgage-calculator", "tip-calculator", "currency-converter"],
   // AI
   "background-blur": ["face-landmarks", "hand-gesture", "remove-bg"],
   "face-landmarks": ["background-blur", "hand-gesture", "object-detection"],

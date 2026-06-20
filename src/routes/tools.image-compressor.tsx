@@ -129,14 +129,30 @@ function ImageCompressorPage() {
         Images never leave your device — compression runs 100% in the browser.
       </div>
 
-      {/* Drop zone */}
-      <DropZone
-        multiple
-        accept="image/jpeg,image/png,image/webp,image/gif"
-        onFiles={addFiles}
-        label="Drop images here"
-        hint="JPG, PNG, WebP — multiple files supported · click to browse"
-      />
+      {/* Drop zone — full when empty, compact when items exist */}
+      {items.length === 0 ? (
+        <DropZone
+          multiple
+          accept="image/jpeg,image/png,image/webp,image/gif"
+          onFiles={addFiles}
+          label="Drop images here"
+          hint="JPG, PNG, WebP — multiple files supported · click to browse"
+        />
+      ) : (
+        <label className="flex items-center gap-2 w-fit cursor-pointer rounded-xl border border-dashed border-border bg-secondary/30 hover:bg-secondary/60 transition px-4 py-2.5 text-sm text-muted-foreground hover:text-foreground">
+          <ImageIcon className="w-4 h-4 shrink-0" />
+          <span>+ Add more images</span>
+          <input
+            type="file"
+            accept="image/jpeg,image/png,image/webp,image/gif"
+            multiple
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files) addFiles(Array.from(e.target.files));
+            }}
+          />
+        </label>
+      )}
 
       {items.length > 0 && (
         <div className="mt-5 space-y-4">

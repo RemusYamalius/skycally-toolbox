@@ -339,23 +339,32 @@ function getPageContents(page: any, pdf: any): string {
 function stripArtifactWatermarkBlocks(content: string, lowAlphaGStates: Set<string>): { out: string; removed: number } {
   let removed = 0;
 
-  // Match /Artifact BDC ... EMC blocks
-  // Word watermarks use: /Artifact <</Attached [/Top]/Type/Pagination>> BDC
-  const artifactRe = /\/Artifact\s*<<[^>]*>>\s*BDC([\s\S]*?)EMC/g;
+  // Match /Artifact BDC ... EMC blocks (Word watermarks use Type/Pagination)
+  // Use non-greedy .*? to handle nested << >> correctly
+  const artifactRe = /\/Artifact\s*<<.*?>>\s*BDC([\s\S]*?)EMC/g;
 
   const out = content.replace(artifactRe, (full, body: string) => {
-    // Check if this block uses a low-alpha GS state (watermark indicator)
+    // Check 1: uses a known low-alpha GS state
     const usesLowAlpha = [...body.matchAll(/\/([A-Za-z0-9_.+-]+)\s+gs/g)].some((m) => lowAlphaGStates.has(m[1]));
 
-    // Check if it contains vector drawing ops (m, c, h, f, S, s) but no text (BT/ET)
+    // Check 2: contains vector drawing ops (m, c, h) but no text (BT/ET)
+    // This is the signature of Word's calligraphic watermarks
     const hasVectorPaths = /\b[mch]\b/.test(body) && !/\bBT\b/.test(body);
 
-    // Check for low gray fill (watermark color is typically 0.5-0.9 gray)
-    const hasLightGray = /^0\.[5-9]\d*\s+g\b/m.test(body.trim()) || /\b0\.[5-9]\d*\s+g\b/.test(body);
+    // Check 3: uses light gray fill color (0.5–0.95 range = translucent watermark)
+    const hasLightGray = /\b0\.[5-9]\d*\s+g\b/.test(body);
 
-    if (usesLowAlpha || (hasVectorPaths && hasLightGray)) {
+    // Check 4: any GS state reference (even if not in our lowAlpha set)
+    // Word watermarks always reference a GS state for transparency
+    const hasAnyGS = /\/GS\d+\s+gs/.test(body);
+
+    // Remove if: (any GS + vector paths + light gray) OR (lowAlpha + vector/gray)
+    const isWatermark =
+      (hasVectorPaths && hasLightGray && hasAnyGS) || (usesLowAlpha && (hasVectorPaths || hasLightGray));
+
+    if (isWatermark) {
       removed++;
-      return ""; // Remove entire Artifact block
+      return "";
     }
     return full;
   });

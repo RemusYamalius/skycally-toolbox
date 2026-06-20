@@ -1262,3 +1262,11 @@ function ResultCard({
     </div>
   );
 }
+function Mini({ label, v }: { label: string; v: string }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="font-mono text-sm font-medium">{v}</div>
+    </div>
+  );
+}

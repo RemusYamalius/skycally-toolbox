@@ -1209,7 +1209,6 @@ export default function LoanCalculatorPage({ defaultTab, slug }: { defaultTab: L
 }
 
 /* ------------------------- Small components ------------------------- */
-
 function ResultCard({
   label,
   value,
@@ -1227,7 +1226,7 @@ function ResultCard({
 }) {
   return (
     <div
-      className="rounded-2xl border border-border bg-card p-4"
+      className="rounded-2xl border border-border bg-card p-4 min-w-0 overflow-hidden"
       style={
         accent && !muted
           ? {
@@ -1239,7 +1238,7 @@ function ResultCard({
     >
       <div className="text-xs text-muted-foreground">{label}</div>
       <div
-        className={`font-display font-bold mt-1 leading-tight break-all ${big ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl"}`}
+        className={`font-display font-bold mt-1 leading-none truncate min-w-0 ${big ? "text-xl sm:text-2xl lg:text-3xl" : "text-lg sm:text-xl"}`}
         style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
       >
         {value}
@@ -1248,7 +1247,6 @@ function ResultCard({
     </div>
   );
 }
-
 function Mini({ label, v }: { label: string; v: string }) {
   return (
     <div>

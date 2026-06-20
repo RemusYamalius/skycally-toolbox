@@ -331,6 +331,38 @@ function getPageContents(page: any, pdf: any): string {
   }
 }
 
+// ---------- Strategy 5: Word/Office vector watermark via Artifact BDC blocks ----------
+// Word exports watermarks as /Artifact BDC blocks with low-opacity GS state
+// containing vector paths (m c h f operators). These are NOT text — they are
+// drawn shapes that form Arabic calligraphy or text outlines.
+
+function stripArtifactWatermarkBlocks(content: string, lowAlphaGStates: Set<string>): { out: string; removed: number } {
+  let removed = 0;
+
+  // Match /Artifact BDC ... EMC blocks
+  // Word watermarks use: /Artifact <</Attached [/Top]/Type/Pagination>> BDC
+  const artifactRe = /\/Artifact\s*<<[^>]*>>\s*BDC([\s\S]*?)EMC/g;
+
+  const out = content.replace(artifactRe, (full, body: string) => {
+    // Check if this block uses a low-alpha GS state (watermark indicator)
+    const usesLowAlpha = [...body.matchAll(/\/([A-Za-z0-9_.+-]+)\s+gs/g)].some((m) => lowAlphaGStates.has(m[1]));
+
+    // Check if it contains vector drawing ops (m, c, h, f, S, s) but no text (BT/ET)
+    const hasVectorPaths = /\b[mch]\b/.test(body) && !/\bBT\b/.test(body);
+
+    // Check for low gray fill (watermark color is typically 0.5-0.9 gray)
+    const hasLightGray = /^0\.[5-9]\d*\s+g\b/m.test(body.trim()) || /\b0\.[5-9]\d*\s+g\b/.test(body);
+
+    if (usesLowAlpha || (hasVectorPaths && hasLightGray)) {
+      removed++;
+      return ""; // Remove entire Artifact block
+    }
+    return full;
+  });
+
+  return { out, removed };
+}
+
 // ---------- Strategy 4: Word/Office watermark via header XObjects ----------
 // Word exports watermarks as Form XObjects referenced from the page /Resources
 // under names like "Watermark", "WMK", "wm", etc., or as the only large Form
@@ -462,6 +494,11 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
     let content = pageContents[i];
     const lowAlpha = findLowAlphaGStates(page);
     if (!content) return;
+
+    // Strategy 5 — Word vector watermark Artifact BDC blocks
+    const r5 = stripArtifactWatermarkBlocks(content, lowAlpha);
+    content = r5.out;
+    totalRemoved += r5.removed;
 
     // Strategy 1
     const r1 = stripWatermarkTextBlocks(content, repeated, lowAlpha);

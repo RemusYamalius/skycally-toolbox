@@ -185,21 +185,24 @@ function TypingSpeedPage() {
     });
   };
 
-  const progress = quote.length > 0 ? Math.min((input.length / quote.length) * 100, 100) : 0;
-
   const liveWpm = useMemo(() => {
+    if (!started || !quote) return 0;
     const elapsed = CONFIG[difficulty].duration - timeLeft;
-    if (!started || elapsed === 0) return 0;
-    const typedWords = input.trim().split(/\s+/).filter(Boolean).length;
-    return Math.round((typedWords / elapsed) * 60);
-  }, [input, timeLeft, started, difficulty]);
+    if (elapsed <= 0) return 0;
+    const typedWords = input.trim().split(/\s+/).filter(Boolean);
+    const words = quote.trim().split(/\s+/);
+    const correct = typedWords.filter((w, i) => words[i] === w).length;
+    return Math.round((correct / elapsed) * 60);
+  }, [input, timeLeft, started, difficulty, quote]);
+
+  const progress = ((CONFIG[difficulty].duration - timeLeft) / CONFIG[difficulty].duration) * 100;
 
   return (
     <ToolPageShell
       title="Typing Speed Test"
-      description="Test your typing speed and accuracy. Find out how many words per minute you can type!"
+      description="Test your typing speed in WPM. Choose a category and difficulty, then type as fast as you can."
     >
-      <div className="max-w-2xl mx-auto">
+      <div className="space-y-6">
         {phase === "setup" && (
           <div className="rounded-2xl border border-border bg-card p-6 sm:p-8 space-y-6">
             <div>
@@ -243,7 +246,9 @@ function TypingSpeedPage() {
             </div>
 
             {best[difficulty] > 0 && (
-              <p className="text-sm text-yellow-400">🏆 Best on {difficulty}: {best[difficulty]} WPM</p>
+              <p className="text-sm text-yellow-400">
+                🏆 Best on {difficulty}: {best[difficulty]} WPM
+              </p>
             )}
 
             <Button onClick={startGame} className="w-full" size="lg">
@@ -342,44 +347,66 @@ function TypingSpeedPage() {
 
         <HowToUse
           steps={[
-            "Choose a category and difficulty, then hit Start.",
-            "Start typing the displayed text — the timer begins on your first keystroke.",
-            "Finish as many words as you can before time runs out to maximize your WPM score!",
+            "Choose a quote category (General, Technology, Motivational, or Science) and a difficulty level (60s, 30s, or 15s).",
+            "Click Start Test and begin typing the displayed text — the timer starts on your first keystroke.",
+            "Type as accurately and quickly as possible. Green means correct, red means wrong. Your WPM and personal best are saved automatically.",
           ]}
         />
 
-        <RelatedTools currentSlug="typing-speed" />
-
         <ToolSeoContent
-          title="Typing Speed Test — Free Online WPM Typing Test"
-          description="Play Typing Speed Test online for free. Get your WPM score, accuracy, and personal best. 4 categories, 3 difficulty levels, instant results."
+          title="Free Typing Speed Test — WPM Test Online, No Signup"
+          description="Test your typing speed in words per minute (WPM) with real-time feedback. 4 categories, 3 difficulty levels, personal best tracker. Free, instant, no signup required."
           body={[
-            "Our free online Typing Speed Test measures how many words per minute (WPM) you can type accurately. Pick one of four quote categories — General, Technology, Motivational, or Science — and choose a difficulty that controls your time limit: 60 seconds (Easy), 30 seconds (Medium), or 15 seconds (Hard). The timer only starts when you press your first key, so you can read the quote and get ready without losing time.",
-            "As you type, every character is highlighted in real time: green for correct, red for wrong, with a pulsing cursor showing your current position. You'll see live WPM and a progress bar while typing, then a full report at the end with accuracy, correct and incorrect word counts, and a personal-best tracker stored on your device. No signup, no uploads — everything runs in your browser.",
+            "Skycally's Typing Speed Test measures how many words per minute (WPM) you can type accurately. Choose from four quote categories — General, Technology, Motivational, or Science — and set your difficulty: 60 seconds for beginners, 30 seconds for intermediate typists, and 15 seconds for advanced users. The timer only starts when you press your first key, giving you time to read the text before beginning.",
+            "Real-time character highlighting shows your progress as you type: green for correct characters, red for mistakes, with a pulsing cursor marking your position. A live WPM counter updates every second alongside a countdown timer and progress bar. At the end, you receive a full breakdown: WPM score, accuracy percentage, correct word count, and incorrect word count.",
+            "Your personal best for each difficulty level is saved locally in your browser, so you can track your improvement over time without creating an account. The test uses a rotating bank of quotes for variety — each round presents a randomly selected text from your chosen category, keeping practice sessions fresh and engaging.",
+            "The average typing speed for adults is 40 WPM. Touch typists typically reach 50–80 WPM, while professional typists and transcriptionists often exceed 100 WPM. Regular daily practice of 10–15 minutes is the most effective way to improve — focusing on accuracy first, then building speed gradually.",
           ]}
           faqs={[
             {
               question: "How is WPM calculated?",
               answer:
-                "WPM (words per minute) is calculated as the number of correctly typed words divided by the test duration in seconds, multiplied by 60. Only words that exactly match the quote count toward your WPM score.",
+                "WPM (words per minute) equals the number of correctly typed words divided by the test duration in seconds, multiplied by 60. Only words that exactly match the displayed text count as correct. Partially typed or misspelled words count as incorrect and do not contribute to your WPM score.",
             },
             {
               question: "When does the timer start?",
               answer:
-                "The timer doesn't start until you press your first key. Take your time to read the quote, then begin typing whenever you're ready — the countdown begins on your first keystroke.",
+                "The timer starts on your first keystroke — not when you click Start. This gives you time to read the quote and position your fingers before the countdown begins. Take a moment to scan the text before you start typing.",
+            },
+            {
+              question: "What is a good typing speed?",
+              answer:
+                "The average adult types 40 WPM. A speed of 50–70 WPM is considered good for general use. Touch typists typically reach 70–90 WPM. Professional typists, programmers, and transcriptionists often type at 90–120 WPM or faster. Above 120 WPM is considered elite.",
             },
             {
               question: "What categories are available?",
               answer:
-                "There are four quote categories: General (everyday quotes), Technology (programming and tech wisdom), Motivational (inspirational sayings), and Science (curiosity-driven thinking). A random quote is picked from your chosen category each round.",
+                "Four categories: General (everyday quotes), Technology (programming and tech insights), Motivational (inspirational sayings), and Science (curiosity-driven thinking). A random quote is selected from your chosen category each round, so you get different text every time.",
             },
             {
               question: "How can I improve my typing speed?",
               answer:
-                "Practice daily, keep your fingers on the home row, avoid looking at the keyboard, and focus on accuracy before speed. Try the Easy 60-second mode first to build rhythm, then move to Medium and Hard as your accuracy stays above 95%.",
+                "Focus on accuracy before speed — aim for 95%+ accuracy at your current speed before trying to go faster. Keep your fingers on the home row (ASDF JKL;), avoid looking at the keyboard, and practice for 10–15 minutes daily. Start with Easy (60s) and move to harder difficulties as your accuracy improves.",
+            },
+            {
+              question: "Is my score saved?",
+              answer:
+                "Yes. Your personal best WPM for each difficulty level (Easy, Medium, Hard) is saved locally in your browser using localStorage. It persists between sessions and is displayed during the test so you can track your progress. No account or server is involved.",
+            },
+            {
+              question: "What is the difference between Easy, Medium, and Hard?",
+              answer:
+                "The difficulty controls the time limit: Easy gives you 60 seconds, Medium gives 30 seconds, and Hard gives only 15 seconds. A shorter time limit is harder because you must type faster with no room to correct mistakes. The text content is the same across all difficulties.",
+            },
+            {
+              question: "Does this test work on mobile?",
+              answer:
+                "Yes, the test works on mobile devices with a keyboard attached. On-screen (virtual) keyboards on phones and tablets are generally too slow and inaccurate for a meaningful typing speed test — a physical keyboard gives the most accurate results.",
             },
           ]}
         />
+
+        <RelatedTools currentSlug="typing-speed" />
       </div>
     </ToolPageShell>
   );

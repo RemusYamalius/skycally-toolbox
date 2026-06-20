@@ -913,7 +913,7 @@ export default function LoanCalculatorPage({ defaultTab, slug }: { defaultTab: L
         {/* ------- Results ------- */}
         <div className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
           {/* Hero cards */}
-          <div className={`grid gap-4 ${mortgage ? "sm:grid-cols-2 2xl:grid-cols-4" : "sm:grid-cols-3"}`}>
+          <div className={`grid gap-4 ${mortgage ? "grid-cols-2" : "sm:grid-cols-3"}`}>
             <ResultCard
               label={STRINGS.results.monthlyPayment}
               value={result ? formatCurrency(periodicPayment, state.currency) : "—"}

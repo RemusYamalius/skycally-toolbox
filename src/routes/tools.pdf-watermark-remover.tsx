@@ -85,11 +85,13 @@ function detectRepeatedStrings(pageContents: string[]): Set<string> {
   const counts = new Map<string, number>();
   for (const c of pageContents) {
     const seen = new Set(
-      extractShownStrings(c).map((s) => s.trim()).filter((s) => s.length >= 2),
+      extractShownStrings(c)
+        .map((s) => s.trim())
+        .filter((s) => s.length >= 2),
     );
     for (const s of seen) counts.set(s, (counts.get(s) ?? 0) + 1);
   }
-  const threshold = pageContents.length <= 2 ? 1 : Math.max(2, Math.floor(pageContents.length * 0.5));
+  const threshold = 1; // detect watermark appearing on any page
   const out = new Set<string>();
   for (const [s, n] of counts) if (n >= threshold) out.add(s);
   return out;
@@ -138,18 +140,25 @@ function stripWatermarkTextBlocks(
   }
 
   function hasLowAlpha(text: string): boolean {
-    return [...text.matchAll(/\/([A-Za-z0-9_.+-]+)\s+gs/g)]
-      .map((m) => m[1])
-      .some((g) => lowAlphaGStates.has(g));
+    return [...text.matchAll(/\/([A-Za-z0-9_.+-]+)\s+gs/g)].map((m) => m[1]).some((g) => lowAlphaGStates.has(g));
   }
 
   function matchesTargets(text: string): boolean {
-    return extractShownStrings(text).map((s) => s.trim()).some((s) => targets.has(s));
+    return extractShownStrings(text)
+      .map((s) => s.trim())
+      .some((s) => targets.has(s));
+  }
+
+  const WATERMARK_KEYWORDS = /water\s*mark|confidential|draft|sample|specimen|do not copy|void|copy|برouillon|مسودة/i;
+
+  function hasWatermarkKeyword(text: string): boolean {
+    const strings = extractShownStrings(text);
+    return strings.some((s) => WATERMARK_KEYWORDS.test(s));
   }
 
   function isWatermarkBlock(block: string): boolean {
     if (!/\bBT\b/.test(block)) return false;
-    return isRotated(block) || hasLowAlpha(block) || matchesTargets(block);
+    return isRotated(block) || hasLowAlpha(block) || matchesTargets(block) || hasWatermarkKeyword(block);
   }
 
   // Stack-based parser: correctly handles arbitrarily nested q...Q blocks
@@ -229,7 +238,8 @@ function stripLargeImageDraws(
     if (!doMatches.length) return full;
     // Last cm in this block
     const cmRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+cm/g;
-    let lastA = 1, lastD = 1;
+    let lastA = 1,
+      lastD = 1;
     let cm: RegExpExecArray | null;
     while ((cm = cmRe.exec(body)) !== null) {
       lastA = Math.abs(parseFloat(cm[1]));
@@ -274,9 +284,7 @@ function stripStampAnnots(page: any): number {
         // Also: FreeText / Square / Widget annots whose contents look like a watermark
         if (!drop) {
           const contents = aDict.lookup(PDFName.of("Contents"));
-          const text = contents && typeof (contents as any).asString === "function"
-            ? (contents as any).asString()
-            : "";
+          const text = contents && typeof (contents as any).asString === "function" ? (contents as any).asString() : "";
           if (/water\s*mark|confidential|draft|sample|specimen/i.test(text)) drop = true;
         }
       }
@@ -303,11 +311,11 @@ function getPageContents(page: any, pdf: any): string {
       contents instanceof PDFArray
         ? contents.asArray()
         : contents instanceof PDFRef
-        ? (() => {
-            const resolved = pdf.context.lookup(contents);
-            return resolved instanceof PDFArray ? resolved.asArray() : [resolved];
-          })()
-        : [contents];
+          ? (() => {
+              const resolved = pdf.context.lookup(contents);
+              return resolved instanceof PDFArray ? resolved.asArray() : [resolved];
+            })()
+          : [contents];
     let merged = "";
     for (const item of arr) {
       let s: any = item;
@@ -343,7 +351,7 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
       if (kind === "Image") imageFreq.set(name, (imageFreq.get(name) ?? 0) + 1);
     }
   });
-  const globalThreshold = Math.max(2, Math.floor(pages.length * 0.5) + 1);
+  const globalThreshold = 1; // detect image watermark on any page
   const globalWatermarkImages = new Set<string>();
   for (const [n, c] of imageFreq) if (c >= globalThreshold) globalWatermarkImages.add(n);
 
@@ -516,7 +524,10 @@ function PdfWatermarkRemover() {
   const busy = stage === "processing" || stage === "advanced";
 
   return (
-    <ToolPageShell title="PDF Watermark Remover" description="Remove watermarks from PDF files — fully in your browser, no uploads.">
+    <ToolPageShell
+      title="PDF Watermark Remover"
+      description="Remove watermarks from PDF files — fully in your browser, no uploads."
+    >
       <div className="w-full max-w-xl mx-auto space-y-5">
         <div
           onDrop={onDrop}
@@ -529,19 +540,29 @@ function PdfWatermarkRemover() {
             type="file"
             accept=".pdf,application/pdf"
             className="hidden"
-            onChange={(e) => { if (e.target.files?.[0]) onFile(e.target.files[0]); }}
+            onChange={(e) => {
+              if (e.target.files?.[0]) onFile(e.target.files[0]);
+            }}
           />
           {file ? (
             <div className="space-y-2">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-red-500/10 border border-red-500/30 flex items-center justify-center">
                 <svg className="w-6 h-6 text-red-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <p className="text-foreground font-medium text-sm">{file.name}</p>
               <p className="text-muted-foreground text-xs">{(file.size / 1024 / 1024).toFixed(2)} MB</p>
               <button
-                onClick={(e) => { e.stopPropagation(); reset(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  reset();
+                }}
                 className="text-xs text-muted-foreground hover:text-red-400 transition-colors"
               >
                 Remove
@@ -551,7 +572,12 @@ function PdfWatermarkRemover() {
             <div className="space-y-2 py-4">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
                 <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"
+                  />
                 </svg>
               </div>
               <p className="text-muted-foreground text-sm">Drop a PDF file here or click to select</p>
@@ -565,7 +591,10 @@ function PdfWatermarkRemover() {
               {stage === "advanced" ? "Processing in advanced mode..." : "Removing watermark..."}
             </p>
             <div className="h-2 rounded-full bg-background overflow-hidden">
-              <div className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all" style={{ width: `${progress}%` }} />
+              <div
+                className="h-full bg-gradient-to-r from-cyan-500 to-blue-600 transition-all"
+                style={{ width: `${progress}%` }}
+              />
             </div>
           </div>
         )}
@@ -629,27 +658,68 @@ function PdfWatermarkRemover() {
         )}
       </div>
 
-      <HowToUse steps={[
-        "Upload a PDF by dragging it in or clicking to select a file.",
-        "Click \"Remove Watermark\" and wait for processing to finish.",
-        "Download the cleaned file. If no watermark was detected, try Advanced Mode.",
-      ]} />
-      <RelatedTools currentSlug="pdf-watermark-remover" />
-      <ToolSeoContent
-        title={"PDF Watermark Remover Online Free — Remove Watermarks from PDF"}
-        description={"Remove text, image and stamp watermarks from PDF files for free, directly in your browser. No uploads, no signup, 100% private."}
-        body={[
-          "This PDF Watermark Remover scans every page of your document and automatically detects three common watermark patterns: transparent or rotated text overlays, large repeated images, and stamp/watermark annotations. The cleaned file is rebuilt with the same pages and remains fully selectable and searchable.",
-          "When a watermark is baked into the page content and cannot be removed structurally, you can opt in to advanced mode. Advanced mode rasterizes each page at 2× resolution and rebuilds the PDF from images — the watermark disappears visually, but text in the new PDF is no longer selectable.",
-          "Everything runs locally using pdf-lib and pdfjs-dist. Your file never leaves your device, making this tool safe for confidential contracts, invoices and reports.",
-        ]}
-        faqs={[
-          { question: "Does this tool work on all PDFs?", answer: "It works best on watermarks added as text overlays, transparent layers, large background images or stamp annotations. Watermarks burned directly into scanned images require advanced mode." },
-          { question: "Is my file uploaded to a server?", answer: "No. All processing happens in your browser using pdf-lib and pdfjs-dist. Nothing is uploaded anywhere." },
-          { question: "What is advanced mode?", answer: "Advanced mode rasterizes each page to a high-resolution image and rebuilds the PDF. It removes nearly any visual watermark but the resulting text is no longer selectable." },
-          { question: "Will the result be selectable text?", answer: "Yes for the default mode — pages keep their original text and vectors. In advanced mode, pages become images and text selection is lost." },
+      <HowToUse
+        steps={[
+          "Upload your PDF by dragging it in or clicking to select a file.",
+          "Click Remove Watermark — the tool automatically detects and removes text, image, and stamp watermarks.",
+          "Download the cleaned file. If the watermark persists, try Advanced Mode which rebuilds every page as an image.",
         ]}
       />
+
+      <ToolSeoContent
+        title="PDF Watermark Remover Online Free — Remove Watermarks from PDF"
+        description="Remove text, image, diagonal and stamp watermarks from PDF files for free, directly in your browser. Works on single-page and multi-page documents. No upload, no signup, 100% private."
+        body={[
+          "Skycally's PDF Watermark Remover automatically detects and removes three types of watermarks from PDF files: text overlays (including diagonal and rotated watermarks like DRAFT, CONFIDENTIAL, SAMPLE, and COPY), large background image watermarks, and stamp or annotation watermarks. All processing runs locally in your browser using pdf-lib — your document never leaves your device.",
+          "The tool works by parsing the PDF content streams directly and identifying elements that match watermark patterns: text blocks with rotated transformation matrices (the diagonal text typical of most watermarks), elements with low opacity or transparency, text matching common watermark keywords, and images covering more than 40% of the page area. Matching elements are surgically removed from the page content while leaving all other text, images, and formatting intact.",
+          "When a watermark is embedded so deeply into the page content that it cannot be removed structurally — common with some PDF generators that merge the watermark directly into the base content layer — Advanced Mode is available. Advanced Mode rasterizes each page at 2× resolution using pdfjs-dist, then rebuilds the PDF from high-quality JPEG images. The watermark disappears completely, but the resulting text is no longer selectable or searchable.",
+          "This tool is useful for removing watermarks from documents you have legitimate rights to edit — such as trial software exports, draft documents you authored, or PDFs where you need to remove a watermark you added yourself. Always ensure you have the legal right to modify a document before removing its watermark.",
+        ]}
+        faqs={[
+          {
+            question: "What types of watermarks can be removed?",
+            answer:
+              "The tool removes three types: (1) text watermarks including diagonal overlays, DRAFT/CONFIDENTIAL/SAMPLE/COPY text, and repeated text patterns; (2) large image watermarks covering more than 40% of the page; (3) stamp and annotation watermarks added via PDF annotation layers. Watermarks that are part of scanned page images require Advanced Mode.",
+          },
+          {
+            question: "Why wasn't my watermark detected?",
+            answer:
+              "Some PDFs embed watermarks directly into the base content layer without rotation or transparency — making them structurally identical to regular content. In this case, use Advanced Mode, which bypasses structure analysis entirely and renders each page visually, then rebuilds the PDF from images. The watermark disappears but text becomes non-selectable.",
+          },
+          {
+            question: "Does it work on single-page PDFs?",
+            answer:
+              "Yes. The tool detects watermarks on any number of pages — including single-page documents. Detection does not require the watermark to appear on multiple pages.",
+          },
+          {
+            question: "Is my PDF uploaded to a server?",
+            answer:
+              "No. All processing happens locally in your browser using pdf-lib and pdfjs-dist (WebAssembly). Your file never leaves your device, making this tool safe for confidential contracts, invoices, and sensitive documents.",
+          },
+          {
+            question: "Will the output PDF have selectable text?",
+            answer:
+              "Yes, in the default mode — the PDF is rebuilt preserving all original text, fonts, vectors, and images. Only the watermark elements are removed. In Advanced Mode, pages are converted to images and text selection is lost.",
+          },
+          {
+            question: "What is Advanced Mode?",
+            answer:
+              "Advanced Mode renders each page at 2× screen resolution using pdfjs-dist, captures it as a high-quality image, and rebuilds the PDF from those images. This removes any visual watermark regardless of how it was embedded, but the output PDF no longer has selectable or searchable text.",
+          },
+          {
+            question: "Can it remove diagonal watermarks?",
+            answer:
+              "Yes. Diagonal watermarks use a rotation transformation matrix in the PDF content stream (a non-zero b or c value in the cm or Tm matrix). The tool detects any text block with a rotation angle and flags it as a likely watermark for removal.",
+          },
+          {
+            question: "Does it work on password-protected PDFs?",
+            answer:
+              "The tool attempts to open password-protected PDFs in read mode (ignoreEncryption: true), which works for some protection levels. Strongly encrypted PDFs may fail to open. If you receive an error, you will need to remove the password protection first using your PDF reader.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="pdf-watermark-remover" />
     </ToolPageShell>
   );
 }

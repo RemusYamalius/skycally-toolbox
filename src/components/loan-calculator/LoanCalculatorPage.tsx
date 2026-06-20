@@ -536,7 +536,7 @@ export default function LoanCalculatorPage({
   }, [result, showAllRows]);
 
   const seo = SEO_CONTENT[tab];
-  const mortgage = tab === "mortgage" && result && "totalMonthly" in result ? (result as { totalMonthly: number; monthlyTax: number; monthlyInsurance: number; monthlyPmi: number }) : null;
+  const mortgage = tab === "mortgage" && result && "totalMonthly" in result ? (result as unknown as { totalMonthly: number; monthlyTax: number; monthlyInsurance: number; monthlyPmi: number }) : null;
 
   return (
     <ToolPageShell title={tool.name} description={tool.description}>

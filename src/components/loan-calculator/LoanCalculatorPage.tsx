@@ -1253,16 +1253,16 @@ function ResultCard({
       }
     >
       <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="flex items-baseline gap-1 mt-1 min-w-0">
-        <div
-          className={`font-display font-bold leading-none min-w-0 ${sizeClass}`}
+      <div className="mt-1 min-w-0">
+        <span
+          className={`font-display font-bold leading-none ${sizeClass}`}
           style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
         >
           {value}
-        </div>
+        </span>
         {hint && (
           <span
-            className="text-xs font-normal opacity-70 shrink-0"
+            className="text-xs font-normal opacity-70 ml-1"
             style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
           >
             {hint}

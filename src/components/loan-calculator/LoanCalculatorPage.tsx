@@ -920,22 +920,26 @@ export default function LoanCalculatorPage({ defaultTab, slug }: { defaultTab: L
               hint={freqLabel}
               accent={accent}
               big
+              cols={mortgage ? 4 : 3}
             />
             <ResultCard
               label={STRINGS.results.totalInterest}
               value={result ? formatCurrency(result.totalInterest, state.currency) : "—"}
               accent="#f97316"
+              cols={mortgage ? 4 : 3}
             />
             <ResultCard
               label={STRINGS.results.totalCost}
               value={result ? formatCurrency(result.totalCost, state.currency) : "—"}
               muted
+              cols={mortgage ? 4 : 3}
             />
             {mortgage && (
               <ResultCard
                 label={STRINGS.results.piti}
                 value={formatCurrency(mortgage.totalMonthly, state.currency)}
                 accent="#10b981"
+                cols={4}
               />
             )}
           </div>
@@ -1216,6 +1220,7 @@ function ResultCard({
   accent,
   muted,
   big,
+  cols,
 }: {
   label: string;
   value: string;
@@ -1223,7 +1228,17 @@ function ResultCard({
   accent?: string;
   muted?: boolean;
   big?: boolean;
+  cols?: 3 | 4;
 }) {
+  const sizeClass =
+    cols === 4
+      ? big
+        ? "text-xl sm:text-2xl"
+        : "text-base sm:text-lg"
+      : big
+        ? "text-xl sm:text-2xl lg:text-3xl"
+        : "text-lg sm:text-xl lg:text-2xl";
+
   return (
     <div
       className="rounded-2xl border border-border bg-card p-4 min-w-0 overflow-hidden"
@@ -1238,20 +1253,12 @@ function ResultCard({
     >
       <div className="text-xs text-muted-foreground">{label}</div>
       <div
-        className={`font-display font-bold mt-1 leading-none truncate min-w-0 ${big ? "text-xl sm:text-2xl lg:text-3xl" : "text-lg sm:text-xl"}`}
+        className={`font-display font-bold mt-1 leading-none truncate min-w-0 ${sizeClass}`}
         style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
       >
         {value}
         {hint && <span className="text-xs font-normal ml-1 opacity-70">{hint}</span>}
       </div>
-    </div>
-  );
-}
-function Mini({ label, v }: { label: string; v: string }) {
-  return (
-    <div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="font-mono text-sm font-medium">{v}</div>
     </div>
   );
 }

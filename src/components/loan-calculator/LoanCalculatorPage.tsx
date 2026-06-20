@@ -1212,7 +1212,6 @@ export default function LoanCalculatorPage({ defaultTab, slug }: { defaultTab: L
   );
 }
 
-/* ------------------------- Small components ------------------------- */
 function ResultCard({
   label,
   value,
@@ -1241,13 +1240,20 @@ function ResultCard({
 
   return (
     <div
-      className={`font-display font-bold leading-none break-all min-w-0 ${sizeClass}`}
-      style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
+      className="rounded-2xl border border-border bg-card p-4 min-w-0 overflow-hidden"
+      style={
+        accent && !muted
+          ? {
+              borderColor: accent,
+              background: `linear-gradient(135deg, color-mix(in oklab, ${accent} 12%, transparent), var(--card))`,
+            }
+          : undefined
+      }
     >
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="flex items-baseline gap-1 mt-1 min-w-0">
         <div
-          className={`font-display font-bold leading-none truncate min-w-0 ${sizeClass}`}
+          className={`font-display font-bold leading-none break-all min-w-0 ${sizeClass}`}
           style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
         >
           {value}
@@ -1261,14 +1267,6 @@ function ResultCard({
           </span>
         )}
       </div>
-    </div>
-  );
-}
-function Mini({ label, v }: { label: string; v: string }) {
-  return (
-    <div>
-      <div className="text-xs text-muted-foreground">{label}</div>
-      <div className="font-mono text-sm font-medium">{v}</div>
     </div>
   );
 }

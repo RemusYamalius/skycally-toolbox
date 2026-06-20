@@ -1212,6 +1212,8 @@ export default function LoanCalculatorPage({ defaultTab, slug }: { defaultTab: L
   );
 }
 
+/* ------------------------- Small components ------------------------- */
+
 function ResultCard({
   label,
   value,
@@ -1232,7 +1234,7 @@ function ResultCard({
   const sizeClass =
     cols === 4
       ? big
-        ? "text-lg sm:text-xl"
+        ? "text-base sm:text-lg"
         : "text-sm sm:text-base"
       : big
         ? "text-xl sm:text-2xl lg:text-3xl"
@@ -1253,7 +1255,7 @@ function ResultCard({
       <div className="text-xs text-muted-foreground">{label}</div>
       <div className="flex items-baseline gap-1 mt-1 min-w-0">
         <div
-          className={`font-display font-bold leading-none break-all min-w-0 ${sizeClass}`}
+          className={`font-display font-bold leading-none min-w-0 ${sizeClass}`}
           style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
         >
           {value}
@@ -1267,6 +1269,15 @@ function ResultCard({
           </span>
         )}
       </div>
+    </div>
+  );
+}
+
+function Mini({ label, v }: { label: string; v: string }) {
+  return (
+    <div>
+      <div className="text-xs text-muted-foreground">{label}</div>
+      <div className="font-mono text-sm font-medium">{v}</div>
     </div>
   );
 }

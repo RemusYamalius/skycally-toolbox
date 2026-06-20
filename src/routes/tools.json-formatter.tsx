@@ -21,7 +21,8 @@ function JsonFormatter() {
   const [indent, setIndent] = useState(2);
 
   const format = () => {
-    setError(""); setOutput("");
+    setError("");
+    setOutput("");
     if (!input.trim()) return;
     try {
       const parsed = JSON.parse(input);
@@ -32,7 +33,8 @@ function JsonFormatter() {
   };
 
   const minify = () => {
-    setError(""); setOutput("");
+    setError("");
+    setOutput("");
     if (!input.trim()) return;
     try {
       const parsed = JSON.parse(input);
@@ -49,7 +51,11 @@ function JsonFormatter() {
     setTimeout(() => setCopied(false), 2000);
   };
 
-  const clear = () => { setInput(""); setOutput(""); setError(""); };
+  const clear = () => {
+    setInput("");
+    setOutput("");
+    setError("");
+  };
 
   const lineCount = output ? output.split("\n").length : 0;
 
@@ -98,7 +104,11 @@ function JsonFormatter() {
             </div>
             <textarea
               value={input}
-              onChange={(e) => { setInput(e.target.value); setError(""); setOutput(""); }}
+              onChange={(e) => {
+                setInput(e.target.value);
+                setError("");
+                setOutput("");
+              }}
               placeholder={'{\n  "key": "value"\n}'}
               className="w-full bg-transparent text-foreground placeholder:text-muted-foreground/60 resize-none outline-none font-mono text-sm min-h-[320px] leading-relaxed"
               spellCheck={false}
@@ -129,18 +139,67 @@ function JsonFormatter() {
         </div>
       </div>
 
-      <HowToUse steps={[
-        "Paste your JSON into the input box.",
-        "Click Format to prettify with 2 or 4-space indent, or Minify to compact it.",
-        "Copy the result with one click.",
-      ]} />
-          <RelatedTools currentSlug="json-formatter" />
-          <ToolSeoContent
-        title="Free JSON Formatter — Beautify & Minify JSON Online"
-        description="Skycally's JSON Formatter instantly beautifies or minifies any JSON string. Choose between 2 or 4 space indentation, and switch between formatted and raw views with one click. It clearly highlights syntax errors so you can fix them quickly. Everything runs in your browser — no data is sent anywhere."
-        body={[]}
-        faqs={[{"question":"What does the formatter do exactly?","answer":"It parses your JSON and outputs it with proper indentation and line breaks for easy reading."},{"question":"Can it detect JSON errors?","answer":"Yes, if the input is not valid JSON, a clear error message is displayed explaining the issue."},{"question":"What indentation options are available?","answer":"You can choose between 2-space and 4-space indentation."},{"question":"Can I minify JSON too?","answer":"Yes, use the Minify button to compress JSON into a single line."},{"question":"Is my JSON data sent to a server?","answer":"No. All processing happens locally in your browser."}]}
+      <HowToUse
+        steps={[
+          "Paste your JSON into the input box on the left.",
+          "Click Format to prettify with 2 or 4-space indentation, or Minify to compact it to one line.",
+          "Copy the formatted output with one click.",
+        ]}
       />
+
+      <ToolSeoContent
+        title="Free JSON Formatter & Validator — Beautify and Minify JSON Online"
+        description="Format, prettify, validate and minify JSON instantly in your browser. Highlights syntax errors with clear messages. No data sent to any server — completely free, no signup."
+        body={[
+          "JSON (JavaScript Object Notation) is the most widely used data format for APIs, configuration files, and data exchange between applications. Skycally's JSON Formatter instantly parses and reformats any JSON string with proper indentation and line breaks, making it easy to read, debug, and understand the structure of any data response.",
+          "The formatter also acts as a JSON validator — if your input contains a syntax error (missing comma, unclosed bracket, invalid value), the tool displays a precise error message showing exactly what went wrong. This is especially useful when debugging API responses or hand-editing configuration files where a single misplaced character breaks everything.",
+          "Minifying JSON removes all whitespace, line breaks, and indentation to produce the most compact possible representation. This is used in production environments to reduce the size of JSON payloads sent over the network, improving API response times and reducing bandwidth costs. The difference can be significant for large JSON objects — a formatted 10 KB file might minify to 4 KB.",
+        ]}
+        faqs={[
+          {
+            question: "What does JSON formatting do?",
+            answer:
+              "Formatting (also called prettifying or beautifying) parses your JSON and rewrites it with consistent indentation, line breaks, and spacing. This makes nested structures easy to read and understand, compared to a compact single-line representation.",
+          },
+          {
+            question: "What is JSON validation?",
+            answer:
+              "JSON validation checks whether your input is syntactically valid JSON. Common errors include missing or extra commas, unclosed brackets or braces, unquoted keys, single-quoted strings (JSON requires double quotes), and trailing commas. This tool highlights the exact error when validation fails.",
+          },
+          {
+            question: "What is the difference between 2-space and 4-space indentation?",
+            answer:
+              "Both are valid and commonly used. 2-space indentation produces more compact output and is common in web development (JavaScript, Node.js). 4-space indentation is common in Python and other ecosystems. Choose based on your team's style guide or personal preference.",
+          },
+          {
+            question: "What does minifying JSON do?",
+            answer:
+              "Minifying removes all whitespace, line breaks, and indentation from JSON, producing the smallest possible valid JSON string. This is used in APIs and web applications to reduce payload size and improve transfer speed. The data content is identical — only the formatting is removed.",
+          },
+          {
+            question: "Is my JSON data sent to a server?",
+            answer:
+              "No. All formatting, validation, and minification happens locally in your browser using JavaScript's built-in JSON.parse() and JSON.stringify() functions. Your data never leaves your device.",
+          },
+          {
+            question: "Can this handle very large JSON files?",
+            answer:
+              "Yes, within browser memory limits. JSON files up to several megabytes are handled without issues. Very large files (50 MB+) may be slow depending on your device, since parsing and stringifying large objects is memory-intensive.",
+          },
+          {
+            question: "What is JSON used for?",
+            answer:
+              "JSON is used as the standard data format for REST APIs, configuration files (package.json, tsconfig.json), database documents (MongoDB, Firestore), data export/import, and communication between web services. It is supported natively in every major programming language.",
+          },
+          {
+            question: "How do I fix a JSON syntax error?",
+            answer:
+              "Common fixes: ensure all keys are wrapped in double quotes (not single), check for trailing commas after the last item in arrays or objects, make sure all brackets and braces are properly closed, and verify that string values use double quotes. The error message shown by this tool points to the location of the problem.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="json-formatter" />
     </ToolPageShell>
   );
 }

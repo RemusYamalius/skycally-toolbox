@@ -32,11 +32,7 @@ import {
   formatCurrency,
   rowsToCsv,
 } from "./amortization";
-import type {
-  AmortRow,
-  CurrencyCode,
-  LoanTab,
-} from "./types";
+import type { AmortRow, CurrencyCode, LoanTab } from "./types";
 import { CURRENCIES, RTL_CURRENCIES } from "./types";
 
 /* ------------------------- i18n strings ------------------------- */
@@ -114,10 +110,7 @@ const STRINGS = {
 
 /* ------------------------- Tab metadata ------------------------- */
 
-const TAB_META: Record<
-  LoanTab,
-  { label: string; icon: string; accent: string; example: TabState }
-> = {
+const TAB_META: Record<LoanTab, { label: string; icon: string; accent: string; example: TabState }> = {
   personal: {
     label: STRINGS.tabs.personal,
     icon: "💳",
@@ -203,8 +196,7 @@ const SEO_CONTENT: Record<
   { title: string; description: string; body: string[]; faqs: { question: string; answer: string }[] }
 > = {
   personal: {
-    title:
-      "Free Loan Calculator — Monthly Payment, Total Interest & Amortization",
+    title: "Free Loan Calculator — Monthly Payment, Total Interest & Amortization",
     description:
       "Calculate your monthly loan payment, total interest and full amortization schedule instantly. Supports personal loans, mortgages, car loans and EMI. Free, no signup.",
     body: [
@@ -213,14 +205,46 @@ const SEO_CONTENT: Record<
       "Use the 'Extra Payment' feature to see how much interest you save by paying more each month. Even $50–$100 extra per month on a long-term loan can save thousands in interest and cut years off the repayment period — a feature most online calculators don't show you.",
     ],
     faqs: [
-      { question: "How is the monthly loan payment calculated?", answer: "Using the standard PMT formula: M = P × r(1+r)^n / ((1+r)^n − 1), where P = principal, r = monthly interest rate (annual rate ÷ 12), and n = number of months. If the interest rate is 0%, the payment is simply the principal divided by the number of months." },
-      { question: "What is an amortization schedule?", answer: "A month-by-month breakdown showing how much of each payment goes toward interest and how much reduces the principal balance. In early payments, most of the payment is interest. Over time, the interest portion shrinks and the principal portion grows." },
-      { question: "How can I reduce the total interest I pay?", answer: "Three ways: 1) Negotiate a lower interest rate, 2) Shorten the loan term, 3) Make extra payments toward the principal each month. The 'Extra Payment' calculator above shows exactly how much you save with each extra dollar paid." },
-      { question: "What is a good interest rate for a personal loan?", answer: "Personal loan rates typically range from 5% to 36% depending on your credit score, income, and lender. A rate below 10% is generally considered good. Compare multiple lenders before accepting any offer." },
-      { question: "What is the difference between APR and interest rate?", answer: "The interest rate is the cost of borrowing the principal. APR (Annual Percentage Rate) includes the interest rate plus fees (origination fee, closing costs, etc.), making it the true annual cost of the loan. Always compare APRs when shopping for loans." },
-      { question: "Does this calculator store my financial data?", answer: "No. All calculations run locally in your browser using JavaScript. Your loan amount, rate, and other inputs are saved only in your browser's localStorage for convenience and never transmitted to any server." },
-      { question: "Can I download the amortization table?", answer: "Yes. Click 'Download CSV' under the payment schedule to download the full amortization table as a spreadsheet you can open in Excel, Google Sheets, or any CSV viewer." },
-      { question: "What currencies are supported?", answer: "USD, EUR, GBP, MAD, SAR, AED, INR, BRL, CAD and AUD. Select your currency from the dropdown — the symbol updates instantly and all outputs are formatted according to each currency's conventions." },
+      {
+        question: "How is the monthly loan payment calculated?",
+        answer:
+          "Using the standard PMT formula: M = P × r(1+r)^n / ((1+r)^n − 1), where P = principal, r = monthly interest rate (annual rate ÷ 12), and n = number of months. If the interest rate is 0%, the payment is simply the principal divided by the number of months.",
+      },
+      {
+        question: "What is an amortization schedule?",
+        answer:
+          "A month-by-month breakdown showing how much of each payment goes toward interest and how much reduces the principal balance. In early payments, most of the payment is interest. Over time, the interest portion shrinks and the principal portion grows.",
+      },
+      {
+        question: "How can I reduce the total interest I pay?",
+        answer:
+          "Three ways: 1) Negotiate a lower interest rate, 2) Shorten the loan term, 3) Make extra payments toward the principal each month. The 'Extra Payment' calculator above shows exactly how much you save with each extra dollar paid.",
+      },
+      {
+        question: "What is a good interest rate for a personal loan?",
+        answer:
+          "Personal loan rates typically range from 5% to 36% depending on your credit score, income, and lender. A rate below 10% is generally considered good. Compare multiple lenders before accepting any offer.",
+      },
+      {
+        question: "What is the difference between APR and interest rate?",
+        answer:
+          "The interest rate is the cost of borrowing the principal. APR (Annual Percentage Rate) includes the interest rate plus fees (origination fee, closing costs, etc.), making it the true annual cost of the loan. Always compare APRs when shopping for loans.",
+      },
+      {
+        question: "Does this calculator store my financial data?",
+        answer:
+          "No. All calculations run locally in your browser using JavaScript. Your loan amount, rate, and other inputs are saved only in your browser's localStorage for convenience and never transmitted to any server.",
+      },
+      {
+        question: "Can I download the amortization table?",
+        answer:
+          "Yes. Click 'Download CSV' under the payment schedule to download the full amortization table as a spreadsheet you can open in Excel, Google Sheets, or any CSV viewer.",
+      },
+      {
+        question: "What currencies are supported?",
+        answer:
+          "USD, EUR, GBP, MAD, SAR, AED, INR, BRL, CAD and AUD. Select your currency from the dropdown — the symbol updates instantly and all outputs are formatted according to each currency's conventions.",
+      },
     ],
   },
   emi: {
@@ -233,19 +257,50 @@ const SEO_CONTENT: Record<
       "When planning a loan, use this calculator to work backwards: if you can afford a maximum monthly EMI of $500, adjust the principal and term until the calculated EMI fits your budget. The amortization table shows you exactly when the loan will be paid off and how much interest you'll pay in total.",
     ],
     faqs: [
-      { question: "What is EMI?", answer: "EMI (Equated Monthly Installment) is a fixed monthly payment made to a lender to repay a loan. Each payment covers a portion of the loan principal and the interest accrued for that month, calculated so the loan is fully repaid by the final payment." },
-      { question: "What is the EMI formula?", answer: "EMI = P × r × (1+r)^n / ((1+r)^n − 1), where P = principal loan amount, r = monthly interest rate (annual rate ÷ 12 ÷ 100), and n = number of monthly installments. This is also known as the PMT (payment) formula in Excel." },
-      { question: "How can I reduce my EMI?", answer: "Three ways: 1) Reduce the loan amount by making a larger down payment, 2) Negotiate a lower interest rate (improve your credit score), 3) Increase the loan tenure — but note that a longer tenure means more total interest paid." },
-      { question: "Is a lower EMI always better?", answer: "Not necessarily. A lower EMI often comes from a longer loan tenure, which means you pay more total interest. A higher EMI over a shorter period costs less overall. Use this calculator to compare total interest paid across different tenure options." },
-      { question: "What is the difference between flat rate and reducing balance EMI?", answer: "Flat rate interest is calculated on the original principal throughout the tenure. Reducing balance interest is calculated on the outstanding principal each month, which decreases as you repay. Reducing balance is more favourable to the borrower and is the method used in this calculator." },
-      { question: "Can I prepay my EMI loan?", answer: "Most loans allow prepayment, but some charge a prepayment penalty. Use the 'Extra Payment' feature to see how making lump-sum or regular extra payments reduces the total interest and loan tenure." },
-      { question: "How many EMIs will I pay?", answer: "The number of EMIs equals the loan tenure in months. A 3-year loan = 36 EMIs, a 5-year loan = 60 EMIs, a 20-year home loan = 240 EMIs. The amortization schedule shows every single payment." },
-      { question: "Does the EMI change over time?", answer: "For fixed-rate loans, no — the EMI stays constant throughout the tenure. For floating-rate loans, the EMI (or the tenure) changes when the interest rate changes." },
+      {
+        question: "What is EMI?",
+        answer:
+          "EMI (Equated Monthly Installment) is a fixed monthly payment made to a lender to repay a loan. Each payment covers a portion of the loan principal and the interest accrued for that month, calculated so the loan is fully repaid by the final payment.",
+      },
+      {
+        question: "What is the EMI formula?",
+        answer:
+          "EMI = P × r × (1+r)^n / ((1+r)^n − 1), where P = principal loan amount, r = monthly interest rate (annual rate ÷ 12 ÷ 100), and n = number of monthly installments. This is also known as the PMT (payment) formula in Excel.",
+      },
+      {
+        question: "How can I reduce my EMI?",
+        answer:
+          "Three ways: 1) Reduce the loan amount by making a larger down payment, 2) Negotiate a lower interest rate (improve your credit score), 3) Increase the loan tenure — but note that a longer tenure means more total interest paid.",
+      },
+      {
+        question: "Is a lower EMI always better?",
+        answer:
+          "Not necessarily. A lower EMI often comes from a longer loan tenure, which means you pay more total interest. A higher EMI over a shorter period costs less overall. Use this calculator to compare total interest paid across different tenure options.",
+      },
+      {
+        question: "What is the difference between flat rate and reducing balance EMI?",
+        answer:
+          "Flat rate interest is calculated on the original principal throughout the tenure. Reducing balance interest is calculated on the outstanding principal each month, which decreases as you repay. Reducing balance is more favourable to the borrower and is the method used in this calculator.",
+      },
+      {
+        question: "Can I prepay my EMI loan?",
+        answer:
+          "Most loans allow prepayment, but some charge a prepayment penalty. Use the 'Extra Payment' feature to see how making lump-sum or regular extra payments reduces the total interest and loan tenure.",
+      },
+      {
+        question: "How many EMIs will I pay?",
+        answer:
+          "The number of EMIs equals the loan tenure in months. A 3-year loan = 36 EMIs, a 5-year loan = 60 EMIs, a 20-year home loan = 240 EMIs. The amortization schedule shows every single payment.",
+      },
+      {
+        question: "Does the EMI change over time?",
+        answer:
+          "For fixed-rate loans, no — the EMI stays constant throughout the tenure. For floating-rate loans, the EMI (or the tenure) changes when the interest rate changes.",
+      },
     ],
   },
   mortgage: {
-    title:
-      "Free Mortgage Calculator — Monthly Payment with Tax, Insurance & PMI",
+    title: "Free Mortgage Calculator — Monthly Payment with Tax, Insurance & PMI",
     description:
       "Calculate your monthly mortgage payment including principal, interest, property tax, home insurance and PMI. Full amortization schedule. Free, instant, no signup.",
     body: [
@@ -254,14 +309,45 @@ const SEO_CONTENT: Record<
       "When comparing mortgage offers, look beyond the interest rate to the APR, which includes origination fees and points. A loan with a slightly lower rate but high fees may cost more over the full term than one with a slightly higher rate and no fees — especially if you plan to sell or refinance within 7–10 years.",
     ],
     faqs: [
-      { question: "What does PITI mean?", answer: "PITI stands for Principal, Interest, Taxes, and Insurance — the four components of a full monthly mortgage payment. Lenders use PITI to calculate your debt-to-income ratio when approving your loan." },
-      { question: "What is PMI and when do I need it?", answer: "Private Mortgage Insurance is required when your down payment is less than 20% of the home's purchase price. It protects the lender if you default. PMI typically costs 0.5%–1.5% of the loan amount annually and can be cancelled once your equity reaches 20%." },
-      { question: "How much down payment do I need?", answer: "Conventional loans typically require 5–20%. FHA loans allow as low as 3.5%. VA and USDA loans may allow 0% down. A larger down payment reduces your monthly payment, eliminates PMI, and means you borrow less total." },
-      { question: "Should I choose a 15-year or 30-year mortgage?", answer: "A 15-year mortgage has higher monthly payments but you pay far less interest overall. A 30-year mortgage has lower monthly payments, giving more cash flow flexibility, but costs significantly more in interest over the life of the loan. Use this calculator to compare both scenarios." },
-      { question: "What is a good mortgage interest rate?", answer: "Mortgage rates change daily based on economic conditions. Historically, rates below 4% are very low, 4–6% is moderate, and above 7% is high by recent standards. Check current rates from multiple lenders on the same day for accurate comparison." },
-      { question: "How does extra payment reduce my mortgage?", answer: "Extra principal payments reduce the balance faster, which reduces the interest charged next month, which means more of future regular payments go to principal — a compounding snowball effect. Even $100/month extra on a $300,000 30-year mortgage can save over $30,000 in interest." },
-      { question: "What is the difference between fixed and variable rate mortgages?", answer: "A fixed-rate mortgage has the same interest rate for the entire loan term. A variable (adjustable) rate mortgage (ARM) starts with a lower rate that changes periodically based on a market index. This calculator assumes a fixed rate." },
-      { question: "Is my mortgage data sent to a server?", answer: "No. All calculations run in your browser. Nothing is uploaded or stored anywhere outside your device." },
+      {
+        question: "What does PITI mean?",
+        answer:
+          "PITI stands for Principal, Interest, Taxes, and Insurance — the four components of a full monthly mortgage payment. Lenders use PITI to calculate your debt-to-income ratio when approving your loan.",
+      },
+      {
+        question: "What is PMI and when do I need it?",
+        answer:
+          "Private Mortgage Insurance is required when your down payment is less than 20% of the home's purchase price. It protects the lender if you default. PMI typically costs 0.5%–1.5% of the loan amount annually and can be cancelled once your equity reaches 20%.",
+      },
+      {
+        question: "How much down payment do I need?",
+        answer:
+          "Conventional loans typically require 5–20%. FHA loans allow as low as 3.5%. VA and USDA loans may allow 0% down. A larger down payment reduces your monthly payment, eliminates PMI, and means you borrow less total.",
+      },
+      {
+        question: "Should I choose a 15-year or 30-year mortgage?",
+        answer:
+          "A 15-year mortgage has higher monthly payments but you pay far less interest overall. A 30-year mortgage has lower monthly payments, giving more cash flow flexibility, but costs significantly more in interest over the life of the loan. Use this calculator to compare both scenarios.",
+      },
+      {
+        question: "What is a good mortgage interest rate?",
+        answer:
+          "Mortgage rates change daily based on economic conditions. Historically, rates below 4% are very low, 4–6% is moderate, and above 7% is high by recent standards. Check current rates from multiple lenders on the same day for accurate comparison.",
+      },
+      {
+        question: "How does extra payment reduce my mortgage?",
+        answer:
+          "Extra principal payments reduce the balance faster, which reduces the interest charged next month, which means more of future regular payments go to principal — a compounding snowball effect. Even $100/month extra on a $300,000 30-year mortgage can save over $30,000 in interest.",
+      },
+      {
+        question: "What is the difference between fixed and variable rate mortgages?",
+        answer:
+          "A fixed-rate mortgage has the same interest rate for the entire loan term. A variable (adjustable) rate mortgage (ARM) starts with a lower rate that changes periodically based on a market index. This calculator assumes a fixed rate.",
+      },
+      {
+        question: "Is my mortgage data sent to a server?",
+        answer: "No. All calculations run in your browser. Nothing is uploaded or stored anywhere outside your device.",
+      },
     ],
   },
   car: {
@@ -274,14 +360,46 @@ const SEO_CONTENT: Record<
       "When shopping for a car loan, compare offers from your bank or credit union before going to the dealership — dealer financing is often more expensive. A difference of even 1–2% in interest rate on a $25,000 loan over 5 years can save over $1,300. Use this calculator to compare offers side by side.",
     ],
     faqs: [
-      { question: "How is a car loan calculated?", answer: "The financed amount = (vehicle price + sales tax) − down payment − trade-in value. The monthly payment is then calculated from this financed amount, the interest rate, and the loan term using the standard PMT formula." },
-      { question: "What is a typical car loan interest rate?", answer: "Auto loan rates vary by credit score and lender. For excellent credit (750+), rates of 4–6% are common. For good credit (700–749), expect 6–9%. For fair credit (650–699), 10–15%. For poor credit, rates can exceed 20%." },
-      { question: "How long should a car loan be?", answer: "48–60 months is common. Loans of 72 or 84 months lower the monthly payment but increase total interest paid significantly — and you may owe more than the car is worth (being 'underwater') for most of the loan." },
-      { question: "What is trade-in value?", answer: "The amount a dealership offers for your current car in exchange for a reduction in the price of your new car. Trade-in value reduces the amount you need to finance." },
-      { question: "How does sales tax affect my car loan?", answer: "In most regions, sales tax is applied to the vehicle purchase price before calculating the financed amount. This means you typically finance the tax amount along with the vehicle price, increasing both the loan amount and the total interest paid." },
-      { question: "Should I put money down on a car?", answer: "Yes, if possible. A larger down payment means you borrow less, pay less interest, and are less likely to go 'underwater' on the loan. A down payment of 10–20% of the vehicle price is generally recommended." },
-      { question: "Can I pay off a car loan early?", answer: "Most auto loans allow early payoff without penalty. Use the 'Extra Payment' feature to see how much interest you save by paying extra each month or making a lump-sum payment." },
-      { question: "Is the calculator free to use?", answer: "Completely free. No account, no signup, no data sent anywhere. All calculations run in your browser and inputs are saved locally for your convenience." },
+      {
+        question: "How is a car loan calculated?",
+        answer:
+          "The financed amount = (vehicle price + sales tax) − down payment − trade-in value. The monthly payment is then calculated from this financed amount, the interest rate, and the loan term using the standard PMT formula.",
+      },
+      {
+        question: "What is a typical car loan interest rate?",
+        answer:
+          "Auto loan rates vary by credit score and lender. For excellent credit (750+), rates of 4–6% are common. For good credit (700–749), expect 6–9%. For fair credit (650–699), 10–15%. For poor credit, rates can exceed 20%.",
+      },
+      {
+        question: "How long should a car loan be?",
+        answer:
+          "48–60 months is common. Loans of 72 or 84 months lower the monthly payment but increase total interest paid significantly — and you may owe more than the car is worth (being 'underwater') for most of the loan.",
+      },
+      {
+        question: "What is trade-in value?",
+        answer:
+          "The amount a dealership offers for your current car in exchange for a reduction in the price of your new car. Trade-in value reduces the amount you need to finance.",
+      },
+      {
+        question: "How does sales tax affect my car loan?",
+        answer:
+          "In most regions, sales tax is applied to the vehicle purchase price before calculating the financed amount. This means you typically finance the tax amount along with the vehicle price, increasing both the loan amount and the total interest paid.",
+      },
+      {
+        question: "Should I put money down on a car?",
+        answer:
+          "Yes, if possible. A larger down payment means you borrow less, pay less interest, and are less likely to go 'underwater' on the loan. A down payment of 10–20% of the vehicle price is generally recommended.",
+      },
+      {
+        question: "Can I pay off a car loan early?",
+        answer:
+          "Most auto loans allow early payoff without penalty. Use the 'Extra Payment' feature to see how much interest you save by paying extra each month or making a lump-sum payment.",
+      },
+      {
+        question: "Is the calculator free to use?",
+        answer:
+          "Completely free. No account, no signup, no data sent anywhere. All calculations run in your browser and inputs are saved locally for your convenience.",
+      },
     ],
   },
 };
@@ -328,13 +446,7 @@ function saveState(tab: LoanTab, s: TabState) {
 
 /* ------------------------- Component ------------------------- */
 
-export default function LoanCalculatorPage({
-  defaultTab,
-  slug,
-}: {
-  defaultTab: LoanTab;
-  slug: string;
-}) {
+export default function LoanCalculatorPage({ defaultTab, slug }: { defaultTab: LoanTab; slug: string }) {
   const tool = toolBySlug(slug, tools);
   const [tab, setTab] = useState<LoanTab>(defaultTab);
   const [state, setState] = useState<TabState>(() => loadState(defaultTab));
@@ -386,11 +498,7 @@ export default function LoanCalculatorPage({
   }, [tab, state.amount, state.downPayment]);
 
   const baseInvalid =
-    state.amount <= 0 ||
-    state.months <= 0 ||
-    state.rate < 0 ||
-    !isFinite(state.amount) ||
-    !isFinite(state.rate);
+    state.amount <= 0 || state.months <= 0 || state.rate < 0 || !isFinite(state.amount) || !isFinite(state.rate);
 
   const result = useMemo(() => {
     if (baseInvalid) return null;
@@ -422,23 +530,13 @@ export default function LoanCalculatorPage({
 
   const savings = useMemo(() => {
     if (!result) return null;
-    return calcExtraPaymentSavings(
-      result.principal,
-      state.rate,
-      state.months,
-      state.extra,
-    );
+    return calcExtraPaymentSavings(result.principal, state.rate, state.months, state.extra);
   }, [result, state.rate, state.months, state.extra]);
 
   /* ------- frequency-adjusted display ------- */
   const freqDivisor = state.frequency === "weekly" ? 4.333 : state.frequency === "biweekly" ? 2.1667 : 1;
   const periodicPayment = result ? result.monthlyPayment / freqDivisor : 0;
-  const freqLabel =
-    state.frequency === "weekly"
-      ? "/wk"
-      : state.frequency === "biweekly"
-        ? "/2wk"
-        : "/mo";
+  const freqLabel = state.frequency === "weekly" ? "/wk" : state.frequency === "biweekly" ? "/2wk" : "/mo";
 
   /* ------- chart data ------- */
   const pieData = result
@@ -473,11 +571,9 @@ export default function LoanCalculatorPage({
   }, [result]);
 
   /* ------- handlers ------- */
-  const update = (patch: Partial<TabState>) =>
-    setState((s) => ({ ...s, ...patch }));
+  const update = (patch: Partial<TabState>) => setState((s) => ({ ...s, ...patch }));
 
-  const termInUnit =
-    termUnit === "years" ? state.months / 12 : state.months;
+  const termInUnit = termUnit === "years" ? state.months / 12 : state.months;
 
   const setTerm = (val: number) => {
     const months = termUnit === "years" ? Math.round(val * 12) : Math.round(val);
@@ -522,9 +618,7 @@ export default function LoanCalculatorPage({
       // cap at 200 to avoid performance issues; user can download full CSV.
       const cap = 200;
       if (all.length > cap) {
-        return [
-          ...all.slice(0, cap).map((row) => ({ row })),
-        ];
+        return [...all.slice(0, cap).map((row) => ({ row }))];
       }
       return all.map((row) => ({ row }));
     }
@@ -536,7 +630,15 @@ export default function LoanCalculatorPage({
   }, [result, showAllRows]);
 
   const seo = SEO_CONTENT[tab];
-  const mortgage = tab === "mortgage" && result && "totalMonthly" in result ? (result as unknown as { totalMonthly: number; monthlyTax: number; monthlyInsurance: number; monthlyPmi: number }) : null;
+  const mortgage =
+    tab === "mortgage" && result && "totalMonthly" in result
+      ? (result as unknown as {
+          totalMonthly: number;
+          monthlyTax: number;
+          monthlyInsurance: number;
+          monthlyPmi: number;
+        })
+      : null;
 
   return (
     <ToolPageShell title={tool.name} description={tool.description}>
@@ -554,9 +656,7 @@ export default function LoanCalculatorPage({
               className="inline-flex items-center gap-2 rounded-full border px-4 py-2 text-sm font-medium transition-colors"
               style={{
                 borderColor: active ? meta.accent : "var(--border)",
-                background: active
-                  ? `color-mix(in oklab, ${meta.accent} 15%, transparent)`
-                  : "var(--card)",
+                background: active ? `color-mix(in oklab, ${meta.accent} 15%, transparent)` : "var(--card)",
                 color: active ? meta.accent : "var(--foreground)",
               }}
             >
@@ -640,9 +740,7 @@ export default function LoanCalculatorPage({
                 />
               </div>
               <div>
-                <label className="block text-sm font-medium mb-2">
-                  {STRINGS.inputs.salesTax} (%)
-                </label>
+                <label className="block text-sm font-medium mb-2">{STRINGS.inputs.salesTax} (%)</label>
                 <Input
                   type="number"
                   min={0}
@@ -701,9 +799,7 @@ export default function LoanCalculatorPage({
               max={50}
               step={0.1}
               value={state.rate || ""}
-              onChange={(e) =>
-                update({ rate: Math.max(0, parseFloat(e.target.value) || 0) })
-              }
+              onChange={(e) => update({ rate: Math.max(0, parseFloat(e.target.value) || 0) })}
             />
             <div className="mt-3">
               <Slider
@@ -769,9 +865,7 @@ export default function LoanCalculatorPage({
             </div>
             <p className="mt-2 text-xs text-muted-foreground">
               {state.months} months
-              {state.months >= 12
-                ? ` (${(state.months / 12).toFixed(state.months % 12 === 0 ? 0 : 1)} years)`
-                : ""}
+              {state.months >= 12 ? ` (${(state.months / 12).toFixed(state.months % 12 === 0 ? 0 : 1)} years)` : ""}
             </p>
           </div>
 
@@ -782,16 +876,12 @@ export default function LoanCalculatorPage({
               onClick={() => setShowAdvanced((v) => !v)}
               className="inline-flex items-center gap-1 text-sm text-muted-foreground hover:text-foreground"
             >
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-180" : ""}`}
-              />
+              <ChevronDown className={`w-4 h-4 transition-transform ${showAdvanced ? "rotate-180" : ""}`} />
               {STRINGS.inputs.advanced}
             </button>
             {showAdvanced && (
               <div className="mt-3">
-                <label className="block text-sm font-medium mb-2">
-                  {STRINGS.inputs.frequency}
-                </label>
+                <label className="block text-sm font-medium mb-2">{STRINGS.inputs.frequency}</label>
                 <div className="grid grid-cols-3 gap-2">
                   {(["monthly", "biweekly", "weekly"] as Frequency[]).map((f) => (
                     <button
@@ -802,9 +892,7 @@ export default function LoanCalculatorPage({
                       style={{
                         borderColor: state.frequency === f ? accent : "var(--border)",
                         background:
-                          state.frequency === f
-                            ? `color-mix(in oklab, ${accent} 15%, transparent)`
-                            : "transparent",
+                          state.frequency === f ? `color-mix(in oklab, ${accent} 15%, transparent)` : "transparent",
                       }}
                     >
                       {STRINGS.inputs[f]}
@@ -825,9 +913,7 @@ export default function LoanCalculatorPage({
         {/* ------- Results ------- */}
         <div className="space-y-6" dir={isRTL ? "rtl" : "ltr"}>
           {/* Hero cards */}
-          <div
-            className={`grid gap-4 ${mortgage ? "sm:grid-cols-2 xl:grid-cols-4" : "sm:grid-cols-3"}`}
-          >
+          <div className={`grid gap-4 ${mortgage ? "sm:grid-cols-2 xl:grid-cols-4" : "sm:grid-cols-3"}`}>
             <ResultCard
               label={STRINGS.results.monthlyPayment}
               value={result ? formatCurrency(periodicPayment, state.currency) : "—"}
@@ -926,9 +1012,7 @@ export default function LoanCalculatorPage({
                       <YAxis
                         stroke="var(--muted-foreground)"
                         fontSize={11}
-                        tickFormatter={(v) =>
-                          v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`
-                        }
+                        tickFormatter={(v) => (v >= 1000 ? `${(v / 1000).toFixed(0)}k` : `${v}`)}
                       />
                       <Tooltip
                         formatter={(v: number) => formatCurrency(v, state.currency)}
@@ -974,16 +1058,12 @@ export default function LoanCalculatorPage({
                   {STRINGS.insight.headline}
                 </div>
                 <div className="flex items-center gap-2">
-                  <label className="text-sm text-muted-foreground">
-                    {STRINGS.insight.label}
-                  </label>
+                  <label className="text-sm text-muted-foreground">{STRINGS.insight.label}</label>
                   <Input
                     type="number"
                     min={0}
                     value={state.extra || ""}
-                    onChange={(e) =>
-                      update({ extra: Math.max(0, parseFloat(e.target.value) || 0) })
-                    }
+                    onChange={(e) => update({ extra: Math.max(0, parseFloat(e.target.value) || 0) })}
                     className="w-28"
                   />
                 </div>
@@ -991,14 +1071,10 @@ export default function LoanCalculatorPage({
               <p className="mt-3 text-sm">
                 {savings && savings.interestSaved > 0 ? (
                   <>
-                    {STRINGS.insight.prefix}{" "}
-                    <strong>{formatCurrency(state.extra, state.currency)}</strong>{" "}
+                    {STRINGS.insight.prefix} <strong>{formatCurrency(state.extra, state.currency)}</strong>{" "}
                     {STRINGS.insight.middle}{" "}
-                    <strong style={{ color: accent }}>
-                      {formatCurrency(savings.interestSaved, state.currency)}
-                    </strong>{" "}
-                    {STRINGS.insight.inInterest}{" "}
-                    <strong>{savings.monthsSaved}</strong> {STRINGS.insight.suffix}
+                    <strong style={{ color: accent }}>{formatCurrency(savings.interestSaved, state.currency)}</strong>{" "}
+                    {STRINGS.insight.inInterest} <strong>{savings.monthsSaved}</strong> {STRINGS.insight.suffix}
                   </>
                 ) : (
                   <span className="text-muted-foreground">{STRINGS.insight.none}</span>
@@ -1018,23 +1094,15 @@ export default function LoanCalculatorPage({
             className="w-full flex items-center justify-between px-4 py-3 text-left"
           >
             <span className="font-medium">📋 {STRINGS.amortization.title}</span>
-            <ChevronDown
-              className={`w-4 h-4 transition-transform ${tableOpen ? "rotate-180" : ""}`}
-            />
+            <ChevronDown className={`w-4 h-4 transition-transform ${tableOpen ? "rotate-180" : ""}`} />
           </button>
           {tableOpen && (
             <div>
               <div className="flex items-center justify-between gap-2 px-4 pb-3 flex-wrap">
-                <div className="text-xs text-muted-foreground">
-                  {result.schedule.length} payments total
-                </div>
+                <div className="text-xs text-muted-foreground">{result.schedule.length} payments total</div>
                 <div className="flex gap-2">
                   {result.schedule.length > 8 && (
-                    <Button
-                      variant="outline"
-                      size="sm"
-                      onClick={() => setShowAllRows((v) => !v)}
-                    >
+                    <Button variant="outline" size="sm" onClick={() => setShowAllRows((v) => !v)}>
                       {showAllRows ? STRINGS.amortization.showLess : STRINGS.amortization.showAll}
                     </Button>
                   )}
@@ -1048,10 +1116,7 @@ export default function LoanCalculatorPage({
                 <table className="w-full text-sm">
                   <thead className="sticky top-0 bg-secondary">
                     <tr>
-                      <th
-                        className="px-3 py-2 text-left sticky left-0 bg-secondary z-10"
-                        style={{ minWidth: 70 }}
-                      >
+                      <th className="px-3 py-2 text-left sticky left-0 bg-secondary z-10" style={{ minWidth: 70 }}>
                         {STRINGS.amortization.month}
                       </th>
                       <th className={`px-3 py-2 ${isRTL ? "text-left" : "text-right"}`}>
@@ -1136,12 +1201,7 @@ export default function LoanCalculatorPage({
         ]}
       />
 
-      <ToolSeoContent
-        title={seo.title}
-        description={seo.description}
-        body={seo.body}
-        faqs={seo.faqs}
-      />
+      <ToolSeoContent title={seo.title} description={seo.description} body={seo.body} faqs={seo.faqs} />
 
       <RelatedTools currentSlug={slug} />
     </ToolPageShell>
@@ -1179,7 +1239,7 @@ function ResultCard({
     >
       <div className="text-xs text-muted-foreground">{label}</div>
       <div
-        className={`font-display font-bold mt-1 ${big ? "text-3xl sm:text-4xl" : "text-2xl"}`}
+        className={`font-display font-bold mt-1 leading-tight break-all ${big ? "text-2xl sm:text-3xl" : "text-xl sm:text-2xl"}`}
         style={{ color: muted ? "var(--muted-foreground)" : accent || "var(--foreground)" }}
       >
         {value}

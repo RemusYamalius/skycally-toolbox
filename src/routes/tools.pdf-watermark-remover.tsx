@@ -331,7 +331,103 @@ function getPageContents(page: any, pdf: any): string {
   }
 }
 
-// ---------- Pipeline (strategies 1-3, always all three) ----------
+// ---------- Strategy 4: Word/Office watermark via header XObjects ----------
+// Word exports watermarks as Form XObjects referenced from the page /Resources
+// under names like "Watermark", "WMK", "wm", etc., or as the only large Form
+// XObject drawn with low opacity in the page content stream.
+
+function stripWordWatermarkXObjects(page: any, pdf: any): number {
+  let removed = 0;
+  try {
+    const resources = page.node.Resources();
+    if (!resources) return 0;
+    const xobj = resources.lookup(PDFName.of("XObject"));
+    if (!xobj || !(xobj instanceof PDFDict)) return 0;
+
+    const toRemove: string[] = [];
+    for (const [key, val] of xobj.entries()) {
+      let v: any = val;
+      try {
+        if (v instanceof PDFRef) v = pdf.context.lookup(v);
+      } catch {}
+      if (!(v instanceof PDFDict)) continue;
+
+      const subtype = nameToString(v.lookup(PDFName.of("Subtype")));
+      if (subtype !== "Form") continue;
+
+      const keyStr = nameToString(key);
+
+      // Match by name: Word uses names like "Watermark", "WMK", "wm1", "drw1" etc.
+      if (/water|wmk|wm\d|filigrane|مؤقت|draft|confidential|sample/i.test(keyStr)) {
+        toRemove.push(keyStr);
+        continue;
+      }
+
+      // Check the Form XObject's own resources for low-alpha graphics states
+      try {
+        const formResources = v.lookup(PDFName.of("Resources"));
+        if (formResources instanceof PDFDict) {
+          const formExt = formResources.lookup(PDFName.of("ExtGState"));
+          if (formExt instanceof PDFDict) {
+            for (const [, gsVal] of formExt.entries()) {
+              let gs: any = gsVal;
+              try {
+                if (gs instanceof PDFRef) gs = pdf.context.lookup(gs);
+              } catch {}
+              if (gs instanceof PDFDict) {
+                const ca = gs.lookup(PDFName.of("ca"));
+                const CA = gs.lookup(PDFName.of("CA"));
+                const caV = ca && typeof (ca as any).asNumber === "function" ? (ca as any).asNumber() : undefined;
+                const CAV = CA && typeof (CA as any).asNumber === "function" ? (CA as any).asNumber() : undefined;
+                // Translucide Word watermarks typically use opacity 0.3-0.5
+                if ((caV !== undefined && caV < 0.6) || (CAV !== undefined && CAV < 0.6)) {
+                  toRemove.push(keyStr);
+                  break;
+                }
+              }
+            }
+          }
+        }
+      } catch {}
+    }
+
+    if (toRemove.length > 0) {
+      for (const name of toRemove) {
+        try {
+          xobj.delete(PDFName.of(name));
+        } catch {}
+        removed++;
+      }
+    }
+
+    // Also strip the /Do calls for these XObjects from the page content
+    if (removed > 0) {
+      const content = getPageContents(page, pdf);
+      if (content) {
+        let cleaned = content;
+        for (const name of toRemove) {
+          // Remove q...Q blocks that only draw this XObject
+          cleaned = cleaned.replace(new RegExp(`q[\\s\\S]*?\/${name}\\s+Do[\\s\\S]*?Q`, "g"), "");
+          // Remove bare /Name Do calls
+          cleaned = cleaned.replace(new RegExp(`\\/${name}\\s+Do`, "g"), "");
+        }
+        if (cleaned !== content) {
+          const contentBytes = latin1ToBytes(cleaned);
+          const newStream = pdf.context.stream(contentBytes, {
+            Length: pdf.context.obj(contentBytes.length),
+          });
+          newStream.dict.delete(PDFName.of("Filter"));
+          newStream.dict.delete(PDFName.of("DecodeParms"));
+          const ref = pdf.context.register(newStream);
+          page.node.set(PDFName.of("Contents"), ref);
+        }
+      }
+    }
+  } catch {}
+  return removed;
+}
+
+// ---------- Pipeline (strategies 1-4) ----------
 
 async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8Array; removed: number }> {
   const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
@@ -340,10 +436,10 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
   // Pass A: decode all page content streams.
   const pageContents: string[] = pages.map((p: any) => getPageContents(p, pdf));
 
-  // Detect strings repeating across >50% of pages.
+  // Detect strings repeating across pages.
   const repeated = detectRepeatedStrings(pageContents);
 
-  // Detect image XObject names referenced on >50% of pages (likely watermark).
+  // Detect image XObject names referenced on any page (likely watermark).
   const perPageImages = pages.map((p: any) => collectXObjectNames(p));
   const imageFreq = new Map<string, number>();
   perPageImages.forEach((m) => {
@@ -357,8 +453,11 @@ async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8A
 
   let totalRemoved = 0;
   pages.forEach((page: any, i: number) => {
-    // Strategy 3 — annotations (independent of content stream)
+    // Strategy 3 — annotations
     totalRemoved += stripStampAnnots(page);
+
+    // Strategy 4 — Word/Office watermark XObjects (headers)
+    totalRemoved += stripWordWatermarkXObjects(page, pdf);
 
     let content = pageContents[i];
     const lowAlpha = findLowAlphaGStates(page);

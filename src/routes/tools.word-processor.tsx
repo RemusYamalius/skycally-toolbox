@@ -471,44 +471,60 @@ function WordProcessor() {
         ]}
       />
 
-      <RelatedTools currentSlug="word-processor" />
-
       <ToolSeoContent
-        title="Free Online Word Processor — No Signup, No Microsoft Account"
-        description="A free word processor online no signup required, working entirely in your browser. A true Microsoft Word alternative free for anyone."
+        title="Free Online Word Processor — Write, Format & Export Documents in Your Browser"
+        description="A free browser-based word processor with A4 page layout, rich formatting, RTL/Arabic support, and export to .docx and PDF. No account, no download, no signup required."
         body={[
-          "Skycally's free word processor online no signup gives you a clean, distraction-free way to write documents on any device. There's no download, no install, and no account to create — just open the page and start writing.",
-          "As a Microsoft Word alternative free of charge, it covers everything you need: rich formatting, headings, tables, images, lists, alignment, and a real A4 page layout with rulers you can drag to set custom margins, just like a desktop editor. Export to a fully formatted .docx (bold, colors, fonts, tables, and images all preserved) or PDF whenever you're ready, or save plain text. Your work auto-saves to your browser every 30 seconds, so closing the tab won't lose it.",
-          "The editor includes full free word processor arabic rtl support — flip direction with one click, pick Arabic fonts like Cairo or Amiri, and write naturally. Whether you need to write documents online free for school, work, or a side project, this online word processor no download keeps your files private. It's a word processor browser no account workflow from start to finish.",
+          "Skycally's Word Processor is a full-featured document editor that runs entirely in your browser. It uses the same TipTap editor engine trusted by thousands of developers, delivering a clean A4 page layout with draggable rulers, real margin control, and the formatting tools you expect — headings, bold, italic, underline, text color, highlight, tables, images, bulleted and numbered lists, and text alignment. Your document auto-saves to your browser every 30 seconds, so your work is never lost if you accidentally close the tab.",
+          "Exporting is straightforward. Click the File menu to download your document as a fully formatted .docx file compatible with Microsoft Word, LibreOffice, and Google Docs — all formatting including fonts, colors, bold, lists, tables, and embedded images is preserved. You can also export as PDF using your browser's built-in print dialog, or copy the plain text if you just need the words. For longer documents, Reading Mode eliminates all toolbars and gives you a distraction-free full-screen view.",
+          "One feature that sets this editor apart is full right-to-left (RTL) writing support. Switch text direction with one click and choose from Arabic-optimized fonts including Cairo, Tajawal, Amiri, and Scheherazade New. This makes it one of the few free browser-based editors that handles Arabic, Hebrew, and other RTL languages correctly without any plugin or extension. The editor also supports Voice Typing on compatible browsers, so you can dictate your document hands-free.",
+          "Because everything runs locally in your browser, your documents are completely private. No text is ever uploaded to a server. This makes the editor suitable for sensitive documents — contracts, personal letters, academic work — where privacy matters. There are no file size limits, no page count limits, and no watermarks on exported documents.",
         ]}
         faqs={[
           {
-            question: "Do I need a Microsoft or Google account?",
+            question: "Do I need a Microsoft or Google account to use this?",
             answer:
-              "No. There is no signup and no account. Open the page and start writing — your document stays in your browser.",
+              "No. There is no signup, no login, and no account of any kind. Open the page and start writing immediately. Your document is saved automatically in your browser's local storage.",
           },
           {
-            question: "Can I write in Arabic with RTL support?",
+            question: "Can I export to Microsoft Word (.docx)?",
             answer:
-              "Yes. Click the RTL button to flip text direction, and choose an Arabic font like Cairo, Tajawal, Amiri, or Scheherazade New.",
+              "Yes. Click the File menu and choose Export as .docx. The downloaded file preserves all your formatting — fonts, colors, bold, italic, headings, lists, tables, and embedded images — and opens correctly in Microsoft Word, LibreOffice, and Google Docs.",
           },
           {
-            question: "Can I adjust the page margins?",
+            question: "Is Arabic and RTL writing supported?",
             answer:
-              "Yes. Turn on the rulers from the toolbar, then drag the shaded handles on the top and left rulers to resize the page margins — useful for assignments with strict formatting rules.",
+              "Yes. Click the RTL button in the toolbar to switch text direction to right-to-left. You can also select Arabic-optimized fonts including Cairo, Tajawal, Amiri, and Scheherazade New from the font picker. Both Arabic and Hebrew text render correctly.",
           },
           {
-            question: "Can I export to Microsoft Word (.docx) or PDF?",
+            question: "Are my documents saved automatically?",
             answer:
-              "Yes. Use the File row to export as .docx with your formatting — bold, italics, colors, fonts, lists, tables, and images are all preserved — or export as PDF via your browser's print dialog.",
+              "Yes. The editor auto-saves your document to your browser's localStorage every 30 seconds. Your work is restored automatically the next time you open the page. Note that clearing your browser's site data will erase saved documents — export important work as .docx or PDF for permanent storage.",
+          },
+          {
+            question: "Can I adjust page margins?",
+            answer:
+              "Yes. Enable the rulers from the toolbar, then drag the shaded margin handles on the top and left rulers to set custom margins — useful for academic assignments, cover letters, or documents with specific formatting requirements.",
           },
           {
             question: "Does it work offline?",
             answer:
-              "Once the page is loaded it works fully offline for typing, formatting, and saving to your browser. Google Fonts and the .docx export library require an initial connection.",
+              "Once the page has loaded, the editor works fully offline for typing, formatting, and auto-saving. Google Fonts and the .docx export library require an internet connection on first load but are cached by the browser for subsequent use.",
+          },
+          {
+            question: "Is there a page or word count limit?",
+            answer:
+              "No. There are no page limits, word limits, or file size restrictions. The editor handles documents of any length, though very large documents (50,000+ words) may become slower depending on your device's performance.",
+          },
+          {
+            question: "Are my documents private?",
+            answer:
+              "Completely. All text processing happens locally in your browser. Nothing you type is ever transmitted to any server. This makes it safe for sensitive documents including contracts, personal letters, and confidential work.",
           },
         ]}
       />
+
+      <RelatedTools currentSlug="word-processor" />
     </ToolPageShell>
   );
 }

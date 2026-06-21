@@ -938,6 +938,57 @@ function Editor4U() {
       {templatesOpen && <TemplatesModal editor={editor} onClose={() => setTemplatesOpen(false)} />}
 
       {/* ── Voice Typing language popup ── */}
+      {/* ── Read Aloud language popup ── */}
+{showSpeakPopup && (
+  <div className="wp-popup-overlay" onClick={() => setShowSpeakPopup(false)}>
+    <div className="wp-popup" onClick={e => e.stopPropagation()}>
+      <h3 className="wp-popup-title">Read Aloud — Choose Language</h3>
+      <div className="wp-popup-grid">
+        {[
+          { code: "en-US", label: "English (US)" },
+          { code: "en-GB", label: "English (UK)" },
+          { code: "ar-SA", label: "Arabic" },
+          { code: "fr-FR", label: "French" },
+          { code: "es-ES", label: "Spanish" },
+          { code: "de-DE", label: "German" },
+          { code: "pt-BR", label: "Portuguese" },
+          { code: "it-IT", label: "Italian" },
+          { code: "zh-CN", label: "Chinese" },
+        ].map(l => (
+          <button
+            key={l.code}
+            className={speakLang === l.code ? "wp-popup-btn wp-popup-btn--active" : "wp-popup-btn"}
+            onClick={() => setSpeakLang(l.code)}
+          >
+            {l.label}
+          </button>
+        ))}
+      </div>
+      <div className="wp-popup-actions">
+        <button
+          className="wp-popup-cancel"
+          onClick={() => setShowSpeakPopup(false)}
+        >
+          Cancel
+        </button>
+        <button
+          className="wp-popup-confirm"
+          onClick={() => {
+            setShowSpeakPopup(false);
+            setIsSpeaking(true);
+            speak(
+              editor.getText(),
+              speakLang,
+              () => setIsSpeaking(false)
+            );
+          }}
+        >
+          Start Reading
+        </button>
+      </div>
+    </div>
+  </div>
+)}
       {showVoicePopup && (
         <div className="wp-overlay" onClick={() => setShowVoicePopup(false)}>
           <div className="wp-popup" onClick={(e) => e.stopPropagation()}>
@@ -1891,9 +1942,21 @@ function Toolbar({
           <Search className="w-4 h-4" />
           Count
         </button>
-        <button className={btn} onClick={() => speak(editor)} title="Read aloud">
-          <Volume2 className="w-4 h-4" />
-        </button>
+        <button
+  className={active(isSpeaking)}
+  onClick={() => {
+    if (isSpeaking) {
+      stopSpeak();
+      setIsSpeaking(false);
+    } else {
+      setShowSpeakPopup(true);
+    }
+  }}
+  title={isSpeaking ? "Stop reading" : "Read aloud"}
+>
+  <Volume2 className="w-4 h-4" />
+  {isSpeaking ? "Stop" : "Read aloud"}
+</button>
         <button
           className={active(isListening)}
           onClick={onToggleVoice}
@@ -2442,13 +2505,19 @@ function wordStats(editor: Editor) {
   const chars = t.length;
   const noSpace = t.replace(/\s/g, "").length;
   return `Words: ${words}\nCharacters: ${chars}\nCharacters (no spaces): ${noSpace}`;
-}
-
-function speak(editor: Editor) {
+function speak(text: string, lang: string, onEnd: () => void) {
   if (typeof speechSynthesis === "undefined") return;
   speechSynthesis.cancel();
-  const u = new SpeechSynthesisUtterance(editor.getText());
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = 0.95;
+  u.onend = onEnd;
+  u.onerror = onEnd;
   speechSynthesis.speak(u);
+}
+
+function stopSpeak() {
+  if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
 }
 
 // ---------- DOCX export helpers ----------

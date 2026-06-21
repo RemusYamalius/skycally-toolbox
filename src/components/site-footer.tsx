@@ -52,7 +52,7 @@ export function SiteFooter() {
             >
               𝕏 Twitter / X
             </a>
-            <a
+            
               href="https://www.producthunt.com/products/skycally"
               target="_blank"
               rel="noopener noreferrer"

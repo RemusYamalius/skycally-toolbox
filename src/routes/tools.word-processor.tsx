@@ -891,6 +891,15 @@ function Editor4U() {
             setShowVoicePopup(true);
           }
         }}
+        isSpeaking={isSpeaking}
+        onToggleSpeak={() => {
+          if (isSpeaking) {
+            stopSpeak();
+            setIsSpeaking(false);
+          } else {
+            setShowSpeakPopup(true);
+          }
+        }}
       />
 
       <div className="wp-canvas" ref={canvasRef}>
@@ -1059,6 +1068,8 @@ function Toolbar({
   onToggleReadingMode,
   isListening,
   onToggleVoice,
+  isSpeaking,
+  onToggleSpeak,
 }: {
   editor: Editor;
   saveState: "idle" | "saving" | "saved" | "error";
@@ -1080,6 +1091,8 @@ function Toolbar({
   onToggleReadingMode: () => void;
   isListening: boolean;
   onToggleVoice: () => void;
+  isSpeaking: boolean;
+  onToggleSpeak: () => void;
 }) {
   const fileRef = useRef<HTMLInputElement>(null);
   const imgRef = useRef<HTMLInputElement>(null);
@@ -1942,14 +1955,7 @@ function Toolbar({
         </button>
         <button
           className={active(isSpeaking)}
-          onClick={() => {
-            if (isSpeaking) {
-              stopSpeak();
-              setIsSpeaking(false);
-            } else {
-              setShowSpeakPopup(true);
-            }
-          }}
+          onClick={onToggleSpeak}
           title={isSpeaking ? "Stop reading" : "Read aloud"}
         >
           <Volume2 className="w-4 h-4" />

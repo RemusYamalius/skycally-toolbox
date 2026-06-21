@@ -31,10 +31,7 @@ type DotStyle = "square" | "rounded" | "dots" | "classy" | "classy-rounded";
 type ColorMode = "solid" | "gradient";
 type GradientType = "linear" | "radial";
 type FrameStyle = "none" | "simple" | "rounded" | "badge";
-type LogoChoice =
-  | { kind: "none" }
-  | { kind: "builtin"; id: string }
-  | { kind: "upload"; dataUrl: string };
+type LogoChoice = { kind: "none" } | { kind: "builtin"; id: string } | { kind: "upload"; dataUrl: string };
 
 const QR_TYPES: { id: QRType; label: string; icon: string }[] = [
   { id: "url", label: "URL", icon: "🔗" },
@@ -107,7 +104,13 @@ function formatQRContent(type: QRType, d: any): string {
 
 function hexToRgb(hex: string) {
   const clean = hex.replace("#", "").slice(0, 6);
-  const full = clean.length === 3 ? clean.split("").map((c) => c + c).join("") : clean.padEnd(6, "0");
+  const full =
+    clean.length === 3
+      ? clean
+          .split("")
+          .map((c) => c + c)
+          .join("")
+      : clean.padEnd(6, "0");
   const value = Number.parseInt(full, 16);
   return { r: (value >> 16) & 255, g: (value >> 8) & 255, b: value & 255 };
 }
@@ -443,7 +446,23 @@ function QrGeneratorPage() {
     } catch (err) {
       console.error(err);
     }
-  }, [content, logo.kind, color1, bg, dotStyle, colorMode, color2, gradientType, angle, logoSrc, logoSize, frameStyle, cta, frameColor, frameTextColor]);
+  }, [
+    content,
+    logo.kind,
+    color1,
+    bg,
+    dotStyle,
+    colorMode,
+    color2,
+    gradientType,
+    angle,
+    logoSrc,
+    logoSize,
+    frameStyle,
+    cta,
+    frameColor,
+    frameTextColor,
+  ]);
 
   useEffect(() => {
     const id = requestAnimationFrame(() => {
@@ -514,7 +533,10 @@ function QrGeneratorPage() {
   };
 
   return (
-    <ToolPageShell title="QR Code Generator" description="Create custom QR codes with logos, gradients, dot styles & frames — instantly, in your browser.">
+    <ToolPageShell
+      title="QR Code Generator"
+      description="Create custom QR codes with logos, gradients, dot styles & frames — instantly, in your browser."
+    >
       <TooltipProvider delayDuration={150}>
         <div className="grid gap-6 lg:grid-cols-[1fr_360px]">
           {/* LEFT: controls */}
@@ -536,24 +558,53 @@ function QrGeneratorPage() {
             {/* Dynamic content */}
             <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
               {type === "url" && (
-                <Input value={forms.url.url} onChange={(e) => updateForm({ url: e.target.value })} placeholder="https://example.com" />
+                <Input
+                  value={forms.url.url}
+                  onChange={(e) => updateForm({ url: e.target.value })}
+                  placeholder="https://example.com"
+                />
               )}
               {type === "text" && (
-                <Textarea value={forms.text.text} onChange={(e) => updateForm({ text: e.target.value })} placeholder="Enter any text..." className="min-h-[100px]" />
+                <Textarea
+                  value={forms.text.text}
+                  onChange={(e) => updateForm({ text: e.target.value })}
+                  placeholder="Enter any text..."
+                  className="min-h-[100px]"
+                />
               )}
               {type === "email" && (
                 <>
-                  <Input value={forms.email.address} onChange={(e) => updateForm({ address: e.target.value })} placeholder="email@example.com" />
-                  <Input value={forms.email.subject} onChange={(e) => updateForm({ subject: e.target.value })} placeholder="Subject (optional)" />
+                  <Input
+                    value={forms.email.address}
+                    onChange={(e) => updateForm({ address: e.target.value })}
+                    placeholder="email@example.com"
+                  />
+                  <Input
+                    value={forms.email.subject}
+                    onChange={(e) => updateForm({ subject: e.target.value })}
+                    placeholder="Subject (optional)"
+                  />
                 </>
               )}
               {type === "phone" && (
-                <Input value={forms.phone.phone} onChange={(e) => updateForm({ phone: e.target.value })} placeholder="+1234567890" />
+                <Input
+                  value={forms.phone.phone}
+                  onChange={(e) => updateForm({ phone: e.target.value })}
+                  placeholder="+1234567890"
+                />
               )}
               {type === "wifi" && (
                 <>
-                  <Input value={forms.wifi.ssid} onChange={(e) => updateForm({ ssid: e.target.value })} placeholder="Network name (SSID)" />
-                  <Input value={forms.wifi.password} onChange={(e) => updateForm({ password: e.target.value })} placeholder="Password" />
+                  <Input
+                    value={forms.wifi.ssid}
+                    onChange={(e) => updateForm({ ssid: e.target.value })}
+                    placeholder="Network name (SSID)"
+                  />
+                  <Input
+                    value={forms.wifi.password}
+                    onChange={(e) => updateForm({ password: e.target.value })}
+                    placeholder="Password"
+                  />
                   <div className="flex gap-2">
                     {(["WPA", "WEP", "nopass"] as const).map((s) => (
                       <button
@@ -569,10 +620,26 @@ function QrGeneratorPage() {
               )}
               {type === "vcard" && (
                 <>
-                  <Input value={forms.vcard.name} onChange={(e) => updateForm({ name: e.target.value })} placeholder="Full name" />
-                  <Input value={forms.vcard.phone} onChange={(e) => updateForm({ phone: e.target.value })} placeholder="Phone" />
-                  <Input value={forms.vcard.email} onChange={(e) => updateForm({ email: e.target.value })} placeholder="Email" />
-                  <Input value={forms.vcard.website} onChange={(e) => updateForm({ website: e.target.value })} placeholder="Website" />
+                  <Input
+                    value={forms.vcard.name}
+                    onChange={(e) => updateForm({ name: e.target.value })}
+                    placeholder="Full name"
+                  />
+                  <Input
+                    value={forms.vcard.phone}
+                    onChange={(e) => updateForm({ phone: e.target.value })}
+                    placeholder="Phone"
+                  />
+                  <Input
+                    value={forms.vcard.email}
+                    onChange={(e) => updateForm({ email: e.target.value })}
+                    placeholder="Email"
+                  />
+                  <Input
+                    value={forms.vcard.website}
+                    onChange={(e) => updateForm({ website: e.target.value })}
+                    placeholder="Website"
+                  />
                 </>
               )}
             </div>
@@ -615,7 +682,11 @@ function QrGeneratorPage() {
               </div>
 
               <div className="grid grid-cols-2 gap-3">
-                <ColorField label={colorMode === "gradient" ? "Start color" : "QR color"} value={color1} onChange={setColor1} />
+                <ColorField
+                  label={colorMode === "gradient" ? "Start color" : "QR color"}
+                  value={color1}
+                  onChange={setColor1}
+                />
                 {colorMode === "gradient" && <ColorField label="End color" value={color2} onChange={setColor2} />}
                 <ColorField label="Background" value={bg} onChange={setBg} />
               </div>
@@ -635,7 +706,9 @@ function QrGeneratorPage() {
                   </div>
                   {gradientType === "linear" && (
                     <div>
-                      <label className="text-xs font-semibold mb-2 block text-muted-foreground">Direction ({angle}°)</label>
+                      <label className="text-xs font-semibold mb-2 block text-muted-foreground">
+                        Direction ({angle}°)
+                      </label>
                       <div className="flex gap-2">
                         {[
                           { a: 0, g: "→" },
@@ -776,11 +849,7 @@ function QrGeneratorPage() {
               )}
               <div className="rounded-xl p-3" style={{ background: bg }}>
                 <div key={content} className="animate-in fade-in duration-200">
-                  <canvas
-                    ref={previewRef}
-                    className="max-w-full h-auto"
-                    style={{ maxWidth: 300 }}
-                  />
+                  <canvas ref={previewRef} className="max-w-full h-auto" style={{ maxWidth: 300 }} />
                 </div>
               </div>
               {content && lowContrast && (
@@ -788,17 +857,27 @@ function QrGeneratorPage() {
                   ⚠️ Low contrast detected — QR code may not scan correctly. Try darker colors.
                 </p>
               )}
-              {!content && (
-                <p className="text-xs text-muted-foreground">Enter content to generate your QR code.</p>
-              )}
+              {!content && <p className="text-xs text-muted-foreground">Enter content to generate your QR code.</p>}
               <div className="grid grid-cols-3 gap-2 w-full">
-                <button onClick={downloadPng} disabled={!content} className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-foreground text-background font-semibold px-3 py-2.5 text-sm disabled:opacity-50">
+                <button
+                  onClick={downloadPng}
+                  disabled={!content}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl bg-foreground text-background font-semibold px-3 py-2.5 text-sm disabled:opacity-50"
+                >
                   <Download className="w-4 h-4" /> PNG
                 </button>
-                <button onClick={downloadSvg} disabled={!content} className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border font-semibold px-3 py-2.5 text-sm disabled:opacity-50 hover:bg-secondary">
+                <button
+                  onClick={downloadSvg}
+                  disabled={!content}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border font-semibold px-3 py-2.5 text-sm disabled:opacity-50 hover:bg-secondary"
+                >
                   <FileCode className="w-4 h-4" /> SVG
                 </button>
-                <button onClick={copyImage} disabled={!content} className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border font-semibold px-3 py-2.5 text-sm disabled:opacity-50 hover:bg-secondary">
+                <button
+                  onClick={copyImage}
+                  disabled={!content}
+                  className="inline-flex items-center justify-center gap-1.5 rounded-xl border border-border font-semibold px-3 py-2.5 text-sm disabled:opacity-50 hover:bg-secondary"
+                >
                   <Copy className="w-4 h-4" /> Copy
                 </button>
               </div>
@@ -817,13 +896,60 @@ function QrGeneratorPage() {
           "Download as PNG or SVG, or copy the image straight to your clipboard.",
         ]}
       />
-          <RelatedTools currentSlug="qr-generator" />
-          <ToolSeoContent
-        title="Free QR Code Generator — Custom QR Codes with Logo"
-        description="Skycally's QR Code Generator creates fully customized QR codes in seconds. Add your logo, choose dot styles, apply gradient colors, and add a frame — all from one simple interface. Supports URL, Text, Email, Phone, WiFi, and vCard formats. Download as PNG or SVG. 100% free, no signup required."
-        body={[]}
-        faqs={[{"question":"What types of QR codes can I generate?","answer":"URL, plain text, email address, phone number, WiFi credentials, and vCard contact cards."},{"question":"Can I add my logo to the QR code?","answer":"Yes, upload your own logo or choose from built-in icons to place in the center."},{"question":"What file formats can I download?","answer":"PNG and SVG formats are both available."},{"question":"Will a customized QR code still scan correctly?","answer":"Yes, as long as sufficient contrast is maintained. The tool warns you if contrast is too low."},{"question":"Is the QR code generated on a server?","answer":"No. QR codes are generated entirely in your browser."}]}
+      <ToolSeoContent
+        title="Free QR Code Generator — Custom QR Codes with Logo, Colors & Frames"
+        description="Create fully customized QR codes in seconds. Add your logo, choose dot styles, apply gradient colors, and add a frame. Supports URL, Text, Email, Phone, WiFi, and vCard. Download as PNG or SVG. 100% free, no signup."
+        body={[
+          "Skycally's QR Code Generator goes beyond basic black-and-white squares. You can customize every visual aspect of your QR code: choose from multiple dot styles (rounded, dots, classy, extra-rounded), apply solid or gradient fill colors, add a center logo or icon, and wrap the code in a styled frame with a custom label. Every change previews instantly — no waiting, no server round-trips.",
+          "Six content types are supported: URL (web links, social profiles, app stores), plain text (instructions, notes), email address (pre-filled recipient), phone number (tap-to-call), WiFi credentials (guests scan to connect automatically), and vCard contact cards (full name, phone, email, organization, and website in one scan). This covers virtually every real-world use case from business cards to restaurant menus.",
+          "All QR codes are generated entirely in your browser using the qr-code-styling library — nothing is sent to any server. Download your finished code as a high-resolution PNG for print and digital use, or as a scalable SVG vector for logos, signage, and large-format printing where pixel-perfect sharpness is essential. There are no watermarks, no usage limits, and no account required.",
+          "When customizing colors, the tool automatically checks contrast between your foreground and background colors and warns you if the QR code may not scan reliably. As a rule, keep sufficient contrast (dark dots on a light background is most reliable) and test your final code with at least two different QR scanner apps before printing at scale.",
+        ]}
+        faqs={[
+          {
+            question: "What types of QR codes can I generate?",
+            answer:
+              "Six types: URL (web links), plain text, email address, phone number, WiFi credentials (SSID, password, and security type), and vCard contact cards (name, phone, email, organization, website). Select your type from the tab menu at the top of the generator.",
+          },
+          {
+            question: "Can I add my logo or icon to the center of the QR code?",
+            answer:
+              "Yes. Upload your own logo image (PNG or SVG recommended) to place in the center, or choose from built-in icons. The logo is overlaid on the QR code's quiet zone. Keep the logo small (under 30% of the total area) to avoid affecting scannability.",
+          },
+          {
+            question: "What file formats can I download?",
+            answer:
+              "PNG and SVG. PNG is best for web, social media, and standard print. SVG is a vector format that scales to any size without losing sharpness — ideal for large-format print, signage, business cards, and merchandise.",
+          },
+          {
+            question: "Will a customized or colored QR code still scan correctly?",
+            answer:
+              "Yes, provided there is sufficient contrast between the dot color and the background. The tool warns you if contrast is too low. As a rule: dark dots on a light background scan most reliably. Always test your final code with multiple scanner apps before printing.",
+          },
+          {
+            question: "Is my data sent to a server?",
+            answer:
+              "No. QR codes are generated entirely in your browser using the qr-code-styling library. Your URLs, WiFi passwords, contact details, and other content never leave your device.",
+          },
+          {
+            question: "Can I use these QR codes commercially?",
+            answer:
+              "Yes. QR codes generated by Skycally are completely free for personal and commercial use — business cards, menus, packaging, marketing materials, and signage. There are no watermarks, usage fees, or attribution requirements.",
+          },
+          {
+            question: "What is the difference between PNG and SVG download?",
+            answer:
+              "PNG is a raster image — best for screen use and standard printing at defined sizes. SVG is a vector format that scales infinitely without pixelation, making it ideal for large-format printing, laser cutting, or anywhere the QR code needs to be resized frequently.",
+          },
+          {
+            question: "How do I create a WiFi QR code?",
+            answer:
+              "Select the WiFi tab, enter your network name (SSID), password, and security type (WPA/WPA2 for most home routers). Guests who scan the code are automatically prompted to join the network without typing the password. This is perfect for cafés, hotels, offices, and events.",
+          },
+        ]}
       />
+
+      <RelatedTools currentSlug="qr-generator" />
     </ToolPageShell>
   );
 }

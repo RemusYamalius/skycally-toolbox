@@ -163,7 +163,7 @@ export function SiteFooter() {
             </li>
           </ul>
           <div className="mt-6 rounded-xl border border-border bg-card/50 p-3 text-xs text-muted-foreground leading-relaxed">
-            Your files never leave your device.
+            🔒 Your files never leave your device.
           </div>
         </div>
       </div>

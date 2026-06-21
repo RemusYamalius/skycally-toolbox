@@ -17,7 +17,7 @@ export const Route = createFileRoute("/privacy")({
     buildPageMeta({
       title: "Privacy Policy — Skycally",
       description:
-        "How Skycally collects, uses, and protects information when you use our free online tools. Most tools run entirely in your browser.",
+        "Skycally's Privacy Policy. Learn how we handle your data, files, and browser information. Most tools run entirely in your browser — your files never leave your device.",
       path: "/privacy",
     }),
   component: PrivacyPage,
@@ -27,83 +27,177 @@ function PrivacyPage() {
   return (
     <div className="max-w-[720px] mx-auto px-4 sm:px-6 py-12 text-[16px] leading-[1.8]">
       <header className="mb-10">
-        <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
-          Privacy Policy
-        </h1>
-        <p className="mt-4 text-sm text-muted-foreground">Last updated: May 16, 2026</p>
+        <h1 className="font-display text-3xl sm:text-4xl font-bold tracking-tight leading-tight">Privacy Policy</h1>
+        <p className="mt-4 text-sm text-muted-foreground">Last updated: June 21, 2026</p>
       </header>
 
       <article className={articleClass}>
-        <h2>Introduction</h2>
+        <h2>Overview</h2>
         <p>
-          Skycally ("we", "us", or "our") operates skycally.com. This Privacy Policy explains how we collect, use, and protect information when you use our website and tools.
+          Skycally ("we", "us", or "our") operates skycally.com, a collection of free browser-based online tools. We are
+          committed to protecting your privacy. The short version:{" "}
+          <strong>most tools process your files entirely in your browser — your files never reach our servers.</strong>{" "}
+          This policy explains in full what data we collect, why, and how.
         </p>
 
-        <h2>Information We Collect</h2>
+        <h2>1. Files and Documents</h2>
 
-        <h3>Information You Provide</h3>
+        <h3>Client-side tools (the vast majority)</h3>
         <p>
-          We do not require you to create an account or provide personal information to use Skycally tools. If you contact us via our contact form, we collect your name and email address solely to respond to your inquiry.
+          The majority of Skycally tools — including Image Compressor, Image Converter, PDF tools, Word Counter,
+          Password Generator, Loan Calculator, Compound Interest Calculator, Document Scanner, and all game tools — run
+          entirely in your browser using JavaScript and WebAssembly.{" "}
+          <strong>Your files, images, and documents are never transmitted to any server.</strong> Processing happens
+          locally on your device and stops when you close the tab.
         </p>
 
-        <h3>Automatically Collected Information</h3>
-        <p>When you visit Skycally, we automatically collect certain information including:</p>
+        <h3>Server-side tools</h3>
+        <p>
+          A small number of tools require server-side processing (currently Audio Converter and Video Downloader). When
+          you use these tools, your files are transmitted securely over HTTPS to our processing server hosted on
+          Railway. Files are processed immediately and <strong>deleted automatically within seconds</strong> of the
+          operation completing. They are never stored, indexed, shared, or accessed by any person.
+        </p>
+
+        <h2>2. Information We Collect Automatically</h2>
+        <p>When you visit Skycally, we automatically collect standard web analytics data including:</p>
         <ul>
           <li>Browser type and version</li>
           <li>Operating system</li>
-          <li>Pages visited and time spent</li>
-          <li>Referring website</li>
-          <li>IP address (anonymized)</li>
+          <li>Pages visited and time spent on each page</li>
+          <li>Referring website or search query</li>
+          <li>Country-level location (derived from IP address, not stored directly)</li>
+          <li>Device type (desktop, mobile, tablet)</li>
         </ul>
         <p>
-          This data is collected via Google Analytics to help us understand how visitors use our site. We do not sell or share this data with third parties.
+          This data is collected via <strong>Google Analytics</strong> and is used exclusively to understand which tools
+          are most useful and how to improve the site. We do not sell, rent, or share this data with any third party for
+          commercial purposes.
         </p>
 
-        <h2>How We Use Your Files</h2>
+        <h2>3. Local Storage</h2>
         <p>
-          Most Skycally tools run entirely in your browser using client-side processing. This means your files are never uploaded to our servers. Tools that require server-side processing (such as Audio Converter, Video Downloader, and Remove Background) transmit your files securely to our processing server solely for the purpose of completing the requested operation. Files are deleted immediately after processing and are never stored, shared, or accessed by anyone.
+          Several Skycally tools save your preferences or last-used values in your browser's{" "}
+          <strong>localStorage</strong> to improve your experience. For example, the Loan Calculator saves your last
+          inputs so they are restored on your next visit. This data is stored only on your device and is never
+          transmitted to us. You can clear it at any time by clearing your browser's site data for skycally.com.
         </p>
 
-        <h2>Cookies</h2>
-        <p>We use cookies for the following purposes:</p>
-
-        <h3>Analytics Cookies</h3>
+        <h2>4. Information You Provide</h2>
         <p>
-          We use Google Analytics to collect anonymous usage data. These cookies help us understand which tools are most popular and how to improve our service. You can opt out of Google Analytics by installing the Google Analytics Opt-out Browser Add-on.
+          We do not require you to create an account to use any Skycally tool. If you contact us via the contact form,
+          we collect your name and email address solely to respond to your inquiry. This information is not used for
+          marketing and is not shared with third parties.
         </p>
 
-        <h3>Advertising Cookies</h3>
+        <h2>5. Cookies</h2>
+
+        <h3>Analytics cookies</h3>
         <p>
-          We may display advertisements provided by third-party advertising networks including Google AdSense and Media.net. These networks may use cookies to serve ads based on your prior visits to our website or other websites. You can opt out of personalized advertising by visiting Google's Ad Settings or the Network Advertising Initiative opt-out page.
+          We use Google Analytics cookies to collect anonymous, aggregated usage data. You can opt out by installing the{" "}
+          <a href="https://tools.google.com/dlpage/gaoptout" target="_blank" rel="noopener noreferrer">
+            Google Analytics Opt-out Browser Add-on
+          </a>
+          .
         </p>
 
-        <h2>Third-Party Services</h2>
-        <p>Skycally uses the following third-party services:</p>
+        <h3>Advertising cookies</h3>
+        <p>
+          We display advertisements served by third-party networks including Google AdSense and Media.net. These
+          networks may place cookies to serve ads relevant to your interests based on your browsing history. You can
+          manage ad personalization at{" "}
+          <a href="https://adssettings.google.com" target="_blank" rel="noopener noreferrer">
+            Google Ad Settings
+          </a>{" "}
+          or the{" "}
+          <a href="https://optout.networkadvertising.org" target="_blank" rel="noopener noreferrer">
+            Network Advertising Initiative opt-out page
+          </a>
+          .
+        </p>
+
+        <h2>6. Third-Party Services</h2>
+        <p>Skycally integrates with the following third-party services, each governed by its own privacy policy:</p>
         <ul>
-          <li><strong>Google Analytics</strong> — website usage analytics</li>
-          <li><strong>Google AdSense / Media.net</strong> — advertising</li>
-          <li><strong>Cloudflare</strong> — content delivery and security</li>
-          <li><strong>Railway</strong> — server-side processing infrastructure</li>
+          <li>
+            <strong>Google Analytics</strong> — website usage analytics (
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+            </a>
+            )
+          </li>
+          <li>
+            <strong>Google AdSense</strong> — advertising (
+            <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
+              Privacy Policy
+            </a>
+            )
+          </li>
+          <li>
+            <strong>Media.net</strong> — advertising
+          </li>
+          <li>
+            <strong>Cloudflare</strong> — content delivery network and DDoS protection
+          </li>
+          <li>
+            <strong>Railway</strong> — server infrastructure for server-side tools
+          </li>
+          <li>
+            <strong>Frankfurter API</strong> — exchange rate data for Currency Converter (no personal data transmitted)
+          </li>
         </ul>
-        <p>Each of these services has its own privacy policy governing the use of your data.</p>
 
-        <h2>Data Security</h2>
+        <h2>7. GDPR and EEA Users</h2>
         <p>
-          We implement appropriate technical measures to protect against unauthorized access to our systems. However, no method of transmission over the internet is 100% secure.
+          If you are located in the European Economic Area (EEA), you have the following rights under the General Data
+          Protection Regulation (GDPR):
+        </p>
+        <ul>
+          <li>
+            <strong>Right of access</strong> — request a copy of the data we hold about you
+          </li>
+          <li>
+            <strong>Right to rectification</strong> — request correction of inaccurate data
+          </li>
+          <li>
+            <strong>Right to erasure</strong> — request deletion of your data
+          </li>
+          <li>
+            <strong>Right to object</strong> — object to processing of your data for analytics or advertising
+          </li>
+          <li>
+            <strong>Right to data portability</strong> — receive your data in a portable format
+          </li>
+        </ul>
+        <p>
+          Our legal basis for processing analytics data is <strong>legitimate interest</strong> (understanding and
+          improving our service). For advertising cookies, the legal basis is <strong>consent</strong>. To exercise any
+          GDPR right, contact us at <a href="mailto:hello@skycally.com">hello@skycally.com</a>.
         </p>
 
-        <h2>Children's Privacy</h2>
+        <h2>8. Children's Privacy</h2>
         <p>
-          Skycally is not directed at children under the age of 13. We do not knowingly collect personal information from children.
+          Skycally is not directed at children under the age of 13. We do not knowingly collect personal information
+          from children. If you believe a child has provided us with personal information, please contact us and we will
+          delete it promptly.
         </p>
 
-        <h2>Changes to This Policy</h2>
+        <h2>9. Data Security</h2>
         <p>
-          We may update this Privacy Policy from time to time. We will notify you of significant changes by posting the new policy on this page with an updated date.
+          We implement appropriate technical and organizational measures to protect against unauthorized access to our
+          systems. All data transmitted between your browser and our servers is encrypted via HTTPS/TLS. However, no
+          method of transmission over the internet is 100% secure, and we cannot guarantee absolute security.
         </p>
 
-        <h2>Contact Us</h2>
-        <p>If you have questions about this Privacy Policy, please contact us at:</p>
+        <h2>10. Changes to This Policy</h2>
+        <p>
+          We may update this Privacy Policy from time to time to reflect changes in our practices or for legal,
+          operational, or regulatory reasons. We will post the updated policy on this page with a revised "Last updated"
+          date. For significant changes, we will add a notice to our homepage.
+        </p>
+
+        <h2>11. Contact Us</h2>
+        <p>If you have questions, requests, or concerns about this Privacy Policy or your data, please contact us:</p>
         <p>
           Email: <a href="mailto:hello@skycally.com">hello@skycally.com</a>
           <br />

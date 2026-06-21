@@ -145,6 +145,7 @@ export const tools: Tool[] = [
   { slug: "emi-calculator", name: "EMI Calculator", description: "Calculate Equated Monthly Installment for personal, home and vehicle loans.", category: "utility", icon: Calculator, path: "/tools/emi-calculator" },
   { slug: "mortgage-calculator", name: "Mortgage Calculator", description: "Calculate mortgage payments with PITI: principal, interest, tax, insurance and PMI.", category: "utility", icon: Calculator, path: "/tools/mortgage-calculator" },
   { slug: "car-loan-calculator", name: "Car Loan Calculator", description: "Calculate auto loan payments including sales tax, down payment and trade-in value.", category: "utility", icon: Calculator, path: "/tools/car-loan-calculator" },
+  { slug: "compound-interest", name: "Compound Interest Calculator", description: "Calculate how your investment grows over time with compound interest and monthly contributions.", category: "utility", icon: Calculator, path: "/tools/compound-interest" },
 ];
 
 

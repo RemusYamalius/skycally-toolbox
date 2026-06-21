@@ -24,15 +24,33 @@ export function SiteFooter() {
             90+ free browser-based tools — no signup, no uploads, no limits. Fast, private, and always free.
           </p>
           {/* Social / directory badges */}
-          <div className="mt-5 flex flex-wrap gap-3">
-            <a
-              href="https://www.pinterest.com/skycally"
+           <div className="mt-5 flex flex-wrap gap-3">
+            
+              href="https://www.pinterest.com/skycallytools/"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-muted-foreground hover:text-foreground transition flex items-center gap-1"
               aria-label="Skycally on Pinterest"
             >
               📌 Pinterest
+            </a>
+            
+              href="https://www.youtube.com/@Skycally"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-foreground transition flex items-center gap-1"
+              aria-label="Skycally on YouTube"
+            >
+              ▶️ YouTube
+            </a>
+            
+              href="https://x.com/skycallytools"
+              target="_blank"
+              rel="noopener noreferrer"
+              className="text-xs text-muted-foreground hover:text-foreground transition flex items-center gap-1"
+              aria-label="Skycally on X"
+            >
+              𝕏 Twitter / X
             </a>
             <a
               href="https://www.producthunt.com/products/skycally"

@@ -6,7 +6,7 @@ const categoryOrder: ToolCategory[] = ["ai", "video", "image", "audio", "pdf", "
 export function SiteFooter() {
   return (
     <footer className="mt-24 border-t border-border bg-secondary/30">
-      {/* ── Top section ── */}
+      {/* Top section */}
       <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12 grid gap-10 sm:grid-cols-2 md:grid-cols-4">
         {/* Brand */}
         <div>
@@ -23,9 +23,8 @@ export function SiteFooter() {
           <p className="mt-3 text-sm text-muted-foreground max-w-xs leading-relaxed">
             90+ free browser-based tools — no signup, no uploads, no limits. Fast, private, and always free.
           </p>
-          {/* Social / directory badges */}
-           <div className="mt-5 flex flex-wrap gap-3">
-            
+          <div className="mt-5 flex flex-wrap gap-3">
+            <a
               href="https://www.pinterest.com/skycallytools/"
               target="_blank"
               rel="noopener noreferrer"
@@ -34,7 +33,7 @@ export function SiteFooter() {
             >
               📌 Pinterest
             </a>
-            
+            <a
               href="https://www.youtube.com/@Skycally"
               target="_blank"
               rel="noopener noreferrer"
@@ -43,16 +42,16 @@ export function SiteFooter() {
             >
               ▶️ YouTube
             </a>
-            
+            <a
               href="https://x.com/skycallytools"
               target="_blank"
               rel="noopener noreferrer"
               className="text-xs text-muted-foreground hover:text-foreground transition flex items-center gap-1"
               aria-label="Skycally on X"
             >
-              𝕏 Twitter / X
+              X / Twitter
             </a>
-            
+            <a
               href="https://www.producthunt.com/products/skycally"
               target="_blank"
               rel="noopener noreferrer"
@@ -143,7 +142,7 @@ export function SiteFooter() {
           </ul>
         </div>
 
-        {/* Legal & Info */}
+        {/* Legal */}
         <div>
           <h4 className="text-sm font-semibold mb-3">Legal</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
@@ -164,12 +163,12 @@ export function SiteFooter() {
             </li>
           </ul>
           <div className="mt-6 rounded-xl border border-border bg-card/50 p-3 text-xs text-muted-foreground leading-relaxed">
-            🔒 All tools run in your browser. Your files never leave your device.
+            Your files never leave your device.
           </div>
         </div>
       </div>
 
-      {/* ── All tools by category ── */}
+      {/* All tools by category */}
       <div className="border-t border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <h4 className="text-sm font-semibold mb-6 text-foreground/80">Explore all tools</h4>
@@ -200,19 +199,21 @@ export function SiteFooter() {
         </div>
       </div>
 
-      {/* ── Bottom bar ── */}
+      {/* Bottom bar */}
       <div className="border-t border-border">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-5 flex flex-wrap items-center justify-between gap-4 text-xs text-muted-foreground">
           <p>
-            © {new Date().getFullYear()} Skycally.com ·{" "}
+            {"© "}
+            {new Date().getFullYear()}
+            {" Skycally.com · "}
             <Link to="/privacy" className="hover:text-foreground">
               Privacy
-            </Link>{" "}
-            ·{" "}
+            </Link>
+            {" · "}
             <Link to="/terms" className="hover:text-foreground">
               Terms
-            </Link>{" "}
-            ·{" "}
+            </Link>
+            {" · "}
             <Link to="/contact" className="hover:text-foreground">
               Contact
             </Link>
@@ -236,7 +237,7 @@ export function SiteFooter() {
                 src="https://api.producthunt.com/widgets/embed-image/v1/featured.svg?post_id=1158564&theme=neutral&t=1780398527058"
                 width={250}
                 height={54}
-                alt="Skycally - 90+ free browser tools — no signup, no uploads, no limits | Product Hunt"
+                alt="Skycally on Product Hunt"
                 className="opacity-70 hover:opacity-100 transition-opacity"
               />
             </a>

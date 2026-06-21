@@ -113,6 +113,7 @@ import { Route as ToolsCurrencyConverterRouteImport } from './routes/tools.curre
 import { Route as ToolsCountryInfoRouteImport } from './routes/tools.country-info'
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
+import { Route as ToolsCompoundInterestRouteImport } from './routes/tools.compound-interest'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
 import { Route as ToolsChessRouteImport } from './routes/tools.chess'
@@ -657,6 +658,11 @@ const ToolsCompressPdfRoute = ToolsCompressPdfRouteImport.update({
   path: '/tools/compress-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsCompoundInterestRoute = ToolsCompoundInterestRouteImport.update({
+  id: '/tools/compound-interest',
+  path: '/tools/compound-interest',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsColorPaletteRoute = ToolsColorPaletteRouteImport.update({
   id: '/tools/color-palette',
   path: '/tools/color-palette',
@@ -797,6 +803,7 @@ export interface FileRoutesByFullPath {
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
@@ -924,6 +931,7 @@ export interface FileRoutesByTo {
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
@@ -1052,6 +1060,7 @@ export interface FileRoutesById {
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
@@ -1181,6 +1190,7 @@ export interface FileRouteTypes {
     | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
+    | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
@@ -1308,6 +1318,7 @@ export interface FileRouteTypes {
     | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
+    | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
@@ -1435,6 +1446,7 @@ export interface FileRouteTypes {
     | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
+    | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
@@ -1563,6 +1575,7 @@ export interface RootRouteChildren {
   ToolsChessRoute: typeof ToolsChessRoute
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
+  ToolsCompoundInterestRoute: typeof ToolsCompoundInterestRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
   ToolsCountryInfoRoute: typeof ToolsCountryInfoRoute
@@ -2393,6 +2406,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsCompressPdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/compound-interest': {
+      id: '/tools/compound-interest'
+      path: '/tools/compound-interest'
+      fullPath: '/tools/compound-interest'
+      preLoaderRoute: typeof ToolsCompoundInterestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/color-palette': {
       id: '/tools/color-palette'
       path: '/tools/color-palette'
@@ -2574,6 +2594,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsChessRoute: ToolsChessRoute,
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
+  ToolsCompoundInterestRoute: ToolsCompoundInterestRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsConnectFourRoute: ToolsConnectFourRoute,
   ToolsCountryInfoRoute: ToolsCountryInfoRoute,

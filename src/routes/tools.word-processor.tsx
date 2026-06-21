@@ -594,6 +594,11 @@ function Editor4U() {
     return () => window.removeEventListener("keydown", onKey);
   }, [isReadingMode]);
 
+  // ── Read Aloud ──
+  const [isSpeaking, setIsSpeaking] = useState(false);
+  const [showSpeakPopup, setShowSpeakPopup] = useState(false);
+  const [speakLang, setSpeakLang] = useState("en-US");
+
   // ── Voice Typing ──
   const [isListening, setIsListening] = useState(false);
   const [voiceLang, setVoiceLang] = useState("en-US");
@@ -2498,17 +2503,19 @@ function wordStats(editor: Editor) {
   const chars = t.length;
   const noSpace = t.replace(/\s/g, "").length;
   return `Words: ${words}\nCharacters: ${chars}\nCharacters (no spaces): ${noSpace}`;
-  function speak(text: string, lang: string, onEnd: () => void) {
-    if (typeof speechSynthesis === "undefined") return;
-    speechSynthesis.cancel();
-    const u = new SpeechSynthesisUtterance(text);
-    u.lang = lang;
-    u.rate = 0.95;
-    u.onend = onEnd;
-    u.onerror = onEnd;
-    speechSynthesis.speak(u);
-  }
 }
+
+function speak(text: string, lang: string, onEnd: () => void) {
+  if (typeof speechSynthesis === "undefined") return;
+  speechSynthesis.cancel();
+  const u = new SpeechSynthesisUtterance(text);
+  u.lang = lang;
+  u.rate = 0.95;
+  u.onend = onEnd;
+  u.onerror = onEnd;
+  speechSynthesis.speak(u);
+}
+
 function stopSpeak() {
   if (typeof speechSynthesis !== "undefined") speechSynthesis.cancel();
 }
@@ -2606,7 +2613,8 @@ const WP_CSS = `
 }
 
 /* ── Voice popup ── */
-.wp-overlay {
+.wp-overlay,
+.wp-popup-overlay {
   position: fixed; inset: 0; z-index: 999;
   background: rgba(0,0,0,0.45);
   display: flex; align-items: center; justify-content: center;
@@ -2646,6 +2654,30 @@ const WP_CSS = `
   text-align: center;
 }
 .wp-popup-cancel:hover { background: var(--secondary); }
+.wp-popup-grid {
+  display: grid; grid-template-columns: 1fr 1fr; gap: 6px; margin: 8px 0;
+}
+.wp-popup-btn {
+  padding: 8px 12px; border-radius: 8px; font-size: 12px;
+  border: 1px solid var(--border); background: transparent;
+  color: var(--foreground); cursor: pointer; transition: background 120ms;
+  text-align: center;
+}
+.wp-popup-btn:hover { background: var(--secondary); }
+.wp-popup-btn--active {
+  background: color-mix(in oklab, var(--primary) 18%, var(--card));
+  border-color: var(--primary); color: var(--primary);
+}
+.wp-popup-actions {
+  display: flex; gap: 8px; justify-content: flex-end; margin-top: 8px;
+  border-top: 1px solid var(--border); padding-top: 8px;
+}
+.wp-popup-confirm {
+  padding: 8px 16px; border-radius: 10px; font-size: 13px; font-weight: 600;
+  background: var(--foreground); color: var(--background);
+  cursor: pointer; border: none; transition: opacity 120ms;
+}
+.wp-popup-confirm:hover { opacity: 0.85; }
 
 /* ── Live Word Count Bar ── */
 .wp-word-bar {

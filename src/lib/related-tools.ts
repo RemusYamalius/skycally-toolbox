@@ -8,6 +8,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "emi-calculator": ["loan-calculator", "mortgage-calculator", "car-loan-calculator", "tip-calculator", "currency-converter"],
   "mortgage-calculator": ["loan-calculator", "emi-calculator", "car-loan-calculator", "tip-calculator", "currency-converter"],
   "car-loan-calculator": ["loan-calculator", "emi-calculator", "mortgage-calculator", "tip-calculator", "currency-converter"],
+  "compound-interest": ["loan-calculator", "emi-calculator", "mortgage-calculator", "tip-calculator", "currency-converter"],
   // AI
   "background-blur": ["face-landmarks", "hand-gesture", "remove-bg"],
   "face-landmarks": ["background-blur", "hand-gesture", "object-detection"],

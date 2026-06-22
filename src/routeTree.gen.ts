@@ -114,6 +114,7 @@ import { Route as ToolsCountryInfoRouteImport } from './routes/tools.country-inf
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsCompoundInterestRouteImport } from './routes/tools.compound-interest'
+import { Route as ToolsColorPickerRouteImport } from './routes/tools.color-picker'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
 import { Route as ToolsChessRouteImport } from './routes/tools.chess'
@@ -663,6 +664,11 @@ const ToolsCompoundInterestRoute = ToolsCompoundInterestRouteImport.update({
   path: '/tools/compound-interest',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsColorPickerRoute = ToolsColorPickerRouteImport.update({
+  id: '/tools/color-picker',
+  path: '/tools/color-picker',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsColorPaletteRoute = ToolsColorPaletteRouteImport.update({
   id: '/tools/color-palette',
   path: '/tools/color-palette',
@@ -803,6 +809,7 @@ export interface FileRoutesByFullPath {
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/color-picker': typeof ToolsColorPickerRoute
   '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
@@ -931,6 +938,7 @@ export interface FileRoutesByTo {
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/color-picker': typeof ToolsColorPickerRoute
   '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
@@ -1060,6 +1068,7 @@ export interface FileRoutesById {
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
+  '/tools/color-picker': typeof ToolsColorPickerRoute
   '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
@@ -1190,6 +1199,7 @@ export interface FileRouteTypes {
     | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
+    | '/tools/color-picker'
     | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
@@ -1318,6 +1328,7 @@ export interface FileRouteTypes {
     | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
+    | '/tools/color-picker'
     | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
@@ -1446,6 +1457,7 @@ export interface FileRouteTypes {
     | '/tools/chess'
     | '/tools/collage-maker'
     | '/tools/color-palette'
+    | '/tools/color-picker'
     | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
@@ -1575,6 +1587,7 @@ export interface RootRouteChildren {
   ToolsChessRoute: typeof ToolsChessRoute
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
+  ToolsColorPickerRoute: typeof ToolsColorPickerRoute
   ToolsCompoundInterestRoute: typeof ToolsCompoundInterestRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
@@ -2413,6 +2426,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsCompoundInterestRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/color-picker': {
+      id: '/tools/color-picker'
+      path: '/tools/color-picker'
+      fullPath: '/tools/color-picker'
+      preLoaderRoute: typeof ToolsColorPickerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/color-palette': {
       id: '/tools/color-palette'
       path: '/tools/color-palette'
@@ -2594,6 +2614,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsChessRoute: ToolsChessRoute,
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
+  ToolsColorPickerRoute: ToolsColorPickerRoute,
   ToolsCompoundInterestRoute: ToolsCompoundInterestRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsConnectFourRoute: ToolsConnectFourRoute,
@@ -2697,12 +2718,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

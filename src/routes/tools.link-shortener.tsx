@@ -17,49 +17,16 @@ export const Route = createFileRoute("/tools/link-shortener")({
   component: LinkShortener,
 });
 
-// ─── Types ────────────────────────────────────────────────────────────────────
+const WORKER_URL = "https://link-shortener.skycally-tools.workers.dev";
+const LS_KEY = "skycally:link-history";
+const MAX_HISTORY = 15;
 
 interface HistoryItem {
   original: string;
   short: string;
+  slug: string;
   date: string;
 }
-
-const LS_KEY = "skycally:link-history";
-const MAX_HISTORY = 15;
-
-// ─── Shortener APIs (with fallback) ──────────────────────────────────────────
-
-async function shortenWithTinyUrl(url: string): Promise<string> {
-  const res = await fetch(`https://tinyurl.com/api-create.php?url=${encodeURIComponent(url)}`, {
-    signal: AbortSignal.timeout(6000),
-  });
-  if (!res.ok) throw new Error("TinyURL failed");
-  const text = (await res.text()).trim();
-  if (!/^https?:\/\//i.test(text)) throw new Error("Invalid TinyURL response");
-  return text;
-}
-
-async function shortenWithIsGd(url: string): Promise<string> {
-  const res = await fetch(`https://is.gd/create.php?format=simple&url=${encodeURIComponent(url)}`, {
-    signal: AbortSignal.timeout(6000),
-  });
-  if (!res.ok) throw new Error("is.gd failed");
-  const text = (await res.text()).trim();
-  if (!/^https?:\/\//i.test(text)) throw new Error("Invalid is.gd response");
-  return text;
-}
-
-async function shortenUrl(url: string): Promise<string> {
-  try {
-    return await shortenWithTinyUrl(url);
-  } catch {
-    // Fallback to is.gd
-    return await shortenWithIsGd(url);
-  }
-}
-
-// ─── QR helpers ───────────────────────────────────────────────────────────────
 
 async function renderQR(canvas: HTMLCanvasElement, url: string, color: string) {
   const QR = (await import("qrcode")).default;
@@ -70,18 +37,17 @@ async function renderQR(canvas: HTMLCanvasElement, url: string, color: string) {
   });
 }
 
-// ─── Component ────────────────────────────────────────────────────────────────
-
 function LinkShortener() {
   const [url, setUrl] = useState("");
+  const [alias, setAlias] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [qrColor, setQrColor] = useState("#000000");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
+  const [copiedMain, setCopiedMain] = useState(false);
   const canvasRef = useRef<HTMLCanvasElement>(null);
 
-  // Load history from localStorage
   useEffect(() => {
     try {
       const saved = localStorage.getItem(LS_KEY);
@@ -105,26 +71,31 @@ function LinkShortener() {
     setBusy(true);
     setShortUrl("");
     try {
-      const result = await shortenUrl(trimmed);
-      setShortUrl(result);
-
-      // Render QR
-      if (canvasRef.current) {
-        await renderQR(canvasRef.current, result, qrColor);
+      const res = await fetch(`${WORKER_URL}/create`, {
+        method: "POST",
+        headers: { "Content-Type": "application/json" },
+        body: JSON.stringify({ url: trimmed, alias: alias.trim() || undefined }),
+      });
+      const data = await res.json();
+      if (!res.ok) {
+        toast.error(data.error || "Failed to shorten URL");
+        return;
       }
-
-      // Save to history
+      setShortUrl(data.short);
+      if (canvasRef.current) {
+        await renderQR(canvasRef.current, data.short, qrColor);
+      }
       const item: HistoryItem = {
         original: trimmed,
-        short: result,
+        short: data.short,
+        slug: data.slug,
         date: new Date().toLocaleDateString(),
       };
       const next = [item, ...history.filter((h) => h.original !== trimmed)].slice(0, MAX_HISTORY);
       saveHistory(next);
-
       toast.success("Link shortened!");
     } catch {
-      toast.error("Both shorteners failed. Check your connection and try again.");
+      toast.error("Connection error. Please try again.");
     } finally {
       setBusy(false);
     }
@@ -132,11 +103,14 @@ function LinkShortener() {
 
   const copy = async (text: string, idx?: number) => {
     await navigator.clipboard.writeText(text);
-    toast.success("Copied!");
     if (idx !== undefined) {
       setCopiedIdx(idx);
       setTimeout(() => setCopiedIdx(null), 2000);
+    } else {
+      setCopiedMain(true);
+      setTimeout(() => setCopiedMain(false), 2000);
     }
+    toast.success("Copied!");
   };
 
   const downloadQr = () => {
@@ -162,16 +136,7 @@ function LinkShortener() {
   };
 
   const removeFromHistory = (idx: number) => {
-    const next = history.filter((_, i) => i !== idx);
-    saveHistory(next);
-  };
-
-  const clearHistory = () => {
-    saveHistory([]);
-    try {
-      localStorage.removeItem(LS_KEY);
-    } catch {}
-    toast.success("History cleared");
+    saveHistory(history.filter((_, i) => i !== idx));
   };
 
   const tool = toolBySlug("link-shortener", tools);
@@ -180,27 +145,48 @@ function LinkShortener() {
     <ToolPageShell title={tool.name} description={tool.description}>
       {/* ── Input ── */}
       <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
-        <label className="text-sm font-medium block">Long URL</label>
-        <div className="flex gap-2 flex-col sm:flex-row">
-          <div className="relative flex-1">
-            <LinkIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
-            <Input
-              type="url"
-              value={url}
-              onChange={(e) => setUrl(e.target.value)}
-              placeholder="https://example.com/very/long/path"
-              className="pl-9"
-              onKeyDown={(e) => e.key === "Enter" && shorten()}
-            />
+        {/* URL input */}
+        <div>
+          <label className="text-sm font-medium mb-2 block">Long URL</label>
+          <div className="flex gap-2 flex-col sm:flex-row">
+            <div className="relative flex-1">
+              <LinkIcon className="w-4 h-4 absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground" />
+              <Input
+                type="url"
+                value={url}
+                onChange={(e) => setUrl(e.target.value)}
+                placeholder="https://example.com/very/long/path"
+                className="pl-9"
+                onKeyDown={(e) => e.key === "Enter" && shorten()}
+              />
+            </div>
+            <Button onClick={shorten} disabled={busy || !url} className="sm:w-32">
+              {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Shorten"}
+            </Button>
           </div>
-          <Button onClick={shorten} disabled={busy || !url} className="sm:w-32">
-            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : "Shorten"}
-          </Button>
         </div>
 
-        {/* ── Result ── */}
+        {/* Custom alias */}
+        <div>
+          <label className="text-sm font-medium mb-2 block">
+            Custom alias <span className="text-xs text-muted-foreground font-normal">(optional)</span>
+          </label>
+          <div className="flex items-center gap-2">
+            <span className="text-sm text-muted-foreground shrink-0">go.skycally.com/</span>
+            <Input
+              value={alias}
+              onChange={(e) => setAlias(e.target.value.toLowerCase().replace(/[^a-z0-9-]/g, ""))}
+              placeholder="my-link"
+              maxLength={30}
+              className="max-w-[200px]"
+            />
+            {alias && <span className="text-xs text-muted-foreground">→ go.skycally.com/{alias}</span>}
+          </div>
+        </div>
+
+        {/* Result */}
         {shortUrl && (
-          <div className="mt-2 grid gap-6 md:grid-cols-[1fr,auto] items-start">
+          <div className="mt-2 pt-4 border-t border-border grid gap-6 md:grid-cols-[1fr,auto] items-start">
             <div className="space-y-3">
               <p className="text-xs uppercase tracking-wide text-muted-foreground">Your short link</p>
               <div className="flex items-center gap-2 rounded-lg border border-border bg-background p-3">
@@ -208,13 +194,19 @@ function LinkShortener() {
                   href={shortUrl}
                   target="_blank"
                   rel="noreferrer"
-                  className="flex-1 truncate font-mono text-sm"
+                  className="flex-1 truncate font-mono text-sm font-semibold"
                   style={{ color: "var(--cyan-brand)" }}
                 >
                   {shortUrl}
                 </a>
                 <Button variant="outline" size="sm" onClick={() => copy(shortUrl)}>
-                  <Copy className="w-3 h-3 mr-1" /> Copy
+                  {copiedMain ? (
+                    "✓"
+                  ) : (
+                    <>
+                      <Copy className="w-3 h-3 mr-1" /> Copy
+                    </>
+                  )}
                 </Button>
                 <a href={shortUrl} target="_blank" rel="noreferrer">
                   <Button variant="outline" size="sm">
@@ -223,7 +215,7 @@ function LinkShortener() {
                 </a>
               </div>
 
-              {/* QR color picker */}
+              {/* QR color */}
               <div className="flex items-center gap-3">
                 <label className="text-xs text-muted-foreground">QR color:</label>
                 <input
@@ -231,7 +223,6 @@ function LinkShortener() {
                   value={qrColor}
                   onChange={(e) => updateQrColor(e.target.value)}
                   className="w-8 h-8 rounded border border-border cursor-pointer bg-transparent p-0"
-                  title="QR code color"
                 />
                 <span className="text-xs font-mono text-muted-foreground">{qrColor}</span>
                 <button
@@ -265,7 +256,10 @@ function LinkShortener() {
                 ({history.length}/{MAX_HISTORY})
               </span>
             </div>
-            <button onClick={clearHistory} className="text-xs text-muted-foreground hover:text-red-400 transition">
+            <button
+              onClick={() => saveHistory([])}
+              className="text-xs text-muted-foreground hover:text-red-400 transition"
+            >
               Clear all
             </button>
           </div>
@@ -273,14 +267,14 @@ function LinkShortener() {
             {history.map((item, i) => (
               <div
                 key={i}
-                className="flex items-center gap-3 rounded-xl border border-border bg-background/50 px-3 py-2 group"
+                className="flex items-center gap-3 rounded-xl border border-border bg-background/50 px-3 py-2"
               >
                 <div className="flex-1 min-w-0">
                   <a
                     href={item.short}
                     target="_blank"
                     rel="noreferrer"
-                    className="text-sm font-mono truncate block"
+                    className="text-sm font-mono truncate block font-semibold"
                     style={{ color: "var(--cyan-brand)" }}
                   >
                     {item.short}
@@ -292,21 +286,18 @@ function LinkShortener() {
                   <button
                     onClick={() => copy(item.short, i)}
                     className="p-1.5 rounded-lg hover:bg-secondary transition text-muted-foreground hover:text-foreground"
-                    title="Copy short link"
                   >
                     {copiedIdx === i ? "✓" : <Copy className="w-3 h-3" />}
                   </button>
                   <button
                     onClick={() => loadFromHistory(item)}
                     className="p-1.5 rounded-lg hover:bg-secondary transition text-muted-foreground hover:text-foreground"
-                    title="Load this link"
                   >
                     <ExternalLink className="w-3 h-3" />
                   </button>
                   <button
                     onClick={() => removeFromHistory(i)}
                     className="p-1.5 rounded-lg hover:bg-secondary transition text-muted-foreground hover:text-red-400"
-                    title="Remove"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -319,61 +310,61 @@ function LinkShortener() {
 
       <HowToUse
         steps={[
-          "Paste any long URL into the box and click Shorten.",
-          "Copy your short link or open it directly to verify.",
-          "Download the QR code — customize the color to match your brand.",
+          "Paste your long URL and optionally type a custom alias (e.g. my-brand).",
+          "Click Shorten — your link will be at go.skycally.com/your-alias.",
+          "Copy the short link or download the QR code with your chosen color.",
         ]}
       />
 
       <ToolSeoContent
-        title="Free Link Shortener with QR Code — Shorten URLs Instantly Online"
-        description="Shorten any URL instantly and get a downloadable QR code. Includes link history, custom QR colors, and dual-API fallback. Free, no signup, no expiry."
+        title="Free Link Shortener — go.skycally.com Custom Short URLs with QR Code"
+        description="Shorten any URL to a branded go.skycally.com link with a custom alias. Includes QR code generator, link history, and custom colors. Free, no signup."
         body={[
-          "Skycally's Link Shortener converts any long URL into a clean, shareable short link in under a second. The tool uses TinyURL as the primary shortener with is.gd as an automatic fallback — so if one service is temporarily unavailable, the other takes over seamlessly. Shortened links are permanent and never expire as long as the upstream service operates.",
-          "Every shortened link automatically generates a QR code you can download as a high-resolution PNG. The QR code color is fully customizable — pick any hex color to match your brand, presentation, or printed material. QR codes work with any modern smartphone camera without requiring a separate app.",
-          "Your 15 most recent shortened links are saved automatically in your browser's localStorage and displayed in the Recent Links panel. Each history entry shows the original URL, the short link, and the date it was created. You can copy, reload, or delete individual entries, or clear the entire history with one click. Nothing is stored on any server — your link history stays on your device.",
-          "Short links are widely used in social media posts where character counts matter, printed marketing materials like flyers and business cards, email campaigns, presentations, and any context where a long URL would be unwieldy. The QR code format is ideal for physical-to-digital bridges — placing a QR code on printed material lets anyone scan it with their phone to reach the destination instantly.",
+          "Skycally's Link Shortener creates branded short URLs on the go.skycally.com domain — no third-party services, no dependency on TinyURL or Bitly. Type a custom alias like 'my-brand' and your link becomes go.skycally.com/my-brand. Leave it blank for a random 7-character slug. Links are stored permanently in Cloudflare's global KV network and resolve in milliseconds from anywhere in the world.",
+          "Every shortened link automatically generates a downloadable QR code. Choose any color for the QR dots to match your brand identity, presentation theme, or print material. Download as a high-resolution PNG and use it on business cards, flyers, menus, packaging, or slides — anyone can scan it with a standard smartphone camera to reach your destination instantly.",
+          "Your 15 most recent shortened links are saved locally in your browser and displayed in the Recent Links panel. Each entry shows the original URL, the short link, and the creation date. Copy, reopen, or delete individual entries at any time. Nothing is stored on Skycally's servers beyond the link mapping itself — your browsing history stays private.",
+          "Custom alias shorteners are used in marketing campaigns to create memorable, on-brand links; in print materials where clean URLs matter; in social media posts where character count is limited; and in presentations where a short memorable link is more professional than a long parameter-heavy URL.",
         ]}
         faqs={[
           {
+            question: "What domain are the short links on?",
+            answer:
+              "All links use go.skycally.com — Skycally's own branded domain. For example: go.skycally.com/my-link. This is powered by a Cloudflare Worker and KV store, with no dependency on third-party shorteners.",
+          },
+          {
+            question: "Can I choose my own custom alias?",
+            answer:
+              "Yes. Type your desired alias in the 'Custom alias' field (letters, numbers, and hyphens only). If the alias is already taken, you will see an error and can try a different one. Leave it blank for a random 7-character slug.",
+          },
+          {
             question: "Do the short links expire?",
             answer:
-              "No. TinyURL links are permanent and do not expire. is.gd links (used as fallback) are also permanent. Both services have operated continuously for over a decade.",
+              "No. Links are stored with a 5-year TTL in Cloudflare KV and are effectively permanent for any practical use. They resolve from Cloudflare's global edge network with sub-millisecond latency.",
           },
           {
-            question: "What happens if TinyURL is down?",
+            question: "Is there a usage limit?",
             answer:
-              "The tool automatically falls back to is.gd, a second independent URL shortener. If both services are temporarily unavailable, you will see an error message — try again after a few seconds.",
+              "The Cloudflare Worker runs on the free plan which allows 100,000 requests per day. For typical personal and business use, this limit is never reached.",
           },
           {
-            question: "Can I customize the short URL slug?",
+            question: "Can I customize the QR code color?",
             answer:
-              "This tool generates standard short URLs automatically. Custom slugs (like tinyurl.com/my-brand) require a TinyURL account on their website. Skycally does not currently offer custom domain short links.",
+              "Yes. After shortening, click the color swatch next to 'QR color' to open a color picker. The QR code regenerates instantly. Ensure strong contrast between the dot color and the white background for reliable scanning.",
           },
           {
-            question: "Is my URL stored on Skycally's servers?",
+            question: "What happens if my custom alias is already taken?",
             answer:
-              "No. Your URL is sent directly to TinyURL or is.gd's API to create the short link — Skycally's servers are not involved. Your link history is saved only in your browser's localStorage and never transmitted anywhere.",
+              "You will see a message: 'This alias is already taken. Try another.' Choose a different alias or leave the field blank to get a unique random slug.",
           },
           {
-            question: "How do I use the QR code?",
+            question: "Are there any restrictions on alias names?",
             answer:
-              "Click Download QR to save a 256×256 PNG. Use it anywhere: print it on business cards, flyers, packaging, slides, posters, or menus. Anyone who scans it with a smartphone camera (no app needed on iOS or Android) is redirected to your short link.",
+              "Aliases must be 3–30 characters long and contain only lowercase letters (a–z), numbers (0–9), and hyphens (-). Spaces and special characters are not allowed and are automatically removed.",
           },
           {
-            question: "Can I change the QR code color?",
+            question: "Is my original URL stored anywhere?",
             answer:
-              "Yes. Click the color swatch next to 'QR color' to open a color picker and choose any color. The QR code regenerates instantly. For reliable scanning, ensure strong contrast between the QR color and the white background.",
-          },
-          {
-            question: "Are there any usage limits?",
-            answer:
-              "There are no limits enforced by Skycally. TinyURL and is.gd may rate-limit very high-volume usage (thousands of requests per hour), but for typical personal and business use there are no restrictions.",
-          },
-          {
-            question: "How long is the link history kept?",
-            answer:
-              "Your 15 most recent links are stored in your browser's localStorage. They persist between sessions until you clear them manually or clear your browser's site data for skycally.com.",
+              "The mapping between your alias and your original URL is stored in Cloudflare's KV store to enable redirection. Your link history panel is stored only in your browser's localStorage and is never transmitted to any server.",
           },
         ]}
       />

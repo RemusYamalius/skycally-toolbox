@@ -54,7 +54,10 @@ function UuidGeneratorTool() {
         <div className="bg-card border border-border rounded-2xl p-4">
           <label className="text-xs text-muted-foreground uppercase tracking-wider">How many? (1–20)</label>
           <input
-            type="number" min={1} max={20} value={count}
+            type="number"
+            min={1}
+            max={20}
+            value={count}
             onChange={(e) => setCount(Math.max(1, Math.min(20, Number(e.target.value) || 1)))}
             className="w-full mt-2 bg-transparent border border-border rounded-xl px-3 py-2 text-foreground outline-none focus:border-cyan-500"
           />
@@ -70,16 +73,24 @@ function UuidGeneratorTool() {
         {uuids.length > 0 && (
           <div className="bg-card border border-border rounded-2xl p-4">
             <div className="flex justify-between items-center mb-3">
-              <span className="text-xs text-muted-foreground uppercase tracking-wider">{uuids.length} UUID{uuids.length > 1 ? "s" : ""}</span>
+              <span className="text-xs text-muted-foreground uppercase tracking-wider">
+                {uuids.length} UUID{uuids.length > 1 ? "s" : ""}
+              </span>
               <button onClick={copyAll} className="text-xs text-muted-foreground hover:text-cyan-400 transition-colors">
                 {copiedAll ? "✓ Copied" : "Copy All"}
               </button>
             </div>
             <ul className="space-y-2 max-h-[400px] overflow-auto">
               {uuids.map((u, i) => (
-                <li key={i} className="flex items-center justify-between gap-3 bg-background/50 border border-border/60 rounded-xl px-3 py-2">
+                <li
+                  key={i}
+                  className="flex items-center justify-between gap-3 bg-background/50 border border-border/60 rounded-xl px-3 py-2"
+                >
                   <code className="font-mono text-sm text-cyan-400 break-all">{u}</code>
-                  <button onClick={() => copyOne(u, i)} className="shrink-0 text-xs text-muted-foreground hover:text-cyan-400 transition-colors">
+                  <button
+                    onClick={() => copyOne(u, i)}
+                    className="shrink-0 text-xs text-muted-foreground hover:text-cyan-400 transition-colors"
+                  >
                     {copiedIdx === i ? "✓" : "Copy"}
                   </button>
                 </li>
@@ -89,26 +100,67 @@ function UuidGeneratorTool() {
         )}
       </div>
 
-      <HowToUse steps={[
-        "Pick how many UUIDs you need (1–20).",
-        "Click Generate to create them instantly.",
-        "Copy a single value or use Copy All.",
-      ]} />
-      <RelatedTools currentSlug="uuid-generator" />
-      <ToolSeoContent
-        title="Free UUID v4 Generator — Online Tool"
-        description="Generate cryptographically random UUID version 4 identifiers in your browser. Useful for database keys, API tokens, file names, and any case where you need a guaranteed unique identifier."
-        body={[
-          "A UUID (Universally Unique Identifier) is a 128-bit value commonly written as 36 hexadecimal characters with hyphens. Version 4 UUIDs are generated from random data, making collisions practically impossible.",
-          "This tool uses the Web Crypto API (crypto.randomUUID) for true cryptographic randomness, with a getRandomValues fallback for older browsers. Nothing is transmitted — generation happens locally.",
-        ]}
-        faqs={[
-          { question: "What is a UUID v4?", answer: "A 128-bit identifier generated from random data, formatted as 8-4-4-4-12 hex characters." },
-          { question: "Are these truly unique?", answer: "Collisions are astronomically unlikely — UUID v4 is safe to use as a primary key." },
-          { question: "How many can I generate at once?", answer: "Up to 20 UUIDs per click." },
-          { question: "Is it secure?", answer: "Yes — generation uses the browser's cryptographically secure random source." },
+      <HowToUse
+        steps={[
+          "Pick how many UUIDs you need (1–20).",
+          "Click Generate to create them instantly.",
+          "Copy a single value or use Copy All.",
         ]}
       />
+
+      <ToolSeoContent
+        title="Free UUID Generator Online — Generate UUID v4 Instantly"
+        description="Generate cryptographically secure UUID v4 identifiers instantly in your browser. Bulk generate up to 20 at once. Free, no signup, runs locally."
+        body={[
+          "A UUID (Universally Unique Identifier) is a 128-bit value that is practically guaranteed to be unique across all space and time. UUID version 4 identifiers are generated entirely from random data, formatted as 32 hexadecimal characters separated by hyphens in the pattern 8-4-4-4-12 (e.g., 550e8400-e29b-41d4-a716-446655440000). They are the standard choice for database primary keys, session tokens, file names, and any context requiring a unique identifier.",
+          "This tool uses the browser's Web Crypto API (crypto.randomUUID()) to generate cryptographically secure random UUIDs. The Web Crypto API uses the operating system's secure random number generator, making the output suitable for security-sensitive applications — unlike Math.random() which is not cryptographically secure. A getRandomValues fallback is used for older browsers that don't support crypto.randomUUID.",
+          "You can generate between 1 and 20 UUIDs per click. Each UUID is displayed in the standard lowercase format with hyphens. Click Copy next to any individual UUID to copy it, or use Copy All to copy the entire batch as a newline-separated list for pasting into code, spreadsheets, or databases.",
+          "UUID v4 collision probability is negligibly small. The number of random version 4 UUIDs that would need to be generated to have a 50% probability of a single collision is approximately 2.71 quintillion — making practical collisions impossible for any real application.",
+        ]}
+        faqs={[
+          {
+            question: "What is a UUID v4?",
+            answer:
+              "UUID v4 is a 128-bit identifier generated entirely from random data. It is formatted as 32 hexadecimal characters in the pattern 8-4-4-4-12 separated by hyphens. The 'v4' indicates it uses random generation rather than time-based (v1) or name-based (v3/v5) methods.",
+          },
+          {
+            question: "Are generated UUIDs truly unique?",
+            answer:
+              "Yes, practically. The probability of generating two identical UUID v4s is approximately 1 in 5.3 × 10^36. For context, you would need to generate 1 billion UUIDs per second for 100 years to have a 50% chance of a single collision. UUID v4 is safe to use as a primary key without any collision checking.",
+          },
+          {
+            question: "Is the generation cryptographically secure?",
+            answer:
+              "Yes. The tool uses the browser's Web Crypto API (crypto.randomUUID()), which draws from the operating system's cryptographically secure random number generator (CSPRNG). This is the same source used for cryptographic keys and is suitable for security-sensitive identifiers.",
+          },
+          {
+            question: "How many UUIDs can I generate at once?",
+            answer: "Up to 20 UUIDs per generation. Click Generate again for another batch of up to 20.",
+          },
+          {
+            question: "What is the difference between UUID v1, v4, and v7?",
+            answer:
+              "UUID v1 is time-based and includes the MAC address of the generating machine (a privacy concern). UUID v4 is fully random — the most widely used version. UUID v7 is a newer standard that combines a timestamp prefix with random data for sortability, which is useful for database performance.",
+          },
+          {
+            question: "Can I use these UUIDs as database primary keys?",
+            answer:
+              "Yes. UUID v4 is one of the most common choices for primary keys in distributed systems because it can be generated client-side without querying the database, and is guaranteed unique across multiple servers. Some databases (PostgreSQL, MySQL 8+) have native UUID types for efficient storage.",
+          },
+          {
+            question: "Is anything sent to a server?",
+            answer:
+              "No. UUID generation runs entirely in your browser using the Web Crypto API. Nothing is transmitted to any server, and no generated UUID is ever logged or stored by Skycally.",
+          },
+          {
+            question: "What format are the UUIDs in?",
+            answer:
+              "Standard UUID format: lowercase hexadecimal characters in the pattern xxxxxxxx-xxxx-4xxx-yxxx-xxxxxxxxxxxx, where 4 identifies the version and y is either 8, 9, a, or b (the variant bits). Example: 550e8400-e29b-41d4-a716-446655440000.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="uuid-generator" />
     </ToolPageShell>
   );
 }

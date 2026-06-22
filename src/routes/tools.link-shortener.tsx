@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
-import { useRef, useState, useEffect } from "react";
+import { useState, useEffect } from "react";
 import { toast } from "sonner";
 import { Copy, Download, Link as LinkIcon, Loader2, Trash2, ExternalLink, Clock } from "lucide-react";
 
@@ -28,9 +28,9 @@ interface HistoryItem {
   date: string;
 }
 
-async function renderQR(canvas: HTMLCanvasElement, url: string, color: string) {
+async function generateQrDataUrl(url: string, color: string): Promise<string> {
   const QR = (await import("qrcode")).default;
-  await QR.toCanvas(canvas, url, {
+  return QR.toDataURL(url, {
     width: 256,
     margin: 2,
     color: { dark: color, light: "#ffffff" },
@@ -41,12 +41,12 @@ function LinkShortener() {
   const [url, setUrl] = useState("");
   const [alias, setAlias] = useState("");
   const [shortUrl, setShortUrl] = useState("");
+  const [qrDataUrl, setQrDataUrl] = useState("");
   const [busy, setBusy] = useState(false);
   const [qrColor, setQrColor] = useState("#000000");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const [copiedMain, setCopiedMain] = useState(false);
-  const canvasRef = useRef<HTMLCanvasElement>(null);
 
   useEffect(() => {
     try {
@@ -70,6 +70,7 @@ function LinkShortener() {
     }
     setBusy(true);
     setShortUrl("");
+    setQrDataUrl("");
     try {
       const res = await fetch(`${WORKER_URL}/create`, {
         method: "POST",
@@ -81,10 +82,14 @@ function LinkShortener() {
         toast.error(data.error || "Failed to shorten URL");
         return;
       }
+
       setShortUrl(data.short);
-      if (canvasRef.current) {
-        await renderQR(canvasRef.current, data.short, qrColor);
-      }
+
+      // Generate QR immediately as data URL
+      const dataUrl = await generateQrDataUrl(data.short, qrColor);
+      setQrDataUrl(dataUrl);
+
+      // Save to history
       const item: HistoryItem = {
         original: trimmed,
         short: data.short,
@@ -101,6 +106,22 @@ function LinkShortener() {
     }
   };
 
+  const updateQrColor = async (color: string) => {
+    setQrColor(color);
+    if (shortUrl) {
+      const dataUrl = await generateQrDataUrl(shortUrl, color);
+      setQrDataUrl(dataUrl);
+    }
+  };
+
+  const downloadQr = () => {
+    if (!qrDataUrl) return;
+    const a = document.createElement("a");
+    a.href = qrDataUrl;
+    a.download = "skycally-qr.png";
+    a.click();
+  };
+
   const copy = async (text: string, idx?: number) => {
     await navigator.clipboard.writeText(text);
     if (idx !== undefined) {
@@ -113,26 +134,11 @@ function LinkShortener() {
     toast.success("Copied!");
   };
 
-  const downloadQr = () => {
-    const c = canvasRef.current;
-    if (!c) return;
-    const a = document.createElement("a");
-    a.href = c.toDataURL("image/png");
-    a.download = "skycally-qr.png";
-    a.click();
-  };
-
-  const updateQrColor = async (color: string) => {
-    setQrColor(color);
-    if (shortUrl && canvasRef.current) {
-      await renderQR(canvasRef.current, shortUrl, color);
-    }
-  };
-
-  const loadFromHistory = (item: HistoryItem) => {
+  const loadFromHistory = async (item: HistoryItem) => {
     setUrl(item.original);
     setShortUrl(item.short);
-    if (canvasRef.current) renderQR(canvasRef.current, item.short, qrColor);
+    const dataUrl = await generateQrDataUrl(item.short, qrColor);
+    setQrDataUrl(dataUrl);
   };
 
   const removeFromHistory = (idx: number) => {
@@ -145,7 +151,7 @@ function LinkShortener() {
     <ToolPageShell title={tool.name} description={tool.description}>
       {/* ── Input ── */}
       <div className="rounded-2xl border border-border bg-card p-6 space-y-4">
-        {/* URL input */}
+        {/* URL */}
         <div>
           <label className="text-sm font-medium mb-2 block">Long URL</label>
           <div className="flex gap-2 flex-col sm:flex-row">
@@ -171,7 +177,7 @@ function LinkShortener() {
           <label className="text-sm font-medium mb-2 block">
             Custom alias <span className="text-xs text-muted-foreground font-normal">(optional)</span>
           </label>
-          <div className="flex items-center gap-2">
+          <div className="flex items-center gap-2 flex-wrap">
             <span className="text-sm text-muted-foreground shrink-0">go.skycally.com/</span>
             <Input
               value={alias}
@@ -180,42 +186,45 @@ function LinkShortener() {
               maxLength={30}
               className="max-w-[200px]"
             />
-            {alias && <span className="text-xs text-muted-foreground">→ go.skycally.com/{alias}</span>}
+            {alias && <span className="text-xs text-cyan-400 font-mono">→ go.skycally.com/{alias}</span>}
           </div>
         </div>
 
         {/* Result */}
         {shortUrl && (
-          <div className="mt-2 pt-4 border-t border-border grid gap-6 md:grid-cols-[1fr,auto] items-start">
-            <div className="space-y-3">
-              <p className="text-xs uppercase tracking-wide text-muted-foreground">Your short link</p>
-              <div className="flex items-center gap-2 rounded-lg border border-border bg-background p-3">
-                <a
-                  href={shortUrl}
-                  target="_blank"
-                  rel="noreferrer"
-                  className="flex-1 truncate font-mono text-sm font-semibold"
-                  style={{ color: "var(--cyan-brand)" }}
-                >
-                  {shortUrl}
-                </a>
-                <Button variant="outline" size="sm" onClick={() => copy(shortUrl)}>
-                  {copiedMain ? (
-                    "✓"
-                  ) : (
-                    <>
-                      <Copy className="w-3 h-3 mr-1" /> Copy
-                    </>
-                  )}
-                </Button>
-                <a href={shortUrl} target="_blank" rel="noreferrer">
-                  <Button variant="outline" size="sm">
-                    <ExternalLink className="w-3 h-3" />
+          <div className="pt-4 border-t border-border grid gap-6 md:grid-cols-[1fr,auto] items-start">
+            <div className="space-y-4">
+              <div>
+                <p className="text-xs uppercase tracking-wide text-muted-foreground mb-2">Your short link</p>
+                <div className="flex items-center gap-2 rounded-lg border border-border bg-background p-3">
+                  <a
+                    href={shortUrl}
+                    target="_blank"
+                    rel="noreferrer"
+                    className="flex-1 truncate font-mono text-sm font-semibold"
+                    style={{ color: "var(--cyan-brand)" }}
+                  >
+                    {shortUrl}
+                  </a>
+                  <Button variant="outline" size="sm" onClick={() => copy(shortUrl)}>
+                    {copiedMain ? (
+                      "✓"
+                    ) : (
+                      <>
+                        <Copy className="w-3 h-3 mr-1" />
+                        Copy
+                      </>
+                    )}
                   </Button>
-                </a>
+                  <a href={shortUrl} target="_blank" rel="noreferrer">
+                    <Button variant="outline" size="sm">
+                      <ExternalLink className="w-3 h-3" />
+                    </Button>
+                  </a>
+                </div>
               </div>
 
-              {/* QR color */}
+              {/* QR Color */}
               <div className="flex items-center gap-3">
                 <label className="text-xs text-muted-foreground">QR color:</label>
                 <input
@@ -234,10 +243,18 @@ function LinkShortener() {
               </div>
             </div>
 
-            {/* QR Code */}
+            {/* QR Image */}
             <div className="flex flex-col items-center gap-2">
-              <canvas ref={canvasRef} className="rounded-xl border border-border bg-white" />
-              <Button variant="outline" size="sm" onClick={downloadQr} className="w-full">
+              {qrDataUrl && (
+                <img
+                  src={qrDataUrl}
+                  alt="QR Code"
+                  className="rounded-xl border border-border"
+                  width={256}
+                  height={256}
+                />
+              )}
+              <Button variant="outline" size="sm" onClick={downloadQr} disabled={!qrDataUrl} className="w-full">
                 <Download className="w-4 h-4 mr-1" /> Download QR
               </Button>
             </div>
@@ -286,18 +303,21 @@ function LinkShortener() {
                   <button
                     onClick={() => copy(item.short, i)}
                     className="p-1.5 rounded-lg hover:bg-secondary transition text-muted-foreground hover:text-foreground"
+                    title="Copy"
                   >
                     {copiedIdx === i ? "✓" : <Copy className="w-3 h-3" />}
                   </button>
                   <button
                     onClick={() => loadFromHistory(item)}
                     className="p-1.5 rounded-lg hover:bg-secondary transition text-muted-foreground hover:text-foreground"
+                    title="Load"
                   >
                     <ExternalLink className="w-3 h-3" />
                   </button>
                   <button
                     onClick={() => removeFromHistory(i)}
                     className="p-1.5 rounded-lg hover:bg-secondary transition text-muted-foreground hover:text-red-400"
+                    title="Delete"
                   >
                     <Trash2 className="w-3 h-3" />
                   </button>
@@ -310,61 +330,61 @@ function LinkShortener() {
 
       <HowToUse
         steps={[
-          "Paste your long URL and optionally type a custom alias (e.g. my-brand).",
-          "Click Shorten — your link will be at go.skycally.com/your-alias.",
-          "Copy the short link or download the QR code with your chosen color.",
+          "Paste your long URL and optionally type a custom alias like 'my-brand'.",
+          "Click Shorten — your branded link go.skycally.com/my-brand is ready instantly.",
+          "Copy the short link or download the QR code. Change the QR dot color to match your brand.",
         ]}
       />
 
       <ToolSeoContent
-        title="Free Link Shortener — go.skycally.com Custom Short URLs with QR Code"
-        description="Shorten any URL to a branded go.skycally.com link with a custom alias. Includes QR code generator, link history, and custom colors. Free, no signup."
+        title="Free Link Shortener — go.skycally.com Branded Short URLs with QR Code"
+        description="Shorten any URL to a branded go.skycally.com link with a custom alias. Includes instant QR code, custom colors, and link history. Free, no signup."
         body={[
-          "Skycally's Link Shortener creates branded short URLs on the go.skycally.com domain — no third-party services, no dependency on TinyURL or Bitly. Type a custom alias like 'my-brand' and your link becomes go.skycally.com/my-brand. Leave it blank for a random 7-character slug. Links are stored permanently in Cloudflare's global KV network and resolve in milliseconds from anywhere in the world.",
-          "Every shortened link automatically generates a downloadable QR code. Choose any color for the QR dots to match your brand identity, presentation theme, or print material. Download as a high-resolution PNG and use it on business cards, flyers, menus, packaging, or slides — anyone can scan it with a standard smartphone camera to reach your destination instantly.",
-          "Your 15 most recent shortened links are saved locally in your browser and displayed in the Recent Links panel. Each entry shows the original URL, the short link, and the creation date. Copy, reopen, or delete individual entries at any time. Nothing is stored on Skycally's servers beyond the link mapping itself — your browsing history stays private.",
+          "Skycally's Link Shortener creates branded short URLs on the go.skycally.com domain — powered by Cloudflare Workers and KV, with no dependency on TinyURL or Bitly. Type a custom alias like 'my-brand' and your link becomes go.skycally.com/my-brand instantly. Leave the alias blank for a random 7-character slug. Links are stored permanently in Cloudflare's global edge network and resolve in milliseconds from anywhere in the world.",
+          "Every shortened link generates an instant QR code — no extra click needed. The QR code appears immediately after shortening and you can customize the dot color to match your brand, presentation theme, or print material. Download as a high-resolution PNG and use it on business cards, flyers, menus, packaging, or slides. Anyone can scan it with a standard smartphone camera.",
+          "Your 15 most recent shortened links are saved locally in your browser's localStorage and displayed in the Recent Links panel. Each entry shows the original URL, the short link, and the creation date. Copy, reload, or delete individual entries at any time. Nothing is stored on Skycally's servers beyond the link mapping itself.",
           "Custom alias shorteners are used in marketing campaigns to create memorable, on-brand links; in print materials where clean URLs matter; in social media posts where character count is limited; and in presentations where a short memorable link is more professional than a long parameter-heavy URL.",
         ]}
         faqs={[
           {
             question: "What domain are the short links on?",
             answer:
-              "All links use go.skycally.com — Skycally's own branded domain. For example: go.skycally.com/my-link. This is powered by a Cloudflare Worker and KV store, with no dependency on third-party shorteners.",
+              "All links use go.skycally.com — Skycally's own branded subdomain. For example: go.skycally.com/my-link. Powered by Cloudflare Workers and KV with no third-party dependency.",
           },
           {
             question: "Can I choose my own custom alias?",
             answer:
-              "Yes. Type your desired alias in the 'Custom alias' field (letters, numbers, and hyphens only). If the alias is already taken, you will see an error and can try a different one. Leave it blank for a random 7-character slug.",
+              "Yes. Type your alias in the Custom alias field (letters, numbers, and hyphens only, 3–30 characters). If already taken, you will see an error. Leave blank for a random 7-character slug.",
           },
           {
             question: "Do the short links expire?",
             answer:
-              "No. Links are stored with a 5-year TTL in Cloudflare KV and are effectively permanent for any practical use. They resolve from Cloudflare's global edge network with sub-millisecond latency.",
+              "No. Links are stored with a 5-year TTL in Cloudflare KV and are effectively permanent for any practical use.",
           },
           {
-            question: "Is there a usage limit?",
+            question: "Does the QR code appear automatically?",
             answer:
-              "The Cloudflare Worker runs on the free plan which allows 100,000 requests per day. For typical personal and business use, this limit is never reached.",
+              "Yes. The QR code generates instantly as soon as your short link is created — no extra step needed. You can then change the dot color and download it.",
           },
           {
             question: "Can I customize the QR code color?",
             answer:
-              "Yes. After shortening, click the color swatch next to 'QR color' to open a color picker. The QR code regenerates instantly. Ensure strong contrast between the dot color and the white background for reliable scanning.",
+              "Yes. After shortening, click the color swatch to open a color picker. The QR updates instantly. Ensure strong contrast between the dot color and the white background for reliable scanning.",
           },
           {
-            question: "What happens if my custom alias is already taken?",
+            question: "What happens if my alias is already taken?",
             answer:
-              "You will see a message: 'This alias is already taken. Try another.' Choose a different alias or leave the field blank to get a unique random slug.",
+              "You will see: 'This alias is already taken. Try another.' Choose a different alias or leave the field blank for a unique random slug.",
           },
           {
-            question: "Are there any restrictions on alias names?",
+            question: "Is there a usage limit?",
             answer:
-              "Aliases must be 3–30 characters long and contain only lowercase letters (a–z), numbers (0–9), and hyphens (-). Spaces and special characters are not allowed and are automatically removed.",
+              "The Cloudflare Worker runs on the free plan: 100,000 requests per day. For typical personal and business use this limit is never reached.",
           },
           {
             question: "Is my original URL stored anywhere?",
             answer:
-              "The mapping between your alias and your original URL is stored in Cloudflare's KV store to enable redirection. Your link history panel is stored only in your browser's localStorage and is never transmitted to any server.",
+              "The alias-to-URL mapping is stored in Cloudflare KV to enable redirection. Your link history is stored only in your browser's localStorage and never transmitted to any server.",
           },
         ]}
       />

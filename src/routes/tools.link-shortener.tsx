@@ -76,7 +76,7 @@ function LinkShortener() {
   const [url, setUrl] = useState("");
   const [shortUrl, setShortUrl] = useState("");
   const [busy, setBusy] = useState(false);
-  const [qrColor, setQrColor] = useState("#0b0b0f");
+  const [qrColor, setQrColor] = useState("#000000");
   const [history, setHistory] = useState<HistoryItem[]>([]);
   const [copiedIdx, setCopiedIdx] = useState<number | null>(null);
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -235,7 +235,7 @@ function LinkShortener() {
                 />
                 <span className="text-xs font-mono text-muted-foreground">{qrColor}</span>
                 <button
-                  onClick={() => updateQrColor("#0b0b0f")}
+                  onClick={() => updateQrColor("#000000")}
                   className="text-xs text-muted-foreground hover:text-foreground transition"
                 >
                   Reset

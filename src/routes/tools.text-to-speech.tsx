@@ -46,7 +46,9 @@ function Page() {
     };
     load();
     window.speechSynthesis.onvoiceschanged = load;
-    return () => { window.speechSynthesis.onvoiceschanged = null; };
+    return () => {
+      window.speechSynthesis.onvoiceschanged = null;
+    };
   }, [voiceURI]);
 
   const voice = useMemo(() => voices.find((v) => v.voiceURI === voiceURI) || null, [voices, voiceURI]);
@@ -56,7 +58,10 @@ function Page() {
     setPlaying(true);
     speak(text, voice, rate, pitch, () => setPlaying(false));
   };
-  const onStop = () => { stop(); setPlaying(false); };
+  const onStop = () => {
+    stop();
+    setPlaying(false);
+  };
   const onDownload = async () => {
     try {
       toast.info("Recording playback... please keep this tab focused.");
@@ -67,26 +72,48 @@ function Page() {
   };
 
   return (
-    <ToolPageShell title="Text to Speech" description="Type any text and hear it spoken in your chosen language and voice.">
+    <ToolPageShell
+      title="Text to Speech"
+      description="Type any text and hear it spoken in your chosen language and voice."
+    >
       <div className="space-y-6">
         <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-          <Textarea value={text} maxLength={MAX} onChange={(e) => setText(e.target.value)} placeholder="Enter text to convert to speech..." dir="auto" className="min-h-[180px] text-base" />
+          <Textarea
+            value={text}
+            maxLength={MAX}
+            onChange={(e) => setText(e.target.value)}
+            placeholder="Enter text to convert to speech..."
+            dir="auto"
+            className="min-h-[180px] text-base"
+          />
           <div className="flex justify-between text-xs text-muted-foreground">
-            <span>{text.length} / {MAX} characters</span>
+            <span>
+              {text.length} / {MAX} characters
+            </span>
           </div>
         </div>
 
         <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
           <div>
             <label className="text-sm font-semibold mb-2 block">Voice</label>
-            <select value={voiceURI} onChange={(e) => setVoiceURI(e.target.value)} className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm">
+            <select
+              value={voiceURI}
+              onChange={(e) => setVoiceURI(e.target.value)}
+              className="w-full rounded-md border border-border bg-transparent px-3 py-2 text-sm"
+            >
               {voices.length === 0 && <option>Loading voices...</option>}
               {voices.map((v) => {
                 const flag = FLAGS[v.lang.toLowerCase().slice(0, 2)] || "🌐";
-                return <option key={v.voiceURI} value={v.voiceURI}>{flag} {v.name} ({v.lang})</option>;
+                return (
+                  <option key={v.voiceURI} value={v.voiceURI}>
+                    {flag} {v.name} ({v.lang})
+                  </option>
+                );
               })}
             </select>
-            <p className="text-xs text-muted-foreground mt-2">💡 Voices labeled "Online" or "Neural" sound most natural.</p>
+            <p className="text-xs text-muted-foreground mt-2">
+              💡 Voices labeled "Online" or "Neural" sound most natural.
+            </p>
           </div>
           <div>
             <label className="text-sm font-semibold mb-2 block">Speed: {rate.toFixed(2)}x</label>
@@ -98,15 +125,26 @@ function Page() {
           </div>
           <div className="flex flex-wrap gap-3">
             {!playing ? (
-              <button onClick={onPlay} disabled={!text.trim()} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5 disabled:opacity-50">
+              <button
+                onClick={onPlay}
+                disabled={!text.trim()}
+                className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5 disabled:opacity-50"
+              >
                 <Play className="w-4 h-4" /> Play
               </button>
             ) : (
-              <button onClick={onStop} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5">
+              <button
+                onClick={onStop}
+                className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5"
+              >
                 <Square className="w-4 h-4" /> Stop
               </button>
             )}
-            <button onClick={onDownload} disabled={!text.trim()} className="inline-flex items-center gap-2 rounded-xl border border-border font-semibold px-5 py-2.5 hover:bg-secondary disabled:opacity-50">
+            <button
+              onClick={onDownload}
+              disabled={!text.trim()}
+              className="inline-flex items-center gap-2 rounded-xl border border-border font-semibold px-5 py-2.5 hover:bg-secondary disabled:opacity-50"
+            >
               <Download className="w-4 h-4" /> Download
             </button>
           </div>
@@ -116,26 +154,68 @@ function Page() {
       {/* ADSENSE_ZONE: tts-bottom 728x90 */}
       <AdZone id="tts-bottom" size="728x90" />
 
-      <HowToUse steps={[
-        "Type or paste your text (up to 5000 characters).",
-        "Pick a voice, speed, and pitch.",
-        "Press Play to listen, or Download to save the audio.",
-      ]} />
-          <RelatedTools currentSlug="text-to-speech" />
-          <ToolSeoContent
-        title={"Free Text to Speech — Convert Text to Audio Online"}
-        description={"Convert any text to natural-sounding speech for free. 50+ voices in Arabic, English, French and Spanish. Adjust speed and pitch. Download as audio."}
-        body={[
-        "Type or paste your text, select a voice from our library of 50+ options across multiple languages, adjust the speaking speed and pitch, then click Play or Download. The tool uses your browser's built-in speech synthesis engine for instant, private conversion.",
-        "Arabic voices are fully supported with natural-sounding pronunciation. Select from regional Arabic variants including Moroccan, Egyptian, Saudi and Gulf Arabic dialects depending on your browser's installed voices.",
-      ]}
-        faqs={[
-        { question: "Is text to speech completely free?", answer: "Yes, completely free with no character limits, no signup and no watermarks on downloaded audio." },
-        { question: "What languages are supported?", answer: "The available voices depend on your browser and operating system. Common supported languages include English, Arabic, French, Spanish, German, Italian, Portuguese and many more." },
-        { question: "Can I download the audio as MP3?", answer: "Yes. Click the Download button to save the generated speech as an audio file to your device." },
-        { question: "Why do I hear different voices on different devices?", answer: "The voice library comes from your operating system and browser. Windows, Mac, iOS and Android each have different built-in voices." },
-      ]}
+      <HowToUse
+        steps={[
+          "Type or paste your text (up to 5000 characters).",
+          "Pick a voice, speed, and pitch.",
+          "Press Play to listen, or Download to save the audio.",
+        ]}
       />
-      </ToolPageShell>
+
+      <ToolSeoContent
+        title="Free Text to Speech — Convert Text to Audio Online, 50+ Voices"
+        description="Convert any text to natural-sounding speech instantly. Supports Arabic, English, French, Spanish and more. Adjust speed and pitch. Download as audio. Free, no signup, runs in your browser."
+        body={[
+          "Skycally's Text to Speech converter uses your browser's built-in Web Speech Synthesis API to convert any text into spoken audio instantly — no server processing, no file uploads, and no account required. Type or paste up to 5,000 characters, select from 50+ available voices across multiple languages, adjust the speaking speed (0.5× to 2×) and pitch, then click Play or Download.",
+          "The voice library available to you depends on your operating system and browser. Chrome on Windows typically offers the widest selection including Microsoft's neural voices. Safari on iOS and macOS provides high-quality Siri-based voices. On Android, Google's text-to-speech engine powers the available options. Voices labeled 'Online' or 'Neural' generally sound the most natural and human-like.",
+          "Arabic text to speech is fully supported with natural pronunciation. Depending on your device, you may have access to regional variants including Modern Standard Arabic, Egyptian Arabic, Saudi Arabic, and Gulf Arabic. The tool automatically detects right-to-left text direction for Arabic and other RTL languages.",
+          "The Download button records the audio playback in real time using the MediaRecorder API and saves it as a WebM or OGG audio file — the exact format depends on your browser. This makes it easy to use converted speech in videos, presentations, podcasts, language learning materials, or accessibility content.",
+        ]}
+        faqs={[
+          {
+            question: "Is text to speech completely free?",
+            answer:
+              "Yes. There is no cost, no character limit per session, no signup, and no watermark on downloaded audio. The tool uses your browser's built-in speech engine.",
+          },
+          {
+            question: "What languages are supported?",
+            answer:
+              "Available voices depend on your browser and OS. Common languages include English (US, UK, Australian), Arabic (multiple dialects), French, Spanish, German, Italian, Portuguese, Japanese, Chinese, Korean, and many more. Chrome on Windows has the widest selection.",
+          },
+          {
+            question: "Can I download the speech as an audio file?",
+            answer:
+              "Yes. Click the Download button to record and save the audio. The file is saved in WebM or OGG format depending on your browser. You can convert it to MP3 using our Audio Converter tool.",
+          },
+          {
+            question: "Why do I hear different voices on different devices?",
+            answer:
+              "The voice library comes from your operating system and browser, not from Skycally. Windows includes Microsoft voices, macOS includes Siri voices, Android uses Google TTS, and iOS uses Apple voices. Each device offers a different set.",
+          },
+          {
+            question: "Is my text sent to any server?",
+            answer:
+              "No text is ever sent to Skycally's servers. However, some browser voices labeled 'Online' (such as Google voices in Chrome) do send text to Google's servers for synthesis. Voices labeled 'local' or without the 'Online' tag process text entirely on your device.",
+          },
+          {
+            question: "Can I use this for Arabic text?",
+            answer:
+              "Yes. Arabic is fully supported. Select an Arabic voice from the dropdown (marked 🇸🇦). The tool handles right-to-left text automatically. Available Arabic variants depend on your device — Chrome on Windows typically offers Saudi, Egyptian, and other regional Arabic voices.",
+          },
+          {
+            question: "What is the maximum text length?",
+            answer:
+              "The input is capped at 5,000 characters per session. For longer documents, split the text into sections and play or download each part separately.",
+          },
+          {
+            question: "How do I get more voices?",
+            answer:
+              "On Windows: Settings → Time & Language → Speech → Add voices. On Android: Settings → General Management → Language → Text-to-Speech → install Google TTS voices. On macOS: System Settings → Accessibility → Spoken Content → System Voice → Manage Voices.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="text-to-speech" />
+    </ToolPageShell>
   );
 }

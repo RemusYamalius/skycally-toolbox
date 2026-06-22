@@ -64,7 +64,10 @@ ${html}
   };
 
   return (
-    <ToolPageShell title="Word to PDF" description="Convert Word documents to PDF directly in your browser — private and fast.">
+    <ToolPageShell
+      title="Word to PDF"
+      description="Convert Word documents to PDF directly in your browser — private and fast."
+    >
       <div className="space-y-5">
         <DropZone
           accept=".docx"
@@ -96,26 +99,67 @@ ${html}
         <iframe ref={iframeRef} title="print-frame" style={{ display: "none" }} />
       </div>
 
-      <HowToUse steps={[
-        "Upload your Word (.docx) file using the drop zone.",
-        "Click Convert to PDF to process your document.",
-        "In the print dialog, select Save as PDF to download.",
-      ]} />
-      <RelatedTools currentSlug="word-to-pdf" />
-      <ToolSeoContent
-        title="Word to PDF Converter — Free Online Tool"
-        description="Convert Word documents to PDF instantly in your browser. No uploads, no server — 100% private."
-        body={[
-          "Skycally's Word to PDF converter processes your document entirely in your browser using the mammoth library.",
-          "Your file never leaves your device, ensuring complete privacy. Supports .docx files up to 20MB.",
-        ]}
-        faqs={[
-          { question: "Is it free?", answer: "Yes, completely free with no registration required." },
-          { question: "Is my file uploaded to a server?", answer: "No — conversion happens entirely in your browser. Your file never leaves your device." },
-          { question: "What file types are supported?", answer: "Currently .docx files (Word 2007 and later). DOC files are not supported." },
-          { question: "Does it support Arabic and RTL text?", answer: "Yes — RTL and Arabic content is preserved during conversion." },
+      <HowToUse
+        steps={[
+          "Upload your Word (.docx) file using the drop zone.",
+          "Click Convert to PDF to process your document.",
+          "In the print dialog, select Save as PDF to download.",
         ]}
       />
+
+      <ToolSeoContent
+        title="Word to PDF Converter Free Online — Convert .docx to PDF Instantly"
+        description="Convert Word documents (.docx) to PDF for free in your browser. No file uploads, no server, 100% private. Supports Arabic RTL, tables, images, and all formatting."
+        body={[
+          "Skycally's Word to PDF converter transforms your .docx files into PDF documents entirely in your browser using the mammoth.js library. There are no file uploads, no server processing, and no account required — your document never leaves your device at any point during conversion. Simply drop your Word file, click Convert, and save the result as PDF from your browser's print dialog.",
+          "The conversion preserves your document's structure including headings, paragraphs, bold and italic formatting, numbered and bulleted lists, tables, and embedded images. Arabic and other right-to-left text is fully supported — the tool correctly renders RTL content without any special configuration.",
+          "Word to PDF conversion is one of the most common document tasks in offices, schools, and businesses. PDFs are preferred for sharing because they look identical on every device regardless of the operating system or installed fonts. Converting from Word ensures your document layout is locked in exactly as you intended.",
+          "For the reverse operation — converting an existing PDF back into an editable Word document — use Skycally's PDF to Word tool. For creating new documents from scratch that can be exported as PDF or .docx, try the free Word Processor tool which requires no account and works entirely in your browser.",
+        ]}
+        faqs={[
+          {
+            question: "Is Word to PDF conversion free?",
+            answer:
+              "Yes, completely free with no file size limits, no registration, and no watermarks on the output PDF.",
+          },
+          {
+            question: "Is my Word file uploaded to a server?",
+            answer:
+              "No. Conversion happens entirely in your browser using the mammoth.js library. Your .docx file never leaves your device.",
+          },
+          {
+            question: "What file types are supported?",
+            answer:
+              "Currently .docx files (Word 2007 format and later). The older .doc format (Word 97–2003) is not supported. If you have a .doc file, open it in Microsoft Word or LibreOffice and save it as .docx first.",
+          },
+          {
+            question: "Does it support Arabic and RTL text?",
+            answer:
+              "Yes. Right-to-left text including Arabic and Hebrew is preserved correctly during conversion. Tables, headings, and other structural elements with RTL content are also handled.",
+          },
+          {
+            question: "Will the PDF look exactly like my Word document?",
+            answer:
+              "The conversion preserves most formatting including headings, bold, italic, lists, and tables. Some complex Word features like custom macros, tracked changes, or highly customized styles may not render identically. For pixel-perfect results, use Microsoft Word's built-in Save As PDF feature.",
+          },
+          {
+            question: "Is there a file size limit?",
+            answer:
+              "There is no enforced file size limit. Large files with many images may take a few seconds to process. Very large documents (50+ pages with high-resolution images) may be slow depending on your device's memory.",
+          },
+          {
+            question: "Can I convert multiple Word files at once?",
+            answer: "Currently the tool converts one file at a time. Upload and convert each file separately.",
+          },
+          {
+            question: "How do I save the PDF after conversion?",
+            answer:
+              "After clicking Convert to PDF, your browser's print dialog opens automatically. Select 'Save as PDF' (or 'Microsoft Print to PDF' on Windows) as the destination, then click Save. Choose your filename and save location.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="word-to-pdf" />
     </ToolPageShell>
   );
 }

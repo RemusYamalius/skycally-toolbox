@@ -305,8 +305,6 @@ function WordCounterPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="word-counter" />
-
       <ToolSeoContent
         title="Free Word Counter — Count Words, Characters, Sentences & Reading Time Online"
         description="Instantly count words, characters (with and without spaces), sentences, paragraphs and lines in any text. Estimates reading time and speaking time. Updates live as you type. Free, no signup, no limit."
@@ -358,6 +356,8 @@ function WordCounterPage() {
           },
         ]}
       />
+
+      <RelatedTools currentSlug="word-counter" />
     </ToolPageShell>
   );
 }

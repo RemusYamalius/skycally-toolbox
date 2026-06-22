@@ -263,8 +263,6 @@ function ImageUpscalerPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="image-upscaler" />
-
       <ToolSeoContent
         title="Free Image Upscaler — Enlarge Photos 2× or 4× Online Without Losing Quality"
         description="Upscale JPG, PNG and WebP images 2× or 4× using Lanczos3 resampling and unsharp masking. Sharper results than browser scaling. Free, no upload, no account — runs entirely in your browser."
@@ -316,6 +314,8 @@ function ImageUpscalerPage() {
           },
         ]}
       />
+
+      <RelatedTools currentSlug="image-upscaler" />
     </ToolPageShell>
   );
 }

@@ -341,8 +341,6 @@ function ImageCompressorPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="image-compressor" />
-
       <ToolSeoContent
         title="Free Image Compressor — Reduce JPG, PNG & WebP Size Online"
         description="Compress JPG, PNG and WebP images by up to 80% without visible quality loss. Batch compress multiple images, resize dimensions, and download individually or as ZIP. Free, no upload, no account."
@@ -394,6 +392,8 @@ function ImageCompressorPage() {
           },
         ]}
       />
+
+      <RelatedTools currentSlug="image-compressor" />
     </ToolPageShell>
   );
 }

@@ -327,8 +327,6 @@ function PasswordGeneratorPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="password-generator" />
-
       <ToolSeoContent
         title="Free Password Generator — Strong, Secure, Random Passwords Online"
         description="Generate strong, cryptographically random passwords instantly. Choose length (4–64), character types, and exclude ambiguous characters. Generate up to 10 passwords at once. Free, no signup, nothing stored or transmitted."
@@ -380,6 +378,8 @@ function PasswordGeneratorPage() {
           },
         ]}
       />
+
+      <RelatedTools currentSlug="password-generator" />
     </ToolPageShell>
   );
 }

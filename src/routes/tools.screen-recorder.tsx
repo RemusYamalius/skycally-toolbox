@@ -599,8 +599,6 @@ function ScreenRecorderPage() {
         }
       />
 
-      <RelatedTools currentSlug="screen-recorder" />
-
       <ToolSeoContent
         title="Free Screen Recorder — Record Screen or Camera Online, No Install"
         description="Record your screen (desktop) or camera (mobile) directly in your browser — no software to install, no account needed, no upload. Everything stays on your device. Free and unlimited."
@@ -652,6 +650,8 @@ function ScreenRecorderPage() {
           },
         ]}
       />
+
+      <RelatedTools currentSlug="screen-recorder" />
     </ToolPageShell>
   );
 }

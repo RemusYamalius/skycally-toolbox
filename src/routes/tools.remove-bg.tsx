@@ -245,8 +245,6 @@ function RemoveBgPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="remove-bg" />
-
       <ToolSeoContent
         title="Remove Background Free — AI Image Background Remover Online"
         description="Remove the background from any photo instantly using AI. No signup, no upload — the AI model runs entirely in your browser. Download a transparent PNG in seconds. Free, unlimited, private."
@@ -298,6 +296,8 @@ function RemoveBgPage() {
           },
         ]}
       />
+
+      <RelatedTools currentSlug="remove-bg" />
     </ToolPageShell>
   );
 }

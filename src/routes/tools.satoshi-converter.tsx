@@ -299,7 +299,10 @@ function SatoshiConverterPage() {
                     borderRadius: 8,
                     fontSize: 12,
                   }}
-                  labelFormatter={(t) => new Date(t as number).toLocaleString()}
+                  labelFormatter={(_label, payload) => {
+                    const t = payload?.[0]?.payload?.t;
+                    return t ? new Date(t).toLocaleString() : "";
+                  }}
                   formatter={(v: number) => [`$${v.toFixed(2)}`, "BTC"]}
                 />
                 <Area type="monotone" dataKey="p" stroke={BITCOIN_ORANGE} strokeWidth={2} fill="url(#btcSpark)" />

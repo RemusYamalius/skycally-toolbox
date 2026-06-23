@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useState } from "react";
+import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeftRight, Bitcoin, Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { ArrowLeftRight, Bitcoin, Check, ChevronsUpDown, Copy, Loader2 } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
@@ -381,41 +381,15 @@ function CurrencyConverter() {
 
         {/* Result */}
         {rates && rate && result !== null && (
-          <motion.div
-            key={`${from}-${to}-${amount}`}
-            initial={{ opacity: 0, y: 8 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.3 }}
-            className="rounded-2xl border p-6"
-            style={{
-              background: "color-mix(in oklab, var(--cyan-brand) 12%, transparent)",
-              borderColor: "color-mix(in oklab, var(--cyan-brand) 40%, transparent)",
-            }}
-          >
-            <div className="text-xs uppercase tracking-wide font-semibold mb-2" style={{ color: "var(--cyan-brand)" }}>
-              Result
-            </div>
-            <div className="font-display text-3xl sm:text-4xl font-bold break-words">
-              <span className="mr-2">{flagFor(from)}</span>
-              {formatNumber(numAmount)} {from} = <span className="mr-2">{flagFor(to)}</span>
-              {formatNumber(result)} {to}
-            </div>
-            <div className="mt-3 text-sm text-muted-foreground">
-              1 {from} = {formatNumber(rate)} {to}
-              {inverseRate !== null && (
-                <>
-                  {" "}
-                  · 1 {to} = {formatNumber(inverseRate)} {from}
-                </>
-              )}
-            </div>
-            {rates.time_last_update_utc && (
-              <div className="mt-2 text-xs text-muted-foreground">Last updated: {rates.time_last_update_utc}</div>
-            )}
-            <div className="mt-1 text-xs text-muted-foreground">
-              Rates updated daily. For real-time trading rates, consult your bank or broker directly.
-            </div>
-          </motion.div>
+          <ResultCard
+            from={from}
+            to={to}
+            numAmount={numAmount}
+            result={result}
+            rate={rate}
+            inverseRate={inverseRate}
+            timeLastUpdated={rates.time_last_update_utc}
+          />
         )}
       </div>
 
@@ -574,5 +548,91 @@ function CurrencyConverter() {
 
       <RelatedTools currentSlug="currency-converter" />
     </ToolPageShell>
+  );
+}
+
+interface ResultCardProps {
+  from: string;
+  to: string;
+  numAmount: number;
+  result: number;
+  rate: number;
+  inverseRate: number | null;
+  timeLastUpdated?: string;
+}
+
+function ResultCard({ from, to, numAmount, result, rate, inverseRate, timeLastUpdated }: ResultCardProps) {
+  const [copied, setCopied] = useState(false);
+  const tRef = useRef<number | null>(null);
+
+  const copy = async () => {
+    try {
+      await navigator.clipboard.writeText(formatNumber(result));
+      setCopied(true);
+      if (tRef.current) window.clearTimeout(tRef.current);
+      tRef.current = window.setTimeout(() => setCopied(false), 1500);
+    } catch {
+      /* noop */
+    }
+  };
+
+  useEffect(() => {
+    return () => {
+      if (tRef.current) window.clearTimeout(tRef.current);
+    };
+  }, []);
+
+  return (
+    <motion.div
+      key={`${from}-${to}-${numAmount}`}
+      initial={{ opacity: 0, y: 8 }}
+      animate={{ opacity: 1, y: 0 }}
+      transition={{ duration: 0.3 }}
+      className="rounded-2xl border p-6"
+      style={{
+        background: "color-mix(in oklab, var(--cyan-brand) 12%, transparent)",
+        borderColor: "color-mix(in oklab, var(--cyan-brand) 40%, transparent)",
+      }}
+    >
+      <div className="flex items-center justify-between mb-2">
+        <div className="text-xs uppercase tracking-wide font-semibold" style={{ color: "var(--cyan-brand)" }}>
+          Result
+        </div>
+        <button
+          onClick={copy}
+          className="flex items-center gap-1.5 px-2.5 py-1 rounded-md border text-xs font-medium transition-colors hover:bg-secondary"
+          style={{ borderColor: "color-mix(in oklab, var(--cyan-brand) 40%, transparent)" }}
+          aria-label="Copy result"
+        >
+          {copied ? (
+            <>
+              <Check className="w-3.5 h-3.5" style={{ color: "#10b981" }} /> Copied
+            </>
+          ) : (
+            <>
+              <Copy className="w-3.5 h-3.5" /> Copy
+            </>
+          )}
+        </button>
+      </div>
+      <div className="font-display text-3xl sm:text-4xl font-bold break-words">
+        <span className="mr-2">{flagFor(from)}</span>
+        {formatNumber(numAmount)} {from} = <span className="mr-2">{flagFor(to)}</span>
+        {formatNumber(result)} {to}
+      </div>
+      <div className="mt-3 text-sm text-muted-foreground">
+        1 {from} = {formatNumber(rate)} {to}
+        {inverseRate !== null && (
+          <>
+            {" "}
+            · 1 {to} = {formatNumber(inverseRate)} {from}
+          </>
+        )}
+      </div>
+      {timeLastUpdated && <div className="mt-2 text-xs text-muted-foreground">Last updated: {timeLastUpdated}</div>}
+      <div className="mt-1 text-xs text-muted-foreground">
+        Rates updated daily. For real-time trading rates, consult your bank or broker directly.
+      </div>
+    </motion.div>
   );
 }

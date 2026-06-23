@@ -1,36 +1,59 @@
-## Add Color Picker tool
+## Satoshi Converter — Implementation Plan
 
-### Files
+Create a new utility tool at `/tools/satoshi-converter` for converting between Bitcoin units (Satoshi, BTC, mBTC, Bits) and fiat currencies (USD, EUR, MAD) with live CoinGecko pricing.
 
-1. **Create `src/routes/tools.color-picker.tsx`** — single-file route component at `/tools/color-picker` implementing all 9 feature sections in tabs (Picker / Harmony / Contrast / Gradient / Extract), plus Saved Palette and Recently Used rows shown under the picker. Uses existing primitives: `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`, `Tabs`, `Input`, `Slider`, `Button`, `buildToolMeta`, `toolBySlug`. No new dependencies — color math is hand-rolled, image extraction is pure canvas.
+### 1. Register the tool — `src/lib/tools.ts`
+- Add `Bitcoin` to the `lucide-react` import.
+- Append entry after the existing utility tools:
+  ```ts
+  { slug: "satoshi-converter", name: "Satoshi Converter", description: "Convert between Bitcoin, Satoshi, mBTC, bits, USD, EUR and MAD instantly. Live BTC price updated every 60 seconds.", category: "utility", icon: Bitcoin, path: "/tools/satoshi-converter" }
+  ```
 
-2. **Edit `src/lib/tools.ts`** — append the `color-picker` entry to the tools array. Add `Pipette` to the existing `lucide-react` import if not already present.
+### 2. Related tools — `src/lib/related-tools.ts`
+- Add `satoshi-converter` mapping to: `currency-converter`, `compound-interest`, `loan-calculator`, `tip-calculator`, `qr-generator`.
 
-3. **Edit `src/lib/related-tools.ts`** — add a `color-picker` mapping pointing to relevant utility/design tools (e.g. `color-palette`, `image-filters`, `meme-generator`, `qr-generator`).
+### 3. New route — `src/routes/tools.satoshi-converter.tsx`
 
-### Implementation outline
+Single file using `createFileRoute("/tools/satoshi-converter")`, wrapped in `ToolPageShell`, ending with `HowToUse` → `ToolSeoContent` → `RelatedTools`.
 
-Inside `tools.color-picker.tsx`:
+**State**
+- `prices: { usd, eur, mad, change24h } | null`
+- `sparklineData: { t, p }[]`
+- `lastUpdated: number`, `secondsAgo` (1s tick), `loading`, `error`
+- `satoshi: string` as single source of truth; all 7 fields derived via `useMemo`.
 
-- **Color math (top of file, pure functions)**: `hexToRgb`, `rgbToHex`, `rgbToHsl`, `hslToRgb`, `rgbToHsb`, `rgbToCmyk`, `relativeLuminance` + `getContrastRatio`, `getHarmonyColors(hex, mode)`, `getShades(hex)`, `getTints(hex)`, `getRandomColor()`, `findClosestTailwindColor(hex)` backed by a hardcoded `TAILWIND_COLORS` map covering slate→rose, shades 50-950.
-- **State**: HSV (`h`, `s`, `v`, `a`) as source of truth — derive HEX/RGB/etc. Default `#06b6d4`. Saved palette + recents in `localStorage` (`cp:saved`, `cp:recents`). Push to recents on color change (debounced).
-- **Picker tab**: 
-  - SV canvas (`<div>` with layered gradients: white→transparent horizontally, transparent→black vertically, hue background) with pointer/touch handlers; draggable knob.
-  - Hue `<input type="range">` styled as rainbow.
-  - Alpha `<input type="range">` styled with checker + color gradient.
-  - Large preview swatch, Random button, Recently Used row (12 max), Saved Palette row (20 max, with X / Clear all / Copy all as JSON array).
-  - Format outputs grid: HEX, HEX+alpha, RGB, RGBA, HSL, HSLA, HSB, CMYK, `--color-primary: #hex;`, Tailwind closest match. Each row has a `CopyButton` that flips to a checkmark for 1500ms via `setTimeout`.
-- **Harmony tab**: buttons for Complementary / Analogous / Triadic / Split-Complementary / Tetradic; render swatches (click to set as current, copy on second click via per-swatch copy button).
-- **Shades & Tints**: row of 10 swatches under the picker (5 darker + current + 4 lighter), clickable+copyable.
-- **Contrast tab**: foreground + background color inputs (text + native color picker), ratio (rounded to 2 dp), AA/AAA badges for normal (4.5 / 7) and large text (3 / 4.5), live preview block with sample text.
-- **Gradient tab**: up to 5 stops (add/remove buttons), each stop has color input + position slider; angle slider (0-360) + preset buttons (0/45/90/135/180/225/270/315); Linear/Radial toggle; full-width preview; Copy CSS + Copy Tailwind buttons (Tailwind uses `bg-gradient-to-*` + `from-[#hex] via-[#hex] to-[#hex]`).
-- **Extract tab**: drop zone + file input, draw image to offscreen canvas (downscaled to ~100px max edge), bucket pixels into a 4-bit-per-channel histogram, sort by count, return top 8 distinct colors as clickable+copyable swatches. All client-side, never uploaded.
-- **Active tab accent**: inline style on `TabsTrigger` data-state=active uses the current hex (apply via a thin CSS variable wrapper).
-- **Mobile**: pointer events for canvas; `touch-action: none` on the SV canvas to prevent scroll while dragging.
+**Live price**
+- `fetchPrice()` calls `https://api.coingecko.com/api/v3/simple/price?ids=bitcoin&vs_currencies=usd,eur,mad&include_24hr_change=true`.
+- `useEffect` on mount + `setInterval` every 60s; separate 1s interval for "X seconds ago" countdown.
+- Loading skeleton (using `Skeleton`), error state with Retry button.
 
-Bottom of page: `HowToUse` (3 steps as specified), `ToolSeoContent` (title/description as specified, 2-3 paragraph body, 8 FAQs covering formats, WCAG, harmony, image extraction, saved palette, Tailwind match, gradient, privacy), and `<RelatedTools currentSlug="color-picker" />`.
+**Sparkline**
+- `fetchSparkline()` calls `/coins/bitcoin/market_chart?vs_currency=usd&days=7`.
+- Recharts `AreaChart`, 120px tall, no axes, orange `#f7931a` gradient fill, single tooltip.
 
-### Verification
+**Converter (7 fields)**
+- Each field controlled; `onChange` parses to BTC then sets `satoshi`.
+- Field config array: `{ key, label, badge, decimals, color, value, fromInput }`.
+- Color groups: orange (`#f7931a`) for Satoshi/BTC, yellow (`#eab308`) for mBTC/bits, green (`var(--green-brand)`) for USD/EUR/MAD.
+- Copy button per field — `navigator.clipboard.writeText`, ✓ icon for 1.5s.
+- Fiat fields disabled with hint when `prices` unavailable.
 
-- Dev server compiles, `/tools/color-picker` renders with default `#06b6d4`.
-- All 5 tabs switch; copy buttons flash checkmark; saved palette and recents persist across reload; image extractor returns 8 swatches for a test image.
+**Quick amounts**
+- Row of buttons: 1 sat, 100 sat, 1k sat, 1 bit (100 sat), 1 mBTC (100k sat), 0.001 BTC, 0.01 BTC, 0.1 BTC, 1 BTC. Each sets `satoshi`.
+
+**Reset button** clears `satoshi` to `""`.
+
+**Reference card** — static grid of 6 conversion facts.
+
+**Disclaimer** — small muted text under chart.
+
+### 4. SEO block
+- `HowToUse` with 3 provided steps.
+- `ToolSeoContent` with the exact title/description, 4 body paragraphs (~150–200 words total) and 8 FAQs as specified.
+- `<RelatedTools currentSlug="satoshi-converter" />`.
+
+### Technical notes
+- No new dependencies — `recharts`, `lucide-react`, shadcn `Input`/`Button`/`Skeleton` already present.
+- All math in browser; only outbound calls are the two CoinGecko endpoints (public, no key).
+- `routeTree.gen.ts` regenerates automatically via the Vite plugin.
+- English-only copy, dark theme tokens, mobile responsive grid (1 col on mobile, 2 col ≥sm for fields).

@@ -4,7 +4,7 @@ import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
-
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -83,8 +83,7 @@ function applySketch(img: HTMLImageElement, style: Style): string {
         const gx = -tl - 2 * ml - bl + tr + 2 * mr + br;
         const gy = -tl - 2 * tc - tr + bl + 2 * bc + br;
         const mag = Math.min(255, Math.sqrt(gx * gx + gy * gy));
-        const edge = 255 - mag;
-        result.data[idx] = result.data[idx + 1] = result.data[idx + 2] = edge;
+        result.data[idx] = result.data[idx + 1] = result.data[idx + 2] = 255 - mag;
         result.data[idx + 3] = 255;
       }
     }
@@ -98,10 +97,12 @@ function boxBlur(src: ImageData, w: number, h: number, radius: number): ImageDat
   const dst = new ImageData(w, h);
   for (let y = 0; y < h; y++) {
     for (let x = 0; x < w; x++) {
-      let sum = 0, count = 0;
+      let sum = 0,
+        count = 0;
       for (let dy = -radius; dy <= radius; dy++) {
         for (let dx = -radius; dx <= radius; dx++) {
-          const nx = x + dx, ny = y + dy;
+          const nx = x + dx,
+            ny = y + dy;
           if (nx >= 0 && nx < w && ny >= 0 && ny < h) {
             sum += src.data[(ny * w + nx) * 4];
             count++;
@@ -157,7 +158,10 @@ function ImageToSketch() {
   };
 
   return (
-    <ToolPageShell title="Image to Sketch" description="Transform any photo into a pencil or charcoal sketch instantly.">
+    <ToolPageShell
+      title="Image to Sketch"
+      description="Transform any photo into a pencil, charcoal, or edge-detection sketch instantly."
+    >
       <div className="w-full space-y-5">
         <div
           onDrop={onDrop}
@@ -166,17 +170,22 @@ function ImageToSketch() {
           className="border-2 border-dashed border-border hover:border-cyan-500/50 rounded-2xl p-6 text-center cursor-pointer transition-all"
         >
           <input
-            ref={inputRef} type="file" accept="image/*" className="hidden"
-            onChange={(e) => { if (e.target.files?.[0]) onFile(e.target.files[0]); }}
+            ref={inputRef}
+            type="file"
+            accept="image/*"
+            className="hidden"
+            onChange={(e) => {
+              if (e.target.files?.[0]) onFile(e.target.files[0]);
+            }}
           />
           {preview ? (
             <div className="space-y-2">
-              <img
-                ref={imgRef} src={preview} alt="Original"
-                className="max-h-48 mx-auto rounded-xl object-contain"
-              />
+              <img ref={imgRef} src={preview} alt="Original" className="max-h-48 mx-auto rounded-xl object-contain" />
               <button
-                onClick={(e) => { e.stopPropagation(); inputRef.current?.click(); }}
+                onClick={(e) => {
+                  e.stopPropagation();
+                  inputRef.current?.click();
+                }}
                 className="text-xs text-muted-foreground hover:text-cyan-400 transition-colors"
               >
                 Change image
@@ -186,10 +195,16 @@ function ImageToSketch() {
             <div className="py-8 space-y-2">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
                 <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M15.232 5.232l3.536 3.536m-2.036-5.036a2.5 2.5 0 113.536 3.536L6.5 21.036H3v-3.572L16.732 3.732z"
+                  />
                 </svg>
               </div>
               <p className="text-muted-foreground text-sm">Drop an image or click to browse</p>
+              <p className="text-xs text-muted-foreground">PNG, JPG, WEBP</p>
             </div>
           )}
         </div>
@@ -201,11 +216,12 @@ function ImageToSketch() {
               {STYLES.map((s) => (
                 <button
                   key={s.value}
-                  onClick={() => { setStyle(s.value); setResult(""); }}
+                  onClick={() => {
+                    setStyle(s.value);
+                    setResult("");
+                  }}
                   className={`p-3 rounded-xl border text-left transition-all ${
-                    style === s.value
-                      ? "border-cyan-500 bg-cyan-500/10"
-                      : "border-border hover:border-border"
+                    style === s.value ? "border-cyan-500 bg-cyan-500/10" : "border-border hover:border-foreground/30"
                   }`}
                 >
                   <p className={`text-sm font-medium ${style === s.value ? "text-cyan-300" : "text-muted-foreground"}`}>
@@ -229,10 +245,8 @@ function ImageToSketch() {
         )}
 
         {result && (
-          <div className="bg-[#0d1526] border border-border rounded-2xl p-4 space-y-3">
-            <div className="flex justify-between items-center">
-              <p className="text-xs text-muted-foreground uppercase tracking-wider">Result — {style}</p>
-            </div>
+          <div className="bg-[#0d1526] border border-green-500/20 rounded-2xl p-4 space-y-3">
+            <p className="text-xs text-green-400 uppercase tracking-wider">Result — {style}</p>
             <div className="grid grid-cols-2 gap-3">
               <div>
                 <p className="text-xs text-muted-foreground mb-2 text-center">Original</p>
@@ -252,18 +266,70 @@ function ImageToSketch() {
           </div>
         )}
       </div>
-      <HowToUse steps={[
-        "Upload a photo by drag-and-drop or browse.",
-        "Pick a sketch style: pencil, charcoal, or edges.",
-        "Click Convert and download your sketch as PNG.",
-      ]} />
-          <RelatedTools currentSlug="image-to-sketch" />
-          <ToolSeoContent
-        title="Free Image to Sketch — Turn Photos into Drawings"
-        description="Skycally's Image to Sketch tool transforms any photo into a hand-drawn sketch using advanced canvas processing. Choose from three styles: Pencil for soft lines, Charcoal for bold strokes, or Edges for sharp outlines. The conversion runs entirely in your browser — no uploads, no waiting, completely free."
-        body={[]}
-        faqs={[{"question":"What sketch styles are available?","answer":"Three styles are available: Pencil (soft), Charcoal (bold), and Edges (sharp outlines)."},{"question":"How long does conversion take?","answer":"Conversion is nearly instant for most images, typically under 2 seconds."},{"question":"What format is the sketch saved as?","answer":"The sketch is downloaded as a PNG file."},{"question":"Does it work on all types of photos?","answer":"It works on all photos, but portraits and landscapes with clear subjects give the best results."},{"question":"Is my image uploaded to a server?","answer":"No. All processing happens in your browser using Canvas API."}]}
+
+      <AdZone id="image-to-sketch-bottom" size="300x250" />
+
+      <HowToUse
+        steps={[
+          "Upload a photo by drag-and-drop or click to browse — PNG, JPG, or WEBP.",
+          "Choose a sketch style: Pencil for soft lines, Charcoal for bold strokes, or Edges for sharp outlines.",
+          "Click Convert to Sketch and download the result as PNG. A before/after preview is shown.",
+        ]}
       />
+
+      <ToolSeoContent
+        title="Free Image to Sketch Converter — Turn Photos into Pencil Drawings Online"
+        description="Transform any photo into a pencil, charcoal, or edge sketch instantly. Free, no upload, runs in your browser. Download as PNG. Perfect for artists, designers, and social media."
+        body={[
+          "Skycally's Image to Sketch tool transforms any photo into a hand-drawn sketch effect using advanced Canvas-based image processing — directly in your browser. Upload an image, choose your sketch style, click Convert, and download the result as a PNG. No server upload, no account required.",
+          "Three distinct sketch styles give you creative flexibility: Pencil produces a soft, light drawing effect that mimics graphite on paper — ideal for portraits and landscapes. Charcoal creates bold, dark strokes with deeper contrast, perfect for dramatic artistic renditions. Edges uses Sobel edge detection to extract sharp outlines from the image, producing a clean line-art effect popular in illustration and graphic design.",
+          "The conversion uses pure JavaScript Canvas API processing — grayscale conversion, inversion, Gaussian-style box blur, and color dodge blending for the pencil and charcoal effects, and Sobel gradient detection for the edges style. All computation happens locally in your browser tab, making the tool completely private and offline-capable once loaded.",
+          "A side-by-side before/after comparison lets you evaluate the result before downloading. Portraits with clear subjects, architectural photos, and landscapes with defined shapes give the best results. Busy or very low-contrast images may produce subtler effects.",
+        ]}
+        faqs={[
+          {
+            question: "What sketch styles are available?",
+            answer:
+              "Three styles: Pencil (soft graphite-style lines), Charcoal (bold, high-contrast strokes), and Edges (sharp Sobel edge-detection outlines).",
+          },
+          {
+            question: "What types of photos work best?",
+            answer:
+              "Portraits, architectural photos, and landscapes with clear subjects and defined shapes give the best results. Very busy or low-contrast images may produce subtler sketch effects.",
+          },
+          {
+            question: "How long does conversion take?",
+            answer:
+              "Conversion is nearly instant for most images, typically under 2 seconds depending on image size and your device's CPU.",
+          },
+          {
+            question: "What format is the sketch saved as?",
+            answer: "The sketch is downloaded as a full-resolution PNG file matching the original image dimensions.",
+          },
+          {
+            question: "Is my image uploaded to a server?",
+            answer:
+              "No. All processing happens locally in your browser using the Canvas API. Your image never leaves your device.",
+          },
+          {
+            question: "Can I use the sketch for commercial projects?",
+            answer:
+              "The sketch is derived from your original image. Ensure you have the rights to the source photo before using the result commercially.",
+          },
+          {
+            question: "Can I apply the sketch effect to a logo or illustration?",
+            answer:
+              "Yes. The tool works on any image type. Logos and illustrations with clear shapes work especially well with the Edges style.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The tool is fully responsive and works on smartphones and tablets running Chrome or other modern mobile browsers.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="image-to-sketch" />
     </ToolPageShell>
   );
 }

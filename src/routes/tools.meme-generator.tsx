@@ -54,8 +54,11 @@ function MemeGenerator() {
     if (!imgSrc) return;
     const img = new Image();
     img.crossOrigin = "anonymous";
-    img.onload = () => { imgRef.current = img; render(); };
-    img.onerror = () => toast.error("❌ Failed to load template. Try uploading your own image.");
+    img.onload = () => {
+      imgRef.current = img;
+      render();
+    };
+    img.onerror = () => toast.error("Failed to load template. Try uploading your own image.");
     img.src = imgSrc;
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [imgSrc]);
@@ -74,7 +77,7 @@ function MemeGenerator() {
     ctx.strokeStyle = outlineColor;
     ctx.lineWidth = outlineWidth;
     ctx.lineJoin = "round";
-    const tx = (s: string) => allCaps ? s.toUpperCase() : s;
+    const tx = (s: string) => (allCaps ? s.toUpperCase() : s);
     if (topText) {
       ctx.strokeText(tx(topText), canvas.width / 2, fontSize + 10);
       ctx.fillText(tx(topText), canvas.width / 2, fontSize + 10);
@@ -85,7 +88,9 @@ function MemeGenerator() {
     }
   };
 
-  useEffect(() => { render(); /* eslint-disable-next-line react-hooks/exhaustive-deps */ }, [topText, bottomText, fontSize, textColor, outlineColor, outlineWidth, allCaps, font]);
+  useEffect(() => {
+    render(); /* eslint-disable-next-line react-hooks/exhaustive-deps */
+  }, [topText, bottomText, fontSize, textColor, outlineColor, outlineWidth, allCaps, font]);
 
   const download = () => {
     const canvas = canvasRef.current;
@@ -96,9 +101,9 @@ function MemeGenerator() {
       a.href = url;
       a.download = "meme.png";
       a.click();
-      toast.success("✅ Download started!");
+      toast.success("Download started!");
     } catch {
-      toast.error("❌ This template blocked export. Try uploading your own image.");
+      toast.error("This template blocked export. Try uploading your own image.");
     }
   };
 
@@ -114,25 +119,36 @@ function MemeGenerator() {
         } else {
           await navigator.share({ title: "My meme", url: location.href });
         }
-      } catch {/* user cancel */}
+      } catch {
+        /* user cancel */
+      }
     }, "image/png");
   };
 
   return (
-    <ToolPageShell title="Meme Generator" description="Create classic memes from popular templates or your own image.">
+    <ToolPageShell
+      title="Meme Generator"
+      description="Create memes from 12 popular templates or upload your own image. Customize text, font, and colors."
+    >
       {!imgSrc ? (
         <div className="space-y-5">
-          <p className="text-sm text-muted-foreground">Pick a template:</p>
+          <p className="text-sm text-muted-foreground">Pick a template or upload your own image:</p>
           <div className="grid grid-cols-3 sm:grid-cols-4 lg:grid-cols-6 gap-3">
             {MEME_TEMPLATES.map((t) => (
-              <button key={t.id} onClick={() => setImgSrc(t.url)} className="group rounded-lg overflow-hidden border border-border bg-card hover:ring-2 hover:ring-[var(--cyan-brand)] transition">
+              <button
+                key={t.id}
+                onClick={() => setImgSrc(t.url)}
+                className="group rounded-xl overflow-hidden border border-border bg-card hover:ring-2 hover:ring-[var(--cyan-brand)] transition"
+              >
                 <img src={t.url} alt={t.name} crossOrigin="anonymous" className="w-full aspect-square object-cover" />
-                <p className="text-[11px] py-1 px-1 text-center truncate">{t.name}</p>
+                <p className="text-[11px] py-1.5 px-1 text-center truncate text-muted-foreground group-hover:text-foreground transition">
+                  {t.name}
+                </p>
               </button>
             ))}
           </div>
           <label className="block">
-            <div className="rounded-2xl border-2 border-dashed border-border p-8 text-center cursor-pointer hover:border-foreground/30">
+            <div className="rounded-2xl border-2 border-dashed border-border p-8 text-center cursor-pointer hover:border-cyan-500/50 transition-colors">
               <p className="font-semibold">Or upload your own image</p>
               <p className="text-xs text-muted-foreground mt-1">PNG, JPG or WEBP</p>
             </div>
@@ -145,52 +161,163 @@ function MemeGenerator() {
             <canvas ref={canvasRef} className="max-w-full h-auto rounded-lg" />
           </div>
           <div className="space-y-3">
-            <input value={topText} onChange={(e) => setTopText(e.target.value)} placeholder="Top text" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
-            <input value={bottomText} onChange={(e) => setBottomText(e.target.value)} placeholder="Bottom text" className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm" />
-            <select value={font} onChange={(e) => setFont(e.target.value)} className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm">
-              <option>Impact</option><option>Arial</option><option>Oswald</option>
+            <input
+              value={topText}
+              onChange={(e) => setTopText(e.target.value)}
+              placeholder="Top text"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            />
+            <input
+              value={bottomText}
+              onChange={(e) => setBottomText(e.target.value)}
+              placeholder="Bottom text"
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            />
+            <select
+              value={font}
+              onChange={(e) => setFont(e.target.value)}
+              className="w-full rounded-lg border border-border bg-background px-3 py-2 text-sm"
+            >
+              <option>Impact</option>
+              <option>Arial</option>
+              <option>Oswald</option>
             </select>
-            <label className="block text-xs text-muted-foreground">Font size: {fontSize}px
-              <input type="range" min={24} max={80} value={fontSize} onChange={(e) => setFontSize(Number(e.target.value))} className="w-full mt-1" />
+            <label className="block text-xs text-muted-foreground">
+              Font size: {fontSize}px
+              <input
+                type="range"
+                min={24}
+                max={80}
+                value={fontSize}
+                onChange={(e) => setFontSize(Number(e.target.value))}
+                className="w-full mt-1"
+              />
             </label>
             <div className="grid grid-cols-2 gap-2">
-              <label className="text-xs text-muted-foreground">Text color<input type="color" value={textColor} onChange={(e) => setTextColor(e.target.value)} className="mt-1 w-full h-8 rounded border border-border" /></label>
-              <label className="text-xs text-muted-foreground">Outline<input type="color" value={outlineColor} onChange={(e) => setOutlineColor(e.target.value)} className="mt-1 w-full h-8 rounded border border-border" /></label>
+              <label className="text-xs text-muted-foreground">
+                Text color
+                <input
+                  type="color"
+                  value={textColor}
+                  onChange={(e) => setTextColor(e.target.value)}
+                  className="mt-1 w-full h-8 rounded border border-border"
+                />
+              </label>
+              <label className="text-xs text-muted-foreground">
+                Outline color
+                <input
+                  type="color"
+                  value={outlineColor}
+                  onChange={(e) => setOutlineColor(e.target.value)}
+                  className="mt-1 w-full h-8 rounded border border-border"
+                />
+              </label>
             </div>
-            <label className="block text-xs text-muted-foreground">Outline width: {outlineWidth}px
-              <input type="range" min={1} max={8} value={outlineWidth} onChange={(e) => setOutlineWidth(Number(e.target.value))} className="w-full mt-1" />
+            <label className="block text-xs text-muted-foreground">
+              Outline width: {outlineWidth}px
+              <input
+                type="range"
+                min={1}
+                max={8}
+                value={outlineWidth}
+                onChange={(e) => setOutlineWidth(Number(e.target.value))}
+                className="w-full mt-1"
+              />
             </label>
-            <label className="flex items-center gap-2 text-xs"><input type="checkbox" checked={allCaps} onChange={(e) => setAllCaps(e.target.checked)} />ALL CAPS</label>
-
-            <button onClick={download} className="w-full py-3 rounded-xl bg-foreground text-background font-semibold">Download Meme</button>
+            <label className="flex items-center gap-2 text-xs cursor-pointer">
+              <input type="checkbox" checked={allCaps} onChange={(e) => setAllCaps(e.target.checked)} />
+              ALL CAPS
+            </label>
+            <button
+              onClick={download}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold transition-all"
+            >
+              Download Meme
+            </button>
             {typeof navigator !== "undefined" && "share" in navigator && (
-              <button onClick={share} className="w-full py-2 rounded-xl border border-border text-sm hover:bg-secondary">Share</button>
+              <button
+                onClick={share}
+                className="w-full py-2 rounded-xl border border-border text-sm hover:bg-secondary transition-colors"
+              >
+                Share
+              </button>
             )}
-            <button onClick={() => { setImgSrc(""); imgRef.current = null; }} className="w-full py-2 text-xs text-muted-foreground hover:text-foreground">Choose another template</button>
+            <button
+              onClick={() => {
+                setImgSrc("");
+                imgRef.current = null;
+              }}
+              className="w-full py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Choose another template
+            </button>
           </div>
         </div>
       )}
+
       <AdZone id="image-tool-below-result" size="300x250" />
-      <HowToUse steps={[
-        "Pick a template or upload your own image.",
-        "Type your top and bottom text and tweak font, size and outline.",
-        "Click Download Meme to save your masterpiece as PNG.",
-      ]} />
-          <RelatedTools currentSlug="meme-generator" />
-          <ToolSeoContent
-        title={"Free Meme Generator — Create Custom Memes Online"}
-        description={"Create memes from popular templates or upload your own image. Add top and bottom text with classic Impact font. Customize colors, size and outline. Download instantly."}
-        body={[
-        "Choose from 12 iconic meme templates including Drake, Distracted Boyfriend, Two Buttons, This is Fine and more — or upload your own custom image. Add your text in the classic Impact font with bold outline for maximum readability.",
-        "All customization happens in real-time — see your meme update as you type. Download as PNG when you're happy with the result and share anywhere.",
-      ]}
-        faqs={[
-        { question: "Can I use my own image for a meme?", answer: "Yes! Click 'Upload Your Own' to use any image from your device as the meme background." },
-        { question: "Why does meme text use Impact font?", answer: "Impact is the traditional meme font — its bold, condensed style with white fill and black outline is instantly recognizable and highly readable on any image background." },
-        { question: "Can I save my meme and edit it later?", answer: "Currently memes are generated fresh each session. We recommend downloading immediately after creation." },
-        { question: "Are the meme templates copyright free?", answer: "Meme templates are widely used for parody and commentary purposes under fair use. However, always check local copyright laws before commercial use." },
-      ]}
+
+      <HowToUse
+        steps={[
+          "Pick one of 12 popular meme templates or upload your own image.",
+          "Type your top and bottom text. Customize font, size, text color, and outline color.",
+          "Click Download Meme to save your creation as a PNG, or use the Share button on mobile.",
+        ]}
       />
-      </ToolPageShell>
+
+      <ToolSeoContent
+        title="Free Meme Generator — Create Custom Memes Online, No Signup"
+        description="Create memes from 12 popular templates or your own image. Add top and bottom text in classic Impact font. Customize colors, size, and outline. Download instantly — free, no signup."
+        body={[
+          "Skycally's Meme Generator lets you create classic memes from 12 iconic templates — or upload your own image — directly in your browser. Type your top and bottom text, customize the font, size, text color, and outline, and download your meme as a PNG in seconds. No account, no watermark, no server upload.",
+          "The 12 built-in templates include some of the most recognizable memes on the internet: Drake Approving/Disapproving, Distracted Boyfriend, Two Buttons, Change My Mind, One Does Not Simply, This is Fine, Surprised Pikachu, Woman Yelling at Cat, Bernie Sanders, Expanding Brain, Left Exit 12, and Gru's Plan. Each template is loaded from the original source for maximum quality.",
+          "Text customization goes beyond the basics: choose between Impact (the classic meme font), Arial, or Oswald; adjust font size from 24 to 80px; set custom text color and outline color; control outline width; and toggle ALL CAPS on or off. The canvas updates in real time as you type, so you always see exactly what you'll get.",
+          "On mobile devices, a Share button lets you send the finished meme directly to messaging apps, social media, or email using the Web Share API. All processing runs locally in your browser — your image never leaves your device.",
+        ]}
+        faqs={[
+          {
+            question: "Can I use my own image for a meme?",
+            answer:
+              "Yes. Scroll past the templates and click 'Upload your own image' to use any photo from your device as the meme background.",
+          },
+          {
+            question: "Why does meme text use Impact font?",
+            answer:
+              "Impact is the traditional meme font — its bold, condensed style with white fill and black outline is instantly recognizable and highly readable on any image background.",
+          },
+          {
+            question: "Can I add text anywhere on the image, not just top and bottom?",
+            answer:
+              "The standard meme format places text at the top and bottom. For fully custom text placement, use the Add Text to Image tool instead.",
+          },
+          {
+            question: "Is there a watermark on downloaded memes?",
+            answer: "No. Downloaded memes are completely clean with no watermark or branding added.",
+          },
+          {
+            question: "Are the meme templates copyright-free?",
+            answer:
+              "Meme templates are widely used for parody and commentary under fair use principles. Always check local copyright laws before commercial use.",
+          },
+          {
+            question: "Can I save my meme and edit it later?",
+            answer:
+              "Memes are generated fresh each session. Download immediately after creation — settings are not saved between visits.",
+          },
+          {
+            question: "Is my image uploaded to a server?",
+            answer:
+              "No. All meme generation runs locally in your browser using the Canvas API. Your image never leaves your device.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The meme generator is fully responsive. On mobile, a Share button lets you send the meme directly to other apps using the Web Share API.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="meme-generator" />
+    </ToolPageShell>
   );
 }

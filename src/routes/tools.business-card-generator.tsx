@@ -15,13 +15,7 @@ import { Switch } from "@/components/ui/switch";
 import { Slider } from "@/components/ui/slider";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 
 export const Route = createFileRoute("/tools/business-card-generator")({
   head: () => buildToolMeta(toolBySlug("business-card-generator", tools)),
@@ -57,14 +51,54 @@ interface CardInfo {
 }
 
 const TEMPLATES: Template[] = [
-  { id: "classic-white", name: "Classic White", description: "Clean minimal design", colors: { bg: "#ffffff", accent: "#1e293b", text: "#1e293b" } },
-  { id: "dark-elegant", name: "Dark Elegant", description: "Premium black & gold", colors: { bg: "#0a0a0a", accent: "#d4af37", text: "#ffffff" } },
-  { id: "navy-professional", name: "Navy Professional", description: "Corporate navy blue", colors: { bg: "#0f172a", accent: "#38bdf8", text: "#ffffff" } },
-  { id: "red-bold", name: "Red Bold", description: "Bold red accent", colors: { bg: "#ffffff", accent: "#dc2626", text: "#1e293b" } },
-  { id: "green-modern", name: "Green Modern", description: "Fresh modern green", colors: { bg: "#ffffff", accent: "#16a34a", text: "#1e293b" } },
-  { id: "orange-creative", name: "Orange Creative", description: "Creative orange style", colors: { bg: "#1c1c1c", accent: "#f97316", text: "#ffffff" } },
-  { id: "purple-luxury", name: "Purple Luxury", description: "Luxury purple gradient", colors: { bg: "#1e1b4b", accent: "#a78bfa", text: "#ffffff" } },
-  { id: "minimal-gray", name: "Minimal Gray", description: "Ultra minimal gray", colors: { bg: "#f8fafc", accent: "#64748b", text: "#1e293b" } },
+  {
+    id: "classic-white",
+    name: "Classic White",
+    description: "Clean minimal design",
+    colors: { bg: "#ffffff", accent: "#1e293b", text: "#1e293b" },
+  },
+  {
+    id: "dark-elegant",
+    name: "Dark Elegant",
+    description: "Premium black & gold",
+    colors: { bg: "#0a0a0a", accent: "#d4af37", text: "#ffffff" },
+  },
+  {
+    id: "navy-professional",
+    name: "Navy Professional",
+    description: "Corporate navy blue",
+    colors: { bg: "#0f172a", accent: "#38bdf8", text: "#ffffff" },
+  },
+  {
+    id: "red-bold",
+    name: "Red Bold",
+    description: "Bold red accent",
+    colors: { bg: "#ffffff", accent: "#dc2626", text: "#1e293b" },
+  },
+  {
+    id: "green-modern",
+    name: "Green Modern",
+    description: "Fresh modern green",
+    colors: { bg: "#ffffff", accent: "#16a34a", text: "#1e293b" },
+  },
+  {
+    id: "orange-creative",
+    name: "Orange Creative",
+    description: "Creative orange style",
+    colors: { bg: "#1c1c1c", accent: "#f97316", text: "#ffffff" },
+  },
+  {
+    id: "purple-luxury",
+    name: "Purple Luxury",
+    description: "Luxury purple gradient",
+    colors: { bg: "#1e1b4b", accent: "#a78bfa", text: "#ffffff" },
+  },
+  {
+    id: "minimal-gray",
+    name: "Minimal Gray",
+    description: "Ultra minimal gray",
+    colors: { bg: "#f8fafc", accent: "#64748b", text: "#1e293b" },
+  },
 ];
 
 const FONTS = [
@@ -177,7 +211,7 @@ function BusinessCardGeneratorPage() {
         .then(() => {
           if (!cancelled) setQrCanvas(c);
         })
-        .catch(() => {})
+        .catch(() => {}),
     );
     return () => {
       cancelled = true;
@@ -317,7 +351,24 @@ function BusinessCardGeneratorPage() {
     if (frontRef.current) drawFront(frontRef.current);
     if (backRef.current) drawBack(backRef.current);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [step, info, colors, font, nameSize, infoSize, qrPos, qrSize, qrPx, logoPos, showDivider, dividerColor, orientation, qrCanvas, logoImg, side]);
+  }, [
+    step,
+    info,
+    colors,
+    font,
+    nameSize,
+    infoSize,
+    qrPos,
+    qrSize,
+    qrPx,
+    logoPos,
+    showDivider,
+    dividerColor,
+    orientation,
+    qrCanvas,
+    logoImg,
+    side,
+  ]);
 
   const handleLogo = (file: File | null) => {
     if (!file) {
@@ -411,19 +462,39 @@ function BusinessCardGeneratorPage() {
               />
             </Field>
             <Field label="Company">
-              <Input value={info.company} onChange={(e) => setInfo({ ...info, company: e.target.value })} placeholder="Acme Corp" />
+              <Input
+                value={info.company}
+                onChange={(e) => setInfo({ ...info, company: e.target.value })}
+                placeholder="Acme Corp"
+              />
             </Field>
             <Field label="Phone">
-              <Input value={info.phone} onChange={(e) => setInfo({ ...info, phone: e.target.value })} placeholder="+1 234 567 890" />
+              <Input
+                value={info.phone}
+                onChange={(e) => setInfo({ ...info, phone: e.target.value })}
+                placeholder="+1 234 567 890"
+              />
             </Field>
             <Field label="Email">
-              <Input value={info.email} onChange={(e) => setInfo({ ...info, email: e.target.value })} placeholder="john@acme.com" />
+              <Input
+                value={info.email}
+                onChange={(e) => setInfo({ ...info, email: e.target.value })}
+                placeholder="john@acme.com"
+              />
             </Field>
             <Field label="Website">
-              <Input value={info.website} onChange={(e) => setInfo({ ...info, website: e.target.value })} placeholder="www.acme.com" />
+              <Input
+                value={info.website}
+                onChange={(e) => setInfo({ ...info, website: e.target.value })}
+                placeholder="www.acme.com"
+              />
             </Field>
             <Field label="Address">
-              <Input value={info.address} onChange={(e) => setInfo({ ...info, address: e.target.value })} placeholder="123 Main St, New York" />
+              <Input
+                value={info.address}
+                onChange={(e) => setInfo({ ...info, address: e.target.value })}
+                placeholder="123 Main St, New York"
+              />
             </Field>
             <Field label="LinkedIn (optional)">
               <Input value={info.linkedin} onChange={(e) => setInfo({ ...info, linkedin: e.target.value })} />
@@ -469,7 +540,11 @@ function BusinessCardGeneratorPage() {
               </label>
               {info.logoUrl && (
                 <div className="flex items-center gap-2">
-                  <img src={info.logoUrl} alt="logo preview" className="w-12 h-12 rounded object-contain border border-border" />
+                  <img
+                    src={info.logoUrl}
+                    alt="logo preview"
+                    className="w-12 h-12 rounded object-contain border border-border"
+                  />
                   <Button variant="ghost" size="icon" onClick={() => handleLogo(null)}>
                     <X className="w-4 h-4" />
                   </Button>
@@ -546,7 +621,11 @@ function BusinessCardGeneratorPage() {
             <Section title="Colors">
               <div className="grid grid-cols-3 gap-2">
                 <ColorInput label="Background" value={colors.bg} onChange={(v) => setColors({ ...colors, bg: v })} />
-                <ColorInput label="Accent" value={colors.accent} onChange={(v) => setColors({ ...colors, accent: v })} />
+                <ColorInput
+                  label="Accent"
+                  value={colors.accent}
+                  onChange={(v) => setColors({ ...colors, accent: v })}
+                />
                 <ColorInput label="Text" value={colors.text} onChange={(v) => setColors({ ...colors, text: v })} />
               </div>
               <div className="mt-3">
@@ -571,7 +650,9 @@ function BusinessCardGeneratorPage() {
             <Section title="Typography">
               <Field label="Font">
                 <Select value={font} onValueChange={setFont}>
-                  <SelectTrigger><SelectValue /></SelectTrigger>
+                  <SelectTrigger>
+                    <SelectValue />
+                  </SelectTrigger>
                   <SelectContent>
                     {FONTS.map((f) => (
                       <SelectItem key={f.value} value={f.value} style={{ fontFamily: f.value }}>
@@ -603,7 +684,11 @@ function BusinessCardGeneratorPage() {
               </Field>
               <Field label="QR size">
                 <ToggleRow
-                  options={[{ v: "S", l: "S" }, { v: "M", l: "M" }, { v: "L", l: "L" }]}
+                  options={[
+                    { v: "S", l: "S" },
+                    { v: "M", l: "M" },
+                    { v: "L", l: "L" },
+                  ]}
                   value={qrSize}
                   onChange={(v) => setQrSize(v as "S" | "M" | "L")}
                 />
@@ -624,11 +709,7 @@ function BusinessCardGeneratorPage() {
                 <Switch checked={showDivider} onCheckedChange={setShowDivider} />
               </div>
               {showDivider && (
-                <ColorInput
-                  label="Divider color"
-                  value={dividerColor || colors.accent}
-                  onChange={setDividerColor}
-                />
+                <ColorInput label="Divider color" value={dividerColor || colors.accent} onChange={setDividerColor} />
               )}
             </Section>
 
@@ -653,22 +734,62 @@ function BusinessCardGeneratorPage() {
           "Customize colors and download print-ready PNG",
         ]}
       />
-          <RelatedTools currentSlug="business-card-generator" />
-          <ToolSeoContent
-        title={"Free Business Card Generator — Design & Download Online"}
-        description={"Design professional business cards online for free. 8 templates, QR code integration, custom colors. Download print-ready PNG at 300 DPI. No signup needed."}
+
+      <ToolSeoContent
+        title="Free Business Card Generator — Design & Download Online, Print-Ready"
+        description="Design professional business cards online for free. 8 templates, QR code, custom colors, logo upload. Download print-ready PNG at 300 DPI. No signup, no upload, instant."
         body={[
-        "Choose from 8 professionally designed templates ranging from clean minimal white to premium dark and gold. Fill in your contact details, upload your logo, and customize colors to match your brand identity.",
-        "Every business card automatically includes a QR code generated from your website URL, making it easy for contacts to find you online. Download the front and back separately or combined in a single file ready for printing at standard business card size (3.5\" × 2\").",
-      ]}
+          "Skycally's Business Card Generator lets you design a professional business card in three steps — choose a template, fill in your details, and customize the design — then download a print-ready PNG directly from your browser. No signup, no server, no design software required.",
+          "Eight professionally designed templates cover a wide range of professional styles: Classic White for a clean minimal look, Dark Elegant with black and gold accents, Navy Professional for corporate identity, Red Bold for high-impact branding, Green Modern for fresh contemporary style, Orange Creative for bold personality, Purple Luxury for premium positioning, and Minimal Gray for ultra-clean simplicity.",
+          "Each card is fully customizable in the design step: choose background, accent, and text colors individually or use preset combinations; select from six Google Fonts (Inter, Playfair Display, Montserrat, Roboto, Georgia, Oswald); adjust name and info text sizes; set QR code position and size; upload your logo and set its position; toggle a divider line; and switch between horizontal and vertical orientation.",
+          "Cards are generated at 1050×600px — equivalent to 300 DPI at the standard 3.5×2 inch business card size — making them suitable for professional printing. Download the front side, back side, or both combined in a single file. A QR code is automatically generated from your website URL and embedded on the front of the card.",
+        ]}
         faqs={[
-        { question: "Are the business cards print-ready?", answer: "Yes. Cards are generated at 1050×600px which equals 300 DPI at standard business card size (3.5\"×2\"). Add 3mm bleed when sending to professional printers." },
-        { question: "Can I add my company logo?", answer: "Yes. Upload any PNG or JPG logo and it will be placed on your card. Transparent PNG logos work best for a professional look." },
-        { question: "Is the QR code on the business card scannable?", answer: "Yes. The QR code is generated at high error correction level ensuring it remains scannable even at small print sizes." },
-        { question: "Can I download both sides of the business card?", answer: "Yes. Download the front, back, or both sides combined in a single image file for easy printing." },
-      ]}
+          {
+            question: "Are the business cards print-ready?",
+            answer:
+              'Yes. Cards are generated at 1050×600px which equals 300 DPI at standard business card size (3.5"×2"). Add 3mm bleed when sending to professional printers.',
+          },
+          {
+            question: "Can I add my company logo?",
+            answer:
+              "Yes. Upload any PNG or JPG logo and position it at the top left, center, or right of the card. Transparent PNG logos work best for a clean, professional look.",
+          },
+          {
+            question: "Is the QR code scannable at print size?",
+            answer:
+              "Yes. The QR code is generated at high error-correction level, ensuring it remains scannable even at small print sizes on a physical card.",
+          },
+          {
+            question: "Can I download both sides of the card?",
+            answer:
+              "Yes. Download the front, back, or both sides combined in a single image file. The combined file stacks front and back vertically for easy printing.",
+          },
+          {
+            question: "What fonts are available?",
+            answer:
+              "Six Google Fonts: Inter (modern sans-serif), Playfair Display (elegant serif), Montserrat (geometric sans), Roboto (clean neutral), Georgia (classic serif), and Oswald (condensed bold).",
+          },
+          {
+            question: "Can I customize the colors?",
+            answer:
+              "Yes. Background, accent, and text colors are fully customizable with a color picker. Six quick presets let you switch to common professional combinations in one click.",
+          },
+          {
+            question: "Is my information uploaded to a server?",
+            answer:
+              "No. All card generation runs locally in your browser. Your contact details, logo, and QR content never leave your device.",
+          },
+          {
+            question: "Can I create a vertical business card?",
+            answer:
+              "Yes. The orientation toggle in the design step switches between standard horizontal (landscape) and vertical (portrait) card formats.",
+          },
+        ]}
       />
-      </ToolPageShell>
+
+      <RelatedTools currentSlug="business-card-generator" />
+    </ToolPageShell>
   );
 }
 
@@ -685,7 +806,11 @@ function Stepper({ step }: { step: 1 | 2 | 3 }) {
           <div key={l} className="flex items-center gap-2">
             <div
               className={`flex items-center gap-2 rounded-full px-3 py-1.5 border ${
-                active ? "bg-foreground text-background border-foreground" : done ? "border-foreground/40 text-foreground" : "border-border text-muted-foreground"
+                active
+                  ? "bg-foreground text-background border-foreground"
+                  : done
+                    ? "border-foreground/40 text-foreground"
+                    : "border-border text-muted-foreground"
               }`}
             >
               <span className="w-5 h-5 rounded-full bg-background/20 flex items-center justify-center text-[11px] font-bold">
@@ -764,10 +889,7 @@ function ToggleRow({
 
 function MiniPreview({ colors }: { colors: TemplateColors }) {
   return (
-    <div
-      className="aspect-[7/4] w-full rounded-md overflow-hidden flex"
-      style={{ background: colors.bg }}
-    >
+    <div className="aspect-[7/4] w-full rounded-md overflow-hidden flex" style={{ background: colors.bg }}>
       <div style={{ width: 8, background: colors.accent }} />
       <div className="flex-1 p-2 flex flex-col justify-between">
         <div className="space-y-1">

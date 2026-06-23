@@ -42,7 +42,6 @@ function AddTextToImage() {
   const [dragging, setDragging] = useState<string | null>(null);
   const [dragOffset, setDragOffset] = useState({ x: 0, y: 0 });
 
-  // New-layer controls
   const [text, setText] = useState("Your text here");
   const [fontSize, setFontSize] = useState(40);
   const [color, setColor] = useState("#ffffff");
@@ -88,7 +87,6 @@ function AddTextToImage() {
 
       ctx.fillStyle = layer.color;
       ctx.fillText(layer.text, layer.x, layer.y);
-
       ctx.shadowColor = "transparent";
       ctx.shadowBlur = 0;
       ctx.shadowOffsetX = 0;
@@ -105,7 +103,9 @@ function AddTextToImage() {
     });
   }, [image, layers, selected]);
 
-  useEffect(() => { draw(); }, [draw]);
+  useEffect(() => {
+    draw();
+  }, [draw]);
 
   const handleFiles = (files: File[]) => {
     const f = files[0];
@@ -117,7 +117,7 @@ function AddTextToImage() {
       setLayers([]);
       setSelected(null);
     };
-    img.onerror = () => toast.error("❌ Something went wrong. Please try again.");
+    img.onerror = () => toast.error("Something went wrong. Please try again.");
     img.src = url;
   };
 
@@ -199,21 +199,23 @@ function AddTextToImage() {
       a.href = canvas.toDataURL("image/png");
       a.download = "image-with-text.png";
       a.click();
-      toast.success("✅ Download started!");
+      toast.success("Download started!");
     } catch {
-      toast.error("❌ Something went wrong. Please try again.");
+      toast.error("Something went wrong. Please try again.");
     }
   };
 
   const selectedLayer = layers.find((l) => l.id === selected);
 
   return (
-    <ToolPageShell title="Add Text to Image" description="Add custom, draggable text layers to any image — fonts, colors, shadow and outline.">
+    <ToolPageShell
+      title="Add Text to Image"
+      description="Add draggable text layers to any image — fonts, colors, shadow, outline and more."
+    >
       {!image ? (
         <DropZone accept="image/*" onFiles={handleFiles} label="Drop an image to start" hint="PNG, JPG or WEBP" />
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_340px]">
-          {/* Canvas */}
           <div>
             <div className="rounded-2xl border border-border bg-card p-3 overflow-hidden">
               <canvas
@@ -222,26 +224,35 @@ function AddTextToImage() {
                 onMouseMove={onMouseMove}
                 onMouseUp={onMouseUp}
                 onMouseLeave={onMouseUp}
-                style={{ width: "100%", height: "auto", display: "block", borderRadius: 8, cursor: dragging ? "grabbing" : "default" }}
+                style={{
+                  width: "100%",
+                  height: "auto",
+                  display: "block",
+                  borderRadius: 8,
+                  cursor: dragging ? "grabbing" : "default",
+                }}
               />
             </div>
             <div className="flex gap-3 mt-4">
               <button
-                onClick={() => { setImage(null); setLayers([]); setSelected(null); }}
+                onClick={() => {
+                  setImage(null);
+                  setLayers([]);
+                  setSelected(null);
+                }}
                 className="px-4 py-2 rounded-xl border border-border text-sm text-muted-foreground hover:text-foreground hover:border-foreground/30 transition"
               >
                 Change image
               </button>
               <button
                 onClick={download}
-                className="flex-1 py-2.5 rounded-xl bg-foreground text-background font-semibold text-sm"
+                className="flex-1 py-2.5 rounded-xl bg-foreground text-background font-semibold text-sm hover:opacity-90 transition"
               >
                 Download Image
               </button>
             </div>
           </div>
 
-          {/* Controls */}
           <div className="space-y-4">
             <div className="rounded-2xl border border-border bg-card p-4 space-y-3">
               <p className="text-[10px] uppercase tracking-wider text-muted-foreground">New text layer</p>
@@ -259,28 +270,48 @@ function AddTextToImage() {
                     onChange={(e) => setFontFamily(e.target.value)}
                     className="w-full mt-1 rounded-lg border border-border bg-background px-2 py-1.5 text-sm"
                   >
-                    {FONTS.map((f) => <option key={f} value={f}>{f}</option>)}
+                    {FONTS.map((f) => (
+                      <option key={f} value={f}>
+                        {f}
+                      </option>
+                    ))}
                   </select>
                 </div>
                 <div>
                   <label className="text-xs text-muted-foreground">Size: {fontSize}px</label>
-                  <input type="range" min={12} max={200} value={fontSize} onChange={(e) => setFontSize(+e.target.value)} className="w-full mt-2" />
+                  <input
+                    type="range"
+                    min={12}
+                    max={200}
+                    value={fontSize}
+                    onChange={(e) => setFontSize(+e.target.value)}
+                    className="w-full mt-2"
+                  />
                 </div>
               </div>
               <div className="flex items-end gap-3">
                 <div>
                   <label className="text-xs text-muted-foreground block">Color</label>
-                  <input type="color" value={color} onChange={(e) => setColor(e.target.value)} className="block w-10 h-8 rounded border border-border cursor-pointer mt-1" />
+                  <input
+                    type="color"
+                    value={color}
+                    onChange={(e) => setColor(e.target.value)}
+                    className="block w-10 h-8 rounded border border-border cursor-pointer mt-1"
+                  />
                 </div>
                 <div className="flex gap-2">
                   <button
                     onClick={() => setBold(!bold)}
                     className={`w-8 h-8 rounded-lg border text-sm font-bold ${bold ? "bg-[var(--cyan-brand)] text-background border-transparent" : "border-border text-muted-foreground"}`}
-                  >B</button>
+                  >
+                    B
+                  </button>
                   <button
                     onClick={() => setItalic(!italic)}
                     className={`w-8 h-8 rounded-lg border text-sm italic ${italic ? "bg-[var(--cyan-brand)] text-background border-transparent" : "border-border text-muted-foreground"}`}
-                  >I</button>
+                  >
+                    I
+                  </button>
                 </div>
               </div>
               <div className="flex gap-4 text-sm">
@@ -297,17 +328,29 @@ function AddTextToImage() {
                 <div className="flex items-end gap-3">
                   <div>
                     <label className="text-xs text-muted-foreground block">Outline color</label>
-                    <input type="color" value={outlineColor} onChange={(e) => setOutlineColor(e.target.value)} className="block w-10 h-8 rounded border border-border cursor-pointer mt-1" />
+                    <input
+                      type="color"
+                      value={outlineColor}
+                      onChange={(e) => setOutlineColor(e.target.value)}
+                      className="block w-10 h-8 rounded border border-border cursor-pointer mt-1"
+                    />
                   </div>
                   <div className="flex-1">
                     <label className="text-xs text-muted-foreground">Width: {outlineWidth}px</label>
-                    <input type="range" min={1} max={10} value={outlineWidth} onChange={(e) => setOutlineWidth(+e.target.value)} className="w-full mt-2" />
+                    <input
+                      type="range"
+                      min={1}
+                      max={10}
+                      value={outlineWidth}
+                      onChange={(e) => setOutlineWidth(+e.target.value)}
+                      className="w-full mt-2"
+                    />
                   </div>
                 </div>
               )}
               <button
                 onClick={addLayer}
-                className="w-full py-2.5 rounded-xl bg-[var(--cyan-brand)] text-background font-semibold text-sm"
+                className="w-full py-2.5 rounded-xl bg-[var(--cyan-brand)] text-background font-semibold text-sm hover:opacity-90 transition"
               >
                 + Add Text Layer
               </button>
@@ -316,8 +359,13 @@ function AddTextToImage() {
             {selectedLayer && (
               <div className="rounded-2xl border border-[var(--cyan-brand)]/40 bg-card p-4 space-y-3">
                 <div className="flex items-center justify-between">
-                  <p className="text-[10px] uppercase tracking-wider" style={{ color: "var(--cyan-brand)" }}>Edit selected</p>
-                  <button onClick={deleteSelected} className="inline-flex items-center gap-1 text-xs text-destructive hover:opacity-80">
+                  <p className="text-[10px] uppercase tracking-wider" style={{ color: "var(--cyan-brand)" }}>
+                    Edit selected
+                  </p>
+                  <button
+                    onClick={deleteSelected}
+                    className="inline-flex items-center gap-1 text-xs text-destructive hover:opacity-80"
+                  >
                     <Trash2 className="w-3.5 h-3.5" /> Delete
                   </button>
                 </div>
@@ -329,11 +377,23 @@ function AddTextToImage() {
                 <div className="grid grid-cols-2 gap-2">
                   <div>
                     <label className="text-xs text-muted-foreground">Size: {selectedLayer.fontSize}px</label>
-                    <input type="range" min={12} max={200} value={selectedLayer.fontSize} onChange={(e) => updateSelected({ fontSize: +e.target.value })} className="w-full mt-2" />
+                    <input
+                      type="range"
+                      min={12}
+                      max={200}
+                      value={selectedLayer.fontSize}
+                      onChange={(e) => updateSelected({ fontSize: +e.target.value })}
+                      className="w-full mt-2"
+                    />
                   </div>
                   <div>
                     <label className="text-xs text-muted-foreground block">Color</label>
-                    <input type="color" value={selectedLayer.color} onChange={(e) => updateSelected({ color: e.target.value })} className="block w-10 h-8 rounded border border-border cursor-pointer mt-1" />
+                    <input
+                      type="color"
+                      value={selectedLayer.color}
+                      onChange={(e) => updateSelected({ color: e.target.value })}
+                      className="block w-10 h-8 rounded border border-border cursor-pointer mt-1"
+                    />
                   </div>
                 </div>
                 <p className="text-xs text-muted-foreground">Drag the text on the canvas to reposition.</p>
@@ -342,7 +402,9 @@ function AddTextToImage() {
 
             {layers.length > 0 && (
               <div className="rounded-2xl border border-border bg-card p-4">
-                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">Text layers ({layers.length})</p>
+                <p className="text-[10px] uppercase tracking-wider text-muted-foreground mb-2">
+                  Text layers ({layers.length})
+                </p>
                 <div className="space-y-1">
                   {layers.map((l) => (
                     <button
@@ -360,29 +422,70 @@ function AddTextToImage() {
         </div>
       )}
 
-      {/* ADSENSE_ZONE: image-tool-below-result 300x250 */}
       <AdZone id="image-tool-below-result" size="300x250" />
 
-      <HowToUse steps={[
-        "Drop an image to load it onto the canvas.",
-        "Customize your text and click Add Text Layer — drag it anywhere on the image.",
-        "Click Download Image to save the merged result as a PNG.",
-      ]} />
-          <RelatedTools currentSlug="add-text-to-image" />
-          <ToolSeoContent
-        title={"Add Text to Image Online — Free Photo Text Editor"}
-        description={"Add custom text, captions and watermarks to any image. Multiple fonts, colors, shadows and outlines. Drag to reposition text layers. Download as PNG."}
-        body={[
-        "Upload any image and add unlimited text layers with full customization. Choose from multiple font families, adjust size and color, enable text shadow for depth, and add outline strokes for visibility on any background.",
-        "Text layers are fully interactive — click any text on the canvas to select and edit it, drag to reposition anywhere on the image. All processing happens in your browser for complete privacy.",
-      ]}
-        faqs={[
-        { question: "Can I add multiple text layers?", answer: "Yes, you can add unlimited text layers. Each layer is independently editable and draggable on the canvas." },
-        { question: "How do I move text on the image?", answer: "Click on any text in the canvas to select it, then drag it to your desired position. A blue dashed outline shows the selected text layer." },
-        { question: "What fonts are available?", answer: "We offer Impact, Arial, Georgia, Courier New, Verdana, Comic Sans MS and Times New Roman. Impact is the classic choice for memes and bold captions." },
-        { question: "Can I add a watermark to my photos?", answer: "Yes. Add your brand name or logo text, reduce opacity using the color picker's alpha channel, and position it anywhere on the image." },
-      ]}
+      <HowToUse
+        steps={[
+          "Drop an image to load it onto the canvas.",
+          "Type your text, choose font, size, color, shadow and outline, then click Add Text Layer. Drag the text anywhere on the canvas to reposition.",
+          "Click Download Image to save the final result as PNG.",
+        ]}
       />
-      </ToolPageShell>
+
+      <ToolSeoContent
+        title="Add Text to Image Online Free — Photo Text Editor, No Upload"
+        description="Add unlimited draggable text layers to any image. Choose fonts, colors, shadow and outline. Download as PNG. Free, no signup, runs entirely in your browser."
+        body={[
+          "Skycally's Add Text to Image tool lets you place unlimited customizable text layers on any photo, directly in your browser. Upload an image, type your text, adjust the font, size, color, shadow, and outline, then drag each layer to exactly where you want it on the canvas — no server upload, no account required.",
+          "Seven font families cover the most popular text styles: Impact for classic meme captions, Arial for clean modern text, Georgia for elegant serif headings, Courier New for monospace or code-style text, Verdana for highly legible body text, Comic Sans for casual creative use, and Times New Roman for traditional document-style text.",
+          "Each text layer supports independent customization: bold and italic toggles, drop shadow for depth and readability on any background, and stroke outline with adjustable color and width. Layers are listed in a sidebar panel — click any layer name to select and edit it, or delete it. The selected layer is highlighted on the canvas with a dashed blue border.",
+          "All rendering runs locally in your browser using the HTML5 Canvas API. Your image never leaves your device. The final export is a full-resolution PNG combining the original image and all text layers — ready to share, post, or print.",
+        ]}
+        faqs={[
+          {
+            question: "Can I add multiple text layers?",
+            answer:
+              "Yes. Add unlimited text layers — each with independent font, size, color, shadow, and outline settings. Click any layer in the list to select and edit it.",
+          },
+          {
+            question: "How do I move text on the image?",
+            answer:
+              "Click any text on the canvas to select it (shown with a blue dashed border), then drag it to your desired position.",
+          },
+          {
+            question: "What fonts are available?",
+            answer:
+              "Impact, Arial, Georgia, Courier New, Verdana, Comic Sans MS, and Times New Roman. Impact is the classic choice for memes and bold captions.",
+          },
+          {
+            question: "Can I add a text watermark?",
+            answer:
+              "Yes. Add your brand name or copyright notice as a text layer, choose a light color with low visual weight, and position it in a corner.",
+          },
+          {
+            question: "Is my image uploaded to a server?",
+            answer:
+              "No. Everything runs locally in your browser using the Canvas API. Your image never leaves your device.",
+          },
+          {
+            question: "What is the output format?",
+            answer:
+              "The final image is downloaded as a full-resolution PNG combining your original image and all text layers.",
+          },
+          {
+            question: "Can I edit a text layer after adding it?",
+            answer:
+              "Yes. Click the layer in the sidebar list or click its text on the canvas to select it. An edit panel appears where you can change the text, size, and color.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes, though dragging text layers on mobile uses touch events. For precise positioning on small screens, a desktop browser is recommended.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="add-text-to-image" />
+    </ToolPageShell>
   );
 }

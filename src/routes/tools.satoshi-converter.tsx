@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { Area, AreaChart, ResponsiveContainer, Tooltip } from "recharts";
-import { Bitcoin, Check, Copy, RefreshCw, RotateCcw, TrendingDown, TrendingUp } from "lucide-react";
+import { Bitcoin, Check, Copy, RefreshCw, RotateCcw, TrendingDown, TrendingUp, ArrowLeftRight } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -383,6 +384,24 @@ function SatoshiConverterPage() {
       <p className="mt-6 text-xs text-muted-foreground text-center">
         Prices are for informational purposes only and do not constitute financial advice.
       </p>
+
+      {/* Internal Link → Currency Converter */}
+      <Link
+        to="/tools/currency-converter"
+        className="mt-4 flex items-center justify-between gap-4 rounded-2xl border p-4 transition-colors hover:bg-secondary/50"
+        style={{ borderColor: "var(--border)", background: "var(--card)" }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "#00D4FF1a" }}>
+            <ArrowLeftRight className="w-4 h-4" style={{ color: "#00D4FF" }} />
+          </div>
+          <div>
+            <div className="text-sm font-semibold">Currency Converter</div>
+            <div className="text-xs text-muted-foreground">Convert BTC value between 170+ world currencies</div>
+          </div>
+        </div>
+        <span className="text-xs text-muted-foreground shrink-0">Try it →</span>
+      </Link>
 
       <HowToUse
         steps={[

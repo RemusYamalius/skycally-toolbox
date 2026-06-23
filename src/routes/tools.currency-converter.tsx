@@ -1,7 +1,8 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useMemo, useState } from "react";
 import { motion } from "framer-motion";
-import { ArrowLeftRight, Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { ArrowLeftRight, Bitcoin, Check, ChevronsUpDown, Loader2 } from "lucide-react";
+import { Link } from "@tanstack/react-router";
 import { CartesianGrid, Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
@@ -183,7 +184,7 @@ function CurrencyConverter() {
     })();
   }, []);
 
-  // 7-day rate history — fetch on currency change AND on debounced amount change
+  // 7-day rate history
   useEffect(() => {
     if (from === to) {
       setHistory(null);
@@ -216,7 +217,6 @@ function CurrencyConverter() {
         })
         .catch(() => {
           if (cancelled) return;
-          // Keep previous data if any; otherwise leave null so section hides silently.
           setHistoryLoading(false);
         });
     }, 500);
@@ -509,6 +509,24 @@ function CurrencyConverter() {
           </div>
         </section>
       )}
+
+      {/* Internal Link → Satoshi Converter */}
+      <Link
+        to="/tools/satoshi-converter"
+        className="mt-8 flex items-center justify-between gap-4 rounded-2xl border p-4 transition-colors hover:bg-secondary/50"
+        style={{ borderColor: "var(--border)", background: "var(--card)" }}
+      >
+        <div className="flex items-center gap-3">
+          <div className="w-9 h-9 rounded-full flex items-center justify-center" style={{ background: "#f7931a1a" }}>
+            <Bitcoin className="w-4 h-4" style={{ color: "#f7931a" }} />
+          </div>
+          <div>
+            <div className="text-sm font-semibold">Satoshi Converter</div>
+            <div className="text-xs text-muted-foreground">Convert between Satoshi, BTC, mBTC, and fiat currencies</div>
+          </div>
+        </div>
+        <span className="text-xs text-muted-foreground shrink-0">Try it →</span>
+      </Link>
 
       <HowToUse
         steps={[

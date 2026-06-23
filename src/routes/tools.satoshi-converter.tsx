@@ -123,9 +123,9 @@ function SatoshiConverterPage() {
       const pData = await priceRes.json();
       const b = pData.bitcoin;
       setPrices({
-        usd: b.usd,
-        eur: b.eur,
-        mad: b.mad,
+        usd: b.usd ?? 0,
+        eur: b.eur ?? 0,
+        mad: b.mad ?? (b.usd ? b.usd * 9.9 : 0), // fallback: 1 USD ≈ 9.9 MAD
         change24h: b.usd_24h_change ?? 0,
       });
       if (chartRes && chartRes.ok) {
@@ -234,7 +234,7 @@ function SatoshiConverterPage() {
               ) : prices ? (
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <span className="text-2xl font-bold" style={{ color: BITCOIN_ORANGE }}>
-                    ${prices.usd.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    ${(prices.usd ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                   </span>
                   <span
                     className="inline-flex items-center gap-1 text-sm font-medium"
@@ -254,11 +254,11 @@ function SatoshiConverterPage() {
             {prices && (
               <>
                 <div className="text-sm text-muted-foreground">
-                  €{prices.eur.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  €{(prices.eur ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                 </div>
                 <span className="text-muted-foreground/40">·</span>
                 <div className="text-sm text-muted-foreground">
-                  MAD {prices.mad.toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  MAD {(prices.mad ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
                 </div>
               </>
             )}

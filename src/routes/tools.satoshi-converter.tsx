@@ -45,9 +45,9 @@ const FIELDS: FieldDef[] = [
   { key: "btc", label: "Bitcoin", badge: "BTC", decimals: 8, color: BITCOIN_ORANGE },
   { key: "mbtc", label: "Millibitcoin", badge: "mBTC", decimals: 5, color: YELLOW },
   { key: "bits", label: "Bits", badge: "μBTC", decimals: 2, color: YELLOW },
-  { key: "usd", label: "US Dollar", badge: "USD", decimals: 2, color: "var(--green-brand)", fiat: true },
-  { key: "eur", label: "Euro", badge: "EUR", decimals: 2, color: "var(--green-brand)", fiat: true },
-  { key: "mad", label: "Moroccan Dirham", badge: "MAD", decimals: 2, color: "var(--green-brand)", fiat: true },
+  { key: "usd", label: "US Dollar", badge: "USD", decimals: 2, color: "#10b981", fiat: true },
+  { key: "eur", label: "Euro", badge: "EUR", decimals: 2, color: "#10b981", fiat: true },
+  { key: "mad", label: "Moroccan Dirham", badge: "MAD", decimals: 2, color: "#10b981", fiat: true },
 ];
 
 const SATS_PER_BTC = 100_000_000;
@@ -218,10 +218,7 @@ function SatoshiConverterPage() {
       description="Convert between Bitcoin, Satoshi, mBTC, bits, USD, EUR and MAD instantly. Live BTC price updated every 60 seconds."
     >
       {/* Live Price Header */}
-      <section
-        className="rounded-2xl border p-6"
-        style={{ borderColor: "var(--border)", background: "var(--card)" }}
-      >
+      <section className="rounded-2xl border p-6" style={{ borderColor: "var(--border)", background: "var(--card)" }}>
         <div className="flex items-start justify-between flex-wrap gap-4">
           <div className="flex items-center gap-3">
             <div
@@ -241,13 +238,9 @@ function SatoshiConverterPage() {
                   </span>
                   <span
                     className="inline-flex items-center gap-1 text-sm font-medium"
-                    style={{ color: prices.change24h >= 0 ? "var(--green-brand)" : "#ef4444" }}
+                    style={{ color: prices.change24h >= 0 ? "#10b981" : "#ef4444" }}
                   >
-                    {prices.change24h >= 0 ? (
-                      <TrendingUp className="w-4 h-4" />
-                    ) : (
-                      <TrendingDown className="w-4 h-4" />
-                    )}
+                    {prices.change24h >= 0 ? <TrendingUp className="w-4 h-4" /> : <TrendingDown className="w-4 h-4" />}
                     {prices.change24h >= 0 ? "+" : ""}
                     {prices.change24h.toFixed(2)}% 24h
                   </span>
@@ -308,13 +301,7 @@ function SatoshiConverterPage() {
                   labelFormatter={(t) => new Date(t as number).toLocaleString()}
                   formatter={(v: number) => [`$${v.toFixed(2)}`, "BTC"]}
                 />
-                <Area
-                  type="monotone"
-                  dataKey="p"
-                  stroke={BITCOIN_ORANGE}
-                  strokeWidth={2}
-                  fill="url(#btcSpark)"
-                />
+                <Area type="monotone" dataKey="p" stroke={BITCOIN_ORANGE} strokeWidth={2} fill="url(#btcSpark)" />
               </AreaChart>
             </ResponsiveContainer>
           </div>
@@ -323,7 +310,10 @@ function SatoshiConverterPage() {
       </section>
 
       {/* Converter */}
-      <section className="mt-6 rounded-2xl border p-6" style={{ borderColor: "var(--border)", background: "var(--card)" }}>
+      <section
+        className="mt-6 rounded-2xl border p-6"
+        style={{ borderColor: "var(--border)", background: "var(--card)" }}
+      >
         <div className="flex items-center justify-between mb-5 flex-wrap gap-2">
           <h2 className="font-display text-lg font-bold">Convert</h2>
           <Button variant="outline" size="sm" onClick={reset}>
@@ -362,7 +352,10 @@ function SatoshiConverterPage() {
       </section>
 
       {/* Reference */}
-      <section className="mt-6 rounded-2xl border p-6" style={{ borderColor: "var(--border)", background: "var(--card)" }}>
+      <section
+        className="mt-6 rounded-2xl border p-6"
+        style={{ borderColor: "var(--border)", background: "var(--card)" }}
+      >
         <h2 className="font-display text-lg font-bold mb-4">Reference</h2>
         <div className="grid gap-2 sm:grid-cols-2 text-sm">
           {[
@@ -378,7 +371,9 @@ function SatoshiConverterPage() {
               className="flex items-center justify-between rounded-md border px-3 py-2"
               style={{ borderColor: "var(--border)" }}
             >
-              <span className="font-medium" style={{ color: BITCOIN_ORANGE }}>{a}</span>
+              <span className="font-medium" style={{ color: BITCOIN_ORANGE }}>
+                {a}
+              </span>
               <span className="text-muted-foreground">= {b}</span>
             </div>
           ))}
@@ -517,7 +512,7 @@ function ConverterField({ field, value, onChange, disabled }: FieldProps) {
           aria-label="Copy"
         >
           {copied ? (
-            <Check className="w-4 h-4" style={{ color: "var(--green-brand)" }} />
+            <Check className="w-4 h-4" style={{ color: "#10b981" }} />
           ) : (
             <Copy className="w-4 h-4 text-muted-foreground" />
           )}

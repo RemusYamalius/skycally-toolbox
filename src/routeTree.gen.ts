@@ -54,6 +54,7 @@ import { Route as ToolsSlidingPuzzleRouteImport } from './routes/tools.sliding-p
 import { Route as ToolsSleepCalculatorRouteImport } from './routes/tools.sleep-calculator'
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
+import { Route as ToolsSatoshiConverterRouteImport } from './routes/tools.satoshi-converter'
 import { Route as ToolsRotatePdfRouteImport } from './routes/tools.rotate-pdf'
 import { Route as ToolsRoleSpinnerRouteImport } from './routes/tools.role-spinner'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
@@ -361,6 +362,11 @@ const ToolsSentimentAnalysisRoute = ToolsSentimentAnalysisRouteImport.update({
 const ToolsScreenRecorderRoute = ToolsScreenRecorderRouteImport.update({
   id: '/tools/screen-recorder',
   path: '/tools/screen-recorder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsSatoshiConverterRoute = ToolsSatoshiConverterRouteImport.update({
+  id: '/tools/satoshi-converter',
+  path: '/tools/satoshi-converter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsRotatePdfRoute = ToolsRotatePdfRouteImport.update({
@@ -870,6 +876,7 @@ export interface FileRoutesByFullPath {
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
+  '/tools/satoshi-converter': typeof ToolsSatoshiConverterRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
@@ -999,6 +1006,7 @@ export interface FileRoutesByTo {
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
+  '/tools/satoshi-converter': typeof ToolsSatoshiConverterRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
@@ -1129,6 +1137,7 @@ export interface FileRoutesById {
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
+  '/tools/satoshi-converter': typeof ToolsSatoshiConverterRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
@@ -1260,6 +1269,7 @@ export interface FileRouteTypes {
     | '/tools/remove-bg'
     | '/tools/role-spinner'
     | '/tools/rotate-pdf'
+    | '/tools/satoshi-converter'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
@@ -1389,6 +1399,7 @@ export interface FileRouteTypes {
     | '/tools/remove-bg'
     | '/tools/role-spinner'
     | '/tools/rotate-pdf'
+    | '/tools/satoshi-converter'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
@@ -1518,6 +1529,7 @@ export interface FileRouteTypes {
     | '/tools/remove-bg'
     | '/tools/role-spinner'
     | '/tools/rotate-pdf'
+    | '/tools/satoshi-converter'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
     | '/tools/sleep-calculator'
@@ -1648,6 +1660,7 @@ export interface RootRouteChildren {
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
   ToolsRoleSpinnerRoute: typeof ToolsRoleSpinnerRoute
   ToolsRotatePdfRoute: typeof ToolsRotatePdfRoute
+  ToolsSatoshiConverterRoute: typeof ToolsSatoshiConverterRoute
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
   ToolsSleepCalculatorRoute: typeof ToolsSleepCalculatorRoute
@@ -2004,6 +2017,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/screen-recorder'
       fullPath: '/tools/screen-recorder'
       preLoaderRoute: typeof ToolsScreenRecorderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/satoshi-converter': {
+      id: '/tools/satoshi-converter'
+      path: '/tools/satoshi-converter'
+      fullPath: '/tools/satoshi-converter'
+      preLoaderRoute: typeof ToolsSatoshiConverterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/rotate-pdf': {
@@ -2675,6 +2695,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
   ToolsRoleSpinnerRoute: ToolsRoleSpinnerRoute,
   ToolsRotatePdfRoute: ToolsRotatePdfRoute,
+  ToolsSatoshiConverterRoute: ToolsSatoshiConverterRoute,
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
   ToolsSleepCalculatorRoute: ToolsSleepCalculatorRoute,

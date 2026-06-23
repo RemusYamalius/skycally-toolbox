@@ -67,40 +67,32 @@ function Page() {
     setProgress(0);
     setResult(null);
     setStatus("Preparing trim...");
-
     try {
       const video = videoRef.current;
       const stream = (video as any).captureStream
         ? (video as any).captureStream()
         : (video as any).mozCaptureStream?.();
-
       if (!stream) throw new Error("Your browser does not support video capture. Try Chrome or Edge.");
-
       const chunks: BlobPart[] = [];
-      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9")
-        ? "video/webm;codecs=vp9"
-        : "video/webm";
-
+      const mimeType = MediaRecorder.isTypeSupported("video/webm;codecs=vp9") ? "video/webm;codecs=vp9" : "video/webm";
       const recorder = new MediaRecorder(stream, { mimeType });
-      recorder.ondataavailable = (e) => { if (e.data.size > 0) chunks.push(e.data); };
-
+      recorder.ondataavailable = (e) => {
+        if (e.data.size > 0) chunks.push(e.data);
+      };
       await new Promise<void>((resolve, reject) => {
         recorder.onstop = () => resolve();
         recorder.onerror = () => reject(new Error("Recording failed"));
-
         video.currentTime = start;
-
         video.onseeked = async () => {
           video.onseeked = null;
           setStatus("Trimming...");
           recorder.start(100);
           video.muted = true;
           await video.play();
-
-          const duration = end - start;
+          const clipDuration = end - start;
           const interval = setInterval(() => {
             const elapsed = video.currentTime - start;
-            setProgress(Math.min(99, Math.round((elapsed / duration) * 100)));
+            setProgress(Math.min(99, Math.round((elapsed / clipDuration) * 100)));
             if (video.currentTime >= end) {
               clearInterval(interval);
               video.pause();
@@ -109,7 +101,6 @@ function Page() {
           }, 200);
         };
       });
-
       const blob = new Blob(chunks, { type: mimeType });
       setResult({ url: URL.createObjectURL(blob), blob });
       setProgress(100);
@@ -127,7 +118,10 @@ function Page() {
   };
 
   return (
-    <ToolPageShell title="Video Trimmer" description="Cut and trim any video — works entirely in your browser, no uploads.">
+    <ToolPageShell
+      title="Video Trimmer"
+      description="Cut and trim any video — works entirely in your browser, no uploads."
+    >
       {!file && (
         <DropZone accept="video/*" onFiles={onPick} label="Drop your video" hint="MP4, MOV, WEBM · max 200MB" />
       )}
@@ -139,7 +133,16 @@ function Page() {
               <p className="font-semibold">{file.name}</p>
               <p className="text-muted-foreground">{formatBytes(file.size)}</p>
             </div>
-            <button onClick={() => { setFile(null); setVideoUrl(""); setResult(null); }} className="text-sm text-muted-foreground hover:text-foreground">Change</button>
+            <button
+              onClick={() => {
+                setFile(null);
+                setVideoUrl("");
+                setResult(null);
+              }}
+              className="text-sm text-muted-foreground hover:text-foreground"
+            >
+              Change
+            </button>
           </div>
 
           {videoUrl && (
@@ -154,24 +157,48 @@ function Page() {
 
           {duration > 0 && (
             <div className="rounded-2xl border border-border bg-card p-5 space-y-4">
-              <p className="text-xs uppercase tracking-wider text-muted-foreground">Trim · total {formatTime(duration)}</p>
+              <p className="text-xs uppercase tracking-wider text-muted-foreground">
+                Trim · total {formatTime(duration)}
+              </p>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted-foreground">Start</span>
-                  <span className="font-mono" style={{ color: "var(--cyan-brand)" }}>{formatTime(start)}</span>
+                  <span className="font-mono" style={{ color: "var(--cyan-brand)" }}>
+                    {formatTime(start)}
+                  </span>
                 </div>
-                <input type="range" min={0} max={Math.max(0, duration - 1)} value={start}
-                  onChange={(e) => { const v = +e.target.value; setStart(v); if (v >= end) setEnd(Math.min(v + 1, duration)); }}
-                  className="w-full" />
+                <input
+                  type="range"
+                  min={0}
+                  max={Math.max(0, duration - 1)}
+                  value={start}
+                  onChange={(e) => {
+                    const v = +e.target.value;
+                    setStart(v);
+                    if (v >= end) setEnd(Math.min(v + 1, duration));
+                  }}
+                  className="w-full"
+                />
               </div>
               <div>
                 <div className="flex justify-between text-sm mb-1">
                   <span className="text-muted-foreground">End</span>
-                  <span className="font-mono" style={{ color: "var(--cyan-brand)" }}>{formatTime(end)}</span>
+                  <span className="font-mono" style={{ color: "var(--cyan-brand)" }}>
+                    {formatTime(end)}
+                  </span>
                 </div>
-                <input type="range" min={1} max={duration} value={end}
-                  onChange={(e) => { const v = +e.target.value; setEnd(v); if (v <= start) setStart(Math.max(v - 1, 0)); }}
-                  className="w-full" />
+                <input
+                  type="range"
+                  min={1}
+                  max={duration}
+                  value={end}
+                  onChange={(e) => {
+                    const v = +e.target.value;
+                    setEnd(v);
+                    if (v <= start) setStart(Math.max(v - 1, 0));
+                  }}
+                  className="w-full"
+                />
               </div>
               <div className="flex justify-between text-sm bg-secondary/40 rounded-xl px-4 py-3">
                 <span className="text-muted-foreground">Clip duration</span>
@@ -180,21 +207,31 @@ function Page() {
             </div>
           )}
 
-          <button onClick={run} disabled={busy || end <= start} className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-foreground text-background font-semibold px-4 py-3 disabled:opacity-50">
-            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Scissors className="w-4 h-4" />} {busy ? (status || "Working...") : "Trim Video"}
+          <button
+            onClick={run}
+            disabled={busy || end <= start}
+            className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-foreground text-background font-semibold px-4 py-3 disabled:opacity-50"
+          >
+            {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Scissors className="w-4 h-4" />}{" "}
+            {busy ? status || "Working..." : "Trim Video"}
           </button>
 
           {busy && (
             <div className="space-y-2">
               <Progress value={progress} />
-              <p className="text-xs text-muted-foreground text-center">{status} · {progress}%</p>
+              <p className="text-xs text-muted-foreground text-center">
+                {status} · {progress}%
+              </p>
             </div>
           )}
 
           {result && (
             <div className="rounded-2xl border border-border bg-card p-5 flex flex-col items-center gap-4">
               <video src={result.url} controls className="w-full rounded-xl border border-border bg-black" />
-              <button onClick={() => downloadBlob(result.blob, `trimmed_${file.name.replace(/\.[^.]+$/, "")}.webm`)} className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5">
+              <button
+                onClick={() => downloadBlob(result.blob, `trimmed_${file.name.replace(/\.[^.]+$/, "")}.webm`)}
+                className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5"
+              >
                 <Download className="w-4 h-4" /> Download
               </button>
             </div>
@@ -202,31 +239,74 @@ function Page() {
         </div>
       )}
 
-      {/* ADSENSE_ZONE: video-trimmer-bottom 728x90 */}
       <AdZone id="video-trimmer-bottom" size="728x90" />
 
-      <HowToUse steps={[
-        "Upload a video file (MP4, MOV, WEBM up to 200MB).",
-        "Drag the start and end sliders to choose your clip.",
-        "Click Trim and download the trimmed video.",
-      ]} />
-
-      <p className="mt-6 text-center text-xs text-muted-foreground">Runs entirely in your browser — no uploads, no servers.</p>
-          <RelatedTools currentSlug="video-trimmer" />
-          <ToolSeoContent
-        title={"Free Video Trimmer — Cut and Trim Videos Online"}
-        description={"Cut your videos to the exact length you need with Skycally's free online video trimmer. No installation required — works directly in your browser."}
-        body={[
-        "Upload your video, set the start and end points using the intuitive sliders, and download your trimmed clip in seconds. The tool supports MP4, MOV, AVI, MKV and WEBM formats.",
-        "Video trimming uses stream copying which means no re-encoding — your video quality is preserved exactly and processing is nearly instant regardless of file size.",
-      ]}
-        faqs={[
-        { question: "Does trimming affect video quality?", answer: "No. We use stream copy mode which cuts the video without re-encoding, preserving the original quality perfectly." },
-        { question: "What is the maximum video length I can trim?", answer: "There is no length limit. You can trim videos of any duration — from short clips to full-length movies." },
-        { question: "Can I trim multiple sections from one video?", answer: "Currently the tool supports one trim operation per video. For multiple cuts, download each trimmed section separately." },
-        { question: "Does the trimmer work on mobile?", answer: "Yes, the video trimmer is fully responsive and works on smartphones and tablets." },
-      ]}
+      <HowToUse
+        steps={[
+          "Upload a video file (MP4, MOV, WEBM up to 200MB).",
+          "Drag the start and end sliders to select the clip you want to keep.",
+          "Click Trim Video and download the trimmed clip instantly.",
+        ]}
       />
-      </ToolPageShell>
+
+      <p className="mt-6 text-center text-xs text-muted-foreground">
+        Runs entirely in your browser — no uploads, no servers.
+      </p>
+
+      <ToolSeoContent
+        title="Free Video Trimmer — Cut and Trim Videos Online, No Upload"
+        description="Cut your video to the exact length you need with Skycally's free online video trimmer. Works entirely in your browser — no installs, no uploads, no signup."
+        body={[
+          "Skycally's Video Trimmer lets you cut any video to the exact clip you need, directly in your browser. Upload your video, drag the start and end sliders to your desired range, and download the trimmed result in seconds. No server upload is required — everything runs locally using your browser's built-in MediaRecorder API.",
+          "Unlike desktop software, this trimmer requires no installation and works on any device with a modern browser. It supports MP4, MOV, AVI, MKV, and WEBM input formats and outputs a clean WebM file ready for sharing, uploading, or further editing.",
+          "Video trimming is one of the most common editing tasks — whether you're removing a silent intro, cutting out a blooper, isolating a highlight, or shortening a clip for social media. This tool handles all of those needs in a clean, distraction-free interface with no ads interrupting your workflow.",
+          "The output file is saved as WebM (VP9), which is widely supported by Chrome, Firefox, Android, and most modern platforms. If you need MP4 output for specific platforms, you can convert the WebM using the Video Converter after trimming.",
+        ]}
+        faqs={[
+          {
+            question: "Does trimming affect video quality?",
+            answer:
+              "No. The trim captures the video using your browser's MediaRecorder at the original quality settings. The resulting clip closely matches the original in visual quality.",
+          },
+          {
+            question: "What video formats can I trim?",
+            answer:
+              "You can upload MP4, MOV, AVI, MKV, and WEBM files. The output is always saved as WebM (VP9) for maximum browser compatibility.",
+          },
+          {
+            question: "Is there a file size or length limit?",
+            answer:
+              "The maximum file size is 200MB. There is no duration limit — you can trim short clips or full-length videos.",
+          },
+          {
+            question: "Is my video uploaded to a server?",
+            answer:
+              "No. Everything runs locally in your browser using the MediaRecorder API. Your video never leaves your device.",
+          },
+          {
+            question: "Can I trim multiple sections from one video?",
+            answer:
+              "Currently the tool supports one trim operation per video. For multiple cuts, trim each section separately and merge the clips using the Video Merger.",
+          },
+          {
+            question: "Does the trimmer work on mobile?",
+            answer:
+              "Yes. The video trimmer is fully responsive and works on smartphones and tablets running Chrome or other modern browsers.",
+          },
+          {
+            question: "Why does the output file have a .webm extension?",
+            answer:
+              "WebM is the format produced by the browser's built-in MediaRecorder API. It is supported by Chrome, Firefox, Android, and most video players. For MP4 compatibility, convert the output using a video converter.",
+          },
+          {
+            question: "How accurate are the start and end cut points?",
+            answer:
+              "The sliders offer second-level precision. For frame-accurate cuts, use a desktop editor such as DaVinci Resolve or CapCut after downloading the trimmed clip.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="video-trimmer" />
+    </ToolPageShell>
   );
 }

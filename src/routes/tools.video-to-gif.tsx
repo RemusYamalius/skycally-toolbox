@@ -179,14 +179,13 @@ function Page() {
         </div>
       )}
 
-      {/* ADSENSE_ZONE: video-to-gif-bottom 728x90 */}
       <AdZone id="video-to-gif-bottom" size="728x90" />
 
       <HowToUse
         steps={[
           "Upload a video (MP4, MOV, or WEBM up to 50MB).",
-          "Pick start time, duration, width, and FPS.",
-          "Click Convert and download your GIF.",
+          "Set start time, duration, output width, and frame rate.",
+          "Click Convert to GIF and download your animated GIF instantly.",
         ]}
       />
 
@@ -194,10 +193,10 @@ function Page() {
         title="Convert Video to GIF Online Free — MP4, MOV, WebM to Animated GIF"
         description="Convert any video clip to an animated GIF for free. Customize frame rate, size, and duration. Fast, no signup required."
         body={[
-          "Skycally's Video to GIF converter turns any video clip into a smooth animated GIF in seconds. Upload an MP4, MOV, or WebM file, set your start time and clip duration, choose the output width and frame rate, and download your GIF. Conversion uses FFmpeg on our secure server for fast, reliable results with accurate color reproduction.",
+          "Skycally's Video to GIF converter turns any video clip into a smooth animated GIF in seconds. Upload an MP4, MOV, or WebM file, set your start time and clip duration, choose the output width and frame rate, and download your GIF. Conversion runs entirely in your browser using FFmpeg WebAssembly — no server uploads, no waiting in queues.",
           "Frame rate is the biggest factor controlling GIF quality and file size. A frame rate of 8–12 fps produces small files suitable for messaging apps and social media. Frame rates of 20–24 fps produce smoother motion but significantly larger files. For most use cases, 12–15 fps is the sweet spot between quality and file size.",
           "GIF is the format of choice for short looping animations on the web, messaging platforms, and social media. Unlike MP4, GIFs loop automatically and require no video player — they embed directly into web pages, emails, and chat apps. This makes them ideal for tutorials, reactions, product demos, and visual explanations.",
-          "For best results, keep source clips under 10 seconds and 480px wide. Longer or wider GIFs can exceed 10MB, which many platforms reject. If you need a GIF from a longer video, use the trim controls to select just the essential moment before converting.",
+          "For best results, keep source clips under 10 seconds and 480px wide. Longer or wider GIFs can exceed 10MB, which many platforms reject. If you need a GIF from a longer video, use the start time and duration controls to select just the essential moment before converting.",
         ]}
         faqs={[
           {
@@ -213,17 +212,17 @@ function Page() {
           {
             question: "What is the maximum clip duration?",
             answer:
-              "GIF conversion is limited to 10 seconds to keep file sizes manageable. For longer content, consider using the Video Compressor to reduce file size while keeping video format.",
+              "GIF conversion is limited to 10 seconds to keep file sizes manageable. For longer video content, consider using the Video Trimmer to cut the exact moment you need first.",
           },
           {
-            question: "How is my video processed?",
+            question: "Is my video uploaded to a server?",
             answer:
-              "Your video is uploaded to our secure server, processed with FFmpeg, and the resulting GIF is sent back to your browser. Files are deleted immediately after processing and never stored permanently.",
+              "No. Everything runs locally in your browser using FFmpeg WebAssembly. Your video never leaves your device, making this tool completely private.",
           },
           {
             question: "Can I convert a YouTube video to GIF?",
             answer:
-              "You need the video file on your device first. Use Skycally's Video Downloader to save the clip locally, then upload it here to convert to GIF.",
+              "You need the video file on your device first. Download the clip locally, then upload it here to convert to GIF.",
           },
           {
             question: "Why does my GIF look washed out or pixelated?",

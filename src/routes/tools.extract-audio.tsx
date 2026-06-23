@@ -6,14 +6,13 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
+import { getFFmpeg } from "@/utils/ffmpegLoader";
+import { fetchFile } from "@ffmpeg/util";
 
 export const Route = createFileRoute("/tools/extract-audio")({
   head: () => buildToolMeta(toolBySlug("extract-audio", tools)),
   component: ExtractAudio,
 });
-
-import { getFFmpeg } from "@/utils/ffmpegLoader";
-import { fetchFile } from "@ffmpeg/util";
 
 type Format = "mp3" | "aac" | "wav";
 
@@ -43,7 +42,6 @@ function ExtractAudio() {
     setDone(false);
     setAudioSize(null);
   };
-
   const onDrop = (e: React.DragEvent) => {
     e.preventDefault();
     const f = e.dataTransfer.files[0];
@@ -85,7 +83,10 @@ function ExtractAudio() {
   };
 
   return (
-    <ToolPageShell title="Extract Audio from Video" description="Extract MP3, AAC or WAV audio from any video file.">
+    <ToolPageShell
+      title="Extract Audio from Video"
+      description="Extract MP3, AAC or WAV audio from any video file — runs entirely in your browser."
+    >
       <div className="w-full max-w-xl mx-auto space-y-5">
         <div
           onDrop={onDrop}
@@ -98,13 +99,20 @@ function ExtractAudio() {
             type="file"
             accept="video/*"
             className="hidden"
-            onChange={(e) => { if (e.target.files?.[0]) onFile(e.target.files[0]); }}
+            onChange={(e) => {
+              if (e.target.files?.[0]) onFile(e.target.files[0]);
+            }}
           />
           {file ? (
             <div className="space-y-2">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-cyan-500/10 border border-cyan-500/30 flex items-center justify-center">
                 <svg className="w-6 h-6 text-cyan-400" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                  />
                 </svg>
               </div>
               <p className="text-foreground font-medium text-sm">{file.name}</p>
@@ -125,7 +133,12 @@ function ExtractAudio() {
             <div className="space-y-2 py-4">
               <div className="w-12 h-12 mx-auto rounded-2xl bg-[#0d1526] border border-border flex items-center justify-center">
                 <svg className="w-6 h-6 text-muted-foreground" fill="none" stroke="currentColor" viewBox="0 0 24 24">
-                  <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={1.5} d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3" />
+                  <path
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    strokeWidth={1.5}
+                    d="M9 19V6l12-3v13M9 19c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zm12-3c0 1.105-1.343 2-3 2s-3-.895-3-2 1.343-2 3-2 3 .895 3 2zM9 10l12-3"
+                  />
                 </svg>
               </div>
               <p className="text-muted-foreground text-sm">Drop a video or click to browse</p>
@@ -142,9 +155,7 @@ function ExtractAudio() {
                 <button
                   key={f}
                   onClick={() => setFormat(f)}
-                  className={`p-3 rounded-xl border text-left transition-all ${
-                    format === f ? "border-cyan-500 bg-cyan-500/10" : "border-border hover:border-border"
-                  }`}
+                  className={`p-3 rounded-xl border text-left transition-all ${format === f ? "border-cyan-500 bg-cyan-500/10" : "border-border hover:border-border"}`}
                 >
                   <p className={`text-sm font-medium ${format === f ? FORMAT_INFO[f].color : "text-muted-foreground"}`}>
                     {FORMAT_INFO[f].label}
@@ -197,30 +208,75 @@ function ExtractAudio() {
                 </svg>
                 Extracting...
               </span>
-            ) : `Extract ${format.toUpperCase()}`}
+            ) : (
+              `Extract ${format.toUpperCase()}`
+            )}
           </button>
         )}
       </div>
-      <HowToUse steps={[
-        "Upload a video by dropping it or clicking to browse.",
-        "Choose your output format: MP3, AAC or WAV.",
-        "Click Extract to download the audio file instantly.",
-      ]} />
-          <RelatedTools currentSlug="extract-audio" />
-          <ToolSeoContent
-        title={"Extract Audio from Video — Free MP3, AAC & WAV Converter"}
-        description={"Extract the audio track from any video file and download it as MP3, AAC or WAV for free. Perfect for creating podcasts, music files or audio samples."}
-        body={[
-        "Upload any video file in MP4, MOV, AVI, MKV or WEBM format and extract the audio in your preferred format. MP3 works on all devices, AAC offers better quality at the same file size, and WAV provides uncompressed lossless audio.",
-        "The extraction process uses FFmpeg on our secure server, ensuring high-quality audio output. Your video file is immediately deleted after the audio is extracted and downloaded.",
-      ]}
-        faqs={[
-        { question: "Will the audio quality be affected?", answer: "For MP3 and AAC we use high quality settings (192kbps equivalent). WAV is completely lossless. The output quality matches the original audio in the video." },
-        { question: "Can I extract audio from any video format?", answer: "Yes, we support all major video formats including MP4, MOV, AVI, MKV, WEBM and more." },
-        { question: "How long does extraction take?", answer: "Audio extraction is very fast — typically a few seconds for most videos regardless of length, since no video re-encoding is required." },
-        { question: "What is the difference between MP3, AAC and WAV?", answer: "MP3 is universal and works everywhere. AAC offers better quality at smaller file sizes and is preferred by Apple devices. WAV is uncompressed lossless audio with the largest file size." },
-      ]}
+
+      <HowToUse
+        steps={[
+          "Upload any video file (MP4, MOV, AVI, MKV, WEBM).",
+          "Choose your output audio format: MP3, AAC, or WAV.",
+          "Click Extract — the audio file downloads automatically.",
+        ]}
       />
-      </ToolPageShell>
+
+      <ToolSeoContent
+        title="Extract Audio from Video Online Free — MP3, AAC & WAV, No Upload"
+        description="Extract the audio track from any video and download it as MP3, AAC, or WAV for free. Runs entirely in your browser with FFmpeg — no server upload, no signup."
+        body={[
+          "Skycally's Extract Audio tool lets you pull the audio track from any video file and save it as MP3, AAC, or WAV, directly in your browser. Upload a video in MP4, MOV, AVI, MKV, or WEBM format, choose your preferred audio format, and download the audio file in seconds using FFmpeg WebAssembly — no server required.",
+          "Extracting audio from video is useful in many everyday situations: saving the soundtrack from a recorded concert, converting a lecture video into a podcast episode, pulling music from a screen recording, or extracting narration from a presentation. This tool handles all of those needs in a simple, distraction-free interface.",
+          "MP3 is the most universally compatible format and works on every device and platform. AAC offers better audio quality at the same file size and is the preferred format for Apple devices, Spotify, and YouTube. WAV is uncompressed lossless audio — the largest file size but perfect when you need to preserve every detail for professional editing.",
+          "All audio extraction runs locally using FFmpeg WebAssembly. Your video file never leaves your browser tab, making this tool completely private. There is no account required, no file size restriction enforced by a server, and no waiting in upload queues.",
+        ]}
+        faqs={[
+          {
+            question: "What video formats are supported?",
+            answer:
+              "You can upload MP4, MOV, AVI, MKV, WEBM, and most other common video formats. FFmpeg handles a wide range of container and codec combinations.",
+          },
+          {
+            question: "What audio formats can I extract to?",
+            answer:
+              "MP3 (most compatible, works everywhere), AAC (better quality at same size, preferred by Apple and streaming platforms), and WAV (uncompressed lossless audio, largest file size).",
+          },
+          {
+            question: "Will the audio quality be affected?",
+            answer:
+              "For MP3 we use variable bitrate quality setting 2 (~190kbps average). For AAC we use 192kbps CBR. WAV is completely lossless. Output quality closely matches the original audio in the video.",
+          },
+          {
+            question: "Is my video uploaded to a server?",
+            answer:
+              "No. Everything runs locally in your browser using FFmpeg WebAssembly. Your video never leaves your device.",
+          },
+          {
+            question: "How long does extraction take?",
+            answer:
+              "Audio extraction is very fast — typically a few seconds for most videos regardless of length, since only the audio stream is processed without re-encoding the video.",
+          },
+          {
+            question: "Can I extract audio from a video with multiple audio tracks?",
+            answer:
+              "The tool extracts the default (first) audio track from the video. For multi-track extraction or track selection, a desktop tool like VLC or FFmpeg CLI would be needed.",
+          },
+          {
+            question: "What is the difference between MP3, AAC, and WAV?",
+            answer:
+              "MP3 is universal and works everywhere. AAC offers better quality at smaller file sizes and is preferred by Apple devices and streaming services. WAV is uncompressed lossless audio with the largest file size — ideal for further editing.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The tool works on smartphones and tablets running Chrome or other modern mobile browsers that support WebAssembly.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="extract-audio" />
+    </ToolPageShell>
   );
 }

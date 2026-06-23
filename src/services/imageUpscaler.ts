@@ -143,7 +143,9 @@ export const upscaleImage = async (file: File, scale: number, onProgress: (msg: 
   onProgress("Finalizing…");
   const dstCanvas = new OffscreenCanvas(dstW, dstH);
   const dstCtx = dstCanvas.getContext("2d") as OffscreenCanvasRenderingContext2D;
-  dstCtx.putImageData(new ImageData(sharpened, dstW, dstH), 0, 0);
+  const imgData = dstCtx.createImageData(dstW, dstH);
+  imgData.data.set(sharpened);
+  dstCtx.putImageData(imgData, 0, 0);
 
   const blob = await dstCanvas.convertToBlob({ type: "image/png" });
   return URL.createObjectURL(blob);

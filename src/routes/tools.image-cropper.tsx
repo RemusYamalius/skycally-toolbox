@@ -57,21 +57,32 @@ function ImageCropper() {
     setBusy(true);
     const canvas = c.getCroppedCanvas();
     const mime = format === "jpg" ? "image/jpeg" : format === "webp" ? "image/webp" : "image/png";
-    canvas.toBlob((blob) => {
-      if (!blob) { setBusy(false); toast.error("❌ Something went wrong. Please try again."); return; }
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `cropped.${format}`;
-      a.click();
-      URL.revokeObjectURL(url);
-      toast.success("✅ Download started!");
-      setBusy(false);
-    }, mime, 0.92);
+    canvas.toBlob(
+      (blob) => {
+        if (!blob) {
+          setBusy(false);
+          toast.error("Something went wrong. Please try again.");
+          return;
+        }
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `cropped.${format}`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast.success("Download started!");
+        setBusy(false);
+      },
+      mime,
+      0.92,
+    );
   };
 
   return (
-    <ToolPageShell title="Image Cropper" description="Crop images with aspect-ratio presets. Rotate, flip and download.">
+    <ToolPageShell
+      title="Image Cropper"
+      description="Crop, rotate and flip images with aspect-ratio presets. Download in JPG, PNG or WEBP."
+    >
       <style>{cropperStyles}</style>
       {!src ? (
         <DropZone accept="image/*" onFiles={onFiles} label="Drop an image to crop" hint="PNG, JPG or WEBP" />
@@ -95,64 +106,166 @@ function ImageCropper() {
           </div>
           <div className="space-y-4">
             <div className="rounded-xl border border-border bg-card/50 p-3 text-sm flex justify-between">
-              <span className="text-muted-foreground">Crop</span>
-              <span className="font-mono">{dims.w} × {dims.h} px</span>
+              <span className="text-muted-foreground">Crop size</span>
+              <span className="font-mono">
+                {dims.w} × {dims.h} px
+              </span>
             </div>
 
             <div>
               <p className="text-xs text-muted-foreground mb-2">Aspect ratio</p>
               <div className="grid grid-cols-3 gap-1.5">
                 {RATIOS.map((r) => (
-                  <button key={r.label} onClick={() => setRatio(r.value ?? NaN)} className={`rounded-md px-2 py-1.5 text-xs border ${(isNaN(ratio) && isNaN(r.value as number)) || ratio === r.value ? "bg-foreground text-background border-foreground" : "border-border hover:bg-secondary"}`}>
+                  <button
+                    key={r.label}
+                    onClick={() => setRatio(r.value ?? NaN)}
+                    className={`rounded-md px-2 py-1.5 text-xs border transition-colors ${
+                      (isNaN(ratio) && isNaN(r.value as number)) || ratio === r.value
+                        ? "bg-foreground text-background border-foreground"
+                        : "border-border hover:bg-secondary"
+                    }`}
+                  >
                     {r.label}
                   </button>
                 ))}
               </div>
             </div>
 
-            <div className="grid grid-cols-2 gap-2">
-              <button onClick={() => cropper()?.rotate(-90)} className="rounded-md border border-border px-2 py-1.5 text-xs hover:bg-secondary">↺ -90°</button>
-              <button onClick={() => cropper()?.rotate(90)} className="rounded-md border border-border px-2 py-1.5 text-xs hover:bg-secondary">↻ +90°</button>
-              <button onClick={() => { const c = cropper(); if (c) c.scaleX(-(c.getData().scaleX || 1)); }} className="rounded-md border border-border px-2 py-1.5 text-xs hover:bg-secondary">↔ Flip H</button>
-              <button onClick={() => { const c = cropper(); if (c) c.scaleY(-(c.getData().scaleY || 1)); }} className="rounded-md border border-border px-2 py-1.5 text-xs hover:bg-secondary">↕ Flip V</button>
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">Transform</p>
+              <div className="grid grid-cols-2 gap-2">
+                <button
+                  onClick={() => cropper()?.rotate(-90)}
+                  className="rounded-md border border-border px-2 py-1.5 text-xs hover:bg-secondary transition-colors"
+                >
+                  ↺ -90°
+                </button>
+                <button
+                  onClick={() => cropper()?.rotate(90)}
+                  className="rounded-md border border-border px-2 py-1.5 text-xs hover:bg-secondary transition-colors"
+                >
+                  ↻ +90°
+                </button>
+                <button
+                  onClick={() => {
+                    const c = cropper();
+                    if (c) c.scaleX(-(c.getData().scaleX || 1));
+                  }}
+                  className="rounded-md border border-border px-2 py-1.5 text-xs hover:bg-secondary transition-colors"
+                >
+                  ↔ Flip H
+                </button>
+                <button
+                  onClick={() => {
+                    const c = cropper();
+                    if (c) c.scaleY(-(c.getData().scaleY || 1));
+                  }}
+                  className="rounded-md border border-border px-2 py-1.5 text-xs hover:bg-secondary transition-colors"
+                >
+                  ↕ Flip V
+                </button>
+              </div>
             </div>
 
-            <label className="block text-xs text-muted-foreground">Format
-              <select value={format} onChange={(e) => setFormat(e.target.value as "jpg" | "png" | "webp")} className="mt-1 w-full rounded-lg border border-border bg-background px-3 py-2 text-sm">
-                <option value="jpg">JPG</option>
-                <option value="png">PNG</option>
-                <option value="webp">WEBP</option>
-              </select>
-            </label>
+            <div>
+              <p className="text-xs text-muted-foreground mb-2">Output format</p>
+              <div className="grid grid-cols-3 gap-1.5">
+                {(["jpg", "png", "webp"] as const).map((f) => (
+                  <button
+                    key={f}
+                    onClick={() => setFormat(f)}
+                    className={`rounded-md px-2 py-1.5 text-xs border uppercase font-mono transition-colors ${
+                      format === f
+                        ? "bg-foreground text-background border-foreground"
+                        : "border-border hover:bg-secondary"
+                    }`}
+                  >
+                    {f}
+                  </button>
+                ))}
+              </div>
+            </div>
 
-            <button onClick={handleCrop} disabled={busy} className="w-full py-3 rounded-xl bg-foreground text-background font-semibold disabled:opacity-50">
+            <button
+              onClick={handleCrop}
+              disabled={busy}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold disabled:opacity-50 transition-all hover:scale-[1.02] active:scale-[0.98]"
+            >
               {busy ? "Cropping…" : "Crop & Download"}
             </button>
-            <button onClick={() => setSrc("")} className="w-full py-2 text-xs text-muted-foreground hover:text-foreground">Choose another image</button>
+            <button
+              onClick={() => setSrc("")}
+              className="w-full py-2 text-xs text-muted-foreground hover:text-foreground transition-colors"
+            >
+              Choose another image
+            </button>
           </div>
         </div>
       )}
+
       <AdZone id="image-tool-below-result" size="300x250" />
-      <HowToUse steps={[
-        "Drop an image into the cropper.",
-        "Pick an aspect ratio, then drag the box to frame your crop.",
-        "Click Crop & Download to save the result.",
-      ]} />
-          <RelatedTools currentSlug="image-cropper" />
-          <ToolSeoContent
-        title={"Free Image Cropper — Crop Photos Online with Aspect Ratio"}
-        description={"Crop images online with precision. Choose from preset aspect ratios or crop freely. Rotate and flip options included. Download in JPG, PNG or WEBP."}
-        body={[
-        "Use the intuitive crop interface to select exactly the area you want to keep. Drag the handles to resize the crop area and drag inside to reposition it. Switch between preset aspect ratios for social media sizes or use Free mode for custom crops.",
-        "Additional editing options include 90-degree rotation in both directions and horizontal/vertical flipping — useful for correcting mirror-image selfies or adjusting landscape photos.",
-      ]}
-        faqs={[
-        { question: "What aspect ratios are available?", answer: "We offer Free crop, 1:1 Square, 4:3 Standard, 16:9 Widescreen, 3:4 Portrait and 9:16 Story/Reel presets." },
-        { question: "Can I crop to exact pixel dimensions?", answer: "The cropper shows real-time pixel dimensions of your selection. Set the desired aspect ratio and resize to match your target dimensions." },
-        { question: "Will cropping reduce image quality?", answer: "No. Cropping only removes areas outside the selection — the remaining image retains its original quality at 92% compression." },
-        { question: "Can I undo a crop?", answer: "Yes, you can adjust the crop area at any time before clicking Crop & Download. The original image is preserved until you download." },
-      ]}
+
+      <HowToUse
+        steps={[
+          "Drop an image or click to upload — PNG, JPG, or WEBP.",
+          "Select an aspect ratio preset or crop freely. Drag the handles to frame your selection. Rotate or flip if needed.",
+          "Choose the output format (JPG, PNG, WEBP) and click Crop & Download.",
+        ]}
       />
-      </ToolPageShell>
+
+      <ToolSeoContent
+        title="Free Image Cropper — Crop Photos Online with Aspect Ratio Presets"
+        description="Crop any image online with precision using Skycally's free image cropper. Choose from preset aspect ratios, rotate, flip, and download in JPG, PNG, or WEBP. No signup, no upload."
+        body={[
+          "Skycally's Image Cropper gives you a precise, browser-based tool for cropping any photo or image exactly the way you want. Upload an image, drag the crop handles to select your area, and download the result in JPG, PNG, or WEBP — entirely in your browser with no server upload required.",
+          "Six aspect ratio presets cover the most common cropping needs: Free for custom shapes, 1:1 Square for Instagram posts and avatars, 4:3 for standard photos and presentations, 16:9 for YouTube thumbnails and widescreen, 3:4 for portrait photos, and 9:16 for Instagram Stories and TikTok. Switch between presets instantly at any time.",
+          "Additional transform tools let you rotate the image 90 degrees left or right, and flip horizontally or vertically — useful for correcting mirror-image selfies, fixing scanned documents, or adjusting landscape orientation. The real-time pixel counter shows the exact dimensions of your crop selection as you drag.",
+          "All cropping runs locally in your browser using the CropperJS library. Your image never leaves your device, making this tool completely private. Output quality is set to 92% for JPEG, which preserves virtually all visible detail while keeping file sizes manageable.",
+        ]}
+        faqs={[
+          {
+            question: "What aspect ratios are available?",
+            answer:
+              "Free crop (any shape), 1:1 Square, 4:3 Standard, 16:9 Widescreen, 3:4 Portrait, and 9:16 Story/Reel. You can switch presets at any time before downloading.",
+          },
+          {
+            question: "Can I crop to exact pixel dimensions?",
+            answer:
+              "The cropper shows real-time pixel dimensions of your selection. Set the desired aspect ratio and resize the crop box to match your target dimensions.",
+          },
+          {
+            question: "Will cropping reduce image quality?",
+            answer:
+              "No. Cropping only removes the area outside your selection. The remaining image retains its full original quality (92% JPEG compression for JPG output, lossless for PNG).",
+          },
+          {
+            question: "What output formats are supported?",
+            answer:
+              "You can download the cropped image as JPG (smallest file size), PNG (lossless, supports transparency), or WEBP (modern format, best compression).",
+          },
+          {
+            question: "Can I rotate or flip the image?",
+            answer:
+              "Yes. The tool includes 90° left/right rotation and horizontal/vertical flip controls, accessible from the sidebar panel.",
+          },
+          {
+            question: "Is my image uploaded to a server?",
+            answer:
+              "No. All cropping runs locally in your browser using CropperJS. Your image never leaves your device.",
+          },
+          {
+            question: "Can I undo a crop?",
+            answer:
+              "You can adjust the crop area at any time before clicking Crop & Download. The original image is preserved in memory until you choose to download.",
+          },
+          {
+            question: "What image formats can I upload?",
+            answer: "PNG, JPG, WEBP, and most other common image formats are supported as input.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="image-cropper" />
+    </ToolPageShell>
   );
 }

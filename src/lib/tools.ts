@@ -147,6 +147,7 @@ export const tools: Tool[] = [
   { slug: "car-loan-calculator", name: "Car Loan Calculator", description: "Calculate auto loan payments including sales tax, down payment and trade-in value.", category: "utility", icon: Calculator, path: "/tools/car-loan-calculator" },
   { slug: "compound-interest", name: "Compound Interest Calculator", description: "Calculate how your investment grows over time with compound interest and monthly contributions.", category: "utility", icon: Calculator, path: "/tools/compound-interest" },
   { slug: "color-picker", name: "Color Picker", description: "Pick, convert, and generate color palettes. Supports HEX, RGB, HSL, HSB, CMYK. Includes harmony generator, contrast checker, gradient builder, and image color extractor.", category: "utility", icon: Pipette, path: "/tools/color-picker" },
+  { slug: "satoshi-converter", name: "Satoshi Converter", description: "Convert between Bitcoin, Satoshi, mBTC, bits, USD, EUR and MAD instantly. Live BTC price updated every 60 seconds.", category: "utility", icon: Bitcoin, path: "/tools/satoshi-converter" },
 ];
 
 

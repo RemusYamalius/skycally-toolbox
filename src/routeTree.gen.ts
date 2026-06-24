@@ -125,6 +125,7 @@ import { Route as ToolsBubbleShooterRouteImport } from './routes/tools.bubble-sh
 import { Route as ToolsBreakoutRouteImport } from './routes/tools.breakout'
 import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calculator'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
+import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAgeCalculatorRouteImport } from './routes/tools.age-calculator'
@@ -721,6 +722,11 @@ const ToolsBase64Route = ToolsBase64RouteImport.update({
   path: '/tools/base64',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsBallSortRoute = ToolsBallSortRouteImport.update({
+  id: '/tools/ball-sort',
+  path: '/tools/ball-sort',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsBackgroundBlurRoute = ToolsBackgroundBlurRouteImport.update({
   id: '/tools/background-blur',
   path: '/tools/background-blur',
@@ -806,6 +812,7 @@ export interface FileRoutesByFullPath {
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
+  '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/breakout': typeof ToolsBreakoutRoute
@@ -936,6 +943,7 @@ export interface FileRoutesByTo {
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
+  '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/breakout': typeof ToolsBreakoutRoute
@@ -1067,6 +1075,7 @@ export interface FileRoutesById {
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
+  '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/breakout': typeof ToolsBreakoutRoute
@@ -1199,6 +1208,7 @@ export interface FileRouteTypes {
     | '/tools/age-calculator'
     | '/tools/audio-converter'
     | '/tools/background-blur'
+    | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/bmi-calculator'
     | '/tools/breakout'
@@ -1329,6 +1339,7 @@ export interface FileRouteTypes {
     | '/tools/age-calculator'
     | '/tools/audio-converter'
     | '/tools/background-blur'
+    | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/bmi-calculator'
     | '/tools/breakout'
@@ -1459,6 +1470,7 @@ export interface FileRouteTypes {
     | '/tools/age-calculator'
     | '/tools/audio-converter'
     | '/tools/background-blur'
+    | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/bmi-calculator'
     | '/tools/breakout'
@@ -1590,6 +1602,7 @@ export interface RootRouteChildren {
   ToolsAgeCalculatorRoute: typeof ToolsAgeCalculatorRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
+  ToolsBallSortRoute: typeof ToolsBallSortRoute
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsBmiCalculatorRoute: typeof ToolsBmiCalculatorRoute
   ToolsBreakoutRoute: typeof ToolsBreakoutRoute
@@ -2516,6 +2529,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsBase64RouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/ball-sort': {
+      id: '/tools/ball-sort'
+      path: '/tools/ball-sort'
+      fullPath: '/tools/ball-sort'
+      preLoaderRoute: typeof ToolsBallSortRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/background-blur': {
       id: '/tools/background-blur'
       path: '/tools/background-blur'
@@ -2625,6 +2645,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAgeCalculatorRoute: ToolsAgeCalculatorRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
+  ToolsBallSortRoute: ToolsBallSortRoute,
   ToolsBase64Route: ToolsBase64Route,
   ToolsBmiCalculatorRoute: ToolsBmiCalculatorRoute,
   ToolsBreakoutRoute: ToolsBreakoutRoute,

@@ -86,6 +86,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   pinball: ["breakout", "bubble-shooter", "pac-man"],
   "space-shooter": ["snake", "2048", "wordle"],
   tetris: ["2048", "snake", "pac-man", "breakout", "bubble-shooter", "minesweeper"],
+  "ball-sort": ["2048", "sudoku", "memory-match", "sliding-puzzle", "minesweeper"],
   // Utility
   "ip-address-lookup": ["network-speed-test", "qr-generator", "url-encoder"],
   "port-checker": ["ip-address-lookup", "network-speed-test", "qr-generator"],

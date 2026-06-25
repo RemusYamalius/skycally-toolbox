@@ -22,8 +22,16 @@ export const Route = createFileRoute("/tools/unit-converter")({
 // ---------- Data ----------
 
 type CategoryId =
-  | "length" | "weight" | "temperature" | "area" | "volume"
-  | "speed" | "time" | "data" | "pressure" | "energy";
+  | "length"
+  | "weight"
+  | "temperature"
+  | "area"
+  | "volume"
+  | "speed"
+  | "time"
+  | "data"
+  | "pressure"
+  | "energy";
 
 interface Unit {
   id: string;
@@ -319,29 +327,40 @@ const CATEGORIES: Category[] = [
   },
 ];
 
-const CATEGORY_MAP: Record<CategoryId, Category> = Object.fromEntries(
-  CATEGORIES.map((c) => [c.id, c]),
-) as Record<CategoryId, Category>;
+const CATEGORY_MAP: Record<CategoryId, Category> = Object.fromEntries(CATEGORIES.map((c) => [c.id, c])) as Record<
+  CategoryId,
+  Category
+>;
 
 // ---------- Conversion ----------
 
 function tempToCelsius(value: number, from: string): number {
   switch (from) {
-    case "celsius": return value;
-    case "fahrenheit": return (value - 32) * (5 / 9);
-    case "kelvin": return value - 273.15;
-    case "rankine": return (value - 491.67) * (5 / 9);
-    default: return value;
+    case "celsius":
+      return value;
+    case "fahrenheit":
+      return (value - 32) * (5 / 9);
+    case "kelvin":
+      return value - 273.15;
+    case "rankine":
+      return (value - 491.67) * (5 / 9);
+    default:
+      return value;
   }
 }
 
 function celsiusTo(value: number, to: string): number {
   switch (to) {
-    case "celsius": return value;
-    case "fahrenheit": return value * (9 / 5) + 32;
-    case "kelvin": return value + 273.15;
-    case "rankine": return (value + 273.15) * (9 / 5);
-    default: return value;
+    case "celsius":
+      return value;
+    case "fahrenheit":
+      return value * (9 / 5) + 32;
+    case "kelvin":
+      return value + 273.15;
+    case "rankine":
+      return (value + 273.15) * (9 / 5);
+    default:
+      return value;
   }
 }
 
@@ -464,11 +483,26 @@ function UnitConverterPage() {
       setRecent((prev) => {
         const entry: RecentEntry = { cat: categoryId, from: fromUnit, to: toUnit, val: fromValue, result: toValue };
         const last = prev[0];
-        if (last && last.cat === entry.cat && last.from === entry.from && last.to === entry.to && last.val === entry.val) {
+        if (
+          last &&
+          last.cat === entry.cat &&
+          last.from === entry.from &&
+          last.to === entry.to &&
+          last.val === entry.val
+        ) {
           return prev;
         }
-        const next = [entry, ...prev.filter((r) => !(r.cat === entry.cat && r.from === entry.from && r.to === entry.to && r.val === entry.val))].slice(0, 5);
-        try { localStorage.setItem("unit-converter-history", JSON.stringify(next)); } catch { /* ignore */ }
+        const next = [
+          entry,
+          ...prev.filter(
+            (r) => !(r.cat === entry.cat && r.from === entry.from && r.to === entry.to && r.val === entry.val),
+          ),
+        ].slice(0, 5);
+        try {
+          localStorage.setItem("unit-converter-history", JSON.stringify(next));
+        } catch {
+          /* ignore */
+        }
         return next;
       });
     }, 600);
@@ -525,6 +559,7 @@ function UnitConverterPage() {
     <ToolPageShell
       title="Unit Converter"
       description="Convert length, weight, temperature, area, volume, speed, time, data, pressure and energy units instantly."
+      showFileDisclaimer={false}
     >
       {/* Category tabs */}
       <div className="-mx-4 px-4 sm:mx-0 sm:px-0 overflow-x-auto">
@@ -564,7 +599,13 @@ function UnitConverterPage() {
           {/* FROM */}
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">From</label>
-            <Select value={fromUnit} onValueChange={(v) => { setFromUnit(v); setLastEdited("from"); }}>
+            <Select
+              value={fromUnit}
+              onValueChange={(v) => {
+                setFromUnit(v);
+                setLastEdited("from");
+              }}
+            >
               <SelectTrigger className="h-12">
                 <SelectValue />
               </SelectTrigger>
@@ -579,7 +620,10 @@ function UnitConverterPage() {
             <Input
               value={fromValue}
               inputMode="decimal"
-              onChange={(e) => { setFromValue(e.target.value); setLastEdited("from"); }}
+              onChange={(e) => {
+                setFromValue(e.target.value);
+                setLastEdited("from");
+              }}
               className="h-14 text-3xl font-mono tabular-nums"
               placeholder="0"
               aria-label={`Value in ${fromUnitDef.label}`}
@@ -604,7 +648,13 @@ function UnitConverterPage() {
           {/* TO */}
           <div className="space-y-2">
             <label className="text-xs uppercase tracking-wider text-muted-foreground font-medium">To</label>
-            <Select value={toUnit} onValueChange={(v) => { setToUnit(v); setLastEdited("from"); }}>
+            <Select
+              value={toUnit}
+              onValueChange={(v) => {
+                setToUnit(v);
+                setLastEdited("from");
+              }}
+            >
               <SelectTrigger className="h-12">
                 <SelectValue />
               </SelectTrigger>
@@ -620,7 +670,10 @@ function UnitConverterPage() {
               <Input
                 value={toValue}
                 inputMode="decimal"
-                onChange={(e) => { setToValue(e.target.value); setLastEdited("to"); }}
+                onChange={(e) => {
+                  setToValue(e.target.value);
+                  setLastEdited("to");
+                }}
                 className="h-14 text-3xl font-mono tabular-nums pr-12"
                 placeholder="0"
                 aria-label={`Value in ${toUnitDef.label}`}
@@ -633,7 +686,11 @@ function UnitConverterPage() {
                 aria-label="Copy result"
                 title="Copy result"
               >
-                {copied ? <Check className="w-4 h-4" style={{ color: "var(--green-brand)" }} /> : <Copy className="w-4 h-4" />}
+                {copied ? (
+                  <Check className="w-4 h-4" style={{ color: "var(--green-brand)" }} />
+                ) : (
+                  <Copy className="w-4 h-4" />
+                )}
               </button>
             </div>
           </div>
@@ -641,7 +698,9 @@ function UnitConverterPage() {
 
         {/* Quick conversions */}
         <div className="mt-7">
-          <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-3">Quick conversions</div>
+          <div className="text-xs uppercase tracking-wider text-muted-foreground font-medium mb-3">
+            Quick conversions
+          </div>
           <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
             {category.quick.map((q, i) => {
               const f = category.units.find((u) => u.id === q.from);
@@ -655,9 +714,13 @@ function UnitConverterPage() {
                   onClick={() => handleQuickChip(q)}
                   className="rounded-lg border border-border bg-background/50 px-3 py-2 text-left text-xs hover:border-[color:var(--cyan-brand)] hover:text-foreground transition-colors"
                 >
-                  <span className="text-foreground font-medium">{q.value} {f.symbol}</span>
+                  <span className="text-foreground font-medium">
+                    {q.value} {f.symbol}
+                  </span>
                   <span className="text-muted-foreground"> = </span>
-                  <span style={{ color: "var(--cyan-brand)" }}>{result} {t.symbol}</span>
+                  <span style={{ color: "var(--cyan-brand)" }}>
+                    {result} {t.symbol}
+                  </span>
                 </button>
               );
             })}
@@ -725,14 +788,45 @@ function UnitConverterPage() {
           "All conversions run in your browser. The URL updates automatically for bookmarking or sharing. Recent conversions are saved locally for quick access.",
         ]}
         faqs={[
-          { question: "How many unit categories are supported?", answer: "10 categories: Length, Weight/Mass, Temperature, Area, Volume, Speed, Time, Data Storage, Pressure, and Energy — covering 100+ units." },
-          { question: "How is temperature conversion different?", answer: "Temperature uses mathematical formulas not multipliers. Celsius to Fahrenheit is (°C × 9/5) + 32. Covers Celsius, Fahrenheit, Kelvin, and Rankine." },
-          { question: "What is the difference between KB and KiB?", answer: "KB = 1,000 bytes (SI standard). KiB = 1,024 bytes (binary standard used by operating systems). Both are included and clearly labeled." },
-          { question: "Can I convert in both directions?", answer: "Yes. Both FROM and TO fields are editable. Type in either and the other updates instantly. Use the swap button to flip units." },
-          { question: "Does the tool save recent conversions?", answer: "Yes. Last 5 conversions are saved in localStorage and shown in a Recent section for quick access." },
-          { question: "Can I share a specific conversion?", answer: "Yes. The URL updates with your current category, units, and value. Copy the URL to share or bookmark any conversion." },
-          { question: "Is the converter accurate?", answer: "Yes. Uses standardized scientific conversion factors, displays up to 8 significant digits, with scientific notation for very large/small numbers." },
-          { question: "Does this work on mobile?", answer: "Yes. Large touch targets, numeric keyboard, horizontal scrolling tabs — fully optimized for smartphones." },
+          {
+            question: "How many unit categories are supported?",
+            answer:
+              "10 categories: Length, Weight/Mass, Temperature, Area, Volume, Speed, Time, Data Storage, Pressure, and Energy — covering 100+ units.",
+          },
+          {
+            question: "How is temperature conversion different?",
+            answer:
+              "Temperature uses mathematical formulas not multipliers. Celsius to Fahrenheit is (°C × 9/5) + 32. Covers Celsius, Fahrenheit, Kelvin, and Rankine.",
+          },
+          {
+            question: "What is the difference between KB and KiB?",
+            answer:
+              "KB = 1,000 bytes (SI standard). KiB = 1,024 bytes (binary standard used by operating systems). Both are included and clearly labeled.",
+          },
+          {
+            question: "Can I convert in both directions?",
+            answer:
+              "Yes. Both FROM and TO fields are editable. Type in either and the other updates instantly. Use the swap button to flip units.",
+          },
+          {
+            question: "Does the tool save recent conversions?",
+            answer: "Yes. Last 5 conversions are saved in localStorage and shown in a Recent section for quick access.",
+          },
+          {
+            question: "Can I share a specific conversion?",
+            answer:
+              "Yes. The URL updates with your current category, units, and value. Copy the URL to share or bookmark any conversion.",
+          },
+          {
+            question: "Is the converter accurate?",
+            answer:
+              "Yes. Uses standardized scientific conversion factors, displays up to 8 significant digits, with scientific notation for very large/small numbers.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. Large touch targets, numeric keyboard, horizontal scrolling tabs — fully optimized for smartphones.",
+          },
         ]}
       />
 

@@ -34,6 +34,7 @@ import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-d
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
 import { Route as ToolsUuidGeneratorRouteImport } from './routes/tools.uuid-generator'
 import { Route as ToolsUrlEncoderRouteImport } from './routes/tools.url-encoder'
+import { Route as ToolsUnitConverterRouteImport } from './routes/tools.unit-converter'
 import { Route as ToolsTypingSpeedRouteImport } from './routes/tools.typing-speed'
 import { Route as ToolsTunnelDashRouteImport } from './routes/tools.tunnel-dash'
 import { Route as ToolsTruthOrDareRouteImport } from './routes/tools.truth-or-dare'
@@ -263,6 +264,11 @@ const ToolsUuidGeneratorRoute = ToolsUuidGeneratorRouteImport.update({
 const ToolsUrlEncoderRoute = ToolsUrlEncoderRouteImport.update({
   id: '/tools/url-encoder',
   path: '/tools/url-encoder',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsUnitConverterRoute = ToolsUnitConverterRouteImport.update({
+  id: '/tools/unit-converter',
+  path: '/tools/unit-converter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsTypingSpeedRoute = ToolsTypingSpeedRouteImport.update({
@@ -904,6 +910,7 @@ export interface FileRoutesByFullPath {
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/tunnel-dash': typeof ToolsTunnelDashRoute
   '/tools/typing-speed': typeof ToolsTypingSpeedRoute
+  '/tools/unit-converter': typeof ToolsUnitConverterRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -1035,6 +1042,7 @@ export interface FileRoutesByTo {
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/tunnel-dash': typeof ToolsTunnelDashRoute
   '/tools/typing-speed': typeof ToolsTypingSpeedRoute
+  '/tools/unit-converter': typeof ToolsUnitConverterRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -1167,6 +1175,7 @@ export interface FileRoutesById {
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
   '/tools/tunnel-dash': typeof ToolsTunnelDashRoute
   '/tools/typing-speed': typeof ToolsTypingSpeedRoute
+  '/tools/unit-converter': typeof ToolsUnitConverterRoute
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
@@ -1300,6 +1309,7 @@ export interface FileRouteTypes {
     | '/tools/truth-or-dare'
     | '/tools/tunnel-dash'
     | '/tools/typing-speed'
+    | '/tools/unit-converter'
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
@@ -1431,6 +1441,7 @@ export interface FileRouteTypes {
     | '/tools/truth-or-dare'
     | '/tools/tunnel-dash'
     | '/tools/typing-speed'
+    | '/tools/unit-converter'
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
@@ -1562,6 +1573,7 @@ export interface FileRouteTypes {
     | '/tools/truth-or-dare'
     | '/tools/tunnel-dash'
     | '/tools/typing-speed'
+    | '/tools/unit-converter'
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
@@ -1694,6 +1706,7 @@ export interface RootRouteChildren {
   ToolsTruthOrDareRoute: typeof ToolsTruthOrDareRoute
   ToolsTunnelDashRoute: typeof ToolsTunnelDashRoute
   ToolsTypingSpeedRoute: typeof ToolsTypingSpeedRoute
+  ToolsUnitConverterRoute: typeof ToolsUnitConverterRoute
   ToolsUrlEncoderRoute: typeof ToolsUrlEncoderRoute
   ToolsUuidGeneratorRoute: typeof ToolsUuidGeneratorRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
@@ -1890,6 +1903,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/url-encoder'
       fullPath: '/tools/url-encoder'
       preLoaderRoute: typeof ToolsUrlEncoderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/unit-converter': {
+      id: '/tools/unit-converter'
+      path: '/tools/unit-converter'
+      fullPath: '/tools/unit-converter'
+      preLoaderRoute: typeof ToolsUnitConverterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/typing-speed': {
@@ -2737,6 +2757,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsTruthOrDareRoute: ToolsTruthOrDareRoute,
   ToolsTunnelDashRoute: ToolsTunnelDashRoute,
   ToolsTypingSpeedRoute: ToolsTypingSpeedRoute,
+  ToolsUnitConverterRoute: ToolsUnitConverterRoute,
   ToolsUrlEncoderRoute: ToolsUrlEncoderRoute,
   ToolsUuidGeneratorRoute: ToolsUuidGeneratorRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,

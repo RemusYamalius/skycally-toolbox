@@ -9,6 +9,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import COUNTRIES from "@/data/countries.json";
@@ -114,15 +115,10 @@ function CountryInfo() {
         .join(", ")
     : "—";
 
-  const languages = country?.languages
-    ? Object.values(country.languages).join(", ")
-    : "—";
+  const languages = country?.languages ? Object.values(country.languages).join(", ") : "—";
 
   return (
-    <ToolPageShell
-      title="Country Info"
-      description="Explore facts, flags, and data for every country in the world."
-    >
+    <ToolPageShell title="Country Info" description="Explore facts, flags, and data for every country in the world.">
       <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3">
         <Input
           value={search}
@@ -137,9 +133,7 @@ function CountryInfo() {
       </form>
 
       <div className="mt-4 rounded-2xl border border-border bg-card/40 p-4">
-        <label className="text-xs text-muted-foreground mb-2 block">
-          Or pick from the full list
-        </label>
+        <label className="text-xs text-muted-foreground mb-2 block">Or pick from the full list</label>
         <Input
           value={query}
           onChange={(e) => setQuery(e.target.value)}
@@ -165,9 +159,7 @@ function CountryInfo() {
               <span>{c.name.common}</span>
             </button>
           ))}
-          {filtered.length === 0 && (
-            <p className="px-3 py-4 text-sm text-muted-foreground">No matches.</p>
-          )}
+          {filtered.length === 0 && <p className="px-3 py-4 text-sm text-muted-foreground">No matches.</p>}
         </div>
       </div>
 
@@ -195,9 +187,7 @@ function CountryInfo() {
               <h2 className="font-display text-3xl font-bold tracking-tight">
                 {country.flagEmoji} {country.name.common}
               </h2>
-              <p className="text-sm text-muted-foreground mt-1">
-                {country.name.official}
-              </p>
+              <p className="text-sm text-muted-foreground mt-1">{country.name.official}</p>
               {(country.region || country.subregion) && (
                 <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-3 py-1.5 text-xs text-muted-foreground">
                   <MapPin className="w-3.5 h-3.5" />
@@ -211,33 +201,19 @@ function CountryInfo() {
           <div className="mt-6 grid grid-cols-1 sm:grid-cols-2 gap-3">
             <InfoTile icon="🏛️" label="Capital" value={country.capital.join(", ") || "—"} />
             <InfoTile icon="👥" label="Population" value={formatNumber(country.population)} />
-            <InfoTile
-              icon="📐"
-              label="Area"
-              value={country.area ? `${formatNumber(country.area)} km²` : "—"}
-            />
+            <InfoTile icon="📐" label="Area" value={country.area ? `${formatNumber(country.area)} km²` : "—"} />
             <InfoTile icon="💰" label="Currency" value={currencies} />
             <InfoTile icon="🗣️" label="Languages" value={languages} />
-            <InfoTile
-              icon="🌐"
-              label="Top-Level Domain"
-              value={country.tld.join(", ") || "—"}
-            />
+            <InfoTile icon="🌐" label="Top-Level Domain" value={country.tld.join(", ") || "—"} />
             <InfoTile icon="📞" label="Calling Code" value={country.callingCode || "—"} />
             <InfoTile
               icon="🚗"
               label="Driving Side"
               value={
-                country.drivingSide
-                  ? country.drivingSide.charAt(0).toUpperCase() + country.drivingSide.slice(1)
-                  : "—"
+                country.drivingSide ? country.drivingSide.charAt(0).toUpperCase() + country.drivingSide.slice(1) : "—"
               }
             />
-            <InfoTile
-              icon="⏰"
-              label="Timezones"
-              value={country.timezones.join(", ") || "—"}
-            />
+            <InfoTile icon="⏰" label="Timezones" value={country.timezones.join(", ") || "—"} />
             <InfoTile
               icon="🗺️"
               label="Google Maps"
@@ -269,12 +245,7 @@ function CountryInfo() {
                     className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1.5 text-xs hover:bg-secondary/60 transition-colors"
                   >
                     {b.flagSvg && (
-                      <img
-                        src={b.flagSvg}
-                        alt=""
-                        loading="lazy"
-                        className="w-4 h-3 object-cover rounded-sm"
-                      />
+                      <img src={b.flagSvg} alt="" loading="lazy" className="w-4 h-3 object-cover rounded-sm" />
                     )}
                     {b.name.common}
                   </button>
@@ -285,42 +256,65 @@ function CountryInfo() {
         </motion.div>
       )}
 
+      <AdZone id="country-info-bottom" size="728x90" />
+
       <HowToUse
         steps={[
-          "Type a country name in the search box, or pick one from the dropdown list.",
-          "The country's full profile loads instantly — flag, capital, population, currency and more.",
-          "Click any bordering country chip to instantly explore its neighbors.",
+          "Type a country name in the search box, or pick one from the full list below.",
+          "The country's profile loads instantly — flag, capital, population, currency, languages, and more.",
+          "Click any bordering country chip to jump to that country's profile instantly.",
         ]}
       />
 
       <ToolSeoContent
-        title="Country Info — Free Country Facts and Data Lookup"
-        description="Instant facts, flags, and data for every country in the world. Free, no signup, runs in your browser."
+        title="Country Info — Free Country Facts, Flags & Data for Every Nation"
+        description="Explore facts, flags, and data for all 250 countries and territories. Capital, population, currency, languages, calling code, timezones and more. Free, instant, no signup."
         body={[
-          "Country Info gives you instant access to facts about any of the 250 countries and territories recognized in the world. Type a country name or pick from the list and you immediately see the flag, capital, official name, population, area, currency, official languages, calling code, top-level domain, driving side, timezones, and a direct link to Google Maps — all on one clean card. Nothing is uploaded, nothing is stored, and no signup is required.",
-          "The entire dataset is bundled directly into the app, so every lookup is instant — no API calls, no loading spinners, and no risk of an outside service going down. The data is compiled from open public sources including the mledoze/countries project and other community-maintained references covering every UN member state and territory.",
-          "Country Info is useful for students researching world geography, travelers planning a trip, trivia and quiz players checking answers, language learners exploring official languages, and anyone simply curious about the world. The bordering-country chips also make it easy to hop between neighbors — pick one and you instantly land on its profile, perfect for exploring an entire region in just a few clicks.",
+          "Country Info gives you instant access to comprehensive facts about any of the 250 countries and territories in the world. Type a country name or pick from the alphabetically sorted full list, and you immediately see the flag, capital, official name, population, area, currency, official languages, calling code, top-level domain, driving side, timezones, and a direct link to Google Maps — all on one clean card.",
+          "The entire dataset is bundled directly into the app, so every lookup is instant — no API calls, no loading spinners, and no risk of an outside service going down. The data is compiled from open public sources including the mledoze/countries project and other community-maintained references, covering every UN member state and dependent territory.",
+          "Country Info is useful for students researching world geography, travelers planning a trip, trivia and quiz players checking answers, language learners exploring official languages, and anyone curious about the world. The bordering-country chips make it easy to hop between neighbors — click one and you instantly land on its profile, perfect for exploring an entire region in just a few clicks.",
+          "The tool supports instant filtering of the full country list — type a few letters and the list narrows to matching countries in real time. Both common names (Morocco) and partial matches (Mor) work. The flag images are loaded as SVG files directly from the dataset for crisp, high-resolution display at any screen size.",
         ]}
         faqs={[
           {
             question: "How many countries are available?",
             answer:
-              "All 250 countries and territories recognized internationally are available, including small island nations and territories.",
+              "All 250 countries and territories recognized internationally, including UN member states, dependent territories, and small island nations.",
           },
           {
             question: "Where does the data come from?",
             answer:
-              "Data is compiled from open public datasets (including mledoze/countries) and bundled directly with the app — no external API is used.",
+              "Data is compiled from open public datasets (including mledoze/countries) and bundled directly with the app — no external API is used, ensuring instant lookups with no downtime.",
           },
           {
             question: "Can I search in languages other than English?",
             answer:
-              "Currently search works best with English country names. Type the common English name for best results (e.g. \"Morocco\" not \"Maroc\").",
+              "Currently search works best with English country names. Type the common English name (e.g. 'Morocco' not 'Maroc') for best results.",
           },
           {
             question: "Is the population data up to date?",
             answer:
-              "Population figures reflect the most recent values from the bundled dataset. For real-time statistics, consult official national sources.",
+              "Population figures reflect the most recent values from the bundled dataset. For real-time census statistics, consult official national sources.",
+          },
+          {
+            question: "How do I find neighboring countries?",
+            answer:
+              "After selecting a country, scroll down to the Bordering Countries section. Click any neighbor chip to instantly jump to that country's profile.",
+          },
+          {
+            question: "Can I see the country on a map?",
+            answer:
+              "Yes. Each country profile includes a 'View on Maps' link that opens Google Maps centered on that country.",
+          },
+          {
+            question: "What information is shown for each country?",
+            answer:
+              "Flag, official and common name, capital, region, population, area, currency (with symbol), official languages, top-level domain, calling code, driving side, timezones, and bordering countries.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The country list and profile cards are fully responsive and optimized for smartphone browsing.",
           },
         ]}
       />
@@ -330,15 +324,7 @@ function CountryInfo() {
   );
 }
 
-function InfoTile({
-  icon,
-  label,
-  value,
-}: {
-  icon: string;
-  label: string;
-  value: React.ReactNode;
-}) {
+function InfoTile({ icon, label, value }: { icon: string; label: string; value: React.ReactNode }) {
   return (
     <div className="rounded-xl border border-border bg-background/40 p-3">
       <div className="flex items-center gap-1.5 text-xs text-muted-foreground">

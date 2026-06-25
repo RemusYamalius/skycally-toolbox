@@ -14,6 +14,7 @@ import { Button } from "@/components/ui/button";
 import { Popover, PopoverContent, PopoverTrigger } from "@/components/ui/popover";
 import { Command, CommandEmpty, CommandInput, CommandItem, CommandList } from "@/components/ui/command";
 import { cn } from "@/lib/utils";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -502,6 +503,8 @@ function CurrencyConverter() {
         <span className="text-xs text-muted-foreground shrink-0">Try it →</span>
       </Link>
 
+      <AdZone id="currency-converter-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Enter an amount and pick the currency you're converting from.",
@@ -511,12 +514,13 @@ function CurrencyConverter() {
       />
 
       <ToolSeoContent
-        title="Currency Converter — Free Live Exchange Rate Tool"
-        description="Convert any amount between 170+ world currencies using live exchange rates. Free, instant, no signup required."
+        title="Currency Converter — Free Live Exchange Rate Tool, 170+ Currencies"
+        description="Convert any amount between 170+ world currencies using live exchange rates. Free, instant, no signup required. Includes 7-day rate history chart."
         body={[
           "Convert any amount between 170+ world currencies using live exchange rates — free, instant, no signup required. Type the amount, select your currencies, and get the converted value along with the mid-market rate and its inverse in one click. Rates are updated every 24 hours from trusted financial data providers, making this tool ideal for quick reference checks throughout your day.",
           "The 7-day rate history chart lets you see how a currency pair has moved over the past week, giving you useful context before making decisions. Whether you are tracking USD to MAD, EUR to GBP, or any of 170+ pairs, the chart updates automatically with every conversion. Note that rates shown are mid-market reference rates — actual transfer rates from banks or services may include fees and spreads.",
           "From travellers checking hotel prices abroad to freelancers invoicing international clients and finance professionals monitoring currency exposure, the Currency Converter serves a wide range of daily needs. Everything runs in your browser — no data is logged, no account is needed, and no tracking occurs. Just clean, reliable numbers whenever you need them.",
+          "The Quick Conversions section at the bottom shows live rates for the six most popular currency pairs — USD/EUR, USD/GBP, USD/MAD, EUR/USD, GBP/USD, and USD/JPY — without needing to type anything. The internal link to the Satoshi Converter makes it easy to also convert Bitcoin and cryptocurrency units if needed.",
         ]}
         faqs={[
           {
@@ -542,6 +546,21 @@ function CurrencyConverter() {
           {
             question: "Do you store my conversion history?",
             answer: "No. All calculations happen in your browser. Nothing is logged or stored on our servers.",
+          },
+          {
+            question: "Why is MAD (Moroccan Dirham) in the Quick Conversions?",
+            answer:
+              "We built Skycally with North African users in mind — MAD is often missing from major converter tools. It's included by default to give Moroccan users a first-class experience.",
+          },
+          {
+            question: "Can I convert Bitcoin or Satoshi?",
+            answer:
+              "Yes — use the Satoshi Converter linked at the bottom of the page. It converts between BTC, Satoshi, mBTC, bits, USD, EUR, and MAD with live Bitcoin price.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The converter is fully responsive with touch-friendly currency dropdowns and a searchable currency list.",
           },
         ]}
       />

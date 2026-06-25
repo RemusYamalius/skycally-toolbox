@@ -1,7 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Thermometer, Droplets, Wind, CloudRain, Loader2, Search, Sun, Sunrise, Sunset, Wind as WindIcon } from "lucide-react";
+import {
+  Thermometer,
+  Droplets,
+  Wind,
+  CloudRain,
+  Loader2,
+  Search,
+  Sun,
+  Sunrise,
+  Sunset,
+  Wind as WindIcon,
+} from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -9,6 +20,7 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -301,16 +313,30 @@ function WeatherChecker() {
               {Math.round(data.current.temp)}°C
             </div>
             <div className="mt-3 flex items-center justify-center gap-2">
-              <span className="text-4xl leading-none" aria-hidden>{cur.emoji}</span>
+              <span className="text-4xl leading-none" aria-hidden>
+                {cur.emoji}
+              </span>
               <span className="text-base text-muted-foreground">{cur.label}</span>
             </div>
           </div>
 
           <div className="mt-6 grid grid-cols-2 gap-3">
-            <StatTile icon={<Thermometer className="w-4 h-4" />} label="Feels Like" value={`${Math.round(data.current.feels)}°C`} />
+            <StatTile
+              icon={<Thermometer className="w-4 h-4" />}
+              label="Feels Like"
+              value={`${Math.round(data.current.feels)}°C`}
+            />
             <StatTile icon={<Droplets className="w-4 h-4" />} label="Humidity" value={`${data.current.humidity}%`} />
-            <StatTile icon={<Wind className="w-4 h-4" />} label="Wind Speed" value={`${Math.round(data.current.wind)} km/h`} />
-            <StatTile icon={<CloudRain className="w-4 h-4" />} label="Precipitation" value={`${data.current.precip}%`} />
+            <StatTile
+              icon={<Wind className="w-4 h-4" />}
+              label="Wind Speed"
+              value={`${Math.round(data.current.wind)} km/h`}
+            />
+            <StatTile
+              icon={<CloudRain className="w-4 h-4" />}
+              label="Precipitation"
+              value={`${data.current.precip}%`}
+            />
             <StatTile
               icon={<Sunrise className="w-4 h-4" />}
               label="Sunrise"
@@ -344,14 +370,13 @@ function WeatherChecker() {
             {data.hourly.map((h, i) => {
               const info = wmoInfo(h.code);
               return (
-                <div
-                  key={h.time}
-                  className="shrink-0 w-20 rounded-xl border border-border bg-card/40 p-3 text-center"
-                >
+                <div key={h.time} className="shrink-0 w-20 rounded-xl border border-border bg-card/40 p-3 text-center">
                   <div className="text-xs text-muted-foreground">
                     {i === 0 ? "Now" : formatTimeInTz(h.time, data.timezone)}
                   </div>
-                  <div className="text-2xl my-1.5" aria-hidden>{info.emoji}</div>
+                  <div className="text-2xl my-1.5" aria-hidden>
+                    {info.emoji}
+                  </div>
                   <div className="text-sm font-medium">{Math.round(h.temp)}°</div>
                   <div className="mt-1 text-[10px] text-muted-foreground inline-flex items-center gap-1">
                     <CloudRain className="w-3 h-3" /> {h.precip}%
@@ -370,12 +395,11 @@ function WeatherChecker() {
             {data.daily.map((d, i) => {
               const info = wmoInfo(d.code);
               return (
-                <div
-                  key={d.date}
-                  className="shrink-0 w-32 rounded-xl border border-border bg-card/40 p-3 text-center"
-                >
+                <div key={d.date} className="shrink-0 w-32 rounded-xl border border-border bg-card/40 p-3 text-center">
                   <div className="text-xs text-muted-foreground">{i === 0 ? "Today" : weekday(d.date)}</div>
-                  <div className="text-3xl my-2" aria-hidden>{info.emoji}</div>
+                  <div className="text-3xl my-2" aria-hidden>
+                    {info.emoji}
+                  </div>
                   <div className="text-sm font-medium">
                     {Math.round(d.max)}° / <span className="text-muted-foreground">{Math.round(d.min)}°</span>
                   </div>
@@ -402,42 +426,65 @@ function WeatherChecker() {
         </section>
       )}
 
+      <AdZone id="weather-checker-bottom" size="728x90" />
+
       <HowToUse
         steps={[
-          "Type any city name in the search box (or allow location access for your area).",
-          "Click Check Weather to fetch current conditions, 24-hour and 7-day forecasts.",
-          "Review temperature, UV index, air quality, sunrise/sunset and the city map instantly.",
+          "Type any city name in the search box (or allow location access for your current area).",
+          "Click Check Weather to fetch current conditions, 24-hour forecast, 7-day outlook, UV index and air quality.",
+          "Review all data including sunrise/sunset times and the interactive city map below.",
         ]}
       />
 
       <ToolSeoContent
-        title="Weather Checker — Free Live Forecast, UV Index & Air Quality"
-        description="Check the current weather, 24-hour forecast, 7-day outlook, UV index, air quality and sunrise/sunset times for any city. Free, instant, runs entirely in your browser."
+        title="Weather Checker — Free Live Forecast, UV Index & Air Quality for Any City"
+        description="Check live weather conditions, 24-hour forecast, 7-day outlook, UV index, air quality, and sunrise/sunset times for any city worldwide. Free, instant, no signup required."
         body={[
-          "Weather Checker is a free weather checker no signup tool powered by the Open-Meteo API. Type any city and you instantly see live conditions, an hourly weather forecast free for the next 24 hours, and a 7-day outlook. There is no API key, no app to install, and nothing to register — results appear in your browser in under a second.",
-          "Beyond temperature and wind, the tool doubles as a uv index checker free of charge and an air quality index online dashboard. Each search returns today's max UV with a color-coded risk level (Low → Extreme) and the European AQI with a Good → Extremely Poor scale, so you can decide when to apply sunscreen, open the windows, or keep an N95 handy.",
-          "Sunrise sunset times are shown in the city's local timezone, alongside humidity, precipitation probability, feels-like temperature and an OpenStreetMap map of the location. Privacy is built in: we do not store searches, IP addresses, or geolocation. If you grant location permission, your coordinates are used only once to fetch the forecast from Open-Meteo (which aggregates NOAA, ECMWF and 15+ national weather services).",
+          "Skycally's Weather Checker is a free, no-signup weather tool powered by the Open-Meteo API. Type any city and instantly see live conditions, a 24-hour hourly forecast, and a 7-day daily outlook — all loading in under a second with no API key or account required. The tool auto-detects your location on first load for immediate local weather.",
+          "Beyond basic temperature and wind speed, the tool includes a UV Index checker with color-coded risk levels (Low through Extreme) and a European Air Quality Index showing Good through Extremely Poor ratings. Sunrise and sunset times display in the city's local timezone, alongside humidity, precipitation probability, and feels-like temperature — everything you need to plan your day.",
+          "Weather data comes from Open-Meteo, which aggregates forecasts from NOAA, ECMWF, and 15+ national meteorological services worldwide. Accuracy is comparable to major weather apps. An interactive OpenStreetMap view pins the searched city, providing geographic context alongside the weather data. Privacy is built in — no searches, IP addresses, or location data are stored or logged.",
+          "The 24-hour hourly cards scroll horizontally on both mobile and desktop, showing weather emoji, temperature, and precipitation probability for each hour ahead. The 7-day forecast cards display high/low temperatures, weather conditions, and precipitation probability for each day — giving you a complete picture from now through the week.",
         ]}
         faqs={[
           {
             question: "How accurate is the weather data?",
             answer:
-              "Data comes from Open-Meteo, which aggregates models from NOAA, ECMWF, and 15+ national weather services. Accuracy is comparable to major weather apps.",
+              "Data comes from Open-Meteo, which aggregates models from NOAA, ECMWF, and 15+ national weather services. Accuracy is comparable to major weather apps like Weather.com and AccuWeather.",
           },
           {
             question: "Which cities are supported?",
             answer:
-              "Any city or town worldwide with a population above a few thousand. Simply type the city name and the tool will find it automatically.",
+              "Any city or town worldwide with a population above a few thousand. Type the city name in English and the geocoding API will find it automatically.",
           },
           {
             question: "Is the forecast updated in real time?",
             answer:
-              "Yes. Every time you search, a fresh request is sent to Open-Meteo, which updates its models hourly.",
+              "Yes. Every search sends a fresh request to Open-Meteo, which updates its models hourly from live weather station data.",
           },
           {
-            question: "Do you store my location or search data?",
+            question: "Do you store my location or search history?",
             answer:
-              "No. Your city search and location (if you grant permission) are only used to fetch weather data. Nothing is stored or logged.",
+              "No. Your city search and location (if granted) are used only to fetch weather data from Open-Meteo. Nothing is stored or logged on our servers.",
+          },
+          {
+            question: "What is the UV Index?",
+            answer:
+              "The UV Index measures ultraviolet radiation intensity: 0–2 Low (safe), 3–5 Moderate (sunscreen recommended), 6–7 High (protection essential), 8–10 Very High, 11+ Extreme (avoid outdoor exposure). The calculator shows today's maximum UV.",
+          },
+          {
+            question: "What is the Air Quality Index (AQI)?",
+            answer:
+              "The European AQI shown here rates air quality on a scale: 0–20 Good, 21–40 Fair, 41–60 Moderate, 61–80 Poor, 81–100 Very Poor, 100+ Extremely Poor. Higher values indicate more air pollutants that may affect health.",
+          },
+          {
+            question: "Why does the tool show London by default?",
+            answer:
+              "London is the fallback city used when location permission is denied or unavailable. Type any city name and press Check Weather to see your preferred location.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The tool is fully responsive with touch-friendly scrolling for the hourly forecast cards. Location detection works on mobile browsers that support the Geolocation API.",
           },
         ]}
       />

@@ -9,13 +9,8 @@ import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -141,9 +136,7 @@ function HolidayChecker() {
   const filteredCountries = useMemo(() => {
     const q = query.trim().toLowerCase();
     if (!q) return countries;
-    return countries.filter(
-      (c) => c.name.toLowerCase().includes(q) || c.countryCode.toLowerCase().includes(q),
-    );
+    return countries.filter((c) => c.name.toLowerCase().includes(q) || c.countryCode.toLowerCase().includes(q));
   }, [countries, query]);
 
   const today = todayISO();
@@ -153,17 +146,10 @@ function HolidayChecker() {
   }, [holidays, today]);
 
   return (
-    <ToolPageShell
-      title="Holiday Checker"
-      description="Find all public holidays for any country — instantly."
-    >
+    <ToolPageShell title="Holiday Checker" description="Find all public holidays for any country — instantly.">
       <form onSubmit={onSubmit} className="grid gap-3 sm:grid-cols-[1fr_auto_auto]">
         <div className="flex flex-col gap-2">
-          <Input
-            value={query}
-            onChange={(e) => setQuery(e.target.value)}
-            placeholder="Search a country…"
-          />
+          <Input value={query} onChange={(e) => setQuery(e.target.value)} placeholder="Search a country…" />
           <Select value={countryCode} onValueChange={setCountryCode}>
             <SelectTrigger>
               <SelectValue placeholder="Select a country" />
@@ -239,7 +225,10 @@ function HolidayChecker() {
                 borderColor: "color-mix(in oklab, var(--cyan-brand) 40%, transparent)",
               }}
             >
-              <div className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wide font-semibold" style={{ color: "var(--cyan-brand)" }}>
+              <div
+                className="inline-flex items-center gap-1.5 text-xs uppercase tracking-wide font-semibold"
+                style={{ color: "var(--cyan-brand)" }}
+              >
                 <Sparkles className="w-3.5 h-3.5" /> Next holiday
               </div>
               <div className="mt-2 font-display text-2xl font-bold">{nextHoliday.localName}</div>
@@ -272,18 +261,14 @@ function HolidayChecker() {
                     key={h.date + h.name}
                     className={`grid grid-cols-[110px_120px_1fr_100px] gap-3 px-4 py-3 text-sm items-center ${isPast ? "opacity-50" : ""}`}
                     style={
-                      isNext
-                        ? { background: "color-mix(in oklab, var(--cyan-brand) 10%, transparent)" }
-                        : undefined
+                      isNext ? { background: "color-mix(in oklab, var(--cyan-brand) 10%, transparent)" } : undefined
                     }
                   >
                     <div className="font-mono text-xs">{h.date}</div>
                     <div className="hidden sm:block text-muted-foreground">{weekday(h.date)}</div>
                     <div className="font-medium">
                       {h.localName}
-                      {h.localName !== h.name && (
-                        <span className="ml-2 text-xs text-muted-foreground">({h.name})</span>
-                      )}
+                      {h.localName !== h.name && <span className="ml-2 text-xs text-muted-foreground">({h.name})</span>}
                     </div>
                     <div className="text-right">
                       <span className="inline-flex items-center rounded-full border border-border bg-background/40 px-2 py-0.5 text-xs text-muted-foreground">
@@ -301,42 +286,65 @@ function HolidayChecker() {
         </motion.div>
       )}
 
+      <AdZone id="holiday-checker-bottom" size="728x90" />
+
       <HowToUse
         steps={[
-          "Pick a country from the dropdown (use the search box to filter).",
-          "Choose a year — 2025 or 2026.",
-          "Click Check Holidays to see the full list and the next upcoming holiday.",
+          "Search for a country using the search box, then select it from the dropdown.",
+          "Choose the year (2025 or 2026) and click Check Holidays.",
+          "See the full holiday list with the next upcoming holiday highlighted at the top.",
         ]}
       />
 
       <ToolSeoContent
-        title="Public Holiday Checker — National Holidays for Every Country"
-        description="Find official public holidays for any country in 2025 and 2026. Free, instant, and runs entirely in your browser."
+        title="Public Holiday Checker — National Holidays for Any Country, 2025 & 2026"
+        description="Find official public holidays for any country in 2025 and 2026. See the next upcoming holiday, full calendar, and days remaining. Free, instant, no signup required."
         body={[
-          "Holiday Checker is a free online tool that lets you look up every official public holiday for any country, so you can plan trips, schedule meetings, organise events, or simply know when the next long weekend is coming. Just pick a country and a year and you instantly get the full list of national observances with dates, weekdays, and the next upcoming holiday highlighted.",
-          "The data is powered by the Nager.Date API, an open project that aggregates official holiday information for more than 100 countries — including all major nations in Europe, the Americas, Asia, Africa, and Oceania. Holiday lists are sourced from each country's official government calendars and refreshed every year, so you always see accurate, up-to-date national and public holidays.",
-          "Privacy is built in. We do not store your country selection, your queries, or any other data. Every request goes directly from your browser to the Nager.Date API — there is no backend on our side and no API key required from you. It is a fully client-side tool that runs the moment you open the page.",
+          "Holiday Checker is a free online tool that lets you look up every official public holiday for any country, so you can plan trips, schedule international meetings, organize events, or simply know when the next long weekend is coming. Pick a country and a year and you instantly get the complete list of national observances with dates, weekdays, and the next upcoming holiday highlighted in a prominent card.",
+          "The data is powered by the Nager.Date API, an open project that aggregates official holiday information for more than 100 countries — including all major nations in Europe, the Americas, Asia, Africa, and Oceania. Holiday lists are sourced from each country's official government calendars and updated every year, so you always see accurate national and public holidays.",
+          "The next upcoming holiday card shows not only the holiday name and date, but also exactly how many days remain — 'Tomorrow', 'in 3 days', 'in 47 days' — making it easy to plan ahead. Past holidays in the full list appear slightly dimmed so you can quickly focus on what's still to come.",
+          "Privacy is built in. No country selections, queries, or session data are stored on our servers. Every request goes directly from your browser to the Nager.Date API — there is no backend on our side, no API key required, and no tracking of any kind. The tool loads and responds instantly on every device.",
         ]}
         faqs={[
           {
             question: "How many countries are supported?",
             answer:
-              "Over 100 countries are supported, including all major nations. The list is sourced directly from the Nager.Date API and updated regularly.",
+              "Over 100 countries are supported, including all major nations. The list is sourced directly from the Nager.Date API and updated annually.",
           },
           {
             question: "Is the holiday data official?",
             answer:
-              "Yes. Nager.Date aggregates data from official government sources for each country, covering national and public holidays.",
+              "Yes. Nager.Date aggregates data from official government sources for each country, covering national and public holidays recognized by law.",
           },
           {
             question: "Can I check holidays for next year?",
             answer:
-              "Yes. Use the year selector to switch between 2025 and 2026.",
+              "Yes. Use the year selector to switch between 2025 and 2026. Both years are available for all supported countries.",
           },
           {
             question: "Do you store my searches?",
             answer:
               "No. Every request goes directly from your browser to the Nager.Date API. Nothing is logged or stored on our servers.",
+          },
+          {
+            question: "How do I find the next holiday from today?",
+            answer:
+              "After fetching holidays, the next upcoming holiday is automatically highlighted in a cyan card at the top of the results, showing the name, date, and exact number of days remaining.",
+          },
+          {
+            question: "Are regional holidays included?",
+            answer:
+              "The API includes both national (global) holidays and some regional/state holidays. The 'Type' badge in the list indicates whether a holiday is national or regional.",
+          },
+          {
+            question: "Why is my country not in the list?",
+            answer:
+              "The tool includes 100+ countries from the Nager.Date API. Some smaller countries and territories may not be covered. The API is updated regularly as new countries are added.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The holiday table is responsive with a compact layout optimized for smartphones, and the search and dropdown controls are touch-friendly.",
           },
         ]}
       />

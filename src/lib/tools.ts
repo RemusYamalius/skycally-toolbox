@@ -148,6 +148,7 @@ export const tools: Tool[] = [
   { slug: "compound-interest", name: "Compound Interest Calculator", description: "Calculate how your investment grows over time with compound interest and monthly contributions.", category: "utility", icon: Calculator, path: "/tools/compound-interest" },
   { slug: "color-picker", name: "Color Picker", description: "Pick, convert, and generate color palettes. Supports HEX, RGB, HSL, HSB, CMYK. Includes harmony generator, contrast checker, gradient builder, and image color extractor.", category: "utility", icon: Pipette, path: "/tools/color-picker" },
   { slug: "satoshi-converter", name: "Satoshi Converter", description: "Convert between Bitcoin, Satoshi, mBTC, bits, USD, EUR and MAD instantly. Live BTC price updated every 60 seconds.", category: "utility", icon: Bitcoin, path: "/tools/satoshi-converter" },
+  { slug: "unit-converter", name: "Unit Converter", description: "Convert length, weight, temperature, area, volume, speed, time, data, pressure and energy units instantly.", category: "utility", icon: Ruler, path: "/tools/unit-converter" },
   { slug: "ball-sort", name: "Ball Sort Puzzle", description: "Sort colored balls into matching tubes. 30 free levels, mobile and desktop, no download.", category: "minigames", icon: CircleDot, path: "/tools/ball-sort" },
 ];
 

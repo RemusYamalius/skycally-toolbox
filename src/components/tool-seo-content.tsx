@@ -13,6 +13,27 @@ interface ToolSeoContentProps {
 export default function ToolSeoContent({ title, description, body, faqs }: ToolSeoContentProps) {
   return (
     <section className="max-w-2xl mx-auto mt-16 px-1 pb-4 border-t border-border pt-10">
+      {/* FAQPage JSON-LD Schema — enables rich snippets in Google */}
+      {faqs.length > 0 && (
+        <script
+          type="application/ld+json"
+          dangerouslySetInnerHTML={{
+            __html: JSON.stringify({
+              "@context": "https://schema.org",
+              "@type": "FAQPage",
+              mainEntity: faqs.map((faq) => ({
+                "@type": "Question",
+                name: faq.question,
+                acceptedAnswer: {
+                  "@type": "Answer",
+                  text: faq.answer,
+                },
+              })),
+            }),
+          }}
+        />
+      )}
+
       <h2 className="text-xl font-semibold text-foreground mb-3">{title}</h2>
       <p className="text-sm text-muted-foreground mb-6 leading-relaxed">{description}</p>
 

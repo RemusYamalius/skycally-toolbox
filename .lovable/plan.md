@@ -1,108 +1,110 @@
-## Ball Sort Puzzle — Implementation Plan
+## Unit Converter — Implementation Plan
 
-Build a premium Ball Sort Puzzle game at `/tools/ball-sort` with 30 solvable levels, polished visuals, Web Audio SFX, and full mobile/desktop support.
+Build a premium, SEO-optimized Unit Converter at `/tools/unit-converter` covering 10 categories and 100+ units, with deep linking, recent history, and instant bidirectional conversion.
 
 ### Files to change
 
 1. **`src/lib/tools.ts`** — register entry:
-   - `{ slug: "ball-sort", name: "Ball Sort Puzzle", description: "Sort colored balls into matching tubes. 30 free levels, mobile and desktop, no download.", category: "game", icon: CircleDot, path: "/tools/ball-sort" }`
-2. **`src/lib/related-tools.ts`** — map `ball-sort` → `["2048", "sudoku", "memory-match", "sliding-puzzle", "minesweeper"]`
-3. **`src/routes/tools.ball-sort.tsx`** — new route (single file)
+   - `{ slug: "unit-converter", name: "Unit Converter", description: "Convert length, weight, temperature, area, volume, speed, time, data, pressure and energy units instantly.", category: "utility", icon: Ruler, path: "/tools/unit-converter" }`
+2. **`src/lib/related-tools.ts`** — map `unit-converter` → `["currency-converter", "satoshi-converter", "color-picker", "qr-generator", "json-formatter"]` (subject to what exists)
+3. **`src/routes/tools.unit-converter.tsx`** — new route (single file)
 4. `src/routeTree.gen.ts` regenerates automatically.
 
 ### Route file structure
 
 ```tsx
-createFileRoute("/tools/ball-sort")({ head: buildToolMeta(toolBySlug("ball-sort")!), component: BallSortPage })
+createFileRoute("/tools/unit-converter")({
+  head: buildToolMeta(toolBySlug("unit-converter")!),
+  component: UnitConverterPage,
+})
 ```
 
-Wrap content in `<ToolPageShell title description>` followed by:
-- Game area
-- `<HowToUse steps={...} />`
-- `<ToolSeoContent ... 8 FAQs />`
-- `<RelatedTools currentSlug="ball-sort" />`
+Inside `<ToolPageShell title description>`:
+1. Converter card (category tabs → FROM/TO panel → quick chips → recent → formula)
+2. `<AdZone id="unit-converter-mid" size="728x90" />`
+3. `<HowToUse steps={...} />`
+4. `<ToolSeoContent ... 8 FAQs />` (exact copy from spec)
+5. `<RelatedTools currentSlug="unit-converter" />`
 
-### Level generation (static, pre-baked)
-
-- Tier config:
-  - L1–5: 5 tubes, 3 colors, 3 balls each (1 + 1 empty buffer = 2 empties)
-  - L6–15: 6 tubes, 4 colors, 4 balls each (2 empties)
-  - L16–25: 7 tubes, 5 colors, 4 balls each (2 empties)
-  - L26–30: 8 tubes, 6 colors, 4 balls each (2 empties)
-- **Reverse-solve generator**: start from solved state, perform N random *valid* reverse-moves (N scales with level: 15→80). Guarantees solvability. Seed RNG with level index so all clients see identical layouts. Store `optimalMoves` = floor(N * 0.6) heuristic OR just N for the star threshold baseline; thresholds: 3★ ≤ optimal, 2★ ≤ optimal+5, 1★ ≤ optimal+10.
-- Generated **once at module load** into a `const LEVELS: Level[]` array.
-
-### State (useReducer)
+### Data model
 
 ```ts
-type State = {
-  tubes: Color[][];           // current
-  selected: number | null;
-  moves: number;
-  history: Snapshot[];        // for undo
-  undosLeft: number;          // 3 per level
-  status: "playing" | "won";
-  shake: number | null;       // tube id flashing
-  hint: { from: number; to: number } | null;
-}
-type Action =
-  | { type: "select"; tube: number }
-  | { type: "undo" } | { type: "restart" } | { type: "hint" }
-  | { type: "loadLevel"; level: number } | { type: "clearShake" } | { type: "clearHint" };
+type CategoryId = "length" | "weight" | "temperature" | "area" | "volume"
+  | "speed" | "time" | "data" | "pressure" | "energy";
+
+interface Unit { id: string; label: string; symbol?: string; toBase?: number; }
+interface Category { id: CategoryId; label: string; icon: string; units: Unit[]; base?: string; quick: [string,string,number][]; formula?: string; }
 ```
 
-Move validation: source non-empty; dest empty OR (dest not full AND top colors match). Auto-deselect if same tube clicked again.
+All categories use `value * toBase[from] / toBase[to]` except **temperature**, which routes through a dedicated `convertTemperature(value, from, to)` using formulas via Celsius pivot (C↔F, C↔K, C↔R derived).
 
-### Visuals (dark premium)
+Static `CATEGORIES: Category[]` constant with all units listed in spec, plus 6–8 `quick` pairs per category (e.g. Length: `1 km → mi`, `1 mi → km`, `1 inch → cm`, `1 ft → cm`, `1 m → ft`, `1 yard → m`).
 
-- Page bg: radial gradient `from-[#0a0a1a] to-[#000008]`
-- Tube: `w-16 sm:w-20 h-64` rounded-b-[2rem] glass — `bg-white/5 backdrop-blur-md border border-white/15`
-- Selected tube: `shadow-[0_0_30px_rgba(0,212,255,0.6)] border-cyan-400`
-- Ball: 56px circle, `radial-gradient(circle at 30% 30%, light, dark)` per color, inner glossy white highlight overlay, drop-shadow
-- Layout: flex-wrap grid centered; mobile splits to 4+rest rows naturally via `flex-wrap justify-center gap-3`
-- Animations via **framer-motion** (already in project): `layout` for ball reposition, spring drop (`stiffness:400 damping:18`), lifted ball `y:-24`, shake variant `x: [0,-8,8,-8,8,0]`
-- Tube-complete: `motion.div` ring pulse + 8 CSS particle dots `animate-ping`
-- Level-complete overlay: full-screen `motion.div` with staggered star scale-in + "Next Level" CTA
+### State (useState)
 
-### Colors
+- `categoryId: CategoryId`
+- `fromUnit: string`, `toUnit: string`
+- `fromValue: string`, `toValue: string` (strings to allow `""`, `-`, etc.)
+- `lastEdited: "from" | "to"` — drives which side recomputes
+- `copied: boolean`
+- `recent: RecentEntry[]` (from localStorage `unit-converter-history`)
+- `formulaOpen: boolean`
 
-Inline gradient objects: cyan `#00D4FF→#0088AA`, purple `#A855F7→#6B21A8`, orange `#F97316→#C2410C`, green `#22C55E→#15803D`, pink `#EC4899→#9D174D`, yellow `#EAB308→#A16207`. Applied via `style={{ background: \`radial-gradient(...)\` }}`.
+Effect: whenever `categoryId`/`fromUnit`/`toUnit`/edited value changes, recompute the opposite side. URL sync via `window.history.replaceState` with `?cat=&from=&to=&val=`.
 
-### Web Audio SFX
+On initial mount, parse `window.location.search` to restore state (fallback defaults: length / meter / kilometer / 1).
 
-Local `useSound()` helper inside the file (NOT shared `src/lib/sound.ts` — needs custom envelopes). Lazy `AudioContext` on first user gesture. Six functions: `pick`, `place`, `tubeComplete`, `invalid`, `levelComplete` (arpeggio C4-E4-G4-C5), `click`. Reads `localStorage('ballsort.muted')`.
+### Formatting
+
+`formatResult(n)`:
+- If `!isFinite(n)` → "—"
+- If `abs(n) !== 0 && (abs(n) >= 1e10 || abs(n) < 1e-6)` → `n.toExponential(6)` trimmed
+- Else `Number(n.toPrecision(8)).toString()` (strips trailing zeros naturally)
+
+### Visuals (dark premium, matches Skycally)
+
+- Outer card: `bg-card border border-border rounded-2xl p-6`
+- **Category tabs**: `flex gap-2 overflow-x-auto sm:flex-wrap` — each pill `px-3 py-2 rounded-full border text-sm`; selected `bg-[color:var(--cyan-brand)]/15 border-[color:var(--cyan-brand)] text-foreground shadow-[0_0_20px_rgba(0,212,255,0.25)]`
+- **FROM/TO panels**: two grid cells (`grid sm:grid-cols-2 gap-4`) with shadcn `Select` (unit) and large `Input` (`text-3xl font-mono h-14`, `inputMode="decimal"`)
+- **Swap button** between panels: `rounded-full border w-12 h-12`, framer-motion `rotate: 180` on click toggle
+- **Result side**: cyan-tinted text + Copy button (`Check` icon for 1.5s after copy)
+- **Quick chips**: grid `grid-cols-2 sm:grid-cols-4 gap-2`; click fills FROM unit/value and TO unit
+- **Formula**: shadcn `Collapsible` "Show formula" — shows multiplier or temperature formula string
+- **Recent**: horizontal list, click to restore
 
 ### Controls
 
-- Click/tap tube → select; click another → attempt move. Click selected tube to deselect.
-- Keyboard 1–8 → select tube (`window.addEventListener('keydown')`)
-- 150ms debounce via `useRef<number>` timestamp guard
-- Min tube width 64px (mobile-safe tap target)
+- Both FROM and TO `Input` fields editable; typing in either updates the other
+- Swap button: exchanges units AND values, sets `lastEdited` accordingly
+- Tab order: from-unit → from-value → swap → to-unit → to-value → Copy
+- Copy button writes `"<val> <fromSymbol> = <result> <toSymbol>"`
 
-### UI Layout inside ToolPageShell
+### URL deep linking
 
-- Top bar inside the game card: `LEVEL X / 30` (glowing cyan), `Moves: N`, 3 stars preview filled by current move count vs thresholds
-- Tubes container centered
-- Bottom row: Undo (with 3 dots showing remaining), Restart, Hint, Level Select, Mute toggle
-- **Level Select**: modal/sheet with 30 bubbles — locked (🔒) past `maxUnlocked`, completed shows star count
+```
+/tools/unit-converter?cat=length&from=kilometer&to=mile&val=5
+```
 
-### localStorage keys
+`useEffect` syncs current state into URL via `replaceState` (no history pollution). Initial mount restores from `URLSearchParams`. Invalid params → fall back to defaults silently.
 
-- `ballsort.progress` → `{ currentLevel: number, maxUnlocked: number, bestMoves: Record<number, number>, stars: Record<number, 0|1|2|3> }`
-- `ballsort.muted` → `"0"|"1"`
+### localStorage
 
-### SEO content (exact)
+- `unit-converter-history` → JSON array of last 5 `{cat, from, to, val, result}` entries. Push on each value change with 600ms debounce; dedupe consecutive identical entries.
 
-`ToolSeoContent`:
-- title: "Ball Sort Puzzle — Free Online Color Sorting Game"
-- description: "Sort colored balls into tubes in this satisfying puzzle game. 30 levels from easy to expert. Free, no download, works on mobile and desktop."
-- body: 4 paragraphs (~150–200 words total) on the game, color-sorting genre appeal, brain training benefit, strategy tips
-- 8 FAQs: how to play, level count, win condition, undo limit, mobile support, hint use, tips for hard levels, data privacy
+### Mobile considerations
+
+- Min 48px tap targets; numeric keyboard via `inputMode="decimal"`
+- Category tabs horizontal scroll with `-mx-4 px-4` bleed
+- Quick chips wrap to 2 columns; FROM/TO panels stack vertically
+
+### SEO content
+
+Use exact `title`, `description`, `body` (4 paragraphs), and 8 FAQs from spec.
 
 ### Dependencies
 
-None new. Uses existing framer-motion, lucide-react, shadcn Button/Dialog, `createFileRoute`, `buildToolMeta`, `toolBySlug`, `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`.
+None new. Uses existing shadcn `Select`, `Input`, `Button`, `Collapsible`, framer-motion, lucide-react (`Ruler`, `ArrowDownUp`, `Copy`, `Check`, `ChevronDown`), `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`, `AdZone`, `buildToolMeta`, `toolBySlug`.
 
 ### Verification
 
-After build: open `/tools/ball-sort`, play L1 to win, check star rating + persistence, verify undo stack, keyboard 1–5, mute toggle, level select gating.
+After build: visit `/tools/unit-converter`, type in FROM, confirm TO updates; swap; switch category; click quick chip; verify URL params update; reload — state restored; verify copy; check mobile viewport.

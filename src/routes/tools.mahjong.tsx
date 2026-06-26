@@ -58,11 +58,11 @@ const FACES: Face[] = (() => {
   CHAR.forEach((g, i) => out.push({ id: `chr${i + 1}`, group: `chr${i + 1}`, glyph: g, label: `${i + 1} Character` }));
   // Winds: East 🀀, South 🀁, West 🀂, North 🀃
   ["🀀", "🀁", "🀂", "🀃"].forEach((g, i) =>
-    out.push({ id: `wind${i}`, group: `wind${i}`, glyph: g, label: ["East", "South", "West", "North"][i] + " Wind" })
+    out.push({ id: `wind${i}`, group: `wind${i}`, glyph: g, label: ["East", "South", "West", "North"][i] + " Wind" }),
   );
   // Dragons: Red 🀄, Green 🀅, White 🀆
   ["🀄", "🀅", "🀆"].forEach((g, i) =>
-    out.push({ id: `drag${i}`, group: `drag${i}`, glyph: g, label: ["Red", "Green", "White"][i] + " Dragon" })
+    out.push({ id: `drag${i}`, group: `drag${i}`, glyph: g, label: ["Red", "Green", "White"][i] + " Dragon" }),
   );
   return out;
 })();
@@ -384,7 +384,7 @@ function MahjongPage() {
         .filter((t) => !removed.has(t.key))
         .slice()
         .sort((a, b) => a.slot.z - b.slot.z || a.slot.y - b.slot.y || a.slot.x - b.slot.x),
-    [tiles, removed]
+    [tiles, removed],
   );
 
   const fmtTime = (s: number) => `${String(Math.floor(s / 60)).padStart(2, "0")}:${String(s % 60).padStart(2, "0")}`;
@@ -426,48 +426,47 @@ function MahjongPage() {
       {/* Board */}
       <div className="relative w-full rounded-2xl border border-border bg-card/40 p-2 sm:p-4">
         <div className="overflow-x-auto overflow-y-hidden -mx-2 sm:mx-0 px-2 sm:px-0">
-        <div className="relative mx-auto" style={{ width: boardW, height: boardH, minWidth: "min-content" }}>
-          {sortedTiles.map((t) => {
-            const free = isFree(t, alive);
-            const isSel = selected === t.key;
-            const isHint = hint.has(t.key);
-            const left =
-              (t.slot.x - bounds.minX) * TILE_W + t.slot.z * Z_OFFSET_X + 20;
-            const top =
-              (t.slot.y - bounds.minY) * TILE_H - t.slot.z * Z_OFFSET_Y + 20;
-            const zIndex = t.slot.z * 100 + t.slot.y * 10 + t.slot.x;
-            return (
-              <button
-                key={t.key}
-                onClick={() => onTileClick(t)}
-                disabled={!free}
-                className={`absolute select-none rounded-md border text-2xl flex items-center justify-center transition-colors ${
-                  isSel
-                    ? "border-cyan-400 ring-2 ring-cyan-400 bg-cyan-50"
-                    : isHint
-                      ? "border-amber-400 ring-2 ring-amber-400 bg-amber-50"
-                      : free
-                        ? "border-slate-300 bg-white hover:bg-cyan-50 cursor-pointer"
-                        : "border-slate-400 bg-slate-100 cursor-not-allowed opacity-90"
-                }`}
-                style={{
-                  left,
-                  top,
-                  width: TILE_W,
-                  height: TILE_H,
-                  zIndex,
-                  boxShadow: free
-                    ? "1px 1px 0 rgba(0,0,0,0.15), 2px 2px 4px rgba(0,0,0,0.2)"
-                    : "1px 1px 0 rgba(0,0,0,0.25)",
-                  color: t.face.group === "drag0" || t.face.group === "flower" ? "#dc2626" : "#0f172a",
-                }}
-                aria-label={t.face.label}
-                title={t.face.label}
-              >
-                <span style={{ fontSize: 26, lineHeight: 1 }}>{t.face.glyph}</span>
-              </button>
-            );
-          })}
+          <div className="relative mx-auto" style={{ width: boardW, height: boardH, minWidth: "min-content" }}>
+            {sortedTiles.map((t) => {
+              const free = isFree(t, alive);
+              const isSel = selected === t.key;
+              const isHint = hint.has(t.key);
+              const left = (t.slot.x - bounds.minX) * TILE_W + t.slot.z * Z_OFFSET_X + 20;
+              const top = (t.slot.y - bounds.minY) * TILE_H - t.slot.z * Z_OFFSET_Y + 20;
+              const zIndex = t.slot.z * 100 + t.slot.y * 10 + t.slot.x;
+              return (
+                <button
+                  key={t.key}
+                  onClick={() => onTileClick(t)}
+                  disabled={!free}
+                  className={`absolute select-none rounded-md border text-2xl flex items-center justify-center transition-colors ${
+                    isSel
+                      ? "border-cyan-400 ring-2 ring-cyan-400 bg-cyan-50"
+                      : isHint
+                        ? "border-amber-400 ring-2 ring-amber-400 bg-amber-50"
+                        : free
+                          ? "border-slate-300 bg-white hover:bg-cyan-50 cursor-pointer"
+                          : "border-slate-400 bg-slate-100 cursor-not-allowed opacity-90"
+                  }`}
+                  style={{
+                    left,
+                    top,
+                    width: TILE_W,
+                    height: TILE_H,
+                    zIndex,
+                    boxShadow: free
+                      ? "1px 1px 0 rgba(0,0,0,0.15), 2px 2px 4px rgba(0,0,0,0.2)"
+                      : "1px 1px 0 rgba(0,0,0,0.25)",
+                    color: t.face.group === "drag0" || t.face.group === "flower" ? "#dc2626" : "#0f172a",
+                  }}
+                  aria-label={t.face.label}
+                  title={t.face.label}
+                >
+                  <span style={{ fontSize: 26, lineHeight: 1 }}>{t.face.glyph}</span>
+                </button>
+              );
+            })}
+          </div>
         </div>
       </div>
 
@@ -496,9 +495,7 @@ function MahjongPage() {
           <div className="text-center">
             <AlertTriangle className="mx-auto h-10 w-10 text-amber-500" />
             <h3 className="mt-3 text-xl font-bold">No moves left</h3>
-            <p className="mt-1 text-sm text-muted-foreground">
-              Shuffle the remaining tiles or start a new game.
-            </p>
+            <p className="mt-1 text-sm text-muted-foreground">Shuffle the remaining tiles or start a new game.</p>
             <div className="mt-5 flex justify-center gap-2">
               <button
                 onClick={onShuffle}
@@ -537,14 +534,44 @@ function MahjongPage() {
           "The board scales responsively to fit any screen size, making it playable on smartphones as well as desktop. On mobile, the tile layout adjusts to ensure all tiles are visible and tappable without zooming. A hint button and shuffle option are available when you get stuck.",
         ]}
         faqs={[
-          { question: "How do I play Mahjong Solitaire?", answer: "Select two identical free tiles to remove them. A tile is free if nothing is stacked on top of it and at least one of its left or right sides is open. Clear all 144 tiles to win." },
-          { question: "What makes a tile free?", answer: "A tile is free (selectable) when no other tile is resting on top of it AND at least one of its horizontal sides (left or right) is not blocked by another tile." },
-          { question: "How do Flower and Season tiles work?", answer: "Any Flower tile matches any other Flower tile (they don't need to be identical). Same for Season tiles — any two Season tiles can be matched together." },
-          { question: "What if I get stuck?", answer: "Use the Hint button to highlight a valid pair. If no moves are available, use Shuffle to rearrange remaining tiles into a potentially solvable position." },
-          { question: "Is every deal winnable?", answer: "Not always — Mahjong Solitaire layouts can become unwinnable depending on move order. If you get stuck, shuffle or start a new game." },
-          { question: "How many tiles are there?", answer: "The classic layout uses 144 tiles arranged in a pyramid shape across multiple layers." },
-          { question: "Does this work on mobile?", answer: "Yes. The board scales to fit the screen with touch-friendly tile sizing. The layout adapts for portrait and landscape orientations." },
-          { question: "Can I undo a move?", answer: "Check the game controls — an undo button may be available to reverse the last pair removed." },
+          {
+            question: "How do I play Mahjong Solitaire?",
+            answer:
+              "Select two identical free tiles to remove them. A tile is free if nothing is stacked on top of it and at least one of its left or right sides is open. Clear all 144 tiles to win.",
+          },
+          {
+            question: "What makes a tile free?",
+            answer:
+              "A tile is free (selectable) when no other tile is resting on top of it AND at least one of its horizontal sides (left or right) is not blocked by another tile.",
+          },
+          {
+            question: "How do Flower and Season tiles work?",
+            answer:
+              "Any Flower tile matches any other Flower tile (they don't need to be identical). Same for Season tiles — any two Season tiles can be matched together.",
+          },
+          {
+            question: "What if I get stuck?",
+            answer:
+              "Use the Hint button to highlight a valid pair. If no moves are available, use Shuffle to rearrange remaining tiles into a potentially solvable position.",
+          },
+          {
+            question: "Is every deal winnable?",
+            answer:
+              "Not always — Mahjong Solitaire layouts can become unwinnable depending on move order. If you get stuck, shuffle or start a new game.",
+          },
+          {
+            question: "How many tiles are there?",
+            answer: "The classic layout uses 144 tiles arranged in a pyramid shape across multiple layers.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The board scales to fit the screen with touch-friendly tile sizing. The layout adapts for portrait and landscape orientations.",
+          },
+          {
+            question: "Can I undo a move?",
+            answer: "Check the game controls — an undo button may be available to reverse the last pair removed.",
+          },
         ]}
       />
 

@@ -7,6 +7,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -167,12 +168,7 @@ const getPieceMoves = (state: GameState, r: number, c: number): Move[] => {
         }
       }
       // en passant
-      if (
-        state.enPassant &&
-        state.enPassant[0] === tr &&
-        state.enPassant[1] === tc &&
-        !target
-      ) {
+      if (state.enPassant && state.enPassant[0] === tr && state.enPassant[1] === tc && !target) {
         push(tr, tc);
       }
     }
@@ -235,8 +231,7 @@ const getPieceMoves = (state: GameState, r: number, c: number): Move[] => {
   }
 
   // sliding
-  const dirs =
-    piece.type === "R" ? SLIDES.R : piece.type === "B" ? SLIDES.B : SLIDES.Q;
+  const dirs = piece.type === "R" ? SLIDES.R : piece.type === "B" ? SLIDES.B : SLIDES.Q;
   for (const [dr, dc] of dirs) {
     let tr = r + dr;
     let tc = c + dc;
@@ -255,12 +250,7 @@ const getPieceMoves = (state: GameState, r: number, c: number): Move[] => {
   return moves;
 };
 
-const isSquareAttacked = (
-  state: GameState,
-  r: number,
-  c: number,
-  by: Color,
-): boolean => {
+const isSquareAttacked = (state: GameState, r: number, c: number, by: Color): boolean => {
   const board = state.board;
   // pawn attacks
   const pdir = by === "w" ? 1 : -1; // attacking pawn comes from below if by white pieces? white pawns attack upward (dir=-1), so square r,c attacked by white pawn at r+1, c±1
@@ -531,13 +521,7 @@ const evaluate = (state: GameState): number => {
   return score;
 };
 
-const minimax = (
-  state: GameState,
-  depth: number,
-  alpha: number,
-  beta: number,
-  maximizing: boolean,
-): number => {
+const minimax = (state: GameState, depth: number, alpha: number, beta: number, maximizing: boolean): number => {
   if (depth === 0) return evaluate(state);
   const moves = getLegalMoves(state);
   if (moves.length === 0) {
@@ -550,13 +534,7 @@ const minimax = (
   if (maximizing) {
     let max = -Infinity;
     for (const move of moves) {
-      const val = minimax(
-        applyMove(state, move),
-        depth - 1,
-        alpha,
-        beta,
-        false,
-      );
+      const val = minimax(applyMove(state, move), depth - 1, alpha, beta, false);
       if (val > max) max = val;
       if (val > alpha) alpha = val;
       if (beta <= alpha) break;
@@ -565,13 +543,7 @@ const minimax = (
   } else {
     let min = Infinity;
     for (const move of moves) {
-      const val = minimax(
-        applyMove(state, move),
-        depth - 1,
-        alpha,
-        beta,
-        true,
-      );
+      const val = minimax(applyMove(state, move), depth - 1, alpha, beta, true);
       if (val < min) min = val;
       if (val < beta) beta = val;
       if (beta <= alpha) break;
@@ -606,6 +578,7 @@ function ChessPage() {
   const [selected, setSelected] = useState<[number, number] | null>(null);
   const [legalMoves, setLegalMoves] = useState<Move[]>([]);
   const [phase, setPhase] = useState<"idle" | "playing" | "ended">("idle");
+  const [humanSide, setHumanSide] = useState<"w" | "b">("w");
   const [result, setResult] = useState<"w" | "b" | "draw" | null>(null);
   const [aiThinkingState, setAiThinking] = useState(false);
   const [promotionPending, setPromotionPending] = useState<Move | null>(null);
@@ -614,10 +587,7 @@ function ChessPage() {
   const [lastMove, setLastMove] = useState<Move | null>(null);
   const aiThinking = useRef(false);
 
-  const allLegalForTurn = useMemo(
-    () => (phase === "playing" ? getLegalMoves(gameState) : []),
-    [gameState, phase],
-  );
+  const allLegalForTurn = useMemo(() => (phase === "playing" ? getLegalMoves(gameState) : []), [gameState, phase]);
 
   const resetAll = () => {
     setGameState(INIT_STATE());
@@ -682,12 +652,16 @@ function ChessPage() {
         else setCapturedB((prev) => [...prev, epPawn.type]);
       }
     } else if (captured) {
-      if (captured.color === "w")
-        setCapturedW((prev) => [...prev, captured.type]);
+      if (captured.color === "w") setCapturedW((prev) => [...prev, captured.type]);
       else setCapturedB((prev) => [...prev, captured.type]);
     }
     const newState = applyMove(gameState, move);
-    const wasCapture = !!captured || (piece?.type === "P" && !!gameState.enPassant && move.toR === gameState.enPassant[0] && move.toC === gameState.enPassant[1]);
+    const wasCapture =
+      !!captured ||
+      (piece?.type === "P" &&
+        !!gameState.enPassant &&
+        move.toR === gameState.enPassant[0] &&
+        move.toC === gameState.enPassant[1]);
     playMoveSound(gameState, move, wasCapture, "b");
     setGameState(newState);
     setLastMove(move);
@@ -698,8 +672,7 @@ function ChessPage() {
 
   // AI move effect
   useEffect(() => {
-    if (gameState.turn !== "b" || phase !== "playing" || aiThinking.current)
-      return;
+    if (gameState.turn === humanSide || phase !== "playing" || aiThinking.current) return;
     aiThinking.current = true;
     setAiThinking(true);
     const t = setTimeout(() => {
@@ -716,17 +689,20 @@ function ChessPage() {
         ) {
           const epPawn = gameState.board[move.fromR][move.toC];
           if (epPawn) {
-            if (epPawn.color === "w")
-              setCapturedW((prev) => [...prev, epPawn.type]);
+            if (epPawn.color === "w") setCapturedW((prev) => [...prev, epPawn.type]);
             else setCapturedB((prev) => [...prev, epPawn.type]);
           }
         } else if (captured) {
-          if (captured.color === "w")
-            setCapturedW((prev) => [...prev, captured.type]);
+          if (captured.color === "w") setCapturedW((prev) => [...prev, captured.type]);
           else setCapturedB((prev) => [...prev, captured.type]);
         }
         const newState = applyMove(gameState, move);
-        const wasCapture = !!captured || (piece?.type === "P" && !!gameState.enPassant && move.toR === gameState.enPassant[0] && move.toC === gameState.enPassant[1]);
+        const wasCapture =
+          !!captured ||
+          (piece?.type === "P" &&
+            !!gameState.enPassant &&
+            move.toR === gameState.enPassant[0] &&
+            move.toC === gameState.enPassant[1]);
         playMoveSound(gameState, move, wasCapture, "w");
         setGameState(newState);
         setLastMove(move);
@@ -740,8 +716,7 @@ function ChessPage() {
   }, [gameState, phase]);
 
   const handleCellClick = (r: number, c: number) => {
-    if (phase !== "playing" || gameState.turn !== "w" || aiThinkingState)
-      return;
+    if (phase !== "playing" || gameState.turn !== humanSide || aiThinkingState) return;
 
     if (selected) {
       const move = legalMoves.find((m) => m.toR === r && m.toC === c);
@@ -759,9 +734,7 @@ function ChessPage() {
     const piece = gameState.board[r][c];
     if (piece && piece.color === "w") {
       setSelected([r, c]);
-      setLegalMoves(
-        allLegalForTurn.filter((m) => m.fromR === r && m.fromC === c),
-      );
+      setLegalMoves(allLegalForTurn.filter((m) => m.fromR === r && m.fromC === c));
     } else {
       setSelected(null);
       setLegalMoves([]);
@@ -769,20 +742,17 @@ function ChessPage() {
   };
 
   const isLight = (r: number, c: number) => (r + c) % 2 === 0;
-  const isSelected = (r: number, c: number) =>
-    selected?.[0] === r && selected?.[1] === c;
-  const isLegalTarget = (r: number, c: number) =>
-    legalMoves.some((m) => m.toR === r && m.toC === c);
+  const isSelected = (r: number, c: number) => selected?.[0] === r && selected?.[1] === c;
+  const isLegalTarget = (r: number, c: number) => legalMoves.some((m) => m.toR === r && m.toC === c);
   const isLastMoveSq = (r: number, c: number) =>
-    !!lastMove &&
-    ((lastMove.fromR === r && lastMove.fromC === c) ||
-      (lastMove.toR === r && lastMove.toC === c));
+    !!lastMove && ((lastMove.fromR === r && lastMove.fromC === c) || (lastMove.toR === r && lastMove.toC === c));
 
   const inCheckNow = phase === "playing" && isInCheck(gameState, gameState.turn);
   const kingPos = inCheckNow ? findKing(gameState.board, gameState.turn) : null;
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Chess"
       description="Play chess against a smart AI opponent. Classic strategy game with full rules support!"
     >
@@ -817,7 +787,7 @@ function ChessPage() {
                     : result === "w"
                       ? "You win! 🎉"
                       : "AI wins!"
-                  : gameState.turn === "w"
+                  : gameState.turn === humanSide
                     ? "Your turn"
                     : "AI's turn"}
           </span>
@@ -838,8 +808,7 @@ function ChessPage() {
               const sel = isSelected(r, c);
               const legal = isLegalTarget(r, c);
               const last = isLastMoveSq(r, c);
-              const isCheckSq =
-                kingPos && kingPos[0] === r && kingPos[1] === c;
+              const isCheckSq = kingPos && kingPos[0] === r && kingPos[1] === c;
 
               return (
                 <div
@@ -853,9 +822,7 @@ function ChessPage() {
                     isCheckSq && "ring-4 ring-inset ring-red-500",
                   )}
                 >
-                  {legal && !piece && (
-                    <div className="w-1/3 h-1/3 rounded-full bg-black/25 pointer-events-none" />
-                  )}
+                  {legal && !piece && <div className="w-1/3 h-1/3 rounded-full bg-black/25 pointer-events-none" />}
                   {legal && piece && (
                     <div className="absolute inset-0 ring-4 ring-inset ring-black/35 pointer-events-none" />
                   )}
@@ -899,15 +866,32 @@ function ChessPage() {
 
         <div className="flex gap-2 mt-2">
           {phase === "idle" && (
-            <button
-              onClick={() => {
-                resetAll();
-                setPhase("playing");
-              }}
-              className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition"
-            >
-              Start Game
-            </button>
+            <div className="flex flex-col items-center gap-3">
+              <p className="text-sm font-medium text-muted-foreground">Play as:</p>
+              <div className="flex gap-2">
+                <button
+                  onClick={() => setHumanSide("w")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-bold transition-all ${humanSide === "w" ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-secondary"}`}
+                >
+                  ♙ White
+                </button>
+                <button
+                  onClick={() => setHumanSide("b")}
+                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-bold transition-all ${humanSide === "b" ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-secondary"}`}
+                >
+                  ♟ Black
+                </button>
+              </div>
+              <button
+                onClick={() => {
+                  resetAll();
+                  setPhase("playing");
+                }}
+                className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition"
+              >
+                Start Game
+              </button>
+            </div>
           )}
           {phase !== "idle" && (
             <button
@@ -951,15 +935,9 @@ function ChessPage() {
       {phase === "ended" && (
         <div className="fixed inset-0 z-50 bg-black/60 flex items-center justify-center p-4">
           <div className="bg-card rounded-3xl p-8 text-center border border-border max-w-sm w-full">
-            <p className="text-5xl mb-3">
-              {result === "w" ? "🎉" : result === "draw" ? "🤝" : "😔"}
-            </p>
+            <p className="text-5xl mb-3">{result === "w" ? "🎉" : result === "draw" ? "🤝" : "😔"}</p>
             <p className="text-2xl font-black text-foreground mb-1">
-              {result === "w"
-                ? "You Win!"
-                : result === "draw"
-                  ? "Draw!"
-                  : "AI Wins!"}
+              {result === "w" ? "You Win!" : result === "draw" ? "Draw!" : "AI Wins!"}
             </p>
             <p className="text-muted-foreground text-sm mb-6">
               {result === "w"
@@ -983,44 +961,67 @@ function ChessPage() {
 
       <HowToUse
         steps={[
-          "Click any of your pieces (white) to see its legal moves highlighted.",
+          "Choose to play as White or Black on the setup screen, then click Start Game.",
           "Click a highlighted square to move — dots show empty squares, rings show captures.",
           "Beat the AI by checkmating its king — good luck!",
         ]}
       />
 
-      <RelatedTools currentSlug="chess" />
+      <AdZone id="chess-bottom" size="728x90" />
 
       <ToolSeoContent
-        title="Chess — Free Online Chess Game vs AI"
-        description="Play chess online for free against a smart AI. Full chess rules including castling, en passant and pawn promotion. No sign-up needed!"
+        title="Free Chess Game Online — Play Chess Against AI in Your Browser"
+        description="Play chess against a smart AI opponent in your browser. Choose to play as White or Black. Full rules, legal move highlights, and pawn promotion. Free, no signup."
         body={[
-          "Chess is the timeless game of strategy where two players battle wits across a 64-square board. This free online version lets you play directly in your browser against a built-in AI opponent — no downloads, no account, no setup. Click one of your white pieces to see every legal move highlighted, then click a destination square to play it. The AI replies automatically as black, using a minimax engine with alpha-beta pruning and a positional evaluation to choose its move.",
-          "All standard rules are supported: castling on both sides, en passant captures, and pawn promotion with a choice between queen, rook, bishop, or knight. The game also detects checkmate, stalemate, and the 50-move rule automatically, so you always know when a game is over. Whether you're learning the basics or sharpening your tactics, this is a clean, fast way to play a full game of chess anytime.",
+          "Skycally's Chess lets you play a full game of chess against a built-in AI opponent, directly in your browser with no download or account required. Choose whether to play as White or Black before starting, then click any of your pieces to see every legal move highlighted — click a destination square to play. The AI responds automatically using a minimax engine with alpha-beta pruning and positional evaluation.",
+          "The game enforces all standard chess rules: castling (kingside and queenside), en passant captures, pawn promotion with a choice of queen, rook, bishop, or knight, and check and checkmate detection. Illegal moves are automatically prevented, so you can focus on strategy rather than rules. A check warning highlights when your king is under attack.",
+          "Choose your side at the start: White goes first by convention, while Black plays a reactive game responding to the AI's opening. When playing as Black, the board flips automatically so your pieces are always at the bottom — a standard orientation used in competitive chess. You can start a new game at any time using the New Game button.",
+          "Chess is one of the oldest and most played strategy games in the world, with a history spanning over 1,500 years. It develops critical thinking, pattern recognition, planning ahead, and tactical awareness. Whether you're a beginner learning the basics or an intermediate player looking for practice, this browser-based opponent provides a consistent, available challenge at any time.",
         ]}
         faqs={[
           {
-            question: "How strong is the AI opponent?",
+            question: "Can I choose to play as White or Black?",
             answer:
-              "The AI uses a minimax search with alpha-beta pruning and a material plus piece-square evaluation. It searches a few plies deep and plays a reasonable tactical game — strong enough to punish blunders but beatable with solid positional play.",
+              "Yes. Before starting, select White or Black using the color picker on the setup screen. When playing as Black, the board automatically flips so your pieces are at the bottom.",
+          },
+          {
+            question: "How strong is the AI?",
+            answer:
+              "The AI uses a minimax algorithm with alpha-beta pruning and positional evaluation — a solid intermediate-level opponent that plays legal, strategic moves. It's challenging for beginners and recreational for intermediate players.",
+          },
+          {
+            question: "Are all chess rules supported?",
+            answer:
+              "Yes. Castling (both kingside and queenside), en passant captures, pawn promotion, check detection, checkmate, and stalemate are all fully implemented.",
           },
           {
             question: "How do I castle?",
             answer:
-              "Click your king and then click two squares toward the rook on the side you want to castle. Castling is only offered when the king and rook have not moved, the squares between them are empty, and the king does not move through or into check.",
+              "Click the king and then click the rook's destination square (two squares toward the rook). Castling is only available if neither the king nor rook has moved and the squares between them are empty and not under attack.",
           },
           {
-            question: "What about pawn promotion?",
+            question: "How does pawn promotion work?",
             answer:
-              "When one of your pawns reaches the last rank, a small modal pops up letting you choose to promote it to a queen, rook, bishop, or knight. The AI promotes automatically to a queen.",
+              "When your pawn reaches the last rank, a promotion dialog appears. Select queen, rook, bishop, or knight. The queen is the strongest choice in almost all situations.",
           },
           {
             question: "How do I start a new game?",
             answer:
-              "Use the New Game button below the board at any time to reset the position and start fresh. The same button appears on the game-over overlay after a win, loss, or draw.",
+              "Click the New Game button below the board at any time. This also lets you switch sides between games.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The board is touch-friendly and scales to fit any screen size. Tap a piece to select it and tap the destination square to move.",
+          },
+          {
+            question: "Can I undo a move?",
+            answer:
+              "Currently there is no undo feature — each move is final. Start a new game if you want to try a different approach.",
           },
         ]}
       />
+      <RelatedTools currentSlug="chess" />
     </ToolPageShell>
   );
 }

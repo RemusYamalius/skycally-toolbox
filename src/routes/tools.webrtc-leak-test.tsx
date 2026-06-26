@@ -145,9 +145,7 @@ function InfoCard({
         <Icon className="w-4 h-4" style={{ color: accent }} />
         {label}
       </div>
-      <div className="mt-3 text-lg font-display font-semibold tabular-nums break-words text-foreground">
-        {children}
-      </div>
+      <div className="mt-3 text-lg font-display font-semibold tabular-nums break-words text-foreground">{children}</div>
     </motion.div>
   );
 }
@@ -255,9 +253,7 @@ function WebrtcLeakTestPage() {
             <span className="text-muted-foreground text-base">None detected</span>
           )}
           {!loading && localIps.length > 0 && (
-            <div className="mt-2 text-xs font-normal text-muted-foreground">
-              Local: {localIps.join(", ")}
-            </div>
+            <div className="mt-2 text-xs font-normal text-muted-foreground">Local: {localIps.join(", ")}</div>
           )}
         </InfoCard>
 
@@ -278,6 +274,8 @@ function WebrtcLeakTestPage() {
         </InfoCard>
       </div>
 
+      <AdZone id="webrtc-leak-test-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "We automatically run the WebRTC leak test as soon as the page loads.",
@@ -287,33 +285,54 @@ function WebrtcLeakTestPage() {
       />
 
       <ToolSeoContent
-        title="Free WebRTC Leak Test — Check if Your VPN Is Leaking Your IP"
-        description="Instantly check if WebRTC is exposing your real IP address behind a VPN or proxy. Free, private and runs entirely in your browser."
+        title="Free WebRTC Leak Test — Check if Your VPN Leaks Your Real IP"
+        description="Test if your VPN or browser is leaking your real IP address through WebRTC. Instant browser-based WebRTC leak detection. Free, no signup required."
         body={[
-          "A WebRTC leak happens when your browser's real-time communication APIs reveal your real public IP address — even when you're connected to a VPN or proxy. Because WebRTC uses STUN servers to discover network paths, it can bypass your VPN tunnel and expose the underlying IP that your VPN was meant to hide. Our free WebRTC Leak Test detects this in seconds.",
-          "The tool fetches your visible public IP from ipify and then uses the browser's RTCPeerConnection API with a public STUN server to discover any IPs your browser would expose to a remote peer. It then compares the two: if they match, you're safe; if WebRTC reveals a different public IP, you have a leak and your real address is being exposed.",
-          "Everything runs entirely in your browser. No IPs, results, or test data are sent to or stored on our servers. To fix a WebRTC leak you can disable WebRTC via a browser extension, use a VPN that explicitly blocks WebRTC, or switch to a browser that lets you turn it off in settings.",
+          "Skycally's WebRTC Leak Test checks whether your browser is revealing your real IP address through the WebRTC protocol — a common security vulnerability that can expose your true location even when using a VPN. The test detects both your public IP and any local network IPs that WebRTC may be leaking to websites.",
+          "WebRTC (Web Real-Time Communication) is a browser technology used for video calls, voice chat, and peer-to-peer file sharing. It requires knowing the actual IP addresses of both parties to establish a direct connection. This means your browser may reveal your real IP to websites through WebRTC even when your VPN masks it at the network level.",
+          "A WebRTC leak is particularly dangerous for VPN users who rely on location privacy. A website can use JavaScript to trigger a WebRTC connection attempt, which forces your browser to reveal all its network interfaces — including your real public IP and local network IPs. Many popular VPN apps fail to prevent this.",
+          "If this test shows your real IP address while connected to a VPN, your VPN has a WebRTC leak. Solutions include using a VPN that blocks WebRTC leaks, disabling WebRTC in your browser settings, installing a browser extension that blocks WebRTC, or switching to a browser with better privacy defaults such as Firefox or Brave.",
         ]}
         faqs={[
           {
             question: "What is a WebRTC leak?",
             answer:
-              "It's when your browser's WebRTC APIs expose your real public IP address to websites, even though you're connected to a VPN or proxy that should hide it.",
-          },
-          {
-            question: "How do you detect a WebRTC leak?",
-            answer:
-              "We use the browser's RTCPeerConnection API with a public STUN server to discover IP candidates, then compare them against your visible public IP from ipify. If they differ, WebRTC is leaking.",
-          },
-          {
-            question: "Is this WebRTC leak test private?",
-            answer:
-              "Yes. The test runs entirely in your browser. We do not log, store, or share your IP address or test results on our servers.",
+              "A WebRTC leak occurs when your browser reveals your real IP address through the WebRTC protocol, even when connected to a VPN. Websites can use JavaScript to detect these IPs without your knowledge.",
           },
           {
             question: "How do I fix a WebRTC leak?",
             answer:
-              "Use a VPN that blocks WebRTC, install a browser extension that disables WebRTC, or switch to a browser like Brave or Firefox where WebRTC can be disabled in settings.",
+              "Use a VPN that blocks WebRTC leaks, disable WebRTC in your browser settings, or install a browser extension like uBlock Origin with WebRTC blocking enabled. Firefox and Brave have stronger WebRTC privacy defaults.",
+          },
+          {
+            question: "Does every VPN prevent WebRTC leaks?",
+            answer:
+              "No. Many VPNs fail to block WebRTC leaks. If this test shows your real IP while connected to a VPN, your VPN is not protecting you from WebRTC exposure.",
+          },
+          {
+            question: "What is my local IP?",
+            answer:
+              "Your local IP (e.g. 192.168.1.x) is your address on your local network assigned by your router. WebRTC can reveal this alongside your public IP, which can help identify your network even when your public IP is masked.",
+          },
+          {
+            question: "Is WebRTC dangerous?",
+            answer:
+              "WebRTC itself is not dangerous — it enables useful features like video calls. The privacy risk comes from websites using it to detect your real IP. The risk is highest for VPN users relying on location privacy.",
+          },
+          {
+            question: "How do I disable WebRTC in Chrome?",
+            answer:
+              "Chrome does not have a built-in toggle to disable WebRTC. Use an extension like uBlock Origin with WebRTC blocking enabled, or switch to Firefox and set media.peerconnection.enabled to false in about:config.",
+          },
+          {
+            question: "What browsers are safest against WebRTC leaks?",
+            answer:
+              "Brave blocks WebRTC leaks by default. Firefox can be configured to prevent leaks via about:config. Chrome and Edge require extensions for WebRTC leak protection.",
+          },
+          {
+            question: "Does this test store my IP address?",
+            answer:
+              "No. The test runs entirely in your browser using WebRTC APIs. No data is sent to or stored on Skycally's servers.",
           },
         ]}
       />

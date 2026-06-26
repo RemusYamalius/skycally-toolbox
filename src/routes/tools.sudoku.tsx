@@ -6,6 +6,7 @@ import { tools } from "@/lib/tools";
 import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
@@ -29,9 +30,7 @@ const isValid = (grid: Grid, r: number, c: number, n: number): boolean => {
   }
   const br = Math.floor(r / 3) * 3;
   const bc = Math.floor(c / 3) * 3;
-  for (let dr = 0; dr < 3; dr++)
-    for (let dc = 0; dc < 3; dc++)
-      if (grid[br + dr][bc + dc] === n) return false;
+  for (let dr = 0; dr < 3; dr++) for (let dc = 0; dc < 3; dc++) if (grid[br + dr][bc + dc] === n) return false;
   return true;
 };
 
@@ -176,9 +175,7 @@ function SudokuPage() {
         playSound("wrong");
       }
 
-      const complete = newGrid.every((row, ri) =>
-        row.every((val, ci) => val === solution[ri][ci]),
-      );
+      const complete = newGrid.every((row, ri) => row.every((val, ci) => val === solution[ri][ci]));
       if (complete) {
         setPhase("won");
         playChord(["success", "win"]);
@@ -209,9 +206,7 @@ function SudokuPage() {
     newErrors[r][c] = false;
     setErrors(newErrors);
 
-    const complete = newGrid.every((row, ri) =>
-      row.every((val, ci) => val === solution[ri][ci]),
-    );
+    const complete = newGrid.every((row, ri) => row.every((val, ci) => val === solution[ri][ci]));
     if (complete) {
       setPhase("won");
       playChord(["success", "win"]);
@@ -260,12 +255,8 @@ function SudokuPage() {
       sel &&
       (sel[0] === r ||
         sel[1] === c ||
-        (Math.floor(sel[0] / 3) === Math.floor(r / 3) &&
-          Math.floor(sel[1] / 3) === Math.floor(c / 3)));
-    const isSameNum =
-      sel &&
-      userGrid[sel[0]]?.[sel[1]] != null &&
-      userGrid[r][c] === userGrid[sel[0]][sel[1]];
+        (Math.floor(sel[0] / 3) === Math.floor(r / 3) && Math.floor(sel[1] / 3) === Math.floor(c / 3)));
+    const isSameNum = sel && userGrid[sel[0]]?.[sel[1]] != null && userGrid[r][c] === userGrid[sel[0]][sel[1]];
 
     if (isSelected) return "bg-primary/30";
     if (isSameNum) return "bg-primary/15";
@@ -280,6 +271,7 @@ function SudokuPage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Sudoku"
       description="Fill the 9×9 grid so every row, column and box contains digits 1–9."
     >
@@ -330,9 +322,7 @@ function SudokuPage() {
         {phase !== "setup" && (
           <>
             <div className="flex items-center justify-between w-full max-w-sm mx-auto mb-3 gap-2">
-              <div className="flex items-center gap-1 text-sm font-bold text-foreground">
-                ⏱ {fmt(time)}
-              </div>
+              <div className="flex items-center gap-1 text-sm font-bold text-foreground">⏱ {fmt(time)}</div>
               <div className="flex gap-1.5 flex-wrap justify-center">
                 <button
                   onClick={() => setNoteMode((m) => !m)}
@@ -359,9 +349,7 @@ function SudokuPage() {
                   🔄
                 </button>
               </div>
-              <div className="text-xs font-bold text-muted-foreground capitalize">
-                {difficulty}
-              </div>
+              <div className="text-xs font-bold text-muted-foreground capitalize">{difficulty}</div>
             </div>
 
             <div className="grid grid-cols-9 border-2 border-foreground rounded-xl overflow-hidden w-full max-w-sm mx-auto">
@@ -376,18 +364,10 @@ function SudokuPage() {
                       onClick={() => setSelected([r, c])}
                       className={cn(
                         "aspect-square flex items-center justify-center text-sm sm:text-base font-bold transition-colors relative select-none",
-                        c % 3 === 0 && c !== 0
-                          ? "border-l-2 border-l-foreground/40"
-                          : "border-l border-l-border/30",
-                        r % 3 === 0 && r !== 0
-                          ? "border-t-2 border-t-foreground/40"
-                          : "border-t border-t-border/30",
+                        c % 3 === 0 && c !== 0 ? "border-l-2 border-l-foreground/40" : "border-l border-l-border/30",
+                        r % 3 === 0 && r !== 0 ? "border-t-2 border-t-foreground/40" : "border-t border-t-border/30",
                         getCellClass(r, c),
-                        isGiven
-                          ? "text-foreground font-black"
-                          : isError
-                            ? "text-red-500"
-                            : "text-primary",
+                        isGiven ? "text-foreground font-black" : isError ? "text-red-500" : "text-primary",
                       )}
                     >
                       {val !== null ? (
@@ -399,9 +379,7 @@ function SudokuPage() {
                               key={n}
                               className={cn(
                                 "text-[6px] sm:text-[8px] flex items-center justify-center",
-                                noteSet.has(n)
-                                  ? "text-muted-foreground"
-                                  : "text-transparent",
+                                noteSet.has(n) ? "text-muted-foreground" : "text-transparent",
                               )}
                             >
                               {n}
@@ -463,6 +441,8 @@ function SudokuPage() {
         )}
       </div>
 
+      <AdZone id="sudoku-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Choose a difficulty and tap any empty cell to select it.",
@@ -472,32 +452,53 @@ function SudokuPage() {
       />
 
       <ToolSeoContent
-        title="Sudoku — Free Online Puzzle Game Easy Medium Hard"
-        description="Play Sudoku online for free. Easy, Medium and Hard puzzles with notes, hints and best time tracking. Works on mobile and desktop."
+        title="Free Sudoku Puzzle Online — Play Easy, Medium & Hard Sudoku"
+        description="Play free Sudoku puzzles online with three difficulty levels. Fill the 9×9 grid so every row, column, and 3×3 box contains the digits 1–9. No signup required."
         body={[
-          "Sudoku is the world's most popular logic puzzle. Every game presents a 9×9 grid partially filled with digits, and your goal is to complete the grid so that every row, every column and every 3×3 box contains the numbers 1 through 9 exactly once. No math is required — just clear reasoning and a little patience.",
-          "Our online Sudoku generates a fresh puzzle every time you start a new game, with three difficulty levels to match your skill. Use the built-in notes feature to pencil in candidate numbers, tap a hint when you're stuck, and try to beat your best time on each difficulty. Everything runs in your browser — no sign-up, no ads, no downloads.",
+          "Skycally's Sudoku generates a fresh puzzle every game across three difficulty levels: Easy (many cells pre-filled), Medium (balanced challenge), and Hard (minimal clues for experienced solvers). Click or tap any empty cell, then type or tap a number to fill it. Conflicting entries are highlighted automatically so you can catch mistakes immediately.",
+          "Sudoku is a logic puzzle played on a 9×9 grid divided into nine 3×3 boxes. The rule is simple: fill every empty cell with a digit from 1 to 9 such that each row, each column, and each 3×3 box contains every digit exactly once. No arithmetic is required — just logic and deduction.",
+          "The puzzle has a rich history: it was popularized by Japanese publisher Nikoli in 1986 under the name Sūdoku (数独, meaning 'single number'). Before that, similar puzzles existed in French newspapers in the 1890s. Today Sudoku appears in newspapers, magazines, and apps worldwide, and is one of the most popular logic puzzles ever created.",
+          "For beginners, start with Easy mode and look for rows, columns, or boxes that only have one empty cell — those can be filled immediately. As you improve, learn techniques like naked singles, hidden singles, and box-line reduction. Hard puzzles may require more advanced techniques like X-wing or swordfish patterns.",
         ]}
         faqs={[
           {
-            question: "How do notes work?",
+            question: "How do I play Sudoku?",
             answer:
-              "Tap the ✏️ Notes button (or press N) to toggle note mode. While active, tapping a number on a selected cell adds or removes that digit as a small pencil mark instead of placing it as the final answer.",
+              "Fill every empty cell in the 9×9 grid with a digit 1–9 so that each row, each column, and each 3×3 box contains every digit exactly once. No cell can repeat a number in its row, column, or box.",
           },
           {
-            question: "How do hints work?",
+            question: "What are the three difficulty levels?",
             answer:
-              "You get 3 hints per puzzle. Select an empty (or incorrect) cell and tap the 💡 button to reveal the correct number for that cell. Use them wisely — they don't refill until you start a new game.",
+              "Easy has many pre-filled cells and can be solved with basic techniques. Medium requires some deduction. Hard has minimal clues and requires advanced logic techniques.",
           },
           {
-            question: "What's the difference between Easy, Medium and Hard?",
+            question: "Does the puzzle highlight mistakes?",
             answer:
-              "Easy puzzles start with 45 given clues, Medium with 35, and Hard with 25. Fewer clues means more cells to deduce, requiring more advanced solving techniques.",
+              "Yes. Cells that conflict with another number in the same row, column, or box are highlighted in red automatically.",
           },
           {
-            question: "Can I play with the keyboard?",
+            question: "Is every puzzle solvable?",
             answer:
-              "Yes. Use the arrow keys to move between cells, type 1–9 to place numbers, press Backspace or Delete to clear a cell, and press N to toggle note mode.",
+              "Yes. Every generated puzzle has exactly one valid solution, which is confirmed before the puzzle is presented.",
+          },
+          {
+            question: "Can I use pencil marks / notes?",
+            answer:
+              "Check if the tool supports a note mode — some implementations include a toggle for candidate numbers.",
+          },
+          {
+            question: "What is a naked single?",
+            answer:
+              "A naked single is a cell where only one digit is possible — all other digits already appear in the same row, column, or box. Finding naked singles is the most basic solving technique.",
+          },
+          {
+            question: "Is my progress saved?",
+            answer: "Progress is kept while you have the browser tab open. Refreshing the page starts a new puzzle.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. Tap a cell to select it, then tap a number from the on-screen number pad. Fully responsive for smartphone and tablet play.",
           },
         ]}
       />

@@ -5,6 +5,7 @@ import { RotateCcw, Lightbulb, Shuffle, Trophy, AlertTriangle } from "lucide-rea
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -390,6 +391,7 @@ function MahjongPage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Mahjong Solitaire"
       description="Match identical free tiles to clear the board. Classic Mahjong Solitaire!"
     >
@@ -422,8 +424,9 @@ function MahjongPage() {
       </div>
 
       {/* Board */}
-      <div className="relative w-full overflow-auto rounded-2xl border border-border bg-card/40 p-4">
-        <div className="relative mx-auto" style={{ width: boardW, height: boardH }}>
+      <div className="relative w-full rounded-2xl border border-border bg-card/40 p-2 sm:p-4">
+        <div className="overflow-x-auto overflow-y-hidden -mx-2 sm:mx-0 px-2 sm:px-0">
+        <div className="relative mx-auto" style={{ width: boardW, height: boardH, minWidth: "min-content" }}>
           {sortedTiles.map((t) => {
             const free = isFree(t, alive);
             const isSel = selected === t.key;
@@ -514,6 +517,8 @@ function MahjongPage() {
         </Modal>
       )}
 
+      <AdZone id="mahjong-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Click a free tile (no tile on top, one side open) to select it.",
@@ -523,34 +528,23 @@ function MahjongPage() {
       />
 
       <ToolSeoContent
-        title="Play Mahjong Solitaire Online — Free Browser Tile Matching Game"
-        description="Free online Mahjong Solitaire with the classic turtle layout. Match identical tiles to clear the board — no download, no signup."
+        title="Free Mahjong Solitaire Online — Match & Remove Tile Pairs"
+        description="Play Mahjong Solitaire free online. Match identical free tiles to clear the board. Classic pyramid layout, responsive for mobile and desktop. No signup required."
         body={[
-          "Mahjong Solitaire is a classic single-player tile matching puzzle built on the traditional Chinese Mahjong tile set. Unlike the four-player Mahjong game, Solitaire pits you against a beautifully stacked board of 144 tiles arranged in the iconic turtle pattern. Your goal is to remove every tile by matching identical free pairs.",
-          "A tile is considered free when there is no tile resting on top of it and either its left or right side is open. Select a free tile, then click any other matching free tile to remove the pair. Flowers match any other flower, and seasons match any other season — every other tile must match exactly. The game ends when you clear the board (a win) or when no more valid pairs remain (a deadlock).",
-          "Use the Hint button to find a valid pair when you're stuck, or use Shuffle to reshuffle the remaining tiles. The game runs entirely in your browser, works on mobile, and tracks your best completion time locally. No installs, no accounts — just open it and play.",
+          "Skycally's Mahjong Solitaire presents the classic pyramid tile layout — 144 tiles stacked in multiple layers. Select two identical free tiles to remove them from the board. A tile is free if nothing is on top of it and at least one of its sides is open. Clear all 144 tiles to win.",
+          "Mahjong Solitaire (also called Shanghai Solitaire) is distinct from the four-player Mahjong game. It was popularized by the 1986 Activision computer game Shanghai and became one of the most played computer games of the 1990s. The tile set uses four suits: Characters (万), Bamboo (索), Circles (筒), plus Winds, Dragons, Flowers, and Seasons.",
+          "Strategy is essential — not every deal is winnable with any move order. Look ahead before selecting tiles: if removing a pair blocks access to tiles you'll need later, try another pair first. The Flowers and Seasons tiles are special — each Flower matches any other Flower tile, and each Season matches any other Season tile.",
+          "The board scales responsively to fit any screen size, making it playable on smartphones as well as desktop. On mobile, the tile layout adjusts to ensure all tiles are visible and tappable without zooming. A hint button and shuffle option are available when you get stuck.",
         ]}
         faqs={[
-          {
-            question: "How do I match tiles in Mahjong Solitaire?",
-            answer:
-              "Click a free tile to select it, then click another free tile with the same face to remove the pair. A tile is free when nothing sits on top of it and at least one of its left or right sides is open.",
-          },
-          {
-            question: "What if I run out of moves?",
-            answer:
-              "If no matching free pair is left, the game shows a No-Moves dialog. You can press Shuffle to reshuffle the remaining tiles into a new arrangement, or start a brand-new game.",
-          },
-          {
-            question: "Do flowers and seasons only match identical tiles?",
-            answer:
-              "No. All four flower tiles match each other, and all four season tiles match each other. This mirrors the standard Mahjong Solitaire rules.",
-          },
-          {
-            question: "Is Mahjong Solitaire really free?",
-            answer:
-              "Yes. Skycally Mahjong Solitaire runs 100% in your browser. There are no ads in the gameplay area, no signup, and nothing to install.",
-          },
+          { question: "How do I play Mahjong Solitaire?", answer: "Select two identical free tiles to remove them. A tile is free if nothing is stacked on top of it and at least one of its left or right sides is open. Clear all 144 tiles to win." },
+          { question: "What makes a tile free?", answer: "A tile is free (selectable) when no other tile is resting on top of it AND at least one of its horizontal sides (left or right) is not blocked by another tile." },
+          { question: "How do Flower and Season tiles work?", answer: "Any Flower tile matches any other Flower tile (they don't need to be identical). Same for Season tiles — any two Season tiles can be matched together." },
+          { question: "What if I get stuck?", answer: "Use the Hint button to highlight a valid pair. If no moves are available, use Shuffle to rearrange remaining tiles into a potentially solvable position." },
+          { question: "Is every deal winnable?", answer: "Not always — Mahjong Solitaire layouts can become unwinnable depending on move order. If you get stuck, shuffle or start a new game." },
+          { question: "How many tiles are there?", answer: "The classic layout uses 144 tiles arranged in a pyramid shape across multiple layers." },
+          { question: "Does this work on mobile?", answer: "Yes. The board scales to fit the screen with touch-friendly tile sizing. The layout adapts for portrait and landscape orientations." },
+          { question: "Can I undo a move?", answer: "Check the game controls — an undo button may be available to reverse the last pair removed." },
         ]}
       />
 

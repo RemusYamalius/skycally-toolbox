@@ -670,9 +670,11 @@ function ChessPage() {
     checkGameOver(newState);
   };
 
-  // AI move effect
+  // AI move effect - triggers when it's AI's turn
   useEffect(() => {
-    if (gameState.turn === humanSide || phase !== "playing" || aiThinking.current) return;
+    if (phase !== "playing") return;
+    if (gameState.turn === humanSide) return;
+    if (aiThinking.current) return;
     aiThinking.current = true;
     setAiThinking(true);
     const t = setTimeout(() => {
@@ -713,7 +715,7 @@ function ChessPage() {
     }, 80);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState, phase]);
+  }, [gameState, phase, humanSide]);
 
   const handleCellClick = (r: number, c: number) => {
     if (phase !== "playing" || gameState.turn !== humanSide || aiThinkingState) return;
@@ -801,8 +803,10 @@ function ChessPage() {
 
         {/* Board */}
         <div className="grid grid-cols-8 border border-border rounded-xl overflow-hidden w-full max-w-[480px] mx-auto aspect-square">
-          {Array.from({ length: 8 }, (_, r) =>
-            Array.from({ length: 8 }, (_, c) => {
+          {Array.from({ length: 8 }, (_, ri) => {
+            const r = humanSide === "b" ? 7 - ri : ri;
+            return Array.from({ length: 8 }, (_, ci) => {
+              const c = humanSide === "b" ? 7 - ci : ci;
               const piece = gameState.board[r][c];
               const light = isLight(r, c);
               const sel = isSelected(r, c);
@@ -845,7 +849,7 @@ function ChessPage() {
                         light ? "text-[#B58863]" : "text-[#F0D9B5]",
                       )}
                     >
-                      {8 - r}
+                      {humanSide === "b" ? r + 1 : 8 - r}
                     </span>
                   )}
                   {r === 7 && (
@@ -860,8 +864,8 @@ function ChessPage() {
                   )}
                 </div>
               );
-            }),
-          )}
+            });
+          })}
         </div>
 
         <div className="flex gap-2 mt-2">

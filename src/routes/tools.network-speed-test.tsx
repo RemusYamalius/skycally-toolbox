@@ -39,12 +39,7 @@ function fmtMs(v: number) {
   return v.toFixed(v >= 100 ? 0 : 1);
 }
 
-async function fetchWithRetry(
-  url: string,
-  options: RequestInit,
-  retries = 3,
-  delay = 800,
-): Promise<Response> {
+async function fetchWithRetry(url: string, options: RequestInit, retries = 3, delay = 800): Promise<Response> {
   let lastErr: unknown;
   for (let attempt = 0; attempt <= retries; attempt++) {
     try {
@@ -85,10 +80,7 @@ async function measureLatency(controller: AbortController, onProgress: (pct: num
   return { ping, jitter };
 }
 
-async function measureDownload(
-  controller: AbortController,
-  onLive: (mbps: number, pct: number) => void,
-) {
+async function measureDownload(controller: AbortController, onLive: (mbps: number, pct: number) => void) {
   const passes = [1, 10, 10, 25, 25];
   const totalBytesPlanned = passes.reduce((a, b) => a + b, 0) * 1024 * 1024;
   let bytesAcc = 0;
@@ -132,10 +124,7 @@ async function measureDownload(
   return (totalBytes * 8) / totalSec / 1e6;
 }
 
-async function measureUploadSpeed(
-  controller: AbortController,
-  onLive: (mbps: number) => void,
-): Promise<number> {
+async function measureUploadSpeed(controller: AbortController, onLive: (mbps: number) => void): Promise<number> {
   const CHUNK_MB = 1;
   const CHUNKS = 5;
   const chunkBytes = CHUNK_MB * 1024 * 1024;
@@ -181,15 +170,7 @@ function arcPath(cx: number, cy: number, r: number, startDeg: number, endDeg: nu
   return `M ${s.x} ${s.y} A ${r} ${r} 0 ${large} 1 ${e.x} ${e.y}`;
 }
 
-function SpeedGauge({
-  mbps,
-  phase,
-  pingMs,
-}: {
-  mbps: number;
-  phase: Phase;
-  pingMs: number;
-}) {
+function SpeedGauge({ mbps, phase, pingMs }: { mbps: number; phase: Phase; pingMs: number }) {
   const size = 320;
   const cx = size / 2;
   const cy = size / 2;
@@ -278,9 +259,7 @@ function SpeedGauge({
         >
           {phase === "latency" ? fmtMs(pingMs) : fmtMbps(clamped)}
         </div>
-        <div className="text-sm text-muted-foreground mt-2">
-          {phase === "latency" ? "ms" : "Mbps"}
-        </div>
+        <div className="text-sm text-muted-foreground mt-2">{phase === "latency" ? "ms" : "Mbps"}</div>
       </div>
     </div>
   );
@@ -305,9 +284,7 @@ function MetricCard({
     <motion.div
       initial={{ opacity: 0, y: 12 }}
       animate={{ opacity: 1, y: 0 }}
-      className={`rounded-2xl border p-5 transition ${
-        highlight ? "border-transparent" : "border-border bg-card/60"
-      }`}
+      className={`rounded-2xl border p-5 transition ${highlight ? "border-transparent" : "border-border bg-card/60"}`}
       style={
         highlight
           ? {
@@ -542,6 +519,8 @@ function NetworkSpeedTest() {
         </p>
       </div>
 
+      <AdZone id="network-speed-test-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Click Run Test to start measuring your connection",
@@ -551,33 +530,54 @@ function NetworkSpeedTest() {
       />
 
       <ToolSeoContent
-        title="Network Speed Test — Free Internet Download, Ping & Jitter Test"
-        description="Free in-browser internet speed test that measures download speed, ping and jitter against Cloudflare's global network in seconds."
+        title="Free Network Speed Test — Test Internet Download & Upload Speed"
+        description="Test your internet download speed, upload speed, ping, and jitter instantly. Free, browser-based network speed test — no app needed, no signup required."
         body={[
-          "Skycally's Network Speed Test gives you a quick, accurate picture of your internet connection without installing anything. It runs entirely in your browser and uses Cloudflare's worldwide anycast endpoints to measure real download throughput, ping latency and jitter — three numbers that predict how a connection will feel when you stream, game or join a video call.",
-          "Download is reported in megabits per second (Mbps). Ping is the round-trip time to the nearest Cloudflare edge, measured in milliseconds. Jitter is the variation between successive ping samples — low jitter matters more than raw bandwidth for video conferencing and online gaming. For most home connections, anything above 25 Mbps down handles 4K streaming, and ping under 50 ms with single-digit jitter feels snappy.",
-          "Results vary based on Wi-Fi signal, the device you're using, time of day and other devices on your network. For the most accurate reading, close other tabs and apps, pause downloads, and run the test a couple of times. Nothing is uploaded, logged or stored — every test starts and ends in your browser.",
+          "Skycally's Network Speed Test measures your internet connection's download speed, upload speed, ping (latency), and jitter — all directly in your browser with no app to install. Results appear in seconds and give you a complete picture of your connection quality for streaming, gaming, video calls, and everyday browsing.",
+          "Download speed is how fast data travels from the internet to your device — this affects streaming quality, web page load times, and file downloads. Upload speed is the reverse — how fast you can send data — critical for video calls, cloud backups, and uploading files. Higher numbers are better for both.",
+          "Ping (latency) measures the round-trip time in milliseconds between your device and a test server. Low ping (under 20ms) is ideal for gaming and video calls. Jitter measures how consistent your ping is — high jitter causes choppy video calls and lag spikes in games even when average ping is acceptable.",
+          "For the most accurate results, run the test while connected directly to your router via Ethernet rather than WiFi, close other bandwidth-heavy applications, and run the test multiple times at different times of day. Internet speeds fluctuate based on network congestion, especially during peak evening hours.",
         ]}
         faqs={[
           {
-            question: "How accurate is this speed test?",
+            question: "What does download speed mean?",
             answer:
-              "Very accurate for client-side conditions. We use Cloudflare's edge network — the same infrastructure powering speed.cloudflare.com — and measure the actual bytes transferred. Wi-Fi, VPNs, and background traffic on your network can lower the reading compared to a wired test directly from your router.",
+              "Download speed measures how fast data travels from the internet to your device in Mbps. It affects streaming quality, web browsing, and file downloads. Netflix recommends 25 Mbps for 4K streaming.",
           },
           {
-            question: "What is a good internet speed?",
+            question: "What does upload speed mean?",
             answer:
-              "For a single user: 25+ Mbps download covers 4K streaming, 100+ Mbps is comfortable for most households, and 300+ Mbps is solid for heavy multi-user homes. Aim for ping under 50 ms and jitter under 10 ms for smooth gaming and video calls.",
+              "Upload speed measures how fast you can send data from your device to the internet. It affects video calls, cloud storage uploads, and live streaming. Video calls typically need 3-5 Mbps upload.",
           },
           {
-            question: "Why don't you measure upload speed?",
+            question: "What is a good ping for gaming?",
             answer:
-              "Reliable in-browser upload measurement requires a dedicated server endpoint with the right CORS headers. To keep this tool fast and dependency-free we focus on download, ping and jitter, which are the metrics that most affect everyday browsing, streaming and video calls.",
+              "Under 20ms is excellent. 20-50ms is good for most online games. 50-100ms is acceptable. Over 100ms causes noticeable lag. Over 200ms makes fast-paced games nearly unplayable.",
           },
           {
-            question: "Do you store my test results or IP address?",
+            question: "What is jitter?",
             answer:
-              "No. The test runs entirely in your browser. We don't log results, store data, or track your IP address. Refreshing the page clears everything.",
+              "Jitter is the variation in ping over time. Low jitter (under 10ms) means a stable connection. High jitter causes choppy video calls and inconsistent game performance even when average ping is low.",
+          },
+          {
+            question: "Why is my speed test result lower than my plan?",
+            answer:
+              "Speed test results can be lower due to WiFi interference, router quality, network congestion, device limitations, or ISP throttling during peak hours. Test via Ethernet for the most accurate result.",
+          },
+          {
+            question: "How many Mbps do I need?",
+            answer:
+              "Basic browsing: 10 Mbps. HD streaming: 5-25 Mbps. 4K streaming: 25+ Mbps. Video calls: 3-5 Mbps upload. Online gaming: 3+ Mbps with low ping. Working from home: 25+ Mbps recommended.",
+          },
+          {
+            question: "Does this speed test use a lot of data?",
+            answer:
+              "Yes — a full test uses approximately 100-500MB of data depending on your connection speed. Avoid running it on a mobile data plan with a limited cap.",
+          },
+          {
+            question: "Why should I test at different times of day?",
+            answer:
+              "ISPs share bandwidth among neighbors. Evening peak hours (7-11 PM) often see slower speeds due to congestion. Morning speeds are typically the fastest and most representative of your plan.",
           },
         ]}
       />

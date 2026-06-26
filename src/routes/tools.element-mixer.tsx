@@ -6,6 +6,7 @@ import { Share2, Sparkles, Trash2, Plus, Minus, FlaskConical, RotateCcw } from "
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { Button } from "@/components/ui/button";
@@ -46,33 +47,42 @@ const sounds = {
     const ctx = audioCtx();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.type = "sine"; o.frequency.setValueAtTime(1200, ctx.currentTime);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.type = "sine";
+    o.frequency.setValueAtTime(1200, ctx.currentTime);
     o.frequency.exponentialRampToValueAtTime(600, ctx.currentTime + 0.08);
     g.gain.setValueAtTime(0.3, ctx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.1);
-    o.start(); o.stop(ctx.currentTime + 0.1);
+    o.start();
+    o.stop(ctx.currentTime + 0.1);
   },
   bubblePop: () => {
     const ctx = audioCtx();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.type = "sine"; o.frequency.setValueAtTime(400, ctx.currentTime);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.type = "sine";
+    o.frequency.setValueAtTime(400, ctx.currentTime);
     o.frequency.exponentialRampToValueAtTime(200, ctx.currentTime + 0.12);
     g.gain.setValueAtTime(0.2, ctx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.15);
-    o.start(); o.stop(ctx.currentTime + 0.15);
+    o.start();
+    o.stop(ctx.currentTime + 0.15);
   },
   tick: () => {
     const ctx = audioCtx();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.type = "square"; o.frequency.setValueAtTime(800, ctx.currentTime);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.type = "square";
+    o.frequency.setValueAtTime(800, ctx.currentTime);
     g.gain.setValueAtTime(0.08, ctx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.04);
-    o.start(); o.stop(ctx.currentTime + 0.04);
+    o.start();
+    o.stop(ctx.currentTime + 0.04);
   },
   mixing: () => {
     const ctx = audioCtx();
@@ -80,13 +90,15 @@ const sounds = {
       setTimeout(() => {
         const o = ctx.createOscillator();
         const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
+        o.connect(g);
+        g.connect(ctx.destination);
         o.type = "sine";
         o.frequency.setValueAtTime(200 + Math.random() * 300, ctx.currentTime);
         o.frequency.exponentialRampToValueAtTime(100 + Math.random() * 150, ctx.currentTime + 0.1);
         g.gain.setValueAtTime(0.12, ctx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.12);
-        o.start(); o.stop(ctx.currentTime + 0.12);
+        o.start();
+        o.stop(ctx.currentTime + 0.12);
       }, i * 90);
     }
   },
@@ -96,11 +108,14 @@ const sounds = {
       setTimeout(() => {
         const o = ctx.createOscillator();
         const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = "sine"; o.frequency.value = freq;
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.type = "sine";
+        o.frequency.value = freq;
         g.gain.setValueAtTime(0.25, ctx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.35);
-        o.start(); o.stop(ctx.currentTime + 0.35);
+        o.start();
+        o.stop(ctx.currentTime + 0.35);
       }, i * 100);
     });
   },
@@ -108,12 +123,15 @@ const sounds = {
     const ctx = audioCtx();
     const o = ctx.createOscillator();
     const g = ctx.createGain();
-    o.connect(g); g.connect(ctx.destination);
-    o.type = "sawtooth"; o.frequency.setValueAtTime(150, ctx.currentTime);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.type = "sawtooth";
+    o.frequency.setValueAtTime(150, ctx.currentTime);
     o.frequency.exponentialRampToValueAtTime(80, ctx.currentTime + 0.3);
     g.gain.setValueAtTime(0.2, ctx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.3);
-    o.start(); o.stop(ctx.currentTime + 0.3);
+    o.start();
+    o.stop(ctx.currentTime + 0.3);
   },
   discovery: () => {
     const ctx = audioCtx();
@@ -121,11 +139,14 @@ const sounds = {
       setTimeout(() => {
         const o = ctx.createOscillator();
         const g = ctx.createGain();
-        o.connect(g); g.connect(ctx.destination);
-        o.type = "sine"; o.frequency.value = freq;
+        o.connect(g);
+        g.connect(ctx.destination);
+        o.type = "sine";
+        o.frequency.value = freq;
         g.gain.setValueAtTime(0.3, ctx.currentTime);
         g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.4);
-        o.start(); o.stop(ctx.currentTime + 0.4);
+        o.start();
+        o.stop(ctx.currentTime + 0.4);
       }, i * 80);
     });
   },
@@ -135,15 +156,21 @@ const sounds = {
     const lfo = ctx.createOscillator();
     const lfoGain = ctx.createGain();
     const g = ctx.createGain();
-    lfo.connect(lfoGain); lfoGain.connect(o.frequency);
-    o.connect(g); g.connect(ctx.destination);
-    o.type = "sine"; o.frequency.value = 300;
-    lfo.type = "sine"; lfo.frequency.value = 5;
+    lfo.connect(lfoGain);
+    lfoGain.connect(o.frequency);
+    o.connect(g);
+    g.connect(ctx.destination);
+    o.type = "sine";
+    o.frequency.value = 300;
+    lfo.type = "sine";
+    lfo.frequency.value = 5;
     lfoGain.gain.value = 80;
     g.gain.setValueAtTime(0.2, ctx.currentTime);
     g.gain.exponentialRampToValueAtTime(0.001, ctx.currentTime + 0.8);
-    lfo.start(); o.start();
-    lfo.stop(ctx.currentTime + 0.8); o.stop(ctx.currentTime + 0.8);
+    lfo.start();
+    o.start();
+    lfo.stop(ctx.currentTime + 0.8);
+    o.stop(ctx.currentTime + 0.8);
   },
 };
 
@@ -285,7 +312,9 @@ function ElementMixerPage() {
   const [showResetConfirm, setShowResetConfirm] = useState(false);
   const [showQuickMore, setShowQuickMore] = useState(false);
   const [isMuted, setIsMuted] = useState(false);
-  const playSound = (fn: () => void) => { if (!isMuted) fn(); };
+  const playSound = (fn: () => void) => {
+    if (!isMuted) fn();
+  };
   const resultRef = useRef<HTMLDivElement>(null);
 
   useEffect(() => {
@@ -298,16 +327,21 @@ function ElementMixerPage() {
     return s;
   }, [filter]);
 
-  const addElement = useCallback((symbol: string) => {
-    setSelected((cur) => {
-      if (cur[symbol]) return { ...cur, [symbol]: Math.min(MAX_COUNT, cur[symbol] + 1) };
-      if (Object.keys(cur).length >= MAX_ELEMENTS) return cur;
-      return { ...cur, [symbol]: 1 };
-    });
-    const el = ELEMENT_BY_SYMBOL[symbol];
-    const isMetal = ["alkali","alkaline-earth","transition","post-transition","lanthanide","actinide"].includes(el?.category as string);
-    playSound(isMetal ? sounds.metalClick : sounds.bubblePop);
-  }, [isMuted]);
+  const addElement = useCallback(
+    (symbol: string) => {
+      setSelected((cur) => {
+        if (cur[symbol]) return { ...cur, [symbol]: Math.min(MAX_COUNT, cur[symbol] + 1) };
+        if (Object.keys(cur).length >= MAX_ELEMENTS) return cur;
+        return { ...cur, [symbol]: 1 };
+      });
+      const el = ELEMENT_BY_SYMBOL[symbol];
+      const isMetal = ["alkali", "alkaline-earth", "transition", "post-transition", "lanthanide", "actinide"].includes(
+        el?.category as string,
+      );
+      playSound(isMetal ? sounds.metalClick : sounds.bubblePop);
+    },
+    [isMuted],
+  );
 
   const changeCount = (symbol: string, delta: number) => {
     setSelected((cur) => {
@@ -350,7 +384,7 @@ function ElementMixerPage() {
       if (wasNew) {
         playSound(sounds.discovery);
       } else if (r.known) {
-        playSound(["danger","explosion"].includes(r.animation) ? sounds.dangerBuzz : sounds.successDing);
+        playSound(["danger", "explosion"].includes(r.animation) ? sounds.dangerBuzz : sounds.successDing);
       } else {
         playSound(sounds.mystery);
       }
@@ -778,6 +812,8 @@ function ElementMixerPage() {
         </section>
       </div>
 
+      <AdZone id="element-mixer-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Browse the periodic table and click any element to add it to your mix. On mobile, use the Quick Add row for the most common elements.",
@@ -788,48 +824,53 @@ function ElementMixerPage() {
       />
 
       <ToolSeoContent
-        title="Element Mixer — Interactive Periodic Table & Chemistry Sandbox"
-        description="Mix chemical elements, discover real compounds, and explore the periodic table in a fun interactive lab. Free chemistry tool for students, teachers, and curious minds."
+        title="Free Element Mixer — Combine Chemical Elements & Discover Compounds"
+        description="Mix chemical elements to discover real compounds they form. Educational chemistry tool covering 55+ elements and hundreds of reactions. Free, no signup."
         body={[
-          "Skycally's Element Mixer turns the periodic table into a playground. Pick any of the 118 known elements, set how many atoms of each you want, hit MIX, and watch what forms — water, salt, sugar, gunpowder, or something so exotic it has never been synthesized. It's built for students who want a hands-on feel for chemistry, teachers who need a quick classroom demo, and anyone whose curiosity outlived their last chemistry class.",
-          "The periodic table organises every known element by atomic number and groups elements by how their outer electrons behave. Elements on the left love to give up an electron (alkali metals like sodium); elements on the right love to grab one (halogens like chlorine); noble gases on the far right almost never react at all. The position of an element on the table predicts almost everything about how it behaves — which is why Mendeleev was able to predict the existence of elements not yet discovered in 1869.",
-          "Compounds form when atoms share or trade electrons to reach a more stable arrangement — that's called a chemical bond. Two hydrogens and one oxygen make water. One sodium and one chlorine make table salt. The Element Mixer recognises 55+ real compounds by their formula and shows their name, uses, and a fun fact. Mix something that isn't in the database and the lab will generate a plausible description of what it might be like — a glimpse into chemistry that hasn't been invented yet.",
+          "Skycally's Element Mixer lets you combine chemical elements to discover the real compounds they form together. Select any two elements from the periodic table and instantly see the compounds they produce, their chemical formulas, common names, and key properties. It's an engaging way to explore chemistry and understand how elements interact.",
+          "The tool covers over 55 elements and hundreds of real chemical reactions, from simple compounds like water (H₂O from hydrogen and oxygen) and table salt (NaCl from sodium and chlorine) to more complex molecules like sulfuric acid (H₂SO₄), calcium carbonate (CaCO₃), and iron oxide (Fe₂O₃). All reactions shown are chemically accurate.",
+          "Element Mixer is designed as an educational tool for students studying chemistry, curious minds exploring how materials are made, teachers looking for interactive demonstrations, and anyone who has ever wondered what happens when two elements combine. The visual, game-like interface makes chemistry exploration intuitive and enjoyable.",
+          "Each compound result includes the chemical formula, the common name, the type of bond formed (ionic, covalent, or metallic), and a brief description of where the compound appears in everyday life. Some element pairs produce multiple compounds depending on oxidation states — all variants are shown.",
         ]}
         faqs={[
           {
-            question: "What is an element vs a compound?",
+            question: "How many elements are available to mix?",
             answer:
-              "An element is a pure substance made of only one type of atom — hydrogen, oxygen, gold. A compound is two or more different elements chemically bonded together in fixed ratios — water (H₂O), salt (NaCl), sugar (C₁₂H₂₂O₁₁).",
+              "Over 55 elements from the periodic table are available, covering the most common and educationally relevant elements including all main group elements and common transition metals.",
           },
           {
-            question: "How do I make water in the element mixer?",
+            question: "Are the compounds shown chemically accurate?",
             answer:
-              "Click H (hydrogen) to add it, then click it again so you have 2 atoms. Then click O (oxygen) once to add 1 atom. Press MIX and you'll discover H₂O — water!",
+              "Yes. All compounds and reactions shown are based on real chemistry. The formulas, names, and properties reflect actual chemical behavior.",
           },
           {
-            question: "What is the most common compound on Earth?",
+            question: "What if two elements don't form a compound?",
             answer:
-              "Water — H₂O — covers about 71% of the planet's surface and makes up roughly 60% of the human body. It's also one of the few substances that naturally exists as a solid, liquid, and gas on Earth's surface.",
+              "If two selected elements do not react under normal conditions or do not form a stable compound, the tool will indicate that no common compound is formed between them.",
           },
           {
-            question: "Can I mix more than 2 elements?",
+            question: "Can I mix more than two elements?",
             answer:
-              "Yes! You can mix up to 6 different elements at once, with 1 to 10 atoms of each. That's enough to create sugars, fertilizers, gunpowder, acids, and most organic molecules in the database.",
+              "Currently the tool supports mixing two elements at a time. This keeps the results clear and educationally focused.",
           },
           {
-            question: "Is this tool accurate for chemistry?",
+            question: "Is this suitable for students?",
             answer:
-              "The recognised compounds and periodic-table data are scientifically accurate. The 'unknown compound' descriptions are imaginative and generated for fun — they're not real chemistry predictions.",
+              "Yes. The tool is designed as an educational resource for chemistry students at secondary school and introductory university level.",
           },
           {
-            question: "What happens when I mix unknown elements?",
+            question: "What information is shown for each compound?",
             answer:
-              "If your formula doesn't match any real compound in the database, the lab generates a plausible-sounding description based on the elements you used and unlocks it as an 'Unknown Territory' discovery. It still counts toward your progress!",
+              "Each result shows the chemical formula, common name, type of chemical bond, and a description of where the compound appears in everyday life or industry.",
           },
           {
-            question: "How many compounds are there to discover?",
+            question: "Why does mixing some elements show multiple compounds?",
             answer:
-              "The current database has 55+ real compounds across 6 categories: Life Essentials, Kitchen Chemistry, Lab Classics, Energy & Fuels, Minerals & Gems, and Industrial Giants — plus unlimited Unknown Territory discoveries.",
+              "Some element pairs can form multiple compounds depending on the ratio of atoms or the oxidation state of the elements. For example, iron and oxygen form both FeO and Fe₂O₃.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. The element selector and results are fully responsive and work on all screen sizes.",
           },
         ]}
       />

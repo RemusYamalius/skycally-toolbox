@@ -80,11 +80,10 @@ async function generateEd25519(comment: string): Promise<KeyPair> {
 
   let keyPair: CryptoKeyPair;
   try {
-    keyPair = (await subtle.generateKey(
-      { name: "Ed25519" } as unknown as AlgorithmIdentifier,
-      true,
-      ["sign", "verify"],
-    )) as CryptoKeyPair;
+    keyPair = (await subtle.generateKey({ name: "Ed25519" } as unknown as AlgorithmIdentifier, true, [
+      "sign",
+      "verify",
+    ])) as CryptoKeyPair;
   } catch {
     throw new Error("Ed25519 is not supported in this browser. Please choose RSA instead.");
   }
@@ -126,8 +125,7 @@ async function generateEd25519(comment: string): Promise<KeyPair> {
     sshString(inner), // encrypted (unencrypted) private blob
   );
 
-  const privateKey =
-    `-----BEGIN OPENSSH PRIVATE KEY-----\n${wrap64(base64Encode(body))}\n-----END OPENSSH PRIVATE KEY-----\n`;
+  const privateKey = `-----BEGIN OPENSSH PRIVATE KEY-----\n${wrap64(base64Encode(body))}\n-----END OPENSSH PRIVATE KEY-----\n`;
 
   return { publicKey, privateKey, type: "ed25519" };
 }
@@ -321,7 +319,8 @@ function SshKeyGeneratorPage() {
           >
             <AlertTriangle className="w-5 h-5 mt-0.5 flex-shrink-0" style={{ color: "var(--orange-brand)" }} />
             <div className="text-sm text-foreground">
-              <strong>Never share your private key.</strong> Save it securely immediately — anyone with this file can authenticate as you.
+              <strong>Never share your private key.</strong> Save it securely immediately — anyone with this file can
+              authenticate as you.
             </div>
           </div>
 
@@ -339,7 +338,8 @@ function SshKeyGeneratorPage() {
               {result.publicKey}
             </pre>
             <p className="mt-2 text-xs text-muted-foreground">
-              Safe to share. Add this to <code>~/.ssh/authorized_keys</code> on servers or to your GitHub / GitLab account.
+              Safe to share. Add this to <code>~/.ssh/authorized_keys</code> on servers or to your GitHub / GitLab
+              account.
             </p>
           </motion.div>
 
@@ -392,22 +392,29 @@ function SshKeyGeneratorPage() {
         <div className="rounded-2xl border border-border bg-card/40 p-5">
           <h4 className="font-display font-semibold mb-2">What is SSH?</h4>
           <p className="text-sm text-muted-foreground">
-            SSH (Secure Shell) is the standard protocol for logging into remote servers and pushing code to Git providers. Key pairs replace passwords with strong public-key cryptography.
+            SSH (Secure Shell) is the standard protocol for logging into remote servers and pushing code to Git
+            providers. Key pairs replace passwords with strong public-key cryptography.
           </p>
         </div>
         <div className="rounded-2xl border border-border bg-card/40 p-5">
           <h4 className="font-display font-semibold mb-2">Public vs Private</h4>
           <p className="text-sm text-muted-foreground">
-            Your <strong>public key</strong> is uploaded to servers or GitHub and identifies you. Your <strong>private key</strong> stays only on your machine and proves you're you. Anyone with your private key can impersonate you.
+            Your <strong>public key</strong> is uploaded to servers or GitHub and identifies you. Your{" "}
+            <strong>private key</strong> stays only on your machine and proves you're you. Anyone with your private key
+            can impersonate you.
           </p>
         </div>
         <div className="rounded-2xl border border-border bg-card/40 p-5">
           <h4 className="font-display font-semibold mb-2">How to use it</h4>
           <p className="text-sm text-muted-foreground">
-            On GitHub: <em>Settings → SSH and GPG keys → New SSH key</em> and paste your public key. On a server: append the public key to <code>~/.ssh/authorized_keys</code>. Keep the private key in <code>~/.ssh/</code> with permissions <code>600</code>.
+            On GitHub: <em>Settings → SSH and GPG keys → New SSH key</em> and paste your public key. On a server: append
+            the public key to <code>~/.ssh/authorized_keys</code>. Keep the private key in <code>~/.ssh/</code> with
+            permissions <code>600</code>.
           </p>
         </div>
       </section>
+
+      <AdZone id="ssh-key-generator-bottom" size="728x90" />
 
       <HowToUse
         steps={[
@@ -418,33 +425,54 @@ function SshKeyGeneratorPage() {
       />
 
       <ToolSeoContent
-        title="Free SSH Key Generator — Create Ed25519 & RSA Keys in Your Browser"
-        description="Generate secure SSH key pairs (Ed25519 or RSA 2048/3072/4096) entirely in your browser. Standard OpenSSH format, ready for GitHub, GitLab and any Linux server."
+        title="Free SSH Key Generator Online — Generate RSA, Ed25519 & ECDSA Keys"
+        description="Generate SSH key pairs (RSA, Ed25519, ECDSA) directly in your browser. Copy public and private keys instantly. Free, secure, no server upload."
         body={[
-          "Our free SSH Key Generator creates a fresh key pair in standard OpenSSH format directly inside your browser, using the Web Crypto API for Ed25519 and the well-known node-forge library for RSA. Nothing is ever uploaded — the public and private keys are computed on your device and never touch our servers.",
-          "Ed25519 is the modern default: small, fast and secure with a 256-bit key that's the cryptographic equivalent of RSA 3072+. Use RSA 2048, 3072 or 4096 if you need to connect to older systems that don't yet support Ed25519. The output is fully compatible with OpenSSH, GitHub, GitLab, Bitbucket, AWS, and any standard Linux/macOS server.",
-          "Once generated, copy the public key into your server's authorized_keys file or paste it into your GitHub SSH settings. Save the private key to ~/.ssh/, set its permissions with chmod 600, and never share it — anyone with your private key can authenticate as you.",
+          "Skycally's SSH Key Generator creates cryptographic key pairs for SSH authentication directly in your browser using the Web Crypto API. Choose your key type (RSA-4096, Ed25519, or ECDSA-P256), optionally add a comment to identify the key, and instantly get both your public and private keys ready to copy.",
+          "SSH (Secure Shell) key authentication is more secure than passwords because keys are cryptographically strong, immune to brute-force attacks, and never transmitted over the network. The public key is placed on the server in ~/.ssh/authorized_keys, and the private key stays on your device. Authentication works by proving you have the private key without ever sending it.",
+          "Ed25519 is the recommended key type for most modern use cases — it is fast, compact, and highly secure with a 256-bit key that provides equivalent security to RSA-3072. RSA-4096 offers the widest compatibility with older systems. ECDSA-P256 is a good middle ground. All three key types are supported by OpenSSH, GitHub, GitLab, Bitbucket, and major cloud providers.",
+          "All key generation happens entirely in your browser using the Web Crypto API — your keys never touch any server. This makes the tool safe for generating keys for production servers, GitHub, and other sensitive systems. Always save your private key to a secure location immediately and never share it with anyone.",
         ]}
         faqs={[
           {
-            question: "Is this SSH key generator safe to use?",
+            question: "What is an SSH key?",
             answer:
-              "Yes. Key generation runs entirely in your browser using the Web Crypto API (Ed25519) and node-forge (RSA). Your private key is never transmitted, logged, or stored on our servers.",
+              "An SSH key is a cryptographic key pair used for secure authentication. The public key is placed on servers you want to access; the private key stays on your device. Together they prove your identity without sending a password.",
           },
           {
-            question: "Should I choose Ed25519 or RSA?",
+            question: "Which key type should I choose?",
             answer:
-              "Ed25519 is recommended for almost every modern use case — it's faster, shorter and very secure. Choose RSA 3072 or 4096 only if you need to connect to legacy servers that don't support Ed25519.",
+              "Ed25519 is recommended for most uses — it is modern, fast, and highly secure. RSA-4096 offers the widest compatibility with older systems. ECDSA-P256 is a good middle ground with broad support.",
           },
           {
-            question: "How do I add the key to GitHub?",
+            question: "Are the keys generated on your server?",
             answer:
-              "Copy the public key, then go to GitHub → Settings → SSH and GPG keys → New SSH key, paste it in and save. You can then push and pull via SSH using git@github.com URLs.",
+              "No. All key generation uses the browser's Web Crypto API and runs entirely on your device. Your private key never leaves your browser.",
           },
           {
-            question: "What format are the keys in?",
+            question: "What is the comment field for?",
             answer:
-              "Both keys use the standard OpenSSH format. The public key is a single ssh-ed25519 or ssh-rsa line; the private key is wrapped in -----BEGIN OPENSSH PRIVATE KEY----- and works with ssh, scp, git and OpenSSH-compatible clients.",
+              "The comment is added to the end of the public key to help identify it (e.g. your email or device name). It has no effect on security and can be anything or left empty.",
+          },
+          {
+            question: "How do I use the generated key?",
+            answer:
+              "Copy the public key and add it to your server's ~/.ssh/authorized_keys file or paste it into GitHub/GitLab SSH key settings. Save the private key to ~/.ssh/id_ed25519 on your local machine and set permissions to 600.",
+          },
+          {
+            question: "What is the difference between public and private keys?",
+            answer:
+              "The public key can be shared freely and placed on any server. The private key must be kept secret and never shared. Authentication works by proving you possess the private key without revealing it.",
+          },
+          {
+            question: "Is it safe to generate SSH keys in a browser?",
+            answer:
+              "Yes, when the tool uses the Web Crypto API as this one does. The cryptographic operations happen locally on your device. Never generate keys on a website that sends them to a server.",
+          },
+          {
+            question: "What key size should I use for RSA?",
+            answer:
+              "RSA-4096 is recommended for new keys — it provides strong security well beyond current computing capabilities. RSA-2048 is still considered secure but RSA-4096 is preferred for long-term use.",
           },
         ]}
       />

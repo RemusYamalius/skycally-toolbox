@@ -6,6 +6,7 @@ import { tools } from "@/lib/tools";
 import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -47,7 +48,9 @@ function FlappyBirdPage() {
     try {
       const v = Number(window.localStorage.getItem("flappy-best") || 0);
       if (v > 0) setBest(v);
-    } catch { /* ignore */ }
+    } catch {
+      /* ignore */
+    }
   }, []);
 
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -170,9 +173,7 @@ function FlappyBirdPage() {
     birdRef.current.vy += GRAVITY;
     birdRef.current.y += birdRef.current.vy;
 
-    pipesRef.current = pipesRef.current
-      .map((p) => ({ ...p, x: p.x - PIPE_SPEED }))
-      .filter((p) => p.x > -PIPE_WIDTH);
+    pipesRef.current = pipesRef.current.map((p) => ({ ...p, x: p.x - PIPE_SPEED })).filter((p) => p.x > -PIPE_WIDTH);
 
     pipesRef.current.forEach((p) => {
       if (!p.passed && p.x + PIPE_WIDTH < BIRD_X) {
@@ -276,17 +277,14 @@ function FlappyBirdPage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Flappy Bird"
       description="Tap to flap and fly through the pipes! How far can you go?"
     >
       <div className="flex flex-col items-center gap-4">
-        {best > 0 && (
-          <p className="text-yellow-400 font-bold text-sm">🏆 Best: {best}</p>
-        )}
+        {best > 0 && <p className="text-yellow-400 font-bold text-sm">🏆 Best: {best}</p>}
 
-        {phase === "playing" && (
-          <p className="text-muted-foreground text-sm">Score: {score}</p>
-        )}
+        {phase === "playing" && <p className="text-muted-foreground text-sm">Score: {score}</p>}
 
         <canvas
           ref={canvasRef}
@@ -301,9 +299,7 @@ function FlappyBirdPage() {
           style={{ maxWidth: "100%", maxHeight: "70vh" }}
         />
 
-        <p className="text-muted-foreground text-xs">
-          Tap canvas or press Space to flap
-        </p>
+        <p className="text-muted-foreground text-xs">Tap canvas or press Space to flap</p>
       </div>
 
       <HowToUse
@@ -314,38 +310,58 @@ function FlappyBirdPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="flappy-bird" />
+      <AdZone id="flappy-bird-bottom" size="728x90" />
 
       <ToolSeoContent
-        title="Flappy Bird — Free Online Flappy Bird Game"
-        description="Play Flappy Bird online for free. Tap to flap through pipes, beat your high score, and challenge your reflexes. No download needed!"
+        title="Free Flappy Bird Game Online — Play in Your Browser"
+        description="Play the classic Flappy Bird game free in your browser. Tap or press Space to flap through pipes. How far can you go? No download, no signup required."
         body={[
-          "Flappy Bird is the iconic one-tap arcade game that took the world by storm. Guide a tiny yellow bird through an endless series of green pipes by tapping the screen or pressing Space to flap. Each pipe you clear earns you a point, and your personal best is saved automatically in your browser so you can keep chasing a new high score every session.",
-          "This free online version runs entirely in your browser — no downloads, no installs, no signup. It works on desktop with the spacebar and on mobile with a simple tap. The physics are tuned to match the original: gravity pulls the bird down, every flap gives it a quick lift, and a single touch on a pipe or the ground ends the run. Simple to learn, brutally hard to master.",
+          "Skycally's Flappy Bird recreates the iconic 2013 mobile game directly in your browser. Tap the screen or press Space to make the bird flap upward — gravity pulls it down continuously. Navigate through gaps in the green pipes without touching them or the ground. Each pipe you pass scores one point. How far can you go?",
+          "The game is deceptively simple: one control, one mechanic, infinite replay value. The challenge comes from timing each flap precisely — tap too fast and the bird flies too high, tap too slow and it plummets. The pipe gaps stay consistent, but the rhythm required to pass each one demands focus and pattern recognition.",
+          "Flappy Bird was created by Vietnamese developer Dong Nguyen and released in 2013. It became a viral phenomenon in early 2014, reaching 50 million downloads before being pulled from app stores by its creator. Its simple mechanic and brutal difficulty made it both addicting and meme-worthy — a defining mobile game moment.",
+          "Every run is a fresh start. Your best score is saved locally so you always have a target to beat. Compete with friends by sharing your score, or keep playing to beat your own record. The game runs entirely in your browser with no ads, no accounts, and no data collection.",
         ]}
         faqs={[
           {
             question: "How do I control the bird?",
             answer:
-              "Tap the canvas (on mobile) or click it with your mouse (on desktop) to flap. You can also press the Space key on your keyboard. Each flap gives the bird an instant upward boost; gravity pulls it down between flaps.",
+              "Tap the canvas on mobile, click it on desktop, or press the Space key. Each action makes the bird flap upward once. Gravity pulls it down continuously between flaps.",
           },
           {
-            question: "How does scoring work?",
+            question: "Can I use the keyboard?",
             answer:
-              "You earn one point every time the bird successfully passes through a pair of pipes. Your current score is shown at the top of the canvas during play, and your best score is saved locally so it persists between sessions.",
+              "Yes. Press Space at any time to flap, start a new game, or restart after a game over. The keyboard control works identically to tapping or clicking.",
           },
           {
-            question: "Is there a keyboard shortcut?",
+            question: "Why is it so hard?",
             answer:
-              "Yes — press Space at any time to flap, start a new game, or restart after a game over. The keyboard control works exactly like tapping the canvas.",
+              "Flappy Bird's difficulty comes from the continuous gravity and the precision required to time each flap. The pipe gap is fixed, but the rhythm needed to pass through takes practice to internalize.",
           },
           {
-            question: "Does it work on mobile and touch screens?",
+            question: "Is my high score saved?",
+            answer: "Yes. Your best score is saved in your browser's localStorage and displayed above the game area.",
+          },
+          {
+            question: "How do I start a new game?",
+            answer: "After a game over, tap, click, or press Space to restart immediately.",
+          },
+          {
+            question: "What happens if I touch the pipes or ground?",
             answer:
-              "Absolutely. The canvas responds to touch events directly, so you can play on any phone or tablet. The game prevents accidental scrolling while you tap, giving you a smooth, native-feeling experience.",
+              "The game ends immediately on any collision — with a pipe, the top of the screen, or the ground. Every run starts fresh from zero.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Tap the canvas to flap. The game is fully responsive and works on smartphones and tablets.",
+          },
+          {
+            question: "Is this the original Flappy Bird?",
+            answer:
+              "This is a fan recreation inspired by the original game by Dong Nguyen. The original app is no longer officially available on app stores.",
           },
         ]}
       />
+      <RelatedTools currentSlug="flappy-bird" />
     </ToolPageShell>
   );
 }

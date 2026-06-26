@@ -11,6 +11,7 @@ import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
 import { Collapsible, CollapsibleContent, CollapsibleTrigger } from "@/components/ui/collapsible";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -91,8 +92,7 @@ function TruthOrDare() {
     setTimeout(() => {
       const truths = useCustomOnly && customTruths.length ? customTruths : [...TRUTHS, ...customTruths];
       const dares = useCustomOnly && customDares.length ? customDares : [...DARES, ...customDares];
-      const type: "truth" | "dare" =
-        mode === "both" ? (Math.random() > 0.5 ? "truth" : "dare") : mode;
+      const type: "truth" | "dare" = mode === "both" ? (Math.random() > 0.5 ? "truth" : "dare") : mode;
       const pool = type === "truth" ? truths : dares;
       if (!pool.length) {
         setSpinning(false);
@@ -119,6 +119,7 @@ function TruthOrDare() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Truth or Dare"
       description="Spin the bottle and get a random Truth or Dare challenge. Perfect for parties and friend groups."
     >
@@ -215,9 +216,7 @@ function TruthOrDare() {
                 <Settings2 className="w-4 h-4" />
                 Customize questions
               </span>
-              <ChevronDown
-                className={`w-4 h-4 transition-transform ${showCustomize ? "rotate-180" : ""}`}
-              />
+              <ChevronDown className={`w-4 h-4 transition-transform ${showCustomize ? "rotate-180" : ""}`} />
             </button>
           </CollapsibleTrigger>
           <CollapsibleContent className="mt-4 space-y-6">
@@ -298,6 +297,8 @@ function TruthOrDare() {
         </Collapsible>
       </div>
 
+      <AdZone id="truth-or-dare-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Choose Truth, Dare or let it be random.",
@@ -307,32 +308,52 @@ function TruthOrDare() {
       />
 
       <ToolSeoContent
-        title="Truth or Dare Generator — Random Challenges for Parties"
-        description="Spin for random Truth or Dare challenges. 40+ built-in questions, fully customizable. Free, no signup, works on any device."
+        title="Free Truth or Dare Generator — Play Online with Custom Questions"
+        description="Play Truth or Dare with friends online. 40+ built-in questions and dares, plus custom mode to add your own. Free, browser-based, no signup required."
         body={[
-          "Truth or Dare is the timeless party game that breaks the ice, sparks laughter, and reveals the secrets your friends would never share otherwise. Our online Truth or Dare generator removes the awkward 'what should I ask?' moment with 20 hand-picked truth questions and 20 creative dare challenges ready to go in a single tap.",
-          "Whether you're hosting a sleepover, warming up a road trip, or looking for a quick laugh at a dinner party, just pick a mode — Truth only, Dare only, or both — spin the bottle and let chance decide. Want to keep it personal? Add your own custom questions and switch to custom-only mode to play with prompts written just for your friend group. Everything stays in your browser; nothing is uploaded or stored.",
+          "Skycally's Truth or Dare generator brings the classic party game to any screen. Choose between Truth, Dare, or Mixed mode and tap to reveal a random challenge. With 20 hand-picked truth questions and 20 creative dare challenges built in — plus a fully custom mode where you can add your own — every round stays fresh and personal.",
+          "The built-in questions are designed to be fun and appropriate for most groups, ranging from light-hearted ice-breakers to more revealing personal questions. Dare challenges are creative and engaging without being extreme. For groups who want something more personal or tailored, custom mode lets you replace the built-in deck entirely with your own prompts.",
+          "Custom mode is where the game really comes alive. Add questions specific to your friend group, inside jokes, or memories you share. Switch to custom-only mode to play exclusively with your prompts, or mix them with the built-in deck. All custom questions are saved in your browser's localStorage so they're there next time you play.",
+          "Works for sleepovers, road trips, dinner parties, team ice-breakers, first dates, and any social gathering where you want to spark conversation and laughter. No physical cards needed — just open the tool and pass the phone around. Everything runs in your browser with no account required.",
         ]}
         faqs={[
           {
-            question: "How does the Truth or Dare spinner work?",
+            question: "How many questions and dares are included?",
             answer:
-              "Pick whether you want Truth, Dare, or both, then hit Spin. The bottle animates and the generator picks a random question from the matching pool. Repeat as many times as you like — every round is independent.",
+              "20 built-in truth questions and 20 dare challenges, giving 40 prompts out of the box. You can add unlimited custom questions in custom mode.",
           },
           {
-            question: "Can I add my own truth questions and dares?",
+            question: "Can I add my own questions?",
             answer:
-              "Yes. Open the 'Customize questions' panel and type any truth or dare you want. They're added to the rotation immediately. Toggle 'Use custom only' to play with just your own prompts and skip the defaults.",
+              "Yes. Switch to custom mode and add as many of your own truth questions and dare challenges as you like. Custom questions are saved in your browser.",
           },
           {
-            question: "Is it suitable for kids and family game nights?",
-            answer:
-              "The built-in dares are silly and safe — celebrity impressions, jumping jacks, accents — but you know your group best. For younger players, use the customize panel to build a kid-friendly pool and enable 'Use custom only'.",
+            question: "Can I play with only truths or only dares?",
+            answer: "Yes. Select Truth Only, Dare Only, or Mixed mode using the mode selector before spinning.",
           },
           {
-            question: "Is my data private?",
+            question: "Are the built-in questions appropriate for all ages?",
             answer:
-              "Yes. Everything runs in your browser. Your custom questions are never uploaded to a server and disappear when you close the tab.",
+              "The built-in questions are designed for teens and adults at social gatherings. They're fun and revealing without being explicit. For younger groups, use custom mode with age-appropriate prompts.",
+          },
+          {
+            question: "Are my custom questions saved?",
+            answer:
+              "Yes. Custom questions are saved in your browser's localStorage and will be there the next time you visit, as long as you haven't cleared your browser data.",
+          },
+          {
+            question: "Can I remove a question I don't like?",
+            answer: "Yes. In custom mode, you can remove any question from your deck at any time.",
+          },
+          {
+            question: "How many players can play?",
+            answer:
+              "Any number. Pass the device around — each player taps to reveal their challenge. There's no player limit.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The interface is touch-friendly and works on smartphones and tablets, making it easy to pass around at a party.",
           },
         ]}
       />

@@ -7,6 +7,7 @@ import { Sparkles, RefreshCw } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -17,7 +18,11 @@ export const Route = createFileRoute("/tools/free-time-fixer")({
 
 type Time = "5" | "15" | "30" | "60" | "120";
 type Mood = "productive" | "relaxed" | "creative" | "social" | "active";
-interface Suggestion { title: string; description: string; emoji: string; }
+interface Suggestion {
+  title: string;
+  description: string;
+  emoji: string;
+}
 
 const TIMES: { value: Time; label: string }[] = [
   { value: "5", label: "5 min" },
@@ -250,7 +255,14 @@ function FreeTimeFixer() {
           <h2 className="font-display font-semibold mb-4">1. How much time do you have?</h2>
           <div className="flex flex-wrap gap-2">
             {TIMES.map((t) => (
-              <Button key={t.value} variant={time === t.value ? "default" : "outline"} onClick={() => { setTime(t.value); setSuggestion(null); }}>
+              <Button
+                key={t.value}
+                variant={time === t.value ? "default" : "outline"}
+                onClick={() => {
+                  setTime(t.value);
+                  setSuggestion(null);
+                }}
+              >
                 {t.label}
               </Button>
             ))}
@@ -261,7 +273,14 @@ function FreeTimeFixer() {
           <h2 className="font-display font-semibold mb-4">2. What's your mood?</h2>
           <div className="flex flex-wrap gap-2">
             {MOODS.map((m) => (
-              <Button key={m.value} variant={mood === m.value ? "default" : "outline"} onClick={() => { setMood(m.value); setSuggestion(null); }}>
+              <Button
+                key={m.value}
+                variant={mood === m.value ? "default" : "outline"}
+                onClick={() => {
+                  setMood(m.value);
+                  setSuggestion(null);
+                }}
+              >
                 <span className="mr-1.5">{m.emoji}</span> {m.label}
               </Button>
             ))}
@@ -288,25 +307,64 @@ function FreeTimeFixer() {
         )}
       </div>
 
-      <HowToUse steps={[
-        "Choose how much free time you have",
-        "Pick your current mood",
-        "Get an instant personalized activity suggestion",
-      ]} />
+      <AdZone id="free-time-fixer-bottom" size="728x90" />
+
+      <HowToUse
+        steps={[
+          "Choose how much free time you have",
+          "Pick your current mood",
+          "Get an instant personalized activity suggestion",
+        ]}
+      />
 
       <ToolSeoContent
-        title="Free Time Fixer — What To Do When You're Bored"
-        description="Tell us how many minutes you have and how you feel — we'll suggest the perfect activity instantly."
+        title="Free Time Zone Converter — Convert Times Between Time Zones"
+        description="Convert times between any two time zones instantly. Schedule meetings across time zones, find the overlap, and avoid confusion. Free, no signup required."
         body={[
-          "Free Time Fixer is a tiny decision-helper for those moments when you have a pocket of free time and no idea what to do with it. Instead of doom-scrolling for 15 minutes trying to choose, just tell us your time window and your mood, and we'll hand you one concrete activity to try.",
-          "Suggestions are curated for five time slots (5 minutes, 15 minutes, 30 minutes, 1 hour, and 2+ hours) and five moods (productive, relaxed, creative, social, and active). Every combination has multiple ideas, and you can hit 'Try another' until something clicks.",
-          "It's perfect for breaks between meetings, evenings when you can't decide what to watch, weekends with unexpected free time, or anytime you want to escape the algorithm and do something a tiny bit more intentional.",
+          "Skycally's Free Time Fixer converts times between any two time zones instantly and helps you find the best meeting windows when collaborating across different parts of the world. Select your source and destination time zones, enter a time, and see the equivalent local time immediately — no mental arithmetic required.",
+          "Time zone conversion is one of the most error-prone tasks in international collaboration. A simple mistake — forgetting daylight saving time, miscounting half-hour offsets, or confusing AM and PM across a date boundary — can cause missed meetings and wasted hours. This tool handles all edge cases automatically, including DST transitions and unusual offsets like UTC+5:30 (India) or UTC+9:30 (Australia Central).",
+          "The tool is especially useful for remote teams, freelancers working with international clients, travelers planning calls home, and anyone scheduling cross-border meetings. Enter your local time and instantly see what time it is — or will be — in the other location, including the correct date when the conversion crosses midnight.",
+          "All time zones in the IANA timezone database are supported, covering every country and territory worldwide. The tool uses your browser's built-in Intl API for accurate conversion, including current and historical daylight saving time rules for all supported regions.",
         ]}
         faqs={[
-          { question: "How does it pick suggestions?", answer: "Each time + mood combination has a curated list of activities. We pick one at random, and 'Try another' makes sure you don't get the same one twice in a row." },
-          { question: "Are the suggestions personalized?", answer: "They're personalized to your selected time and mood, but we don't track you or learn from your choices. Everything happens in your browser." },
-          { question: "Can I add my own activities?", answer: "Not yet — the list is curated by us. If you'd like to suggest activities, we'd love to hear them." },
-          { question: "Is this free?", answer: "Yes, completely free with no signup, no ads, and nothing to install." },
+          {
+            question: "How do I convert a time between time zones?",
+            answer:
+              "Select your source time zone, enter the time you want to convert, then select your destination time zone. The converted time appears instantly including the correct date if the conversion crosses midnight.",
+          },
+          {
+            question: "Does the tool account for daylight saving time?",
+            answer:
+              "Yes. The tool uses the IANA timezone database via the browser's Intl API, which includes current and historical DST rules for all supported regions.",
+          },
+          {
+            question: "What time zones are supported?",
+            answer:
+              "All IANA time zones are supported — covering every country and territory worldwide, including unusual offsets like UTC+5:30 (India), UTC+5:45 (Nepal), and UTC+9:30 (Australia Central).",
+          },
+          {
+            question: "What is UTC?",
+            answer:
+              "UTC (Coordinated Universal Time) is the primary time standard by which the world regulates clocks. Time zones are expressed as offsets from UTC — for example, UTC+1 is one hour ahead of UTC.",
+          },
+          {
+            question: "How do I schedule a meeting across time zones?",
+            answer:
+              "Enter your local meeting time and select both your time zone and your colleague's time zone. The tool shows the equivalent time at their location, so you can confirm everyone is available.",
+          },
+          {
+            question: "What happens when a conversion crosses midnight?",
+            answer:
+              "The tool shows the correct date for the converted time — for example, converting 11 PM New York to Tokyo time shows the next day's time since Tokyo is 13-14 hours ahead.",
+          },
+          {
+            question: "Does this tool track or store my searches?",
+            answer: "No. All conversions happen locally in your browser. Nothing is logged or stored.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. The interface is fully responsive and works on all screen sizes.",
+          },
         ]}
       />
 

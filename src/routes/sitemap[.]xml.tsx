@@ -1,7 +1,8 @@
-import { createServerFileRoute } from "@tanstack/react-start/server";
+import { createFileRoute } from "@tanstack/react-router";
 
-export const ServerRoute = createServerFileRoute("/sitemap.xml").methods({
-  GET: () => {
+export const Route = createFileRoute("/sitemap.xml")({
+  component: () => null,
+  loader: () => {
     const SITE = "https://skycally.com";
     const now = new Date().toISOString().slice(0, 10);
 
@@ -57,6 +58,7 @@ export const ServerRoute = createServerFileRoute("/sitemap.xml").methods({
       "rotate-pdf",
       "delete-pdf-pages",
       "pdf-page-numbers",
+      "protect-pdf",
       "pdf-reader",
       "pdf-watermark-remover",
       "document-scanner",
@@ -80,7 +82,6 @@ export const ServerRoute = createServerFileRoute("/sitemap.xml").methods({
       "mortgage-calculator",
       "car-loan-calculator",
       "compound-interest",
-      "calorie-calculator",
       "tip-calculator",
       "age-calculator",
       "bmi-calculator",
@@ -88,6 +89,16 @@ export const ServerRoute = createServerFileRoute("/sitemap.xml").methods({
       "country-info",
       "holiday-checker",
       "weather-checker",
+      "calorie-calculator",
+      "file-viewer",
+      "bmi-calculator",
+      "age-calculator",
+      "loan-calculator",
+      "emi-calculator",
+      "mortgage-calculator",
+      "car-loan-calculator",
+      "compound-interest",
+      "color-picker",
       "world-radio",
       "network-speed-test",
       "ip-address-lookup",
@@ -135,7 +146,7 @@ export const ServerRoute = createServerFileRoute("/sitemap.xml").methods({
       "tunnel-dash",
       "pinball",
       "whack-a-mole",
-      // Game Tools
+      // Mini games / utilities
       "spinning-wheel",
       "dice-roller",
       "role-spinner",
@@ -143,10 +154,7 @@ export const ServerRoute = createServerFileRoute("/sitemap.xml").methods({
       "truth-or-dare",
     ];
 
-    // Deduplicate
-    const uniqueSlugs = [...new Set(toolSlugs)];
-
-    const toolPages = uniqueSlugs.map((slug) => ({
+    const toolPages = toolSlugs.map((slug) => ({
       url: `/tools/${slug}`,
       priority: "0.8",
       changefreq: "weekly",
@@ -172,7 +180,6 @@ ${allPages
       headers: {
         "Content-Type": "application/xml; charset=utf-8",
         "Cache-Control": "public, max-age=3600",
-        "X-Content-Type-Options": "nosniff",
       },
     });
   },

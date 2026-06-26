@@ -1,8 +1,7 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createServerFileRoute } from "@tanstack/react-start/server";
 
-export const Route = createFileRoute("/sitemap.xml")({
-  component: () => null,
-  loader: () => {
+export const ServerRoute = createServerFileRoute("/sitemap.xml").methods({
+  GET: () => {
     const SITE = "https://skycally.com";
     const now = new Date().toISOString().slice(0, 10);
 
@@ -58,7 +57,6 @@ export const Route = createFileRoute("/sitemap.xml")({
       "rotate-pdf",
       "delete-pdf-pages",
       "pdf-page-numbers",
-      "protect-pdf",
       "pdf-reader",
       "pdf-watermark-remover",
       "document-scanner",
@@ -82,6 +80,7 @@ export const Route = createFileRoute("/sitemap.xml")({
       "mortgage-calculator",
       "car-loan-calculator",
       "compound-interest",
+      "calorie-calculator",
       "tip-calculator",
       "age-calculator",
       "bmi-calculator",
@@ -89,16 +88,6 @@ export const Route = createFileRoute("/sitemap.xml")({
       "country-info",
       "holiday-checker",
       "weather-checker",
-      "calorie-calculator",
-      "file-viewer",
-      "bmi-calculator",
-      "age-calculator",
-      "loan-calculator",
-      "emi-calculator",
-      "mortgage-calculator",
-      "car-loan-calculator",
-      "compound-interest",
-      "color-picker",
       "world-radio",
       "network-speed-test",
       "ip-address-lookup",
@@ -146,7 +135,7 @@ export const Route = createFileRoute("/sitemap.xml")({
       "tunnel-dash",
       "pinball",
       "whack-a-mole",
-      // Mini games / utilities
+      // Game Tools
       "spinning-wheel",
       "dice-roller",
       "role-spinner",
@@ -154,7 +143,10 @@ export const Route = createFileRoute("/sitemap.xml")({
       "truth-or-dare",
     ];
 
-    const toolPages = toolSlugs.map((slug) => ({
+    // Deduplicate
+    const uniqueSlugs = [...new Set(toolSlugs)];
+
+    const toolPages = uniqueSlugs.map((slug) => ({
       url: `/tools/${slug}`,
       priority: "0.8",
       changefreq: "weekly",
@@ -180,6 +172,7 @@ ${allPages
       headers: {
         "Content-Type": "application/xml; charset=utf-8",
         "Cache-Control": "public, max-age=3600",
+        "X-Content-Type-Options": "nosniff",
       },
     });
   },

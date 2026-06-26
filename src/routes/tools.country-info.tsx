@@ -253,7 +253,7 @@ function CountryInfo() {
           ))}
           {filtered.length === 0 && <p className="px-3 py-4 text-sm text-muted-foreground">No matches.</p>}
         </div>
-
+      </div>
 
       <AdZone id="country-info-bottom" size="728x90" />
 

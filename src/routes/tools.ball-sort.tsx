@@ -482,7 +482,6 @@ function TubeView({
           transition: "border-color 0.2s, box-shadow 0.2s",
         }}
         className="relative rounded-t-lg rounded-b-[20px] flex flex-col-reverse items-center justify-start pt-2 pb-1 select-none touch-none"
-        style2={{ gap: `${gap}px` }}
       >
         <div className="flex flex-col-reverse items-center w-full h-full px-2" style={{ gap: `${gap}px` }}>
           {tube.map((c, i) => {

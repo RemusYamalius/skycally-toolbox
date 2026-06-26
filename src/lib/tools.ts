@@ -1070,6 +1070,15 @@ export const tools: Tool[] = [
     path: "/tools/unit-converter",
   },
   {
+    slug: "calorie-calculator",
+    name: "Calorie Calculator",
+    description:
+      "Calculate your daily calorie needs and macros based on your age, weight, height, and activity level.",
+    category: "utility",
+    icon: Flame,
+    path: "/tools/calorie-calculator",
+  },
+  {
     slug: "ball-sort",
     name: "Ball Sort Puzzle",
     description: "Sort colored balls into matching tubes. 30 free levels, mobile and desktop, no download.",

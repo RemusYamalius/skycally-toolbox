@@ -97,6 +97,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "timetable-generator": ["age-calculator", "qr-generator", "word-to-pdf"],
   "world-radio": ["network-speed-test", "ip-address-lookup", "qr-generator"],
   "element-mixer": ["age-calculator", "bmi-calculator", "wordle"],
+  "calorie-calculator": ["bmi-calculator", "sleep-calculator", "age-calculator", "tip-calculator", "unit-converter"],
 };
 
 export function getRelatedTools(slug: string): Tool[] {

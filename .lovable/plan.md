@@ -1,110 +1,97 @@
-## Unit Converter — Implementation Plan
+## Calorie Calculator — Implementation Plan
 
-Build a premium, SEO-optimized Unit Converter at `/tools/unit-converter` covering 10 categories and 100+ units, with deep linking, recent history, and instant bidirectional conversion.
+Build a premium TDEE + macro calculator at `/tools/calorie-calculator` with live calculations, unit toggles, and full nutrition breakdown.
 
-### Files to change
+### Files
 
-1. **`src/lib/tools.ts`** — register entry:
-   - `{ slug: "unit-converter", name: "Unit Converter", description: "Convert length, weight, temperature, area, volume, speed, time, data, pressure and energy units instantly.", category: "utility", icon: Ruler, path: "/tools/unit-converter" }`
-2. **`src/lib/related-tools.ts`** — map `unit-converter` → `["currency-converter", "satoshi-converter", "color-picker", "qr-generator", "json-formatter"]` (subject to what exists)
-3. **`src/routes/tools.unit-converter.tsx`** — new route (single file)
-4. `src/routeTree.gen.ts` regenerates automatically.
+1. **`src/routes/tools.calorie-calculator.tsx`** (new) — single-file route
+2. **`src/lib/tools.ts`** — register: `{ slug: "calorie-calculator", name: "Calorie Calculator", description: "Calculate your daily calorie needs and macros based on your age, weight, height, and activity level.", category: "utility", icon: Flame, path: "/tools/calorie-calculator" }`
+3. **`src/lib/related-tools.ts`** — map to `["bmi-calculator", "sleep-calculator", "age-calculator", "tip-calculator", "unit-converter"]`
+4. `src/routeTree.gen.ts` regenerates automatically
 
-### Route file structure
+### Route shell
 
 ```tsx
-createFileRoute("/tools/unit-converter")({
-  head: buildToolMeta(toolBySlug("unit-converter")!),
-  component: UnitConverterPage,
+createFileRoute("/tools/calorie-calculator")({
+  head: () => buildToolMeta(toolBySlug("calorie-calculator", tools)),
+  component: CalorieCalculator,
 })
 ```
 
-Inside `<ToolPageShell title description>`:
-1. Converter card (category tabs → FROM/TO panel → quick chips → recent → formula)
-2. `<AdZone id="unit-converter-mid" size="728x90" />`
-3. `<HowToUse steps={...} />`
+Inside `<ToolPageShell showFileDisclaimer={false}>`:
+1. Calculator card
+2. `<AdZone id="calorie-calculator-mid" size="728x90" />`
+3. `<HowToUse steps={[3 steps from spec]} />`
 4. `<ToolSeoContent ... 8 FAQs />` (exact copy from spec)
-5. `<RelatedTools currentSlug="unit-converter" />`
+5. `<RelatedTools currentSlug="calorie-calculator" />`
 
-### Data model
+### State
 
 ```ts
-type CategoryId = "length" | "weight" | "temperature" | "area" | "volume"
-  | "speed" | "time" | "data" | "pressure" | "energy";
-
-interface Unit { id: string; label: string; symbol?: string; toBase?: number; }
-interface Category { id: CategoryId; label: string; icon: string; units: Unit[]; base?: string; quick: [string,string,number][]; formula?: string; }
+const [age, setAge] = useState("30");
+const [sex, setSex] = useState<"male" | "female">("male");
+const [units, setUnits] = useState<"metric" | "imperial">("metric");
+const [cm, setCm] = useState("175");
+const [ft, setFt] = useState("5"); const [inch, setInch] = useState("9");
+const [kg, setKg] = useState("70");
+const [lb, setLb] = useState("154");
+const [activity, setActivity] = useState<ActivityKey>("moderate");
+const [goal, setGoal] = useState<"maintain" | "lose" | "gain">("maintain");
 ```
 
-All categories use `value * toBase[from] / toBase[to]` except **temperature**, which routes through a dedicated `convertTemperature(value, from, to)` using formulas via Celsius pivot (C↔F, C↔K, C↔R derived).
+Unit toggle converts values in place (kg↔lb at 2.20462; cm↔ft/in via 2.54). localStorage keys: `calorie-calculator-units`, `calorie-calculator-inputs`.
 
-Static `CATEGORIES: Category[]` constant with all units listed in spec, plus 6–8 `quick` pairs per category (e.g. Length: `1 km → mi`, `1 mi → km`, `1 inch → cm`, `1 ft → cm`, `1 m → ft`, `1 yard → m`).
+### Calculations (useMemo)
 
-### State (useState)
+```ts
+const weightKg = units === "metric" ? +kg : +lb / 2.20462;
+const heightCm = units === "metric" ? +cm : ((+ft * 12) + +inch) * 2.54;
+const bmr = sex === "male"
+  ? 10*weightKg + 6.25*heightCm - 5*+age + 5
+  : 10*weightKg + 6.25*heightCm - 5*+age - 161;
+const tdee = bmr * ACTIVITY[activity];
 
-- `categoryId: CategoryId`
-- `fromUnit: string`, `toUnit: string`
-- `fromValue: string`, `toValue: string` (strings to allow `""`, `-`, etc.)
-- `lastEdited: "from" | "to"` — drives which side recomputes
-- `copied: boolean`
-- `recent: RecentEntry[]` (from localStorage `unit-converter-history`)
-- `formulaOpen: boolean`
+const calorieMin = sex === "female" ? 1200 : 1500;
+const targets = {
+  maintain: tdee,
+  loseMild: Math.max(tdee - 250, calorieMin),
+  loseModerate: Math.max(tdee - 500, calorieMin),
+  loseAggressive: Math.max(tdee - 1000, calorieMin),
+  gainMild: tdee + 250,
+  gainModerate: tdee + 500,
+};
 
-Effect: whenever `categoryId`/`fromUnit`/`toUnit`/edited value changes, recompute the opposite side. URL sync via `window.history.replaceState` with `?cat=&from=&to=&val=`.
-
-On initial mount, parse `window.location.search` to restore state (fallback defaults: length / meter / kilometer / 1).
-
-### Formatting
-
-`formatResult(n)`:
-- If `!isFinite(n)` → "—"
-- If `abs(n) !== 0 && (abs(n) >= 1e10 || abs(n) < 1e-6)` → `n.toExponential(6)` trimmed
-- Else `Number(n.toPrecision(8)).toString()` (strips trailing zeros naturally)
-
-### Visuals (dark premium, matches Skycally)
-
-- Outer card: `bg-card border border-border rounded-2xl p-6`
-- **Category tabs**: `flex gap-2 overflow-x-auto sm:flex-wrap` — each pill `px-3 py-2 rounded-full border text-sm`; selected `bg-[color:var(--cyan-brand)]/15 border-[color:var(--cyan-brand)] text-foreground shadow-[0_0_20px_rgba(0,212,255,0.25)]`
-- **FROM/TO panels**: two grid cells (`grid sm:grid-cols-2 gap-4`) with shadcn `Select` (unit) and large `Input` (`text-3xl font-mono h-14`, `inputMode="decimal"`)
-- **Swap button** between panels: `rounded-full border w-12 h-12`, framer-motion `rotate: 180` on click toggle
-- **Result side**: cyan-tinted text + Copy button (`Check` icon for 1.5s after copy)
-- **Quick chips**: grid `grid-cols-2 sm:grid-cols-4 gap-2`; click fills FROM unit/value and TO unit
-- **Formula**: shadcn `Collapsible` "Show formula" — shows multiplier or temperature formula string
-- **Recent**: horizontal list, click to restore
-
-### Controls
-
-- Both FROM and TO `Input` fields editable; typing in either updates the other
-- Swap button: exchanges units AND values, sets `lastEdited` accordingly
-- Tab order: from-unit → from-value → swap → to-unit → to-value → Copy
-- Copy button writes `"<val> <fromSymbol> = <result> <toSymbol>"`
-
-### URL deep linking
-
-```
-/tools/unit-converter?cat=length&from=kilometer&to=mile&val=5
+const bmi = weightKg / (heightCm / 100) ** 2;
 ```
 
-`useEffect` syncs current state into URL via `replaceState` (no history pollution). Initial mount restores from `URLSearchParams`. Invalid params → fall back to defaults silently.
+Macros computed from each displayed target (protein 1g/lb body weight → grams; fat = cal × 0.30 / 9; carbs = remainder / 4).
 
-### localStorage
+Weeks-to-goal: `(deficitPerDay × 7) / 7716` kg/week → user enters no target weight, so show "≈ X kg/month" projection per option.
 
-- `unit-converter-history` → JSON array of last 5 `{cat, from, to, val, result}` entries. Push on each value change with 600ms debounce; dedupe consecutive identical entries.
+### Visuals (dark Skycally)
 
-### Mobile considerations
+- **Form panel** (left, `lg:col-span-2`): age input, sex segmented toggle, units segmented toggle, height/weight inputs (auto-swap UI based on units), activity 5-card grid (`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2`), goal 3-card row.
+- **Results panel** (right or below):
+  - Hero calorie card with cyan glow: big number, "kcal/day" subtitle, three sub-rows for selected goal variants (when lose/gain, show all sub-options as comparable mini-cards).
+  - Macros: 3-column grid (protein/carbs/fat) with animated horizontal progress bars filling to their % share.
+  - BMI card: value + colored badge + horizontal gradient scale with marker positioned by BMI.
+  - Projection line: "At a 500 kcal deficit you'll lose ≈ 0.45 kg / week".
+- Animation: results wrap in `motion.div` with `initial={{opacity:0,y:8}} animate={{opacity:1,y:0}}`.
+- Show results only when age/height/weight are valid numbers and BMR > 800; otherwise show inline warning.
 
-- Min 48px tap targets; numeric keyboard via `inputMode="decimal"`
-- Category tabs horizontal scroll with `-mx-4 px-4` bleed
-- Quick chips wrap to 2 columns; FROM/TO panels stack vertically
+### Validation
 
-### SEO content
-
-Use exact `title`, `description`, `body` (4 paragraphs), and 8 FAQs from spec.
+- Age 1–100 (warn <15 or >80, inline text)
+- Weight 20–300 kg / 44–660 lb
+- Height 50–250 cm
+- Invalid → grey out results card with message
+- BMR < 800 → "Values seem unusual, please check your inputs."
 
 ### Dependencies
 
-None new. Uses existing shadcn `Select`, `Input`, `Button`, `Collapsible`, framer-motion, lucide-react (`Ruler`, `ArrowDownUp`, `Copy`, `Check`, `ChevronDown`), `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`, `AdZone`, `buildToolMeta`, `toolBySlug`.
+None new. Uses shadcn `Input`, `Button`, framer-motion, lucide (`Flame`, `Beef`, `Wheat`, `Droplet`, plus emoji), `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`, `AdZone`, `buildToolMeta`, `toolBySlug`.
 
-### Verification
+### Reminders after build
 
-After build: visit `/tools/unit-converter`, type in FROM, confirm TO updates; swap; switch category; click quick chip; verify URL params update; reload — state restored; verify copy; check mobile viewport.
+1. Tool registered in `src/lib/tools.ts` with icon `Flame`, category `utility`.
+2. Add `/tools/calorie-calculator` to sitemap and request indexing in Google Search Console.

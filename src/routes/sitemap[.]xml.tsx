@@ -2,7 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 
 export const Route = createFileRoute("/sitemap.xml")({
   component: () => null,
-  loader: () => {
+  beforeLoad: () => {
     const SITE = "https://skycally.com";
     const now = new Date().toISOString().slice(0, 10);
 
@@ -17,7 +17,6 @@ export const Route = createFileRoute("/sitemap.xml")({
     ];
 
     const toolSlugs = [
-      // Video
       "video-to-gif",
       "video-trimmer",
       "video-merger",
@@ -25,7 +24,6 @@ export const Route = createFileRoute("/sitemap.xml")({
       "video-compressor",
       "extract-audio",
       "screen-recorder",
-      // Image
       "image-converter",
       "image-compressor",
       "image-upscaler",
@@ -43,11 +41,9 @@ export const Route = createFileRoute("/sitemap.xml")({
       "business-card-generator",
       "color-palette",
       "color-picker",
-      // Audio
       "audio-converter",
       "text-to-speech",
       "speech-to-text",
-      // PDF
       "pdf-text-extractor",
       "word-to-pdf",
       "merge-pdf",
@@ -58,12 +54,10 @@ export const Route = createFileRoute("/sitemap.xml")({
       "rotate-pdf",
       "delete-pdf-pages",
       "pdf-page-numbers",
-      "protect-pdf",
       "pdf-reader",
       "pdf-watermark-remover",
       "document-scanner",
       "file-viewer",
-      // Text
       "base64",
       "word-counter",
       "json-formatter",
@@ -73,7 +67,6 @@ export const Route = createFileRoute("/sitemap.xml")({
       "hash-generator",
       "lorem-ipsum",
       "word-processor",
-      // Finance / Utility
       "unit-converter",
       "currency-converter",
       "satoshi-converter",
@@ -82,6 +75,7 @@ export const Route = createFileRoute("/sitemap.xml")({
       "mortgage-calculator",
       "car-loan-calculator",
       "compound-interest",
+      "calorie-calculator",
       "tip-calculator",
       "age-calculator",
       "bmi-calculator",
@@ -89,16 +83,6 @@ export const Route = createFileRoute("/sitemap.xml")({
       "country-info",
       "holiday-checker",
       "weather-checker",
-      "calorie-calculator",
-      "file-viewer",
-      "bmi-calculator",
-      "age-calculator",
-      "loan-calculator",
-      "emi-calculator",
-      "mortgage-calculator",
-      "car-loan-calculator",
-      "compound-interest",
-      "color-picker",
       "world-radio",
       "network-speed-test",
       "ip-address-lookup",
@@ -114,13 +98,11 @@ export const Route = createFileRoute("/sitemap.xml")({
       "free-time-fixer",
       "timetable-generator",
       "youtube-comment-analyzer",
-      // AI
       "background-blur",
       "face-landmarks",
       "hand-gesture",
       "object-detection",
       "sentiment-analysis",
-      // Games
       "wordle",
       "2048",
       "tetris",
@@ -146,7 +128,6 @@ export const Route = createFileRoute("/sitemap.xml")({
       "tunnel-dash",
       "pinball",
       "whack-a-mole",
-      // Mini games / utilities
       "spinning-wheel",
       "dice-roller",
       "role-spinner",
@@ -154,29 +135,42 @@ export const Route = createFileRoute("/sitemap.xml")({
       "truth-or-dare",
     ];
 
-    const toolPages = toolSlugs.map((slug) => ({
-      url: `/tools/${slug}`,
-      priority: "0.8",
-      changefreq: "weekly",
-    }));
+    const allPages = [
+      ...staticPages,
+      ...toolSlugs.map((slug) => ({
+        url: `/tools/${slug}`,
+        priority: "0.8",
+        changefreq: "weekly",
+      })),
+    ];
 
-    const allPages = [...staticPages, ...toolPages];
+    const xml =
+      '<?xml version="1.0" encoding="UTF-8"?>\n' +
+      '<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">\n' +
+      allPages
+        .map(
+          (p) =>
+            "  <url>\n" +
+            "    <loc>" +
+            SITE +
+            p.url +
+            "</loc>\n" +
+            "    <lastmod>" +
+            now +
+            "</lastmod>\n" +
+            "    <changefreq>" +
+            p.changefreq +
+            "</changefreq>\n" +
+            "    <priority>" +
+            p.priority +
+            "</priority>\n" +
+            "  </url>",
+        )
+        .join("\n") +
+      "\n</urlset>";
 
-    const xml = `<?xml version="1.0" encoding="UTF-8"?>
-<urlset xmlns="http://www.sitemaps.org/schemas/sitemap/0.9">
-${allPages
-  .map(
-    (p) => `  <url>
-    <loc>${SITE}${p.url}</loc>
-    <lastmod>${now}</lastmod>
-    <changefreq>${p.changefreq}</changefreq>
-    <priority>${p.priority}</priority>
-  </url>`,
-  )
-  .join("\n")}
-</urlset>`;
-
-    return new Response(xml, {
+    throw new Response(xml, {
+      status: 200,
       headers: {
         "Content-Type": "application/xml; charset=utf-8",
         "Cache-Control": "public, max-age=3600",

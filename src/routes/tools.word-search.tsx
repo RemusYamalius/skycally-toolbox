@@ -109,8 +109,8 @@ type Dir = "H" | "V" | "D1" | "D2" | "RH" | "RV" | "RD1" | "RD2";
 type Difficulty = "easy" | "medium" | "hard";
 
 const CONFIG: Record<Difficulty, { grid: number; words: number; directions: Dir[] }> = {
-  easy: { grid: 10, words: 6, directions: ["H", "V"] },
-  medium: { grid: 13, words: 9, directions: ["H", "V", "D1", "D2"] },
+  easy: { grid: 10, words: 6, directions: ["H", "V", "D1", "D2"] },
+  medium: { grid: 13, words: 9, directions: ["H", "V", "D1", "D2", "RH", "RV"] },
   hard: { grid: 15, words: 12, directions: ["H", "V", "D1", "D2", "RH", "RV", "RD1", "RD2"] },
 };
 

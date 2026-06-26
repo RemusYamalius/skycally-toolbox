@@ -120,6 +120,7 @@ import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-pale
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
 import { Route as ToolsChessRouteImport } from './routes/tools.chess'
 import { Route as ToolsCarLoanCalculatorRouteImport } from './routes/tools.car-loan-calculator'
+import { Route as ToolsCalorieCalculatorRouteImport } from './routes/tools.calorie-calculator'
 import { Route as ToolsBusinessCardGeneratorRouteImport } from './routes/tools.business-card-generator'
 import { Route as ToolsBubbleShooterRouteImport } from './routes/tools.bubble-shooter'
 import { Route as ToolsBreakoutRouteImport } from './routes/tools.breakout'
@@ -696,6 +697,11 @@ const ToolsCarLoanCalculatorRoute = ToolsCarLoanCalculatorRouteImport.update({
   path: '/tools/car-loan-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsCalorieCalculatorRoute = ToolsCalorieCalculatorRouteImport.update({
+  id: '/tools/calorie-calculator',
+  path: '/tools/calorie-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsBusinessCardGeneratorRoute =
   ToolsBusinessCardGeneratorRouteImport.update({
     id: '/tools/business-card-generator',
@@ -818,6 +824,7 @@ export interface FileRoutesByFullPath {
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
+  '/tools/calorie-calculator': typeof ToolsCalorieCalculatorRoute
   '/tools/car-loan-calculator': typeof ToolsCarLoanCalculatorRoute
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
@@ -949,6 +956,7 @@ export interface FileRoutesByTo {
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
+  '/tools/calorie-calculator': typeof ToolsCalorieCalculatorRoute
   '/tools/car-loan-calculator': typeof ToolsCarLoanCalculatorRoute
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
@@ -1081,6 +1089,7 @@ export interface FileRoutesById {
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
   '/tools/business-card-generator': typeof ToolsBusinessCardGeneratorRoute
+  '/tools/calorie-calculator': typeof ToolsCalorieCalculatorRoute
   '/tools/car-loan-calculator': typeof ToolsCarLoanCalculatorRoute
   '/tools/chess': typeof ToolsChessRoute
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
@@ -1214,6 +1223,7 @@ export interface FileRouteTypes {
     | '/tools/breakout'
     | '/tools/bubble-shooter'
     | '/tools/business-card-generator'
+    | '/tools/calorie-calculator'
     | '/tools/car-loan-calculator'
     | '/tools/chess'
     | '/tools/collage-maker'
@@ -1345,6 +1355,7 @@ export interface FileRouteTypes {
     | '/tools/breakout'
     | '/tools/bubble-shooter'
     | '/tools/business-card-generator'
+    | '/tools/calorie-calculator'
     | '/tools/car-loan-calculator'
     | '/tools/chess'
     | '/tools/collage-maker'
@@ -1476,6 +1487,7 @@ export interface FileRouteTypes {
     | '/tools/breakout'
     | '/tools/bubble-shooter'
     | '/tools/business-card-generator'
+    | '/tools/calorie-calculator'
     | '/tools/car-loan-calculator'
     | '/tools/chess'
     | '/tools/collage-maker'
@@ -1608,6 +1620,7 @@ export interface RootRouteChildren {
   ToolsBreakoutRoute: typeof ToolsBreakoutRoute
   ToolsBubbleShooterRoute: typeof ToolsBubbleShooterRoute
   ToolsBusinessCardGeneratorRoute: typeof ToolsBusinessCardGeneratorRoute
+  ToolsCalorieCalculatorRoute: typeof ToolsCalorieCalculatorRoute
   ToolsCarLoanCalculatorRoute: typeof ToolsCarLoanCalculatorRoute
   ToolsChessRoute: typeof ToolsChessRoute
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
@@ -2494,6 +2507,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsCarLoanCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/calorie-calculator': {
+      id: '/tools/calorie-calculator'
+      path: '/tools/calorie-calculator'
+      fullPath: '/tools/calorie-calculator'
+      preLoaderRoute: typeof ToolsCalorieCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/business-card-generator': {
       id: '/tools/business-card-generator'
       path: '/tools/business-card-generator'
@@ -2651,6 +2671,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsBreakoutRoute: ToolsBreakoutRoute,
   ToolsBubbleShooterRoute: ToolsBubbleShooterRoute,
   ToolsBusinessCardGeneratorRoute: ToolsBusinessCardGeneratorRoute,
+  ToolsCalorieCalculatorRoute: ToolsCalorieCalculatorRoute,
   ToolsCarLoanCalculatorRoute: ToolsCarLoanCalculatorRoute,
   ToolsChessRoute: ToolsChessRoute,
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,

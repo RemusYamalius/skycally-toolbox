@@ -10,6 +10,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter } from "@/components/ui/dialog";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -33,13 +34,7 @@ const DEFAULT_ROLES: Role[] = [
   { name: "Citizen", count: 3, color: "#3b82f6" },
 ];
 
-function Wheel({
-  segments,
-  rotation,
-}: {
-  segments: Segment[];
-  rotation: number;
-}) {
+function Wheel({ segments, rotation }: { segments: Segment[]; rotation: number }) {
   const canvasRef = useRef<HTMLCanvasElement>(null);
   const containerRef = useRef<HTMLDivElement>(null);
   const [size, setSize] = useState(420);
@@ -146,7 +141,12 @@ function RoleSpinner() {
     [remainingPlayers],
   );
   const roleSegments: Segment[] = useMemo(
-    () => remainingRoles.flatMap((r) => Array(r.count).fill(null).map(() => ({ label: r.name, color: r.color }))),
+    () =>
+      remainingRoles.flatMap((r) =>
+        Array(r.count)
+          .fill(null)
+          .map(() => ({ label: r.name, color: r.color })),
+      ),
     [remainingRoles],
   );
 
@@ -166,9 +166,7 @@ function RoleSpinner() {
   };
   const removeRole = (i: number) => setRoles((r) => r.filter((_, idx) => idx !== i));
   const adjustCount = (i: number, delta: number) =>
-    setRoles((r) =>
-      r.map((x, idx) => (idx === i ? { ...x, count: Math.max(0, x.count + delta) } : x)),
-    );
+    setRoles((r) => r.map((x, idx) => (idx === i ? { ...x, count: Math.max(0, x.count + delta) } : x)));
 
   const startGame = () => {
     setRemainingPlayers([...players]);
@@ -434,9 +432,7 @@ function RoleSpinner() {
       <Dialog open={revealOpen} onOpenChange={setRevealOpen}>
         <DialogContent className="text-center">
           <DialogHeader>
-            <DialogTitle className="text-sm uppercase tracking-wide text-muted-foreground">
-              Role assigned
-            </DialogTitle>
+            <DialogTitle className="text-sm uppercase tracking-wide text-muted-foreground">Role assigned</DialogTitle>
           </DialogHeader>
           <div className="py-4 space-y-3">
             <p className="font-display text-2xl font-bold">👤 {currentName}</p>
@@ -454,6 +450,8 @@ function RoleSpinner() {
         </DialogContent>
       </Dialog>
 
+      <AdZone id="role-spinner-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Add player names and set how many of each role you need.",
@@ -463,32 +461,54 @@ function RoleSpinner() {
       />
 
       <ToolSeoContent
-        title="Role Spinner — Random Role Assignment for Mafia & Party Games"
-        description="Assign secret roles to players randomly using two spinning wheels. Perfect for Mafia, Werewolf, and any party game that needs fair role distribution."
+        title="Free Role Spinner — Assign Secret Roles for Mafia & Party Games"
+        description="Randomly assign secret roles for Mafia, Werewolf, Among Us, and other social deduction games. Free, private, browser-based role spinner. No signup."
         body={[
-          "Skycally's Role Spinner takes the awkwardness out of distributing secret roles for social deduction games. Add your players, configure how many Mafia, Doctors, Sheriffs, Citizens — or any custom roles — you want in play, then let the wheels do the rest. A first wheel picks a random player, and a second wheel assigns them a role drawn from the remaining pool, so every game starts with a perfectly fair, fully randomized setup.",
-          "Everything runs locally in your browser: names and roles never leave your device, so it's safe to use even when someone is screen-sharing. It's ideal for Mafia, Werewolf, Secret Hitler, Among Us-style party games, classroom activities, team-building exercises, or any moment when you need to hand out hidden roles without arguments. Once the game is over, copy the full assignment table with one click for moderators or post-game recaps.",
+          "Skycally's Role Spinner takes the awkwardness out of distributing secret roles for social deduction games. Add your players, configure how many Mafia, Doctors, Sheriffs, Citizens — or any custom roles — you want in play, then let the spinner do the rest. A first wheel picks a random player, and a second wheel assigns them a role drawn from the remaining pool, ensuring every game starts with a perfectly fair, fully randomized setup.",
+          "The spinner supports any combination of named roles — perfect for Mafia, Werewolf, Secret Hitler, Among Us-style party games, classroom activities, team-building exercises, or any moment when you need to hand out hidden identities without arguments. Role counts are configurable, so you can tailor the game balance for any group size from 4 to 20+ players.",
+          "Everything runs locally in your browser: names and roles never leave your device, making it safe to use even when someone is screen-sharing. Once all roles are assigned, copy the full assignment table with one click for moderators or post-game recaps. The animated dual-wheel presentation builds suspense and makes each reveal a moment.",
+          "Unlike passing folded pieces of paper or whispering roles, the spinner provides a transparent process everyone can watch without seeing each other's results. Each player receives their role privately on their own screen, maintaining the secrecy that social deduction games depend on.",
         ]}
         faqs={[
           {
-            question: "How does the Role Spinner work?",
+            question: "What games is this suitable for?",
             answer:
-              "You configure your players and the roles you want in play, then for each round the tool spins one wheel to choose a random player and a second wheel to assign them a role. Once assigned, that player and one slot of that role are removed from the remaining pool, so the distribution stays correct.",
+              "Mafia, Werewolf, Secret Hitler, Town of Salem, Among Us, Avalon, One Night Ultimate Werewolf, and any other social deduction or hidden role game. It also works for classroom role-play and team-building activities.",
           },
           {
-            question: "Which games is it good for?",
+            question: "How many players and roles can I add?",
             answer:
-              "It works for any game that needs secret role assignment — Mafia, Werewolf, Secret Hitler, One Night Ultimate Werewolf, Among Us-style party games, escape rooms, classroom simulations, and team-building exercises.",
+              "There is no hard limit. The spinner works for any group size — typically 4 to 20+ players. Add as many custom role types as your game requires.",
           },
           {
-            question: "Can I add custom roles?",
+            question: "Can I create custom roles?",
             answer:
-              "Yes. Add any role name you like and choose how many copies of it to include. Each custom role gets its own color automatically so it's easy to spot on the wheel and in the final summary.",
+              "Yes. You can define any role name and set how many players receive that role. Perfect for custom game variants or creating unique role sets for your group.",
           },
           {
-            question: "Is my data private?",
+            question: "Is the role assignment private?",
             answer:
-              "Completely. Player names, role configurations, and final assignments all stay in your browser tab. Nothing is uploaded, stored on a server, or tracked.",
+              "Each player's role is revealed on their own screen — other players cannot see it unless they look at the same device. This maintains the secrecy that social deduction games require.",
+          },
+          {
+            question: "Can I copy the full assignment list?",
+            answer:
+              "Yes. After all roles are assigned, a copy button lets you export the complete player-role table as plain text for moderators or record-keeping.",
+          },
+          {
+            question: "Does the role assignment stay on the server?",
+            answer:
+              "No. All assignments happen locally in your browser. Nothing is sent to any server, making it safe to use with shared screens or in sensitive environments.",
+          },
+          {
+            question: "Can I re-spin if someone gets the wrong role?",
+            answer:
+              "Yes. You can reset and re-run the spinner at any time without losing your player or role configuration.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The spinner and role configuration are fully responsive and work on smartphones, tablets, and desktops.",
           },
         ]}
       />

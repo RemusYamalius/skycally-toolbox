@@ -8,6 +8,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
@@ -18,12 +19,78 @@ export const Route = createFileRoute("/tools/hangman")({
 });
 
 const WORD_BANK: Record<string, string[]> = {
-  Animals:    ["ELEPHANT", "GIRAFFE", "PENGUIN", "DOLPHIN", "CHEETAH", "FLAMINGO", "KANGAROO", "CROCODILE", "BUTTERFLY", "HAMSTER"],
-  Countries:  ["MOROCCO", "BRAZIL", "AUSTRALIA", "CANADA", "JAPAN", "GERMANY", "ARGENTINA", "PORTUGAL", "NIGERIA", "THAILAND"],
-  Sports:     ["BASKETBALL", "SWIMMING", "VOLLEYBALL", "GYMNASTICS", "BADMINTON", "WRESTLING", "ARCHERY", "SKATEBOARD", "SNOWBOARD", "CRICKET"],
-  Technology: ["COMPUTER", "KEYBOARD", "INTERNET", "SOFTWARE", "ALGORITHM", "DATABASE", "FRAMEWORK", "BLUETOOTH", "PROCESSOR", "JAVASCRIPT"],
-  Food:       ["SPAGHETTI", "CROISSANT", "AVOCADO", "BLUEBERRY", "CHOCOLATE", "PINEAPPLE", "MUSHROOM", "BROCCOLI", "CINNAMON", "RASPBERRY"],
-  Movies:     ["INCEPTION", "GLADIATOR", "INTERSTELLAR", "TITANIC", "AVATAR", "FROZEN", "MATRIX", "JOKER", "GRAVITY", "PARASITE"],
+  Animals: [
+    "ELEPHANT",
+    "GIRAFFE",
+    "PENGUIN",
+    "DOLPHIN",
+    "CHEETAH",
+    "FLAMINGO",
+    "KANGAROO",
+    "CROCODILE",
+    "BUTTERFLY",
+    "HAMSTER",
+  ],
+  Countries: [
+    "MOROCCO",
+    "BRAZIL",
+    "AUSTRALIA",
+    "CANADA",
+    "JAPAN",
+    "GERMANY",
+    "ARGENTINA",
+    "PORTUGAL",
+    "NIGERIA",
+    "THAILAND",
+  ],
+  Sports: [
+    "BASKETBALL",
+    "SWIMMING",
+    "VOLLEYBALL",
+    "GYMNASTICS",
+    "BADMINTON",
+    "WRESTLING",
+    "ARCHERY",
+    "SKATEBOARD",
+    "SNOWBOARD",
+    "CRICKET",
+  ],
+  Technology: [
+    "COMPUTER",
+    "KEYBOARD",
+    "INTERNET",
+    "SOFTWARE",
+    "ALGORITHM",
+    "DATABASE",
+    "FRAMEWORK",
+    "BLUETOOTH",
+    "PROCESSOR",
+    "JAVASCRIPT",
+  ],
+  Food: [
+    "SPAGHETTI",
+    "CROISSANT",
+    "AVOCADO",
+    "BLUEBERRY",
+    "CHOCOLATE",
+    "PINEAPPLE",
+    "MUSHROOM",
+    "BROCCOLI",
+    "CINNAMON",
+    "RASPBERRY",
+  ],
+  Movies: [
+    "INCEPTION",
+    "GLADIATOR",
+    "INTERSTELLAR",
+    "TITANIC",
+    "AVATAR",
+    "FROZEN",
+    "MATRIX",
+    "JOKER",
+    "GRAVITY",
+    "PARASITE",
+  ],
 };
 
 const MAX_WRONG = 6;
@@ -43,11 +110,21 @@ function HangmanSVG({ wrong }: { wrong: number }) {
       <line x1="60" y1="20" x2="130" y2="20" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
       <line x1="130" y1="20" x2="130" y2="45" stroke="currentColor" strokeWidth="4" strokeLinecap="round" />
       {wrong >= 1 && <circle cx="130" cy="60" r="15" stroke="currentColor" strokeWidth="3" fill="none" />}
-      {wrong >= 2 && <line x1="130" y1="75" x2="130" y2="135" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />}
-      {wrong >= 3 && <line x1="130" y1="90" x2="105" y2="115" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />}
-      {wrong >= 4 && <line x1="130" y1="90" x2="155" y2="115" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />}
-      {wrong >= 5 && <line x1="130" y1="135" x2="105" y2="165" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />}
-      {wrong >= 6 && <line x1="130" y1="135" x2="155" y2="165" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />}
+      {wrong >= 2 && (
+        <line x1="130" y1="75" x2="130" y2="135" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      )}
+      {wrong >= 3 && (
+        <line x1="130" y1="90" x2="105" y2="115" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      )}
+      {wrong >= 4 && (
+        <line x1="130" y1="90" x2="155" y2="115" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      )}
+      {wrong >= 5 && (
+        <line x1="130" y1="135" x2="105" y2="165" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      )}
+      {wrong >= 6 && (
+        <line x1="130" y1="135" x2="155" y2="165" stroke="currentColor" strokeWidth="3" strokeLinecap="round" />
+      )}
     </svg>
   );
 }
@@ -124,15 +201,14 @@ function HangmanPage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Hangman"
       description="Guess the hidden word letter by letter. You have 6 wrong guesses before the hangman is complete."
     >
       <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
         {phase === "setup" ? (
           <div className="max-w-md mx-auto">
-            <p className="text-sm font-semibold text-muted-foreground mb-3 text-center">
-              Pick a category
-            </p>
+            <p className="text-sm font-semibold text-muted-foreground mb-3 text-center">Pick a category</p>
             <div className="grid grid-cols-2 sm:grid-cols-3 gap-2 mb-6">
               {Object.keys(WORD_BANK).map((cat) => (
                 <button
@@ -191,8 +267,8 @@ function HangmanPage() {
                           ? phase === "lost" && !guessed.has(letter)
                             ? "text-red-500"
                             : phase === "won"
-                            ? "text-green-500"
-                            : "text-foreground"
+                              ? "text-green-500"
+                              : "text-foreground"
                           : "text-transparent",
                       )}
                     >
@@ -230,10 +306,8 @@ function HangmanPage() {
                     disabled={used || phase !== "playing"}
                     className={cn(
                       "w-9 h-9 sm:w-10 sm:h-10 rounded-lg text-sm font-bold transition-all",
-                      correct &&
-                        "bg-green-500/30 text-green-500 border border-green-500/40",
-                      wrong &&
-                        "bg-muted text-muted-foreground border border-transparent opacity-40",
+                      correct && "bg-green-500/30 text-green-500 border border-green-500/40",
+                      wrong && "bg-muted text-muted-foreground border border-transparent opacity-40",
                       !used &&
                         "bg-card border border-border hover:border-primary/50 hover:bg-secondary text-foreground",
                     )}
@@ -263,6 +337,8 @@ function HangmanPage() {
         )}
       </div>
 
+      <AdZone id="hangman-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Choose a word category and start the game.",
@@ -272,28 +348,48 @@ function HangmanPage() {
       />
 
       <ToolSeoContent
-        title="Hangman Game — Free Online Word Guessing Game"
-        description="Play Hangman online for free. Guess words from Animals, Countries, Sports, Technology and more. Works on mobile and desktop!"
+        title="Free Hangman Game Online — Guess the Word Before the Man Falls"
+        description="Play Hangman free online. Guess letters to reveal the hidden word before running out of attempts. Multiple categories. Free, no signup, works on mobile."
         body={[
-          "Hangman is the timeless word-guessing game where you reveal a hidden word one letter at a time. Each wrong guess draws another part of the hangman — head, body, arms and legs. Find the word in six wrong guesses or fewer to win, and build the longest winning streak you can.",
-          "This free online version runs entirely in your browser with no sign-up or downloads. Pick from six categories — Animals, Countries, Sports, Technology, Food and Movies — and guess letters with the on-screen keyboard or your physical keyboard. A streak counter rewards back-to-back wins and resets the moment you lose, so every guess matters.",
+          "Skycally's Hangman presents a hidden word and gives you 6 attempts to guess it letter by letter. Click a letter or press a key on your keyboard to guess. Correct letters are revealed in their positions; wrong guesses add a part to the hangman drawing. Guess the word before the figure is complete to win.",
+          "Hangman is one of the oldest word-guessing games in the world, appearing in print as early as 1894. It's a staple of classrooms, road trips, and family game nights because it requires no equipment beyond paper and a pen. The digital version preserves the original tension — each wrong guess brings the figure closer to completion.",
+          "Words are drawn from multiple categories including Animals, Countries, Sports, Technology, Food, and Nature. Each new game picks a random word from a randomly selected category, ensuring variety across sessions. The category is shown as a hint so you can narrow down the possibilities.",
+          "Strategy matters in Hangman. Start with the most common English letters: E, T, A, O, I, N, S, H, R. Then use the pattern of revealed letters to make educated guesses about the remaining ones. Short words with unusual letter combinations are the hardest — a 4-letter word with a Q or Z can be brutal even for experienced players.",
         ]}
         faqs={[
           {
-            question: "How many wrong guesses do I get?",
-            answer: "You can make 6 wrong guesses. The 7th wrong letter completes the hangman and ends the game.",
+            question: "How do I play Hangman?",
+            answer:
+              "A hidden word is shown as blank spaces. Click letters or use your keyboard to guess. Correct guesses reveal the letter in its position(s). Wrong guesses draw parts of the hangman. Guess the word in 6 wrong attempts or fewer to win.",
           },
           {
-            question: "Can I use my keyboard?",
-            answer: "Yes — just press any letter key from A to Z. The on-screen keyboard is also fully clickable for touch and mouse users.",
+            question: "How many wrong guesses do I get?",
+            answer:
+              "6 wrong guesses — head, body, left arm, right arm, left leg, right leg. The game ends when all 6 parts are drawn.",
+          },
+          {
+            question: "Can I use my physical keyboard?",
+            answer:
+              "Yes. Press any letter key on your keyboard to guess it. The keyboard on-screen is also available for mouse or touch input.",
           },
           {
             question: "What categories are available?",
-            answer: "Six categories: Animals, Countries, Sports, Technology, Food and Movies. Each has 10 hand-picked words, and a new random word is chosen every round.",
+            answer:
+              "Words come from Animals, Countries, Sports, Technology, Food, and Nature categories. The category is shown as a hint when a new game starts.",
           },
           {
-            question: "How does the streak counter work?",
-            answer: "Win a round and your streak goes up by one. Lose a round and it resets to zero. It's a quick way to challenge yourself across multiple games.",
+            question: "What are the best letters to guess first?",
+            answer:
+              "Start with the most common English letters: E, T, A, O, I, N, S, H, R. These appear most frequently and give you the most information early.",
+          },
+          { question: "Is there a time limit?", answer: "No. Take as long as you need to think through each guess." },
+          {
+            question: "Is my score tracked?",
+            answer: "The game tracks wins and losses in the current session. Closing the tab resets the count.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. The on-screen keyboard is touch-friendly and the hangman drawing scales to all screen sizes.",
           },
         ]}
       />

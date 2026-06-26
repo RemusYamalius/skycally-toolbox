@@ -9,6 +9,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -24,15 +25,15 @@ type Direction = "left" | "right" | "up" | "down";
 const SIZE = 4;
 
 const TILE_COLORS: Record<number, { bg: string; text: string }> = {
-  2:    { bg: "#eee4da", text: "#776e65" },
-  4:    { bg: "#ede0c8", text: "#776e65" },
-  8:    { bg: "#f2b179", text: "#f9f6f2" },
-  16:   { bg: "#f59563", text: "#f9f6f2" },
-  32:   { bg: "#f67c5f", text: "#f9f6f2" },
-  64:   { bg: "#f65e3b", text: "#f9f6f2" },
-  128:  { bg: "#edcf72", text: "#f9f6f2" },
-  256:  { bg: "#edcc61", text: "#f9f6f2" },
-  512:  { bg: "#edc850", text: "#f9f6f2" },
+  2: { bg: "#eee4da", text: "#776e65" },
+  4: { bg: "#ede0c8", text: "#776e65" },
+  8: { bg: "#f2b179", text: "#f9f6f2" },
+  16: { bg: "#f59563", text: "#f9f6f2" },
+  32: { bg: "#f67c5f", text: "#f9f6f2" },
+  64: { bg: "#f65e3b", text: "#f9f6f2" },
+  128: { bg: "#edcf72", text: "#f9f6f2" },
+  256: { bg: "#edcc61", text: "#f9f6f2" },
+  512: { bg: "#edc850", text: "#f9f6f2" },
   1024: { bg: "#edc53f", text: "#f9f6f2" },
   2048: { bg: "#edc22e", text: "#f9f6f2" },
 };
@@ -47,7 +48,11 @@ function cloneBoard(b: Board): Board {
 
 function addTile(b: Board): Board {
   const empty: [number, number][] = [];
-  b.forEach((row, r) => row.forEach((cell, c) => { if (cell == null) empty.push([r, c]); }));
+  b.forEach((row, r) =>
+    row.forEach((cell, c) => {
+      if (cell == null) empty.push([r, c]);
+    }),
+  );
   if (!empty.length) return b;
   const [r, c] = empty[Math.floor(Math.random() * empty.length)];
   const next = cloneBoard(b);
@@ -117,7 +122,11 @@ function canMove(b: Board): boolean {
 
 function loadBest(): number {
   if (typeof window === "undefined") return 0;
-  try { return parseInt(localStorage.getItem("2048-best") || "0", 10) || 0; } catch { return 0; }
+  try {
+    return parseInt(localStorage.getItem("2048-best") || "0", 10) || 0;
+  } catch {
+    return 0;
+  }
 }
 
 function initialBoard(): Board {
@@ -139,43 +148,59 @@ function Game2048() {
   const [gameOver, setGameOver] = useState(false);
   const [won, setWon] = useState(false);
 
-  const doMove = useCallback((dir: Direction) => {
-    setBoard((cur) => {
-      if (gameOver) return cur;
-      const { board: moved, score: gained, changed } = move(cur, dir);
-      if (!changed) return cur;
-      const withTile = addTile(moved);
-      playSound("click");
-      setScore((s) => {
-        const ns = s + gained;
-        if (ns > best) {
-          setBest(ns);
-          if (typeof window !== "undefined") {
-            try { localStorage.setItem("2048-best", String(ns)); } catch { /* noop */ }
+  const doMove = useCallback(
+    (dir: Direction) => {
+      setBoard((cur) => {
+        if (gameOver) return cur;
+        const { board: moved, score: gained, changed } = move(cur, dir);
+        if (!changed) return cur;
+        const withTile = addTile(moved);
+        playSound("click");
+        setScore((s) => {
+          const ns = s + gained;
+          if (ns > best) {
+            setBest(ns);
+            if (typeof window !== "undefined") {
+              try {
+                localStorage.setItem("2048-best", String(ns));
+              } catch {
+                /* noop */
+              }
+            }
           }
+          return ns;
+        });
+        if (!won && withTile.flat().some((v) => v === 2048)) {
+          setWon(true);
+          playChord(["success", "win"]);
+          toast.success("🎉 You reached 2048! Keep going for a higher score.");
         }
-        return ns;
+        if (!canMove(withTile)) {
+          setGameOver(true);
+          playSound("fail");
+          toast.error("Game over — no more moves!");
+        }
+        return withTile;
       });
-      if (!won && withTile.flat().some((v) => v === 2048)) {
-        setWon(true);
-        playChord(["success", "win"]);
-        toast.success("🎉 You reached 2048! Keep going for a higher score.");
-      }
-      if (!canMove(withTile)) {
-        setGameOver(true);
-        playSound("fail");
-        toast.error("Game over — no more moves!");
-      }
-      return withTile;
-    });
-  }, [gameOver, best, won]);
+    },
+    [gameOver, best, won],
+  );
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => {
-      if (e.key === "ArrowLeft") { e.preventDefault(); doMove("left"); }
-      else if (e.key === "ArrowRight") { e.preventDefault(); doMove("right"); }
-      else if (e.key === "ArrowUp") { e.preventDefault(); doMove("up"); }
-      else if (e.key === "ArrowDown") { e.preventDefault(); doMove("down"); }
+      if (e.key === "ArrowLeft") {
+        e.preventDefault();
+        doMove("left");
+      } else if (e.key === "ArrowRight") {
+        e.preventDefault();
+        doMove("right");
+      } else if (e.key === "ArrowUp") {
+        e.preventDefault();
+        doMove("up");
+      } else if (e.key === "ArrowDown") {
+        e.preventDefault();
+        doMove("down");
+      }
     };
     window.addEventListener("keydown", onKey);
     return () => window.removeEventListener("keydown", onKey);
@@ -252,13 +277,17 @@ function Game2048() {
         </div>
 
         {gameOver && (
-          <p className="text-sm text-muted-foreground">Game over! Final score: <span className="font-bold text-foreground">{score}</span></p>
+          <p className="text-sm text-muted-foreground">
+            Game over! Final score: <span className="font-bold text-foreground">{score}</span>
+          </p>
         )}
 
         <p className="text-xs text-muted-foreground text-center max-w-sm">
           Use arrow keys on desktop, or swipe on mobile.
         </p>
       </div>
+
+      <AdZone id="2048-bottom" size="728x90" />
 
       <HowToUse
         steps={[
@@ -269,17 +298,54 @@ function Game2048() {
       />
 
       <ToolSeoContent
-        title="2048 Game — Free Online Puzzle Game"
-        description="Play 2048 online for free. Slide and merge tiles to reach 2048. No download, works on mobile and desktop."
+        title="Free 2048 Game Online — Slide & Merge Tiles to Reach 2048"
+        description="Play the classic 2048 puzzle game free online. Slide tiles to merge matching numbers and reach the 2048 tile. Free, no signup, works on mobile and desktop."
         body={[
-          "2048 is a single-player sliding tile puzzle that is incredibly easy to learn but surprisingly hard to master. Every move slides all the tiles on a 4×4 grid in one of four directions. When two tiles with the same number collide, they merge into a single tile with double the value. The goal is to combine your way up to the legendary 2048 tile — but the real challenge is keeping the board from filling up before you get there.",
-          "Our free online version of 2048 runs entirely in your browser, on phones, tablets, and laptops alike. Swipe on touchscreens or use arrow keys on a keyboard. Your best score is saved locally so you can keep pushing your personal record without any account or signup. Quick to start, satisfying to play, and impossible to put down.",
+          "Skycally's 2048 is a faithful recreation of the viral sliding tile puzzle. Use arrow keys on desktop or swipe on mobile to slide all tiles in one direction. When two tiles with the same number collide, they merge into one — doubling the value. The goal is to create a tile with the value 2048. A new tile (value 2 or 4) appears after each move.",
+          "2048 was created by Gabriele Cirulli in 2014 and became one of the most viral browser games ever, reaching 4 million unique visitors in its first week. The gameplay is deceptively simple but requires genuine strategic thinking: managing the board space, keeping the highest-value tile in a corner, and building a chain of decreasing values toward it.",
+          "The score increases with every merge — merging two 128 tiles adds 256 to your score. Your best score is saved locally so you always have a target to beat. The game ends when no valid moves remain — either by merging or by having empty spaces. Reach 2048 and keep going: 4096, 8192, and beyond are all achievable.",
+          "Strategy tips: keep your highest tile in a corner at all times. Build a descending chain of values toward it — for example, 1024 → 512 → 256 → 128 in one direction. Avoid filling the board by planning 2-3 moves ahead, and be cautious about moving in a direction that disrupts your tile arrangement.",
         ]}
         faqs={[
-          { question: "How do I play 2048?", answer: "Slide tiles in any of the four directions using arrow keys or swipes. Tiles with the same number merge when they touch. Try to reach the 2048 tile without filling the board." },
-          { question: "What happens when I reach 2048?", answer: "You win — but the game does not stop. You can keep merging tiles to chase a higher score and bigger tiles like 4096 and beyond." },
-          { question: "Is my best score saved?", answer: "Yes. Your highest score is stored in your browser's local storage, so it stays with you between sessions on the same device." },
-          { question: "Does it work on mobile?", answer: "Absolutely. The board is responsive and supports swipe gestures, so it plays great on phones and tablets." },
+          {
+            question: "How do I play 2048?",
+            answer:
+              "Use arrow keys (desktop) or swipe (mobile) to slide all tiles. When two tiles with the same number collide, they merge into double the value. Reach 2048 to win — but you can keep going further.",
+          },
+          {
+            question: "What happens when I reach 2048?",
+            answer:
+              "The game congratulates you and lets you continue. Skilled players can reach 4096, 8192, or even higher tiles.",
+          },
+          {
+            question: "How is the score calculated?",
+            answer:
+              "Every time two tiles merge, their combined value is added to your score. Merging two 512 tiles adds 1024 to your score.",
+          },
+          {
+            question: "What is the best strategy?",
+            answer:
+              "Keep your highest tile in a corner. Build a descending chain of values along the edges toward that corner. Avoid moving in directions that break this chain.",
+          },
+          {
+            question: "Is my high score saved?",
+            answer:
+              "Yes. Your best score is saved in your browser's localStorage and displayed at the top of the game.",
+          },
+          {
+            question: "What ends the game?",
+            answer:
+              "The game ends when the board is full and no adjacent tiles can merge — meaning no valid moves remain in any direction.",
+          },
+          {
+            question: "Can I undo a move?",
+            answer: "Currently there is no undo feature. Plan carefully before each swipe.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. Swipe in any direction to move tiles. The game is fully responsive and optimized for touchscreens.",
+          },
         ]}
       />
 

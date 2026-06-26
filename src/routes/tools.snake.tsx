@@ -7,6 +7,7 @@ import { tools } from "@/lib/tools";
 import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
@@ -59,7 +60,9 @@ function SnakePage() {
     try {
       const stored = parseInt(localStorage.getItem("snake-best") || "0", 10);
       if (!isNaN(stored)) setBest(stored);
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, []);
 
   const stopLoop = useCallback(() => {
@@ -109,7 +112,9 @@ function SnakePage() {
           localStorage.setItem("snake-best", String(scoreRef.current));
           setBest(scoreRef.current);
         }
-      } catch { /* noop */ }
+      } catch {
+        /* noop */
+      }
 
       // Speed up every 50 points
       if (scoreRef.current % 50 === 0) {
@@ -152,12 +157,15 @@ function SnakePage() {
 
   useEffect(() => () => stopLoop(), [stopLoop]);
 
-  const changeDir = useCallback((nd: Dir) => {
-    if (!running) return;
-    // prevent 180° reversal vs current committed direction
-    if (OPPOSITE[dirRef.current] === nd) return;
-    pendingDirRef.current = nd;
-  }, [running]);
+  const changeDir = useCallback(
+    (nd: Dir) => {
+      if (!running) return;
+      // prevent 180° reversal vs current committed direction
+      if (OPPOSITE[dirRef.current] === nd) return;
+      pendingDirRef.current = nd;
+    },
+    [running],
+  );
 
   // Keyboard controls
   useEffect(() => {
@@ -216,7 +224,9 @@ function SnakePage() {
       const h = CELL - 2;
       const r = 4;
       ctx.beginPath();
-      const anyCtx = ctx as CanvasRenderingContext2D & { roundRect?: (x: number, y: number, w: number, h: number, r: number) => void };
+      const anyCtx = ctx as CanvasRenderingContext2D & {
+        roundRect?: (x: number, y: number, w: number, h: number, r: number) => void;
+      };
       if (typeof anyCtx.roundRect === "function") {
         anyCtx.roundRect(x, y, w, h, r);
       } else {
@@ -232,7 +242,10 @@ function SnakePage() {
   }, [snake, food]);
 
   return (
-    <ToolPageShell title="Snake" description="The classic arcade snake. Eat the food, grow longer, don't crash into walls or your tail.">
+    <ToolPageShell
+      title="Snake"
+      description="The classic arcade snake. Eat the food, grow longer, don't crash into walls or your tail."
+    >
       <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
         {/* Score */}
         <div className="flex justify-center gap-4 mb-4">
@@ -293,25 +306,63 @@ function SnakePage() {
         </div>
       </div>
 
+      <AdZone id="snake-bottom" size="728x90" />
 
-      <HowToUse steps={[
-        "Press Start and use arrow keys or WASD to move the snake.",
-        "Eat the red food to grow longer and score points.",
-        "Don't hit the walls or your own tail — speed increases as you score!",
-      ]} />
+      <HowToUse
+        steps={[
+          "Press Start and use arrow keys or WASD to move the snake.",
+          "Eat the red food to grow longer and score points.",
+          "Don't hit the walls or your own tail — speed increases as you score!",
+        ]}
+      />
 
       <ToolSeoContent
-        title="Snake Game — Play Classic Snake Online Free"
-        description="Play the classic Snake game online for free. Eat food, grow longer, avoid walls and your tail. Works on mobile with swipe controls!"
+        title="Free Snake Game Online — Classic Snake in Your Browser"
+        description="Play the classic Snake game free online. Eat food to grow longer without hitting walls or your own tail. Arrow keys or swipe to control. No signup required."
         body={[
-          "Snake is the iconic arcade game everyone grew up with, now playable instantly in your browser. Guide the snake around the grid to eat the red food, growing one segment at a time. Each bite scores 10 points, and every 50 points the game speeds up — how long can you survive once the snake gets really fast?",
-          "Our version saves your best score locally so you can keep chasing your personal record across sessions. It works on desktop with arrow keys or WASD, and on mobile with swipe gestures or the on-screen D-pad. No downloads, no ads, no sign-up — just pure retro arcade fun.",
+          "Skycally's Snake recreates the classic mobile game that defined an era of Nokia phones. Use arrow keys on desktop or swipe on mobile to steer the snake. Eat the food that appears on the grid to grow longer and score points. Avoid hitting the walls or your own body — the game ends on any collision.",
+          "Snake has a history stretching back to 1976, when it appeared as an arcade game called Blockade. It became universally known in the late 1990s when Nokia pre-installed it on its iconic mobile phones, where it became one of the most played games in history. The simplicity of one-button control and endlessly increasing difficulty made it timeless.",
+          "The challenge scales naturally as the snake grows longer — what starts as easy navigation becomes a tight spatial puzzle as the snake fills more of the board. Advanced players develop strategies to spiral outward from the center, keeping the body in predictable patterns to avoid self-collision on longer runs.",
+          "Every food eaten scores points and increases the snake's length. The game speed may increase as your score grows, adding urgency. Your best score is saved locally. There's no end condition other than a collision — the theoretical maximum score is reached when the snake fills the entire grid, a feat that requires perfect play.",
         ]}
         faqs={[
-          { question: "How do I control the snake?", answer: "On desktop, use the arrow keys or WASD. On mobile, swipe in any direction on the board, or tap the on-screen D-pad below the board." },
-          { question: "Is my best score saved?", answer: "Yes. Your best score is saved in your browser's local storage and persists between sessions on the same device. Clearing your browser data will reset it." },
-          { question: "Does the game get harder?", answer: "Yes — the snake speeds up every 50 points you score, capping at a fast but playable speed. Combined with the snake getting longer, it gets challenging quickly." },
-          { question: "Why did I lose?", answer: "Snake ends if you hit a wall or run into your own tail. Plan ahead, especially as your snake grows long enough to fill the board." },
+          {
+            question: "How do I control the snake?",
+            answer:
+              "Desktop: use arrow keys or WASD. Mobile: swipe in the direction you want to turn. The snake moves continuously — you only control the direction.",
+          },
+          {
+            question: "What ends the game?",
+            answer: "The game ends when the snake hits a wall or collides with its own body.",
+          },
+          {
+            question: "Does the snake get faster as it grows?",
+            answer:
+              "The game may increase speed as your score grows, making longer snakes progressively harder to control.",
+          },
+          {
+            question: "Is my high score saved?",
+            answer: "Yes. Your best score is saved in your browser's localStorage and displayed above the game grid.",
+          },
+          {
+            question: "Can I pause the game?",
+            answer: "Yes. Press Escape or click the pause button to freeze the game and resume when ready.",
+          },
+          {
+            question: "What is the maximum possible score?",
+            answer:
+              "Theoretically, the snake can fill the entire grid without colliding — a perfect run that grows rarer and more difficult as the snake lengthens.",
+          },
+          {
+            question: "Does the snake wrap around walls?",
+            answer:
+              "In this version, the snake stops and the game ends when it hits a wall. No wall-wrapping mode is enabled by default.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. Swipe to control direction. The grid scales to fit the screen and touch controls are responsive.",
+          },
         ]}
       />
 

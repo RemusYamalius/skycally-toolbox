@@ -452,7 +452,7 @@ function WorldRadioPage() {
       const L = (window as any).L;
       if (!L || mapRef.current) return;
       const map = L.map(mapElRef.current, { worldCopyJump: true, zoomControl: true }).setView([20, 0], 2);
-      L.tileLayer("https://{s}.basemaps.cartocdn.com/dark_all/{z}/{x}/{y}{r}.png", {
+      L.tileLayer("https://{s}.basemaps.cartocdn.com/rastertiles/voyager/{z}/{x}/{y}{r}.png", {
         attribution: "&copy; OpenStreetMap &copy; CARTO",
         subdomains: "abcd",
         maxZoom: 19,
@@ -721,11 +721,13 @@ function WorldRadioPage() {
           0% { opacity: .6; }
           100% { opacity: .1; }
         }
+        .leaflet-pane { z-index: 10 !important; }
+        .leaflet-top, .leaflet-bottom { z-index: 20 !important; }
         .leaflet-popup-content-wrapper, .leaflet-popup-tip {
           background: hsl(var(--card)); color: hsl(var(--card-foreground));
           border: 1px solid hsl(var(--border));
         }
-        .leaflet-container { background: #0a0a0a; }
+        .leaflet-container { background: #e8e8e8; }
       `}</style>
 
       <div className="grid gap-4 grid-cols-1 md:grid-cols-[40fr_60fr] lg:grid-cols-[35fr_65fr] pb-28 max-w-full overflow-x-hidden">
@@ -893,7 +895,7 @@ function WorldRadioPage() {
       </div>
 
       {/* Bottom player */}
-      <div className="fixed bottom-0 inset-x-0 z-40 border-t border-border bg-background/80 backdrop-blur-md">
+      <div className="fixed bottom-0 inset-x-0 z-50 border-t border-border bg-background/80 backdrop-blur-md">
         <div className="max-w-7xl mx-auto px-4 py-3 flex items-center gap-3">
           <div className="w-10 h-10 rounded bg-muted flex items-center justify-center shrink-0 overflow-hidden">
             {current?.favicon ? (

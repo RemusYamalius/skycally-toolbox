@@ -724,7 +724,7 @@ function ChessPage() {
       const move = legalMoves.find((m) => m.toR === r && m.toC === c);
       if (move) {
         const piece = gameState.board[selected[0]][selected[1]];
-        if (piece?.type === "P" && r === 0) {
+        if (piece?.type === "P" && (humanSide === "w" ? r === 0 : r === 7)) {
           setPromotionPending({ ...move, promotion: "Q" });
           return;
         }
@@ -734,7 +734,7 @@ function ChessPage() {
     }
 
     const piece = gameState.board[r][c];
-    if (piece && piece.color === "w") {
+    if (piece && piece.color === humanSide) {
       setSelected([r, c]);
       setLegalMoves(allLegalForTurn.filter((m) => m.fromR === r && m.fromC === c));
     } else {

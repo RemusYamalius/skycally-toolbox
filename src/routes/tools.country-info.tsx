@@ -7,9 +7,9 @@ import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
-import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import COUNTRIES from "@/data/countries.json";
@@ -118,32 +118,41 @@ function CountryInfo() {
   const languages = country?.languages ? Object.values(country.languages).join(", ") : "—";
 
   return (
-    <ToolPageShell title="Country Info" description="Explore facts, flags, and data for every country in the world.">
+    <ToolPageShell
+      title="Country Info"
+      description="Explore facts, flags, and data for every country in the world."
+      showFileDisclaimer={false}
+    >
+      {/* Search */}
       <form onSubmit={onSubmit} className="flex flex-col sm:flex-row gap-3">
         <Input
           value={search}
           onChange={(e) => setSearch(e.target.value)}
           placeholder="Type a country name, e.g. Morocco"
           className="flex-1"
+          aria-label="Search country"
         />
         <Button type="submit" className="gap-2">
-          <Search className="w-4 h-4" />
+          <Search className="w-4 h-4" aria-hidden="true" />
           Search
         </Button>
       </form>
 
+      {/* Error */}
       {error && (
         <p className="mt-4 text-sm" style={{ color: "var(--orange-brand)" }}>
           {error}
         </p>
       )}
+
+      {/* Country result card */}
       {country && (
         <motion.div
           key={country.cca3}
           initial={{ opacity: 0, y: 10 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.3 }}
-          className="mt-8 rounded-2xl border border-border bg-card/50 p-6"
+          className="mt-6 rounded-2xl border border-border bg-card/50 p-6"
         >
           <div className="flex flex-col sm:flex-row gap-6 items-start">
             <img
@@ -158,7 +167,7 @@ function CountryInfo() {
               <p className="text-sm text-muted-foreground mt-1">{country.name.official}</p>
               {(country.region || country.subregion) && (
                 <div className="mt-3 inline-flex items-center gap-2 rounded-full border border-border bg-secondary/50 px-3 py-1.5 text-xs text-muted-foreground">
-                  <MapPin className="w-3.5 h-3.5" />
+                  <MapPin className="w-3.5 h-3.5" aria-hidden="true" />
                   {country.region}
                   {country.subregion ? ` · ${country.subregion}` : ""}
                 </div>
@@ -224,6 +233,7 @@ function CountryInfo() {
         </motion.div>
       )}
 
+      {/* Or pick from the full list */}
       <div className="mt-8 rounded-2xl border border-border bg-card/40 p-4">
         <label className="text-xs text-muted-foreground mb-2 block">Or pick from the full list</label>
         <Input
@@ -231,6 +241,7 @@ function CountryInfo() {
           onChange={(e) => setQuery(e.target.value)}
           placeholder="Filter countries…"
           className="mb-3"
+          aria-label="Filter countries"
         />
         <div className="max-h-56 overflow-y-auto rounded-lg border border-border bg-background/40 divide-y divide-border">
           {filtered.map((c) => (

@@ -6,6 +6,7 @@ import { tools } from "@/lib/tools";
 import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { DPad, PadButton } from "@/components/game-controls";
@@ -664,6 +665,7 @@ function TetrisPage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Tetris"
       description="Stack falling blocks and clear lines in the ultimate classic arcade game!"
     >
@@ -791,50 +793,61 @@ function TetrisPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="tetris" />
-
       {/* ══ SEO content ══ */}
+      <AdZone id="tetris-bottom" size="728x90" />
+
       <ToolSeoContent
-        title="Tetris Online — Free Classic Block Game, No Download"
-        description="Play Tetris free in your browser. Stack tetrominoes, clear lines, and level up endlessly. Full keyboard controls and mobile touch support — no download, no account needed."
+        title="Free Tetris Game Online — Classic Block Puzzle in Your Browser"
+        description="Play classic Tetris free in your browser. Stack falling tetrominoes, clear lines, and beat your high score. Keyboard and touch controls. No download, no signup."
         body={[
-          "Tetris is the most iconic puzzle game ever made. First released in 1984, it has been played by hundreds of millions of people worldwide. The goal is simple: rotate and position falling tetrominoes to fill complete horizontal lines, which then disappear and earn you points. As you clear more lines, the level increases and the blocks fall faster — making every game a thrilling race against time.",
-          "Skycally's free Tetris includes all 7 classic tetrominoes (I, O, T, S, Z, J, L), a ghost piece that shows exactly where your block will land, instant hard drop, wall-kick rotation for tight spaces, and a next-piece preview so you can plan ahead. Your best score is automatically saved in your browser.",
-          "No download, no account, no ads interrupting your game. Play directly in your browser on any device — desktop, tablet, or mobile. Controls adapt automatically: keyboard on desktop, touch swipes and on-screen D-Pad on mobile.",
+          "Skycally's Tetris is a faithful recreation of the classic block-stacking puzzle game, playable directly in your browser on desktop or mobile. Tetrominoes — the seven classic shapes made of four blocks each — fall from the top of the board. Rotate and move them to fill complete horizontal lines, which disappear and score points. The game speeds up as your score increases.",
+          "On desktop, use the arrow keys to move left and right, rotate with Up or Z, soft-drop with Down, and hard-drop instantly with Space. On mobile, on-screen buttons provide the same controls. The next piece preview in the corner lets you plan your placement before each piece arrives.",
+          "Tetris is one of the best-selling and most played video games of all time, first created by Alexey Pajitnov in 1984. It remains a benchmark for puzzle game design: simple rules, deep skill expression, and infinitely replayable. The game is widely studied for its cognitive benefits including improved spatial reasoning, problem-solving speed, and mental rotation ability.",
+          "Lines scored clear instantly with an animation and sound effect. Clearing multiple lines simultaneously earns bonus points: 2 lines (Double), 3 lines (Triple), or 4 lines at once (Tetris) — the highest-scoring single move in the game. The level increases every 10 lines cleared, dropping pieces faster and demanding quicker decisions.",
         ]}
         faqs={[
           {
-            question: "How do I play Tetris online?",
+            question: "How do I control the pieces?",
             answer:
-              "Use the left/right arrow keys to move pieces, Up or X to rotate clockwise, Z to rotate counter-clockwise, Down for a soft drop, and Space for an instant hard drop. On mobile, tap the board to rotate and use the D-Pad buttons below the board.",
+              "Desktop: Left/Right arrows to move, Up or Z to rotate, Down for soft drop, Space for hard drop. Mobile: use the on-screen control buttons below the board.",
           },
           {
-            question: "What is the ghost piece in Tetris?",
+            question: "What is a Tetris?",
             answer:
-              "The ghost piece is a transparent outline that shows exactly where your current tetromino will land if you drop it straight down. It helps you place pieces more accurately without guessing.",
+              "Clearing exactly 4 lines simultaneously with an I-piece (the long bar) is called a Tetris — it earns the most points of any single move and is the ultimate goal of efficient play.",
           },
           {
-            question: "How does scoring work in Tetris?",
+            question: "How does scoring work?",
             answer:
-              "Clearing 1 line gives 100 × level points, 2 lines = 300 × level, 3 lines = 500 × level, and 4 lines (a Tetris!) = 800 × level. Soft drop adds 1 point per row, hard drop adds 2 points per row.",
+              "Points are awarded for clearing lines: 1 line = 100 pts, 2 lines = 300, 3 lines = 500, 4 lines (Tetris) = 800. Points multiply by your current level.",
           },
           {
-            question: "Does the game get faster?",
+            question: "How do levels work?",
             answer:
-              "Yes! Every 10 lines cleared increases the level by 1, which speeds up the falling pieces. The game starts comfortably and becomes a serious challenge from level 10 onward.",
+              "The game starts at Level 1 and increases by 1 for every 10 lines cleared. Each level makes pieces fall faster, increasing the challenge.",
           },
           {
-            question: "Does Tetris work on mobile?",
+            question: "What are the seven Tetris pieces?",
             answer:
-              "Fully. Tap the board to rotate a piece, swipe left/right to move it, and swipe down to hard drop. You can also use the on-screen D-Pad and Hard Drop button that appears below the board on mobile.",
+              "I (line), O (square), T (T-shape), S, Z, J, and L. Each is color-coded for quick identification. All seven pieces are included in a randomized bag to ensure fair distribution.",
           },
           {
-            question: "Is this Tetris game free?",
+            question: "Is there a high score?",
             answer:
-              "Completely free — no download, no sign-up, and no account required. Just open the page and play instantly in your browser.",
+              "Yes. Your best score is saved in your browser's localStorage and displayed as the high score on the right panel.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. On-screen buttons handle rotation, movement, and dropping. The board scales to fit any screen size.",
+          },
+          {
+            question: "Can I pause the game?",
+            answer: "Yes. Click or tap the pause button to freeze the game and resume when ready.",
           },
         ]}
       />
+      <RelatedTools currentSlug="tetris" />
     </ToolPageShell>
   );
 }

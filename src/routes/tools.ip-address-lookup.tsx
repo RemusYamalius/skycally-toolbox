@@ -2,18 +2,7 @@ import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { toast } from "sonner";
-import {
-  Globe,
-  Copy,
-  Search,
-  MapPin,
-  Building2,
-  Clock,
-  Compass,
-  Map,
-  Flag,
-  Loader2,
-} from "lucide-react";
+import { Globe, Copy, Search, MapPin, Building2, Clock, Compass, Map, Flag, Loader2 } from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -46,17 +35,13 @@ interface IpDetails {
   reason?: string;
 }
 
-const IP_REGEX =
-  /^((25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(25[0-5]|2[0-4]\d|[01]?\d?\d)$|^([0-9a-fA-F:]+:+)+[0-9a-fA-F]+$/;
+const IP_REGEX = /^((25[0-5]|2[0-4]\d|[01]?\d?\d)\.){3}(25[0-5]|2[0-4]\d|[01]?\d?\d)$|^([0-9a-fA-F:]+:+)+[0-9a-fA-F]+$/;
 
 function flagEmoji(code?: string) {
   if (!code || code.length !== 2) return "";
   const A = 0x1f1e6;
   const a = "A".charCodeAt(0);
-  return String.fromCodePoint(
-    A + (code.toUpperCase().charCodeAt(0) - a),
-    A + (code.toUpperCase().charCodeAt(1) - a),
-  );
+  return String.fromCodePoint(A + (code.toUpperCase().charCodeAt(0) - a), A + (code.toUpperCase().charCodeAt(1) - a));
 }
 
 async function fetchIpDetails(ip: string): Promise<IpDetails> {
@@ -94,9 +79,7 @@ function InfoCard({
         </div>
         {action}
       </div>
-      <div className="mt-3 text-lg font-display font-semibold tabular-nums break-words text-foreground">
-        {value}
-      </div>
+      <div className="mt-3 text-lg font-display font-semibold tabular-nums break-words text-foreground">{value}</div>
     </motion.div>
   );
 }
@@ -203,11 +186,7 @@ function IpAddressLookupPage() {
         </div>
         <div className="flex gap-2">
           <Button type="submit" size="lg" className="gap-2" disabled={loading}>
-            {loading ? (
-              <Loader2 className="w-4 h-4 animate-spin" />
-            ) : (
-              <Search className="w-4 h-4" />
-            )}
+            {loading ? <Loader2 className="w-4 h-4 animate-spin" /> : <Search className="w-4 h-4" />}
             Lookup
           </Button>
           {ownIp && !isOwn && (
@@ -285,32 +264,18 @@ function IpAddressLookupPage() {
               accent="var(--orange-brand)"
               value={
                 <span className="inline-flex items-center gap-2">
-                  <span className="text-2xl leading-none">
-                    {flagEmoji(details.country_code)}
-                  </span>
+                  <span className="text-2xl leading-none">{flagEmoji(details.country_code)}</span>
                   <span>
                     {details.country_name || "—"}
                     {details.country_code && (
-                      <span className="ml-1 text-sm text-muted-foreground">
-                        ({details.country_code})
-                      </span>
+                      <span className="ml-1 text-sm text-muted-foreground">({details.country_code})</span>
                     )}
                   </span>
                 </span>
               }
             />
-            <InfoCard
-              label="Region / State"
-              icon={Map}
-              accent="var(--violet-brand)"
-              value={details.region || "—"}
-            />
-            <InfoCard
-              label="City"
-              icon={MapPin}
-              accent="var(--cyan-brand)"
-              value={details.city || "—"}
-            />
+            <InfoCard label="Region / State" icon={Map} accent="var(--violet-brand)" value={details.region || "—"} />
+            <InfoCard label="City" icon={MapPin} accent="var(--cyan-brand)" value={details.city || "—"} />
             <InfoCard
               label="ISP / Organization"
               icon={Building2}
@@ -322,9 +287,7 @@ function IpAddressLookupPage() {
               icon={Clock}
               accent="var(--violet-brand)"
               value={
-                details.timezone
-                  ? `${details.timezone}${details.utc_offset ? ` (UTC${details.utc_offset})` : ""}`
-                  : "—"
+                details.timezone ? `${details.timezone}${details.utc_offset ? ` (UTC${details.utc_offset})` : ""}` : "—"
               }
             />
             <InfoCard
@@ -353,6 +316,8 @@ function IpAddressLookupPage() {
         ) : null}
       </div>
 
+      <AdZone id="ip-address-lookup-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "We automatically detect and display your public IP address on page load.",
@@ -362,33 +327,54 @@ function IpAddressLookupPage() {
       />
 
       <ToolSeoContent
-        title="Free IP Address Lookup — Find Location, ISP and Timezone"
-        description="Instantly look up any IPv4 or IPv6 address to see country, region, city, ISP, timezone and GPS coordinates. Free, private, and runs entirely in your browser."
+        title="Free IP Address Lookup — Find Your IP, Location & ISP"
+        description="Look up any IP address and find its location, ISP, timezone, and more. Check your own public IP instantly. Free, no signup, runs in your browser."
         body={[
-          "An IP address lookup tells you where on the internet a given device is connecting from. Our free IP Address Lookup tool detects your own public IP automatically and lets you check any other IP in seconds — no signup, no installs, and no data stored on our servers.",
-          "Every result includes the country with its flag, region or state, city, ISP or organization, timezone with UTC offset, and approximate latitude and longitude. This is useful for debugging network issues, verifying suspicious login locations, checking your VPN, or simply learning how the internet routes your traffic.",
-          "All lookups run directly in your browser using public APIs (ipify for your own IP and ipapi.co for geolocation details). We never log, save, or share your IP address. Your privacy stays under your control while you get fast, accurate results.",
+          "Skycally's IP Address Lookup tool reveals detailed information about any IP address — including geographic location, ISP (Internet Service Provider), organization, timezone, and connection type. Type any IPv4 or IPv6 address and get results instantly, or leave the field empty to see your own public IP address.",
+          "Your public IP address is the address your Internet Service Provider assigns to your connection — it's what websites, servers, and online services see when you browse the web. Unlike your local network IP (192.168.x.x), your public IP identifies your connection on the global internet and can reveal your approximate city and country.",
+          "IP geolocation data is sourced from reputable GeoIP databases that map IP ranges to physical locations. Results include city, region, country, postal code, coordinates, timezone, and ASN. Note that geolocation accuracy varies — it's typically accurate to the country and city level, but not to the street or building.",
+          "Common uses include checking whether your VPN is working, verifying that a website sees the correct location for localized content, investigating suspicious traffic, or simply satisfying curiosity about where a domain's servers are hosted.",
         ]}
         faqs={[
           {
-            question: "What is an IP address lookup?",
+            question: "What is my public IP address?",
             answer:
-              "It's a way to translate an IP address into useful metadata: the country, region, city, ISP and approximate coordinates of the device that owns it.",
-          },
-          {
-            question: "Is this tool free and private?",
-            answer:
-              "Yes. The tool is completely free and runs in your browser. No IP addresses are stored, logged, or shared on our servers.",
+              "Your public IP is the address your ISP assigns to your internet connection. It's what websites and servers see when you browse. Use this tool with an empty field to see your current public IP instantly.",
           },
           {
             question: "How accurate is IP geolocation?",
             answer:
-              "Country-level data is highly accurate. City-level data is approximate — IP databases usually place you within the same metro area, not at your exact street address.",
+              "IP geolocation is typically accurate to the country and city level — usually within 50km of the actual location. It cannot pinpoint a street address. VPNs and proxies will show the server's location, not yours.",
           },
           {
-            question: "Can I look up IPv6 addresses?",
+            question: "Can I look up any IP address?",
             answer:
-              "Yes. Both IPv4 (like 8.8.8.8) and IPv6 addresses are supported. Just paste the address into the search box and click Lookup.",
+              "Yes. Enter any valid IPv4 (e.g. 8.8.8.8) or IPv6 address and get location and ISP data. Private ranges like 192.168.x.x will return no results as they are not on the public internet.",
+          },
+          {
+            question: "Why does my IP show the wrong city?",
+            answer:
+              "ISPs route traffic through central hubs, so your IP may geolocate to your ISP's regional office rather than your exact city. VPN users will see the VPN server's location.",
+          },
+          {
+            question: "What is an ISP?",
+            answer:
+              "ISP stands for Internet Service Provider — the company that provides your internet connection. Your ISP assigns your public IP address.",
+          },
+          {
+            question: "What is an ASN?",
+            answer:
+              "ASN (Autonomous System Number) is a unique identifier for a network on the internet. Each ISP and major organization has one or more ASNs that group their IP ranges.",
+          },
+          {
+            question: "Does this tool store my IP address?",
+            answer:
+              "No. Lookups are performed client-side via a third-party GeoIP API. Your IP is not logged or stored by Skycally.",
+          },
+          {
+            question: "What is the difference between IPv4 and IPv6?",
+            answer:
+              "IPv4 uses 32-bit addresses (e.g. 8.8.8.8) with about 4 billion possible addresses. IPv6 uses 128-bit addresses with virtually unlimited addresses. Both are supported by this tool.",
           },
         ]}
       />

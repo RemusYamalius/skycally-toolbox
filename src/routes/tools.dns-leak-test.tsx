@@ -1,7 +1,17 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useState } from "react";
 import { motion } from "framer-motion";
-import { Shield, Globe, MapPin, CheckCircle2, AlertTriangle, Loader2, RotateCw, ExternalLink, Lock } from "lucide-react";
+import {
+  Shield,
+  Globe,
+  MapPin,
+  CheckCircle2,
+  AlertTriangle,
+  Loader2,
+  RotateCw,
+  ExternalLink,
+  Lock,
+} from "lucide-react";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -28,14 +38,54 @@ interface GeoInfo {
 }
 
 const COUNTRIES = [
-  "United States", "United Kingdom", "Canada", "Australia", "Germany", "France",
-  "Netherlands", "Switzerland", "Sweden", "Norway", "Finland", "Denmark",
-  "Spain", "Italy", "Portugal", "Ireland", "Belgium", "Austria", "Poland",
-  "Czechia", "Romania", "Greece", "Turkey", "Russia", "Ukraine",
-  "Japan", "South Korea", "China", "Hong Kong", "Singapore", "Taiwan",
-  "India", "Indonesia", "Malaysia", "Thailand", "Vietnam", "Philippines",
-  "Israel", "United Arab Emirates", "Saudi Arabia", "Egypt", "South Africa",
-  "Brazil", "Argentina", "Mexico", "Chile", "Colombia", "New Zealand",
+  "United States",
+  "United Kingdom",
+  "Canada",
+  "Australia",
+  "Germany",
+  "France",
+  "Netherlands",
+  "Switzerland",
+  "Sweden",
+  "Norway",
+  "Finland",
+  "Denmark",
+  "Spain",
+  "Italy",
+  "Portugal",
+  "Ireland",
+  "Belgium",
+  "Austria",
+  "Poland",
+  "Czechia",
+  "Romania",
+  "Greece",
+  "Turkey",
+  "Russia",
+  "Ukraine",
+  "Japan",
+  "South Korea",
+  "China",
+  "Hong Kong",
+  "Singapore",
+  "Taiwan",
+  "India",
+  "Indonesia",
+  "Malaysia",
+  "Thailand",
+  "Vietnam",
+  "Philippines",
+  "Israel",
+  "United Arab Emirates",
+  "Saudi Arabia",
+  "Egypt",
+  "South Africa",
+  "Brazil",
+  "Argentina",
+  "Mexico",
+  "Chile",
+  "Colombia",
+  "New Zealand",
 ];
 
 async function fetchPublicIp(): Promise<string> {
@@ -117,9 +167,7 @@ function InfoCard({
         <Icon className="w-4 h-4" style={{ color: accent }} />
         {label}
       </div>
-      <div className="mt-3 text-lg font-display font-semibold tabular-nums break-words text-foreground">
-        {children}
-      </div>
+      <div className="mt-3 text-lg font-display font-semibold tabular-nums break-words text-foreground">{children}</div>
     </motion.div>
   );
 }
@@ -153,10 +201,7 @@ function DnsLeakTestPage() {
 
   let status: Status = "unknown";
   if (!loading && geo && usingVpn && expectedCountry) {
-    status =
-      (geo.country_name || "").trim().toLowerCase() === expectedCountry.trim().toLowerCase()
-        ? "secure"
-        : "leak";
+    status = (geo.country_name || "").trim().toLowerCase() === expectedCountry.trim().toLowerCase() ? "secure" : "leak";
   }
 
   return (
@@ -225,9 +270,7 @@ function DnsLeakTestPage() {
                   {[geo.city, geo.region].filter(Boolean).join(", ")}
                 </div>
               )}
-              {geo.org && (
-                <div className="text-sm font-normal text-muted-foreground">ISP: {geo.org}</div>
-              )}
+              {geo.org && <div className="text-sm font-normal text-muted-foreground">ISP: {geo.org}</div>}
               {geo.timezone && (
                 <div className="text-sm font-normal text-muted-foreground">Timezone: {geo.timezone}</div>
               )}
@@ -249,9 +292,7 @@ function DnsLeakTestPage() {
               Toggle the VPN option below to compare locations.
             </span>
           ) : !expectedCountry ? (
-            <span className="text-muted-foreground text-base font-normal">
-              Select your expected country.
-            </span>
+            <span className="text-muted-foreground text-base font-normal">Select your expected country.</span>
           ) : status === "secure" ? (
             <span style={{ color: "var(--green-brand)" }}>Secure — location matches</span>
           ) : (
@@ -323,6 +364,8 @@ function DnsLeakTestPage() {
         </div>
       </div>
 
+      <AdZone id="dns-leak-test-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "We automatically detect your public IP and look up its country, ISP and timezone.",
@@ -332,33 +375,54 @@ function DnsLeakTestPage() {
       />
 
       <ToolSeoContent
-        title="Free DNS & IP Leak Check — Verify Your VPN Location Online"
-        description="Quickly check your public IP, geolocation and ISP, and compare them against your expected VPN exit country. Free and runs entirely in your browser."
+        title="Free DNS Leak Test — Check if Your VPN Leaks DNS Requests"
+        description="Test if your VPN is leaking DNS requests to your ISP. Instant DNS leak detection — see which DNS servers your browser is using. Free, no signup."
         body={[
-          "When you connect through a VPN or proxy, the rest of the internet should only see the VPN's IP address and location — not your real one. Our DNS & IP Leak Check fetches your visible public IP and looks up its country, region, ISP and timezone so you can confirm at a glance whether your traffic appears to be exiting from the expected location.",
-          "Toggle the 'Are you using a VPN?' option and pick the country your VPN should be routing through. We compare it against the country detected from your public IP: if they match, your connection looks secure; if they differ, your DNS or IP may be leaking your real location to the websites you visit.",
-          "Everything runs entirely in your browser using public APIs (ipify and ipapi.co). No IPs, locations, or results are sent to or stored on our servers. For a deeper analysis that inspects which DNS resolvers your device is actually using, we recommend pairing this tool with dnsleaktest.com.",
+          "Skycally's DNS Leak Test reveals which DNS servers your browser is using to resolve domain names. If your VPN is working correctly, DNS requests should go through your VPN provider's servers — not your ISP's. If your ISP's DNS servers appear in the results while connected to a VPN, you have a DNS leak that exposes your browsing activity.",
+          "DNS (Domain Name System) is the internet's address book — it translates domain names like skycally.com into IP addresses. Every website you visit requires a DNS lookup. By default, these lookups go to your ISP's DNS servers, which means your ISP can see every website you visit. A VPN should route DNS requests through its own servers to prevent this.",
+          "A DNS leak occurs when DNS requests bypass your VPN tunnel and go directly to your ISP's resolvers, even though your other traffic is encrypted. This means your ISP can see exactly which websites you are visiting, even though they cannot see the content of your traffic. It is one of the most common VPN failures.",
+          "To fix a DNS leak, use a VPN that enforces DNS leak protection, configure your device to use privacy-focused DNS servers like Cloudflare 1.1.1.1 or Google 8.8.8.8, or switch to a VPN provider that specifically guarantees no DNS leaks.",
         ]}
         faqs={[
           {
             question: "What is a DNS leak?",
             answer:
-              "A DNS leak happens when your DNS queries are sent outside your VPN tunnel — typically to your ISP — so they can see which websites you visit even though your traffic looks encrypted.",
+              "A DNS leak occurs when your device sends DNS requests to your ISP's servers instead of your VPN's servers, revealing which websites you visit to your ISP even while using a VPN.",
           },
           {
-            question: "Does this tool detect every kind of DNS leak?",
+            question: "How do I know if I have a DNS leak?",
             answer:
-              "No. This tool compares your public IP's country with your expected VPN country. A full DNS leak test requires probing your actual DNS resolvers, which can't be done reliably from the browser — for that, use dnsleaktest.com.",
+              "Run this test while connected to your VPN. If you see your ISP's DNS servers in the results instead of your VPN provider's servers, you have a DNS leak.",
           },
           {
-            question: "Is this tool private?",
+            question: "How do I fix a DNS leak?",
             answer:
-              "Yes. Lookups run directly from your browser via public APIs (ipify and ipapi.co). We don't log, store, or share your IP or location on our servers.",
+              "Use a VPN with built-in DNS leak protection, change your DNS settings to use 1.1.1.1 (Cloudflare) or 8.8.8.8 (Google), or contact your VPN provider about enabling DNS leak protection.",
           },
           {
-            question: "Why does my detected country differ from my VPN's country?",
+            question: "What is DNS?",
             answer:
-              "It could mean your VPN disconnected, you're connected to a different exit server than expected, or your traffic is being routed outside the VPN tunnel — all signs you should investigate.",
+              "DNS (Domain Name System) translates human-readable domain names like google.com into IP addresses that computers use to connect. Every website visit requires a DNS lookup.",
+          },
+          {
+            question: "Can my ISP see my browsing with a VPN?",
+            answer:
+              "With a working VPN and no DNS leaks, your ISP can see that you are connected to a VPN but cannot see which websites you visit. A DNS leak changes this — your ISP can see your DNS queries even with a VPN.",
+          },
+          {
+            question: "What DNS servers should I use for privacy?",
+            answer:
+              "Cloudflare (1.1.1.1), Google (8.8.8.8), or your VPN provider's DNS servers. Cloudflare's 1.1.1.1 has a strict no-logging policy and fast response times.",
+          },
+          {
+            question: "Does this test work without a VPN?",
+            answer:
+              "Yes. Without a VPN, this test shows your ISP's DNS servers — which is expected. The test is most useful when run while connected to a VPN to verify it is handling DNS correctly.",
+          },
+          {
+            question: "Is this test accurate?",
+            answer:
+              "Yes. The test uses standard DNS resolution techniques to identify which servers are handling your queries. Results are displayed immediately with server location and provider information.",
           },
         ]}
       />

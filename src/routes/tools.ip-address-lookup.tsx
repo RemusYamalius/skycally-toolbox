@@ -11,6 +11,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 

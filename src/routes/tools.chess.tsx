@@ -552,7 +552,7 @@ const minimax = (state: GameState, depth: number, alpha: number, beta: number, m
   }
 };
 
-const getBestMove = (state: GameState): Move | null => {
+const getBestMove = (state: GameState, depth: number = 2): Move | null => {
   const moves = getLegalMoves(state);
   if (moves.length === 0) return null;
   // shuffle for variety
@@ -560,10 +560,12 @@ const getBestMove = (state: GameState): Move | null => {
     .map((m) => ({ m, k: Math.random() }))
     .sort((a, b) => a.k - b.k)
     .map((x) => x.m);
+  // Easy: just pick a random move
+  if (depth === 0) return shuffled[0];
   let bestMove = shuffled[0];
   let bestVal = Infinity;
   for (const move of shuffled) {
-    const val = minimax(applyMove(state, move), 2, -Infinity, Infinity, true);
+    const val = minimax(applyMove(state, move), depth, -Infinity, Infinity, true);
     if (val < bestVal) {
       bestVal = val;
       bestMove = move;
@@ -579,6 +581,8 @@ function ChessPage() {
   const [legalMoves, setLegalMoves] = useState<Move[]>([]);
   const [phase, setPhase] = useState<"idle" | "playing" | "ended">("idle");
   const [humanSide, setHumanSide] = useState<"w" | "b">("w");
+  const [difficulty, setDifficulty] = useState<"easy" | "medium" | "hard">("medium");
+  const [gameMode, setGameMode] = useState<"vs-ai" | "pass-play">("vs-ai");
   const [result, setResult] = useState<"w" | "b" | "draw" | null>(null);
   const [aiThinkingState, setAiThinking] = useState(false);
   const [promotionPending, setPromotionPending] = useState<Move | null>(null);
@@ -673,12 +677,14 @@ function ChessPage() {
   // AI move effect - triggers when it's AI's turn
   useEffect(() => {
     if (phase !== "playing") return;
+    if (gameMode === "pass-play") return;
     if (gameState.turn === humanSide) return;
     if (aiThinking.current) return;
     aiThinking.current = true;
     setAiThinking(true);
     const t = setTimeout(() => {
-      const move = getBestMove(gameState);
+      const depthMap = { easy: 0, medium: 2, hard: 3 };
+      const move = getBestMove(gameState, depthMap[difficulty]);
       if (move) {
         const captured = gameState.board[move.toR][move.toC];
         const piece = gameState.board[move.fromR][move.fromC];
@@ -715,10 +721,11 @@ function ChessPage() {
     }, 80);
     return () => clearTimeout(t);
     // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [gameState, phase, humanSide]);
+  }, [gameState, phase, humanSide, gameMode, difficulty]);
 
   const handleCellClick = (r: number, c: number) => {
-    if (phase !== "playing" || gameState.turn !== humanSide || aiThinkingState) return;
+    if (phase !== "playing") return;
+    if (gameMode === "vs-ai" && (gameState.turn !== humanSide || aiThinkingState)) return;
 
     if (selected) {
       const move = legalMoves.find((m) => m.toR === r && m.toC === c);
@@ -734,7 +741,8 @@ function ChessPage() {
     }
 
     const piece = gameState.board[r][c];
-    if (piece && piece.color === humanSide) {
+    const canSelect = gameMode === "pass-play" ? piece?.color === gameState.turn : piece?.color === humanSide;
+    if (canSelect) {
       setSelected([r, c]);
       setLegalMoves(allLegalForTurn.filter((m) => m.fromR === r && m.fromC === c));
     } else {
@@ -789,9 +797,13 @@ function ChessPage() {
                     : result === "w"
                       ? "You win! 🎉"
                       : "AI wins!"
-                  : gameState.turn === humanSide
-                    ? "Your turn"
-                    : "AI's turn"}
+                  : gameMode === "pass-play"
+                    ? gameState.turn === "w"
+                      ? "White's turn"
+                      : "Black's turn"
+                    : gameState.turn === humanSide
+                      ? "Your turn"
+                      : "AI's turn"}
           </span>
           <div className="flex items-center gap-2 flex-row-reverse min-w-0 flex-1">
             <span className="text-lg shrink-0">♙</span>
@@ -870,43 +882,109 @@ function ChessPage() {
 
         <div className="flex gap-2 mt-2">
           {phase === "idle" && (
-            <div className="flex flex-col items-center gap-3">
-              <p className="text-sm font-medium text-muted-foreground">Play as:</p>
-              <div className="flex gap-2">
-                <button
-                  onClick={() => setHumanSide("w")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-bold transition-all ${humanSide === "w" ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-secondary"}`}
-                >
-                  ♙ White
-                </button>
-                <button
-                  onClick={() => setHumanSide("b")}
-                  className={`flex items-center gap-2 px-4 py-2 rounded-xl border text-sm font-bold transition-all ${humanSide === "b" ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-secondary"}`}
-                >
-                  ♟ Black
-                </button>
+            <div className="flex flex-col items-center gap-4 w-full max-w-xs">
+              {/* Game Mode */}
+              <div className="w-full">
+                <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 text-center">
+                  Mode
+                </p>
+                <div className="grid grid-cols-2 gap-2">
+                  <button
+                    onClick={() => setGameMode("vs-ai")}
+                    className={`px-3 py-2 rounded-xl border text-sm font-bold transition-all text-center ${gameMode === "vs-ai" ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-secondary"}`}
+                  >
+                    🤖 vs AI
+                  </button>
+                  <button
+                    onClick={() => setGameMode("pass-play")}
+                    className={`px-3 py-2 rounded-xl border text-sm font-bold transition-all text-center ${gameMode === "pass-play" ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-secondary"}`}
+                  >
+                    👥 2 Players
+                  </button>
+                </div>
               </div>
+
+              {/* Color - only for vs AI */}
+              {gameMode === "vs-ai" && (
+                <div className="w-full">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 text-center">
+                    Play as
+                  </p>
+                  <div className="grid grid-cols-2 gap-2">
+                    <button
+                      onClick={() => setHumanSide("w")}
+                      className={`px-3 py-2 rounded-xl border text-sm font-bold transition-all ${humanSide === "w" ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-secondary"}`}
+                    >
+                      ♙ White
+                    </button>
+                    <button
+                      onClick={() => setHumanSide("b")}
+                      className={`px-3 py-2 rounded-xl border text-sm font-bold transition-all ${humanSide === "b" ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-secondary"}`}
+                    >
+                      ♟ Black
+                    </button>
+                  </div>
+                </div>
+              )}
+
+              {/* Difficulty - only for vs AI */}
+              {gameMode === "vs-ai" && (
+                <div className="w-full">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wider mb-2 text-center">
+                    Difficulty
+                  </p>
+                  <div className="grid grid-cols-3 gap-2">
+                    {(["easy", "medium", "hard"] as const).map((d) => (
+                      <button
+                        key={d}
+                        onClick={() => setDifficulty(d)}
+                        className={`px-3 py-2 rounded-xl border text-xs font-bold capitalize transition-all ${difficulty === d ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] text-foreground" : "border-border text-muted-foreground hover:bg-secondary"}`}
+                      >
+                        {d === "easy" ? "🟢 Easy" : d === "medium" ? "🟡 Medium" : "🔴 Hard"}
+                      </button>
+                    ))}
+                  </div>
+                </div>
+              )}
+
               <button
                 onClick={() => {
                   resetAll();
+                  aiThinking.current = false;
+                  setAiThinking(false);
                   setPhase("playing");
                 }}
-                className="px-6 py-2 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition"
+                className="w-full px-6 py-2.5 rounded-xl bg-primary text-primary-foreground text-sm font-bold hover:opacity-90 transition"
               >
                 Start Game
               </button>
             </div>
           )}
           {phase !== "idle" && (
-            <button
-              onClick={() => {
-                resetAll();
-                setPhase("playing");
-              }}
-              className="px-5 py-2 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-secondary transition"
-            >
-              New Game
-            </button>
+            <div className="flex gap-2">
+              <button
+                onClick={() => {
+                  resetAll();
+                  aiThinking.current = false;
+                  setAiThinking(false);
+                  setPhase("playing");
+                }}
+                className="px-5 py-2 rounded-xl border border-border text-sm font-bold text-foreground hover:bg-secondary transition"
+              >
+                Rematch
+              </button>
+              <button
+                onClick={() => {
+                  resetAll();
+                  aiThinking.current = false;
+                  setAiThinking(false);
+                  setPhase("idle");
+                }}
+                className="px-5 py-2 rounded-xl border border-border text-sm font-bold text-muted-foreground hover:bg-secondary transition"
+              >
+                Menu
+              </button>
+            </div>
           )}
         </div>
       </div>

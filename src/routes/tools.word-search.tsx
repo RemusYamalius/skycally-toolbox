@@ -8,6 +8,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
@@ -18,21 +19,99 @@ export const Route = createFileRoute("/tools/word-search")({
 });
 
 const WORD_BANK: Record<string, string[]> = {
-  Animals:    ["LION","TIGER","ELEPHANT","GIRAFFE","PENGUIN","DOLPHIN","CHEETAH","GORILLA","FLAMINGO","KANGAROO","CROCODILE","BUTTERFLY"],
-  Countries:  ["MOROCCO","BRAZIL","JAPAN","CANADA","FRANCE","GERMANY","EGYPT","INDIA","MEXICO","SPAIN","ITALY","GREECE"],
-  Sports:     ["FOOTBALL","TENNIS","SWIMMING","BOXING","CYCLING","ARCHERY","SKIING","CRICKET","VOLLEYBALL","BASKETBALL","BADMINTON","GYMNASTICS"],
-  Technology: ["COMPUTER","KEYBOARD","MONITOR","SOFTWARE","INTERNET","BLUETOOTH","PROCESSOR","DATABASE","ALGORITHM","JAVASCRIPT","FRAMEWORK","NETWORK"],
-  Food:       ["PIZZA","SUSHI","BURGER","PASTA","TACOS","SALAD","CHOCOLATE","AVOCADO","BLUEBERRY","CROISSANT","PINEAPPLE","CINNAMON"],
-  Space:      ["GALAXY","NEBULA","COMET","METEOR","SATURN","JUPITER","MERCURY","NEPTUNE","ASTEROID","UNIVERSE","TELESCOPE","ASTRONAUT"],
+  Animals: [
+    "LION",
+    "TIGER",
+    "ELEPHANT",
+    "GIRAFFE",
+    "PENGUIN",
+    "DOLPHIN",
+    "CHEETAH",
+    "GORILLA",
+    "FLAMINGO",
+    "KANGAROO",
+    "CROCODILE",
+    "BUTTERFLY",
+  ],
+  Countries: [
+    "MOROCCO",
+    "BRAZIL",
+    "JAPAN",
+    "CANADA",
+    "FRANCE",
+    "GERMANY",
+    "EGYPT",
+    "INDIA",
+    "MEXICO",
+    "SPAIN",
+    "ITALY",
+    "GREECE",
+  ],
+  Sports: [
+    "FOOTBALL",
+    "TENNIS",
+    "SWIMMING",
+    "BOXING",
+    "CYCLING",
+    "ARCHERY",
+    "SKIING",
+    "CRICKET",
+    "VOLLEYBALL",
+    "BASKETBALL",
+    "BADMINTON",
+    "GYMNASTICS",
+  ],
+  Technology: [
+    "COMPUTER",
+    "KEYBOARD",
+    "MONITOR",
+    "SOFTWARE",
+    "INTERNET",
+    "BLUETOOTH",
+    "PROCESSOR",
+    "DATABASE",
+    "ALGORITHM",
+    "JAVASCRIPT",
+    "FRAMEWORK",
+    "NETWORK",
+  ],
+  Food: [
+    "PIZZA",
+    "SUSHI",
+    "BURGER",
+    "PASTA",
+    "TACOS",
+    "SALAD",
+    "CHOCOLATE",
+    "AVOCADO",
+    "BLUEBERRY",
+    "CROISSANT",
+    "PINEAPPLE",
+    "CINNAMON",
+  ],
+  Space: [
+    "GALAXY",
+    "NEBULA",
+    "COMET",
+    "METEOR",
+    "SATURN",
+    "JUPITER",
+    "MERCURY",
+    "NEPTUNE",
+    "ASTEROID",
+    "UNIVERSE",
+    "TELESCOPE",
+    "ASTRONAUT",
+  ],
 };
 
 type Dir = "H" | "V" | "D1" | "D2" | "RH" | "RV" | "RD1" | "RD2";
 type Difficulty = "easy" | "medium" | "hard";
 
 const CONFIG: Record<Difficulty, { grid: number; words: number; directions: Dir[] }> = {
-  easy:   { grid: 10, words: 6,  directions: ["H", "V"] },
-  medium: { grid: 13, words: 9,  directions: ["H", "V", "D1", "D2"] },
-  hard:   { grid: 15, words: 12, directions: ["H", "V", "D1", "D2", "RH", "RV", "RD1", "RD2"] },
+  easy: { grid: 10, words: 6, directions: ["H", "V"] },
+  medium: { grid: 13, words: 9, directions: ["H", "V", "D1", "D2"] },
+  hard: { grid: 15, words: 12, directions: ["H", "V", "D1", "D2", "RH", "RV", "RD1", "RD2"] },
 };
 
 interface PlacedWord {
@@ -50,15 +129,26 @@ interface Cell {
 
 const ALPHABET = "ABCDEFGHIJKLMNOPQRSTUVWXYZ";
 
-const getDelta = (dir: Dir): [number, number] => ({
-  H: [0, 1], V: [1, 0], D1: [1, 1], D2: [1, -1],
-  RH: [0, -1], RV: [-1, 0], RD1: [-1, -1], RD2: [-1, 1],
-}[dir] as [number, number]);
+const getDelta = (dir: Dir): [number, number] =>
+  ({
+    H: [0, 1],
+    V: [1, 0],
+    D1: [1, 1],
+    D2: [1, -1],
+    RH: [0, -1],
+    RV: [-1, 0],
+    RD1: [-1, -1],
+    RD2: [-1, 1],
+  })[dir] as [number, number];
 
 function generateGrid(size: number, wordList: string[], directions: Dir[]) {
-  const grid: Cell[][] = Array(size).fill(null).map(() =>
-    Array(size).fill(null).map(() => ({ letter: "", wordIndices: [] as number[] }))
-  );
+  const grid: Cell[][] = Array(size)
+    .fill(null)
+    .map(() =>
+      Array(size)
+        .fill(null)
+        .map(() => ({ letter: "", wordIndices: [] as number[] })),
+    );
   const placed: PlacedWord[] = [];
 
   for (let wi = 0; wi < wordList.length; wi++) {
@@ -79,13 +169,18 @@ function generateGrid(size: number, wordList: string[], directions: Dir[]) {
 
       let valid = true;
       for (let i = 0; i < len; i++) {
-        const r = startR + dr * i, c = startC + dc * i;
-        if (grid[r][c].letter && grid[r][c].letter !== word[i]) { valid = false; break; }
+        const r = startR + dr * i,
+          c = startC + dc * i;
+        if (grid[r][c].letter && grid[r][c].letter !== word[i]) {
+          valid = false;
+          break;
+        }
       }
       if (!valid) continue;
 
       for (let i = 0; i < len; i++) {
-        const r = startR + dr * i, c = startC + dc * i;
+        const r = startR + dr * i,
+          c = startC + dc * i;
         grid[r][c].letter = word[i];
         grid[r][c].wordIndices.push(wi);
       }
@@ -95,16 +190,16 @@ function generateGrid(size: number, wordList: string[], directions: Dir[]) {
   }
 
   for (let r = 0; r < size; r++)
-    for (let c = 0; c < size; c++)
-      if (!grid[r][c].letter)
-        grid[r][c].letter = ALPHABET[Math.floor(Math.random() * 26)];
+    for (let c = 0; c < size; c++) if (!grid[r][c].letter) grid[r][c].letter = ALPHABET[Math.floor(Math.random() * 26)];
 
   return { grid, placed };
 }
 
 function getLineCells(start: [number, number], end: [number, number]): [number, number][] {
-  const [r1, c1] = start, [r2, c2] = end;
-  const dr = r2 - r1, dc = c2 - c1;
+  const [r1, c1] = start,
+    [r2, c2] = end;
+  const dr = r2 - r1,
+    dc = c2 - c1;
   if (dr === 0 && dc === 0) return [[r1, c1]];
 
   const stepR = dr === 0 ? 0 : dr / Math.abs(dr);
@@ -184,7 +279,9 @@ function WordSearchPage() {
 
   const wordColors = useMemo(() => {
     const map: Record<string, string> = {};
-    placedWords.forEach((pw, i) => { map[pw.word] = CELL_COLORS[i % CELL_COLORS.length]; });
+    placedWords.forEach((pw, i) => {
+      map[pw.word] = CELL_COLORS[i % CELL_COLORS.length];
+    });
     return map;
   }, [placedWords]);
 
@@ -194,7 +291,8 @@ function WordSearchPage() {
       if (!pw.found) return;
       const [dr, dc] = getDelta(pw.dir);
       for (let i = 0; i < pw.word.length; i++) {
-        const r = pw.startR + dr * i, c = pw.startC + dc * i;
+        const r = pw.startR + dr * i,
+          c = pw.startC + dc * i;
         map[`${r}-${c}`] = wordColors[pw.word];
       }
     });
@@ -213,9 +311,11 @@ function WordSearchPage() {
     if ("touches" in e) {
       const touch = e.touches[0] ?? e.changedTouches[0];
       if (!touch) return null;
-      clientX = touch.clientX; clientY = touch.clientY;
+      clientX = touch.clientX;
+      clientY = touch.clientY;
     } else {
-      clientX = e.clientX; clientY = e.clientY;
+      clientX = e.clientX;
+      clientY = e.clientY;
     }
     const size = CONFIG[difficulty].grid;
     const cellW = rect.width / size;
@@ -253,7 +353,9 @@ function WordSearchPage() {
         if (best[difficulty] === 0 || time < best[difficulty]) {
           const upd = { ...best, [difficulty]: time };
           setBest(upd);
-          try { window.localStorage.setItem("wordsearch-best", JSON.stringify(upd)); } catch {}
+          try {
+            window.localStorage.setItem("wordsearch-best", JSON.stringify(upd));
+          } catch {}
         }
       } else {
         playSound("found");
@@ -290,6 +392,7 @@ function WordSearchPage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Word Search"
       description="Find hidden words in the letter grid — horizontally, vertically and diagonally!"
     >
@@ -305,7 +408,7 @@ function WordSearchPage() {
                   "px-3 py-2 rounded-xl text-sm font-bold border transition",
                   category === c
                     ? "bg-primary text-primary-foreground border-transparent"
-                    : "bg-card border-border text-foreground hover:bg-secondary"
+                    : "bg-card border-border text-foreground hover:bg-secondary",
                 )}
               >
                 {c}
@@ -323,7 +426,7 @@ function WordSearchPage() {
                   "px-3 py-2 rounded-xl text-sm font-bold border capitalize transition",
                   difficulty === d
                     ? "bg-primary text-primary-foreground border-transparent"
-                    : "bg-card border-border text-foreground hover:bg-secondary"
+                    : "bg-card border-border text-foreground hover:bg-secondary",
                 )}
               >
                 {d}
@@ -344,9 +447,7 @@ function WordSearchPage() {
               ✅ {foundCount}/{placedWords.length} found
             </span>
             <span className="text-muted-foreground">⏱ {time}s</span>
-            {best[difficulty] > 0 && (
-              <span className="text-yellow-400">🏆 Best: {best[difficulty]}s</span>
-            )}
+            {best[difficulty] > 0 && <span className="text-yellow-400">🏆 Best: {best[difficulty]}s</span>}
           </div>
 
           <div
@@ -372,15 +473,17 @@ function WordSearchPage() {
                     key={key}
                     className={cn(
                       "aspect-square flex items-center justify-center text-[10px] sm:text-xs font-black border border-border/20 transition-colors",
-                      isFound && foundColor ? foundColor :
-                      isSelected ? "bg-primary/40 text-white" :
-                      "text-foreground bg-card hover:bg-muted/40"
+                      isFound && foundColor
+                        ? foundColor
+                        : isSelected
+                          ? "bg-primary/40 text-white"
+                          : "text-foreground bg-card hover:bg-muted/40",
                     )}
                   >
                     {cell.letter}
                   </div>
                 );
-              })
+              }),
             )}
           </div>
 
@@ -392,10 +495,11 @@ function WordSearchPage() {
                   "px-3 py-1.5 rounded-lg text-xs font-bold text-center border transition-all",
                   pw.found
                     ? cn(wordColors[pw.word], "border-transparent line-through opacity-70")
-                    : "bg-card border-border text-foreground dark:bg-card dark:text-foreground"
+                    : "bg-card border-border text-foreground dark:bg-card dark:text-foreground",
                 )}
               >
-                {pw.found ? "✓ " : ""}{pw.word}
+                {pw.found ? "✓ " : ""}
+                {pw.word}
               </div>
             ))}
           </div>
@@ -417,9 +521,7 @@ function WordSearchPage() {
             <p className="text-5xl mb-3">🎉</p>
             <p className="text-2xl font-black text-foreground mb-1">All Words Found!</p>
             <p className="text-muted-foreground mb-1">Time: {time}s</p>
-            {best[difficulty] === time && time > 0 && (
-              <p className="text-yellow-400 font-bold mb-3">🏆 New Best!</p>
-            )}
+            {best[difficulty] === time && time > 0 && <p className="text-yellow-400 font-bold mb-3">🏆 New Best!</p>}
             <div className="flex gap-3 justify-center mt-4">
               <button
                 onClick={startGame}
@@ -446,22 +548,60 @@ function WordSearchPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="word-search" />
+      <AdZone id="word-search-bottom" size="728x90" />
 
       <ToolSeoContent
-        title="Word Search — Free Online Word Finding Puzzle"
-        description="Play Word Search online for free. Find hidden words in letter grids across 6 categories. Easy, Medium and Hard difficulty with timer!"
+        title="Free Word Search Puzzle Online — Find Hidden Words in the Grid"
+        description="Play free Word Search puzzles online. Find hidden words in the letter grid — horizontal, vertical, and diagonal. Multiple difficulty levels. No signup required."
         body={[
-          "Word Search is a timeless puzzle that sharpens your focus, vocabulary and pattern recognition. Pick from six themed categories — Animals, Countries, Sports, Technology, Food and Space — and scan the letter grid for hidden words tucked away in every direction. The game runs entirely in your browser with no signup, no downloads and no ads getting in the way.",
-          "Three difficulty levels keep the challenge fresh. Easy uses a 10×10 grid with words running horizontally or vertically only — perfect for warming up. Medium adds diagonals on a 13×13 grid, while Hard packs 12 words into a 15×15 grid with words running in all 8 directions, including backwards. Beat your best time on each difficulty and try to clear the board faster every round.",
+          "Skycally's Word Search gives you a grid of letters with hidden words running in every direction — horizontal, vertical, diagonal, and even backwards. Click or tap the first letter of a word, drag to the last letter, and release to mark it found. Words are highlighted in a distinct color when correctly identified. Find all the words to complete the puzzle.",
+          "Three difficulty levels are available: Easy (smaller grid, fewer words, horizontal and vertical only), Medium (larger grid, more words, including diagonals), and Hard (large grid, many words, all directions including reverse). Each new game generates a fresh puzzle with a different word set, so there's always a new challenge.",
+          "Word Search is one of the most popular word games worldwide — it appears in newspapers, puzzle books, educational materials, and classrooms everywhere. It exercises pattern recognition, letter scanning, and vocabulary in a low-pressure, relaxing format that works for all ages.",
+          "All puzzles run entirely in your browser. No data is sent to any server, and no account is required. Works on desktop with mouse drag and on mobile with touch drag. The word list is displayed beside the grid so you always know what to look for.",
         ]}
         faqs={[
-          { question: "Which directions can words go?", answer: "On Easy, words run horizontally or vertically. Medium adds both diagonals. On Hard, words can run in all 8 directions, including reversed (right-to-left, bottom-to-top, and reversed diagonals)." },
-          { question: "What categories are available?", answer: "Six themed word lists: Animals, Countries, Sports, Technology, Food and Space. Each category contains 12 words and the game picks a random subset every round so no two games are the same." },
-          { question: "How are the difficulties different?", answer: "Easy is a 10×10 grid with 6 words and 2 directions. Medium is 13×13 with 9 words and 4 directions. Hard is 15×15 with 12 words and all 8 directions including reverses." },
-          { question: "Does it work on mobile?", answer: "Yes. The grid responds to both mouse drag and touch swipe. Tap and hold the first letter, then drag your finger across the line of letters to select a word and release to confirm." },
+          {
+            question: "How do I mark a word?",
+            answer:
+              "Click or tap the first letter of a word, hold and drag to the last letter, then release. The word highlights automatically if it matches one in the list.",
+          },
+          {
+            question: "What directions can words run?",
+            answer:
+              "On Easy: horizontal and vertical only. On Medium and Hard: horizontal, vertical, diagonal, and reverse in all directions.",
+          },
+          {
+            question: "How many words are in each puzzle?",
+            answer:
+              "Word count varies by difficulty: Easy has fewer words in a small grid, Hard has many words in a large grid. The exact count is shown in the word list.",
+          },
+          {
+            question: "Can I generate a new puzzle?",
+            answer: "Yes. Click New Game to generate a fresh puzzle with a different word set and layout at any time.",
+          },
+          {
+            question: "Are words in the list checked off when found?",
+            answer:
+              "Yes. Each word in the side list gets a strikethrough and color highlight when you find it in the grid.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. Use touch drag to select words — touch and hold the first letter, drag to the last, and release.",
+          },
+          {
+            question: "Is there a timer?",
+            answer:
+              "No timer — Word Search is designed as a relaxing, pressure-free experience. Take as long as you need.",
+          },
+          {
+            question: "Are the puzzles randomly generated?",
+            answer:
+              "Yes. Each new game creates a unique grid with a fresh word placement, so no two games are the same.",
+          },
         ]}
       />
+      <RelatedTools currentSlug="word-search" />
     </ToolPageShell>
   );
 }

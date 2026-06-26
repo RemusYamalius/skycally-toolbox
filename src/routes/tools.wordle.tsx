@@ -9,6 +9,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -18,16 +19,106 @@ export const Route = createFileRoute("/tools/wordle")({
 });
 
 const WORDS = [
-  "APPLE","BRAVE","CHAIR","DELTA","EAGLE","FLAIR","GRACE","HEART","INPUT","JOKER",
-  "KNIFE","LIGHT","MAGIC","NIGHT","OCEAN","PIANO","QUEEN","RIVER","STONE","TIGER",
-  "ULTRA","VIVID","WASTE","XENON","YACHT","ZEBRA","BLAST","CLOUD","DREAM","FLAME",
-  "GIANT","HONEY","IMAGE","JEWEL","KARMA","LEMON","MOOSE","NOBLE","OLIVE","PEARL",
-  "QUEST","RADAR","SLEEK","TREND","UNCLE","VENOM","WATER","EXTRA","YOUNG","ZONED",
-  "ALARM","BLANK","CRISP","DUSKY","EMBER","FINCH","GLOOM","HAVOC","IRONY","JUMPY",
-  "KNEEL","LIVER","MAPLE","NERVE","OPTIC","PLUMB","QUIRK","REIGN","SNOWY","THYME",
-  "UNIFY","VERGE","WRATH","EXACT","YIELD","ZONES","ABIDE","BUDGE","CLEFT","DROOP",
-  "ELOPE","FRISK","GRIPE","HASTE","ICING","JIFFY","KNACK","LOOPY","MANLY","NOTCH",
-  "OXIDE","PLAID","QUILL","RISKY","SPOKE","TOWEL","USHER","VISTA","WALTZ","EXPEL",
+  "APPLE",
+  "BRAVE",
+  "CHAIR",
+  "DELTA",
+  "EAGLE",
+  "FLAIR",
+  "GRACE",
+  "HEART",
+  "INPUT",
+  "JOKER",
+  "KNIFE",
+  "LIGHT",
+  "MAGIC",
+  "NIGHT",
+  "OCEAN",
+  "PIANO",
+  "QUEEN",
+  "RIVER",
+  "STONE",
+  "TIGER",
+  "ULTRA",
+  "VIVID",
+  "WASTE",
+  "XENON",
+  "YACHT",
+  "ZEBRA",
+  "BLAST",
+  "CLOUD",
+  "DREAM",
+  "FLAME",
+  "GIANT",
+  "HONEY",
+  "IMAGE",
+  "JEWEL",
+  "KARMA",
+  "LEMON",
+  "MOOSE",
+  "NOBLE",
+  "OLIVE",
+  "PEARL",
+  "QUEST",
+  "RADAR",
+  "SLEEK",
+  "TREND",
+  "UNCLE",
+  "VENOM",
+  "WATER",
+  "EXTRA",
+  "YOUNG",
+  "ZONED",
+  "ALARM",
+  "BLANK",
+  "CRISP",
+  "DUSKY",
+  "EMBER",
+  "FINCH",
+  "GLOOM",
+  "HAVOC",
+  "IRONY",
+  "JUMPY",
+  "KNEEL",
+  "LIVER",
+  "MAPLE",
+  "NERVE",
+  "OPTIC",
+  "PLUMB",
+  "QUIRK",
+  "REIGN",
+  "SNOWY",
+  "THYME",
+  "UNIFY",
+  "VERGE",
+  "WRATH",
+  "EXACT",
+  "YIELD",
+  "ZONES",
+  "ABIDE",
+  "BUDGE",
+  "CLEFT",
+  "DROOP",
+  "ELOPE",
+  "FRISK",
+  "GRIPE",
+  "HASTE",
+  "ICING",
+  "JIFFY",
+  "KNACK",
+  "LOOPY",
+  "MANLY",
+  "NOTCH",
+  "OXIDE",
+  "PLAID",
+  "QUILL",
+  "RISKY",
+  "SPOKE",
+  "TOWEL",
+  "USHER",
+  "VISTA",
+  "WALTZ",
+  "EXPEL",
   "YEARN",
 ];
 
@@ -37,9 +128,9 @@ const MAX_TRIES = 6;
 const WORD_LEN = 5;
 
 const KEY_ROWS = [
-  ["Q","W","E","R","T","Y","U","I","O","P"],
-  ["A","S","D","F","G","H","J","K","L"],
-  ["ENTER","Z","X","C","V","B","N","M","BACK"],
+  ["Q", "W", "E", "R", "T", "Y", "U", "I", "O", "P"],
+  ["A", "S", "D", "F", "G", "H", "J", "K", "L"],
+  ["ENTER", "Z", "X", "C", "V", "B", "N", "M", "BACK"],
 ];
 
 type Stats = {
@@ -64,7 +155,11 @@ function loadStats(): Stats {
 
 function saveStats(s: Stats) {
   if (typeof window === "undefined") return;
-  try { localStorage.setItem("wordle-stats", JSON.stringify(s)); } catch { /* noop */ }
+  try {
+    localStorage.setItem("wordle-stats", JSON.stringify(s));
+  } catch {
+    /* noop */
+  }
 }
 
 function dailyWord() {
@@ -76,12 +171,19 @@ function evaluateGuess(guess: string, target: string): LetterState[] {
   const targetArr = target.split("");
   const guessArr = guess.split("");
   guessArr.forEach((l, i) => {
-    if (l === targetArr[i]) { result[i] = "correct"; targetArr[i] = "*"; guessArr[i] = "#"; }
+    if (l === targetArr[i]) {
+      result[i] = "correct";
+      targetArr[i] = "*";
+      guessArr[i] = "#";
+    }
   });
   guessArr.forEach((l, i) => {
     if (l === "#") return;
     const ti = targetArr.indexOf(l);
-    if (ti !== -1) { result[i] = "present"; targetArr[ti] = "*"; }
+    if (ti !== -1) {
+      result[i] = "present";
+      targetArr[ti] = "*";
+    }
   });
   return result;
 }
@@ -105,7 +207,9 @@ function WordlePage() {
   const [stats, setStats] = useState<Stats>(DEFAULT_STATS);
   const [showConfetti, setShowConfetti] = useState(false);
 
-  useEffect(() => { setStats(loadStats()); }, []);
+  useEffect(() => {
+    setStats(loadStats());
+  }, []);
 
   const submitGuess = useCallback(() => {
     if (gameOver) return;
@@ -165,23 +269,39 @@ function WordlePage() {
     }
   }, [current, target, guesses, gameOver, stats]);
 
-  const handleKey = useCallback((k: string) => {
-    if (gameOver) return;
-    if (k === "ENTER") { submitGuess(); return; }
-    if (k === "BACK") { setCurrent((c) => c.slice(0, -1)); playSound("click"); return; }
-    if (/^[A-Z]$/.test(k) && current.length < WORD_LEN) {
-      setCurrent((c) => (c + k).slice(0, WORD_LEN));
-      playSound("click");
-    }
-  }, [current, submitGuess, gameOver]);
+  const handleKey = useCallback(
+    (k: string) => {
+      if (gameOver) return;
+      if (k === "ENTER") {
+        submitGuess();
+        return;
+      }
+      if (k === "BACK") {
+        setCurrent((c) => c.slice(0, -1));
+        playSound("click");
+        return;
+      }
+      if (/^[A-Z]$/.test(k) && current.length < WORD_LEN) {
+        setCurrent((c) => (c + k).slice(0, WORD_LEN));
+        playSound("click");
+      }
+    },
+    [current, submitGuess, gameOver],
+  );
 
   useEffect(() => {
     const onKeyDown = (e: KeyboardEvent) => {
       if (e.metaKey || e.ctrlKey || e.altKey) return;
       const k = e.key;
-      if (k === "Enter") { e.preventDefault(); handleKey("ENTER"); }
-      else if (k === "Backspace") { e.preventDefault(); handleKey("BACK"); }
-      else if (/^[a-zA-Z]$/.test(k)) { handleKey(k.toUpperCase()); }
+      if (k === "Enter") {
+        e.preventDefault();
+        handleKey("ENTER");
+      } else if (k === "Backspace") {
+        e.preventDefault();
+        handleKey("BACK");
+      } else if (/^[a-zA-Z]$/.test(k)) {
+        handleKey(k.toUpperCase());
+      }
     };
     window.addEventListener("keydown", onKeyDown);
     return () => window.removeEventListener("keydown", onKeyDown);
@@ -208,7 +328,9 @@ function WordlePage() {
         const evals = evaluateGuess(g, target);
         out.push({ letters: g.split(""), states: evals });
       } else if (r === guesses.length && !gameOver) {
-        const letters = Array(WORD_LEN).fill(null).map((_, i) => current[i] ?? null);
+        const letters = Array(WORD_LEN)
+          .fill(null)
+          .map((_, i) => current[i] ?? null);
         out.push({ letters, states: Array(WORD_LEN).fill(null) });
       } else {
         out.push({ letters: Array(WORD_LEN).fill(null), states: Array(WORD_LEN).fill(null) });
@@ -229,7 +351,7 @@ function WordlePage() {
                 className="absolute top-[-10px] block w-2 h-3 rounded-sm"
                 style={{
                   left: `${Math.random() * 100}%`,
-                  background: ["#22c55e","#eab308","#06b6d4","#a855f7","#ef4444"][i % 5],
+                  background: ["#22c55e", "#eab308", "#06b6d4", "#a855f7", "#ef4444"][i % 5],
                   animation: `wordle-confetti ${2 + Math.random() * 2}s ${Math.random()}s linear forwards`,
                   transform: `rotate(${Math.random() * 360}deg)`,
                 }}
@@ -280,11 +402,20 @@ function WordlePage() {
                 return (
                   <button
                     key={k}
-                    onClick={() => handleKey(k)}
+                    onMouseDown={(e) => {
+                      e.preventDefault();
+                      handleKey(k);
+                    }}
                     className={`h-12 rounded-md border font-semibold text-sm uppercase transition hover:opacity-80 ${cls} ${wide ? "px-3 flex-[1.4]" : "flex-1"}`}
                     aria-label={k === "BACK" ? "Backspace" : k === "ENTER" ? "Enter" : k}
                   >
-                    {k === "BACK" ? <Delete className="w-4 h-4 mx-auto" /> : k === "ENTER" ? <CornerDownLeft className="w-4 h-4 mx-auto" /> : k}
+                    {k === "BACK" ? (
+                      <Delete className="w-4 h-4 mx-auto" />
+                    ) : k === "ENTER" ? (
+                      <CornerDownLeft className="w-4 h-4 mx-auto" />
+                    ) : (
+                      k
+                    )}
                   </button>
                 );
               })}
@@ -308,6 +439,8 @@ function WordlePage() {
         </div>
       </div>
 
+      <AdZone id="wordle-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Type a 5-letter word and press Enter to guess.",
@@ -317,17 +450,54 @@ function WordlePage() {
       />
 
       <ToolSeoContent
-        title="Wordle Game — Free Daily Word Puzzle Online"
-        description="Play Wordle online for free. Guess the 5-letter word in 6 tries. New word every day, no download needed."
+        title="Free Wordle Game Online — Guess the 5-Letter Word in 6 Tries"
+        description="Play Wordle free online. Guess the hidden 5-letter word in 6 tries. Green means correct position, yellow means wrong position. New word every day. No signup."
         body={[
-          "Wordle is a deceptively simple word puzzle that took the world by storm. The rules are clear: guess a hidden five-letter word in six attempts. After each guess, the tiles change color to tell you how close you are — green for the right letter in the right spot, yellow for the right letter in the wrong spot, and gray for letters that are not in the word at all. With only a handful of tries, every guess is a small experiment in deduction.",
-          "Our free online Wordle plays directly in your browser with no signup, no ads on the board, and a fresh word every day. Track your streak, watch your win percentage climb, and challenge friends to beat your best run. Whether you have two minutes between meetings or a quiet morning with coffee, it is the perfect daily brain workout.",
+          "Skycally's Wordle gives you six attempts to guess a hidden five-letter English word. After each guess, the tiles change color to show how close you are: green means the letter is correct and in the right position, yellow means the letter is in the word but in the wrong spot, and gray means the letter is not in the word at all. Use these clues to narrow down the answer in as few guesses as possible.",
+          "Type your guesses using your physical keyboard on desktop — just start typing, press Enter to submit, and Backspace to delete. On mobile, tap the on-screen keyboard displayed below the grid. Every letter you've guessed is color-coded on the keyboard too, so you can quickly see which letters are still available.",
+          "Wordle was originally created by Josh Wardle and went viral in late 2021 before being acquired by The New York Times. The appeal is simple: one puzzle per day, shared with millions of people worldwide, small enough to solve in a few minutes but just challenging enough to keep you thinking. Our version lets you play any time with a randomly selected word from our curated dictionary.",
+          "Strategy matters as much as vocabulary in Wordle. Starting with words that cover common letters — like CRANE, AUDIO, or SLATE — gives you maximum information on the first guess. Avoid reusing gray letters and try to confirm or eliminate yellow letters as quickly as possible. Most players solve the puzzle in 3 to 4 guesses on average.",
         ]}
         faqs={[
-          { question: "How does the daily word work?", answer: "Every day the game picks a new word from our curated 5-letter dictionary using the current date, so the puzzle is the same for everyone on a given day." },
-          { question: "Can I keep playing after I solve today's word?", answer: "Yes — click Play Again after finishing and we will pick a new random word so you can keep practicing as long as you like." },
-          { question: "How are duplicate letters scored?", answer: "Each target letter only credits one guess letter. If you guess two of the same letter but the target has only one, only the better-placed copy turns green or yellow; the other stays gray." },
-          { question: "Are my stats saved?", answer: "Yes. Your games played, win percentage, current streak, and best streak are stored locally in your browser. They never leave your device." },
+          {
+            question: "How do I play Wordle?",
+            answer:
+              "Type a 5-letter word and press Enter to submit. Green tiles show correct letters in the right position. Yellow tiles show letters that are in the word but in the wrong position. Gray tiles show letters not in the word. You have 6 guesses to find the word.",
+          },
+          {
+            question: "Can I use my physical keyboard?",
+            answer:
+              "Yes. On desktop, just start typing — letter keys enter the current guess, Enter submits it, and Backspace deletes the last letter. The on-screen keyboard is also available for mouse or touchscreen use.",
+          },
+          {
+            question: "What are good starting words?",
+            answer:
+              "Words with common letters work best: CRANE, SLATE, AUDIO, ARISE, or STARE are popular first guesses that cover high-frequency letters and give maximum information from the first guess.",
+          },
+          {
+            question: "How many letters does the word have?",
+            answer: "Every Wordle answer is exactly 5 letters long. All guesses must also be valid 5-letter words.",
+          },
+          {
+            question: "Is there a new word every day?",
+            answer:
+              "Our version selects a random word from a curated dictionary each time you play. Play again after winning or losing to try another word.",
+          },
+          {
+            question: "What do the colors mean?",
+            answer:
+              "Green: correct letter in the correct position. Yellow: letter is in the word but in the wrong position. Gray: letter is not in the word at all.",
+          },
+          {
+            question: "Are all words in the dictionary valid guesses?",
+            answer:
+              "Yes. The game accepts any common 5-letter English word as a guess, even if it's not the target word.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. Use the on-screen keyboard displayed below the grid. The game is fully responsive and works on all screen sizes.",
+          },
         ]}
       />
 

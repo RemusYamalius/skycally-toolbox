@@ -132,43 +132,11 @@ function CountryInfo() {
         </Button>
       </form>
 
-      <div className="mt-4 rounded-2xl border border-border bg-card/40 p-4">
-        <label className="text-xs text-muted-foreground mb-2 block">Or pick from the full list</label>
-        <Input
-          value={query}
-          onChange={(e) => setQuery(e.target.value)}
-          placeholder="Filter countries…"
-          className="mb-3"
-        />
-        <div className="max-h-56 overflow-y-auto rounded-lg border border-border bg-background/40 divide-y divide-border">
-          {filtered.map((c) => (
-            <button
-              key={c.cca3}
-              type="button"
-              onClick={() => selectByCode(c.cca3)}
-              className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm hover:bg-secondary/50 transition-colors"
-            >
-              {c.flagSvg && (
-                <img
-                  src={c.flagSvg}
-                  alt=""
-                  loading="lazy"
-                  className="w-6 h-4 object-cover rounded-sm border border-border"
-                />
-              )}
-              <span>{c.name.common}</span>
-            </button>
-          ))}
-          {filtered.length === 0 && <p className="px-3 py-4 text-sm text-muted-foreground">No matches.</p>}
-        </div>
-      </div>
-
       {error && (
         <p className="mt-4 text-sm" style={{ color: "var(--orange-brand)" }}>
           {error}
         </p>
       )}
-
       {country && (
         <motion.div
           key={country.cca3}
@@ -255,6 +223,37 @@ function CountryInfo() {
           </div>
         </motion.div>
       )}
+
+      <div className="mt-8 rounded-2xl border border-border bg-card/40 p-4">
+        <label className="text-xs text-muted-foreground mb-2 block">Or pick from the full list</label>
+        <Input
+          value={query}
+          onChange={(e) => setQuery(e.target.value)}
+          placeholder="Filter countries…"
+          className="mb-3"
+        />
+        <div className="max-h-56 overflow-y-auto rounded-lg border border-border bg-background/40 divide-y divide-border">
+          {filtered.map((c) => (
+            <button
+              key={c.cca3}
+              type="button"
+              onClick={() => selectByCode(c.cca3)}
+              className="w-full flex items-center gap-3 px-3 py-2 text-left text-sm hover:bg-secondary/50 transition-colors"
+            >
+              {c.flagSvg && (
+                <img
+                  src={c.flagSvg}
+                  alt=""
+                  loading="lazy"
+                  className="w-6 h-4 object-cover rounded-sm border border-border"
+                />
+              )}
+              <span>{c.name.common}</span>
+            </button>
+          ))}
+          {filtered.length === 0 && <p className="px-3 py-4 text-sm text-muted-foreground">No matches.</p>}
+        </div>
+
 
       <AdZone id="country-info-bottom" size="728x90" />
 

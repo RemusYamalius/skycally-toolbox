@@ -10,6 +10,7 @@ import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Switch } from "@/components/ui/switch";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -192,7 +193,11 @@ function RandomTeamMaker() {
     setAssignments(distribute(players, teamCount, balanced));
   };
 
-  const finishWithRandomAssignment = (remainingQueue: string[], startingTeam: number, currentAssignments: string[][]) => {
+  const finishWithRandomAssignment = (
+    remainingQueue: string[],
+    startingTeam: number,
+    currentAssignments: string[][],
+  ) => {
     const out = currentAssignments.map((t) => [...t]);
     let t = startingTeam;
     remainingQueue.forEach((p) => {
@@ -234,17 +239,13 @@ function RandomTeamMaker() {
         setSpinning(false);
         const picked = queue[target];
         const newQueue = queue.filter((_, i) => i !== target);
-        const newAssignments = assignments.map((team, i) =>
-          i === nextTeamIdx ? [...team, picked] : team,
-        );
+        const newAssignments = assignments.map((team, i) => (i === nextTeamIdx ? [...team, picked] : team));
         setAssignments(newAssignments);
         setQueue(newQueue);
         if (newQueue.length === 0) {
           setPhase("done");
         } else {
-          const advanceTeam = balanced
-            ? (nextTeamIdx + 1) % teamCount
-            : Math.floor(Math.random() * teamCount);
+          const advanceTeam = balanced ? (nextTeamIdx + 1) % teamCount : Math.floor(Math.random() * teamCount);
           setNextTeamIdx(advanceTeam);
         }
       }
@@ -253,9 +254,7 @@ function RandomTeamMaker() {
   };
 
   const copyResults = async () => {
-    const text = assignments
-      .map((team, i) => `${teamNames[i]}:\n${team.map((p) => `  ${p}`).join("\n")}`)
-      .join("\n\n");
+    const text = assignments.map((team, i) => `${teamNames[i]}:\n${team.map((p) => `  ${p}`).join("\n")}`).join("\n\n");
     try {
       await navigator.clipboard.writeText(text);
       toast.success("Results copied to clipboard");
@@ -345,9 +344,7 @@ function RandomTeamMaker() {
                       <Input
                         autoFocus
                         value={name}
-                        onChange={(e) =>
-                          setTeamNames((prev) => prev.map((n, idx) => (idx === i ? e.target.value : n)))
-                        }
+                        onChange={(e) => setTeamNames((prev) => prev.map((n, idx) => (idx === i ? e.target.value : n)))}
                         onKeyDown={(e) => {
                           if (e.key === "Enter") {
                             e.preventDefault();
@@ -357,19 +354,19 @@ function RandomTeamMaker() {
                         onBlur={() => setEditingTeamIdx(null)}
                         className="h-7"
                       />
-                      <Button variant="ghost" size="icon" onClick={() => setEditingTeamIdx(null)} aria-label="Save name">
+                      <Button
+                        variant="ghost"
+                        size="icon"
+                        onClick={() => setEditingTeamIdx(null)}
+                        aria-label="Save name"
+                      >
                         <Check className="w-4 h-4" />
                       </Button>
                     </>
                   ) : (
                     <>
                       <span className="flex-1 truncate">{name}</span>
-                      <Button
-                        variant="ghost"
-                        size="icon"
-                        onClick={() => setEditingTeamIdx(i)}
-                        aria-label="Rename team"
-                      >
+                      <Button variant="ghost" size="icon" onClick={() => setEditingTeamIdx(i)} aria-label="Rename team">
                         <Pencil className="w-4 h-4" />
                       </Button>
                     </>
@@ -397,14 +394,12 @@ function RandomTeamMaker() {
           <div className="text-center">
             <p className="text-sm text-muted-foreground">Assigning to</p>
             <p className="font-display text-2xl font-bold inline-flex items-center gap-2">
-              <span
-                className="w-3 h-3 rounded-full"
-                style={{ background: PALETTE[nextTeamIdx % PALETTE.length] }}
-              />
+              <span className="w-3 h-3 rounded-full" style={{ background: PALETTE[nextTeamIdx % PALETTE.length] }} />
               {teamNames[nextTeamIdx]}
             </p>
             <p className="text-sm text-muted-foreground mt-1">
-              ({assignments[nextTeamIdx]?.length ?? 0}/{players.length} players assigned overall: {players.length - queue.length}/{players.length})
+              ({assignments[nextTeamIdx]?.length ?? 0}/{players.length} players assigned overall:{" "}
+              {players.length - queue.length}/{players.length})
             </p>
           </div>
           <Wheel segments={segments} rotation={rotation} />
@@ -464,6 +459,8 @@ function RandomTeamMaker() {
         </div>
       )}
 
+      <AdZone id="random-team-maker-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Enter all player names and choose how many teams you need.",
@@ -473,32 +470,52 @@ function RandomTeamMaker() {
       />
 
       <ToolSeoContent
-        title="Random Team Maker — Split Players into Fair Teams Instantly"
-        description="Randomly divide any group into balanced teams with a spinning wheel. Free, instant, no signup — perfect for sports, classrooms and party games."
+        title="Free Random Team Maker — Split People into Balanced Teams"
+        description="Randomly split any group of people into balanced teams. Enter names, choose team count, and spin. Free, browser-based team randomizer. No signup required."
         body={[
-          "Whether you're organizing a pickup soccer match, splitting a classroom into project groups, or breaking up the family for a backyard tournament, picking teams by hand is slow and never feels totally fair. Random Team Maker takes the awkwardness out of it: type in everyone's name, choose how many teams you need, and let the wheel hand out players one spin at a time. The balanced mode rotates assignments so each team ends up with the same headcount (give or take one), which is exactly what you want for competitive play.",
-          "Everything happens in your browser. Names never leave your device, there are no accounts to create, and there's no upload step — the wheel runs locally with a clean, animated draw. Need a different split? Hit Shuffle Again and the tool re-randomizes instantly without resetting your players or team names. When you're done, one click copies a tidy plain-text roster to your clipboard so you can paste it into a group chat, a whiteboard, or your tournament bracket.",
+          "Skycally's Random Team Maker takes the awkwardness out of picking teams by hand. Type in everyone's name, choose how many teams you need, and let the wheel hand out players one spin at a time. The balanced mode rotates assignments so each team ends up with the same headcount (give or take one), which is exactly what you want for competitive play.",
+          "The animated wheel draw makes team selection visually engaging and completely transparent — everyone can watch the process, eliminating the perception of favoritism that comes with manual team picking. Each spin assigns one player to the next team in rotation, building the complete team roster in a series of satisfying reveals.",
+          "Everything happens in your browser. Names never leave your device, there are no accounts to create, and there's no upload step. Need a different split? Hit Shuffle Again and the tool re-randomizes instantly without resetting your players or team names. When you're done, one click copies a tidy plain-text roster to your clipboard so you can paste it into a group chat, a whiteboard, or a tournament bracket.",
+          "Works for any team-making scenario: pickup sports, classroom project groups, office team-building, quiz nights, escape rooms, gaming sessions, or any activity where you need to divide a group into teams quickly and fairly. Supports 2 to 10 teams and any number of players.",
         ]}
         faqs={[
           {
-            question: "How does balanced team distribution work?",
+            question: "How many teams can I create?",
             answer:
-              "When 'Balanced teams' is on, players are shuffled and then dealt out round-robin — first player to Team 1, second to Team 2, and so on. That guarantees each team has the same number of players, plus or minus one when the total doesn't divide evenly. Turn it off if you'd rather every player be assigned to a completely random team, even if that means uneven sizes.",
+              "Between 2 and 10 teams. The tool distributes players as evenly as possible, with larger teams getting one extra player when the group doesn't divide evenly.",
           },
           {
-            question: "Can I rename the teams?",
-            answer:
-              "Yes. Each team name is editable on the setup screen — just click the pencil icon, type a custom name like 'Reds', 'Project Alpha' or 'Cabin 4', and press Enter. Custom names carry through to the results screen and the copied roster.",
+            question: "Can I name the teams?",
+            answer: "Yes. Each team has an editable name. Set custom team names before or after the draw.",
           },
           {
-            question: "What's the minimum number of players?",
+            question: "What if I want to re-randomize?",
             answer:
-              "You need at least two players, and the player count must be greater than or equal to the number of teams. There's no hard upper limit — the wheel handles dozens of names without slowing down, though very large lists are easier to read after using the Skip Animation button.",
+              "Click Shuffle Again to instantly re-randomize the entire team assignment without changing your player list or team configuration.",
           },
           {
-            question: "What is Random Team Maker good for?",
+            question: "Can I copy the team roster?",
             answer:
-              "Anything that needs fair, fast group splits: pickup sports, classroom group projects, summer-camp activities, trivia nights, escape-room teams, work icebreakers, board-game alliances, dodgeball, and family games. Because everything runs locally, it works just as well offline once the page has loaded.",
+              "Yes. A copy button exports the complete team assignments as plain text, ready to paste into a chat, document, or tournament bracket.",
+          },
+          {
+            question: "Does the tool store my player names?",
+            answer: "No. Everything runs locally in your browser. Player names never leave your device.",
+          },
+          {
+            question: "How are teams balanced?",
+            answer:
+              "Players are randomly assigned in a rotating pattern — player 1 goes to team 1, player 2 to team 2, and so on — ensuring each team gets the same number of players (or one team gets an extra if the count is uneven).",
+          },
+          {
+            question: "Can I use this for sports teams?",
+            answer:
+              "Yes. It's commonly used for pickup football, basketball, volleyball, and other sports where you need to split a group into equal sides quickly and fairly.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer:
+              "Yes. The wheel animation and team configuration are fully responsive and work on smartphones and tablets.",
           },
         ]}
       />

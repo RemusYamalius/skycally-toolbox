@@ -7,6 +7,7 @@ import { tools } from "@/lib/tools";
 import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
@@ -147,18 +148,15 @@ function MinesweeperPage() {
     return () => clearInterval(t);
   }, [phase]);
 
-  const startGame = useCallback(
-    (diff: Difficulty) => {
-      const cfg = CONFIG[diff];
-      setDifficulty(diff);
-      setBoard(makeEmptyBoard(cfg.rows, cfg.cols));
-      setPhase("playing");
-      setFirstClick(true);
-      setTime(0);
-      setFlagCount(0);
-    },
-    [],
-  );
+  const startGame = useCallback((diff: Difficulty) => {
+    const cfg = CONFIG[diff];
+    setDifficulty(diff);
+    setBoard(makeEmptyBoard(cfg.rows, cfg.cols));
+    setPhase("playing");
+    setFirstClick(true);
+    setTime(0);
+    setFlagCount(0);
+  }, []);
 
   const resetGame = useCallback(() => {
     setPhase("setup");
@@ -319,13 +317,13 @@ function MinesweeperPage() {
           cell.flagged && !isRevealed ? "bg-yellow-500/20 border-yellow-500/40" : "",
         )}
       >
-        {isMine
-          ? "💣"
-          : cell.flagged && !isRevealed
-            ? "🚩"
-            : isRevealed && cell.adjacent > 0
-              ? <span className={NUM_COLORS[cell.adjacent]}>{cell.adjacent}</span>
-              : null}
+        {isMine ? (
+          "💣"
+        ) : cell.flagged && !isRevealed ? (
+          "🚩"
+        ) : isRevealed && cell.adjacent > 0 ? (
+          <span className={NUM_COLORS[cell.adjacent]}>{cell.adjacent}</span>
+        ) : null}
       </button>
     );
   };
@@ -334,6 +332,7 @@ function MinesweeperPage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Minesweeper"
       description="The classic puzzle of logic and luck. Reveal every safe cell without detonating a mine."
     >
@@ -358,9 +357,7 @@ function MinesweeperPage() {
                   </div>
                   <div className="text-right">
                     <p className="text-xs text-muted-foreground">Best</p>
-                    <p className="font-black text-yellow-400">
-                      {mounted && best[d] > 0 ? `${best[d]}s` : "—"}
-                    </p>
+                    <p className="font-black text-yellow-400">{mounted && best[d] > 0 ? `${best[d]}s` : "—"}</p>
                   </div>
                 </button>
               ))}
@@ -376,9 +373,7 @@ function MinesweeperPage() {
           <>
             {/* Header bar */}
             <div className="flex items-center justify-between w-full max-w-fit mx-auto mb-3 px-2 gap-6">
-              <div className="flex items-center gap-1 text-sm font-bold tabular-nums">
-                💣 {cfg.mines - flagCount}
-              </div>
+              <div className="flex items-center gap-1 text-sm font-bold tabular-nums">💣 {cfg.mines - flagCount}</div>
               <button
                 onClick={resetGame}
                 className="w-10 h-10 text-xl rounded-xl border border-border hover:bg-secondary transition"
@@ -386,9 +381,7 @@ function MinesweeperPage() {
               >
                 {phase === "won" ? "😎" : phase === "lost" ? "😵" : "🙂"}
               </button>
-              <div className="flex items-center gap-1 text-sm font-bold tabular-nums">
-                ⏱ {time}s
-              </div>
+              <div className="flex items-center gap-1 text-sm font-bold tabular-nums">⏱ {time}s</div>
             </div>
 
             {/* Board */}
@@ -442,6 +435,8 @@ function MinesweeperPage() {
         )}
       </div>
 
+      <AdZone id="minesweeper-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Click any cell to start — your first click is always safe.",
@@ -451,28 +446,52 @@ function MinesweeperPage() {
       />
 
       <ToolSeoContent
-        title="Minesweeper — Free Online Classic Game"
-        description="Play the classic Minesweeper game online for free. Easy, Medium and Hard difficulty. Works on mobile with long-press to flag!"
+        title="Free Minesweeper Online — Classic Mine Sweeping Game"
+        description="Play classic Minesweeper free online. Reveal cells without hitting mines. Right-click to flag suspected mines. Easy, Medium, and Hard difficulties. No signup."
         body={[
-          "Minesweeper is the legendary logic puzzle that shipped with Windows for decades and quietly stole millions of work hours. The rules are simple: uncover every cell on the grid that doesn't contain a mine. Each number you reveal tells you exactly how many mines are touching that square, and from that single clue a whole map of safe and dangerous tiles can be deduced. Your very first click is always safe — mines are placed only after you tap, so you never lose on turn one.",
-          "This browser version supports the three classic difficulty levels (9×9 / 16×16 / 16×30), a built-in timer, and per-difficulty best times saved locally to your device. Right-click to plant a flag on desktop, or long-press on mobile. Once a number has all its mines flagged, click it to chord-reveal every remaining safe neighbor at once — the pro move that lets you fly through the board.",
+          "Skycally's Minesweeper recreates the classic Windows puzzle game in your browser. Left-click to reveal a cell — if it's a mine, the game ends. If not, a number appears showing how many of the 8 surrounding cells contain mines. Right-click (or long-press on mobile) to plant a flag on a suspected mine. Clear all non-mine cells to win.",
+          "Minesweeper was included with Windows 3.1 in 1992 as a way to teach users mouse skills, and became one of the most played games in computing history. Three standard difficulties are available: Beginner (9×9 grid, 10 mines), Intermediate (16×16, 40 mines), and Expert (30×16, 99 mines). The first click is always safe — mines are placed after your first reveal.",
+          "The numbers are the key to solving the puzzle. A cell showing '1' means exactly one of its neighbors is a mine. A '3' means three neighbors are mines. Use process of elimination: if a '1' has only one unrevealed neighbor, that neighbor must be a mine — flag it. If all mines around a number are flagged, the remaining neighbors are safe to reveal.",
+          "Chording is an advanced technique: if a numbered cell's mine count matches exactly the number of adjacent flags, clicking the number reveals all remaining unflagged neighbors at once. This speeds up the game significantly once you're comfortable with basic deduction.",
         ]}
         faqs={[
           {
-            question: "How do I flag a mine on mobile?",
-            answer: "Long-press any covered cell for about half a second to toggle a flag. Tap normally to reveal a cell.",
+            question: "How do I play Minesweeper?",
+            answer:
+              "Left-click to reveal a cell. Numbers show how many neighboring cells contain mines. Right-click (or long-press on mobile) to flag a suspected mine. Reveal all non-mine cells to win.",
+          },
+          {
+            question: "What do the numbers mean?",
+            answer:
+              "Each number shows how many of the 8 surrounding cells contain mines. Use these counts to deduce which cells are safe and which are mines.",
+          },
+          {
+            question: "Is the first click always safe?",
+            answer:
+              "Yes. Mines are placed after your first click, guaranteeing the first revealed cell is never a mine.",
           },
           {
             question: "What are the difficulty levels?",
-            answer: "Easy is a 9×9 board with 10 mines, Medium is 16×16 with 40 mines, and Hard (Expert) is 16×30 with 99 mines — the classic Windows configurations.",
+            answer: "Beginner: 9×9 grid with 10 mines. Intermediate: 16×16 with 40 mines. Expert: 30×16 with 99 mines.",
           },
           {
-            question: "What is chord clicking?",
-            answer: "If a revealed numbered cell already has the matching number of flagged neighbors, clicking it reveals all of its remaining unflagged neighbors at once. It speeds up clearing the board significantly — but if you flagged the wrong cell, you'll detonate a mine.",
+            question: "How do I flag a mine?",
+            answer:
+              "Right-click on desktop, or long-press on mobile, to place a flag on a cell you suspect contains a mine. Flag all mines to win (revealing all non-mine cells also wins).",
           },
           {
-            question: "Are my best times saved?",
-            answer: "Yes. Your fastest clear time for each difficulty is stored in your browser's local storage and persists between sessions on the same device. Clearing browser data will reset them.",
+            question: "What is chording?",
+            answer:
+              "If a numbered cell has exactly as many adjacent flags as its number, clicking it reveals all remaining unflagged neighbors — a fast technique for experienced players.",
+          },
+          {
+            question: "Can I win by luck alone?",
+            answer:
+              "Sometimes — but the most efficient solving uses pure logic. Some situations require a guess when two cells are equally likely to be mines.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Tap to reveal and long-press to flag. The grid scales to fit the screen size.",
           },
         ]}
       />

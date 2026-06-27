@@ -6,6 +6,7 @@ import { buildPageMeta, SITE_URL } from "@/lib/seo";
 import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -72,7 +73,10 @@ function cellY(r: number) {
 
 function neighbors(r: number, c: number, parityOffset: number, rowsLen: number): Array<[number, number]> {
   const odd = (r + parityOffset) % 2 === 1;
-  const out: Array<[number, number]> = [[r, c - 1], [r, c + 1]];
+  const out: Array<[number, number]> = [
+    [r, c - 1],
+    [r, c + 1],
+  ];
   if (odd) {
     out.push([r - 1, c], [r - 1, c + 1], [r + 1, c], [r + 1, c + 1]);
   } else {
@@ -142,7 +146,9 @@ function BubbleShooterPage() {
     try {
       const v = parseInt(localStorage.getItem("bubble-shooter-best") || "0", 10);
       if (!isNaN(v)) setBest(v);
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, []);
 
   const saveBest = useCallback((s: number) => {
@@ -152,7 +158,9 @@ function BubbleShooterPage() {
         localStorage.setItem("bubble-shooter-best", String(s));
         setBest(s);
       }
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, []);
 
   const pickNextColor = useCallback((): Color => {
@@ -238,8 +246,13 @@ function BubbleShooterPage() {
     for (let i = 0; i < 400; i++) {
       x += dx * step;
       y += dy * step;
-      if (x < R) { x = R; dx = -dx; }
-      else if (x > W - R) { x = W - R; dx = -dx; }
+      if (x < R) {
+        x = R;
+        dx = -dx;
+      } else if (x > W - R) {
+        x = W - R;
+        dx = -dx;
+      }
       if (y < R) break;
       // Hit any bubble?
       let hit = false;
@@ -250,7 +263,7 @@ function BubbleShooterPage() {
           const by = cellY(r);
           const ddx = bx - x;
           const ddy = by - y;
-          if (ddx * ddx + ddy * ddy < (2 * R) * (2 * R)) hit = true;
+          if (ddx * ddx + ddy * ddy < 2 * R * (2 * R)) hit = true;
         }
       }
       if (hit) break;
@@ -272,9 +285,11 @@ function BubbleShooterPage() {
         if (x < R || x > W - R) continue; // would be off-canvas
         const d = (x - bx) ** 2 + (y - by) ** 2;
         // Must be adjacent to existing bubble OR be in top row
-        const isAdjacent = r === 0 || neighbors(r, c, parityOffsetRef.current, Math.max(grid.length, r + 1)).some(([nr, nc]) => {
-          return nr < grid.length && grid[nr] && grid[nr][nc];
-        });
+        const isAdjacent =
+          r === 0 ||
+          neighbors(r, c, parityOffsetRef.current, Math.max(grid.length, r + 1)).some(([nr, nc]) => {
+            return nr < grid.length && grid[nr] && grid[nr][nc];
+          });
         if (!isAdjacent) continue;
         if (!best || d < best.d) best = { r, c, d };
       }
@@ -372,7 +387,10 @@ function BubbleShooterPage() {
     setRunning(false);
     runningRef.current = false;
     playSound("fail");
-    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
   };
 
   const handleWin = () => {
@@ -383,7 +401,10 @@ function BubbleShooterPage() {
     setRunning(false);
     runningRef.current = false;
     playSound("score");
-    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
   };
 
   const addRowFromTop = () => {
@@ -420,8 +441,13 @@ function BubbleShooterPage() {
       for (let s = 0; s < steps && bulletRef.current; s++) {
         b.x += b.vx / steps;
         b.y += b.vy / steps;
-        if (b.x < R) { b.x = R; b.vx = -b.vx; }
-        else if (b.x > W - R) { b.x = W - R; b.vx = -b.vx; }
+        if (b.x < R) {
+          b.x = R;
+          b.vx = -b.vx;
+        } else if (b.x > W - R) {
+          b.x = W - R;
+          b.vx = -b.vx;
+        }
 
         // Top wall hit
         if (b.y <= R) {
@@ -516,7 +542,12 @@ function BubbleShooterPage() {
     rafRef.current = requestAnimationFrame(loop);
   }, [loop, pickNextColor]);
 
-  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    },
+    [],
+  );
 
   // Pointer handlers
   const updateAimFromEvent = (clientX: number, clientY: number) => {
@@ -553,10 +584,16 @@ function BubbleShooterPage() {
   };
 
   // Initial draw of empty board
-  useEffect(() => { draw(); }, [draw]);
+  useEffect(() => {
+    draw();
+  }, [draw]);
 
   return (
-    <ToolPageShell title="Bubble Shooter" description="Aim, shoot, and pop bubbles before they reach the bottom!">
+    <ToolPageShell
+      showFileDisclaimer={false}
+      title="Bubble Shooter"
+      description="Aim, shoot, and pop bubbles before they reach the bottom!"
+    >
       <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
         <div className="flex justify-center gap-3 mb-4 flex-wrap">
           <div className="text-center px-4 py-2 rounded-xl bg-secondary/60 border border-border min-w-[90px]">
@@ -588,7 +625,9 @@ function BubbleShooterPage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 rounded-xl">
               <p className="text-4xl mb-2">🫧</p>
               <p className="text-white font-black text-2xl mb-1">Bubble Shooter</p>
-              <p className="text-white/60 text-sm mb-4 px-4 text-center">Aim with your mouse or finger, click to shoot</p>
+              <p className="text-white/60 text-sm mb-4 px-4 text-center">
+                Aim with your mouse or finger, click to shoot
+              </p>
               <button
                 onClick={startGame}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold transition-colors"
@@ -627,24 +666,64 @@ function BubbleShooterPage() {
         </div>
       </div>
 
-      <HowToUse steps={[
-        "Move your mouse or finger to aim the cannon at the bottom of the board.",
-        "Click or tap to launch the colored bubble — it bounces off the side walls.",
-        "Match 3 or more bubbles of the same color to pop them. Don't let the bubbles reach the bottom!",
-      ]} />
+      <AdZone id="bubble-shooter-bottom" size="728x90" />
+
+      <HowToUse
+        steps={[
+          "Move your mouse or finger to aim the cannon at the bottom of the board.",
+          "Click or tap to launch the colored bubble — it bounces off the side walls.",
+          "Match 3 or more bubbles of the same color to pop them. Don't let the bubbles reach the bottom!",
+        ]}
+      />
 
       <ToolSeoContent
-        title="Bubble Shooter — Free Online Game, No Download"
-        description="Play the classic Bubble Shooter game in your browser. Pop colored bubbles, clear the board, and climb the levels. No download or signup."
+        title="Free Bubble Shooter Game Online — Pop Colored Bubbles in Your Browser"
+        description="Play Bubble Shooter free online. Aim and shoot colored bubbles to match groups of 3 or more. Free, no download, works on mobile and desktop."
         body={[
-          "Bubble Shooter is one of the most addictive arcade puzzle games ever made. Your goal is simple: aim the cannon at the bottom of the screen and shoot colored bubbles at a slowly-growing cluster at the top. Whenever three or more bubbles of the same color touch, they pop, and any disconnected bubbles fall down for bonus points. Clear the entire board to advance to the next level.",
-          "Our version runs entirely in your browser — no downloads, no ads, no signup. It works on desktop with your mouse and on mobile with touch controls. Your best score is saved locally so you can keep improving across sessions. Every level speeds up the descent, so plan your shots, use wall bounces, and pop those bubbles before they reach the danger line!",
+          "Skycally's Bubble Shooter is a classic match-3 arcade game where you aim and fire colored bubbles from the bottom of the screen. Match three or more bubbles of the same color to pop them and clear the board. Bubbles can ricochet off the side walls, allowing for trick shots that clear multiple clusters at once.",
+          "Bubble Shooter was popularized in 1994 by the arcade game Puzzle Bobble (Bust-a-Move) by Taito, which became one of the most cloned and played casual games in history. The mobile era brought it to billions of devices. The gameplay loop — aim, shoot, match — is instantly understandable yet endlessly replayable.",
+          "Strategy matters more than it might appear. Aim for the joints between color groups rather than the center — ricochets off walls can clear entire clusters unreachable by direct shots. Plan several shots ahead, because unmatched bubbles accumulate and the ceiling drops as you run out of shots. Clearing floating bubble islands scores bonus points.",
+          "The game speeds up as you progress — bubbles descend toward the shooter faster, increasing pressure with each level. Your high score is saved locally so you always have a personal record to beat. Bubble Shooter is one of the best-studied casual game genres for its addictive loop: immediate feedback, clear goal, and just-one-more-shot compulsion.",
         ]}
         faqs={[
-          { question: "How do I control the game?", answer: "Move your mouse (or finger on touch devices) to aim the cannon, then click or tap to shoot. A faint dotted line shows where the bubble will travel, including one bounce off the side walls." },
-          { question: "How does scoring work?", answer: "You earn 10 points per popped bubble in a matched cluster, plus 20 points for every disconnected bubble that falls afterward. Bigger combos mean bigger scores." },
-          { question: "How does the level system work?", answer: "Clear all bubbles on the board to advance to the next level. Higher levels start with more rows and add new rows faster, making each level a tougher challenge than the last." },
-          { question: "Does Bubble Shooter work on mobile?", answer: "Yes. The board is fully touch-friendly — drag your finger to aim and lift to shoot. It runs smoothly on any modern phone or tablet browser." },
+          {
+            question: "How do I play Bubble Shooter?",
+            answer:
+              "Aim the shooter at the bubble cluster and click or tap to fire. Match 3 or more bubbles of the same color to pop them. Bubbles can bounce off side walls for angle shots.",
+          },
+          {
+            question: "Can bubbles bounce off walls?",
+            answer:
+              "Yes. Bubbles ricochet off the left and right walls, allowing you to reach clusters that are not in the direct line of fire.",
+          },
+          {
+            question: "What happens to floating bubbles?",
+            answer:
+              "When you pop a cluster that was holding other bubbles attached to it, those bubbles fall and are removed — scoring bonus points.",
+          },
+          {
+            question: "What ends the game?",
+            answer:
+              "The game ends when bubbles reach the bottom of the screen. Manage the board carefully and clear clusters before they accumulate.",
+          },
+          {
+            question: "Is there a next bubble preview?",
+            answer:
+              "Yes. The next bubble to be fired is shown beside the shooter so you can plan your shot in advance.",
+          },
+          {
+            question: "Can I swap the current and next bubble?",
+            answer:
+              "Check the game controls — a swap button may be available to exchange the current bubble with the next one.",
+          },
+          {
+            question: "Is my high score saved?",
+            answer: "Yes. Your best score is saved in your browser's localStorage.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Tap to aim and fire. The game is fully responsive for touch screens.",
+          },
         ]}
       />
 

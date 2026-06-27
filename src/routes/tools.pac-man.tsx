@@ -6,6 +6,7 @@ import { buildPageMeta, SITE_URL } from "@/lib/seo";
 import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { DPad } from "@/components/game-controls";
@@ -68,7 +69,7 @@ const RAW_MAZE = [
 ];
 
 const COLS = RAW_MAZE[0].length; // 19
-const ROWS = RAW_MAZE.length;    // 21
+const ROWS = RAW_MAZE.length; // 21
 const CELL = 20;
 const W = COLS * CELL;
 const H = ROWS * CELL;
@@ -96,12 +97,20 @@ function parseMaze(): ParsedMaze {
       const ch = RAW_MAZE[r][c];
       let t: CellType;
       if (ch === "#") t = "wall";
-      else if (ch === ".") { t = "dot"; totalPellets++; }
-      else if (ch === "o") { t = "pellet"; totalPellets++; }
-      else if (ch === "=") t = "door";
-      else if (ch === "P") { t = "empty"; pacStart = { x: c, y: r }; }
-      else if (ch === "G") { t = "empty"; ghostStarts.push({ x: c, y: r }); }
-      else t = "empty";
+      else if (ch === ".") {
+        t = "dot";
+        totalPellets++;
+      } else if (ch === "o") {
+        t = "pellet";
+        totalPellets++;
+      } else if (ch === "=") t = "door";
+      else if (ch === "P") {
+        t = "empty";
+        pacStart = { x: c, y: r };
+      } else if (ch === "G") {
+        t = "empty";
+        ghostStarts.push({ x: c, y: r });
+      } else t = "empty";
       row.push(t);
       drow.push(t);
     }
@@ -141,7 +150,7 @@ interface Entity {
 }
 
 interface Ghost extends Entity {
-  kind: typeof GHOST_NAMES[number];
+  kind: (typeof GHOST_NAMES)[number];
   color: string;
   frightened: boolean;
   eaten: boolean; // returning to pen
@@ -189,7 +198,9 @@ function PacManPage() {
     try {
       const v = parseInt(localStorage.getItem("pac-man-best") || "0", 10);
       if (!isNaN(v)) setBest(v);
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, []);
 
   const saveBest = useCallback((s: number) => {
@@ -199,7 +210,9 @@ function PacManPage() {
         localStorage.setItem("pac-man-best", String(s));
         setBest(s);
       }
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, []);
 
   const isWalkable = useCallback((tx: number, ty: number, allowDoor: boolean) => {
@@ -217,7 +230,8 @@ function PacManPage() {
     ghostsRef.current = m.ghostStarts.slice(0, 4).map((g, i) => {
       const c = tileCenter(g.x, g.y);
       return {
-        x: c.x, y: c.y,
+        x: c.x,
+        y: c.y,
         dir: "up",
         nextDir: "up",
         speed: DIFF[difficulty].ghostSpeed * (1 + (levelRef.current - 1) * 0.08),
@@ -296,7 +310,13 @@ function PacManPage() {
 
     // Ghosts
     for (const g of ghostsRef.current) {
-      const color = g.eaten ? "#94a3b8" : g.frightened ? (frightenedTimerRef.current < 90 && Math.floor(frightenedTimerRef.current / 10) % 2 === 0 ? "#ffffff" : "#3b82f6") : g.color;
+      const color = g.eaten
+        ? "#94a3b8"
+        : g.frightened
+          ? frightenedTimerRef.current < 90 && Math.floor(frightenedTimerRef.current / 10) % 2 === 0
+            ? "#ffffff"
+            : "#3b82f6"
+          : g.color;
       const radius = CELL / 2 - 1;
       ctx.fillStyle = color;
       ctx.beginPath();
@@ -330,79 +350,89 @@ function PacManPage() {
   }, []);
 
   // ---------- AI ----------
-  const chooseGhostDir = useCallback((g: Ghost): Dir => {
-    const { tx, ty } = tileAt(g.x, g.y);
-    const candidates: Dir[] = [];
-    const dirs: Dir[] = ["up", "left", "down", "right"];
-    for (const d of dirs) {
-      if (d === OPPOSITE[g.dir]) continue;
-      const v = DIR_VEC[d];
-      if (isWalkable(tx + v.x, ty + v.y, g.eaten || g.frightened === false)) {
-        candidates.push(d);
+  const chooseGhostDir = useCallback(
+    (g: Ghost): Dir => {
+      const { tx, ty } = tileAt(g.x, g.y);
+      const candidates: Dir[] = [];
+      const dirs: Dir[] = ["up", "left", "down", "right"];
+      for (const d of dirs) {
+        if (d === OPPOSITE[g.dir]) continue;
+        const v = DIR_VEC[d];
+        if (isWalkable(tx + v.x, ty + v.y, g.eaten || g.frightened === false)) {
+          candidates.push(d);
+        }
       }
-    }
-    if (candidates.length === 0) return OPPOSITE[g.dir];
+      if (candidates.length === 0) return OPPOSITE[g.dir];
 
-    // Determine target tile
-    const pacTile = tileAt(pacRef.current.x, pacRef.current.y);
-    let target = { x: pacTile.tx, y: pacTile.ty };
-    if (g.eaten) {
-      // return to pen
-      target = { x: 9, y: 9 };
-    } else if (g.frightened) {
-      // random
-      return candidates[Math.floor(Math.random() * candidates.length)];
-    } else if (g.kind === "blinky") {
-      target = { x: pacTile.tx, y: pacTile.ty };
-    } else if (g.kind === "pinky") {
-      const pv = DIR_VEC[pacRef.current.dir];
-      target = { x: pacTile.tx + pv.x * 4, y: pacTile.ty + pv.y * 4 };
-    } else if (g.kind === "inky") {
-      const pv = DIR_VEC[pacRef.current.dir];
-      target = { x: pacTile.tx + pv.x * 2, y: pacTile.ty + pv.y * 2 };
-    } else { // clyde
-      const dist = Math.hypot(tx - pacTile.tx, ty - pacTile.ty);
-      target = dist > 6 ? { x: pacTile.tx, y: pacTile.ty } : { x: 1, y: ROWS - 2 };
-    }
+      // Determine target tile
+      const pacTile = tileAt(pacRef.current.x, pacRef.current.y);
+      let target = { x: pacTile.tx, y: pacTile.ty };
+      if (g.eaten) {
+        // return to pen
+        target = { x: 9, y: 9 };
+      } else if (g.frightened) {
+        // random
+        return candidates[Math.floor(Math.random() * candidates.length)];
+      } else if (g.kind === "blinky") {
+        target = { x: pacTile.tx, y: pacTile.ty };
+      } else if (g.kind === "pinky") {
+        const pv = DIR_VEC[pacRef.current.dir];
+        target = { x: pacTile.tx + pv.x * 4, y: pacTile.ty + pv.y * 4 };
+      } else if (g.kind === "inky") {
+        const pv = DIR_VEC[pacRef.current.dir];
+        target = { x: pacTile.tx + pv.x * 2, y: pacTile.ty + pv.y * 2 };
+      } else {
+        // clyde
+        const dist = Math.hypot(tx - pacTile.tx, ty - pacTile.ty);
+        target = dist > 6 ? { x: pacTile.tx, y: pacTile.ty } : { x: 1, y: ROWS - 2 };
+      }
 
-    let best: Dir = candidates[0];
-    let bestD = Infinity;
-    for (const d of candidates) {
-      const v = DIR_VEC[d];
-      const nx = tx + v.x;
-      const ny = ty + v.y;
-      const dd = (nx - target.x) ** 2 + (ny - target.y) ** 2;
-      if (dd < bestD) { bestD = dd; best = d; }
-    }
-    return best;
-  }, [isWalkable]);
+      let best: Dir = candidates[0];
+      let bestD = Infinity;
+      for (const d of candidates) {
+        const v = DIR_VEC[d];
+        const nx = tx + v.x;
+        const ny = ty + v.y;
+        const dd = (nx - target.x) ** 2 + (ny - target.y) ** 2;
+        if (dd < bestD) {
+          bestD = dd;
+          best = d;
+        }
+      }
+      return best;
+    },
+    [isWalkable],
+  );
 
   // ---------- Step ----------
-  const moveEntity = useCallback((e: Entity, allowDoor: boolean) => {
-    const { tx, ty } = tileAt(e.x, e.y);
-    const center = tileCenter(tx, ty);
-    const onCenter = Math.abs(e.x - center.x) < 1 && Math.abs(e.y - center.y) < 1;
+  const moveEntity = useCallback(
+    (e: Entity, allowDoor: boolean) => {
+      const { tx, ty } = tileAt(e.x, e.y);
+      const center = tileCenter(tx, ty);
+      const onCenter = Math.abs(e.x - center.x) < 1 && Math.abs(e.y - center.y) < 1;
 
-    // Try to honor nextDir at center
-    if (onCenter && e.nextDir !== "none") {
-      const v = DIR_VEC[e.nextDir];
-      if (isWalkable(tx + v.x, ty + v.y, allowDoor)) {
-        e.dir = e.nextDir;
+      // Try to honor nextDir at center
+      if (onCenter && e.nextDir !== "none") {
+        const v = DIR_VEC[e.nextDir];
+        if (isWalkable(tx + v.x, ty + v.y, allowDoor)) {
+          e.dir = e.nextDir;
+        }
       }
-    }
 
-    // Stop at wall
-    const v = DIR_VEC[e.dir];
-    const ahead = { x: tx + v.x, y: ty + v.y };
-    if (onCenter && !isWalkable(ahead.x, ahead.y, allowDoor)) {
-      e.x = center.x;
-      e.y = center.y;
-      return;
-    }
+      // Stop at wall
+      const v = DIR_VEC[e.dir];
+      const ahead = { x: tx + v.x, y: ty + v.y };
+      if (onCenter && !isWalkable(ahead.x, ahead.y, allowDoor)) {
+        e.x = center.x;
+        e.y = center.y;
+        return;
+      }
 
-    e.x += v.x * e.speed;
-    e.y += v.y * e.speed;
-  }, [isWalkable]);
+      e.x += v.x * e.speed;
+      e.y += v.y * e.speed;
+    },
+    [isWalkable],
+  );
 
   const handleLifeLost = useCallback(() => {
     livesRef.current -= 1;
@@ -414,7 +444,10 @@ function PacManPage() {
       setRunning(false);
       runningRef.current = false;
       saveBest(scoreRef.current);
-      if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
       return;
     }
     resetEntities();
@@ -481,7 +514,8 @@ function PacManPage() {
       const ahead = { x: tx + v.x, y: ty + v.y };
       const allowDoor = g.eaten || (tx === 9 && (ty === 8 || ty === 9));
       if (onCenter && !isWalkable(ahead.x, ahead.y, allowDoor)) {
-        g.x = center.x; g.y = center.y;
+        g.x = center.x;
+        g.y = center.y;
         continue;
       }
       const sp = g.eaten ? g.speed * 1.6 : g.frightened ? g.speed * 0.6 : g.speed;
@@ -514,7 +548,10 @@ function PacManPage() {
       setWon(true);
       setRunning(false);
       runningRef.current = false;
-      if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
       playSound("score");
     }
   }, [chooseGhostDir, handleLifeLost, isWalkable, moveEntity, saveBest]);
@@ -527,9 +564,12 @@ function PacManPage() {
   }, [draw, step]);
 
   const startGame = useCallback(() => {
-    scoreRef.current = 0; setScore(0);
-    livesRef.current = 3; setLives(3);
-    levelRef.current = 1; setLevel(1);
+    scoreRef.current = 0;
+    setScore(0);
+    livesRef.current = 3;
+    setLives(3);
+    levelRef.current = 1;
+    setLevel(1);
     resetLevel();
     overRef.current = false;
     setGameOver(false);
@@ -549,7 +589,12 @@ function PacManPage() {
     rafRef.current = requestAnimationFrame(loop);
   }, [advanceLevel, loop]);
 
-  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    },
+    [],
+  );
 
   // Initial draw with maze
   useEffect(() => {
@@ -598,7 +643,11 @@ function PacManPage() {
   };
 
   return (
-    <ToolPageShell title="Pac-Man" description="Eat all the dots and avoid the ghosts. Classic arcade fun!">
+    <ToolPageShell
+      showFileDisclaimer={false}
+      title="Pac-Man"
+      description="Eat all the dots and avoid the ghosts. Classic arcade fun!"
+    >
       <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
         <div className="flex justify-center gap-3 mb-4 flex-wrap">
           <div className="text-center px-4 py-2 rounded-xl bg-secondary/60 border border-border min-w-[80px]">
@@ -649,7 +698,9 @@ function PacManPage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 rounded-xl">
               <p className="text-4xl mb-2">👻</p>
               <p className="text-white font-black text-2xl mb-1">Pac-Man</p>
-              <p className="text-white/60 text-sm mb-4 px-4 text-center">Arrow keys or WASD on desktop. Swipe on mobile.</p>
+              <p className="text-white/60 text-sm mb-4 px-4 text-center">
+                Arrow keys or WASD on desktop. Swipe on mobile.
+              </p>
               <button
                 onClick={startGame}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold transition-colors"
@@ -699,26 +750,63 @@ function PacManPage() {
         </div>
       </div>
 
+      <AdZone id="pac-man-bottom" size="728x90" />
 
-      <HowToUse steps={[
-        "Pick your difficulty — Easy keeps ghosts slow, Hard makes them sprint.",
-        "Use arrow keys or WASD on desktop, or swipe on mobile, to steer Pac-Man through the maze.",
-        "Eat every dot to clear the level. Grab a power pellet to turn the ghosts blue and chomp them for bonus points!",
-      ]} />
+      <HowToUse
+        steps={[
+          "Pick your difficulty — Easy keeps ghosts slow, Hard makes them sprint.",
+          "Use arrow keys or WASD on desktop, or swipe on mobile, to steer Pac-Man through the maze.",
+          "Eat every dot to clear the level. Grab a power pellet to turn the ghosts blue and chomp them for bonus points!",
+        ]}
+      />
 
       <ToolSeoContent
-        title="Pac-Man — Free Online Game, No Download"
-        description="Play the classic Pac-Man arcade game free in your browser. Eat all the dots, dodge the ghosts, and grab power pellets for bonus points."
+        title="Free Pac-Man Game Online — Classic Arcade Ghost Chase in Your Browser"
+        description="Play Pac-Man free online in your browser. Eat all the dots while avoiding ghosts. Eat power pellets to turn the tables. Classic arcade gameplay. No signup."
         body={[
-          "Pac-Man is the legendary maze chase game that defined the golden age of arcades. Guide Pac-Man around the maze, gobbling up every dot while four colorful ghosts — Blinky, Pinky, Inky, and Clyde — try to corner you. Each ghost has its own personality and chase pattern, so reading their movement is the key to surviving longer levels.",
-          "Power pellets sit in the corners of the maze. Grab one and the ghosts turn blue and vulnerable for a few seconds — chase them down for big bonus points that double with each ghost you eat in a row. Clear every dot and pellet to advance to the next level, where the ghosts get a little quicker and the pressure ramps up.",
-          "This version runs entirely in your browser — no downloads, no signup, no ads. Three difficulty levels let you choose between a relaxed warm-up or an intense arcade-style challenge. Your best score is saved locally so you can keep chasing your personal record across sessions.",
+          "Skycally's Pac-Man recreates the iconic 1980 Namco arcade classic in your browser. Guide Pac-Man through the maze, eating all the dots while avoiding the four ghosts — Blinky, Pinky, Inky, and Clyde. Eat one of the four power pellets in the corners to temporarily turn the ghosts blue, making them vulnerable and worth bonus points when eaten.",
+          "Pac-Man was created by Toru Iwatani at Namco and released in Japan in 1980, becoming the best-selling arcade game in history with over 400,000 cabinets worldwide. It was the first video game with a distinct main character and the first to target a female audience, revolutionizing the industry beyond its space shooter contemporaries.",
+          "Each ghost has a distinct AI behavior: Blinky (red) always chases Pac-Man directly. Pinky (pink) targets four tiles ahead of Pac-Man. Inky (cyan) uses a complex calculation involving both Blinky's position and Pac-Man's direction. Clyde (orange) chases Pac-Man when far away but retreats to his corner when close. Understanding these patterns is key to mastering the game.",
+          "Eating all dots clears the level and advances to the next with faster ghosts and shorter power pellet durations. The classic strategy of 'patterns' — repeating the same route — works on authentic AI but our implementation uses randomized elements to keep each game fresh. Fruit bonus items appear periodically in the center for extra points.",
         ]}
         faqs={[
-          { question: "How do I control Pac-Man?", answer: "On desktop use the arrow keys or WASD to change direction. On mobile, swipe in the direction you want Pac-Man to move. Pac-Man will keep going until he hits a wall or you queue up a new direction." },
-          { question: "What do the power pellets do?", answer: "Eating one of the four large pellets makes every ghost vulnerable for a few seconds. They turn blue, slow down, and you can eat them for bonus points (200, 400, 800, 1600 in a row). Eaten ghosts return to the pen and respawn." },
-          { question: "How does scoring work?", answer: "Dots are worth 10 points, power pellets are worth 50, and eating frightened ghosts gives an escalating bonus. Clearing every dot in the maze advances you to the next level with faster ghosts." },
-          { question: "Does Pac-Man work on mobile?", answer: "Yes. The game is fully responsive and uses swipe gestures on touch devices — no app install needed. It runs entirely in your browser and saves your high score locally." },
+          {
+            question: "How do I control Pac-Man?",
+            answer:
+              "Use arrow keys or WASD on desktop. Swipe in any direction on mobile. Pac-Man turns at the next available intersection in the direction you press.",
+          },
+          {
+            question: "How do power pellets work?",
+            answer:
+              "Eating a power pellet (the four large dots in the corners) temporarily turns all ghosts blue. Blue ghosts can be eaten for bonus points. The effect wears off after a few seconds.",
+          },
+          {
+            question: "What do the ghosts do?",
+            answer:
+              "Each ghost has unique AI: Blinky chases directly, Pinky ambushes ahead, Inky uses a complex targeting calculation, and Clyde alternates between chasing and retreating.",
+          },
+          {
+            question: "How do I complete a level?",
+            answer:
+              "Eat all the small dots (pellets) in the maze. Power pellets and fruit bonuses do not need to be eaten to clear the level.",
+          },
+          {
+            question: "What are the fruit bonuses?",
+            answer:
+              "Fruit items appear periodically in the center of the maze for bonus points. Their value increases in later levels.",
+          },
+          {
+            question: "How many lives do I get?",
+            answer: "Typically 3 lives. Touching any ghost that is not in the frightened (blue) state costs a life.",
+          },
+          {
+            question: "Is my high score saved?",
+            answer: "Yes. Your best score is saved in your browser's localStorage.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Swipe to change direction. The maze scales to fit the screen size.",
+          },
         ]}
       />
 

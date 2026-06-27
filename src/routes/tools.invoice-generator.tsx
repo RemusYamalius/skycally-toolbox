@@ -3,7 +3,9 @@ import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Download, Printer, Plus, X, Upload, FileText } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
+import { RelatedTools } from "@/components/related-tools";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { Button } from "@/components/ui/button";
@@ -11,13 +13,7 @@ import { Input } from "@/components/ui/input";
 import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { toast } from "sonner";
 
 export const Route = createFileRoute("/tools/invoice-generator")({
@@ -169,10 +165,7 @@ function InvoiceGeneratorPage() {
     };
   }, [state, rememberMe, hydrated]);
 
-  const currency = useMemo(
-    () => CURRENCIES.find((c) => c.code === state.currency) ?? CURRENCIES[0],
-    [state.currency],
-  );
+  const currency = useMemo(() => CURRENCIES.find((c) => c.code === state.currency) ?? CURRENCIES[0], [state.currency]);
 
   const fmt = useCallback(
     (n: number) => {
@@ -193,25 +186,19 @@ function InvoiceGeneratorPage() {
   const totals = useMemo(() => {
     const subtotal = state.items.reduce((a, it) => a + (it.qty || 0) * (it.price || 0), 0);
     const discount =
-      state.discountType === "percent"
-        ? (subtotal * (state.discountValue || 0)) / 100
-        : state.discountValue || 0;
+      state.discountType === "percent" ? (subtotal * (state.discountValue || 0)) / 100 : state.discountValue || 0;
     const afterDiscount = Math.max(0, subtotal - discount);
     const tax =
       state.taxMode === "global"
         ? (afterDiscount * (state.globalTax || 0)) / 100
-        : state.items.reduce(
-            (a, it) => a + ((it.qty || 0) * (it.price || 0) * (it.tax || 0)) / 100,
-            0,
-          );
+        : state.items.reduce((a, it) => a + ((it.qty || 0) * (it.price || 0) * (it.tax || 0)) / 100, 0);
     const total = afterDiscount + tax;
     return { subtotal, discount, tax, total };
   }, [state]);
 
   const updateFrom = (k: keyof InvoiceState["from"], v: string) =>
     setState((s) => ({ ...s, from: { ...s.from, [k]: v } }));
-  const updateTo = (k: keyof InvoiceState["to"], v: string) =>
-    setState((s) => ({ ...s, to: { ...s.to, [k]: v } }));
+  const updateTo = (k: keyof InvoiceState["to"], v: string) => setState((s) => ({ ...s, to: { ...s.to, [k]: v } }));
   const updateItem = (id: string, patch: Partial<LineItem>) =>
     setState((s) => ({
       ...s,
@@ -241,10 +228,8 @@ function InvoiceGeneratorPage() {
     if (downloading) return;
     setDownloading(true);
     try {
-      const [{ default: jsPDF }, { default: html2canvas }] = await Promise.all([
-        import("jspdf"),
-        import("html2canvas"),
-      ]);
+      const [jspdfModule, { default: html2canvas }] = await Promise.all([import("jspdf"), import("html2canvas")]);
+      const jsPDF = jspdfModule.jsPDF ?? jspdfModule.default;
       const el = document.getElementById("invoice-preview");
       if (!el) throw new Error("Preview not found");
       const canvas = await html2canvas(el, {
@@ -253,7 +238,7 @@ function InvoiceGeneratorPage() {
         backgroundColor: "#ffffff",
         logging: false,
       });
-      const pdf = new jsPDF("p", "mm", "a4");
+      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
       const imgW = pageW;
@@ -371,9 +356,7 @@ function InvoiceGeneratorPage() {
       {/* Top action bar */}
       <div className="mb-6 flex flex-wrap items-center justify-between gap-3 print:hidden">
         <div className="flex flex-wrap items-center gap-2">
-          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-1">
-            Template:
-          </span>
+          <span className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mr-1">Template:</span>
           {(["modern", "classic", "minimal"] as Template[]).map((t) => (
             <button
               key={t}
@@ -526,17 +509,11 @@ function InvoiceGeneratorPage() {
             <div className="grid gap-3 sm:grid-cols-2">
               <div>
                 <Label className="text-xs">Invoice #</Label>
-                <Input
-                  value={state.number}
-                  onChange={(e) => setState((s) => ({ ...s, number: e.target.value }))}
-                />
+                <Input value={state.number} onChange={(e) => setState((s) => ({ ...s, number: e.target.value }))} />
               </div>
               <div>
                 <Label className="text-xs">Currency</Label>
-                <Select
-                  value={state.currency}
-                  onValueChange={(v) => setState((s) => ({ ...s, currency: v }))}
-                >
+                <Select value={state.currency} onValueChange={(v) => setState((s) => ({ ...s, currency: v }))}>
                   <SelectTrigger>
                     <SelectValue />
                   </SelectTrigger>
@@ -615,53 +592,39 @@ function InvoiceGeneratorPage() {
                     />
                     <div className="grid grid-cols-2 sm:grid-cols-4 gap-2">
                       <div>
-                        <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                          Qty
-                        </Label>
+                        <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Qty</Label>
                         <Input
                           type="number"
                           min={0.01}
                           step="any"
                           value={it.qty}
-                          onChange={(e) =>
-                            updateItem(it.id, { qty: parseFloat(e.target.value) || 0 })
-                          }
+                          onChange={(e) => updateItem(it.id, { qty: parseFloat(e.target.value) || 0 })}
                         />
                       </div>
                       <div>
-                        <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                          Price
-                        </Label>
+                        <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Price</Label>
                         <Input
                           type="number"
                           min={0}
                           step="any"
                           value={it.price}
-                          onChange={(e) =>
-                            updateItem(it.id, { price: parseFloat(e.target.value) || 0 })
-                          }
+                          onChange={(e) => updateItem(it.id, { price: parseFloat(e.target.value) || 0 })}
                         />
                       </div>
                       {state.taxMode === "per-line" && (
                         <div>
-                          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                            Tax %
-                          </Label>
+                          <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Tax %</Label>
                           <Input
                             type="number"
                             min={0}
                             step="any"
                             value={it.tax}
-                            onChange={(e) =>
-                              updateItem(it.id, { tax: parseFloat(e.target.value) || 0 })
-                            }
+                            onChange={(e) => updateItem(it.id, { tax: parseFloat(e.target.value) || 0 })}
                           />
                         </div>
                       )}
                       <div className={state.taxMode === "per-line" ? "" : "col-span-2"}>
-                        <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                          Subtotal
-                        </Label>
+                        <Label className="text-[10px] uppercase tracking-wider text-muted-foreground">Subtotal</Label>
                         <div className="h-9 flex items-center justify-end px-2 rounded-md bg-secondary/50 text-sm font-mono">
                           {fmt(sub)}
                         </div>
@@ -701,9 +664,7 @@ function InvoiceGeneratorPage() {
                   />
                   <Select
                     value={state.discountType}
-                    onValueChange={(v) =>
-                      setState((s) => ({ ...s, discountType: v as DiscountType }))
-                    }
+                    onValueChange={(v) => setState((s) => ({ ...s, discountType: v as DiscountType }))}
                   >
                     <SelectTrigger className="w-24">
                       <SelectValue />
@@ -723,9 +684,7 @@ function InvoiceGeneratorPage() {
                     min={0}
                     step="any"
                     value={state.globalTax}
-                    onChange={(e) =>
-                      setState((s) => ({ ...s, globalTax: parseFloat(e.target.value) || 0 }))
-                    }
+                    onChange={(e) => setState((s) => ({ ...s, globalTax: parseFloat(e.target.value) || 0 }))}
                   />
                 </div>
               )}
@@ -758,33 +717,18 @@ function InvoiceGeneratorPage() {
 
         {/* PREVIEW */}
         <div className="lg:sticky lg:top-6 lg:self-start">
-          <div
-            id="invoice-preview"
-            className={`invoice-paper tpl-${state.template}`}
-          >
+          <div id="invoice-preview" className={`invoice-paper tpl-${state.template}`}>
             <div className="inv-head">
               <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
                 {state.from.logo && (
-                  <img
-                    src={state.from.logo}
-                    alt="Logo"
-                    style={{ width: 64, height: 64, objectFit: "contain" }}
-                  />
+                  <img src={state.from.logo} alt="Logo" style={{ width: 64, height: 64, objectFit: "contain" }} />
                 )}
                 <div>
-                  <div style={{ fontWeight: 700, fontSize: 16 }}>
-                    {state.from.name || "Your Business Name"}
-                  </div>
-                  {state.from.email && (
-                    <div style={{ fontSize: 11, color: "#6b7280" }}>{state.from.email}</div>
-                  )}
-                  {state.from.phone && (
-                    <div style={{ fontSize: 11, color: "#6b7280" }}>{state.from.phone}</div>
-                  )}
+                  <div style={{ fontWeight: 700, fontSize: 16 }}>{state.from.name || "Your Business Name"}</div>
+                  {state.from.email && <div style={{ fontSize: 11, color: "#6b7280" }}>{state.from.email}</div>}
+                  {state.from.phone && <div style={{ fontSize: 11, color: "#6b7280" }}>{state.from.phone}</div>}
                   {state.from.address && (
-                    <div style={{ fontSize: 11, color: "#6b7280", whiteSpace: "pre-line" }}>
-                      {state.from.address}
-                    </div>
+                    <div style={{ fontSize: 11, color: "#6b7280", whiteSpace: "pre-line" }}>{state.from.address}</div>
                   )}
                 </div>
               </div>
@@ -808,13 +752,9 @@ function InvoiceGeneratorPage() {
               <div>
                 <div className="inv-label">Bill To</div>
                 <div style={{ fontWeight: 600 }}>{state.to.name || "Client Name"}</div>
-                {state.to.email && (
-                  <div style={{ fontSize: 11, color: "#6b7280" }}>{state.to.email}</div>
-                )}
+                {state.to.email && <div style={{ fontSize: 11, color: "#6b7280" }}>{state.to.email}</div>}
                 {state.to.address && (
-                  <div style={{ fontSize: 11, color: "#6b7280", whiteSpace: "pre-line" }}>
-                    {state.to.address}
-                  </div>
+                  <div style={{ fontSize: 11, color: "#6b7280", whiteSpace: "pre-line" }}>{state.to.address}</div>
                 )}
               </div>
               <div style={{ textAlign: "right" }}>
@@ -850,9 +790,7 @@ function InvoiceGeneratorPage() {
                     <td>{it.description || <span style={{ color: "#9ca3af" }}>—</span>}</td>
                     <td className="num">{it.qty || 0}</td>
                     <td className="num">{fmt(it.price || 0)}</td>
-                    {state.taxMode === "per-line" && (
-                      <td className="num">{it.tax || 0}%</td>
-                    )}
+                    {state.taxMode === "per-line" && <td className="num">{it.tax || 0}%</td>}
                     <td className="num">{fmt((it.qty || 0) * (it.price || 0))}</td>
                   </tr>
                 ))}
@@ -916,6 +854,8 @@ function InvoiceGeneratorPage() {
         </Button>
       </div>
 
+      <AdZone id="invoice-generator-mid" size="728x90" />
+
       <HowToUse
         steps={[
           "Fill in your business details on the left, upload your logo, and add your client.",
@@ -925,36 +865,59 @@ function InvoiceGeneratorPage() {
       />
 
       <ToolSeoContent
-        title="Free Invoice Generator — Create Professional PDF Invoices Online"
-        description="Generate beautiful, professional invoices in seconds. Multi-currency, 3 templates, live preview, instant PDF download — 100% free and private."
+        title="Free Invoice Generator — Create & Download Professional Invoices Online"
+        description="Create professional invoices online in seconds. Add your logo, line items, taxes, and discounts. Download as PDF — free, no signup, no watermark. Supports USD, EUR, GBP, MAD and 9 currencies."
         body={[
-          "Our free Invoice Generator helps freelancers, small businesses, and consultants create polished invoices without signing up or installing software. Just fill in your business name, client details, and line items — the live preview updates as you type, so you know exactly how your invoice will look before you download it.",
-          "Pick from three professional templates (Modern, Classic, Minimal) to match your brand. Choose from 9 currencies including USD, EUR, GBP, MAD, SAR, AED, CAD, AUD, and JPY. Add per-line or global tax, apply flat or percentage discounts, and include notes and payment terms — everything you need to bill clients professionally.",
-          "Privacy comes first: nothing leaves your browser. Your invoice data, logo, and client info are saved locally on your device using your browser's storage. When you're ready, download a print-ready PDF or send it straight to your printer. No watermarks, no signup, no limits.",
+          "Skycally's Invoice Generator lets you create a professional, print-ready invoice in under a minute — completely free, with no account required and no watermark on the downloaded PDF. Fill in your business name, client details, and line items, then click Download to get a polished A4-format PDF ready to send.",
+          "Three invoice templates cover every professional context: Classic for traditional businesses, Modern for tech and creative freelancers, and Minimal for consultants and legal professionals. Switch templates instantly without losing your data — the live preview updates in real time as you type. Your business details and logo are saved locally so you never have to re-enter them.",
+          "Nine currencies are supported including USD, EUR, GBP, and regional currencies such as MAD (Moroccan Dirham), SAR (Saudi Riyal), and AED (UAE Dirham) — making this one of the most internationally versatile free invoice generators available. Add per-line tax rates, a global discount (flat or percentage), and custom payment terms to handle virtually any invoicing scenario.",
+          "Everything runs in your browser — your invoice data is never uploaded to any server. Invoice numbers auto-increment from INV-001 so you maintain a clean sequential record. Print directly from the browser or download as a PDF. Ideal for freelancers, consultants, small business owners, and anyone who needs to invoice clients quickly without expensive software.",
         ]}
         faqs={[
           {
             question: "Is this invoice generator really free?",
             answer:
-              "Yes — completely free with no signup, no watermarks, and no limits on how many invoices you create. All features including PDF download, multi-currency, and templates are unlocked.",
+              "Yes. 100% free, no signup required, and no watermark on the downloaded PDF. There are no hidden fees or premium tiers.",
           },
           {
-            question: "Where is my invoice data stored?",
+            question: "Can I add my company logo?",
             answer:
-              "Everything is stored locally in your browser using localStorage. Your data never touches our servers, making it private and secure. Clearing your browser data will remove saved invoices.",
+              "Yes. Upload your logo using the logo field and it appears in the top-left corner of the invoice preview and PDF.",
           },
           {
-            question: "Can I edit an invoice after I download it?",
+            question: "What currencies are supported?",
             answer:
-              "Yes — your last draft is automatically saved. Come back any time, make changes, and download a new PDF. The invoice number auto-increments after each download.",
+              "USD, EUR, GBP, MAD (Moroccan Dirham), SAR (Saudi Riyal), AED (UAE Dirham), CAD, AUD, and JPY. Select your currency from the dropdown and all amounts update automatically.",
           },
           {
-            question: "Which currencies are supported?",
+            question: "Can I add tax to my invoice?",
             answer:
-              "We support USD, EUR, GBP, MAD (Moroccan Dirham), SAR (Saudi Riyal), AED (UAE Dirham), CAD, AUD, and JPY. The selected currency symbol appears throughout your invoice and PDF.",
+              "Yes. Add a tax percentage per line item, or use a global tax field for a single rate across the whole invoice. Both modes are available.",
+          },
+          {
+            question: "Will my information be saved?",
+            answer:
+              "Your business details, logo, and last invoice draft are saved in your browser's localStorage. They reload automatically next time you visit — nothing is stored on any server.",
+          },
+          {
+            question: "How do invoice numbers work?",
+            answer:
+              "Invoice numbers start at INV-001 and auto-increment each time you download an invoice. You can edit the number manually at any time.",
+          },
+          {
+            question: "Can I print the invoice instead of downloading?",
+            answer:
+              "Yes. Click the Print button to trigger your browser's print dialog, which shows only the invoice preview — the form is hidden in print mode.",
+          },
+          {
+            question: "What format is the downloaded file?",
+            answer:
+              "Invoices download as PDF files, formatted to A4 size. The filename includes the invoice number (e.g. Invoice-INV-003.pdf).",
           },
         ]}
       />
+
+      <RelatedTools currentSlug="invoice-generator" />
     </ToolPageShell>
   );
 }

@@ -1,97 +1,101 @@
-## Calorie Calculator — Implementation Plan
+# Plan: Invoice Generator Tool
 
-Build a premium TDEE + macro calculator at `/tools/calorie-calculator` with live calculations, unit toggles, and full nutrition breakdown.
+Build a professional invoice generator at `/tools/invoice-generator` matching the spec: split form/preview UI, live updates, 3 templates, PDF/print export, multi-currency, localStorage persistence.
 
-### Files
+## Files
 
-1. **`src/routes/tools.calorie-calculator.tsx`** (new) — single-file route
-2. **`src/lib/tools.ts`** — register: `{ slug: "calorie-calculator", name: "Calorie Calculator", description: "Calculate your daily calorie needs and macros based on your age, weight, height, and activity level.", category: "utility", icon: Flame, path: "/tools/calorie-calculator" }`
-3. **`src/lib/related-tools.ts`** — map to `["bmi-calculator", "sleep-calculator", "age-calculator", "tip-calculator", "unit-converter"]`
-4. `src/routeTree.gen.ts` regenerates automatically
+**Create** `src/routes/tools.invoice-generator.tsx` — single-file route containing:
+- `createFileRoute("/tools/invoice-generator")` with `buildToolMeta(toolBySlug("invoice-generator"))` head
+- Wrapped in `ToolPageShell` + `HowToUse` + `ToolSeoContent` (per project memory)
+- All state, components, helpers inline
 
-### Route shell
+**Edit** `src/lib/tools.ts` — register the new tool (icon: `FileText` or `Receipt`, category: `utility`, slug: `invoice-generator`)
 
-```tsx
-createFileRoute("/tools/calorie-calculator")({
-  head: () => buildToolMeta(toolBySlug("calorie-calculator", tools)),
-  component: CalorieCalculator,
-})
+**Edit** `src/lib/related-tools.ts` — cross-link with `qr-generator`, `business-card-generator`, `currency-converter`, `pdf-reader`
+
+## Dependencies
+
+Install via `bun add`: `jspdf`, `html2canvas`
+
+## UI Architecture
+
+```text
+ToolPageShell
+├── Template switcher (Classic | Modern | Minimal) + Download PDF + Print buttons
+├── Grid: md:grid-cols-[2fr_3fr]
+│   ├── Form panel (left/top)
+│   │   ├── FROM card (logo upload + business details + "Remember my details" toggle)
+│   │   ├── TO card (client details)
+│   │   ├── Invoice details (number, dates, currency Select)
+│   │   ├── Line items (dynamic rows, Add Item button)
+│   │   ├── Discount (flat/% toggle) + global tax mode
+│   │   └── Notes + Payment Terms
+│   └── Preview panel (right/bottom) — id="invoice-preview", white card, template-scoped CSS classes
+├── Sticky bottom Download button on mobile
+├── HowToUse
+└── ToolSeoContent (FAQ + body)
 ```
 
-Inside `<ToolPageShell showFileDisclaimer={false}>`:
-1. Calculator card
-2. `<AdZone id="calorie-calculator-mid" size="728x90" />`
-3. `<HowToUse steps={[3 steps from spec]} />`
-4. `<ToolSeoContent ... 8 FAQs />` (exact copy from spec)
-5. `<RelatedTools currentSlug="calorie-calculator" />`
-
-### State
+## State Model
 
 ```ts
-const [age, setAge] = useState("30");
-const [sex, setSex] = useState<"male" | "female">("male");
-const [units, setUnits] = useState<"metric" | "imperial">("metric");
-const [cm, setCm] = useState("175");
-const [ft, setFt] = useState("5"); const [inch, setInch] = useState("9");
-const [kg, setKg] = useState("70");
-const [lb, setLb] = useState("154");
-const [activity, setActivity] = useState<ActivityKey>("moderate");
-const [goal, setGoal] = useState<"maintain" | "lose" | "gain">("maintain");
-```
-
-Unit toggle converts values in place (kg↔lb at 2.20462; cm↔ft/in via 2.54). localStorage keys: `calorie-calculator-units`, `calorie-calculator-inputs`.
-
-### Calculations (useMemo)
-
-```ts
-const weightKg = units === "metric" ? +kg : +lb / 2.20462;
-const heightCm = units === "metric" ? +cm : ((+ft * 12) + +inch) * 2.54;
-const bmr = sex === "male"
-  ? 10*weightKg + 6.25*heightCm - 5*+age + 5
-  : 10*weightKg + 6.25*heightCm - 5*+age - 161;
-const tdee = bmr * ACTIVITY[activity];
-
-const calorieMin = sex === "female" ? 1200 : 1500;
-const targets = {
-  maintain: tdee,
-  loseMild: Math.max(tdee - 250, calorieMin),
-  loseModerate: Math.max(tdee - 500, calorieMin),
-  loseAggressive: Math.max(tdee - 1000, calorieMin),
-  gainMild: tdee + 250,
-  gainModerate: tdee + 500,
+type LineItem = { id: string; description: string; qty: number; price: number; tax: number };
+type Invoice = {
+  from: { name; email; phone; address; logo (base64) };
+  to: { name; email; address };
+  number: string; date: string; dueDate: string; currency: string;
+  items: LineItem[];
+  discount: { value: number; type: 'flat' | 'percent' };
+  taxMode: 'per-line' | 'global'; globalTax: number;
+  notes: string; terms: string;
+  template: 'classic' | 'modern' | 'minimal';
 };
-
-const bmi = weightKg / (heightCm / 100) ** 2;
 ```
 
-Macros computed from each displayed target (protein 1g/lb body weight → grams; fat = cal × 0.30 / 9; carbs = remainder / 4).
+- `useMemo` for subtotal, discount amount, tax amount, total
+- 150ms debounce on localStorage writes
+- Logo: FileReader → base64, max ~500KB enforced
 
-Weeks-to-goal: `(deficitPerDay × 7) / 7716` kg/week → user enters no target weight, so show "≈ X kg/month" projection per option.
+## Calculation Logic
 
-### Visuals (dark Skycally)
+- Per-line subtotal = `qty * price`
+- Per-line tax (if `taxMode==='per-line'`) = `subtotal * tax/100`
+- Subtotal = Σ line subtotals
+- Discount = `type==='flat' ? value : subtotal * value/100`
+- Tax = `taxMode==='global' ? (subtotal - discount) * globalTax/100 : Σ per-line tax`
+- Total = subtotal - discount + tax
+- Format with `Intl.NumberFormat` + currency symbol prepended (per spec)
 
-- **Form panel** (left, `lg:col-span-2`): age input, sex segmented toggle, units segmented toggle, height/weight inputs (auto-swap UI based on units), activity 5-card grid (`grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-5 gap-2`), goal 3-card row.
-- **Results panel** (right or below):
-  - Hero calorie card with cyan glow: big number, "kcal/day" subtitle, three sub-rows for selected goal variants (when lose/gain, show all sub-options as comparable mini-cards).
-  - Macros: 3-column grid (protein/carbs/fat) with animated horizontal progress bars filling to their % share.
-  - BMI card: value + colored badge + horizontal gradient scale with marker positioned by BMI.
-  - Projection line: "At a 500 kcal deficit you'll lose ≈ 0.45 kg / week".
-- Animation: results wrap in `motion.div` with `initial={{opacity:0,y:8}} animate={{opacity:1,y:0}}`.
-- Show results only when age/height/weight are valid numbers and BMR > 800; otherwise show inline warning.
+## PDF / Print
 
-### Validation
+- `downloadPDF`: html2canvas (scale 2, useCORS, backgroundColor white) → jsPDF A4, multi-page if `canvas.height > pageHeight` (slice image across pages)
+- After download: auto-increment `invoice-count` in localStorage, bump invoice number
+- Print: `@media print` styles inside scoped `<style>` block — hide everything except `#invoice-preview`, reset margins, force white bg/black text
 
-- Age 1–100 (warn <15 or >80, inline text)
-- Weight 20–300 kg / 44–660 lb
-- Height 50–250 cm
-- Invalid → grey out results card with message
-- BMR < 800 → "Values seem unusual, please check your inputs."
+## Templates
 
-### Dependencies
+Three CSS class variants on the preview root: `.tpl-classic`, `.tpl-modern`, `.tpl-minimal`. Each defines header layout, table styling, totals block, accent color. Scoped via a local `<style>` tag (no global token pollution) — preview is intentionally white/print-styled regardless of app theme.
 
-None new. Uses shadcn `Input`, `Button`, framer-motion, lucide (`Flame`, `Beef`, `Wheat`, `Droplet`, plus emoji), `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`, `AdZone`, `buildToolMeta`, `toolBySlug`.
+## localStorage Keys
 
-### Reminders after build
+- `invoice-from` (if "Remember" toggle on)
+- `invoice-settings` (currency, template, taxMode, rememberMe)
+- `invoice-draft` (full current invoice state)
+- `invoice-count` (numeric counter for auto-increment)
 
-1. Tool registered in `src/lib/tools.ts` with icon `Flame`, category `utility`.
-2. Add `/tools/calorie-calculator` to sitemap and request indexing in Google Search Console.
+Restored on mount via `useEffect`.
+
+## SEO Content
+
+- Memory rule: include `ToolSeoContent` with title, 1-2 sentence description, 2-3 paragraph body (~150-200 words), 4 FAQs (currency support, offline/private, PDF quality, editing later)
+- English only (per project memory)
+
+## Acceptance
+
+- Live preview updates as user types
+- PDF downloads correctly with logo and all data, multi-page safe
+- Print produces only the invoice
+- Switching template doesn't lose form data
+- Reload restores last draft
+- Mobile: stacked layout, sticky download button
+- Registered in tools.ts and related-tools.ts

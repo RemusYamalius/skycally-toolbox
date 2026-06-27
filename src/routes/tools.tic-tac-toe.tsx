@@ -8,6 +8,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
@@ -22,9 +23,14 @@ type Mode = "pvp" | "ai";
 type Difficulty = "easy" | "medium" | "hard";
 
 const LINES: ReadonlyArray<readonly [number, number, number]> = [
-  [0, 1, 2], [3, 4, 5], [6, 7, 8],
-  [0, 3, 6], [1, 4, 7], [2, 5, 8],
-  [0, 4, 8], [2, 4, 6],
+  [0, 1, 2],
+  [3, 4, 5],
+  [6, 7, 8],
+  [0, 3, 6],
+  [1, 4, 7],
+  [2, 5, 8],
+  [0, 4, 8],
+  [2, 4, 6],
 ];
 
 type WinResult = { winner: "X" | "O"; line: number[] } | "draw" | null;
@@ -87,20 +93,18 @@ function getBestMove(b: Cell[]): number {
 
 function getAIMove(b: Cell[], difficulty: Difficulty): number {
   const empty: number[] = [];
-  b.forEach((c, i) => { if (!c) empty.push(i); });
+  b.forEach((c, i) => {
+    if (!c) empty.push(i);
+  });
   if (empty.length === 0) return -1;
   if (difficulty === "easy") return empty[Math.floor(Math.random() * empty.length)];
   if (difficulty === "medium") {
-    return Math.random() > 0.5
-      ? getBestMove(b)
-      : empty[Math.floor(Math.random() * empty.length)];
+    return Math.random() > 0.5 ? getBestMove(b) : empty[Math.floor(Math.random() * empty.length)];
   }
   return getBestMove(b);
 }
 
 function TicTacToePage() {
-
-
   const [board, setBoard] = useState<Cell[]>(() => Array(9).fill(null));
   const [isX, setIsX] = useState(true);
   const [mode, setMode] = useState<Mode>("pvp");
@@ -142,19 +146,25 @@ function TicTacToePage() {
       setIsX(true);
       setAiThinking(false);
     }, 400);
-    return () => { clearTimeout(t); setAiThinking(false); };
+    return () => {
+      clearTimeout(t);
+      setAiThinking(false);
+    };
   }, [isX, mode, winner, difficulty]);
 
-  const handleClick = useCallback((i: number) => {
-    if (winner || board[i]) return;
-    if (mode === "ai" && !isX) return;
-    const mark: Cell = isX ? "X" : "O";
-    const next = [...board];
-    next[i] = mark;
-    setBoard(next);
-    setIsX((v) => !v);
-    playSound("click");
-  }, [board, isX, winner, mode]);
+  const handleClick = useCallback(
+    (i: number) => {
+      if (winner || board[i]) return;
+      if (mode === "ai" && !isX) return;
+      const mark: Cell = isX ? "X" : "O";
+      const next = [...board];
+      next[i] = mark;
+      setBoard(next);
+      setIsX((v) => !v);
+      playSound("click");
+    },
+    [board, isX, winner, mode],
+  );
 
   const newGame = useCallback(() => {
     setBoard(Array(9).fill(null));
@@ -177,28 +187,57 @@ function TicTacToePage() {
   }, [winner, isX, mode]);
 
   return (
-    <ToolPageShell title="Tic Tac Toe" description="Classic X and O. Play against a friend or challenge the AI on Easy, Medium or Hard.">
+    <ToolPageShell
+      title="Tic Tac Toe"
+      description="Classic X and O. Play against a friend or challenge the AI on Easy, Medium or Hard."
+    >
       <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
         {/* Mode + difficulty */}
         <div className="flex flex-wrap items-center justify-center gap-3 mb-6">
           <div className="inline-flex rounded-lg border border-border overflow-hidden">
             <button
-              onClick={() => { setMode("pvp"); newGame(); }}
-              className={cn("px-4 py-2 text-sm font-medium transition-colors", mode === "pvp" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-secondary")}
-            >Player vs Player</button>
+              onClick={() => {
+                setMode("pvp");
+                newGame();
+              }}
+              className={cn(
+                "px-4 py-2 text-sm font-medium transition-colors",
+                mode === "pvp" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-secondary",
+              )}
+            >
+              Player vs Player
+            </button>
             <button
-              onClick={() => { setMode("ai"); newGame(); }}
-              className={cn("px-4 py-2 text-sm font-medium transition-colors", mode === "ai" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-secondary")}
-            >Player vs AI</button>
+              onClick={() => {
+                setMode("ai");
+                newGame();
+              }}
+              className={cn(
+                "px-4 py-2 text-sm font-medium transition-colors",
+                mode === "ai" ? "bg-primary text-primary-foreground" : "bg-background hover:bg-secondary",
+              )}
+            >
+              Player vs AI
+            </button>
           </div>
           {mode === "ai" && (
             <div className="inline-flex rounded-lg border border-border overflow-hidden">
               {(["easy", "medium", "hard"] as Difficulty[]).map((d) => (
                 <button
                   key={d}
-                  onClick={() => { setDifficulty(d); newGame(); }}
-                  className={cn("px-3 py-2 text-sm font-medium capitalize transition-colors", difficulty === d ? "bg-secondary text-foreground" : "bg-background hover:bg-secondary/60 text-muted-foreground")}
-                >{d}</button>
+                  onClick={() => {
+                    setDifficulty(d);
+                    newGame();
+                  }}
+                  className={cn(
+                    "px-3 py-2 text-sm font-medium capitalize transition-colors",
+                    difficulty === d
+                      ? "bg-secondary text-foreground"
+                      : "bg-background hover:bg-secondary/60 text-muted-foreground",
+                  )}
+                >
+                  {d}
+                </button>
               ))}
             </div>
           )}
@@ -249,30 +288,72 @@ function TicTacToePage() {
 
         {/* Actions */}
         <div className="flex flex-wrap justify-center gap-3 mt-6">
-          <Button onClick={newGame} className="gap-2"><RefreshCw className="w-4 h-4" /> New Game</Button>
-          <Button onClick={resetScores} variant="outline" className="gap-2"><Eraser className="w-4 h-4" /> Reset Scores</Button>
+          <Button onClick={newGame} className="gap-2">
+            <RefreshCw className="w-4 h-4" /> New Game
+          </Button>
+          <Button onClick={resetScores} variant="outline" className="gap-2">
+            <Eraser className="w-4 h-4" /> Reset Scores
+          </Button>
         </div>
         {aiThinking && <p className="sr-only">AI is thinking</p>}
       </div>
 
-      <HowToUse steps={[
-        "Choose Player vs Player or Player vs AI mode.",
-        "Click any square to place your mark — X always goes first.",
-        "Get three in a row to win. Beat the AI on Hard if you can!",
-      ]} />
+      <AdZone id="tic-tac-toe-bottom" size="728x90" />
+
+      <HowToUse
+        steps={[
+          "Choose Player vs Player or Player vs AI mode.",
+          "Click any square to place your mark — X always goes first.",
+          "Get three in a row to win. Beat the AI on Hard if you can!",
+        ]}
+      />
 
       <ToolSeoContent
-        title="Tic Tac Toe — Play Online Free vs Friend or AI"
-        description="Play Tic Tac Toe online for free. Challenge a friend in local multiplayer or play against AI with Easy, Medium and Hard difficulty."
+        title="Free Tic Tac Toe Game Online — Play vs AI or a Friend"
+        description="Play Tic Tac Toe free online against an AI or a friend on the same device. Classic 3x3 grid, instant play, no signup required."
         body={[
-          "Tic Tac Toe (also known as Noughts and Crosses) is the timeless 3×3 strategy game that takes seconds to learn and a lifetime to master. Our free online version runs entirely in your browser — no sign-up, no ads, no downloads — and works equally well on desktop, tablet and mobile.",
-          "Sharpen your skills against the AI opponent powered by the classic Minimax algorithm. Easy mode plays random moves so beginners can win, Medium mixes smart and random play, and Hard never loses — the best you can do is force a draw. Or grab a friend and play locally in Player vs Player mode with a running scoreboard that tracks wins and draws for the session.",
+          "Skycally's Tic Tac Toe lets you play the classic 3×3 grid game against a smart AI opponent or a friend on the same device. Choose X or O, click any empty cell to place your mark, and try to get three in a row — horizontally, vertically, or diagonally — before your opponent does.",
+          "The AI uses a minimax algorithm to play optimally — it never makes a strategic mistake. Against a perfect AI, the best outcome for a human is a draw. This makes Tic Tac Toe a great way to understand game theory: with optimal play from both sides, the game always ends in a draw, making it a classic example of a 'solved game' in mathematics.",
+          "Two-player mode lets two people play on the same device, taking turns — perfect for a quick game with a friend or family member. The score tracker keeps a running tally of wins, losses, and draws across multiple rounds so you can have a proper match.",
+          "Tic Tac Toe has been played for thousands of years under various names — it appears in ancient Egypt and was known as 'noughts and crosses' in the UK. The first known computer implementation was OXO, created by Alexander Douglas in 1952 as part of his PhD thesis on human-computer interaction — making it one of the earliest video games ever created.",
         ]}
         faqs={[
-          { question: "Can I beat the AI on Hard difficulty?", answer: "No — Hard mode uses a perfect Minimax algorithm, so the best result you can get is a draw. If you ever lose to the AI on Hard, it means you missed a forced win or block." },
-          { question: "Is there a two-player local mode?", answer: "Yes. Switch to Player vs Player and take turns on the same device. X always moves first; the scoreboard tracks wins and draws until you reset it." },
-          { question: "Does it work on mobile?", answer: "Absolutely. The board is touch-friendly and scales to your screen size, so you can play on phones and tablets without any app install." },
-          { question: "Are my scores saved?", answer: "Scores reset when you reload the page, keeping each session clean. Use the New Game button to start a fresh round while keeping your current scoreboard." },
+          {
+            question: "How do I play Tic Tac Toe?",
+            answer:
+              "Click any empty cell to place your mark (X or O). Get three of your marks in a row — horizontally, vertically, or diagonally — to win. If all 9 cells are filled with no winner, the game is a draw.",
+          },
+          {
+            question: "Can I play against a friend?",
+            answer: "Yes. Select 2 Player mode and take turns clicking cells on the same device.",
+          },
+          {
+            question: "How strong is the AI?",
+            answer:
+              "The AI uses the minimax algorithm and plays perfectly — it never makes a strategic mistake. The best result against the AI is a draw with optimal play.",
+          },
+          {
+            question: "Can Tic Tac Toe always end in a draw?",
+            answer:
+              "Yes. With perfect play from both sides, Tic Tac Toe always ends in a draw. This is why it's called a 'solved game' — the optimal outcome is determined by mathematics.",
+          },
+          {
+            question: "Does the game track my score?",
+            answer:
+              "Yes. A score counter tracks wins, losses, and draws across multiple rounds in the current session.",
+          },
+          {
+            question: "Who goes first?",
+            answer: "X always goes first by default. You can choose whether to play as X or O before the game starts.",
+          },
+          {
+            question: "Can I undo a move?",
+            answer: "No — once placed, marks are permanent. Start a new game to try a different strategy.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. The grid is touch-friendly and scales to fit any screen size.",
+          },
         ]}
       />
 

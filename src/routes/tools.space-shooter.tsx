@@ -6,6 +6,7 @@ import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -89,10 +90,14 @@ function SpaceShooterPage() {
     try {
       const stored = parseInt(localStorage.getItem("space-shooter:high") || "0", 10);
       if (!isNaN(stored)) setHudHigh(stored);
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, []);
 
-  useEffect(() => { autoFireRef.current = autoFire; }, [autoFire]);
+  useEffect(() => {
+    autoFireRef.current = autoFire;
+  }, [autoFire]);
 
   // ---- Setup helpers ----
   const initStars = useCallback(() => {
@@ -233,7 +238,10 @@ function SpaceShooterPage() {
       // Stars always animate
       for (const s of starsRef.current) {
         s.y += s.speed * dt;
-        if (s.y > H) { s.y = -2; s.x = Math.random() * W; }
+        if (s.y > H) {
+          s.y = -2;
+          s.x = Math.random() * W;
+        }
       }
       const neb = nebulaRef.current;
       if (neb) {
@@ -299,7 +307,9 @@ function SpaceShooterPage() {
       // Enemies
       const enemies = enemiesRef.current;
       let aliveCount = 0;
-      let minX = Infinity, maxX = -Infinity, maxY = -Infinity;
+      let minX = Infinity,
+        maxX = -Infinity,
+        maxY = -Infinity;
       for (const e of enemies) {
         if (!e.alive) continue;
         aliveCount++;
@@ -390,7 +400,9 @@ function SpaceShooterPage() {
           localStorage.setItem("space-shooter:high", String(scoreRef.current));
           setHudHigh(scoreRef.current);
         }
-      } catch { /* noop */ }
+      } catch {
+        /* noop */
+      }
     };
 
     const render = (c: CanvasRenderingContext2D) => {
@@ -579,30 +591,38 @@ function SpaceShooterPage() {
       playAgainHitRef.current = { x: bx, y: by, w: bw, h: bh };
     };
 
-    raf = requestAnimationFrame((t) => { last = t; loop(t); });
+    raf = requestAnimationFrame((t) => {
+      last = t;
+      loop(t);
+    });
     return () => cancelAnimationFrame(raf);
   }, [explode, initStars, isTouch, spawnWave, tryShoot]);
 
   // Track latest high for game-over draw
   const hudHighRef = useRef(0);
-  useEffect(() => { hudHighRef.current = hudHigh; }, [hudHigh]);
+  useEffect(() => {
+    hudHighRef.current = hudHigh;
+  }, [hudHigh]);
 
   // ---- Canvas click / tap (start + play again) ----
-  const handleCanvasPointer = useCallback((cx: number, cy: number) => {
-    if (sceneRef.current === "start") {
-      startGame();
-      return;
-    }
-    if (sceneRef.current === "over") {
-      const hit = playAgainHitRef.current;
-      if (hit && cx >= hit.x && cx <= hit.x + hit.w && cy >= hit.y && cy <= hit.y + hit.h) {
+  const handleCanvasPointer = useCallback(
+    (cx: number, cy: number) => {
+      if (sceneRef.current === "start") {
         startGame();
-      } else {
-        // Tap anywhere also restarts on over screen for mobile UX
-        startGame();
+        return;
       }
-    }
-  }, [startGame]);
+      if (sceneRef.current === "over") {
+        const hit = playAgainHitRef.current;
+        if (hit && cx >= hit.x && cx <= hit.x + hit.w && cy >= hit.y && cy <= hit.y + hit.h) {
+          startGame();
+        } else {
+          // Tap anywhere also restarts on over screen for mobile UX
+          startGame();
+        }
+      }
+    },
+    [startGame],
+  );
 
   const onCanvasClick = (e: React.MouseEvent<HTMLCanvasElement>) => {
     const r = e.currentTarget.getBoundingClientRect();
@@ -682,12 +702,19 @@ function SpaceShooterPage() {
     }
     lastTouchFireRef.current = 0;
   };
-  useEffect(() => () => {
-    if (fireRepeatRef.current) clearInterval(fireRepeatRef.current);
-  }, []);
+  useEffect(
+    () => () => {
+      if (fireRepeatRef.current) clearInterval(fireRepeatRef.current);
+    },
+    [],
+  );
 
   return (
-    <ToolPageShell title="Space Shooter" description="Destroy alien ships and survive the galaxy attack!">
+    <ToolPageShell
+      showFileDisclaimer={false}
+      title="Space Shooter"
+      description="Destroy alien ships and survive the galaxy attack!"
+    >
       <div className="rounded-2xl border border-border bg-card/50 p-4 sm:p-8">
         {/* Top bar with auto-fire toggle */}
         <div className="flex items-center justify-between mb-3 gap-3">
@@ -760,12 +787,10 @@ function SpaceShooterPage() {
         </div>
 
         {/* Desktop hint */}
-        {!isTouch && (
-          <p className="mt-4 text-center text-sm text-muted-foreground">
-            ← → to move • Space to shoot
-          </p>
-        )}
+        {!isTouch && <p className="mt-4 text-center text-sm text-muted-foreground">← → to move • Space to shoot</p>}
       </div>
+
+      <AdZone id="space-shooter-bottom" size="728x90" />
 
       <HowToUse
         steps={[
@@ -776,18 +801,50 @@ function SpaceShooterPage() {
       />
 
       <ToolSeoContent
-        title="Space Shooter — Free Online Arcade Game"
-        description="Play Space Shooter online for free. Destroy alien ships, dodge bullets and survive endless waves of invaders — no signup, no download."
+        title="Free Space Shooter Game Online — Classic Arcade Shoot Em Up"
+        description="Play Space Shooter free online. Pilot your ship through waves of alien enemies, dodge bullets, and survive as long as possible. Free, no signup required."
         body={[
-          "Space Shooter is a classic browser arcade game inspired by Space Invaders. You pilot a lone fighter against waves of alien ships descending from the top of the screen. The action is fast, the rules are simple, and every match runs entirely in your browser — there is nothing to install and no account to create. Just open the page and start blasting.",
-          "Move your ship left and right to dodge incoming fire while shooting upward to destroy the alien grid. Each ship you take down is worth 10 points, and clearing the whole formation advances you to the next wave. Every wave moves faster, fires more often, and pushes deeper toward your position. You have three lives — survive as long as you can and chase a new high score.",
-          "The game is fully mobile-friendly. A virtual joystick controls movement, a large fire button lets you shoot, and an AUTO 🔥 toggle keeps your guns blazing hands-free. Touch controls only appear on touch devices, so desktop players keep a clean keyboard experience. No ads, no downloads, no signup — just instant retro arcade action on any device.",
+          "Skycally's Space Shooter is a vertical scrolling shoot 'em up where you pilot a spaceship through waves of descending alien enemies. Move left and right to dodge incoming fire while shooting continuously at enemies above. Destroy all enemies in a wave to advance. Power-ups drop from defeated enemies to enhance your firepower.",
+          "Space shooters trace their lineage to Space Invaders (Taito, 1978) — the game that launched the video game industry as a mass-market phenomenon. Space Invaders' descending alien formation, limited lives, and escalating speed remain the template for the genre. Later classics like Galaga (1981) and Raiden (1990) added sophisticated patterns and power-up systems.",
+          "Power-ups are the key to surviving later waves. Spread shots cover wider angles, rapid fire increases your shooting speed, shields absorb incoming hits, and bomb power-ups clear the screen of enemies and bullets simultaneously. Prioritize picking up power-ups even if it means exposing yourself briefly to enemy fire.",
+          "The game intensifies with each wave — enemies move faster, fire more frequently, and may introduce new attack patterns. Memorizing enemy formations helps you anticipate dangerous moments. Stay mobile: hovering in one position makes you an easy target for enemies that aim directly at your position.",
         ]}
         faqs={[
-          { question: "Is Space Shooter free to play?", answer: "Yes, completely free with no signup or download required. Just open the page and start playing instantly." },
-          { question: "Can I play on mobile?", answer: "Yes. The game includes a virtual joystick and fire button optimized for touch screens, plus an auto-fire toggle for hands-free shooting." },
-          { question: "Does the game save my high score?", answer: "Your high score is saved locally in your browser so you can keep chasing your personal best on the same device." },
-          { question: "How do I advance to the next wave?", answer: "Destroy all enemy ships in the current wave to advance. Each new wave is faster and more aggressive than the last." },
+          {
+            question: "How do I control my spaceship?",
+            answer:
+              "Use left/right arrow keys or A/D to move. The ship fires automatically. On mobile, tap and drag the ship to move it.",
+          },
+          {
+            question: "Does the ship shoot automatically?",
+            answer: "Yes. Your ship fires continuously without any button press needed. Focus on movement and dodging.",
+          },
+          {
+            question: "What are power-ups?",
+            answer:
+              "Power-ups drop from defeated enemies and include spread shot, rapid fire, shield, and screen-clearing bombs. Move over them to collect.",
+          },
+          {
+            question: "What ends the game?",
+            answer: "The game ends when an enemy bullet or enemy ship collides with your ship and all lives are lost.",
+          },
+          {
+            question: "How many lives do I get?",
+            answer: "Typically 3 lives. An extra life may be awarded for reaching score milestones.",
+          },
+          {
+            question: "Do enemies get harder?",
+            answer:
+              "Yes. Each wave introduces faster enemies with more aggressive firing patterns and new attack formations.",
+          },
+          {
+            question: "Is my high score saved?",
+            answer: "Yes. Your best score is saved in your browser's localStorage and displayed on the game screen.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Drag your ship to move it. The game auto-fires and is fully optimized for touch controls.",
+          },
         ]}
       />
 

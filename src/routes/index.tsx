@@ -86,7 +86,6 @@ const CATEGORY_TAGLINES: Record<ToolCategory, string> = {
 };
 
 const QUICK_CATS = [
-  { icon: Sparkles, label: "AI", cat: "ai" as const },
   { icon: Video, label: "Video", cat: "video" as const },
   { icon: ImageIcon, label: "Image", cat: "image" as const },
   { icon: Music, label: "Audio", cat: "audio" as const },
@@ -95,6 +94,7 @@ const QUICK_CATS = [
   { icon: Wrench, label: "Utility", cat: "utility" as const },
   { icon: Gamepad2, label: "Games", cat: "games" as const },
   { icon: Joystick, label: "Mini Games", cat: "minigames" as const },
+  { icon: Sparkles, label: "AI", cat: "ai" as const },
 ];
 
 const STATS = [

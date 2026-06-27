@@ -224,70 +224,68 @@ function InvoiceGeneratorPage() {
 
   const [downloading, setDownloading] = useState(false);
 
-  const downloadPDF = async () => {
-    if (downloading) return;
-    setDownloading(true);
-    try {
-      const el = document.getElementById("invoice-preview");
-      if (!el) throw new Error("Preview not found");
-      const { default: html2canvas } = await import("html2canvas");
-      const canvas = await html2canvas(el, {
-        scale: 3,
-        useCORS: true,
-        backgroundColor: "#ffffff",
-        logging: false,
-        allowTaint: true,
-      });
-      const imgData = canvas.toDataURL("image/jpeg", 0.92);
-
-      // Try jsPDF with all possible v3/v4 export shapes
-      const mod = (await import("jspdf")) as any;
-      const JsPDFClass = mod.jsPDF || (mod.default && mod.default.jsPDF) || mod.default;
-
-      if (!JsPDFClass) throw new Error("jsPDF not available");
-
-      const pdf = new JsPDFClass({ orientation: "portrait", unit: "mm", format: "a4" });
-      const pageW = pdf.internal.pageSize.getWidth();
-      const pageH = pdf.internal.pageSize.getHeight();
-      const imgW = pageW;
-      const imgH = (canvas.height * imgW) / canvas.width;
-
-      if (imgH <= pageH) {
-        pdf.addImage(imgData, "JPEG", 0, 0, imgW, imgH);
-      } else {
-        let y = 0;
-        while (y < imgH) {
-          if (y > 0) pdf.addPage();
-          pdf.addImage(imgData, "JPEG", 0, -y, imgW, imgH);
-          y += pageH;
-        }
-      }
-      pdf.save(`Invoice-${state.number || "draft"}.pdf`);
-      bumpInvoiceCount();
-      setState((s) => ({ ...s, number: nextInvoiceNumber() }));
-      toast.success("Invoice downloaded!");
-    } catch (e: any) {
-      console.error("PDF error:", e);
-      // Final fallback: download as PNG
-      try {
-        const el2 = document.getElementById("invoice-preview");
-        if (el2) {
-          const { default: html2canvas } = await import("html2canvas");
-          const c2 = await html2canvas(el2, { scale: 2, backgroundColor: "#ffffff" });
-          const link = document.createElement("a");
-          link.download = `Invoice-${state.number || "draft"}.png`;
-          link.href = c2.toDataURL("image/png");
-          link.click();
-          toast.success("Downloaded as PNG — open in browser and print as PDF if needed");
-          bumpInvoiceCount();
-          setState((s) => ({ ...s, number: nextInvoiceNumber() }));
-        }
-      } catch {
-        toast.error("Download failed — use the Print button (Ctrl+P → Save as PDF)");
-      }
-    } finally {
-      setDownloading(false);
+  const downloadPDF = () => {
+    const el = document.getElementById("invoice-preview");
+    if (!el) {
+      toast.error("Preview not found");
+      return;
     }
+
+    const invoiceHTML = el.outerHTML;
+    // Get all inline styles from the page
+    const styles = Array.from(document.styleSheets)
+      .map((sheet) => {
+        try {
+          return Array.from(sheet.cssRules)
+            .map((r) => r.cssText)
+            .join("\n");
+        } catch {
+          return "";
+        }
+      })
+      .join("\n");
+
+    const win = window.open("", "_blank", "width=900,height=700");
+    if (!win) {
+      toast.error("Popup blocked — please allow popups for this site");
+      return;
+    }
+
+    win.document.write(`<!DOCTYPE html>
+<html>
+<head>
+  <meta charset="UTF-8">
+  <title>Invoice-${state.number || "draft"}</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body { background: white; font-family: ui-sans-serif, system-ui, -apple-system, sans-serif; }
+    .invoice-paper { max-width: 794px; margin: 0 auto; padding: 40px; background: white; }
+    ${styles}
+    @media print {
+      @page { size: A4; margin: 10mm; }
+      body { margin: 0; }
+      .invoice-paper { max-width: 100%; padding: 0; }
+    }
+  </style>
+</head>
+<body>
+  <div class="invoice-paper">
+    ${invoiceHTML}
+  </div>
+  <script>
+    window.onload = function() {
+      setTimeout(function() {
+        window.print();
+      }, 400);
+    };
+  <\/script>
+</body>
+</html>`);
+
+    win.document.close();
+    bumpInvoiceCount();
+    setState((s) => ({ ...s, number: nextInvoiceNumber() }));
+    toast.success("Invoice ready — choose \'Save as PDF\' in the print dialog");
   };
 
   const printInvoice = () => window.print();
@@ -398,7 +396,7 @@ function InvoiceGeneratorPage() {
             disabled={downloading}
             className="bg-[var(--cyan-brand)] text-black hover:bg-[var(--cyan-brand)]/90"
           >
-            <Download className="w-4 h-4" /> {downloading ? "Generating..." : "Download PDF"}
+            <Download className="w-4 h-4" /> "Download PDF"
           </Button>
         </div>
       </div>
@@ -868,7 +866,7 @@ function InvoiceGeneratorPage() {
           className="w-full bg-[var(--cyan-brand)] text-black hover:bg-[var(--cyan-brand)]/90 shadow-2xl"
           size="lg"
         >
-          <Download className="w-4 h-4" /> {downloading ? "Generating..." : "Download PDF"}
+          <Download className="w-4 h-4" /> "Download PDF"
         </Button>
       </div>
 

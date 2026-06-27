@@ -6,6 +6,7 @@ import { buildPageMeta, SITE_URL } from "@/lib/seo";
 import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -59,9 +60,15 @@ const ENEMY: Cell = 5;
 
 type Dir = "up" | "down" | "left" | "right";
 
-interface EnemyState { x: number; y: number; dir: Dir }
+interface EnemyState {
+  x: number;
+  y: number;
+  dir: Dir;
+}
 
-function rand(n: number) { return Math.floor(Math.random() * n); }
+function rand(n: number) {
+  return Math.floor(Math.random() * n);
+}
 
 function buildLevel(level: number) {
   const grid: Cell[][] = [];
@@ -73,7 +80,8 @@ function buildLevel(level: number) {
     grid.push(row);
   }
   // Player spawn area cleared
-  const px = 1, py = 1;
+  const px = 1,
+    py = 1;
   grid[py][px] = EMPTY;
   grid[py][px + 1] = EMPTY;
   grid[py + 1][px] = EMPTY;
@@ -88,28 +96,37 @@ function buildLevel(level: number) {
 
   // Place gems
   const gemCount = 14 + level * 3;
-  let placed = 0, tries = 0;
+  let placed = 0,
+    tries = 0;
   while (placed < gemCount && tries < 500) {
     tries++;
     const x = 1 + rand(COLS - 2);
     const y = 2 + rand(ROWS - 3);
-    if (grid[y][x] === DIRT) { grid[y][x] = GEM; placed++; }
+    if (grid[y][x] === DIRT) {
+      grid[y][x] = GEM;
+      placed++;
+    }
   }
 
   // Place rocks (more rocks on higher levels)
   const rockCount = 10 + level * 4;
-  placed = 0; tries = 0;
+  placed = 0;
+  tries = 0;
   while (placed < rockCount && tries < 500) {
     tries++;
     const x = 1 + rand(COLS - 2);
     const y = 2 + rand(ROWS - 4);
-    if (grid[y][x] === DIRT) { grid[y][x] = ROCK; placed++; }
+    if (grid[y][x] === DIRT) {
+      grid[y][x] = ROCK;
+      placed++;
+    }
   }
 
   // Place enemies
   const enemyCount = level; // 1..5
   const enemies: EnemyState[] = [];
-  placed = 0; tries = 0;
+  placed = 0;
+  tries = 0;
   while (placed < enemyCount && tries < 500) {
     tries++;
     const x = COLS - 3 - rand(6);
@@ -164,7 +181,9 @@ function TunnelDashPage() {
   const saveBest = (s: number) => {
     setBest((prev) => {
       if (s > prev) {
-        try { localStorage.setItem("tunnel-dash-best", String(s)); } catch {}
+        try {
+          localStorage.setItem("tunnel-dash-best", String(s));
+        } catch {}
         return s;
       }
       return prev;
@@ -289,16 +308,24 @@ function TunnelDashPage() {
       setGameOver(true);
       setRunning(false);
       saveBest(scoreRef.current);
-      if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       return;
     }
     // Respawn at top-left
     const grid = gridRef.current;
     grid[playerRef.current.y][playerRef.current.x] = EMPTY;
-    let nx = 1, ny = 1;
+    let nx = 1,
+      ny = 1;
     outer: for (let y = 1; y < ROWS - 1; y++) {
       for (let x = 1; x < COLS - 1; x++) {
-        if (grid[y][x] === DIRT || grid[y][x] === EMPTY) { nx = x; ny = y; break outer; }
+        if (grid[y][x] === DIRT || grid[y][x] === EMPTY) {
+          nx = x;
+          ny = y;
+          break outer;
+        }
       }
     }
     playerRef.current = { x: nx, y: ny };
@@ -354,7 +381,10 @@ function TunnelDashPage() {
       wonRef.current = true;
       playSound("win");
       saveBest(scoreRef.current);
-      if (intervalRef.current) { clearInterval(intervalRef.current); intervalRef.current = null; }
+      if (intervalRef.current) {
+        clearInterval(intervalRef.current);
+        intervalRef.current = null;
+      }
       setRunning(false);
       if (levelStateRef.current >= MAX_LEVEL) {
         setWon(true);
@@ -427,7 +457,9 @@ function TunnelDashPage() {
         if (t === EMPTY) {
           grid[e.y][e.x] = EMPTY;
           grid[ny][nx] = ENEMY;
-          e.x = nx; e.y = ny; e.dir = d;
+          e.x = nx;
+          e.y = ny;
+          e.dir = d;
           moved = true;
           break;
         }
@@ -443,12 +475,21 @@ function TunnelDashPage() {
     tickRef.current += 1;
 
     tryMovePlayer();
-    if (overRef.current || wonRef.current) { draw(); return; }
+    if (overRef.current || wonRef.current) {
+      draw();
+      return;
+    }
     updateRocks();
-    if (overRef.current || wonRef.current) { draw(); return; }
+    if (overRef.current || wonRef.current) {
+      draw();
+      return;
+    }
     if (tickRef.current % 2 === 0) {
       updateEnemies();
-      if (overRef.current || wonRef.current) { draw(); return; }
+      if (overRef.current || wonRef.current) {
+        draw();
+        return;
+      }
     }
     if (tickRef.current % 6 === 0) {
       timerRef.current -= 1;
@@ -466,9 +507,12 @@ function TunnelDashPage() {
   }, [tick]);
 
   const startGame = useCallback(() => {
-    scoreRef.current = 0; setScore(0);
-    livesRef.current = 3; setLives(3);
-    levelStateRef.current = 1; setLevel(1);
+    scoreRef.current = 0;
+    setScore(0);
+    livesRef.current = 3;
+    setLives(3);
+    levelStateRef.current = 1;
+    setLevel(1);
     initLevel(1);
     draw();
     setGameOver(false);
@@ -493,7 +537,9 @@ function TunnelDashPage() {
   useEffect(() => {
     initLevel(1);
     draw();
-    return () => { if (intervalRef.current) clearInterval(intervalRef.current); };
+    return () => {
+      if (intervalRef.current) clearInterval(intervalRef.current);
+    };
   }, [draw, initLevel]);
 
   // Keyboard
@@ -512,7 +558,7 @@ function TunnelDashPage() {
     };
     const onUp = (e: KeyboardEvent) => {
       const k = e.key;
-      if (["ArrowUp","ArrowDown","ArrowLeft","ArrowRight","w","W","a","A","s","S","d","D"].includes(k)) {
+      if (["ArrowUp", "ArrowDown", "ArrowLeft", "ArrowRight", "w", "W", "a", "A", "s", "S", "d", "D"].includes(k)) {
         dirRef.current = null;
       }
     };
@@ -524,11 +570,19 @@ function TunnelDashPage() {
     };
   }, []);
 
-  const pressDir = (d: Dir) => { dirRef.current = d; };
-  const releaseDir = () => { dirRef.current = null; };
+  const pressDir = (d: Dir) => {
+    dirRef.current = d;
+  };
+  const releaseDir = () => {
+    dirRef.current = null;
+  };
 
   return (
-    <ToolPageShell title="Tunnel Dash" description="Dig through the earth, collect gems, and outsmart the Crawlers!">
+    <ToolPageShell
+      showFileDisclaimer={false}
+      title="Tunnel Dash"
+      description="Dig through the earth, collect gems, and outsmart the Crawlers!"
+    >
       <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
         <div className="flex justify-center gap-3 mb-4 flex-wrap">
           <div className="text-center px-4 py-2 rounded-xl bg-secondary/60 border border-border min-w-[80px]">
@@ -564,7 +618,9 @@ function TunnelDashPage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 rounded-xl">
               <p className="text-4xl mb-2">⛏️</p>
               <p className="text-white font-black text-2xl mb-1">Tunnel Dash</p>
-              <p className="text-white/60 text-sm mb-4 px-4 text-center">Arrow keys / WASD on desktop. D-pad on mobile.</p>
+              <p className="text-white/60 text-sm mb-4 px-4 text-center">
+                Arrow keys / WASD on desktop. D-pad on mobile.
+              </p>
               <button
                 onClick={startGame}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-yellow-400 hover:bg-yellow-300 text-black font-bold transition-colors"
@@ -620,7 +676,10 @@ function TunnelDashPage() {
           <div className="grid grid-cols-3 gap-2 w-44">
             <div />
             <button
-              onPointerDown={(e) => { e.preventDefault(); pressDir("up"); }}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                pressDir("up");
+              }}
               onPointerUp={releaseDir}
               onPointerLeave={releaseDir}
               className="aspect-square rounded-xl bg-secondary border border-border flex items-center justify-center active:bg-yellow-400 active:text-black"
@@ -630,7 +689,10 @@ function TunnelDashPage() {
             </button>
             <div />
             <button
-              onPointerDown={(e) => { e.preventDefault(); pressDir("left"); }}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                pressDir("left");
+              }}
               onPointerUp={releaseDir}
               onPointerLeave={releaseDir}
               className="aspect-square rounded-xl bg-secondary border border-border flex items-center justify-center active:bg-yellow-400 active:text-black"
@@ -640,7 +702,10 @@ function TunnelDashPage() {
             </button>
             <div />
             <button
-              onPointerDown={(e) => { e.preventDefault(); pressDir("right"); }}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                pressDir("right");
+              }}
               onPointerUp={releaseDir}
               onPointerLeave={releaseDir}
               className="aspect-square rounded-xl bg-secondary border border-border flex items-center justify-center active:bg-yellow-400 active:text-black"
@@ -650,7 +715,10 @@ function TunnelDashPage() {
             </button>
             <div />
             <button
-              onPointerDown={(e) => { e.preventDefault(); pressDir("down"); }}
+              onPointerDown={(e) => {
+                e.preventDefault();
+                pressDir("down");
+              }}
               onPointerUp={releaseDir}
               onPointerLeave={releaseDir}
               className="aspect-square rounded-xl bg-secondary border border-border flex items-center justify-center active:bg-yellow-400 active:text-black"
@@ -663,25 +731,64 @@ function TunnelDashPage() {
         </div>
       </div>
 
-      <HowToUse steps={[
-        "Move with arrow keys or WASD on desktop, or hold the on-screen D-pad on mobile, to dig through the dirt.",
-        "Collect every gem to clear the level. Push rocks sideways and let them fall on Crawlers for bonus points.",
-        "Avoid Crawlers and falling rocks — you have 3 lives and a time bonus rewards a fast finish.",
-      ]} />
+      <AdZone id="tunnel-dash-bottom" size="728x90" />
+
+      <HowToUse
+        steps={[
+          "Move with arrow keys or WASD on desktop, or hold the on-screen D-pad on mobile, to dig through the dirt.",
+          "Collect every gem to clear the level. Push rocks sideways and let them fall on Crawlers for bonus points.",
+          "Avoid Crawlers and falling rocks — you have 3 lives and a time bonus rewards a fast finish.",
+        ]}
+      />
 
       <ToolSeoContent
-        title="Tunnel Dash — Free Online Arcade Game"
-        description="Play Tunnel Dash free in your browser. Dig through tunnels, collect gems, drop rocks on enemies, and clear all 5 levels in this classic 90s-style arcade game."
+        title="Free Tunnel Dash Game Online — Dodge Obstacles at High Speed"
+        description="Play Tunnel Dash free online. Navigate through an endless tunnel dodging walls and obstacles at increasing speed. Free, no signup, works on mobile."
         body={[
-          "Tunnel Dash is a fast, free arcade game inspired by the golden-age DOS digger classics. You guide a hard-hatted miner through grids of dirt, carving out tunnels in real time as you sweep up sparkling gems. Each level packs more gems, more rocks, and more Crawlers, so you'll need to plan your tunnels carefully to stay one step ahead of the chase.",
-          "Rocks are your secret weapon. Dig out the dirt directly below a boulder and gravity does the rest — a falling rock will crush any Crawler unlucky enough to be underneath, awarding 50 bonus points. Push rocks sideways into tunnels to create chokepoints, or stack them to seal off escape routes. The 5 hand-tuned levels build from a gentle warm-up to a hectic, multi-Crawler labyrinth.",
-          "Tunnel Dash runs entirely in your browser — no installs, no signup, no ads. Play with arrow keys or WASD on desktop, or use the on-screen D-pad on mobile. Your best score is saved locally so you can chase your personal record across sessions, and a time bonus on every level rewards fast, clean runs.",
+          "Skycally's Tunnel Dash is a fast-paced endless runner where you steer a ball through a rotating 3D tunnel, dodging colored obstacle sections that block part of the tunnel's circumference. Only the gaps in each obstacle let you pass — steer left or right to align with the gap before the obstacle reaches you.",
+          "The game accelerates continuously as you progress, demanding faster reactions and more precise steering with each passing second. The tunnel's visual rotation creates a sense of vertiginous speed that intensifies with every obstacle survived. A single collision ends the run — there are no lives or second chances.",
+          "Tunnel Dash belongs to the precision reflex genre — games where the core skill is rapid visual processing and motor response rather than strategy or planning. Reaction time, spatial awareness, and the ability to read upcoming obstacles while managing current position are the key competencies the game trains.",
+          "The further you survive, the higher your score. Your best run is saved locally for a personal record. The deceptively simple mechanic — just steer left or right — becomes genuinely challenging at high speeds when multiple obstacles appear in rapid succession with shrinking gaps and faster rotation.",
         ]}
         faqs={[
-          { question: "How do I control Tunnel Dash?", answer: "On desktop, use the arrow keys or WASD to move. Hold a direction to keep digging that way. On mobile, hold one of the on-screen D-pad buttons. You can push a rock by walking into it horizontally if the cell beyond it is empty." },
-          { question: "How do I kill the Crawlers?", answer: "Crawlers can't be touched directly — contact costs you a life. The safe way to take them out is to drop a rock on them. Dig the dirt below a boulder so it falls onto a Crawler beneath; the rock crushes them for 50 bonus points." },
-          { question: "How does scoring work?", answer: "Each gem is worth 10 points, each Crawler crushed by a rock is worth 50, and every second left on the level timer when you clear the board adds 5 bonus points to your score. The faster and tidier your run, the higher your final total." },
-          { question: "Does Tunnel Dash work on mobile?", answer: "Yes. The game is fully responsive and ships with an on-screen D-pad for touchscreens. There's nothing to install — the entire game runs in your browser, and your best score is saved locally on your device." },
+          {
+            question: "How do I control the ball?",
+            answer:
+              "Use left/right arrow keys or A/D on desktop. Tap left or right side of the screen on mobile. Steer to align with the gap in each obstacle before it reaches you.",
+          },
+          {
+            question: "What ends the game?",
+            answer:
+              "Hitting any colored obstacle section ends your run immediately. There are no lives — one collision and it's over.",
+          },
+          {
+            question: "Does the game get faster?",
+            answer:
+              "Yes. Speed increases continuously as you survive longer, making obstacles harder to react to over time.",
+          },
+          {
+            question: "Is my high score saved?",
+            answer: "Yes. Your best distance or score is saved in your browser's localStorage.",
+          },
+          {
+            question: "What are the colored sections?",
+            answer:
+              "Colored sections are the obstacle walls. Only the gaps (uncolored sections) are safe to pass through. Steer to align with the gap.",
+          },
+          {
+            question: "Is there a pause feature?",
+            answer:
+              "Check the game controls — pressing Escape or clicking a pause button may freeze the tunnel temporarily.",
+          },
+          {
+            question: "How do I improve at Tunnel Dash?",
+            answer:
+              "Focus on reading the next obstacle's gap early, not the current one. Anticipating several obstacles ahead gives you more time to react.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Tap the left or right side of the screen to steer. The game is optimized for touch controls.",
+          },
         ]}
       />
 

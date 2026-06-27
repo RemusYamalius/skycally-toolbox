@@ -1079,6 +1079,15 @@ export const tools: Tool[] = [
     path: "/tools/calorie-calculator",
   },
   {
+    slug: "invoice-generator",
+    name: "Invoice Generator",
+    description:
+      "Create professional invoices in seconds. Live preview, 3 templates, multi-currency, logo upload, and instant PDF download. 100% free and private.",
+    category: "utility",
+    icon: FileText,
+    path: "/tools/invoice-generator",
+  },
+  {
     slug: "ball-sort",
     name: "Ball Sort Puzzle",
     description: "Sort colored balls into matching tubes. 30 free levels, mobile and desktop, no download.",
@@ -1087,3 +1096,4 @@ export const tools: Tool[] = [
     path: "/tools/ball-sort",
   },
 ];
+

@@ -7,6 +7,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { cn } from "@/lib/utils";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -29,8 +30,7 @@ type Difficulty = "easy" | "medium" | "hard";
 
 const AI_DEPTH: Record<Difficulty, number> = { easy: 2, medium: 4, hard: 6 };
 
-const emptyBoard = (): Board =>
-  Array.from({ length: ROWS }, () => Array(COLS).fill(EMPTY) as Cell[]);
+const emptyBoard = (): Board => Array.from({ length: ROWS }, () => Array(COLS).fill(EMPTY) as Cell[]);
 
 // ============ Engine ============
 const dropDisc = (board: Board, col: number, player: Cell): Board | null => {
@@ -44,9 +44,7 @@ const dropDisc = (board: Board, col: number, player: Cell): Board | null => {
   return null;
 };
 
-const checkWinner = (
-  board: Board,
-): { player: Cell; cells: [number, number][] } | null => {
+const checkWinner = (board: Board): { player: Cell; cells: [number, number][] } | null => {
   const directions: [number, number][] = [
     [0, 1],
     [1, 0],
@@ -62,14 +60,7 @@ const checkWinner = (
         for (let i = 1; i < 4; i++) {
           const nr = r + dr * i;
           const nc = c + dc * i;
-          if (
-            nr < 0 ||
-            nr >= ROWS ||
-            nc < 0 ||
-            nc >= COLS ||
-            board[nr][nc] !== p
-          )
-            break;
+          if (nr < 0 || nr >= ROWS || nc < 0 || nc >= COLS || board[nr][nc] !== p) break;
           cells.push([nr, nc]);
         }
         if (cells.length === 4) return { player: p, cells };
@@ -79,8 +70,7 @@ const checkWinner = (
   return null;
 };
 
-const isDraw = (board: Board): boolean =>
-  board[0].every((cell) => cell !== EMPTY);
+const isDraw = (board: Board): boolean => board[0].every((cell) => cell !== EMPTY);
 
 const getValidCols = (board: Board): number[] =>
   Array.from({ length: COLS }, (_, c) => c).filter((c) => board[0][c] === EMPTY);
@@ -110,36 +100,17 @@ const scoreBoard = (board: Board, player: Cell): number => {
   }
   for (let c = 0; c < COLS; c++) {
     for (let r = 0; r <= ROWS - 4; r++) {
-      score += scoreWindow(
-        [board[r][c], board[r + 1][c], board[r + 2][c], board[r + 3][c]],
-        player,
-      );
+      score += scoreWindow([board[r][c], board[r + 1][c], board[r + 2][c], board[r + 3][c]], player);
     }
   }
   for (let r = 0; r <= ROWS - 4; r++) {
     for (let c = 0; c <= COLS - 4; c++) {
-      score += scoreWindow(
-        [
-          board[r][c],
-          board[r + 1][c + 1],
-          board[r + 2][c + 2],
-          board[r + 3][c + 3],
-        ],
-        player,
-      );
+      score += scoreWindow([board[r][c], board[r + 1][c + 1], board[r + 2][c + 2], board[r + 3][c + 3]], player);
     }
   }
   for (let r = 0; r <= ROWS - 4; r++) {
     for (let c = 3; c < COLS; c++) {
-      score += scoreWindow(
-        [
-          board[r][c],
-          board[r + 1][c - 1],
-          board[r + 2][c - 2],
-          board[r + 3][c - 3],
-        ],
-        player,
-      );
+      score += scoreWindow([board[r][c], board[r + 1][c - 1], board[r + 2][c - 2], board[r + 3][c - 3]], player);
     }
   }
   return score;
@@ -155,15 +126,11 @@ const minimax = (
   const result = checkWinner(board);
   if (result?.player === AI) return { score: 100000 + depth, col: -1 };
   if (result?.player === HUMAN) return { score: -100000 - depth, col: -1 };
-  if (isDraw(board) || depth === 0)
-    return { score: scoreBoard(board, AI), col: -1 };
+  if (isDraw(board) || depth === 0) return { score: scoreBoard(board, AI), col: -1 };
 
   const cols = getValidCols(board);
   // Order columns: center-first for better pruning
-  cols.sort(
-    (a, b) =>
-      Math.abs(a - Math.floor(COLS / 2)) - Math.abs(b - Math.floor(COLS / 2)),
-  );
+  cols.sort((a, b) => Math.abs(a - Math.floor(COLS / 2)) - Math.abs(b - Math.floor(COLS / 2)));
 
   if (maximizing) {
     let best = { score: -Infinity, col: cols[0] };
@@ -204,13 +171,7 @@ function ConnectFourPage() {
       const cols = getValidCols(b);
       return cols[Math.floor(Math.random() * cols.length)];
     }
-    const { col } = minimax(
-      b,
-      AI_DEPTH[difficulty],
-      -Infinity,
-      Infinity,
-      true,
-    );
+    const { col } = minimax(b, AI_DEPTH[difficulty], -Infinity, Infinity, true);
     return col >= 0 ? col : getValidCols(b)[0];
   };
 
@@ -289,10 +250,8 @@ function ConnectFourPage() {
     cn(
       "w-full aspect-square rounded-full transition-all",
       cell === EMPTY && "bg-background/60 shadow-inner",
-      cell === HUMAN &&
-        "bg-gradient-to-br from-red-400 to-red-600 shadow-md ring-1 ring-red-700/50",
-      cell === AI &&
-        "bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-md ring-1 ring-yellow-700/50",
+      cell === HUMAN && "bg-gradient-to-br from-red-400 to-red-600 shadow-md ring-1 ring-red-700/50",
+      cell === AI && "bg-gradient-to-br from-yellow-300 to-yellow-500 shadow-md ring-1 ring-yellow-700/50",
       isWin && "ring-4 ring-white animate-pulse",
     );
 
@@ -316,8 +275,8 @@ function ConnectFourPage() {
             <div>
               <h2 className="font-display text-2xl font-bold">Connect Four</h2>
               <p className="mt-2 text-sm text-muted-foreground max-w-md">
-                Drop your red discs and connect four in a row — horizontally,
-                vertically, or diagonally — before the AI does.
+                Drop your red discs and connect four in a row — horizontally, vertically, or diagonally — before the AI
+                does.
               </p>
             </div>
             <div className="flex gap-2">
@@ -351,9 +310,7 @@ function ConnectFourPage() {
                 <div className="w-4 h-4 rounded-full bg-gradient-to-br from-red-400 to-red-600" />
                 <span>You{scores.human > 0 && ` (${scores.human})`}</span>
               </div>
-              <div className="text-sm font-bold text-muted-foreground">
-                {statusText}
-              </div>
+              <div className="text-sm font-bold text-muted-foreground">{statusText}</div>
               <div className="flex items-center gap-2 text-sm font-semibold">
                 <span>AI{scores.ai > 0 && ` (${scores.ai})`}</span>
                 <div className="w-4 h-4 rounded-full bg-gradient-to-br from-yellow-300 to-yellow-500" />
@@ -363,10 +320,7 @@ function ConnectFourPage() {
             {/* Board container */}
             <div className="relative mx-auto max-w-xl">
               {/* Preview row */}
-              <div
-                className="grid gap-1.5 mb-1.5 px-2"
-                style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
-              >
+              <div className="grid gap-1.5 mb-1.5 px-2" style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}>
                 {Array.from({ length: COLS }, (_, c) => (
                   <div key={c} className="aspect-square flex items-center justify-center">
                     {hoverCol === c && turn === HUMAN && phase === "playing" && (
@@ -381,23 +335,16 @@ function ConnectFourPage() {
                 className="rounded-2xl p-2 bg-gradient-to-br from-blue-700 to-blue-900 shadow-lg"
                 onMouseLeave={() => setHoverCol(null)}
               >
-                <div
-                  className="grid gap-1.5"
-                  style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}
-                >
+                <div className="grid gap-1.5" style={{ gridTemplateColumns: `repeat(${COLS}, 1fr)` }}>
                   {board.map((row, r) =>
                     row.map((cell, c) => {
-                      const isWin = winCells.some(
-                        ([wr, wc]) => wr === r && wc === c,
-                      );
+                      const isWin = winCells.some(([wr, wc]) => wr === r && wc === c);
                       return (
                         <button
                           key={`${r}-${c}`}
                           onClick={() => handleColClick(c)}
                           onMouseEnter={() => setHoverCol(c)}
-                          disabled={
-                            phase !== "playing" || turn !== HUMAN
-                          }
+                          disabled={phase !== "playing" || turn !== HUMAN}
                           className="p-1 rounded-full bg-blue-950/40 hover:bg-blue-950/60 transition disabled:cursor-not-allowed"
                           aria-label={`Column ${c + 1}, row ${r + 1}`}
                         >
@@ -441,19 +388,9 @@ function ConnectFourPage() {
             {(phase === "won" || phase === "draw") && (
               <div className="fixed inset-0 z-50 flex items-center justify-center bg-black/60 backdrop-blur-sm p-4">
                 <div className="bg-card border border-border rounded-3xl p-8 max-w-sm w-full text-center shadow-2xl">
-                  <div className="text-6xl mb-2">
-                    {phase === "draw"
-                      ? "🤝"
-                      : winner === HUMAN
-                        ? "🎉"
-                        : "😔"}
-                  </div>
+                  <div className="text-6xl mb-2">{phase === "draw" ? "🤝" : winner === HUMAN ? "🎉" : "😔"}</div>
                   <h3 className="font-display text-2xl font-bold mb-2">
-                    {phase === "draw"
-                      ? "It's a Draw!"
-                      : winner === HUMAN
-                        ? "You Win!"
-                        : "AI Wins!"}
+                    {phase === "draw" ? "It's a Draw!" : winner === HUMAN ? "You Win!" : "AI Wins!"}
                   </h3>
                   <p className="text-sm text-muted-foreground mb-6">
                     You: {scores.human} · AI: {scores.ai} · Draws: {scores.draws}
@@ -471,6 +408,8 @@ function ConnectFourPage() {
         )}
       </div>
 
+      <AdZone id="connect-four-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Click any column to drop your red disc — try to connect four in a row.",
@@ -480,32 +419,52 @@ function ConnectFourPage() {
       />
 
       <ToolSeoContent
-        title="Connect Four — Free Online Connect 4 Game vs AI"
-        description="Play Connect Four online for free against a smart AI. Three difficulty levels, instant play, no sign-up needed. Classic drop-disc strategy game!"
+        title="Free Connect Four Game Online — Drop Discs & Connect 4 in a Row"
+        description="Play Connect Four free online against an AI or a friend. Drop discs into the grid to connect four of your color in a row. Free, no signup required."
         body={[
-          "Connect Four is the timeless two-player strategy game where you take turns dropping colored discs into a 7-column, 6-row vertical grid. The goal is simple but deep: be the first to align four of your discs in a row — horizontally, vertically, or diagonally — while preventing your opponent from doing the same.",
-          "Our online Connect Four runs entirely in your browser with three AI difficulty levels powered by a minimax algorithm with alpha-beta pruning. Easy is great for casual play, Medium offers a balanced challenge, and Hard plays several moves ahead and rarely makes mistakes. No sign-up, no downloads — just open and play.",
+          "Skycally's Connect Four challenges you to be the first to connect four discs of your color in a row — horizontally, vertically, or diagonally. Click any column to drop your disc into the lowest available position. The AI responds instantly, or play against a friend on the same device in two-player mode.",
+          "Connect Four was invented by Howard Wexler and Ned Scheider and released by Milton Bradley in 1974. It was mathematically solved in 1988 by James Dow Allen and Victor Allis — with perfect play, the first player always wins. This makes it a fascinating example of combinatorial game theory where the outcome is theoretically determined, yet the game remains strategically rich and engaging.",
+          "Three difficulty levels are available. Easy plays randomly with occasional blocking moves. Medium checks for immediate threats. Hard uses a deeper minimax search and is a genuine challenge for experienced players. The game's 6×7 grid creates over 4 trillion possible positions — far more complex than Tic Tac Toe despite its simple appearance.",
+          "Winning at Connect Four requires thinking several moves ahead. Key strategies include building diagonal threats, creating two simultaneous threats your opponent cannot block in one move (a fork), and controlling the center column — which is involved in more winning combinations than any other column on the board.",
         ]}
         faqs={[
           {
-            question: "How do I win at Connect Four?",
+            question: "How do I play Connect Four?",
             answer:
-              "Connect four of your discs in a row — horizontally, vertically, or diagonally. Controlling the center column is a powerful opening strategy because it gives you the most ways to build a four-in-a-row.",
+              "Click a column to drop your disc into it. Discs fall to the lowest available row. Connect four discs of your color in a row — horizontally, vertically, or diagonally — to win.",
           },
           {
-            question: "How smart is the AI on each difficulty?",
-            answer:
-              "Easy looks 2 moves ahead and plays a random move 30% of the time. Medium searches 4 moves deep and plays solidly. Hard searches 6 moves deep with alpha-beta pruning — it spots traps and rarely loses.",
+            question: "Can I play against a friend?",
+            answer: "Yes. Select 2 Player mode and take turns dropping discs on the same device.",
           },
           {
-            question: "What happens if the board fills up?",
+            question: "How many difficulty levels are there?",
             answer:
-              "If all 42 cells are filled without either player connecting four, the game ends in a draw. The draw counter at the top of the board tracks how many drawn games you've played.",
+              "Three: Easy (mostly random), Medium (blocks immediate threats), and Hard (deep minimax search — a serious challenge).",
           },
           {
-            question: "What are the controls?",
+            question: "Who goes first?",
             answer:
-              "Just click or tap any column to drop your disc into the lowest empty slot. Hover over a column on desktop to preview where your disc will land before you commit.",
+              "Red always goes first. With perfect play, the first player has a forced win — but Hard AI makes it difficult to execute.",
+          },
+          {
+            question: "What is a Connect Four fork?",
+            answer:
+              "A fork is a position where you threaten to connect four in two different directions simultaneously — your opponent can only block one, guaranteeing you win on the next move.",
+          },
+          {
+            question: "Why should I control the center column?",
+            answer:
+              "The center column is part of more potential winning combinations than any other column, making it strategically the most valuable position on the board.",
+          },
+          {
+            question: "Is Connect Four a solved game?",
+            answer:
+              "Yes. Mathematically, with perfect play, the first player always wins. However, this requires very precise play that is difficult to execute in practice.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Tap any column to drop your disc. The board is fully responsive and touch-friendly.",
           },
         ]}
       />

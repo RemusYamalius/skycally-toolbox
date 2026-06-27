@@ -228,45 +228,63 @@ function InvoiceGeneratorPage() {
     if (downloading) return;
     setDownloading(true);
     try {
-      const [jspdfModule, { default: html2canvas }] = await Promise.all([import("jspdf"), import("html2canvas")]);
-      const jsPDF = jspdfModule.jsPDF ?? jspdfModule.default;
       const el = document.getElementById("invoice-preview");
       if (!el) throw new Error("Preview not found");
+      const { default: html2canvas } = await import("html2canvas");
       const canvas = await html2canvas(el, {
-        scale: 2,
+        scale: 3,
         useCORS: true,
         backgroundColor: "#ffffff",
         logging: false,
+        allowTaint: true,
       });
-      const pdf = new jsPDF({ orientation: "portrait", unit: "mm", format: "a4" });
+      const imgData = canvas.toDataURL("image/jpeg", 0.92);
+
+      // Try jsPDF with all possible v3/v4 export shapes
+      const mod = (await import("jspdf")) as any;
+      const JsPDFClass = mod.jsPDF || (mod.default && mod.default.jsPDF) || mod.default;
+
+      if (!JsPDFClass) throw new Error("jsPDF not available");
+
+      const pdf = new JsPDFClass({ orientation: "portrait", unit: "mm", format: "a4" });
       const pageW = pdf.internal.pageSize.getWidth();
       const pageH = pdf.internal.pageSize.getHeight();
       const imgW = pageW;
       const imgH = (canvas.height * imgW) / canvas.width;
-      const imgData = canvas.toDataURL("image/png");
 
       if (imgH <= pageH) {
-        pdf.addImage(imgData, "PNG", 0, 0, imgW, imgH);
+        pdf.addImage(imgData, "JPEG", 0, 0, imgW, imgH);
       } else {
-        // Multi-page slicing
-        let heightLeft = imgH;
-        let position = 0;
-        pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-        heightLeft -= pageH;
-        while (heightLeft > 0) {
-          position = heightLeft - imgH;
-          pdf.addPage();
-          pdf.addImage(imgData, "PNG", 0, position, imgW, imgH);
-          heightLeft -= pageH;
+        let y = 0;
+        while (y < imgH) {
+          if (y > 0) pdf.addPage();
+          pdf.addImage(imgData, "JPEG", 0, -y, imgW, imgH);
+          y += pageH;
         }
       }
       pdf.save(`Invoice-${state.number || "draft"}.pdf`);
       bumpInvoiceCount();
       setState((s) => ({ ...s, number: nextInvoiceNumber() }));
-      toast.success("Invoice downloaded");
-    } catch (e) {
-      console.error(e);
-      toast.error("Failed to generate PDF");
+      toast.success("Invoice downloaded!");
+    } catch (e: any) {
+      console.error("PDF error:", e);
+      // Final fallback: download as PNG
+      try {
+        const el2 = document.getElementById("invoice-preview");
+        if (el2) {
+          const { default: html2canvas } = await import("html2canvas");
+          const c2 = await html2canvas(el2, { scale: 2, backgroundColor: "#ffffff" });
+          const link = document.createElement("a");
+          link.download = `Invoice-${state.number || "draft"}.png`;
+          link.href = c2.toDataURL("image/png");
+          link.click();
+          toast.success("Downloaded as PNG — open in browser and print as PDF if needed");
+          bumpInvoiceCount();
+          setState((s) => ({ ...s, number: nextInvoiceNumber() }));
+        }
+      } catch {
+        toast.error("Download failed — use the Print button (Ctrl+P → Save as PDF)");
+      }
     } finally {
       setDownloading(false);
     }

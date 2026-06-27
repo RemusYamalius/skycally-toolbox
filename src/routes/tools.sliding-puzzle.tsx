@@ -7,6 +7,7 @@ import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
@@ -181,6 +182,7 @@ function SlidingPuzzlePage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Sliding Puzzle"
       description="Slide the tiles into the correct order. How few moves can you do it in?"
     >
@@ -274,10 +276,10 @@ function SlidingPuzzlePage() {
           )}
         </div>
 
-        <p className="text-center text-xs text-muted-foreground mt-4">
-          Tip: use arrow keys to slide tiles on desktop.
-        </p>
+        <p className="text-center text-xs text-muted-foreground mt-4">Tip: use arrow keys to slide tiles on desktop.</p>
       </div>
+
+      <AdZone id="sliding-puzzle-bottom" size="728x90" />
 
       <HowToUse
         steps={[
@@ -288,32 +290,52 @@ function SlidingPuzzlePage() {
       />
 
       <ToolSeoContent
-        title="Sliding Puzzle — Classic 15-Puzzle Online Free"
-        description="Play the classic sliding puzzle (15-puzzle) free in your browser. Solve 3×3, 4×4, or 5×5 grids in the fewest moves and the fastest time."
+        title="Free Sliding Puzzle Game Online — Solve the 15-Puzzle in Your Browser"
+        description="Play the classic 15-Puzzle sliding game free online. Slide tiles into the correct order. Multiple grid sizes from 3×3 to 5×5. No signup required."
         body={[
-          "The sliding puzzle — also known as the 15-puzzle — is a timeless brain teaser where you slide numbered tiles around a square grid to put them back in order. Our online version runs entirely in your browser with three difficulty levels: an approachable 3×3 (8-puzzle), the classic 4×4 with 15 tiles, and a brain-bending 5×5 with 24 tiles. No downloads, no accounts, and no ads getting in the way of your solve.",
-          "Every shuffle is guaranteed solvable because the board is scrambled by performing random legal moves from the solved state. Track your progress with the live move counter and timer, then try to beat your own personal best. The puzzle works equally well with mouse, touch, or arrow keys — perfect for a quick mental workout on desktop or mobile.",
+          "Skycally's Sliding Puzzle presents a grid of numbered tiles with one empty space. Slide adjacent tiles into the empty space to rearrange them in numerical order from left to right, top to bottom. The classic 15-Puzzle uses a 4×4 grid (tiles 1–15), while smaller 3×3 (8-Puzzle) and larger 5×5 (24-Puzzle) variations are also available.",
+          "The 15-Puzzle was invented by Noyes Chapman in the 1870s and marketed by Sam Loyd in 1880, who famously offered a $1,000 prize for anyone who could solve a specific impossible configuration — making it one of the first viral puzzles in history. Today it's a classic benchmark problem in computer science for testing search algorithms like A* and iterative deepening.",
+          "Not all configurations are solvable — exactly half of all possible arrangements of the 15-Puzzle are reachable from a solved state. This tool only generates solvable puzzles by starting from the solved position and making a sequence of random valid moves in reverse, guaranteeing every puzzle has a solution.",
+          "The minimum number of moves required to solve a shuffled 15-Puzzle (the 'optimal solution length') varies widely — easy shuffles take 20–40 moves, while harder configurations can require 80+ moves. The move counter tracks your total moves, and trying to solve it in fewer moves than your previous best adds a layer of competitive challenge.",
         ]}
         faqs={[
           {
-            question: "How do I play the sliding puzzle?",
+            question: "How do I play the Sliding Puzzle?",
             answer:
-              "Click or tap any tile that is directly next to the empty space to slide it into that space. Keep sliding tiles until they are arranged in order from 1 to the highest number, with the empty space in the bottom-right corner.",
+              "Click any tile adjacent to the empty space to slide it into that space. Rearrange all tiles in numerical order from left to right, top to bottom, to win.",
           },
           {
-            question: "Are the puzzles always solvable?",
+            question: "What grid sizes are available?",
             answer:
-              "Yes. The board is shuffled by applying many random legal moves to the solved configuration, which guarantees the resulting puzzle can always be solved.",
+              "3×3 (8-Puzzle, 8 tiles), 4×4 (15-Puzzle, 15 tiles), and 5×5 (24-Puzzle, 24 tiles). Larger grids are significantly harder.",
           },
           {
-            question: "Can I use keyboard controls?",
+            question: "Is every puzzle solvable?",
             answer:
-              "Yes. On desktop you can use the arrow keys to slide the tile in the chosen direction into the empty space.",
+              "Yes. Puzzles are generated by starting from the solved state and making random moves, guaranteeing every generated puzzle has at least one solution.",
           },
           {
-            question: "Is it free and private?",
+            question: "How many moves does it take to solve?",
             answer:
-              "Completely. The game runs entirely in your browser — there is no signup, no download, and no data is sent to our servers.",
+              "It depends on the shuffle. Easy positions take 20–40 moves. Hard positions can require 80+ moves for the optimal solution.",
+          },
+          {
+            question: "Can I undo a move?",
+            answer: "Check the game controls — an undo button may be available to reverse the last slide.",
+          },
+          {
+            question: "What is the 15-Puzzle?",
+            answer:
+              "The 15-Puzzle is the classic version with a 4×4 grid and tiles numbered 1–15. It was invented in the 1870s and is one of the most famous mechanical puzzles in history.",
+          },
+          {
+            question: "Is there a timer?",
+            answer:
+              "Yes. A timer tracks how long each puzzle takes to solve. Try to beat your best time on the same grid size.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Tap tiles to slide them. The grid scales to fit any screen size.",
           },
         ]}
       />

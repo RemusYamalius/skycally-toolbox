@@ -12,6 +12,7 @@ import { Progress } from "@/components/ui/progress";
 import { Skeleton } from "@/components/ui/skeleton";
 import { Badge } from "@/components/ui/badge";
 import { Loader2, Heart, MessageSquare, User, X } from "lucide-react";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -53,8 +54,34 @@ function extractVideoId(input: string): string | null {
   return m ? m[1] : null;
 }
 
-const POSITIVE = ["good", "great", "love", "amazing", "excellent", "fantastic", "wonderful", "best", "perfect", "awesome", "nice", "cool", "happy"];
-const NEGATIVE = ["bad", "terrible", "hate", "worst", "awful", "boring", "ugly", "horrible", "sucks", "trash", "stupid"];
+const POSITIVE = [
+  "good",
+  "great",
+  "love",
+  "amazing",
+  "excellent",
+  "fantastic",
+  "wonderful",
+  "best",
+  "perfect",
+  "awesome",
+  "nice",
+  "cool",
+  "happy",
+];
+const NEGATIVE = [
+  "bad",
+  "terrible",
+  "hate",
+  "worst",
+  "awful",
+  "boring",
+  "ugly",
+  "horrible",
+  "sucks",
+  "trash",
+  "stupid",
+];
 const POS_EMOJI = ["👍", "❤️", "😍", "🔥", "💯", "😊", "😁"];
 const NEG_EMOJI = ["👎", "😡", "🤮", "💩", "😠"];
 
@@ -75,7 +102,99 @@ function classify(text: string): Sentiment {
 }
 
 const STOPWORDS = new Set([
-  "the","a","an","is","in","it","of","and","to","for","on","at","by","be","this","that","with","as","are","was","were","or","but","not","you","your","my","me","we","us","our","they","them","their","he","she","his","her","i","im","ive","id","ill","its","so","do","does","did","have","has","had","just","like","get","got","very","much","really","one","all","can","will","would","should","could","there","here","what","when","where","how","why","then","than","also","too","from","about","out","up","down","if","no","yes","im","u","ur","r","n","ya","yo","oh","ah"
+  "the",
+  "a",
+  "an",
+  "is",
+  "in",
+  "it",
+  "of",
+  "and",
+  "to",
+  "for",
+  "on",
+  "at",
+  "by",
+  "be",
+  "this",
+  "that",
+  "with",
+  "as",
+  "are",
+  "was",
+  "were",
+  "or",
+  "but",
+  "not",
+  "you",
+  "your",
+  "my",
+  "me",
+  "we",
+  "us",
+  "our",
+  "they",
+  "them",
+  "their",
+  "he",
+  "she",
+  "his",
+  "her",
+  "i",
+  "im",
+  "ive",
+  "id",
+  "ill",
+  "its",
+  "so",
+  "do",
+  "does",
+  "did",
+  "have",
+  "has",
+  "had",
+  "just",
+  "like",
+  "get",
+  "got",
+  "very",
+  "much",
+  "really",
+  "one",
+  "all",
+  "can",
+  "will",
+  "would",
+  "should",
+  "could",
+  "there",
+  "here",
+  "what",
+  "when",
+  "where",
+  "how",
+  "why",
+  "then",
+  "than",
+  "also",
+  "too",
+  "from",
+  "about",
+  "out",
+  "up",
+  "down",
+  "if",
+  "no",
+  "yes",
+  "im",
+  "u",
+  "ur",
+  "r",
+  "n",
+  "ya",
+  "yo",
+  "oh",
+  "ah",
 ]);
 
 interface Analysis {
@@ -121,7 +240,11 @@ function analyze(comments: Comment[]): Analysis {
     topAuthor,
     avgLength: total ? Math.round(totalLen / total) : 0,
     totalLikes,
-    sentiment: { positive: pct(sentTally.positive), neutral: pct(sentTally.neutral), negative: pct(sentTally.negative) },
+    sentiment: {
+      positive: pct(sentTally.positive),
+      neutral: pct(sentTally.neutral),
+      negative: pct(sentTally.negative),
+    },
     top5,
     words,
   };
@@ -168,7 +291,11 @@ function YouTubeCommentAnalyzer() {
           return;
         }
         let body: any = null;
-        try { body = await res.json(); } catch { /* ignore */ }
+        try {
+          body = await res.json();
+        } catch {
+          /* ignore */
+        }
         const reason = (body?.error || body?.reason || "").toString().toLowerCase();
         if (reason.includes("disabled")) {
           setError("Comments are disabled for this video");
@@ -179,15 +306,17 @@ function YouTubeCommentAnalyzer() {
       }
       const data = await res.json();
       const raw: any[] = Array.isArray(data) ? data : (data.items ?? data.comments ?? []);
-      const mapped: Comment[] = raw.map((it: any) => {
-        const snip = it?.snippet?.topLevelComment?.snippet ?? it?.snippet ?? it;
-        return {
-          author: snip.authorDisplayName ?? snip.author ?? "Anonymous",
-          text: (snip.textDisplay ?? snip.textOriginal ?? snip.text ?? "").replace(/<[^>]+>/g, ""),
-          likes: Number(snip.likeCount ?? snip.likes ?? 0),
-          publishedAt: snip.publishedAt ?? snip.published ?? "",
-        };
-      }).filter((c) => c.text.trim().length > 0);
+      const mapped: Comment[] = raw
+        .map((it: any) => {
+          const snip = it?.snippet?.topLevelComment?.snippet ?? it?.snippet ?? it;
+          return {
+            author: snip.authorDisplayName ?? snip.author ?? "Anonymous",
+            text: (snip.textDisplay ?? snip.textOriginal ?? snip.text ?? "").replace(/<[^>]+>/g, ""),
+            likes: Number(snip.likeCount ?? snip.likes ?? 0),
+            publishedAt: snip.publishedAt ?? snip.published ?? "",
+          };
+        })
+        .filter((c) => c.text.trim().length > 0);
       if (mapped.length === 0) {
         setError("Comments are disabled for this video");
         toast.error("Comments are disabled for this video");
@@ -210,14 +339,20 @@ function YouTubeCommentAnalyzer() {
   };
 
   return (
-    <ToolPageShell title="YouTube Comment Analyzer" description="Fetch and analyze comments from any YouTube video — sentiment, top comments, and a word cloud.">
+    <ToolPageShell
+      showFileDisclaimer={false}
+      title="YouTube Comment Analyzer"
+      description="Fetch and analyze comments from any YouTube video — sentiment, top comments, and a word cloud."
+    >
       <div className="space-y-4">
         <div className="flex flex-col sm:flex-row gap-2">
           <Input
             value={url}
             onChange={(e) => setUrl(e.target.value)}
             placeholder="Paste a YouTube URL or video ID..."
-            onKeyDown={(e) => { if (e.key === "Enter") handleAnalyze(); }}
+            onKeyDown={(e) => {
+              if (e.key === "Enter") handleAnalyze();
+            }}
             disabled={loading}
           />
           <Button onClick={handleAnalyze} disabled={loading || !url.trim()}>
@@ -243,7 +378,11 @@ function YouTubeCommentAnalyzer() {
             <h2 className="font-display text-xl font-semibold mb-3">Overview</h2>
             <div className="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-4 gap-3">
               <OverviewCard label="Total comments" value={analysis.total.toString()} />
-              <OverviewCard label="Most active commenter" value={analysis.topAuthor.name} sub={`${analysis.topAuthor.count} comments`} />
+              <OverviewCard
+                label="Most active commenter"
+                value={analysis.topAuthor.name}
+                sub={`${analysis.topAuthor.count} comments`}
+              />
               <OverviewCard label="Average length" value={`${analysis.avgLength} chars`} />
               <OverviewCard label="Total likes" value={analysis.totalLikes.toLocaleString()} />
             </div>
@@ -336,26 +475,70 @@ function YouTubeCommentAnalyzer() {
         </div>
       )}
 
-      <HowToUse steps={[
-        "Paste any YouTube video URL or video ID into the input.",
-        "Click Analyze to fetch up to 100 comments and review the overview, sentiment, and top comments.",
-        "Click any word in the cloud to filter comments containing it.",
-      ]} />
-      <RelatedTools currentSlug="youtube-comment-analyzer" />
-      <ToolSeoContent
-        title={"YouTube Comment Analyzer — Free Sentiment & Word Cloud Tool"}
-        description={"Analyze YouTube video comments instantly — get sentiment breakdown, top comments by likes, most active commenters, and a word cloud."}
-        body={[
-          "The YouTube Comment Analyzer fetches up to 100 comments from any public YouTube video and turns them into actionable insights. Paste a YouTube link or video ID and instantly see how viewers are reacting — the overall sentiment, who is commenting the most, and which words dominate the conversation.",
-          "Sentiment is detected from common positive and negative keywords and emojis, then displayed as colored progress bars. The top 5 comments by like count surface the responses that other viewers found most valuable, while the word cloud highlights the topics being discussed. Click any word to filter the comments containing it. All analysis happens locally in your browser — the tool only relays the video ID through a lightweight proxy to fetch the public comment thread, and no comments, accounts, or personal data are stored on our servers.",
-        ]}
-        faqs={[
-          { question: "How many comments are analyzed?", answer: "Up to 100 top-level comments per video — the most relevant ones returned by YouTube's public API." },
-          { question: "Why are some videos showing 'Comments are disabled'?", answer: "The video owner has turned off comments on YouTube, so there is nothing for the tool to fetch." },
-          { question: "How is sentiment calculated?", answer: "Each comment is matched against curated lists of positive and negative keywords and emojis. The dominant signal determines whether the comment counts as positive, negative, or neutral." },
-          { question: "Is any data stored?", answer: "No. Comments are fetched on demand, analyzed in your browser, and discarded as soon as you leave the page." },
+      <AdZone id="youtube-comment-analyzer-bottom" size="728x90" />
+
+      <HowToUse
+        steps={[
+          "Paste any YouTube video URL or video ID (e.g. youtube.com/watch?v=... or youtu.be/...).",
+          "Click Analyze — the tool fetches up to 100 comments and shows sentiment, top comments, and a word cloud.",
+          "Click any word in the cloud to filter and read all comments containing that word.",
         ]}
       />
+
+      <ToolSeoContent
+        title="Free YouTube Comment Analyzer — Sentiment, Word Cloud & Top Comments"
+        description="Analyze any YouTube video's comments instantly. Get sentiment breakdown, top comments by likes, most active commenters, and an interactive word cloud. Free, no signup."
+        body={[
+          "Skycally's YouTube Comment Analyzer fetches up to 100 comments from any public YouTube video and transforms them into clear, visual insights. Paste a YouTube URL or video ID and instantly see the overall audience sentiment, the top comments by like count, the most active commenters, and an interactive word cloud highlighting the most discussed topics.",
+          "Sentiment analysis uses keyword and emoji matching to classify each comment as Positive, Negative, or Neutral — displayed as color-coded progress bars showing the percentage breakdown of all fetched comments. This gives content creators, marketers, and researchers a fast reading of how an audience is responding to a video without manually reading hundreds of comments.",
+          "The word cloud is interactive: click any word to instantly filter and read all comments containing that word. This makes it easy to investigate specific topics — click 'camera' on a review video to read all comments mentioning the camera quality, or click 'price' to see what commenters are saying about pricing. The top 5 comments by like count surface the responses other viewers found most valuable.",
+          "All comment analysis happens locally in your browser. The tool relays the video ID through a lightweight Cloudflare Worker to fetch YouTube's public comment thread, but no comments, personal data, or analysis results are stored anywhere. Refresh the page and the data is gone — there is no account, no history, and no tracking.",
+        ]}
+        faqs={[
+          {
+            question: "How many comments are fetched?",
+            answer:
+              "Up to 100 top-level comments per video — the most relevant ones returned by YouTube's public API, typically sorted by relevance.",
+          },
+          {
+            question: "Why are some videos showing 'Comments are disabled'?",
+            answer:
+              "The video owner has disabled comments on YouTube. There is nothing for the tool to fetch in that case.",
+          },
+          {
+            question: "Can I analyze any YouTube video?",
+            answer:
+              "Yes — any public video with comments enabled. Private videos and videos with comments disabled cannot be analyzed.",
+          },
+          {
+            question: "How is sentiment calculated?",
+            answer:
+              "Each comment is matched against curated lists of positive and negative keywords and emojis. The dominant signal determines whether the comment is positive, negative, or neutral.",
+          },
+          {
+            question: "What does the word cloud show?",
+            answer:
+              "The word cloud shows the 20 most frequently used words across all fetched comments, excluding common stop words. Larger words appear more often. Click any word to filter comments containing it.",
+          },
+          {
+            question: "Is any data stored?",
+            answer:
+              "No. Comments are fetched on demand, analyzed in your browser, and discarded when you leave the page. No accounts, no history, no tracking.",
+          },
+          {
+            question: "What is the most active commenter?",
+            answer:
+              "The Overview section shows the commenter who posted the most comments in the fetched batch — useful for identifying power users or spam accounts in a comment thread.",
+          },
+          {
+            question: "Does this work for Shorts and live stream replays?",
+            answer:
+              "Yes. The tool accepts any YouTube URL format including Shorts (youtu.be/...) and live stream replays, as long as the video is public and comments are enabled.",
+          },
+        ]}
+      />
+
+      <RelatedTools currentSlug="youtube-comment-analyzer" />
     </ToolPageShell>
   );
 }
@@ -365,7 +548,9 @@ function OverviewCard({ label, value, sub }: { label: string; value: string; sub
     <Card>
       <CardContent className="p-4">
         <div className="text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
-        <div className="mt-1 text-xl font-semibold truncate" title={value}>{value}</div>
+        <div className="mt-1 text-xl font-semibold truncate" title={value}>
+          {value}
+        </div>
         {sub && <div className="text-xs text-muted-foreground mt-0.5">{sub}</div>}
       </CardContent>
     </Card>

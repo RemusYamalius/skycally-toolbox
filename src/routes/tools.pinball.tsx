@@ -5,6 +5,7 @@ import { Play, RotateCcw, Volume2, VolumeX } from "lucide-react";
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { FlipperZone, PadButton } from "@/components/game-controls";
@@ -51,23 +52,31 @@ const BUMPER_KICK = 8.5;
 const SLING_KICK = 7;
 const MAX_SPEED = 20;
 const FLIPPER_LEN = 64;
-const FLIPPER_REST = -0.45;  // resting: tip angled downward (classic spread pose)
+const FLIPPER_REST = -0.45; // resting: tip angled downward (classic spread pose)
 const FLIPPER_ACTIVE = 0.55; // active: tip swung upward to strike the ball
 const FLIPPER_SPEED = 0.6;
 
 type TableId = "amazon" | "space" | "dragon";
 
 interface Bumper {
-  x: number; y: number; r: number;
+  x: number;
+  y: number;
+  r: number;
   flash: number;
   score: number;
 }
 interface Sling {
-  x1: number; y1: number; x2: number; y2: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
   flash: number;
 }
 interface Target {
-  x: number; y: number; w: number; h: number;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
   hit: boolean;
   group?: string;
   score: number;
@@ -75,7 +84,10 @@ interface Target {
 }
 interface Ramp {
   // a line segment that acts as a one-way wall; entering through it adds score and multiplier
-  x1: number; y1: number; x2: number; y2: number;
+  x1: number;
+  y1: number;
+  x2: number;
+  y2: number;
   label: string;
   score: number;
   flash: number;
@@ -84,7 +96,8 @@ interface Ramp {
 interface TableTheme {
   id: TableId;
   name: string;
-  bg1: string; bg2: string;
+  bg1: string;
+  bg2: string;
   accent: string;
   wallColor: string;
   bumperColor: string;
@@ -97,7 +110,8 @@ const THEMES: Record<TableId, TableTheme> = {
   amazon: {
     id: "amazon",
     name: "Amazon Hunt",
-    bg1: "#0a3b1f", bg2: "#06210f",
+    bg1: "#0a3b1f",
+    bg2: "#06210f",
     accent: "#fbbf24",
     wallColor: "#854d0e",
     bumperColor: "#facc15",
@@ -108,7 +122,8 @@ const THEMES: Record<TableId, TableTheme> = {
   space: {
     id: "space",
     name: "Space Odyssey",
-    bg1: "#0b1140", bg2: "#040622",
+    bg1: "#0b1140",
+    bg2: "#040622",
     accent: "#22d3ee",
     wallColor: "#6366f1",
     bumperColor: "#a78bfa",
@@ -119,7 +134,8 @@ const THEMES: Record<TableId, TableTheme> = {
   dragon: {
     id: "dragon",
     name: "Dragon's Lair",
-    bg1: "#3b0a0a", bg2: "#1a0303",
+    bg1: "#3b0a0a",
+    bg2: "#1a0303",
     accent: "#f97316",
     wallColor: "#7c2d12",
     bumperColor: "#ef4444",
@@ -192,9 +208,7 @@ function buildTable(id: TableId): {
       { x1: 70, y1: 440, x2: 130, y2: 500, flash: 0 },
       { x1: 350, y1: 440, x2: 290, y2: 500, flash: 0 },
     ],
-    targets: [
-      { x: 180, y: 260, w: 60, h: 14, hit: false, group: "dragon", score: 400, flash: 0 },
-    ],
+    targets: [{ x: 180, y: 260, w: 60, h: 14, hit: false, group: "dragon", score: 400, flash: 0 }],
     ramps: [
       { x1: 40, y1: 340, x2: 100, y2: 320, label: "Castle Ramp", score: 500, flash: 0 },
       { x1: 380, y1: 340, x2: 320, y2: 320, label: "Drawbridge", score: 500, flash: 0 },
@@ -213,9 +227,12 @@ class SoundEngine {
     if (typeof window === "undefined") return null;
     if (!this.ctx) {
       try {
-        const Ctor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+        const Ctor =
+          window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
         this.ctx = new Ctor();
-      } catch { /* noop */ }
+      } catch {
+        /* noop */
+      }
     }
     if (this.ctx?.state === "suspended") this.ctx.resume().catch(() => {});
     return this.ctx;
@@ -257,11 +274,22 @@ class SoundEngine {
     src.start();
   }
 
-  flipper() { this.noise(0.04, 0.18, 2000); this.beep(900, 0.05, "square", 0.06); }
-  launch() { this.beep(220, 0.35, "sawtooth", 0.18, 80); }
-  bumper() { this.beep(700, 0.1, "square", 0.18, 400); }
-  ramp()   { this.noise(0.25, 0.08, 600); }
-  target() { this.beep(180, 0.18, "sine", 0.2, 90); }
+  flipper() {
+    this.noise(0.04, 0.18, 2000);
+    this.beep(900, 0.05, "square", 0.06);
+  }
+  launch() {
+    this.beep(220, 0.35, "sawtooth", 0.18, 80);
+  }
+  bumper() {
+    this.beep(700, 0.1, "square", 0.18, 400);
+  }
+  ramp() {
+    this.noise(0.25, 0.08, 600);
+  }
+  target() {
+    this.beep(180, 0.18, "sine", 0.2, 90);
+  }
   multiball() {
     [523, 659, 784, 1046].forEach((f, i) => setTimeout(() => this.beep(f, 0.25, "triangle", 0.18), i * 90));
   }
@@ -272,7 +300,9 @@ class SoundEngine {
   jingle() {
     [523, 659, 784, 1046, 1318].forEach((f, i) => setTimeout(() => this.beep(f, 0.22, "triangle", 0.2), i * 110));
   }
-  tilt() { this.beep(80, 0.2, "square", 0.22); }
+  tilt() {
+    this.beep(80, 0.2, "square", 0.22);
+  }
   shootAgain() {
     [600, 900].forEach((f, i) => setTimeout(() => this.beep(f, 0.18, "triangle", 0.18), i * 120));
   }
@@ -284,7 +314,7 @@ class SoundEngine {
     if (!ctx) return;
     const scales: Record<TableId, number[]> = {
       amazon: [196, 233, 262, 294, 349, 392, 440],
-      space:  [220, 277, 330, 370, 415, 466, 554],
+      space: [220, 277, 330, 370, 415, 466, 554],
       dragon: [165, 196, 220, 247, 277, 330, 370],
     };
     const scale = scales[table];
@@ -308,25 +338,39 @@ class SoundEngine {
     }, tempo);
   }
   stopBg() {
-    if (this.bgInterval !== null) { clearInterval(this.bgInterval); this.bgInterval = null; }
+    if (this.bgInterval !== null) {
+      clearInterval(this.bgInterval);
+      this.bgInterval = null;
+    }
   }
 }
 
 // ---------- Geometry helpers ----------
 function reflectCircleSegment(
-  bx: number, by: number, vx: number, vy: number, r: number,
-  x1: number, y1: number, x2: number, y2: number
+  bx: number,
+  by: number,
+  vx: number,
+  vy: number,
+  r: number,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
 ): { hit: boolean; nx?: number; ny?: number; vx?: number; vy?: number; bx?: number; by?: number } {
-  const dx = x2 - x1, dy = y2 - y1;
+  const dx = x2 - x1,
+    dy = y2 - y1;
   const len2 = dx * dx + dy * dy || 1;
   let t = ((bx - x1) * dx + (by - y1) * dy) / len2;
   t = Math.max(0, Math.min(1, t));
-  const px = x1 + dx * t, py = y1 + dy * t;
-  const ox = bx - px, oy = by - py;
+  const px = x1 + dx * t,
+    py = y1 + dy * t;
+  const ox = bx - px,
+    oy = by - py;
   const dist2 = ox * ox + oy * oy;
   if (dist2 > r * r) return { hit: false };
   const dist = Math.sqrt(dist2) || 0.001;
-  const nx = ox / dist, ny = oy / dist;
+  const nx = ox / dist,
+    ny = oy / dist;
   const vDotN = vx * nx + vy * ny;
   if (vDotN > 0) return { hit: false };
   const nvx = (vx - 2 * vDotN * nx) * WALL_REST;
@@ -335,7 +379,13 @@ function reflectCircleSegment(
   return { hit: true, nx, ny, vx: nvx, vy: nvy, bx: bx + nx * push, by: by + ny * push };
 }
 
-interface Ball { x: number; y: number; vx: number; vy: number; stuck: boolean; }
+interface Ball {
+  x: number;
+  y: number;
+  vx: number;
+  vy: number;
+  stuck: boolean;
+}
 
 function PinballPage() {
   const canvasRef = useRef<HTMLCanvasElement>(null);
@@ -355,7 +405,7 @@ function PinballPage() {
   const dataRef = useRef(buildTable("amazon"));
   const ballsArrRef = useRef<Ball[]>([]);
   const onPlateRef = useRef(true); // ball on plunger
-  const plungerRef = useRef(0);    // 0..1 charge
+  const plungerRef = useRef(0); // 0..1 charge
   const flipperLRef = useRef(FLIPPER_REST);
   const flipperRRef = useRef(FLIPPER_REST);
   const flipperLTargetRef = useRef(FLIPPER_REST);
@@ -381,12 +431,18 @@ function PinballPage() {
   const keysRef = useRef({ L: false, R: false, launch: false, nudge: false });
 
   // ---------- Lifecycle ----------
-  useEffect(() => () => {
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    soundRef.current.stopBg();
-  }, []);
+  useEffect(
+    () => () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      soundRef.current.stopBg();
+    },
+    [],
+  );
 
-  useEffect(() => { mutedRef.current = muted; soundRef.current.muted = muted; }, [muted]);
+  useEffect(() => {
+    mutedRef.current = muted;
+    soundRef.current.muted = muted;
+  }, [muted]);
 
   const resetBall = useCallback(() => {
     ballsArrRef.current = [{ x: W - 18, y: H - 80, vx: 0, vy: 0, stuck: true }];
@@ -394,28 +450,35 @@ function PinballPage() {
     plungerRef.current = 0;
   }, []);
 
-  const newGame = useCallback((t: TableId) => {
-    tableRef.current = t;
-    dataRef.current = buildTable(t);
-    scoreRef.current = 0; setScore(0);
-    multRef.current = 1; setMultiplier(1);
-    ballsLeftRef.current = 3; setBalls(3);
-    tiltRef.current = 0; setTiltMeter(0);
-    dragonHitsRef.current = 0;
-    hyperspaceUntilRef.current = 0;
-    shootAgainRef.current = false;
-    overRef.current = false;
-    setGameOver(false);
-    setStatusMsg("");
-    resetBall();
-    setRunning(true);
-    runningRef.current = true;
-    soundRef.current.ensure();
-    soundRef.current.startBg(t);
-    if (rafRef.current) cancelAnimationFrame(rafRef.current);
-    rafRef.current = requestAnimationFrame(loop);
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, [resetBall]);
+  const newGame = useCallback(
+    (t: TableId) => {
+      tableRef.current = t;
+      dataRef.current = buildTable(t);
+      scoreRef.current = 0;
+      setScore(0);
+      multRef.current = 1;
+      setMultiplier(1);
+      ballsLeftRef.current = 3;
+      setBalls(3);
+      tiltRef.current = 0;
+      setTiltMeter(0);
+      dragonHitsRef.current = 0;
+      hyperspaceUntilRef.current = 0;
+      shootAgainRef.current = false;
+      overRef.current = false;
+      setGameOver(false);
+      setStatusMsg("");
+      resetBall();
+      setRunning(true);
+      runningRef.current = true;
+      soundRef.current.ensure();
+      soundRef.current.startBg(t);
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+      rafRef.current = requestAnimationFrame(loop);
+      // eslint-disable-next-line react-hooks/exhaustive-deps
+    },
+    [resetBall],
+  );
 
   const flashStatus = (msg: string, ms = 1500) => {
     setStatusMsg(msg);
@@ -445,7 +508,14 @@ function PinballPage() {
     for (let i = 0; i < n; i++) {
       const a = Math.random() * Math.PI * 2;
       const sp = 1 + Math.random() * 3;
-      particlesRef.current.push({ x, y, vx: Math.cos(a) * sp, vy: Math.sin(a) * sp, life: 20 + Math.random() * 20, color });
+      particlesRef.current.push({
+        x,
+        y,
+        vx: Math.cos(a) * sp,
+        vy: Math.sin(a) * sp,
+        life: 20 + Math.random() * 20,
+        color,
+      });
     }
   };
 
@@ -473,7 +543,8 @@ function PinballPage() {
     setBalls(ballsLeftRef.current);
     // bonus
     addScore(500);
-    multRef.current = 1; setMultiplier(1);
+    multRef.current = 1;
+    setMultiplier(1);
     if (ballsLeftRef.current <= 0) {
       overRef.current = true;
       setGameOver(true);
@@ -481,7 +552,10 @@ function PinballPage() {
       runningRef.current = false;
       soundRef.current.stopBg();
       soundRef.current.jingle();
-      if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
       return;
     }
     if (scoreRef.current > 5000 && !shootAgainRef.current) {
@@ -523,20 +597,23 @@ function PinballPage() {
     const theme = THEMES[tableRef.current];
 
     // Walls (outer)
-    if (ball.x < BALL_R + 8) { ball.x = BALL_R + 8; ball.vx = -ball.vx * WALL_REST; }
-    if (ball.x > W - BALL_R - 8) { ball.x = W - BALL_R - 8; ball.vx = -ball.vx * WALL_REST; }
-    if (ball.y < BALL_R + 8) { ball.y = BALL_R + 8; ball.vy = -ball.vy * WALL_REST; }
+    if (ball.x < BALL_R + 8) {
+      ball.x = BALL_R + 8;
+      ball.vx = -ball.vx * WALL_REST;
+    }
+    if (ball.x > W - BALL_R - 8) {
+      ball.x = W - BALL_R - 8;
+      ball.vx = -ball.vx * WALL_REST;
+    }
+    if (ball.y < BALL_R + 8) {
+      ball.y = BALL_R + 8;
+      ball.vy = -ball.vy * WALL_REST;
+    }
 
     // Plunger lane wall (vertical at x = W - 28). Only blocks the ball when it
     // approaches the wall from the playfield (left) side — never teleport a
     // ball that's currently inside the lane (e.g. just after launch).
-    if (
-      ball.x > W - 28 - BALL_R &&
-      ball.x < W - 28 &&
-      ball.vx > 0 &&
-      ball.y > 70 &&
-      ball.y < H - 130
-    ) {
+    if (ball.x > W - 28 - BALL_R && ball.x < W - 28 && ball.vx > 0 && ball.y > 70 && ball.y < H - 130) {
       ball.x = W - 28 - BALL_R;
       ball.vx = -Math.abs(ball.vx) * WALL_REST;
     }
@@ -545,27 +622,44 @@ function PinballPage() {
     // Left slope: from (8, H-200) to (130, H-80)
     {
       const r = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, 8, H - 200, 130, H - 80);
-      if (r.hit && r.bx !== undefined) { ball.x = r.bx; ball.y = r.by!; ball.vx = r.vx!; ball.vy = r.vy!; }
+      if (r.hit && r.bx !== undefined) {
+        ball.x = r.bx;
+        ball.y = r.by!;
+        ball.vx = r.vx!;
+        ball.vy = r.vy!;
+      }
     }
     // Right slope: from (W-30, H-130) to (W-130, H-80) — kept clear of the plunger lane
     {
       const r = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, W - 30, H - 130, W - 130, H - 80);
-      if (r.hit && r.bx !== undefined) { ball.x = r.bx; ball.y = r.by!; ball.vx = r.vx!; ball.vy = r.vy!; }
+      if (r.hit && r.bx !== undefined) {
+        ball.x = r.bx;
+        ball.y = r.by!;
+        ball.vx = r.vx!;
+        ball.vy = r.vy!;
+      }
     }
     // Plunger-lane deflector arch: redirects balls exiting the lane to the left,
     // into the playfield. Segment from (W-8, 60) to (W-95, 14).
     {
       const r = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, W - 8, 60, W - 95, 14);
-      if (r.hit && r.bx !== undefined) { ball.x = r.bx; ball.y = r.by!; ball.vx = r.vx!; ball.vy = r.vy!; }
+      if (r.hit && r.bx !== undefined) {
+        ball.x = r.bx;
+        ball.y = r.by!;
+        ball.vx = r.vx!;
+        ball.vy = r.vy!;
+      }
     }
 
     // Bumpers (circles)
     for (const b of data.bumpers) {
-      const dx = ball.x - b.x, dy = ball.y - b.y;
+      const dx = ball.x - b.x,
+        dy = ball.y - b.y;
       const dist = Math.hypot(dx, dy);
       const minD = BALL_R + b.r;
       if (dist < minD) {
-        const nx = dx / (dist || 1), ny = dy / (dist || 1);
+        const nx = dx / (dist || 1),
+          ny = dy / (dist || 1);
         ball.x = b.x + nx * minD;
         ball.y = b.y + ny * minD;
         const sp = Math.hypot(ball.vx, ball.vy);
@@ -583,7 +677,8 @@ function PinballPage() {
     for (const s of data.slings) {
       const r = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, s.x1, s.y1, s.x2, s.y2);
       if (r.hit && r.bx !== undefined) {
-        ball.x = r.bx; ball.y = r.by!;
+        ball.x = r.bx;
+        ball.y = r.by!;
         // amplify
         const sp = Math.hypot(r.vx!, r.vy!);
         const k = Math.max(SLING_KICK, sp);
@@ -637,8 +732,10 @@ function PinballPage() {
     for (const r of data.ramps) {
       const res = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, r.x1, r.y1, r.x2, r.y2);
       if (res.hit && res.bx !== undefined) {
-        ball.x = res.bx; ball.y = res.by!;
-        ball.vx = res.vx!; ball.vy = res.vy! - 1.5;
+        ball.x = res.bx;
+        ball.y = res.by!;
+        ball.vx = res.vx!;
+        ball.vy = res.vy! - 1.5;
         r.flash = 12;
         addScore(r.score);
         soundRef.current.ramp();
@@ -647,13 +744,15 @@ function PinballPage() {
     }
 
     // Flippers — kick magnitude scales with current angular velocity (set in step()).
-    const lAngVel = (flipperLRef.current - flipperLPrevRef.current); // per-frame
-    const rAngVel = (flipperRRef.current - flipperRPrevRef.current);
+    const lAngVel = flipperLRef.current - flipperLPrevRef.current; // per-frame
+    const rAngVel = flipperRRef.current - flipperRPrevRef.current;
     const { lAnchor, rAnchor, lTip, rTip } = flipperEndpoints();
     const lFlap = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, lAnchor.x, lAnchor.y, lTip.x, lTip.y);
     if (lFlap.hit && lFlap.bx !== undefined) {
-      ball.x = lFlap.bx; ball.y = lFlap.by!;
-      ball.vx = lFlap.vx!; ball.vy = lFlap.vy!;
+      ball.x = lFlap.bx;
+      ball.y = lFlap.by!;
+      ball.vx = lFlap.vx!;
+      ball.vy = lFlap.vy!;
       // Kick on upswing (angle increasing). Base impulse always present so a
       // resting flipper still bounces the ball back, swinging flipper launches it.
       const kick = Math.max(0, lAngVel) * 36 + 2.5;
@@ -662,8 +761,10 @@ function PinballPage() {
     }
     const rFlap = reflectCircleSegment(ball.x, ball.y, ball.vx, ball.vy, BALL_R, rAnchor.x, rAnchor.y, rTip.x, rTip.y);
     if (rFlap.hit && rFlap.bx !== undefined) {
-      ball.x = rFlap.bx; ball.y = rFlap.by!;
-      ball.vx = rFlap.vx!; ball.vy = rFlap.vy!;
+      ball.x = rFlap.bx;
+      ball.y = rFlap.by!;
+      ball.vx = rFlap.vx!;
+      ball.vy = rFlap.vy!;
       const kick = Math.max(0, rAngVel) * 36 + 2.5;
       ball.vy -= kick;
       ball.vx -= kick * 0.35;
@@ -711,7 +812,10 @@ function PinballPage() {
 
     // Particles update
     particlesRef.current = particlesRef.current.filter((p) => {
-      p.x += p.vx; p.y += p.vy; p.vy += 0.1; p.life -= 1;
+      p.x += p.vx;
+      p.y += p.vy;
+      p.vy += 0.1;
+      p.life -= 1;
       return p.life > 0;
     });
 
@@ -725,7 +829,8 @@ function PinballPage() {
       const cap = Math.min(MAX_SPEED * speedMul, sp);
       if (sp > 0.001) {
         const k = cap / Math.hypot(ball.vx, ball.vy);
-        ball.vx *= k; ball.vy *= k;
+        ball.vx *= k;
+        ball.vy *= k;
       }
       const substeps = 5;
       for (let s = 0; s < substeps; s++) {
@@ -787,10 +892,13 @@ function PinballPage() {
     ctx.lineWidth = 5;
     ctx.strokeStyle = theme.wallColor;
     ctx.beginPath();
-    ctx.moveTo(8, H - 200); ctx.lineTo(130, H - 80);
-    ctx.moveTo(W - 30, H - 130); ctx.lineTo(W - 130, H - 80);
+    ctx.moveTo(8, H - 200);
+    ctx.lineTo(130, H - 80);
+    ctx.moveTo(W - 30, H - 130);
+    ctx.lineTo(W - 130, H - 80);
     // Plunger-lane deflector arch (top-right)
-    ctx.moveTo(W - 8, 60); ctx.lineTo(W - 95, 14);
+    ctx.moveTo(W - 8, 60);
+    ctx.lineTo(W - 95, 14);
     ctx.stroke();
 
     // Ramps
@@ -798,7 +906,8 @@ function PinballPage() {
       ctx.strokeStyle = r.flash > 0 ? "#ffffff" : theme.rampColor;
       ctx.lineWidth = r.flash > 0 ? 8 : 5;
       ctx.beginPath();
-      ctx.moveTo(r.x1, r.y1); ctx.lineTo(r.x2, r.y2);
+      ctx.moveTo(r.x1, r.y1);
+      ctx.lineTo(r.x2, r.y2);
       ctx.stroke();
       ctx.fillStyle = "rgba(255,255,255,0.5)";
       ctx.font = "9px sans-serif";
@@ -810,7 +919,8 @@ function PinballPage() {
       ctx.strokeStyle = s.flash > 0 ? "#fff" : theme.accent;
       ctx.lineWidth = s.flash > 0 ? 8 : 5;
       ctx.beginPath();
-      ctx.moveTo(s.x1, s.y1); ctx.lineTo(s.x2, s.y2);
+      ctx.moveTo(s.x1, s.y1);
+      ctx.lineTo(s.x2, s.y2);
       ctx.stroke();
     }
 
@@ -844,8 +954,10 @@ function PinballPage() {
     ctx.lineWidth = 12;
     ctx.lineCap = "round";
     ctx.beginPath();
-    ctx.moveTo(lAnchor.x, lAnchor.y); ctx.lineTo(lTip.x, lTip.y);
-    ctx.moveTo(rAnchor.x, rAnchor.y); ctx.lineTo(rTip.x, rTip.y);
+    ctx.moveTo(lAnchor.x, lAnchor.y);
+    ctx.lineTo(lTip.x, lTip.y);
+    ctx.moveTo(rAnchor.x, rAnchor.y);
+    ctx.lineTo(rTip.x, rTip.y);
     ctx.stroke();
     ctx.lineCap = "butt";
 
@@ -895,9 +1007,17 @@ function PinballPage() {
   useEffect(() => {
     const down = (e: KeyboardEvent) => {
       if (e.key === "z" || e.key === "Z" || e.key === "ArrowLeft") {
-        if (!keysRef.current.L) { keysRef.current.L = true; flipperLTargetRef.current = FLIPPER_ACTIVE; soundRef.current.flipper(); }
+        if (!keysRef.current.L) {
+          keysRef.current.L = true;
+          flipperLTargetRef.current = FLIPPER_ACTIVE;
+          soundRef.current.flipper();
+        }
       } else if (e.key === "/" || e.key === "ArrowRight") {
-        if (!keysRef.current.R) { keysRef.current.R = true; flipperRTargetRef.current = FLIPPER_ACTIVE; soundRef.current.flipper(); }
+        if (!keysRef.current.R) {
+          keysRef.current.R = true;
+          flipperRTargetRef.current = FLIPPER_ACTIVE;
+          soundRef.current.flipper();
+        }
       } else if (e.key === " ") {
         e.preventDefault();
         if (onPlateRef.current && runningRef.current) keysRef.current.launch = true;
@@ -907,9 +1027,11 @@ function PinballPage() {
     };
     const up = (e: KeyboardEvent) => {
       if (e.key === "z" || e.key === "Z" || e.key === "ArrowLeft") {
-        keysRef.current.L = false; flipperLTargetRef.current = FLIPPER_REST;
+        keysRef.current.L = false;
+        flipperLTargetRef.current = FLIPPER_REST;
       } else if (e.key === "/" || e.key === "ArrowRight") {
-        keysRef.current.R = false; flipperRTargetRef.current = FLIPPER_REST;
+        keysRef.current.R = false;
+        flipperRTargetRef.current = FLIPPER_REST;
       } else if (e.key === " ") {
         if (onPlateRef.current) {
           const charge = Math.max(plungerRef.current, 0.25);
@@ -935,7 +1057,9 @@ function PinballPage() {
   }, []);
 
   // Initial draw
-  useEffect(() => { draw(); }, [draw]);
+  useEffect(() => {
+    draw();
+  }, [draw]);
 
   // ---------- Touch button handlers ----------
   const pressLeft = (down: boolean) => {
@@ -981,7 +1105,11 @@ function PinballPage() {
   const theme = THEMES[table];
 
   return (
-    <ToolPageShell title="Pinball" description="Choose your table and beat the high score. Classic arcade pinball!">
+    <ToolPageShell
+      showFileDisclaimer={false}
+      title="Pinball"
+      description="Choose your table and beat the high score. Classic arcade pinball!"
+    >
       <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
         {/* Stats */}
         <div className="flex justify-center gap-2 mb-4 flex-wrap">
@@ -1098,41 +1226,84 @@ function PinballPage() {
         {/* Mobile touch controls */}
         <div className="sm:hidden mt-4 space-y-2">
           <div className="grid grid-cols-2 gap-2">
-            <PadButton onPress={tapLaunch} className="h-14 text-sm">🚀 LAUNCH</PadButton>
-            <PadButton onPress={tapNudge} className="h-14 text-sm">↕ NUDGE</PadButton>
+            <PadButton onPress={tapLaunch} className="h-14 text-sm">
+              🚀 LAUNCH
+            </PadButton>
+            <PadButton onPress={tapNudge} className="h-14 text-sm">
+              ↕ NUDGE
+            </PadButton>
           </div>
           <div className="grid grid-cols-2 gap-2">
             <FlipperZone side="left" onPress={() => pressLeft(true)} onRelease={() => pressLeft(false)} />
             <FlipperZone side="right" onPress={() => pressRight(true)} onRelease={() => pressRight(false)} />
           </div>
-          <p className="text-[11px] text-muted-foreground text-center pt-1">Hold the flipper zones — they're full-width for easy thumb reach.</p>
+          <p className="text-[11px] text-muted-foreground text-center pt-1">
+            Hold the flipper zones — they're full-width for easy thumb reach.
+          </p>
         </div>
-
 
         <p className="text-xs text-muted-foreground text-center mt-4">
           Desktop: Z / ← left flipper · / / → right flipper · Space launch (hold to charge) · X nudge
         </p>
       </div>
 
-      <HowToUse steps={[
-        "Pick a table — Amazon Hunt, Space Odyssey, or Dragon's Lair — each with its own theme and special mode.",
-        "Hold Space (or tap Launch) to charge the plunger and shoot the ball into play.",
-        "Use Z / left arrow and / / right arrow to flip. Hit bumpers, ramps, and targets to score and trigger specials. Don't drain all 3 balls!",
-      ]} />
+      <AdZone id="pinball-bottom" size="728x90" />
+
+      <HowToUse
+        steps={[
+          "Pick a table — Amazon Hunt, Space Odyssey, or Dragon's Lair — each with its own theme and special mode.",
+          "Hold Space (or tap Launch) to charge the plunger and shoot the ball into play.",
+          "Use Z / left arrow and / / right arrow to flip. Hit bumpers, ramps, and targets to score and trigger specials. Don't drain all 3 balls!",
+        ]}
+      />
 
       <ToolSeoContent
-        title="Pinball — Free Online Arcade Game, No Download"
-        description="Play classic arcade pinball free in your browser. Three full tables with realistic physics, multiball, multipliers, and full sound effects — no download, no signup."
+        title="Free Pinball Game Online — Classic Arcade Pinball in Your Browser"
+        description="Play Pinball free online. Launch the ball, use flippers to keep it in play, and score points by hitting bumpers and targets. Classic arcade fun. No signup."
         body={[
-          "Pinball is the timeless arcade classic, reimagined here as a smooth, browser-based game that runs on any device. Pick from three distinct themed tables — Amazon Hunt with its lush jungle bumpers, Space Odyssey with its wormhole multiball loop, and Dragon's Lair with its fire-breathing target — each with its own visual style, color palette, and special game mode. The physics engine simulates real pinball: gravity pulls the ball, bumpers send it flying with satisfying pops, slingshots add chaos, and your flippers can impart real momentum when timed right.",
-          "Every table has the same goal: keep the ball in play for as long as possible, light up the bumpers and targets, hit the ramps to climb your score multiplier from 1× all the way to 5×, and trigger the table's special mode for a massive bonus. Drain the ball and you lose one — three balls per game, plus a Shoot Again reward when you cross the score threshold. The classic tilt mechanic is there too: nudge gently with X to nudge the ball, but lean on it too hard and you'll lose the ball to a TILT penalty.",
-          "Everything runs locally in your browser — no installs, no signup, no ads. Full Web Audio sound design gives every bumper, ramp, and multiball its own unmistakable noise, and you can mute it any time. On mobile, dedicated touch buttons replace the keyboard so your left and right thumbs handle the flippers naturally. Beat your high score, switch tables, and keep flipping.",
+          "Skycally's Pinball brings the classic arcade experience to your browser — complete with flippers, bumpers, ramps, and targets. Launch the ball with the plunger, then use the left and right flippers to keep it in play while scoring points by hitting various targets around the table. Multi-ball modes and special targets unlock bonus scoring opportunities.",
+          "Physical pinball machines have been a fixture of arcades since the 1940s, when manufacturers added flippers to transform passive ball-rolling games into active skill games. The golden age of pinball was the 1980s and 1990s, when elaborate themed tables dominated arcades worldwide. Digital pinball preserves the satisfying flipper physics and scoring systems of these classic machines.",
+          "Scoring big requires more than keeping the ball alive. Target specific high-value areas — bumpers score on every hit, ramps award multipliers, and special targets can activate multiball or bonus modes. The skill of 'nudging' (gently tilting the table to influence ball direction) is represented in digital pinball by precise flipper timing.",
+          "Pinball is a game of controlled chaos — the ball behaves physically but unpredictably. Expert players read ball momentum and position flippers in anticipation rather than reaction. Trapping the ball on a stationary flipper for a moment gives you time to plan your next shot — a technique called 'post passing' in competitive pinball.",
         ]}
         faqs={[
-          { question: "How do I control Pinball?", answer: "On desktop, use Z or the left arrow for the left flipper, / or the right arrow for the right flipper, Space to charge and launch the ball (hold longer for more power), and X to nudge the table. On mobile, tap the on-screen Left, Right, Launch, and Nudge buttons." },
-          { question: "What are the three tables?", answer: "Amazon Hunt is the default jungle-themed table with 3 bumpers, 2 ramps, and a multiball Amazon Bonus when you clear all 4 targets. Space Odyssey is a neon space table with a wormhole loop that triggers Hyperspace (2× ball speed for 10 seconds). Dragon's Lair is a medieval fantasy table where hitting the dragon target three times triggers a massive Dragon Fire bonus." },
-          { question: "How does the multiplier work?", answer: "Every time you complete a ramp shot, your score multiplier goes up one step: 1× → 2× → 3× → 5×. The multiplier resets at the end of each ball, so use it while it lasts. Multiball and special modes stack with the multiplier for huge scores." },
-          { question: "Does Pinball work on mobile?", answer: "Yes. The game is fully responsive and includes dedicated touch buttons for both flippers, the plunger, and the nudge action. Sound works on mobile too, but it requires you to tap the screen first because of browser audio policies." },
+          {
+            question: "How do I control the flippers?",
+            answer:
+              "Press Z or Left Arrow for the left flipper and X or Right Arrow for the right flipper on desktop. On mobile, tap the left or right side of the screen.",
+          },
+          {
+            question: "How do I launch the ball?",
+            answer:
+              "Pull back the plunger with the mouse or hold the launch button, then release to fire the ball onto the table.",
+          },
+          {
+            question: "What are bumpers?",
+            answer:
+              "Bumpers are round targets in the middle of the table that score points and send the ball bouncing in a random direction when hit.",
+          },
+          {
+            question: "What ends a ball?",
+            answer:
+              "When the ball passes both flippers and drains through the bottom of the table, you lose the ball. After all balls are lost, the game ends.",
+          },
+          {
+            question: "How many balls do I get?",
+            answer: "Typically 3 balls per game. The ball count is shown in the game HUD.",
+          },
+          {
+            question: "Is my high score saved?",
+            answer: "Yes. Your best score is saved in your browser's localStorage.",
+          },
+          {
+            question: "What is multiball?",
+            answer:
+              "Multiball is a bonus mode that puts multiple balls in play simultaneously — scoring multiplies while you keep all balls alive.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Tap the left or right side of the screen to control the respective flipper.",
+          },
         ]}
       />
 

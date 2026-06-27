@@ -5,16 +5,10 @@ import { RotateCcw, Undo2, Trophy, Lightbulb } from "lucide-react";
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
-import {
-  Dialog,
-  DialogContent,
-  DialogHeader,
-  DialogTitle,
-  DialogDescription,
-} from "@/components/ui/dialog";
-
+import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogDescription } from "@/components/ui/dialog";
 
 const PATH = "/tools/solitaire";
 const TITLE = "Solitaire — Free Online Card Game, No Download";
@@ -141,8 +135,7 @@ function findHint(s: GameState): Hint | null {
   if (s.waste.length) {
     const c = s.waste[s.waste.length - 1];
     for (let i = 0; i < 4; i++)
-      if (canPlaceOnFoundation(c, s.foundations[i]))
-        return { fromPile: "W", cardId: c.id, toPile: `F${i}` as Pile };
+      if (canPlaceOnFoundation(c, s.foundations[i])) return { fromPile: "W", cardId: c.id, toPile: `F${i}` as Pile };
   }
   // 2. Tableau top -> foundation
   for (let t = 0; t < 7; t++) {
@@ -160,8 +153,7 @@ function findHint(s: GameState): Hint | null {
     for (let t = 0; t < 7; t++) {
       const col = s.tableau[t];
       const dest = col[col.length - 1];
-      if (canPlaceOnTableau(c, dest))
-        return { fromPile: "W", cardId: c.id, toPile: `T${t}` as Pile };
+      if (canPlaceOnTableau(c, dest)) return { fromPile: "W", cardId: c.id, toPile: `T${t}` as Pile };
     }
   }
   // 4. Tableau face-up sub-stack -> another tableau (reveals or empties)
@@ -182,7 +174,6 @@ function findHint(s: GameState): Hint | null {
   return null;
 }
 
-
 // ---------- Component ----------
 function SolitairePage() {
   const [state, setState] = useState<GameState>(() => newGame());
@@ -194,7 +185,6 @@ function SolitairePage() {
   const [won, setWon] = useState(false);
   const [hint, setHint] = useState<Hint | null>(null);
   const hintTimerRef = useRef<number | null>(null);
-
 
   useEffect(() => {
     const raw = localStorage.getItem("solitaire-best-time");
@@ -248,10 +238,12 @@ function SolitairePage() {
     hintTimerRef.current = window.setTimeout(() => setHint(null), 2200);
   }, [state]);
 
-  useEffect(() => () => {
-    if (hintTimerRef.current != null) window.clearTimeout(hintTimerRef.current);
-  }, []);
-
+  useEffect(
+    () => () => {
+      if (hintTimerRef.current != null) window.clearTimeout(hintTimerRef.current);
+    },
+    [],
+  );
 
   const apply = useCallback(
     (mutator: (draft: GameState) => boolean) => {
@@ -314,7 +306,6 @@ function SolitairePage() {
     clearHint();
   };
 
-
   // Try auto-move card to a foundation
   const tryAutoFoundation = (from: Pile, cardId: string) => {
     apply((draft) => {
@@ -367,6 +358,7 @@ function SolitairePage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Solitaire"
       description="Move all cards to the foundation piles to win. Classic Klondike Solitaire!"
     >
@@ -375,11 +367,7 @@ function SolitairePage() {
         <div className="flex justify-center gap-3 mb-4 flex-wrap">
           <Stat label="Moves" value={String(state.moves)} color="text-foreground" />
           <Stat label="Time" value={formatTime(seconds)} color="text-cyan-400" />
-          <Stat
-            label="Best"
-            value={bestTime != null ? formatTime(bestTime) : "—"}
-            color="text-yellow-400"
-          />
+          <Stat label="Best" value={bestTime != null ? formatTime(bestTime) : "—"} color="text-yellow-400" />
         </div>
 
         {/* Controls */}
@@ -459,6 +447,7 @@ function SolitairePage() {
         </DialogContent>
       </Dialog>
 
+      <AdZone id="solitaire-bottom" size="728x90" />
 
       <HowToUse
         steps={[
@@ -469,32 +458,52 @@ function SolitairePage() {
       />
 
       <ToolSeoContent
-        title="Solitaire — Free Online Klondike Card Game"
-        description="Play Klondike Solitaire free in your browser with drag-and-drop controls, undo, and a timer. No download, no signup, works on mobile."
+        title="Free Solitaire Card Game Online — Classic Klondike Solitaire"
+        description="Play classic Klondike Solitaire free online. Build four foundation piles from Ace to King. Free, no signup, works on mobile and desktop."
         body={[
-          "Klondike Solitaire is the most popular single-player card game in the world — the one that comes installed on nearly every computer. The goal is simple: move all 52 cards from the seven tableau columns up to four foundation piles, building each foundation by suit from Ace to King. Along the way, you build descending stacks in the tableau using alternating red and black cards, drawing from the stock pile whenever you run out of legal moves.",
-          "Our version runs entirely in your browser — no downloads, no ads, no signup. Drag cards with your mouse on desktop or with your finger on mobile. Double-click any card to send it instantly to the right foundation when possible. Choose Draw 1 for a relaxing game with great winning odds, or Draw 3 for a tougher, more strategic experience. A move counter and timer track every game, and your best completion time is saved locally so you can keep beating your own record.",
+          "Skycally's Solitaire is a faithful implementation of Klondike Solitaire — the most popular single-player card game in the world. Build four foundation piles (one per suit) from Ace up to King. Cards can be moved between the seven tableau columns in descending order, alternating between red and black suits. Flip cards from the stock pile when no tableau moves are available.",
+          "Klondike Solitaire became one of the most played computer games in history after Microsoft included it with Windows 3.0 in 1990, ostensibly to help users learn mouse drag-and-drop skills. An estimated 35 million people play digital Solitaire daily. The game's appeal lies in its combination of luck and skill — not all deals are winnable, but skilled players can win far more often than chance alone would suggest.",
+          "The standard Klondike rules: tableau cards must alternate red/black and descend in rank. Only Kings (or columns containing a King sequence) can be placed in empty tableau columns. The stock pile deals one or three cards at a time (selectable). Only the top card of a tableau column's face-down cards can be revealed — flip it by moving all face-up cards above it.",
+          "Winning strategy starts with uncovering face-down tableau cards as the priority — they represent hidden options. Move Aces to foundations immediately. Be cautious about emptying a tableau column unless you have a King ready to fill it. When drawing from the stock, don't rush to play every card — sometimes waiting preserves better options.",
         ]}
         faqs={[
           {
-            question: "How do I win at Solitaire?",
+            question: "How do I play Klondike Solitaire?",
             answer:
-              "Move all 52 cards onto the four foundation piles, one for each suit, in ascending order from Ace to King. When every foundation is complete, you win.",
+              "Move cards between the 7 tableau columns in descending order, alternating red and black suits. Build 4 foundation piles (one per suit) from Ace to King. Draw from the stock pile when stuck.",
           },
           {
-            question: "What's the difference between Draw 1 and Draw 3?",
+            question: "How do I move cards to the foundation?",
             answer:
-              "Draw 1 turns over one card at a time from the stock pile, giving you access to every card and a much higher winning rate. Draw 3 turns over three cards at once but you can only play the top one — this is the classic, harder mode.",
+              "Drag an Ace to an empty foundation pile to start it. Then add cards of the same suit in ascending order: A, 2, 3... up to King.",
           },
           {
-            question: "Can I undo a move?",
+            question: "What is the stock pile?",
             answer:
-              "Yes. The Undo button reverts your previous moves one at a time, including drawing from the stock. Use it to recover from a misplay or try a different line.",
+              "The face-down pile in the top left. Click it to deal one (or three) cards to the waste pile. You can cycle through the stock multiple times.",
           },
           {
-            question: "Does Solitaire work on mobile?",
+            question: "Can I move multiple cards at once?",
             answer:
-              "Yes. The board is fully responsive and supports touch drag-and-drop. Tap and drag cards with your finger, or double-tap to auto-move a card to its foundation.",
+              "Yes. You can drag an entire sequence of alternating-color cards as a group between tableau columns.",
+          },
+          {
+            question: "What can go in an empty tableau column?",
+            answer: "Only a King or a sequence starting with a King can be placed in an empty tableau column.",
+          },
+          {
+            question: "Is every deal winnable?",
+            answer:
+              "No. An estimated 79% of Klondike deals are theoretically winnable, but not all of those are winnable with the cards visible. Some deals require lucky stock draws.",
+          },
+          {
+            question: "Does the game auto-complete when I'm winning?",
+            answer:
+              "When all face-down cards are revealed and the solution is clear, an auto-complete option may appear to send remaining cards to the foundation automatically.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Drag and drop cards with touch. The card layout scales to fit smartphones and tablets.",
           },
         ]}
       />
@@ -543,7 +552,6 @@ function Board({
   onAuto: (from: Pile, cardId: string) => void;
   hint: Hint | null;
 }) {
-
   const [drag, setDrag] = useState<DragData | null>(null);
   const [dragPos, setDragPos] = useState<{ x: number; y: number } | null>(null);
   const [hoverPile, setHoverPile] = useState<Pile | null>(null);
@@ -616,12 +624,7 @@ function Board({
     return null;
   };
 
-  const beginDrag = (
-    e: React.PointerEvent,
-    from: Pile,
-    cardId: string,
-    cards: Card[],
-  ) => {
+  const beginDrag = (e: React.PointerEvent, from: Pile, cardId: string, cards: Card[]) => {
     if (!cards.length) return;
     e.currentTarget.setPointerCapture?.(e.pointerId);
     dragMovedRef.current = false;
@@ -667,13 +670,7 @@ function Board({
     dragMovedRef.current = false;
   };
 
-  const renderCard = (
-    c: Card,
-    from: Pile,
-    stackBelow: Card[],
-    offsetY = 0,
-    z = 0,
-  ) => {
+  const renderCard = (c: Card, from: Pile, stackBelow: Card[], offsetY = 0, z = 0) => {
     const draggable = c.faceUp;
     const isHintCard = hint?.cardId === c.id;
     return (
@@ -699,8 +696,6 @@ function Board({
       </div>
     );
   };
-
-
 
   return (
     <div
@@ -730,13 +725,7 @@ function Board({
             {state.waste.length === 0 ? (
               <EmptySlot />
             ) : (
-              renderCard(
-                state.waste[state.waste.length - 1],
-                "W",
-                [state.waste[state.waste.length - 1]],
-                0,
-                10,
-              )
+              renderCard(state.waste[state.waste.length - 1], "W", [state.waste[state.waste.length - 1]], 0, 10)
             )}
           </PileSlot>
         </div>
@@ -772,15 +761,13 @@ function Board({
               <div
                 ref={setPileRef(p)}
                 className={`relative w-full rounded-md border ${
-                  hoverPile === p || hint?.toPile === p ? "border-cyan-400 bg-cyan-500/10" : "border-border/40 bg-secondary/20"
+                  hoverPile === p || hint?.toPile === p
+                    ? "border-cyan-400 bg-cyan-500/10"
+                    : "border-border/40 bg-secondary/20"
                 }`}
                 style={{ minHeight: minH, aspectRatio: col.length <= 1 ? "5 / 7" : undefined }}
               >
-                {col.length === 0 ? (
-                  <EmptySlot />
-                ) : (
-                  col.map((c, idx) => renderCard(c, p, col, offsets[idx], idx + 1))
-                )}
+                {col.length === 0 ? <EmptySlot /> : col.map((c, idx) => renderCard(c, p, col, offsets[idx], idx + 1))}
               </div>
             </div>
           );
@@ -791,7 +778,7 @@ function Board({
       {drag && dragPos && (
         <div
           className="pointer-events-none fixed z-50"
-          style={{ left: dragPos.x - (colWidth / 2), top: dragPos.y - 24, width: colWidth }}
+          style={{ left: dragPos.x - colWidth / 2, top: dragPos.y - 24, width: colWidth }}
         >
           {drag.cards.map((c, i) => {
             const previewOffset = Math.min(28, cardH * 0.32);
@@ -843,7 +830,10 @@ function EmptySlot({ label }: { label?: string }) {
 function CardFace({ card, hidden }: { card: Card; hidden?: boolean }) {
   if (hidden) {
     return (
-      <div className="w-full rounded-md border border-dashed border-border/40 bg-transparent" style={{ aspectRatio: "5 / 7" }} />
+      <div
+        className="w-full rounded-md border border-dashed border-border/40 bg-transparent"
+        style={{ aspectRatio: "5 / 7" }}
+      />
     );
   }
   if (!card.faceUp) return <CardBack />;
@@ -859,9 +849,7 @@ function CardFace({ card, hidden }: { card: Card; hidden?: boolean }) {
         {RANK_LABEL[card.rank]}
         <div className="text-xs sm:text-sm leading-none">{SUIT_GLYPH[card.suit]}</div>
       </div>
-      <div className="text-lg sm:text-2xl font-black text-center leading-none">
-        {SUIT_GLYPH[card.suit]}
-      </div>
+      <div className="text-lg sm:text-2xl font-black text-center leading-none">{SUIT_GLYPH[card.suit]}</div>
       <div className="text-[10px] sm:text-xs font-black leading-none text-right rotate-180">
         {RANK_LABEL[card.rank]}
         <div className="text-xs sm:text-sm leading-none">{SUIT_GLYPH[card.suit]}</div>

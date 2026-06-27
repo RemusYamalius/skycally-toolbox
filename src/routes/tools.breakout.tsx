@@ -6,6 +6,7 @@ import { buildPageMeta, SITE_URL } from "@/lib/seo";
 import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -55,9 +56,9 @@ const BALL_R = 6;
 type Difficulty = "easy" | "medium" | "hard";
 
 const DIFF: Record<Difficulty, { paddle: number; speed: number; label: string }> = {
-  easy:   { paddle: 90, speed: 3.6, label: "Easy" },
+  easy: { paddle: 90, speed: 3.6, label: "Easy" },
   medium: { paddle: 70, speed: 4.6, label: "Medium" },
-  hard:   { paddle: 54, speed: 5.6, label: "Hard" },
+  hard: { paddle: 54, speed: 5.6, label: "Hard" },
 };
 
 // Brick tier: 1 hit (green/10), 2 hits (orange/20), 3 hits (red/30)
@@ -114,7 +115,9 @@ function BreakoutPage() {
     try {
       const v = parseInt(localStorage.getItem("breakout-best") || "0", 10);
       if (!isNaN(v)) setBest(v);
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, []);
 
   const saveBest = useCallback((s: number) => {
@@ -124,7 +127,9 @@ function BreakoutPage() {
         localStorage.setItem("breakout-best", String(s));
         setBest(s);
       }
-    } catch { /* noop */ }
+    } catch {
+      /* noop */
+    }
   }, []);
 
   const resetBall = useCallback(() => {
@@ -140,7 +145,7 @@ function BreakoutPage() {
   const launchBall = useCallback(() => {
     if (launchedRef.current || overRef.current || !runningRef.current) return;
     const speed = baseSpeedRef.current * (1 + (levelRef.current - 1) * 0.12);
-    const angle = (-Math.PI / 2) + (Math.random() * 0.6 - 0.3);
+    const angle = -Math.PI / 2 + (Math.random() * 0.6 - 0.3);
     ballRef.current.vx = Math.cos(angle) * speed;
     ballRef.current.vy = Math.sin(angle) * speed;
     launchedRef.current = true;
@@ -210,7 +215,10 @@ function BreakoutPage() {
       setRunning(false);
       runningRef.current = false;
       saveBest(scoreRef.current);
-      if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+      if (rafRef.current) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
       return;
     }
     resetBall();
@@ -223,7 +231,10 @@ function BreakoutPage() {
     runningRef.current = false;
     playSound("score");
     saveBest(scoreRef.current);
-    if (rafRef.current) { cancelAnimationFrame(rafRef.current); rafRef.current = null; }
+    if (rafRef.current) {
+      cancelAnimationFrame(rafRef.current);
+      rafRef.current = null;
+    }
   }, [saveBest]);
 
   const allCleared = () => {
@@ -255,24 +266,26 @@ function BreakoutPage() {
         b.y += b.vy / steps;
 
         // Walls
-        if (b.x < BALL_R) { b.x = BALL_R; b.vx = -b.vx; }
-        else if (b.x > W - BALL_R) { b.x = W - BALL_R; b.vx = -b.vx; }
-        if (b.y < BALL_R) { b.y = BALL_R; b.vy = -b.vy; }
+        if (b.x < BALL_R) {
+          b.x = BALL_R;
+          b.vx = -b.vx;
+        } else if (b.x > W - BALL_R) {
+          b.x = W - BALL_R;
+          b.vx = -b.vx;
+        }
+        if (b.y < BALL_R) {
+          b.y = BALL_R;
+          b.vy = -b.vy;
+        }
 
         // Paddle
         const py = H - 20;
         const px = paddleXRef.current - paddleWRef.current / 2;
-        if (
-          b.vy > 0 &&
-          b.y + BALL_R >= py &&
-          b.y - BALL_R <= py + 10 &&
-          b.x >= px &&
-          b.x <= px + paddleWRef.current
-        ) {
+        if (b.vy > 0 && b.y + BALL_R >= py && b.y - BALL_R <= py + 10 && b.x >= px && b.x <= px + paddleWRef.current) {
           b.y = py - BALL_R;
           const rel = (b.x - paddleXRef.current) / (paddleWRef.current / 2); // -1..1
           const speed = Math.hypot(b.vx, b.vy);
-          const angle = (-Math.PI / 2) + rel * (Math.PI / 3); // ±60°
+          const angle = -Math.PI / 2 + rel * (Math.PI / 3); // ±60°
           b.vx = Math.cos(angle) * speed;
           b.vy = Math.sin(angle) * speed;
           playSound("click");
@@ -336,9 +349,12 @@ function BreakoutPage() {
 
   const startGame = useCallback(() => {
     applyDifficulty(difficulty);
-    scoreRef.current = 0; setScore(0);
-    livesRef.current = 3; setLives(3);
-    levelRef.current = 1; setLevel(1);
+    scoreRef.current = 0;
+    setScore(0);
+    livesRef.current = 3;
+    setLives(3);
+    levelRef.current = 1;
+    setLevel(1);
     bricksRef.current = buildBricks();
     paddleXRef.current = W / 2;
     resetBall();
@@ -365,7 +381,12 @@ function BreakoutPage() {
     rafRef.current = requestAnimationFrame(loop);
   }, [loop, resetBall]);
 
-  useEffect(() => () => { if (rafRef.current) cancelAnimationFrame(rafRef.current); }, []);
+  useEffect(
+    () => () => {
+      if (rafRef.current) cancelAnimationFrame(rafRef.current);
+    },
+    [],
+  );
 
   // Keyboard
   useEffect(() => {
@@ -411,10 +432,16 @@ function BreakoutPage() {
   };
 
   // Initial draw
-  useEffect(() => { draw(); }, [draw]);
+  useEffect(() => {
+    draw();
+  }, [draw]);
 
   return (
-    <ToolPageShell title="Breakout" description="Break all the bricks before you run out of lives!">
+    <ToolPageShell
+      showFileDisclaimer={false}
+      title="Breakout"
+      description="Break all the bricks before you run out of lives!"
+    >
       <div className="rounded-2xl border border-border bg-card/50 p-6 sm:p-8">
         <div className="flex justify-center gap-3 mb-4 flex-wrap">
           <div className="text-center px-4 py-2 rounded-xl bg-secondary/60 border border-border min-w-[80px]">
@@ -439,7 +466,10 @@ function BreakoutPage() {
           {(Object.keys(DIFF) as Difficulty[]).map((d) => (
             <button
               key={d}
-              onClick={() => { setDifficulty(d); if (!running) applyDifficulty(d); }}
+              onClick={() => {
+                setDifficulty(d);
+                if (!running) applyDifficulty(d);
+              }}
               disabled={running}
               className={`px-3 py-1.5 rounded-full text-xs font-bold border transition-colors ${
                 difficulty === d
@@ -467,7 +497,9 @@ function BreakoutPage() {
             <div className="absolute inset-0 flex flex-col items-center justify-center bg-black/70 rounded-xl">
               <p className="text-4xl mb-2">🧱</p>
               <p className="text-white font-black text-2xl mb-1">Breakout</p>
-              <p className="text-white/60 text-sm mb-4 px-4 text-center">Move with mouse, arrows or touch. Click/tap to launch.</p>
+              <p className="text-white/60 text-sm mb-4 px-4 text-center">
+                Move with mouse, arrows or touch. Click/tap to launch.
+              </p>
               <button
                 onClick={startGame}
                 className="inline-flex items-center gap-2 px-5 py-2.5 rounded-full bg-cyan-500 hover:bg-cyan-400 text-black font-bold transition-colors"
@@ -511,24 +543,62 @@ function BreakoutPage() {
         </div>
       </div>
 
-      <HowToUse steps={[
-        "Pick your difficulty — Easy gives a wider paddle and slower ball, Hard makes it tight and fast.",
-        "Move the paddle with your mouse, arrow keys, or finger. Click, tap, or press Space to launch.",
-        "Break every brick to clear the level. Red bricks take 3 hits, orange 2, green 1. Don't lose all 3 lives!",
-      ]} />
+      <AdZone id="breakout-bottom" size="728x90" />
+
+      <HowToUse
+        steps={[
+          "Pick your difficulty — Easy gives a wider paddle and slower ball, Hard makes it tight and fast.",
+          "Move the paddle with your mouse, arrow keys, or finger. Click, tap, or press Space to launch.",
+          "Break every brick to clear the level. Red bricks take 3 hits, orange 2, green 1. Don't lose all 3 lives!",
+        ]}
+      />
 
       <ToolSeoContent
-        title="Breakout — Free Online Brick Breaker Game, No Download"
-        description="Play the classic Breakout / Arkanoid brick breaker game in your browser. Bounce the ball with your paddle to smash every brick. No download or signup."
+        title="Free Breakout Game Online — Classic Brick Breaking Arcade Game"
+        description="Play the classic Breakout arcade game free in your browser. Break all bricks with a bouncing ball and paddle. Multiple levels, increasing speed. No signup."
         body={[
-          "Breakout is the iconic arcade brick breaker game first popularized by Atari in the 1970s and reinvented countless times since. Your mission is simple: move the paddle at the bottom of the screen, bounce the ball, and chip away at the wall of colored bricks at the top. Red bricks are tough and take three hits, orange take two, and green pop on the first hit — each worth different points. Clear the entire wall to advance to the next level, where the ball speeds up just enough to keep things interesting.",
-          "Our version runs entirely in your browser — no downloads, no ads, no signup. It works great on desktop with your mouse or arrow keys, and on mobile with smooth touch controls. Three difficulty levels let you choose between a forgiving wide paddle for casual play or a razor-thin paddle and a fast ball for a serious challenge. Your best score is saved locally between sessions, so you can keep pushing for that perfect run.",
+          "Skycally's Breakout recreates the iconic 1976 Atari arcade classic directly in your browser. Move the paddle left and right to keep the ball in play. The ball bounces off the paddle, walls, and ceiling — when it hits a brick, the brick is destroyed and the ball bounces back. Clear all bricks to advance to the next level.",
+          "Breakout was designed by Steve Wozniak (with help from Steve Jobs) for Atari in 1976, and its elegant physics loop — one ball, one paddle, one objective — has made it one of the most enduring and cloned game concepts in history. Its descendant Arkanoid (1986) added power-ups and cemented the 'brick breaker' genre.",
+          "The game gets progressively harder: each level has more bricks and the ball moves faster. Bricks in different rows score different points — colored bricks near the top are worth more. When the ball breaks through to the top rows, it moves extremely fast and can clear many bricks in rapid succession — a high-scoring moment that skilled players aim for.",
+          "Keeping the ball in play is the core skill. As speed increases, anticipate where the ball will go several bounces ahead. Position the paddle under the predicted landing spot rather than chasing the ball reactively. Hitting the ball with the edge of the paddle angles it sharply, giving you more control over direction.",
         ]}
         faqs={[
-          { question: "How do I control Breakout?", answer: "On desktop, move the paddle with your mouse or with the arrow keys (or A/D). Click anywhere or press Space / Enter to launch the ball. On mobile, drag your finger across the board to move the paddle and tap to launch." },
-          { question: "How does scoring work?", answer: "Each brick is worth points based on its toughness: green bricks give 10 points, orange give 20, and red give 30. Your highest score is saved automatically in your browser." },
-          { question: "What do the difficulty levels change?", answer: "Easy gives you a wide paddle and a slower ball — perfect for beginners. Medium is the classic experience. Hard shrinks the paddle and speeds up the ball for an arcade-style challenge." },
-          { question: "Does Breakout work on mobile?", answer: "Yes. The game is fully responsive and touch-friendly. Drag your finger to move the paddle and tap to launch the ball — no app install needed." },
+          {
+            question: "How do I control the paddle?",
+            answer:
+              "Move the mouse or touch to move the paddle. On desktop, arrow keys or A/D keys also control the paddle. Keep the ball in play by hitting it with the paddle.",
+          },
+          {
+            question: "What happens if the ball falls below the paddle?",
+            answer: "You lose a life. After all lives are lost, the game ends.",
+          },
+          {
+            question: "How many lives do I have?",
+            answer: "Typically 3 lives. The life count is shown in the game interface.",
+          },
+          {
+            question: "Do different colored bricks score differently?",
+            answer:
+              "Yes. Bricks closer to the top of the screen are usually worth more points, reflecting the original Breakout scoring system.",
+          },
+          {
+            question: "What happens when I clear all bricks?",
+            answer:
+              "The level is complete and you advance to the next level with a fresh brick layout and increased ball speed.",
+          },
+          {
+            question: "Does the ball get faster?",
+            answer:
+              "Yes. Ball speed increases with each level and sometimes when it hits certain rows of bricks — making advanced stages progressively more challenging.",
+          },
+          {
+            question: "Is my high score saved?",
+            answer: "Yes. Your best score is saved in your browser's localStorage.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Touch or swipe to move the paddle. The game scales to fit mobile screen sizes.",
+          },
         ]}
       />
 

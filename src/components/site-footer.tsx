@@ -1,7 +1,7 @@
 import { Link } from "@tanstack/react-router";
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 
-const categoryOrder: ToolCategory[] = ["ai", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"];
+const categoryOrder: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games", "minigames", "ai"];
 
 export function SiteFooter() {
   return (
@@ -172,7 +172,7 @@ export function SiteFooter() {
       <div className="border-t border-border/60">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
           <h4 className="text-sm font-semibold mb-6 text-foreground/80">Explore all tools</h4>
-          <div className="grid gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-7">
+          <div className="grid gap-8 grid-cols-2 md:grid-cols-3 lg:grid-cols-9">
             {categoryOrder.map((c) => {
               const meta = categoryMeta[c];
               const list = tools.filter((t) => toolInCategory(t, c));

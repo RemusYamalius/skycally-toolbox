@@ -7,6 +7,7 @@ import { playSound } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
@@ -186,6 +187,7 @@ function WhackAMolePage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Whack-a-Mole"
       description="Tap the moles before they disappear! How high can you score?"
     >
@@ -261,10 +263,7 @@ function WhackAMolePage() {
                   )}
                 >
                   <span
-                    className={cn(
-                      "transition-all duration-150",
-                      isUp ? "scale-100 opacity-100" : "scale-0 opacity-0",
-                    )}
+                    className={cn("transition-all duration-150", isUp ? "scale-100 opacity-100" : "scale-0 opacity-0")}
                   >
                     🐹
                   </span>
@@ -298,6 +297,8 @@ function WhackAMolePage() {
         </p>
       </div>
 
+      <AdZone id="whack-a-mole-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Pick a difficulty — Easy gives you 30 seconds, Hard only 15.",
@@ -307,32 +308,52 @@ function WhackAMolePage() {
       />
 
       <ToolSeoContent
-        title="Whack-a-Mole — Free Online Reaction Game"
-        description="Play Whack-a-Mole free in your browser. Tap the moles before they disappear and challenge your reaction time across three difficulty levels."
+        title="Free Whack-a-Mole Game Online — Hit Moles as Fast as You Can"
+        description="Play Whack-a-Mole free online. Hit the moles as they pop up to score points before time runs out. Increasing speed. Free, no signup required."
         body={[
-          "Whack-a-Mole is the classic arcade reaction game brought to your browser — no downloads, no accounts, and no ads in the way. Moles pop up at random from a 3×3 grid of holes, and your job is to tap each one before it ducks back down. Three difficulty levels adjust both the round length and how fast the moles appear: Easy gives you a relaxed 30 seconds with slower moles, Medium ramps things up for 20 seconds, and Hard pushes your reflexes to the limit with the fastest moles in just 15 seconds.",
-          "The game tracks your score, misses, and live accuracy percentage, and your best score is saved for the rest of your session so you can keep chasing a new personal best. It's a perfect quick-break game on desktop or mobile — touch, mouse, and trackpad all work the same way. Because everything runs locally in your browser, your scores stay private and the game keeps working even offline.",
+          "Skycally's Whack-a-Mole challenges you to click or tap moles as they pop up from their holes before they disappear. Each successful hit scores a point. Moles appear faster as your score increases, demanding quicker reactions. Miss a mole and it escapes — the game ends when time runs out.",
+          "Whack-a-Mole originated as a Japanese arcade game called Mogura Tataki, first appearing in Japanese arcades in 1975. It reached Western arcades throughout the 1980s and became a fixture of amusement parks and carnivals worldwide. The digital version captures the same reflex-testing appeal — simple to understand, difficult to master at high speeds.",
+          "The game is a pure reaction time test. Average human reaction time is 200–300 milliseconds for a visual stimulus. As moles pop up and disappear faster, only players with sub-250ms reaction times can reliably hit every mole at high difficulty. Regular practice demonstrably improves reaction speed and hand-eye coordination.",
+          "Score as many points as possible before time runs out. A high score tracker saves your best performance locally so you always have a personal record to beat. Challenge friends to beat your score — the simple, shareable nature of Whack-a-Mole makes it one of the most naturally competitive casual games.",
         ]}
         faqs={[
           {
             question: "How do I play Whack-a-Mole?",
             answer:
-              "Press Start, then click or tap each mole the moment it pops up from a hole. Each successful hit earns one point. If a mole disappears before you tap it, it counts as a miss.",
+              "Click or tap a mole as soon as it pops up from a hole to score a point. Moles disappear after a short time — if you miss, they escape. Score as many hits as possible before the timer runs out.",
           },
           {
-            question: "What's the difference between difficulty levels?",
+            question: "Does the game get faster?",
             answer:
-              "Easy lasts 30 seconds with slower moles. Medium is 20 seconds with faster moles. Hard is only 15 seconds and the moles appear and vanish very quickly — best for testing your reaction speed.",
+              "Yes. Moles appear and disappear faster as your score increases, continuously raising the challenge.",
+          },
+          {
+            question: "Is there a time limit?",
+            answer:
+              "Yes. Each game runs for a fixed time. When the timer reaches zero, the game ends and your final score is shown.",
           },
           {
             question: "Is my high score saved?",
-            answer:
-              "Yes. Your best score is saved in your browser session so you can try to beat it across multiple rounds. It clears when you close the tab.",
+            answer: "Yes. Your best score is saved in your browser's localStorage and displayed above the game.",
           },
           {
-            question: "Does it work on mobile?",
+            question: "What is a good score?",
             answer:
-              "Yes. The game is fully touch-friendly and runs in any modern mobile browser — no install required.",
+              "A good score depends on the difficulty level. Consistently hitting moles at high speeds (sub-250ms reactions) is the mark of a skilled player.",
+          },
+          {
+            question: "Does missing a mole cost points?",
+            answer:
+              "Missing a mole means losing a point opportunity — but it does not deduct points. Only hits score points.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. Tap moles to hit them. The game is optimized for touch input on smartphones and tablets.",
+          },
+          {
+            question: "Is this good for reaction time training?",
+            answer:
+              "Yes. Whack-a-Mole is a classic reaction time exercise. Regular play can improve visual reaction speed and hand-eye coordination.",
           },
         ]}
       />

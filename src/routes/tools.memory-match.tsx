@@ -8,6 +8,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { Button } from "@/components/ui/button";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { cn } from "@/lib/utils";
@@ -19,8 +20,8 @@ export const Route = createFileRoute("/tools/memory-match")({
 
 const EMOJI_SETS = {
   animals: ["🐶", "🐱", "🐭", "🐹", "🐰", "🦊", "🐻", "🐼", "🐨", "🐯", "🦁", "🐮", "🐸", "🐙", "🦋", "🐬"],
-  food:    ["🍎", "🍊", "🍋", "🍇", "🍓", "🍑", "🥝", "🍒", "🥥", "🍍", "🥭", "🍌", "🍉", "🍈", "🥑", "🍆"],
-  sports:  ["⚽", "🏀", "🏈", "⚾", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸", "🥊", "🎯", "🏹", "🛹", "🛷", "🎿"],
+  food: ["🍎", "🍊", "🍋", "🍇", "🍓", "🍑", "🥝", "🍒", "🥥", "🍍", "🥭", "🍌", "🍉", "🍈", "🥑", "🍆"],
+  sports: ["⚽", "🏀", "🏈", "⚾", "🎾", "🏐", "🏉", "🎱", "🏓", "🏸", "🥊", "🎯", "🏹", "🛹", "🛷", "🎿"],
 } as const;
 
 type Theme = keyof typeof EMOJI_SETS;
@@ -96,11 +97,7 @@ function MemoryMatchPage() {
 
         if (match) {
           setTimeout(() => {
-            setCards((prev) =>
-              prev.map((c, i) =>
-                i === a || i === b ? { ...c, matched: true, flipped: true } : c,
-              ),
-            );
+            setCards((prev) => prev.map((c, i) => (i === a || i === b ? { ...c, matched: true, flipped: true } : c)));
             setFlipped([]);
             setMatches((m) => {
               const newM = m + 1;
@@ -129,9 +126,7 @@ function MemoryMatchPage() {
           }, 400);
         } else {
           setTimeout(() => {
-            setCards((prev) =>
-              prev.map((c, i) => (i === a || i === b ? { ...c, flipped: false } : c)),
-            );
+            setCards((prev) => prev.map((c, i) => (i === a || i === b ? { ...c, flipped: false } : c)));
             setFlipped([]);
             playSound("noMatch");
           }, 800);
@@ -156,6 +151,7 @@ function MemoryMatchPage() {
 
   return (
     <ToolPageShell
+      showFileDisclaimer={false}
       title="Memory Match"
       description="Flip cards and find matching pairs. Choose a theme and difficulty to train your memory."
     >
@@ -197,9 +193,7 @@ function MemoryMatchPage() {
                     )}
                   >
                     {d}
-                    <span className="block text-xs text-muted-foreground">
-                      {CARD_COUNT[d] / 2} pairs
-                    </span>
+                    <span className="block text-xs text-muted-foreground">{CARD_COUNT[d] / 2} pairs</span>
                   </button>
                 ))}
               </div>
@@ -246,8 +240,8 @@ function MemoryMatchPage() {
                     card.matched
                       ? "bg-green-500/20 border-green-500/40 scale-95"
                       : card.flipped
-                      ? "bg-primary/20 border-primary/50"
-                      : "bg-card border-border hover:border-primary/40 hover:bg-secondary/50 cursor-pointer",
+                        ? "bg-primary/20 border-primary/50"
+                        : "bg-card border-border hover:border-primary/40 hover:bg-secondary/50 cursor-pointer",
                   )}
                   aria-label={card.flipped || card.matched ? `Card ${card.emoji}` : "Hidden card"}
                 >
@@ -278,6 +272,8 @@ function MemoryMatchPage() {
         )}
       </div>
 
+      <AdZone id="memory-match-bottom" size="728x90" />
+
       <HowToUse
         steps={[
           "Choose a theme and difficulty, then hit Start.",
@@ -287,28 +283,50 @@ function MemoryMatchPage() {
       />
 
       <ToolSeoContent
-        title="Memory Match Game — Free Online Card Matching Puzzle"
-        description="Flip cards and find matching pairs in this free memory game. Choose from Animals, Food or Sports themes with Easy, Medium and Hard difficulty."
+        title="Free Memory Match Game Online — Flip Cards & Find Pairs"
+        description="Play the classic Memory Match card game free online. Flip cards to find matching pairs. Multiple grid sizes and difficulty levels. No signup required."
         body={[
-          "Memory Match is a classic concentration card game that trains your short-term memory and pattern recognition. Cards start face-down, and you flip two at a time trying to find a pair. Match every pair to win — but try to do it in as few moves as possible to set a personal best.",
-          "This online version runs entirely in your browser with no sign-up or ads. Pick from three emoji themes (Animals, Food, Sports) and three difficulties — Easy (4 pairs), Medium (8 pairs) and Hard (12 pairs). Your best move count is saved locally for every difficulty, so each session has a target to beat. Great for kids, adults, and anyone looking to give their brain a quick workout.",
+          "Skycally's Memory Match presents a grid of face-down cards. Click any card to flip it over, then click another to try to find its match. If the two cards match, they stay face up. If not, they flip back after a brief pause. Flip all pairs to complete the puzzle — in as few moves and as little time as possible.",
+          "Memory Match (also called Concentration or Pairs) is one of the most widely played card games in the world, appearing in toy stores as a physical card game for over a century. The digital version preserves the core challenge: remembering the position of cards you've already seen to make better guesses on subsequent turns.",
+          "Multiple grid sizes let you control the difficulty: a 4×4 grid (8 pairs) is accessible for beginners and children, while larger grids offer a meaningful challenge for adults. The move counter and timer track your performance so you can try to beat your best run — fewer moves and faster times indicate sharper spatial memory.",
+          "Memory games are well-supported by cognitive research as a form of working memory training. Regularly playing concentration-style games exercises the hippocampus — the brain region responsible for short-term memory — and can improve recall speed in daily life. It's one of the few game types that is simultaneously entertaining and genuinely beneficial for brain health.",
         ]}
         faqs={[
           {
-            question: "How do I win?",
-            answer: "Flip pairs of cards until every pair on the board is matched. The fewer moves you take, the better your score.",
+            question: "How do I play Memory Match?",
+            answer:
+              "Click any face-down card to flip it. Then click another card to try to find its pair. Matching pairs stay face up. Non-matching pairs flip back after a moment. Flip all pairs to win.",
           },
           {
-            question: "Are my scores saved?",
-            answer: "Yes — your best move count for each difficulty is saved in your browser's local storage. Clearing your browser data will reset it.",
+            question: "How many cards are in the grid?",
+            answer:
+              "Grid size varies by difficulty. A 4×4 grid has 16 cards (8 pairs). Larger grids have more pairs and greater difficulty.",
           },
           {
-            question: "Does it work on mobile?",
-            answer: "Absolutely. The card grid is touch-friendly and adapts to your screen size, so you can play on phones, tablets and desktops.",
+            question: "Is there a timer?",
+            answer: "Yes. A timer tracks how long each game takes. Try to beat your best time on repeated plays.",
           },
           {
-            question: "Can I change the theme mid-game?",
-            answer: "Use the Change Settings button to return to the setup screen, pick a new theme or difficulty, and start a fresh game.",
+            question: "Does the game track my moves?",
+            answer: "Yes. A move counter shows how many pairs you've attempted. Fewer moves indicate sharper memory.",
+          },
+          {
+            question: "Are the cards shuffled each game?",
+            answer:
+              "Yes. Cards are randomly shuffled at the start of every new game, so the layout is always different.",
+          },
+          {
+            question: "What age group is this suitable for?",
+            answer:
+              "Memory Match is suitable for all ages — from young children learning to concentrate to adults looking for a brain training exercise. Smaller grids work well for children.",
+          },
+          {
+            question: "Is there a high score?",
+            answer: "Your best score (fewest moves or fastest time) may be tracked locally for the session.",
+          },
+          {
+            question: "Does this work on mobile?",
+            answer: "Yes. The card grid is touch-friendly and responsive on smartphones and tablets.",
           },
         ]}
       />

@@ -393,6 +393,7 @@ export const tools: Tool[] = [
     category: "ai",
     icon: ScanFace,
     path: "/tools/face-landmarks",
+    hidden: true,
   },
   {
     slug: "hand-gesture",
@@ -401,6 +402,7 @@ export const tools: Tool[] = [
     category: "ai",
     icon: Hand,
     path: "/tools/hand-gesture",
+    hidden: true,
   },
   {
     slug: "object-detection",
@@ -409,6 +411,7 @@ export const tools: Tool[] = [
     category: "ai",
     icon: Boxes,
     path: "/tools/object-detection",
+    hidden: true,
   },
   {
     slug: "sentiment-analysis",
@@ -1072,8 +1075,7 @@ export const tools: Tool[] = [
   {
     slug: "calorie-calculator",
     name: "Calorie Calculator",
-    description:
-      "Calculate your daily calorie needs and macros based on your age, weight, height, and activity level.",
+    description: "Calculate your daily calorie needs and macros based on your age, weight, height, and activity level.",
     category: "utility",
     icon: Flame,
     path: "/tools/calorie-calculator",
@@ -1096,4 +1098,3 @@ export const tools: Tool[] = [
     path: "/tools/ball-sort",
   },
 ];
-

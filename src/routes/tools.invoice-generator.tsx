@@ -1,6 +1,6 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
-import { Download, Printer, Plus, X, Upload, FileText } from "lucide-react";
+import { Download, Plus, X, Upload, FileText } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
@@ -288,8 +288,6 @@ function InvoiceGeneratorPage() {
     toast.success("Invoice ready — choose \'Save as PDF\' in the print dialog");
   };
 
-  const printInvoice = () => window.print();
-
   return (
     <ToolPageShell title={tool.name} description={tool.description} showFileDisclaimer={false}>
       <style>{`
@@ -387,18 +385,12 @@ function InvoiceGeneratorPage() {
             </button>
           ))}
         </div>
-        <div className="flex gap-2">
-          <Button variant="outline" onClick={printInvoice}>
-            <Printer className="w-4 h-4" /> Print
-          </Button>
-          <Button
-            onClick={downloadPDF}
-            disabled={downloading}
-            className="bg-[var(--cyan-brand)] text-black hover:bg-[var(--cyan-brand)]/90"
-          >
-            <Download className="w-4 h-4" /> "Download PDF"
-          </Button>
-        </div>
+        <Button
+          onClick={downloadPDF}
+          className="bg-[var(--cyan-brand)] text-black hover:bg-[var(--cyan-brand)]/90 font-semibold px-6"
+        >
+          <Download className="w-4 h-4 mr-2" /> Download PDF
+        </Button>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
@@ -866,7 +858,7 @@ function InvoiceGeneratorPage() {
           className="w-full bg-[var(--cyan-brand)] text-black hover:bg-[var(--cyan-brand)]/90 shadow-2xl"
           size="lg"
         >
-          <Download className="w-4 h-4" /> "Download PDF"
+          <Download className="w-4 h-4 mr-2" /> Download PDF
         </Button>
       </div>
 
@@ -876,7 +868,7 @@ function InvoiceGeneratorPage() {
         steps={[
           "Fill in your business details on the left, upload your logo, and add your client.",
           "Add line items with description, quantity, price, and optional tax. Pick a currency and template.",
-          "Click Download PDF to save your invoice, or Print to send directly to a printer.",
+          "Click Download PDF — a print dialog opens automatically. Select your printer or choose Save as PDF to download.",
         ]}
       />
 
@@ -887,7 +879,7 @@ function InvoiceGeneratorPage() {
           "Skycally's Invoice Generator lets you create a professional, print-ready invoice in under a minute — completely free, with no account required and no watermark on the downloaded PDF. Fill in your business name, client details, and line items, then click Download to get a polished A4-format PDF ready to send.",
           "Three invoice templates cover every professional context: Classic for traditional businesses, Modern for tech and creative freelancers, and Minimal for consultants and legal professionals. Switch templates instantly without losing your data — the live preview updates in real time as you type. Your business details and logo are saved locally so you never have to re-enter them.",
           "Nine currencies are supported including USD, EUR, GBP, and regional currencies such as MAD (Moroccan Dirham), SAR (Saudi Riyal), and AED (UAE Dirham) — making this one of the most internationally versatile free invoice generators available. Add per-line tax rates, a global discount (flat or percentage), and custom payment terms to handle virtually any invoicing scenario.",
-          "Everything runs in your browser — your invoice data is never uploaded to any server. Invoice numbers auto-increment from INV-001 so you maintain a clean sequential record. Print directly from the browser or download as a PDF. Ideal for freelancers, consultants, small business owners, and anyone who needs to invoice clients quickly without expensive software.",
+          "Everything runs in your browser — your invoice data is never uploaded to any server. Invoice numbers auto-increment from INV-001 so you maintain a clean sequential record. Download as PDF with one click — no account, no watermark, completely free. Ideal for freelancers, consultants, small business owners, and anyone who needs to invoice clients quickly without expensive software.",
         ]}
         faqs={[
           {
@@ -923,7 +915,7 @@ function InvoiceGeneratorPage() {
           {
             question: "Can I print the invoice instead of downloading?",
             answer:
-              "Yes. Click the Print button to trigger your browser's print dialog, which shows only the invoice preview — the form is hidden in print mode.",
+              "Yes. Click Download PDF — a new window opens with the invoice and your browser's print/save dialog appears automatically. Select Save as PDF to download the file.",
           },
           {
             question: "What format is the downloaded file?",

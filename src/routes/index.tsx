@@ -71,7 +71,7 @@ const POPULAR_SLUGS = [
   "ball-sort",
 ];
 
-const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "ai", "utility", "games", "minigames"];
+const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games", "minigames", "ai"];
 
 const CATEGORY_TAGLINES: Record<ToolCategory, string> = {
   ai: "Run AI models in your browser — no server, no cost.",

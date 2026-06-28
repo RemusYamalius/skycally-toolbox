@@ -26,6 +26,7 @@ import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counte
 import { Route as ToolsWhackAMoleRouteImport } from './routes/tools.whack-a-mole'
 import { Route as ToolsWebrtcLeakTestRouteImport } from './routes/tools.webrtc-leak-test'
 import { Route as ToolsWeatherCheckerRouteImport } from './routes/tools.weather-checker'
+import { Route as ToolsWaterIntakeCalculatorRouteImport } from './routes/tools.water-intake-calculator'
 import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoMergerRouteImport } from './routes/tools.video-merger'
@@ -227,6 +228,12 @@ const ToolsWeatherCheckerRoute = ToolsWeatherCheckerRouteImport.update({
   path: '/tools/weather-checker',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsWaterIntakeCalculatorRoute =
+  ToolsWaterIntakeCalculatorRouteImport.update({
+    id: '/tools/water-intake-calculator',
+    path: '/tools/water-intake-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsVideoTrimmerRoute = ToolsVideoTrimmerRouteImport.update({
   id: '/tools/video-trimmer',
   path: '/tools/video-trimmer',
@@ -925,6 +932,7 @@ export interface FileRoutesByFullPath {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/water-intake-calculator': typeof ToolsWaterIntakeCalculatorRoute
   '/tools/weather-checker': typeof ToolsWeatherCheckerRoute
   '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
@@ -1058,6 +1066,7 @@ export interface FileRoutesByTo {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/water-intake-calculator': typeof ToolsWaterIntakeCalculatorRoute
   '/tools/weather-checker': typeof ToolsWeatherCheckerRoute
   '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
@@ -1192,6 +1201,7 @@ export interface FileRoutesById {
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
+  '/tools/water-intake-calculator': typeof ToolsWaterIntakeCalculatorRoute
   '/tools/weather-checker': typeof ToolsWeatherCheckerRoute
   '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
@@ -1327,6 +1337,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/water-intake-calculator'
     | '/tools/weather-checker'
     | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
@@ -1460,6 +1471,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/water-intake-calculator'
     | '/tools/weather-checker'
     | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
@@ -1593,6 +1605,7 @@ export interface FileRouteTypes {
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
+    | '/tools/water-intake-calculator'
     | '/tools/weather-checker'
     | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
@@ -1727,6 +1740,7 @@ export interface RootRouteChildren {
   ToolsVideoMergerRoute: typeof ToolsVideoMergerRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
   ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
+  ToolsWaterIntakeCalculatorRoute: typeof ToolsWaterIntakeCalculatorRoute
   ToolsWeatherCheckerRoute: typeof ToolsWeatherCheckerRoute
   ToolsWebrtcLeakTestRoute: typeof ToolsWebrtcLeakTestRoute
   ToolsWhackAMoleRoute: typeof ToolsWhackAMoleRoute
@@ -1860,6 +1874,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/weather-checker'
       fullPath: '/tools/weather-checker'
       preLoaderRoute: typeof ToolsWeatherCheckerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/water-intake-calculator': {
+      id: '/tools/water-intake-calculator'
+      path: '/tools/water-intake-calculator'
+      fullPath: '/tools/water-intake-calculator'
+      preLoaderRoute: typeof ToolsWaterIntakeCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/video-trimmer': {
@@ -2786,6 +2807,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsVideoMergerRoute: ToolsVideoMergerRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
   ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,
+  ToolsWaterIntakeCalculatorRoute: ToolsWaterIntakeCalculatorRoute,
   ToolsWeatherCheckerRoute: ToolsWeatherCheckerRoute,
   ToolsWebrtcLeakTestRoute: ToolsWebrtcLeakTestRoute,
   ToolsWhackAMoleRoute: ToolsWhackAMoleRoute,

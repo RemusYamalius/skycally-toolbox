@@ -98,6 +98,7 @@ import {
   Pipette,
   Bitcoin,
   Ruler,
+  Droplets,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1088,6 +1089,15 @@ export const tools: Tool[] = [
     category: "utility",
     icon: FileText,
     path: "/tools/invoice-generator",
+  },
+  {
+    slug: "water-intake-calculator",
+    name: "Water Intake Calculator",
+    description:
+      "Calculate your personalized daily water intake. Interactive glass tracker with sound effects and smart hydration schedule.",
+    category: "utility",
+    icon: Droplets,
+    path: "/tools/water-intake-calculator",
   },
   {
     slug: "ball-sort",

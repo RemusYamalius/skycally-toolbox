@@ -1,101 +1,98 @@
-# Plan: Invoice Generator Tool
+# Water Intake Calculator
 
-Build a professional invoice generator at `/tools/invoice-generator` matching the spec: split form/preview UI, live updates, 3 templates, PDF/print export, multi-currency, localStorage persistence.
+Build `/tools/water-intake-calculator` as a single self-contained route, following the same shell + SEO pattern as other Skycally calculators (calorie, BMI, sleep).
 
 ## Files
 
-**Create** `src/routes/tools.invoice-generator.tsx` — single-file route containing:
-- `createFileRoute("/tools/invoice-generator")` with `buildToolMeta(toolBySlug("invoice-generator"))` head
-- Wrapped in `ToolPageShell` + `HowToUse` + `ToolSeoContent` (per project memory)
-- All state, components, helpers inline
+**Create** `src/routes/tools.water-intake-calculator.tsx`
+- `createFileRoute("/tools/water-intake-calculator")` + `buildToolMeta(toolBySlug("water-intake-calculator", tools))`
+- Wrapped in `<ToolPageShell showFileDisclaimer={false}>` → calculator UI → `<AdZone>` → `<HowToUse>` → `<ToolSeoContent>` → `<RelatedTools currentSlug="water-intake-calculator" />`
+- All logic, state, schedule builder, Web Audio sound helpers, and scoped CSS (ripple + glass fill) inline
 
-**Edit** `src/lib/tools.ts` — register the new tool (icon: `FileText` or `Receipt`, category: `utility`, slug: `invoice-generator`)
+**Edit** `src/lib/tools.ts` — register tool (slug `water-intake-calculator`, name "Water Intake Calculator", category `utility`, icon `Droplets` from lucide-react)
 
-**Edit** `src/lib/related-tools.ts` — cross-link with `qr-generator`, `business-card-generator`, `currency-converter`, `pdf-reader`
+**Edit** `src/lib/related-tools.ts` — cross-link with `calorie-calculator`, `bmi-calculator`, `sleep-calculator`, `age-calculator`
 
-## Dependencies
+**Edit** `public/sitemap.xml` — add `/tools/water-intake-calculator` entry matching existing format
 
-Install via `bun add`: `jspdf`, `html2canvas`
+## UI layout
 
-## UI Architecture
+Desktop `md:grid-cols-[2fr_3fr]`, mobile stacked.
 
 ```text
-ToolPageShell
-├── Template switcher (Classic | Modern | Minimal) + Download PDF + Print buttons
-├── Grid: md:grid-cols-[2fr_3fr]
-│   ├── Form panel (left/top)
-│   │   ├── FROM card (logo upload + business details + "Remember my details" toggle)
-│   │   ├── TO card (client details)
-│   │   ├── Invoice details (number, dates, currency Select)
-│   │   ├── Line items (dynamic rows, Add Item button)
-│   │   ├── Discount (flat/% toggle) + global tax mode
-│   │   └── Notes + Payment Terms
-│   └── Preview panel (right/bottom) — id="invoice-preview", white card, template-scoped CSS classes
-├── Sticky bottom Download button on mobile
-├── HowToUse
-└── ToolSeoContent (FAQ + body)
+Left (inputs)
+  Weight (number + kg/lbs toggle)
+  Age (number)
+  Sex (Male/Female toggle)
+  Activity (5 card selector w/ emoji)
+  Climate (3 buttons)
+  Special conditions (Pregnant, Breastfeeding toggles — only when Female)
+  Coffees stepper (0-10)
+  Alcoholic drinks stepper (0-10)
+
+Right
+  Hero result card (cyan gradient + animated water ripple)
+    ml primary, then L · glasses · fl oz
+  Breakdown chips (one pill per applied factor with sign + value)
+  Interactive Glass Tracker
+    grid of glass SVGs (cap at 16 visual, real count above)
+    click → fill animation + gulp sound, progress bar
+    completion → confetti + success fanfare
+  Hydration Schedule
+    vertical timeline with time, label, checkbox
+  Contextual tips with internal <Link> to related tools
+  Medical disclaimer
 ```
 
-## State Model
+## Calculation
 
 ```ts
-type LineItem = { id: string; description: string; qty: number; price: number; tax: number };
-type Invoice = {
-  from: { name; email; phone; address; logo (base64) };
-  to: { name; email; address };
-  number: string; date: string; dueDate: string; currency: string;
-  items: LineItem[];
-  discount: { value: number; type: 'flat' | 'percent' };
-  taxMode: 'per-line' | 'global'; globalTax: number;
-  notes: string; terms: string;
-  template: 'classic' | 'modern' | 'minimal';
-};
+const base = unit === 'kg' ? weightKg * 33 : weightLbs * 0.5 * 29.5735;
+const activity = {sedentary:0, light:350, moderate:600, very:900, extra:1200}[level];
+const climateBonus = {cold:-200, temperate:0, hot:500}[climate];
+const pregBonus = pregnant ? 300 : 0;
+const bfBonus = breastfeeding ? 700 : 0;
+const coffeeDeduct = coffees * 150;
+const alcoholDeduct = drinks * 200;
+let total = base + activity + climateBonus + pregBonus + bfBonus - coffeeDeduct - alcoholDeduct;
+total = Math.max(1500, Math.min(5000, total));
+// glasses = ceil(total/250); liters = total/1000; flOz = total/29.5735
 ```
 
-- `useMemo` for subtotal, discount amount, tax amount, total
-- 150ms debounce on localStorage writes
-- Logo: FileReader → base64, max ~500KB enforced
+## Schedule builder
 
-## Calculation Logic
+Use the spec's `buildSchedule` (special labels at 7/13/19/22). Interval spread 7→22.
 
-- Per-line subtotal = `qty * price`
-- Per-line tax (if `taxMode==='per-line'`) = `subtotal * tax/100`
-- Subtotal = Σ line subtotals
-- Discount = `type==='flat' ? value : subtotal * value/100`
-- Tax = `taxMode==='global' ? (subtotal - discount) * globalTax/100 : Σ per-line tax`
-- Total = subtotal - discount + tax
-- Format with `Intl.NumberFormat` + currency symbol prepended (per spec)
+## Sound (Web Audio API)
 
-## PDF / Print
+Singleton `AudioContext` lazily created on first interaction. Two helpers: `playGulpSound` (sine 800→200Hz over 0.3s) and `playSuccessSound` (C-E-G-C arpeggio). Mute toggle button next to glass tracker, state persisted.
 
-- `downloadPDF`: html2canvas (scale 2, useCORS, backgroundColor white) → jsPDF A4, multi-page if `canvas.height > pageHeight` (slice image across pages)
-- After download: auto-increment `invoice-count` in localStorage, bump invoice number
-- Print: `@media print` styles inside scoped `<style>` block — hide everything except `#invoice-preview`, reset margins, force white bg/black text
+## Confetti
 
-## Templates
+Pure CSS/JS — small set of absolutely-positioned divs with randomized transforms animated via Framer Motion (already in project) when `filled === glasses`. No new dependency.
 
-Three CSS class variants on the preview root: `.tpl-classic`, `.tpl-modern`, `.tpl-minimal`. Each defines header layout, table styling, totals block, accent color. Scoped via a local `<style>` tag (no global token pollution) — preview is intentionally white/print-styled regardless of app theme.
+## localStorage keys
 
-## localStorage Keys
+- `water-intake-inputs` — all form fields + unit
+- `water-intake-progress` — `{ date: 'YYYY-MM-DD', filled: number, checkedTimes: string[] }`
+- `water-intake-muted` — boolean
 
-- `invoice-from` (if "Remember" toggle on)
-- `invoice-settings` (currency, template, taxMode, rememberMe)
-- `invoice-draft` (full current invoice state)
-- `invoice-count` (numeric counter for auto-increment)
+On mount, if stored `date !== today` → reset progress (midnight auto-reset).
 
-Restored on mount via `useEffect`.
+## Internal links (TanStack Link)
 
-## SEO Content
+In tips section, use `<Link to="/tools/calorie-calculator">`, `<Link to="/tools/sleep-calculator">`, `<Link to="/tools/bmi-calculator">`. Activity-dependent and coffee-dependent tips per spec.
 
-- Memory rule: include `ToolSeoContent` with title, 1-2 sentence description, 2-3 paragraph body (~150-200 words), 4 FAQs (currency support, offline/private, PDF quality, editing later)
-- English only (per project memory)
+## SEO
+
+Use exact `HowToUse` steps, `ToolSeoContent` title/description/body/faqs from the spec.
 
 ## Acceptance
 
-- Live preview updates as user types
-- PDF downloads correctly with logo and all data, multi-page safe
-- Print produces only the invoice
-- Switching template doesn't lose form data
-- Reload restores last draft
-- Mobile: stacked layout, sticky download button
-- Registered in tools.ts and related-tools.ts
+- Result updates live as inputs change
+- Glass clicks animate + play gulp; completion triggers confetti + fanfare
+- Schedule reflects glass count, checkboxes persist
+- Unit toggle preserves equivalent weight
+- All progress wipes at midnight on reload
+- Mobile: stacked, no horizontal scroll
+- Registered in tools.ts, related-tools.ts, sitemap.xml

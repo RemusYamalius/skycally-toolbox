@@ -555,7 +555,7 @@ function HeartRateZoneCalculator() {
         </div>
       </div>
 
-      <AdZone />
+      <AdZone id="heart-rate-zone-calculator-mid" size="728x90" />
 
       <HowToUse
         steps={[

@@ -1101,6 +1101,15 @@ export const tools: Tool[] = [
     path: "/tools/water-intake-calculator",
   },
   {
+    slug: "heart-rate-zone-calculator",
+    name: "Heart Rate Zone Calculator",
+    description:
+      "Calculate your maximum heart rate and 5 training zones using Tanaka, Fox, Gulati, Nes or the Karvonen (HRR) method. Free, private, runs in your browser.",
+    category: "utility",
+    icon: HeartPulse,
+    path: "/tools/heart-rate-zone-calculator",
+  },
+  {
     slug: "ball-sort",
     name: "Ball Sort Puzzle",
     description: "Sort colored balls into matching tubes. 30 free levels, mobile and desktop, no download.",

@@ -15,21 +15,17 @@ export async function getFFmpeg(onProgress?: (progress: number) => void): Promis
   loadPromise = (async () => {
     try {
       const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-      const { toBlobURL } = await import("@ffmpeg/util");
       const inst = new FFmpeg();
 
       inst.on("progress", ({ progress }) => {
         progressHandler?.(Math.min(100, Math.max(0, Math.round(progress * 100))));
       });
 
-      const base = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd";
-
-      const [coreURL, wasmURL] = await Promise.all([
-        toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
-        toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
-      ]);
-
-      await inst.load({ coreURL, wasmURL });
+      // Files served from same origin — no CORS, no CDN, Worker adds COOP/COEP
+      await inst.load({
+        coreURL: "/ffmpeg/ffmpeg-core.js",
+        wasmURL: "/ffmpeg/ffmpeg-core.wasm",
+      });
 
       ffmpegInstance = inst;
       try {

@@ -44,30 +44,85 @@ function Page() {
     setGif(null);
     try {
       const ffmpeg = await getFFmpeg();
+
+      // Sanitise the input filename for FFmpeg's virtual FS
       const inputName = "input_" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
+      const paletteName = "palette.png";
+      const outputName = "output.gif";
+
+      // Write the source video into the WASM virtual filesystem
       await ffmpeg.writeFile(inputName, await fetchFile(file));
-      const dur = String(Math.min(duration, 10));
-      const vf = `fps=${fps},scale=${width}:-1:flags=lanczos,split[s0][s1];[s0]palettegen[p];[s1][p]paletteuse`;
+
+      const dur = String(Math.min(Math.max(duration, 1), 10));
+      const ss = String(Math.max(start, 0));
+
+      // ── Pass 1: generate an optimised palette from the clip ──────────────
+      // -ss / -t AFTER -i (output seeking) is safer in WASM and avoids
+      // keyframe-seek issues that cause silent failures on some codecs.
       await ffmpeg.exec([
-        "-ss",
-        String(start),
-        "-t",
-        dur,
         "-i",
         inputName,
+        "-ss",
+        ss,
+        "-t",
+        dur,
+        "-vf",
+        `fps=${fps},scale=${width}:-1:flags=lanczos,palettegen=stats_mode=diff`,
+        "-y",
+        paletteName,
+      ]);
+
+      // ── Pass 2: render the GIF using the generated palette ───────────────
+      await ffmpeg.exec([
+        "-i",
+        inputName,
+        "-i",
+        paletteName,
+        "-ss",
+        ss,
+        "-t",
+        dur,
         "-filter_complex",
-        vf,
+        `fps=${fps},scale=${width}:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle`,
         "-loop",
         "0",
-        "output.gif",
+        "-y",
+        outputName,
       ]);
-      const data = await ffmpeg.readFile("output.gif");
+
+      // Read the result and expose it to the UI
+      const data = await ffmpeg.readFile(outputName);
       const bytes = data as Uint8Array;
       const blob = new Blob([new Uint8Array(bytes)], { type: "image/gif" });
+
+      // Clean up the virtual FS to free WASM memory between conversions
+      try {
+        await ffmpeg.deleteFile(inputName);
+      } catch {
+        /* ignore */
+      }
+      try {
+        await ffmpeg.deleteFile(paletteName);
+      } catch {
+        /* ignore */
+      }
+      try {
+        await ffmpeg.deleteFile(outputName);
+      } catch {
+        /* ignore */
+      }
+
       setGif({ url: URL.createObjectURL(blob), blob });
       toast.success("GIF ready!");
-    } catch (e: any) {
-      toast.error(e?.message || "Conversion failed");
+    } catch (e: unknown) {
+      // Surface the real FFmpeg stderr message when available
+      const msg =
+        e instanceof Error
+          ? e.message
+          : typeof e === "string"
+            ? e
+            : "Conversion failed — check start time and duration.";
+      toast.error(msg);
     } finally {
       setBusy(false);
     }
@@ -86,6 +141,7 @@ function Page() {
 
       {file && (
         <div className="space-y-6">
+          {/* File info */}
           <div className="rounded-2xl border border-border bg-card p-5 flex items-center justify-between gap-3 flex-wrap">
             <div className="text-sm">
               <p className="font-semibold">{file.name}</p>
@@ -102,6 +158,7 @@ function Page() {
             </button>
           </div>
 
+          {/* Controls */}
           <div className="rounded-2xl border border-border bg-card p-5 grid gap-4 sm:grid-cols-2">
             <div>
               <label className="text-sm font-semibold mb-2 block">Start (seconds)</label>
@@ -150,6 +207,7 @@ function Page() {
             </div>
           </div>
 
+          {/* Convert button */}
           <button
             onClick={run}
             disabled={busy}
@@ -161,15 +219,16 @@ function Page() {
 
           {busy && (
             <p className="text-sm text-muted-foreground text-center">
-              Converting your video... this may take a few seconds.
+              Generating palette and rendering GIF — this may take a few seconds.
             </p>
           )}
 
+          {/* Result */}
           {gif && (
             <div className="rounded-2xl border border-border bg-card p-5 flex flex-col items-center gap-4">
               <img src={gif.url} alt="GIF preview" className="max-w-full rounded-xl border border-border" />
               <button
-                onClick={() => downloadBlob(gif.blob, "video.gif")}
+                onClick={() => downloadBlob(gif.blob, "skycally.gif")}
                 className="inline-flex items-center gap-2 rounded-xl bg-foreground text-background font-semibold px-5 py-2.5"
               >
                 <Download className="w-4 h-4" /> Download GIF

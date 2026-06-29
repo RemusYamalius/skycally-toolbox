@@ -6,22 +6,11 @@ let progressHandler: ((p: number) => void) | null = null;
 
 export const FFMPEG_FIRST_USE_KEY = "ffmpeg-warmed";
 
-// Single-threaded core — no SharedArrayBuffer / no COOP-COEP needed.
-// We load directly via URL (no toBlobURL) to avoid Cloudflare blob fetch restrictions.
 const CORE_VERSION = "0.12.6";
-
-// Two CDNs tried in order
 const CDNS = [
   `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/umd`,
   `https://unpkg.com/@ffmpeg/core@${CORE_VERSION}/dist/umd`,
 ];
-
-async function tryLoad(inst: FFmpeg, base: string): Promise<void> {
-  await inst.load({
-    coreURL: `${base}/ffmpeg-core.js`,
-    wasmURL: `${base}/ffmpeg-core.wasm`,
-  });
-}
 
 export async function getFFmpeg(onProgress?: (progress: number) => void): Promise<FFmpeg> {
   progressHandler = onProgress ?? null;
@@ -31,6 +20,7 @@ export async function getFFmpeg(onProgress?: (progress: number) => void): Promis
 
   loadPromise = (async () => {
     const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+    const { toBlobURL } = await import("@ffmpeg/util");
     const inst = new FFmpeg();
 
     inst.on("progress", ({ progress }) => {
@@ -41,7 +31,11 @@ export async function getFFmpeg(onProgress?: (progress: number) => void): Promis
 
     for (const base of CDNS) {
       try {
-        await tryLoad(inst, base);
+        const [coreURL, wasmURL] = await Promise.all([
+          toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
+          toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
+        ]);
+        await inst.load({ coreURL, wasmURL });
         ffmpegInstance = inst;
         try {
           localStorage.setItem(FFMPEG_FIRST_USE_KEY, "1");

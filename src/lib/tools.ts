@@ -99,6 +99,7 @@ import {
   Bitcoin,
   Ruler,
   Droplets,
+  HeartPulse,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1098,6 +1099,15 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Droplets,
     path: "/tools/water-intake-calculator",
+  },
+  {
+    slug: "heart-rate-zone-calculator",
+    name: "Heart Rate Zone Calculator",
+    description:
+      "Calculate your maximum heart rate and 5 training zones using Tanaka, Fox, Gulati, Nes or the Karvonen (HRR) method. Free, private, runs in your browser.",
+    category: "utility",
+    icon: HeartPulse,
+    path: "/tools/heart-rate-zone-calculator",
   },
   {
     slug: "ball-sort",

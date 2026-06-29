@@ -1,98 +1,127 @@
-# Water Intake Calculator
+## Heart Rate Zone Calculator
 
-Build `/tools/water-intake-calculator` as a single self-contained route, following the same shell + SEO pattern as other Skycally calculators (calorie, BMI, sleep).
+Build `/tools/heart-rate-zone-calculator` as a single self-contained route, following the same shell + SEO pattern as other Skycally calculators (calorie, BMI, water-intake).
 
-## Files
+### Files
 
-**Create** `src/routes/tools.water-intake-calculator.tsx`
-- `createFileRoute("/tools/water-intake-calculator")` + `buildToolMeta(toolBySlug("water-intake-calculator", tools))`
-- Wrapped in `<ToolPageShell showFileDisclaimer={false}>` → calculator UI → `<AdZone>` → `<HowToUse>` → `<ToolSeoContent>` → `<RelatedTools currentSlug="water-intake-calculator" />`
-- All logic, state, schedule builder, Web Audio sound helpers, and scoped CSS (ripple + glass fill) inline
+**Create** `src/routes/tools.heart-rate-zone-calculator.tsx`
+- `createFileRoute("/tools/heart-rate-zone-calculator")` + `buildToolMeta(toolBySlug(...))`
+- Wrapped in `<ToolPageShell showFileDisclaimer={false}>` → calculator UI → `<AdZone>` → `<HowToUse>` → `<ToolSeoContent>` → `<RelatedTools currentSlug="heart-rate-zone-calculator" />`
+- All logic, constants, Web Audio helpers, and scoped CSS inline
 
-**Edit** `src/lib/tools.ts` — register tool (slug `water-intake-calculator`, name "Water Intake Calculator", category `utility`, icon `Droplets` from lucide-react)
+**Create** `src/lib/heart-rate/constants.ts`
+- All formula constants (MHR formulas, zone percentages, edge-case bounds) — no magic numbers in the route
 
-**Edit** `src/lib/related-tools.ts` — cross-link with `calorie-calculator`, `bmi-calculator`, `sleep-calculator`, `age-calculator`
+**Edit** `src/lib/tools.ts` — register tool (slug `heart-rate-zone-calculator`, name "Heart Rate Zone Calculator", category `utility`, icon `HeartPulse`). Note: project has no `fitness` category; Skycally groups health calculators under **utility** (calorie, BMI, sleep, water-intake all live there).
 
-**Edit** `public/sitemap.xml` — add `/tools/water-intake-calculator` entry matching existing format
+**Edit** `src/lib/related-tools.ts` — cross-link with `calorie-calculator`, `bmi-calculator`, `sleep-calculator`, `water-intake-calculator`
 
-## UI layout
+**Edit** `public/sitemap.xml` — add `/tools/heart-rate-zone-calculator`
+
+### Constants (`src/lib/heart-rate/constants.ts`)
+
+```ts
+export const MHR_FORMULAS = {
+  tanaka:  { label: "Tanaka (recommended)", fn: (age:number) => 208 - 0.7 * age },
+  fox:     { label: "Fox (220 - age)",      fn: (age:number) => 220 - age },
+  gulati:  { label: "Gulati (women)",       fn: (age:number) => 206 - 0.88 * age },
+  nes:     { label: "Nes",                  fn: (age:number) => 211 - 0.64 * age },
+} as const;
+
+export const ZONES = [
+  { id: 1, name: "Very Light",  low: 0.50, high: 0.60, color: "#3b82f6", purpose: "Warm-up, recovery" },
+  { id: 2, name: "Light",       low: 0.60, high: 0.70, color: "#22c55e", purpose: "Fat burn, base endurance" },
+  { id: 3, name: "Moderate",    low: 0.70, high: 0.80, color: "#eab308", purpose: "Aerobic, stamina" },
+  { id: 4, name: "Hard",        low: 0.80, high: 0.90, color: "#f97316", purpose: "Anaerobic threshold" },
+  { id: 5, name: "Maximum",     low: 0.90, high: 1.00, color: "#ef4444", purpose: "VO2 max, sprints" },
+] as const;
+
+export const AGE_MIN_WARN = 10;
+export const AGE_MAX_WARN = 100;
+export const MHR_MIN_WARN = 100;
+export const DEBOUNCE_MS  = 150;
+```
+
+### Calculation
+
+Two methods:
+- **% of MHR**: `target = MHR * pct`
+- **Karvonen (HRR)**: `target = (MHR - RHR) * pct + RHR` — only enabled when RHR provided
+
+Edge cases:
+- `age < 10 || age > 100` → warning chip ("Formulas are validated for ages 10–100")
+- `RHR >= MHR` → error state, block results
+- `MHR < 100` → warning chip ("Unusually low max heart rate — double-check inputs")
+
+### UI layout
 
 Desktop `md:grid-cols-[2fr_3fr]`, mobile stacked.
 
 ```text
 Left (inputs)
-  Weight (number + kg/lbs toggle)
   Age (number)
-  Sex (Male/Female toggle)
-  Activity (5 card selector w/ emoji)
-  Climate (3 buttons)
-  Special conditions (Pregnant, Breastfeeding toggles — only when Female)
-  Coffees stepper (0-10)
-  Alcoholic drinks stepper (0-10)
+  Sex (Male/Female toggle — drives Gulati availability)
+  MHR formula select (Tanaka / Fox / Gulati / Nes / Manual override)
+  Manual MHR (number, shown when "Manual")
+  Resting HR (optional number, enables Karvonen)
+  Calculation method toggle (% MHR / Karvonen)
 
 Right
-  Hero result card (cyan gradient + animated water ripple)
-    ml primary, then L · glasses · fl oz
-  Breakdown chips (one pill per applied factor with sign + value)
-  Interactive Glass Tracker
-    grid of glass SVGs (cap at 16 visual, real count above)
-    click → fill animation + gulp sound, progress bar
-    completion → confetti + success fanfare
-  Hydration Schedule
-    vertical timeline with time, label, checkbox
-  Contextual tips with internal <Link> to related tools
-  Medical disclaimer
+  Hero result card (red→orange gradient + animated pulse heart SVG)
+    MHR primary, method label, RHR echo
+  Zone table — 5 rows, each:
+    color bar, name, BPM range (low–high), % range, purpose
+    click row → plays soft tone at zone frequency
+  Horizontal zone bar (stacked colored segments, full MHR scale)
+  Warning/error chips
+  Share button (uses existing share pattern)
 ```
 
-## Calculation
+### Sound (Web Audio API)
 
-```ts
-const base = unit === 'kg' ? weightKg * 33 : weightLbs * 0.5 * 29.5735;
-const activity = {sedentary:0, light:350, moderate:600, very:900, extra:1200}[level];
-const climateBonus = {cold:-200, temperate:0, hot:500}[climate];
-const pregBonus = pregnant ? 300 : 0;
-const bfBonus = breastfeeding ? 700 : 0;
-const coffeeDeduct = coffees * 150;
-const alcoholDeduct = drinks * 200;
-let total = base + activity + climateBonus + pregBonus + bfBonus - coffeeDeduct - alcoholDeduct;
-total = Math.max(1500, Math.min(5000, total));
-// glasses = ceil(total/250); liters = total/1000; flOz = total/29.5735
-```
+Singleton `AudioContext` lazily created on first interaction. Helpers:
+- `playZoneTone(zoneId)` — sine wave, freq scales with zone (300–700 Hz), 0.15s
+- `playHeartbeat()` — two-thump kick on hero card mount (optional)
+- Mute toggle persisted to `localStorage`
 
-## Schedule builder
+### Performance
 
-Use the spec's `buildSchedule` (special labels at 7/13/19/22). Interval spread 7→22.
+- `useMemo` for derived zone rows
+- Inputs debounced 150ms via small `useDebouncedValue` hook inlined
+- No third-party state libs
 
-## Sound (Web Audio API)
+### Accessibility
 
-Singleton `AudioContext` lazily created on first interaction. Two helpers: `playGulpSound` (sine 800→200Hz over 0.3s) and `playSuccessSound` (C-E-G-C arpeggio). Mute toggle button next to glass tracker, state persisted.
+- All inputs labeled with `<Label htmlFor>`
+- Zone table is a real `<table>` with `<th scope>`
+- Color is never the only signal — every zone has name + numeric range
+- Warning/error chips use `role="status"` / `role="alert"`
+- Keyboard: zone rows are `<button>` for tone playback, full focus-visible ring
+- Mute toggle has `aria-pressed`
 
-## Confetti
+### localStorage
 
-Pure CSS/JS — small set of absolutely-positioned divs with randomized transforms animated via Framer Motion (already in project) when `filled === glasses`. No new dependency.
+- `hr-zone-inputs` — form values
+- `hr-zone-muted` — boolean
 
-## localStorage keys
+### SEO
 
-- `water-intake-inputs` — all form fields + unit
-- `water-intake-progress` — `{ date: 'YYYY-MM-DD', filled: number, checkedTimes: string[] }`
-- `water-intake-muted` — boolean
+- `HowToUse` 3 steps (enter age → pick formula → read zones)
+- `ToolSeoContent` with target keyword "heart rate zone calculator", 2–3 paragraphs explaining MHR, HRR/Karvonen, zone training, plus 4 FAQs (Tanaka vs 220-age, why use RHR, training in zone 2, accuracy disclaimer)
+- Medical disclaimer line at bottom
 
-On mount, if stored `date !== today` → reset progress (midnight auto-reset).
+### Acceptance
 
-## Internal links (TanStack Link)
-
-In tips section, use `<Link to="/tools/calorie-calculator">`, `<Link to="/tools/sleep-calculator">`, `<Link to="/tools/bmi-calculator">`. Activity-dependent and coffee-dependent tips per spec.
-
-## SEO
-
-Use exact `HowToUse` steps, `ToolSeoContent` title/description/body/faqs from the spec.
-
-## Acceptance
-
-- Result updates live as inputs change
-- Glass clicks animate + play gulp; completion triggers confetti + fanfare
-- Schedule reflects glass count, checkboxes persist
-- Unit toggle preserves equivalent weight
-- All progress wipes at midnight on reload
+- Live update on every input change (debounced 150ms)
+- Switching formula or method updates zone table instantly
+- Karvonen disabled until RHR entered; RHR ≥ MHR shows error
+- Age out of 10–100 shows warning, MHR < 100 shows warning
+- Clicking a zone row plays a tone (when unmuted)
 - Mobile: stacked, no horizontal scroll
-- Registered in tools.ts, related-tools.ts, sitemap.xml
+- Registered in tools.ts (utility category), related-tools.ts, sitemap.xml
+- Breadcrumb already provided by ToolPageShell ("Back to all tools" link)
+
+### Note on spec deviations
+
+- **Category**: spec says "Fitness" but Skycally has no fitness category — using `utility` to match calorie/BMI/sleep/water-intake.
+- **Shared components**: spec mentions `ToolCard, ToolHeader, ToolSection, Badge` — project uses `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `AdZone`, `RelatedTools`. Will use those (the actual Skycally pattern).

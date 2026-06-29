@@ -99,6 +99,7 @@ import {
   Bitcoin,
   Ruler,
   Droplets,
+  HeartPulse,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 

@@ -1,10 +1,5 @@
 import type { FFmpeg } from "@ffmpeg/ffmpeg";
 
-// Import core files directly from node_modules (bundled by Vite at build time)
-// This avoids all CDN/CSP/CORS issues entirely.
-import coreURL from "@ffmpeg/core/dist/umd/ffmpeg-core.js?url";
-import wasmURL from "@ffmpeg/core/dist/umd/ffmpeg-core.wasm?url";
-
 let ffmpegInstance: FFmpeg | null = null;
 let loadPromise: Promise<FFmpeg> | null = null;
 let progressHandler: ((p: number) => void) | null = null;
@@ -20,11 +15,19 @@ export async function getFFmpeg(onProgress?: (progress: number) => void): Promis
   loadPromise = (async () => {
     try {
       const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+      const { toBlobURL } = await import("@ffmpeg/util");
       const inst = new FFmpeg();
 
       inst.on("progress", ({ progress }) => {
         progressHandler?.(Math.min(100, Math.max(0, Math.round(progress * 100))));
       });
+
+      const base = "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd";
+
+      const [coreURL, wasmURL] = await Promise.all([
+        toBlobURL(`${base}/ffmpeg-core.js`, "text/javascript"),
+        toBlobURL(`${base}/ffmpeg-core.wasm`, "application/wasm"),
+      ]);
 
       await inst.load({ coreURL, wasmURL });
 

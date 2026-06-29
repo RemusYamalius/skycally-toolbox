@@ -6,37 +6,11 @@ let progressHandler: ((p: number) => void) | null = null;
 
 export const FFMPEG_FIRST_USE_KEY = "ffmpeg-warmed";
 
-// ─── CDN sources tried in order ──────────────────────────────────────────────
-// unpkg is unreliable for large WASM files (CORS timeouts, rate limits).
-// jsdelivr is the primary; unpkg is kept as last-resort fallback.
-const CDN_BASES = [
-  "https://cdn.jsdelivr.net/npm/@ffmpeg/core@0.12.6/dist/umd",
-  "https://unpkg.com/@ffmpeg/core@0.12.6/dist/umd",
-];
-
-// ─── Helpers ─────────────────────────────────────────────────────────────────
-
-async function tryLoad(inst: FFmpeg, baseURL: string): Promise<void> {
-  const { toBlobURL } = await import("@ffmpeg/util");
-
-  // Fetch both files in parallel — fail fast if either times out
-  const TIMEOUT_MS = 20_000;
-
-  const withTimeout = <T,>(p: Promise<T>, ms: number): Promise<T> =>
-    Promise.race([
-      p,
-      new Promise<never>((_, reject) => setTimeout(() => reject(new Error(`CDN timeout after ${ms}ms`)), ms)),
-    ]);
-
-  const [coreURL, wasmURL] = await Promise.all([
-    withTimeout(toBlobURL(`${baseURL}/ffmpeg-core.js`, "text/javascript"), TIMEOUT_MS),
-    withTimeout(toBlobURL(`${baseURL}/ffmpeg-core.wasm`, "application/wasm"), TIMEOUT_MS),
-  ]);
-
-  await inst.load({ coreURL, wasmURL });
-}
-
-// ─── Public API ──────────────────────────────────────────────────────────────
+// ─── Single-threaded core (no SharedArrayBuffer / no COOP-COEP required) ────
+// Uses @ffmpeg/core (NOT @ffmpeg/core-mt) served from jsDelivr.
+// jsDelivr is more reliable than unpkg for large WASM files.
+const CORE_VERSION = "0.12.6";
+const BASE = `https://cdn.jsdelivr.net/npm/@ffmpeg/core@${CORE_VERSION}/dist/umd`;
 
 export async function getFFmpeg(onProgress?: (progress: number) => void): Promise<FFmpeg> {
   progressHandler = onProgress ?? null;
@@ -45,59 +19,64 @@ export async function getFFmpeg(onProgress?: (progress: number) => void): Promis
   if (loadPromise) return loadPromise;
 
   loadPromise = (async () => {
-    const { FFmpeg } = await import("@ffmpeg/ffmpeg");
-    const inst = new FFmpeg();
+    try {
+      const { FFmpeg } = await import("@ffmpeg/ffmpeg");
+      const { toBlobURL } = await import("@ffmpeg/util");
 
-    inst.on("progress", ({ progress }) => {
-      progressHandler?.(Math.min(100, Math.max(0, Math.round(progress * 100))));
-    });
+      const inst = new FFmpeg();
 
-    // Try each CDN in order; move to next on any error
-    let lastError: unknown;
-    for (const base of CDN_BASES) {
+      inst.on("progress", ({ progress }) => {
+        progressHandler?.(Math.min(100, Math.max(0, Math.round(progress * 100))));
+      });
+
+      // Fetch core JS and WASM in parallel with a 30s timeout each
+      const withTimeout = <T,>(p: Promise<T>, ms: number, label: string): Promise<T> =>
+        Promise.race([
+          p,
+          new Promise<never>((_, reject) =>
+            setTimeout(() => reject(new Error(`Timeout loading ${label} after ${ms}ms`)), ms),
+          ),
+        ]);
+
+      const [coreURL, wasmURL] = await Promise.all([
+        withTimeout(toBlobURL(`${BASE}/ffmpeg-core.js`, "text/javascript"), 30_000, "ffmpeg-core.js"),
+        withTimeout(toBlobURL(`${BASE}/ffmpeg-core.wasm`, "application/wasm"), 30_000, "ffmpeg-core.wasm"),
+      ]);
+
+      await inst.load({ coreURL, wasmURL });
+
+      ffmpegInstance = inst;
+
       try {
-        await tryLoad(inst, base);
-        ffmpegInstance = inst;
-
-        try {
-          localStorage.setItem(FFMPEG_FIRST_USE_KEY, "1");
-        } catch {
-          /* ignore storage errors */
-        }
-
-        return inst;
-      } catch (err) {
-        console.warn(`[ffmpegLoader] Failed to load from ${base}:`, err);
-        lastError = err;
+        localStorage.setItem(FFMPEG_FIRST_USE_KEY, "1");
+      } catch {
+        /* ignore */
       }
+
+      return inst;
+    } catch (err) {
+      // Reset so the user can retry
+      loadPromise = null;
+      const msg = err instanceof Error ? err.message : "Failed to load video converter";
+      throw new Error(`Could not load the video converter. Please check your connection and try again.\n${msg}`);
     }
-
-    // All CDNs failed — reset so the next call retries from scratch
-    loadPromise = null;
-
-    throw new Error(
-      "Could not load the video converter. Please check your internet connection and try again.\n" +
-        (lastError instanceof Error ? lastError.message : String(lastError)),
-    );
   })();
 
   return loadPromise;
 }
 
-// ─── Optional: preload in the background after page idle ─────────────────────
-// Call this once from the tool page to warm up the WASM before the user clicks.
+// ─── Warm up in background after page idle ───────────────────────────────────
 export function preloadFFmpeg(): void {
   if (ffmpegInstance || loadPromise) return;
   if (typeof window === "undefined") return;
 
-  const warm = () => {
+  const warm = () =>
     getFFmpeg().catch(() => {
-      // Preload failure is silent — the user will get a proper error on click
+      // Silent — user gets proper error on click
     });
-  };
 
   if ("requestIdleCallback" in window) {
-    (window as Window & { requestIdleCallback: (cb: () => void) => void }).requestIdleCallback(warm);
+    window.requestIdleCallback(warm);
   } else {
     setTimeout(warm, 3000);
   }

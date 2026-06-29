@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useEffect, useMemo, useRef, useState, useCallback } from "react";
+import { useEffect, useMemo, useState, useCallback } from "react";
 import { motion } from "framer-motion";
 import { HeartPulse, Volume2, VolumeX, Share2, AlertTriangle, AlertCircle, Info } from "lucide-react";
 
@@ -44,7 +44,8 @@ let _ctx: AudioContext | null = null;
 const getCtx = (): AudioContext | null => {
   if (typeof window === "undefined") return null;
   if (!_ctx) {
-    const Ctor = window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
+    const Ctor =
+      window.AudioContext || (window as unknown as { webkitAudioContext: typeof AudioContext }).webkitAudioContext;
     if (!Ctor) return null;
     _ctx = new Ctor();
   }
@@ -89,6 +90,16 @@ interface SavedInputs {
   rhr: string;
   method: Method;
 }
+
+// ─── Inline link helper ───────────────────────────────────────────────────────
+// ToolSeoContent accepts ReactNode in body/faq answers, so we can embed <a> tags
+// directly inside the strings using JSX fragments. The helper keeps things DRY.
+const InternalLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  <a href={href} className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
+    {children}
+  </a>
+);
+// ─────────────────────────────────────────────────────────────────────────────
 
 function HeartRateZoneCalculator() {
   const tool = toolBySlug("heart-rate-zone-calculator", tools);
@@ -140,7 +151,7 @@ function HeartRateZoneCalculator() {
     }
   }, [muted]);
 
-  // Debounced source values for recalculation
+  // Debounced source values
   const dAge = useDebouncedValue(age, DEBOUNCE_MS);
   const dFormula = useDebouncedValue(formulaId, DEBOUNCE_MS);
   const dManual = useDebouncedValue(manualMhr, DEBOUNCE_MS);
@@ -152,6 +163,7 @@ function HeartRateZoneCalculator() {
     const n = parseFloat(dAge);
     return Number.isFinite(n) ? n : NaN;
   }, [dAge]);
+
   const rhrNum = useMemo(() => {
     if (dRhr.trim() === "") return NaN;
     const n = parseFloat(dRhr);
@@ -185,20 +197,31 @@ function HeartRateZoneCalculator() {
     errors.push("Resting heart rate must be lower than maximum heart rate.");
   }
 
+  // ─────────────────────────────────────────────────────────────────────────
   // Zone rows
+  // pctLow / pctHigh preserve the original ZONES fractions (e.g. 0.50, 0.60)
+  // so the "% Intensity" column always shows correct values like "50–60%",
+  // regardless of the BPM values computed for the chosen method.
+  // ─────────────────────────────────────────────────────────────────────────
   const zoneRows = useMemo(() => {
     if (!Number.isFinite(mhr)) return [];
     return ZONES.map((z) => {
-      let low: number, high: number;
+      const pctLow = z.low;
+      const pctHigh = z.high;
+
+      let bpmLow: number;
+      let bpmHigh: number;
+
       if (effectiveMethod === "karvonen" && hasRhr) {
         const hrr = mhr - rhrNum;
-        low = Math.round(hrr * z.low + rhrNum);
-        high = Math.round(hrr * z.high + rhrNum);
+        bpmLow = Math.round(hrr * pctLow + rhrNum);
+        bpmHigh = Math.round(hrr * pctHigh + rhrNum);
       } else {
-        low = Math.round(mhr * z.low);
-        high = Math.round(mhr * z.high);
+        bpmLow = Math.round(mhr * pctLow);
+        bpmHigh = Math.round(mhr * pctHigh);
       }
-      return { ...z, low, high };
+
+      return { ...z, low: bpmLow, high: bpmHigh, pctLow, pctHigh };
     });
   }, [mhr, effectiveMethod, hasRhr, rhrNum]);
 
@@ -222,7 +245,7 @@ function HeartRateZoneCalculator() {
         return;
       }
     } catch {
-      /* fall through to clipboard */
+      /* fall through */
     }
     try {
       await navigator.clipboard.writeText(url);
@@ -277,7 +300,11 @@ function HeartRateZoneCalculator() {
             </div>
             <div className="rounded-2xl border border-border bg-card/60 p-5">
               <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Sex</span>
-              <div role="radiogroup" aria-label="Sex" className="mt-2 grid grid-cols-2 gap-1.5 rounded-md bg-secondary p-1">
+              <div
+                role="radiogroup"
+                aria-label="Sex"
+                className="mt-2 grid grid-cols-2 gap-1.5 rounded-md bg-secondary p-1"
+              >
                 {(["male", "female"] as Sex[]).map((s) => (
                   <button
                     key={s}
@@ -319,10 +346,12 @@ function HeartRateZoneCalculator() {
                 ? "Enter your measured or lab-tested MHR below."
                 : MHR_FORMULAS[formulaId].description}
             </p>
-
             {formulaId === "manual" && (
               <div className="mt-3">
-                <label htmlFor="hr-manual" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+                <label
+                  htmlFor="hr-manual"
+                  className="text-xs font-medium uppercase tracking-wider text-muted-foreground"
+                >
                   Your max HR (BPM)
                 </label>
                 <Input
@@ -343,7 +372,8 @@ function HeartRateZoneCalculator() {
           {/* Resting HR */}
           <section className="rounded-2xl border border-border bg-card/60 p-5">
             <label htmlFor="hr-rhr" className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-              Resting Heart Rate <span className="text-muted-foreground/70 normal-case">(optional — enables Karvonen)</span>
+              Resting Heart Rate{" "}
+              <span className="text-muted-foreground/70 normal-case">(optional — enables Karvonen)</span>
             </label>
             <Input
               id="hr-rhr"
@@ -363,12 +393,20 @@ function HeartRateZoneCalculator() {
 
           {/* Method */}
           <section className="rounded-2xl border border-border bg-card/60 p-5">
-            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Calculation Method</span>
-            <div role="radiogroup" aria-label="Calculation method" className="mt-2 grid grid-cols-2 gap-1.5 rounded-md bg-secondary p-1">
-              {([
-                { id: "mhr", label: "% of MHR" },
-                { id: "karvonen", label: "Karvonen (HRR)" },
-              ] as { id: Method; label: string }[]).map((m) => {
+            <span className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
+              Calculation Method
+            </span>
+            <div
+              role="radiogroup"
+              aria-label="Calculation method"
+              className="mt-2 grid grid-cols-2 gap-1.5 rounded-md bg-secondary p-1"
+            >
+              {(
+                [
+                  { id: "mhr", label: "% of MHR" },
+                  { id: "karvonen", label: "Karvonen (HRR)" },
+                ] as { id: Method; label: string }[]
+              ).map((m) => {
                 const disabled = m.id === "karvonen" && !karvonenAvailable;
                 return (
                   <button
@@ -394,7 +432,8 @@ function HeartRateZoneCalculator() {
             <p className="mt-2 text-xs text-muted-foreground inline-flex items-start gap-1.5">
               <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" aria-hidden="true" />
               <span>
-                Karvonen uses Heart Rate Reserve (MHR − RHR) and is generally more accurate when you know your resting heart rate.
+                Karvonen uses Heart Rate Reserve (MHR − RHR) and is generally more accurate when you know your resting
+                heart rate.
               </span>
             </p>
           </section>
@@ -444,7 +483,11 @@ function HeartRateZoneCalculator() {
                 aria-label={muted ? "Unmute zone tones" : "Mute zone tones"}
                 className="inline-flex items-center gap-1.5 rounded-full bg-white/20 hover:bg-white/30 px-3 py-1.5 text-xs font-semibold transition-colors backdrop-blur-sm"
               >
-                {muted ? <VolumeX className="w-3.5 h-3.5" aria-hidden="true" /> : <Volume2 className="w-3.5 h-3.5" aria-hidden="true" />}
+                {muted ? (
+                  <VolumeX className="w-3.5 h-3.5" aria-hidden="true" />
+                ) : (
+                  <Volume2 className="w-3.5 h-3.5" aria-hidden="true" />
+                )}
                 {muted ? "Muted" : "Sound on"}
               </button>
               {shareMsg && <span className="text-xs font-medium opacity-95">{shareMsg}</span>}
@@ -485,7 +528,7 @@ function HeartRateZoneCalculator() {
                   <div
                     key={z.id}
                     className="h-full"
-                    style={{ background: z.color, width: `${(z.high - z.low) * 100}%` }}
+                    style={{ background: z.color, width: `${(z.pctHigh - z.pctLow) * 100}%` }}
                     aria-hidden="true"
                   />
                 ))}
@@ -508,10 +551,18 @@ function HeartRateZoneCalculator() {
                 <caption className="sr-only">Training heart-rate zones</caption>
                 <thead>
                   <tr className="text-left text-xs uppercase tracking-wider text-muted-foreground">
-                    <th scope="col" className="px-2 py-2">Zone</th>
-                    <th scope="col" className="px-2 py-2">Range (BPM)</th>
-                    <th scope="col" className="px-2 py-2 hidden sm:table-cell">% Intensity</th>
-                    <th scope="col" className="px-2 py-2">Purpose</th>
+                    <th scope="col" className="px-2 py-2">
+                      Zone
+                    </th>
+                    <th scope="col" className="px-2 py-2">
+                      Range (BPM)
+                    </th>
+                    <th scope="col" className="px-2 py-2 hidden sm:table-cell">
+                      % Intensity
+                    </th>
+                    <th scope="col" className="px-2 py-2">
+                      Purpose
+                    </th>
                   </tr>
                 </thead>
                 <tbody>
@@ -536,8 +587,12 @@ function HeartRateZoneCalculator() {
                       <td className="px-2 py-2 font-mono tabular-nums">
                         {z.low}–{z.high}
                       </td>
+                      {/*
+                       * % Intensity — always from the original zone fractions
+                       * (pctLow/pctHigh), never from the computed BPM values.
+                       */}
                       <td className="px-2 py-2 font-mono tabular-nums text-muted-foreground hidden sm:table-cell">
-                        {Math.round(z.low * 100)}–{Math.round(z.high * 100)}%
+                        {Math.round(z.pctLow * 100)}–{Math.round(z.pctHigh * 100)}%
                       </td>
                       <td className="px-2 py-2 text-muted-foreground">{z.purpose}</td>
                     </tr>
@@ -555,6 +610,7 @@ function HeartRateZoneCalculator() {
         </div>
       </div>
 
+      {/* ── Ad slot (mid-page) ── */}
       <AdZone id="heart-rate-zone-calculator-mid" size="728x90" />
 
       <HowToUse
@@ -569,11 +625,49 @@ function HeartRateZoneCalculator() {
         title="Free Heart Rate Zone Calculator — MHR, HRR & 5-Zone Training"
         description="Calculate your maximum heart rate and the five training zones using Tanaka, Fox, Gulati, Nes or the Karvonen (HRR) formula. Free, private, and runs entirely in your browser."
         body={[
-          "Heart-rate zone training is the most reliable way to make sure every workout is doing what you want it to do — burn fat, build base endurance, push your aerobic ceiling or recover. This calculator estimates your maximum heart rate (MHR) using your age and one of four validated formulas: Tanaka (208 − 0.7 × age) for adults of all ages, the classic Fox (220 − age), Gulati for women, and Nes for healthy adults. You can also enter your own measured MHR for the most accurate result.",
-          "When you add your resting heart rate (RHR), the calculator unlocks the Karvonen method, which uses Heart Rate Reserve — the gap between your maximum and resting heart rates — to personalise each zone. Karvonen is generally more accurate than the plain percentage-of-MHR method, especially for fit athletes whose resting heart rate sits well below the population average.",
-          "All five zones are shown with their BPM range, intensity percentage and training purpose, from Zone 1 (warm-up & recovery) through Zone 5 (VO₂ max). Tap any row to play a short reference tone. Everything runs locally — your inputs never leave your device.",
+          // ── Paragraph 1 ──────────────────────────────────────────────────
+          <>
+            Heart-rate zone training is the most reliable way to make sure every workout is doing what you want it to do
+            — burn fat, build base endurance, push your aerobic ceiling or recover. This calculator estimates your
+            maximum heart rate (MHR) using your age and one of four validated formulas: Tanaka (208 − 0.7 × age) for
+            adults of all ages, the classic Fox (220 − age), Gulati for women, and Nes for healthy adults. You can also
+            enter your own measured MHR for the most accurate result. Pair your zones with a full nutrition plan using
+            our <InternalLink href="/tools/calorie-calculator">Calorie Calculator</InternalLink> to align your fuelling
+            strategy with each training intensity.
+          </>,
+
+          // ── Paragraph 2 ──────────────────────────────────────────────────
+          <>
+            When you add your resting heart rate (RHR), the calculator unlocks the Karvonen method, which uses Heart
+            Rate Reserve — the gap between your maximum and resting heart rates — to personalise each zone. Karvonen is
+            generally more accurate than the plain percentage-of-MHR method, especially for fit athletes whose resting
+            heart rate sits well below the population average. Staying well-hydrated also directly affects your heart
+            rate at any given effort — use our{" "}
+            <InternalLink href="/tools/water-intake-calculator">Water Intake Calculator</InternalLink> to set a precise
+            daily fluid target before your next session.
+          </>,
+
+          // ── Paragraph 3 ──────────────────────────────────────────────────
+          <>
+            All five zones are shown with their BPM range, intensity percentage and training purpose, from Zone 1
+            (warm-up &amp; recovery) through Zone 5 (VO₂ max). Tap any row to play a short reference tone so you can
+            memorise how each effort level feels. Everything runs locally — your inputs never leave your device. For a
+            complete picture of your body composition alongside your training zones, check the{" "}
+            <InternalLink href="/tools/bmi-calculator">BMI Calculator</InternalLink>.
+          </>,
+
+          // ── Paragraph 4 ──────────────────────────────────────────────────
+          <>
+            Heart-rate zones are not static — they shift as your cardiovascular fitness improves. A beginner runner may
+            find Zone 2 feels genuinely comfortable at 120 BPM, while a trained athlete's Zone 2 ceiling can sit 20–30
+            BPM higher for the same physiological output. Re-run this calculator every 8–12 weeks, or after any
+            significant change in your training volume or intensity, to keep your zones calibrated. Recovery is just as
+            important as training — see our <InternalLink href="/tools/sleep-calculator">Sleep Calculator</InternalLink>{" "}
+            to optimise the rest that makes your hard sessions count.
+          </>,
         ]}
         faqs={[
+          // ── Original 4 ──────────────────────────────────────────────────
           {
             question: "Tanaka vs 220 − age — which formula should I use?",
             answer:
@@ -586,13 +680,53 @@ function HeartRateZoneCalculator() {
           },
           {
             question: "Which zone should I train in to lose fat or build endurance?",
-            answer:
-              "Zone 2 (about 60–70% of MHR) is the classic 'fat burn' and base-endurance zone. Most endurance coaches recommend spending 70–80% of your weekly training time in Zones 1–2, with shorter, harder sessions in Zones 4–5 to raise your ceiling.",
+            answer: (
+              <>
+                Zone 2 (about 60–70% of MHR) is the classic fat-burn and base-endurance zone. Most endurance coaches
+                recommend spending 70–80% of your weekly training time in Zones 1–2, with shorter, harder sessions in
+                Zones 4–5 to raise your ceiling. Combine Zone 2 work with a calorie-aware nutrition plan — our{" "}
+                <InternalLink href="/tools/calorie-calculator">Calorie Calculator</InternalLink> can help you dial in
+                your daily energy needs.
+              </>
+            ),
           },
           {
             question: "How accurate is a calculated maximum heart rate?",
             answer:
               "Formulas have a standard deviation of roughly ±10–12 BPM, so two people the same age can have genuinely different true max heart rates. For the best accuracy, measure yours during a supervised graded exercise test or use a heart-rate monitor during an all-out effort, then enter the result using the Manual override.",
+          },
+
+          // ── 4 new FAQs ──────────────────────────────────────────────────
+          {
+            question: "What is Zone 2 training and why is it so popular right now?",
+            answer:
+              "Zone 2 (60–70% of MHR) has surged in popularity following research into mitochondrial health and metabolic efficiency. Training at this intensity for extended periods — typically 45–90 minutes per session — improves the body's ability to oxidise fat as fuel, builds a larger aerobic base, and produces far less metabolic stress than higher zones. This means faster recovery and the ability to train more frequently without accumulating fatigue. Many elite endurance coaches now recommend that 75–80% of total weekly training volume be completed in Zone 2.",
+          },
+          {
+            question: "What is the difference between % of MHR and the Karvonen (HRR) method?",
+            answer: (
+              <>
+                The percentage-of-MHR method calculates each zone as a simple fraction of your maximum heart rate. The
+                Karvonen method uses Heart Rate Reserve (HRR = MHR − RHR) and derives zones relative to that range, then
+                adds your resting heart rate back to produce the final BPM targets. Because it accounts for your
+                individual resting heart rate, Karvonen tends to assign higher BPM targets for the same effort level —
+                making it noticeably more accurate for athletes with a low resting heart rate (below 55 BPM).
+                Dehydration can artificially elevate your resting heart rate, so make sure you're well-hydrated before
+                measuring — use our{" "}
+                <InternalLink href="/tools/water-intake-calculator">Water Intake Calculator</InternalLink> to check your
+                daily fluid target.
+              </>
+            ),
+          },
+          {
+            question: "Can I use this calculator if I have a heart condition or take medication?",
+            answer:
+              "This tool is designed for general fitness reference only and is not a medical device. If you have a diagnosed heart condition, take medication that affects heart rate — such as beta-blockers, which suppress the heart's natural rate response and make age-based formulas unreliable — or have been advised by a doctor to limit exercise intensity, please consult your physician before using heart-rate zones for training. In those cases, a medically supervised exercise test is the safest way to establish your true training zones.",
+          },
+          {
+            question: "How do I find my true maximum heart rate?",
+            answer:
+              "The most reliable method is a maximal exercise test supervised by a sports medicine professional or cardiologist. A practical field alternative is a structured all-out effort test: after a thorough warm-up, perform three intervals of 3 minutes at maximum sustainable effort on a treadmill, track, or stationary bike, and note the highest BPM recorded by your heart-rate monitor. Enter that value into this calculator using the 'Manual override' option to get the most personalised zone results possible.",
           },
         ]}
       />

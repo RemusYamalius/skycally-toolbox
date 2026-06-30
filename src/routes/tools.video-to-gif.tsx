@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
-import { useState } from "react";
+import { useRef, useState } from "react";
 import { toast } from "sonner";
 import { Film, Download, Loader2 } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -11,8 +11,6 @@ import { DropZone, formatBytes } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
-import { getFFmpeg } from "@/utils/ffmpegLoader";
-import { fetchFile } from "@ffmpeg/util";
 
 export const Route = createFileRoute("/tools/video-to-gif")({
   head: () => buildToolMeta(toolBySlug("video-to-gif", tools)),
@@ -21,107 +19,152 @@ export const Route = createFileRoute("/tools/video-to-gif")({
 
 const MAX_VIDEO_BYTES = 50 * 1024 * 1024;
 
+// ─────────────────────────────────────────────────────────────────────────
+// gif.js is loaded lazily from a CDN as a plain <script> tag (UMD global),
+// NOT as an ES module import. This avoids bundler/WASM/CORS/COOP-COEP
+// issues entirely — it's a small (~50KB), battle-tested encoder that runs
+// fully client-side with a Web Worker it spins up itself.
+// ─────────────────────────────────────────────────────────────────────────
+declare global {
+  interface Window {
+    GIF: new (opts: Record<string, unknown>) => GifEncoderInstance;
+  }
+}
+
+interface GifEncoderInstance {
+  addFrame: (image: CanvasImageSource, opts?: { delay?: number; copy?: boolean }) => void;
+  on: (event: "finished" | "progress", cb: (arg: unknown) => void) => void;
+  render: () => void;
+}
+
+let gifJsLoadPromise: Promise<void> | null = null;
+
+function loadGifJs(): Promise<void> {
+  if (typeof window !== "undefined" && window.GIF) return Promise.resolve();
+  if (gifJsLoadPromise) return gifJsLoadPromise;
+
+  gifJsLoadPromise = new Promise<void>((resolve, reject) => {
+    const script = document.createElement("script");
+    script.src = "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.js";
+    script.async = true;
+    script.onload = () => resolve();
+    script.onerror = () => reject(new Error("Failed to load GIF encoder"));
+    document.head.appendChild(script);
+  });
+
+  return gifJsLoadPromise;
+}
+
+// The worker script gif.js spins up internally also needs to be reachable.
+// cdnjs serves gif.worker.js next to gif.js at the same base path.
+const GIF_WORKER_SCRIPT_URL = "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js";
+
 function Page() {
   const [file, setFile] = useState<File | null>(null);
+  const [videoUrl, setVideoUrl] = useState<string | null>(null);
   const [start, setStart] = useState(0);
   const [duration, setDuration] = useState(3);
   const [width, setWidth] = useState(480);
   const [fps, setFps] = useState(15);
   const [busy, setBusy] = useState(false);
+  const [progress, setProgress] = useState(0);
   const [gif, setGif] = useState<{ url: string; blob: Blob } | null>(null);
+
+  const videoRef = useRef<HTMLVideoElement | null>(null);
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
 
   const onPick = (files: File[]) => {
     const f = files[0];
     if (!f) return;
     if (f.size > MAX_VIDEO_BYTES) return toast.error("Max video size is 50MB");
     setFile(f);
+    setVideoUrl(URL.createObjectURL(f));
     setGif(null);
   };
 
   const run = async () => {
-    if (!file) return;
+    if (!file || !videoUrl) return;
     setBusy(true);
+    setProgress(0);
     setGif(null);
+
     try {
-      const ffmpeg = await getFFmpeg();
+      await loadGifJs();
 
-      // Sanitise the input filename for FFmpeg's virtual FS
-      const inputName = "input_" + file.name.replace(/[^a-zA-Z0-9._-]/g, "_");
-      const paletteName = "palette.png";
-      const outputName = "output.gif";
+      const video = videoRef.current;
+      const canvas = canvasRef.current;
+      if (!video || !canvas) throw new Error("Player not ready");
 
-      // Write the source video into the WASM virtual filesystem
-      await ffmpeg.writeFile(inputName, await fetchFile(file));
+      // Wait for metadata so we know the natural dimensions
+      await new Promise<void>((resolve, reject) => {
+        if (video.readyState >= 1) return resolve();
+        video.onloadedmetadata = () => resolve();
+        video.onerror = () => reject(new Error("Could not read video metadata"));
+      });
 
-      const dur = String(Math.min(Math.max(duration, 1), 10));
-      const ss = String(Math.max(start, 0));
+      const aspect = video.videoHeight / video.videoWidth;
+      const outW = Math.min(width, video.videoWidth);
+      const outH = Math.round(outW * aspect);
+      canvas.width = outW;
+      canvas.height = outH;
+      const ctx = canvas.getContext("2d");
+      if (!ctx) throw new Error("Canvas not supported");
 
-      // ── Pass 1: generate an optimised palette from the clip ──────────────
-      // -ss / -t AFTER -i (output seeking) is safer in WASM and avoids
-      // keyframe-seek issues that cause silent failures on some codecs.
-      await ffmpeg.exec([
-        "-i",
-        inputName,
-        "-ss",
-        ss,
-        "-t",
-        dur,
-        "-vf",
-        `fps=${fps},scale=${width}:-1:flags=lanczos,palettegen=stats_mode=diff`,
-        "-y",
-        paletteName,
-      ]);
+      const clampedStart = Math.max(0, Math.min(start, video.duration - 0.1));
+      const clampedDur = Math.min(Math.max(duration, 1), 10);
+      const frameCount = Math.max(1, Math.round(clampedDur * fps));
+      const frameDelayMs = Math.round(1000 / fps);
 
-      // ── Pass 2: render the GIF using the generated palette ───────────────
-      await ffmpeg.exec([
-        "-i",
-        inputName,
-        "-i",
-        paletteName,
-        "-ss",
-        ss,
-        "-t",
-        dur,
-        "-filter_complex",
-        `fps=${fps},scale=${width}:-1:flags=lanczos[x];[x][1:v]paletteuse=dither=bayer:bayer_scale=5:diff_mode=rectangle`,
-        "-loop",
-        "0",
-        "-y",
-        outputName,
-      ]);
+      const gifEncoder = new window.GIF({
+        workers: 2,
+        quality: 10,
+        width: outW,
+        height: outH,
+        workerScript: GIF_WORKER_SCRIPT_URL,
+      });
 
-      // Read the result and expose it to the UI
-      const data = await ffmpeg.readFile(outputName);
-      const bytes = data as Uint8Array;
-      const blob = new Blob([new Uint8Array(bytes)], { type: "image/gif" });
+      gifEncoder.on("progress", (p: unknown) => {
+        // gif.js reports 0..1 progress during the render/encode phase
+        setProgress(Math.round((p as number) * 100));
+      });
 
-      // Clean up the virtual FS to free WASM memory between conversions
-      try {
-        await ffmpeg.deleteFile(inputName);
-      } catch {
-        /* ignore */
+      // ── Capture frames by seeking the <video> element and drawing to canvas ──
+      for (let i = 0; i < frameCount; i++) {
+        const t = clampedStart + i / fps;
+
+        await new Promise<void>((resolve, reject) => {
+          const onSeeked = () => {
+            video.removeEventListener("seeked", onSeeked);
+            resolve();
+          };
+          video.addEventListener("seeked", onSeeked);
+          video.currentTime = t;
+          // Safety timeout in case 'seeked' never fires for this browser/codec
+          setTimeout(() => {
+            video.removeEventListener("seeked", onSeeked);
+            resolve();
+          }, 800);
+          void reject; // not used — kept for clarity of intent
+        });
+
+        ctx.drawImage(video, 0, 0, outW, outH);
+        gifEncoder.addFrame(canvas, { delay: frameDelayMs, copy: true });
+
+        // Frame-capture phase counts as the first half of overall progress
+        setProgress(Math.round(((i + 1) / frameCount) * 50));
       }
-      try {
-        await ffmpeg.deleteFile(paletteName);
-      } catch {
-        /* ignore */
-      }
-      try {
-        await ffmpeg.deleteFile(outputName);
-      } catch {
-        /* ignore */
-      }
+
+      // ── Encode ──
+      const blob: Blob = await new Promise((resolve) => {
+        gifEncoder.on("finished", (b: unknown) => resolve(b as Blob));
+        gifEncoder.render();
+      });
 
       setGif({ url: URL.createObjectURL(blob), blob });
+      setProgress(100);
       toast.success("GIF ready!");
     } catch (e: unknown) {
-      // Surface the real FFmpeg stderr message when available
-      const msg =
-        e instanceof Error
-          ? e.message
-          : typeof e === "string"
-            ? e
-            : "Conversion failed — check start time and duration.";
+      const msg = e instanceof Error ? e.message : "Conversion failed. Please try a shorter clip.";
       toast.error(msg);
     } finally {
       setBusy(false);
@@ -150,6 +193,7 @@ function Page() {
             <button
               onClick={() => {
                 setFile(null);
+                setVideoUrl(null);
                 setGif(null);
               }}
               className="text-sm text-muted-foreground hover:text-foreground"
@@ -157,6 +201,12 @@ function Page() {
               Change
             </button>
           </div>
+
+          {/* Hidden video + canvas used purely for frame extraction */}
+          {videoUrl && (
+            <video ref={videoRef} src={videoUrl} muted playsInline preload="metadata" style={{ display: "none" }} />
+          )}
+          <canvas ref={canvasRef} style={{ display: "none" }} />
 
           {/* Controls */}
           <div className="rounded-2xl border border-border bg-card p-5 grid gap-4 sm:grid-cols-2">
@@ -214,13 +264,18 @@ function Page() {
             className="w-full inline-flex items-center justify-center gap-2 rounded-xl bg-foreground text-background font-semibold px-4 py-3 disabled:opacity-50"
           >
             {busy ? <Loader2 className="w-4 h-4 animate-spin" /> : <Film className="w-4 h-4" />}{" "}
-            {busy ? "Converting..." : "Convert to GIF"}
+            {busy ? `Converting... ${progress}%` : "Convert to GIF"}
           </button>
 
           {busy && (
-            <p className="text-sm text-muted-foreground text-center">
-              Generating palette and rendering GIF — this may take a few seconds.
-            </p>
+            <div className="space-y-2">
+              <div className="h-1.5 w-full rounded-full bg-secondary overflow-hidden">
+                <div className="h-full bg-foreground transition-all duration-200" style={{ width: `${progress}%` }} />
+              </div>
+              <p className="text-sm text-muted-foreground text-center">
+                {progress < 50 ? "Capturing frames from your video..." : "Encoding GIF — almost there..."}
+              </p>
+            </div>
           )}
 
           {/* Result */}
@@ -252,7 +307,7 @@ function Page() {
         title="Convert Video to GIF Online Free — MP4, MOV, WebM to Animated GIF"
         description="Convert any video clip to an animated GIF for free. Customize frame rate, size, and duration. Fast, no signup required."
         body={[
-          "Skycally's Video to GIF converter turns any video clip into a smooth animated GIF in seconds. Upload an MP4, MOV, or WebM file, set your start time and clip duration, choose the output width and frame rate, and download your GIF. Conversion runs entirely in your browser using FFmpeg WebAssembly — no server uploads, no waiting in queues.",
+          "Skycally's Video to GIF converter turns any video clip into a smooth animated GIF in seconds. Upload an MP4, MOV, or WebM file, set your start time and clip duration, choose the output width and frame rate, and download your GIF. Conversion runs entirely in your browser using the HTML5 Canvas API and a lightweight, dedicated GIF encoder — no server uploads, no waiting in queues.",
           "Frame rate is the biggest factor controlling GIF quality and file size. A frame rate of 8–12 fps produces small files suitable for messaging apps and social media. Frame rates of 20–24 fps produce smoother motion but significantly larger files. For most use cases, 12–15 fps is the sweet spot between quality and file size.",
           "GIF is the format of choice for short looping animations on the web, messaging platforms, and social media. Unlike MP4, GIFs loop automatically and require no video player — they embed directly into web pages, emails, and chat apps. This makes them ideal for tutorials, reactions, product demos, and visual explanations.",
           "For best results, keep source clips under 10 seconds and 480px wide. Longer or wider GIFs can exceed 10MB, which many platforms reject. If you need a GIF from a longer video, use the start time and duration controls to select just the essential moment before converting.",
@@ -276,7 +331,7 @@ function Page() {
           {
             question: "Is my video uploaded to a server?",
             answer:
-              "No. Everything runs locally in your browser using FFmpeg WebAssembly. Your video never leaves your device, making this tool completely private.",
+              "No. Frame capture happens directly in your browser using the Canvas API, and encoding runs in a background Web Worker. Your video file itself never leaves your device — only the small GIF encoder library is loaded from a CDN.",
           },
           {
             question: "Can I convert a YouTube video to GIF?",
@@ -286,7 +341,7 @@ function Page() {
           {
             question: "Why does my GIF look washed out or pixelated?",
             answer:
-              "GIF supports only 256 colors, which causes color banding on photos and gradients. This is a fundamental GIF format limitation. Our two-pass palette generation minimizes this effect, but for rich color video, results will never match the original.",
+              "GIF supports only 256 colors, which causes color banding on photos and gradients. This is a fundamental GIF format limitation, not a flaw in the converter — every GIF tool faces the same constraint.",
           },
           {
             question: "What frame rate should I use?",

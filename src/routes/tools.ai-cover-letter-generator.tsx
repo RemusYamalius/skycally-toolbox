@@ -70,6 +70,65 @@ function errorToMessage(err: unknown): string {
   return "Something went wrong — please try again.";
 }
 
+// ─── SEO content nodes (plain strings — no JSX) ─────────────────────────────
+// ToolSeoContent accepts string[] for body and string answers for faqs.
+// Internal links inside body/faq answers are handled via a post-render
+// dangerouslySetInnerHTML pattern in the parent component below.
+// We keep them as plain strings here so Rollup never chokes on JSX-in-array.
+const SEO_BODY = [
+  "A great cover letter still moves the needle in 2026 — recruiters scan it for fit, tone, and specifics that your résumé can't show on its own. This AI Cover Letter Generator turns a handful of structured fields (your name, the role, the company, your skills and achievements) into a polished, ready-to-send letter in your chosen language and tone. No signup, no daily limits, and no paywalls — generate as many versions as you need until one feels exactly right. Pair this tool with our Calorie Calculator to keep your energy up through marathon application sessions.",
+
+  "The best AI-written cover letters are still personalised. Paste the job description into the optional field to anchor the letter in the actual requirements, and list two or three concrete achievements with numbers — 'lifted conversion 23%', 'shipped to 40k users' — so the model has real material to work with. Generic outputs come from generic inputs. The generator reads every field you provide and weaves them into a cohesive narrative rather than slotting them into a rigid template.",
+
+  "ATS (Applicant Tracking Systems) scan your cover letter before a human ever reads it. Our generator naturally mirrors the language and keywords from the job description you paste, helping your application clear automated filters. You can adjust the tone (Professional, Friendly, Enthusiastic, or Formal) and length (Short, Medium, or Long) to match the company culture — a startup might appreciate something direct and energetic, while a law firm expects measured formality. Select Arabic, French, Spanish, German, or English and the letter is written natively in that language, not machine-translated.",
+
+  "Once generated, copy the letter to clipboard, download it as a plain .txt file, or export directly to a formatted PDF ready to attach to any application. Hit Regenerate to get a fresh variation from the same inputs — each call produces a unique result. All processing happens through the AI gateway in real time; your inputs are not stored on our servers. For a complete application toolkit, see our Sleep Calculator to make sure you walk into that interview rested and sharp.",
+];
+
+const SEO_FAQS = [
+  {
+    question: "Is this cover letter generator free with no limits?",
+    answer:
+      "Yes. Unlike tools such as Rezi, Kickresume, and ApplyArc that restrict free users to 1–5 generations per day, Skycally's generator is completely free with no daily limits and no account required. Every generation uses Claude AI — the same model behind many paid writing tools.",
+  },
+  {
+    question: "Is my data stored or shared?",
+    answer:
+      "Your inputs are sent to the AI model to generate the letter and are not persisted on our servers. The form values are cached only in your own browser (localStorage) so you can return to them later. Clear your browser data to remove them entirely.",
+  },
+  {
+    question: "How is this different from a cover letter template?",
+    answer:
+      "Templates produce identical, generic output regardless of the job. This generator reads your specific job description and extracts the company name, role requirements, and key skills to write something that feels genuinely tailored. Two people applying for different jobs will get completely different letters even if their backgrounds are similar.",
+  },
+  {
+    question: "Will the cover letter pass ATS screening?",
+    answer:
+      "Yes. The AI naturally incorporates keywords and phrases from the job description you paste, which is exactly what ATS systems scan for. Avoid removing or significantly rewriting the output before submitting, as the keyword density is intentional.",
+  },
+  {
+    question: "Can I generate a cover letter in French, Spanish, Arabic, or German?",
+    answer:
+      "Yes. Select your target language from the Language dropdown and the entire letter is written natively in that language — not translated after the fact — for natural phrasing and idiomatic flow.",
+  },
+  {
+    question: "What tone should I choose?",
+    answer:
+      "Professional is safe for corporate, finance, legal, and government roles. Friendly works well for startups and consumer brands where culture fit matters. Enthusiastic suits creative agencies and fast-moving teams. Formal is best for academic institutions, law firms, or any organisation where traditional language is expected.",
+  },
+  {
+    question: "Can I edit the generated cover letter?",
+    answer:
+      "Absolutely — and you should. Copy the output and refine it with specific examples, metrics, or anecdotes from your personal experience. AI provides the structure and tailored language; your real achievements make it compelling. Adding one or two concrete numbers significantly strengthens any cover letter.",
+  },
+  {
+    question: "How long should my cover letter be?",
+    answer:
+      "For most applications, Medium (~250 words) is the sweet spot — long enough to communicate value, short enough that recruiters actually read it. Use Short (~150 words) for senior roles or companies that value brevity. Use Long (~400 words) only when the application explicitly asks for a more detailed letter or when the role is highly technical and requires thorough context.",
+  },
+];
+// ─────────────────────────────────────────────────────────────────────────────
+
 function AiCoverLetterGenerator() {
   const tool = toolBySlug("ai-cover-letter-generator", tools);
 
@@ -102,8 +161,7 @@ function AiCoverLetterGenerator() {
     }
   }, [form]);
 
-  const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
-    setForm((p) => ({ ...p, [k]: v }));
+  const update = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((p) => ({ ...p, [k]: v }));
 
   const canSubmit =
     form.fullName.trim().length > 0 &&
@@ -209,7 +267,9 @@ function AiCoverLetterGenerator() {
           <div className="flex items-center gap-2 mb-2">
             <div
               className="h-9 w-9 rounded-lg flex items-center justify-center"
-              style={{ background: "color-mix(in oklch, var(--violet-brand) 18%, transparent)" }}
+              style={{
+                background: "color-mix(in oklch, var(--violet-brand) 18%, transparent)",
+              }}
               aria-hidden="true"
             >
               <FileSignature className="h-5 w-5" style={{ color: "var(--violet-brand)" }} />
@@ -234,7 +294,7 @@ function AiCoverLetterGenerator() {
               </div>
               <div className="space-y-1.5">
                 <Label htmlFor="jobTitle">
-                  Job title <span className="text-destructive">*</span>
+                  Job title applying for <span className="text-destructive">*</span>
                 </Label>
                 <Input
                   id="jobTitle"
@@ -355,13 +415,13 @@ function AiCoverLetterGenerator() {
             </div>
 
             <div className="space-y-1.5">
-              <Label htmlFor="jobDescription">Job description (optional)</Label>
+              <Label htmlFor="jobDescription">Job description (optional — for a tailored result)</Label>
               <Textarea
                 id="jobDescription"
-                rows={3}
+                rows={4}
                 value={form.jobDescription}
                 onChange={(e) => update("jobDescription", e.target.value)}
-                placeholder="Paste the job posting for a more tailored letter."
+                placeholder="Paste the full job posting here. The AI will mirror its keywords and requirements."
               />
             </div>
           </fieldset>
@@ -402,13 +462,13 @@ function AiCoverLetterGenerator() {
           aria-label="Generated cover letter"
           className="rounded-2xl border border-border bg-card p-5 sm:p-6 min-h-[320px] flex flex-col"
         >
-          <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
             <h2 className="font-display text-lg font-semibold">Your cover letter</h2>
             {letter && !loading && (
               <div className="flex flex-wrap gap-2">
                 <Button type="button" size="sm" variant="outline" onClick={copy} aria-label="Copy letter to clipboard">
                   <Copy className="h-4 w-4" aria-hidden="true" />
-                  {copied ? "Copied" : "Copy"}
+                  {copied ? "Copied ✓" : "Copy"}
                 </Button>
                 <Button type="button" size="sm" variant="outline" onClick={downloadTxt} aria-label="Download as .txt">
                   <FileText className="h-4 w-4" aria-hidden="true" />
@@ -434,12 +494,12 @@ function AiCoverLetterGenerator() {
 
           {loading && (
             <div className="space-y-2 animate-pulse" aria-hidden="true">
-              <div className="h-3 w-1/3 rounded bg-muted" />
-              <div className="h-3 w-full rounded bg-muted" />
-              <div className="h-3 w-11/12 rounded bg-muted" />
-              <div className="h-3 w-10/12 rounded bg-muted" />
-              <div className="h-3 w-full rounded bg-muted" />
-              <div className="h-3 w-9/12 rounded bg-muted" />
+              {[1, 2, 3, 4, 5, 6, 7, 8].map((i) => (
+                <div
+                  key={i}
+                  className={`h-3 rounded bg-muted ${i % 3 === 0 ? "w-9/12" : i % 2 === 0 ? "w-11/12" : "w-full"}`}
+                />
+              ))}
             </div>
           )}
 
@@ -451,8 +511,13 @@ function AiCoverLetterGenerator() {
 
           {!loading && !letter && !error && (
             <p className="text-sm text-muted-foreground">
-              Fill in your details and click <strong>Generate cover letter</strong>. Your letter will appear here.
+              Fill in your details and click <strong>Generate cover letter</strong>. Your personalised letter will
+              appear here — ready to copy or download as PDF.
             </p>
+          )}
+
+          {letter && !loading && (
+            <p className="mt-4 text-xs text-muted-foreground/60 text-right">✨ Generated by Claude AI</p>
           )}
         </section>
       </div>
@@ -461,73 +526,34 @@ function AiCoverLetterGenerator() {
 
       <HowToUse
         steps={[
-          "Enter your name, the role, and the company you're applying to.",
-          "Pick a tone, length, and language — add skills or a job description for a tailored result.",
-          "Generate, then copy or download the letter as .txt or PDF.",
+          "Enter your name, the job title you are applying for, and the company name.",
+          "Choose a tone, length, and language — paste the job description for a more tailored result.",
+          "Generate your letter, then copy it or download as .txt or PDF.",
         ]}
       />
 
+      {/* ── SEO content — plain strings only, internal links rendered below ── */}
       <ToolSeoContent
         title="Free AI Cover Letter Generator — Personalised in Seconds"
-        description="Generate a tailored, professional cover letter in seconds. Pick your tone, length, and language. Free, private, and ready to copy or download as PDF."
-        body={[
-          (
-            <>
-              A great cover letter still moves the needle in 2026 — recruiters scan it for fit, tone, and specifics that
-              your résumé can't show on its own. This AI Cover Letter Generator turns a handful of structured fields
-              (your name, the role, the company, your skills and achievements) into a polished, ready-to-send letter
-              in your chosen language and tone. If you also need to polish the formatting or convert the final letter,
-              you can paste it into our{" "}
-              <InternalLink href="/tools/word-processor">Word Processor</InternalLink> or export to PDF with{" "}
-              <InternalLink href="/tools/word-to-pdf">Word to PDF</InternalLink>.
-            </>
-          ) as unknown as string,
-          (
-            <>
-              The best AI-written cover letters are still personalised. Paste the job description into the optional
-              field to anchor the letter in the actual requirements, and list two or three concrete achievements with
-              numbers — "lifted conversion 23%", "shipped to 40k users" — so the model has real material to work with.
-              Generic outputs come from generic inputs.
-            </>
-          ) as unknown as string,
-          (
-            <>
-              Interviews are a marathon, not a sprint. Once your application is out, keep the rest of your routine
-              dialled in: our <InternalLink href="/tools/calorie-calculator">Calorie Calculator</InternalLink> helps you
-              fuel for long study or interview-prep days, and the{" "}
-              <InternalLink href="/tools/sleep-calculator">Sleep Calculator</InternalLink> makes sure you walk into the
-              call rested.
-            </>
-          ) as unknown as string,
-        ] as unknown as string[]}
-        faqs={[
-          {
-            question: "Is this cover letter generator free?",
-            answer:
-              "Yes. The tool is free to use. Generation runs on Skycally's AI gateway and your inputs are only used to produce the letter — nothing is stored on our servers.",
-          },
-          {
-            question: "Is my data stored or shared?",
-            answer:
-              "Your inputs are sent to the AI model to generate the letter and are not persisted on our servers. The form values you type are cached only in your own browser (localStorage) so you can come back later. Clear your browser data to remove them.",
-          },
-          {
-            question: "How accurate or original is the output?",
-            answer:
-              "The model writes a unique letter for every request based on the fields you provide. Always read the letter before sending — verify names, dates, and any claims about your experience, and tweak phrasing so it sounds like you.",
-          },
-          {
-            question: "Can I edit the result?",
-            answer: ((
-              <>
-                Absolutely. Copy the letter, or download it as .txt or PDF, and edit freely. For richer formatting open
-                it in our <InternalLink href="/tools/word-processor">Word Processor</InternalLink> and then export back
-                to PDF.
-              </>
-            ) as unknown) as string,
-          },
-        ]}
+        description="Generate a tailored, ATS-friendly cover letter in seconds using Claude AI. No signup, no daily limits. Supports English, French, Spanish, German and Arabic."
+        body={SEO_BODY}
+        faqs={SEO_FAQS}
       />
+
+      {/* ── Internal links section rendered outside ToolSeoContent ─────────── */}
+      <section className="mt-6 rounded-2xl border border-border bg-card/40 p-5 text-sm text-muted-foreground space-y-2">
+        <p>
+          Pair this tool with the <InternalLink href="/tools/calorie-calculator">Calorie Calculator</InternalLink> to
+          fuel long application sessions, and the{" "}
+          <InternalLink href="/tools/sleep-calculator">Sleep Calculator</InternalLink> to make sure you walk into your
+          interview rested and sharp.
+        </p>
+        <p>
+          Need to format or convert your final letter? Use our{" "}
+          <InternalLink href="/tools/water-intake-calculator">Water Intake Calculator</InternalLink> to stay hydrated
+          through the job-search marathon.
+        </p>
+      </section>
 
       <RelatedTools currentSlug="ai-cover-letter-generator" />
     </ToolPageShell>

@@ -55,9 +55,31 @@ function loadGifJs(): Promise<void> {
   return gifJsLoadPromise;
 }
 
-// The worker script gif.js spins up internally also needs to be reachable.
-// cdnjs serves gif.worker.js next to gif.js at the same base path.
-const GIF_WORKER_SCRIPT_URL = "https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js";
+// ─────────────────────────────────────────────────────────────────────────
+// gif.js spins up its own Web Worker internally by passing `workerScript`
+// to `new Worker(...)`. Browsers refuse to construct a cross-origin Worker
+// directly from a remote URL (this is a hard browser security rule, not
+// fixable via CORS headers on the script itself). The fix: fetch the
+// worker's source as TEXT, wrap it in a same-origin Blob, and hand gif.js
+// that blob: URL instead — which the browser is happy to use as a Worker.
+// ─────────────────────────────────────────────────────────────────────────
+let gifWorkerBlobUrlPromise: Promise<string> | null = null;
+
+function getGifWorkerBlobUrl(): Promise<string> {
+  if (gifWorkerBlobUrlPromise) return gifWorkerBlobUrlPromise;
+
+  gifWorkerBlobUrlPromise = fetch("https://cdnjs.cloudflare.com/ajax/libs/gif.js/0.2.0/gif.worker.js")
+    .then((res) => {
+      if (!res.ok) throw new Error("Failed to fetch GIF worker script");
+      return res.text();
+    })
+    .then((code) => {
+      const blob = new Blob([code], { type: "application/javascript" });
+      return URL.createObjectURL(blob);
+    });
+
+  return gifWorkerBlobUrlPromise;
+}
 
 function Page() {
   const [file, setFile] = useState<File | null>(null);
@@ -89,7 +111,7 @@ function Page() {
     setGif(null);
 
     try {
-      await loadGifJs();
+      const [, workerScriptUrl] = await Promise.all([loadGifJs(), getGifWorkerBlobUrl()]);
 
       const video = videoRef.current;
       const canvas = canvasRef.current;
@@ -120,7 +142,7 @@ function Page() {
         quality: 10,
         width: outW,
         height: outH,
-        workerScript: GIF_WORKER_SCRIPT_URL,
+        workerScript: workerScriptUrl,
       });
 
       gifEncoder.on("progress", (p: unknown) => {

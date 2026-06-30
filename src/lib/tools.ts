@@ -100,6 +100,7 @@ import {
   Ruler,
   Droplets,
   HeartPulse,
+  FileSignature,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1116,5 +1117,14 @@ export const tools: Tool[] = [
     category: "minigames",
     icon: CircleDot,
     path: "/tools/ball-sort",
+  },
+  {
+    slug: "ai-cover-letter-generator",
+    name: "AI Cover Letter Generator",
+    description:
+      "Generate a tailored, professional cover letter in seconds. Pick tone, length, and language. Free, private, and ready to copy or download as PDF.",
+    category: "ai",
+    icon: FileSignature,
+    path: "/tools/ai-cover-letter-generator",
   },
 ];

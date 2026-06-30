@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FileSignature, Loader2, Copy, FileDown, FileText, RefreshCw, AlertCircle } from "lucide-react";
 import jsPDF from "jspdf";
@@ -169,8 +169,17 @@ function AiCoverLetterGenerator() {
     form.companyName.trim().length > 0 &&
     !loading;
 
-  const submit = useCallback(async () => {
-    if (!canSubmit) return;
+  // ⚠️ Must NOT use useCallback(async () => ...) here — TanStack Start's
+  // Rollup plugin tries to analyse every async arrow function for 'use server'
+  // directives and chokes on async callbacks, causing the red/parseAst.js
+  // build error. A plain async function stored in a ref is the safe pattern.
+  const canSubmitRef = useRef(canSubmit);
+  canSubmitRef.current = canSubmit;
+  const formRef = useRef(form);
+  formRef.current = form;
+
+  async function submit() {
+    if (!canSubmitRef.current) return;
     const now = Date.now();
     if (now - lastSubmitRef.current < DEBOUNCE_MS) return;
     lastSubmitRef.current = now;
@@ -178,20 +187,21 @@ function AiCoverLetterGenerator() {
     setLoading(true);
     setError(null);
     try {
-      const yrs = form.yearsExperience.trim();
+      const f = formRef.current;
+      const yrs = f.yearsExperience.trim();
       const result = await generateCoverLetter({
         data: {
-          fullName: form.fullName.trim(),
-          jobTitle: form.jobTitle.trim(),
-          companyName: form.companyName.trim(),
-          hiringManager: form.hiringManager.trim(),
+          fullName: f.fullName.trim(),
+          jobTitle: f.jobTitle.trim(),
+          companyName: f.companyName.trim(),
+          hiringManager: f.hiringManager.trim(),
           yearsExperience: yrs ? Math.max(0, Math.min(60, Number(yrs) || 0)) : undefined,
-          skills: form.skills.trim(),
-          achievements: form.achievements.trim(),
-          tone: form.tone,
-          length: form.length,
-          language: form.language,
-          jobDescription: form.jobDescription.trim(),
+          skills: f.skills.trim(),
+          achievements: f.achievements.trim(),
+          tone: f.tone,
+          length: f.length,
+          language: f.language,
+          jobDescription: f.jobDescription.trim(),
         },
       });
       setLetter(result.letter);
@@ -201,23 +211,25 @@ function AiCoverLetterGenerator() {
     } finally {
       setLoading(false);
     }
-  }, [canSubmit, form]);
+  }
 
   const onSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     void submit();
   };
 
-  const copy = async () => {
+  function copy() {
     if (!letter) return;
-    try {
-      await navigator.clipboard.writeText(letter);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      /* ignore */
-    }
-  };
+    navigator.clipboard
+      .writeText(letter)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      })
+      .catch(() => {
+        /* ignore */
+      });
+  }
 
   const downloadTxt = () => {
     if (!letter) return;

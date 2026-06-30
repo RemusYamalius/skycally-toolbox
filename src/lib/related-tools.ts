@@ -101,6 +101,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "water-intake-calculator": ["calorie-calculator", "bmi-calculator", "sleep-calculator", "age-calculator", "unit-converter"],
   "heart-rate-zone-calculator": ["calorie-calculator", "bmi-calculator", "sleep-calculator", "water-intake-calculator", "unit-converter"],
   "invoice-generator": ["qr-generator", "business-card-generator", "currency-converter", "pdf-reader", "word-processor"],
+  "ai-cover-letter-generator": ["word-processor", "word-to-pdf", "pdf-text-extractor", "markdown-to-html", "word-counter"],
 };
 
 

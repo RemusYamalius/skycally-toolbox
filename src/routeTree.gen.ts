@@ -132,6 +132,7 @@ import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
+import { Route as ToolsAiCoverLetterGeneratorRouteImport } from './routes/tools.ai-cover-letter-generator'
 import { Route as ToolsAgeCalculatorRouteImport } from './routes/tools.age-calculator'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text-to-image'
@@ -763,6 +764,12 @@ const ToolsAudioConverterRoute = ToolsAudioConverterRouteImport.update({
   path: '/tools/audio-converter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAiCoverLetterGeneratorRoute =
+  ToolsAiCoverLetterGeneratorRouteImport.update({
+    id: '/tools/ai-cover-letter-generator',
+    path: '/tools/ai-cover-letter-generator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsAgeCalculatorRoute = ToolsAgeCalculatorRouteImport.update({
   id: '/tools/age-calculator',
   path: '/tools/age-calculator',
@@ -835,6 +842,7 @@ export interface FileRoutesByFullPath {
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
+  '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
@@ -970,6 +978,7 @@ export interface FileRoutesByTo {
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
+  '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
@@ -1106,6 +1115,7 @@ export interface FileRoutesById {
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
+  '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
@@ -1243,6 +1253,7 @@ export interface FileRouteTypes {
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/age-calculator'
+    | '/tools/ai-cover-letter-generator'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/ball-sort'
@@ -1378,6 +1389,7 @@ export interface FileRouteTypes {
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/age-calculator'
+    | '/tools/ai-cover-letter-generator'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/ball-sort'
@@ -1513,6 +1525,7 @@ export interface FileRouteTypes {
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/age-calculator'
+    | '/tools/ai-cover-letter-generator'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/ball-sort'
@@ -1649,6 +1662,7 @@ export interface RootRouteChildren {
   ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsAgeCalculatorRoute: typeof ToolsAgeCalculatorRoute
+  ToolsAiCoverLetterGeneratorRoute: typeof ToolsAiCoverLetterGeneratorRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBallSortRoute: typeof ToolsBallSortRoute
@@ -2632,6 +2646,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAudioConverterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/ai-cover-letter-generator': {
+      id: '/tools/ai-cover-letter-generator'
+      path: '/tools/ai-cover-letter-generator'
+      fullPath: '/tools/ai-cover-letter-generator'
+      preLoaderRoute: typeof ToolsAiCoverLetterGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/age-calculator': {
       id: '/tools/age-calculator'
       path: '/tools/age-calculator'
@@ -2724,6 +2745,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsAgeCalculatorRoute: ToolsAgeCalculatorRoute,
+  ToolsAiCoverLetterGeneratorRoute: ToolsAiCoverLetterGeneratorRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBallSortRoute: ToolsBallSortRoute,
@@ -2846,12 +2868,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

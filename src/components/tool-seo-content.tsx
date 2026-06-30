@@ -1,12 +1,14 @@
+import type { ReactNode } from "react";
+
 interface FAQItem {
   question: string;
-  answer: string;
+  answer: ReactNode;
 }
 
 interface ToolSeoContentProps {
   title: string;
   description: string;
-  body: string[];
+  body: ReactNode[];
   faqs: FAQItem[];
 }
 

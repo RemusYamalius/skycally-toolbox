@@ -15,7 +15,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { generateCoverLetter } from "@/server/ai-cover-letter.functions";
+import { generateCoverLetter } from "@/lib/ai-cover-letter.functions";
 
 export const Route = createFileRoute("/tools/ai-cover-letter-generator")({
   head: () => buildToolMeta(toolBySlug("ai-cover-letter-generator", tools)),

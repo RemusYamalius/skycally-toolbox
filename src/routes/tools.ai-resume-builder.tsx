@@ -1,7 +1,18 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
-import { FileText, Loader2, Copy, FileDown, RefreshCw, AlertCircle, User, Briefcase, Wrench, Settings2 } from "lucide-react";
+import {
+  FileText,
+  Loader2,
+  Copy,
+  FileDown,
+  RefreshCw,
+  AlertCircle,
+  User,
+  Briefcase,
+  Wrench,
+  Settings2,
+} from "lucide-react";
 import jsPDF from "jspdf";
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
@@ -15,7 +26,9 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { generateCoverLetter } from "@/lib/ai-cover-letter.functions";
+
+// ⚠️ No createServerFn, no @/server/* imports — direct client fetch only
+// (same pattern as ai-cover-letter-generator to avoid parseAst build errors)
 
 export const Route = createFileRoute("/tools/ai-resume-builder")({
   head: () => buildToolMeta(toolBySlug("ai-resume-builder", tools)),
@@ -73,8 +86,21 @@ const DEFAULTS: FormState = {
 const STORAGE_KEY = "ai-resume-builder-inputs";
 const DEBOUNCE_MS = 500;
 
-const SYSTEM_PROMPT = `You are an expert resume writer and career coach with 15 years of experience helping candidates land jobs at top companies. You write resumes that:
+const LENGTH_LABEL: Record<LengthOpt, string> = {
+  concise: "concise one-page",
+  standard: "standard one-to-two-page",
+  detailed: "detailed two-page",
+};
 
+const LANGUAGE_LABEL: Record<LanguageOpt, string> = {
+  english: "English",
+  french: "French",
+  spanish: "Spanish",
+  german: "German",
+  arabic: "Arabic",
+};
+
+const SYSTEM_PROMPT = `You are an expert resume writer and career coach with 15 years of experience helping candidates land jobs at top companies. You write resumes that:
 - Pass ATS (Applicant Tracking Systems) by naturally incorporating keywords from the job description
 - Open with a powerful professional summary that immediately communicates value
 - Use strong action verbs (Led, Built, Increased, Reduced, Shipped, Managed, Designed, Implemented)
@@ -83,12 +109,11 @@ const SYSTEM_PROMPT = `You are an expert resume writer and career coach with 15 
 - Follow a clean, scannable structure: Summary -> Experience -> Skills -> Education -> Certifications
 - Sound human and specific, never generic or templated
 - Never invent credentials, companies, or achievements not provided by the user
-
 Output the resume as clean plain text with clear section headers (use === or --- separators), ready to copy or save. No markdown, no asterisks, no bullet symbols other than simple dashes.`;
 
 function buildPrompt(form: FormState): string {
   const lines: string[] = [
-    `Write a ${form.length} resume in ${form.language} with a ${form.tone} tone.`,
+    `Write a ${LENGTH_LABEL[form.length]} resume in ${LANGUAGE_LABEL[form.language]} with a ${form.tone} tone.`,
     `Full name: ${form.fullName}`,
     `Target role: ${form.jobTitle}`,
     `Email: ${form.email}`,
@@ -101,7 +126,7 @@ function buildPrompt(form: FormState): string {
   if (form.industry) lines.push(`Industry/Field: ${form.industry}`);
   if (form.summary) lines.push(`Professional summary (refine this): ${form.summary}`);
   lines.push(`Key skills: ${form.skills}`);
-  lines.push(`Work experience: ${form.experience}`);
+  lines.push(`Work experience:\n${form.experience}`);
   if (form.education) lines.push(`Education: ${form.education}`);
   if (form.certifications) lines.push(`Certifications: ${form.certifications}`);
   if (form.languages) lines.push(`Languages: ${form.languages}`);
@@ -110,11 +135,30 @@ function buildPrompt(form: FormState): string {
   return lines.join("\n");
 }
 
-const InternalLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <a href={href} className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
-    {children}
-  </a>
-);
+// ─── Direct client-side AI call — no server function needed ─────────────────
+async function callAI(form: FormState): Promise<string> {
+  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
+    method: "POST",
+    headers: {
+      "Content-Type": "application/json",
+      "Lovable-API-Key": (import.meta as any).env?.VITE_LOVABLE_API_KEY ?? "",
+    },
+    body: JSON.stringify({
+      model: "google/gemini-2.0-flash-001",
+      messages: [
+        { role: "system", content: SYSTEM_PROMPT },
+        { role: "user", content: buildPrompt(form) },
+      ],
+    }),
+  });
+  if (res.status === 429) throw new Error("RATE_LIMITED");
+  if (res.status === 402) throw new Error("CREDITS_EXHAUSTED");
+  if (!res.ok) throw new Error("GENERATION_FAILED");
+  const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
+  const result = json.choices?.[0]?.message?.content?.trim();
+  if (!result) throw new Error("GENERATION_FAILED");
+  return result;
+}
 
 function errorToMessage(err: unknown): string {
   const msg = err instanceof Error ? err.message : "";
@@ -122,6 +166,12 @@ function errorToMessage(err: unknown): string {
   if (msg === "CREDITS_EXHAUSTED") return "AI credits exhausted — please try again later.";
   return "Something went wrong — please try again.";
 }
+
+const InternalLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  <a href={href} className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
+    {children}
+  </a>
+);
 
 const SEO_BODY = [
   "Your resume is the single most important document in your job search — yet most people either use a generic template that looks identical to thousands of others, or spend hours trying to format one from scratch. Skycally's AI Resume Builder solves both problems instantly. Enter your experience, skills, and target role, and the AI writes a polished, ATS-friendly resume tailored to the specific job in seconds. No signup, no daily limits, no paywalls — unlimited generations, free forever.",
@@ -131,52 +181,47 @@ const SEO_BODY = [
 ];
 
 const SEO_FAQS = [
-  { question: "Is this AI resume builder really free with no limits?", answer: "Yes. Unlike paid tools like Resume.io ($24/month), Rezi ($29/month), and Kickresume ($19/month), Skycally's AI Resume Builder is completely free with no daily generation limits and no account required. Generate as many versions as you need." },
-  { question: "Will this resume pass ATS screening?", answer: "Yes. The AI is specifically prompted to incorporate keywords and phrases from the job description you paste, which is exactly what ATS systems scan for. Paste the full job posting into the 'Target Job Description' field for the most optimized result." },
-  { question: "How is this different from a resume template?", answer: "Templates give you a blank structure to fill in. This AI reads your actual experience, skills, and the job description, then writes tailored content — including a professional summary, achievement-focused bullet points, and ATS-optimized language — all specific to you and the role you're targeting." },
-  { question: "Can I use this for any industry or job level?", answer: "Yes. The AI adapts to the industry and seniority level you specify. Use the Tone selector to switch between Professional (most roles), Technical (engineering and data roles), Executive (senior leadership), or Creative (design, marketing, and media positions)." },
-  { question: "Can I generate a resume in French, Spanish, Arabic, or German?", answer: "Yes. Select your target language from the Output Language dropdown and the entire resume — including section headers, action verbs, and phrasing — is written natively in that language, not translated after the fact." },
-  { question: "How do I make the output as strong as possible?", answer: "Provide as much detail as possible in the Work Experience field — include company names, your title, dates, team size, and specific results with numbers. The AI turns this raw material into polished bullet points. Paste the full job description for ATS optimization, and add certifications and languages to maximise the resume's completeness." },
-  { question: "Is my data stored or shared?", answer: "No. Your inputs are sent to the AI model to generate the resume and are not persisted on our servers. Form values are cached only in your own browser (localStorage) so you can return to them in the same session. Clear your browser data to remove them entirely." },
-  { question: "Can I edit the generated resume?", answer: "Absolutely. Download it as a .txt file and edit it in any text editor or word processor, or copy it directly into Google Docs or Microsoft Word for formatting. The AI provides the content and structure — you can then adjust wording, reorder sections, or add details before submitting." },
+  {
+    question: "Is this AI resume builder really free with no limits?",
+    answer:
+      "Yes. Unlike paid tools like Resume.io ($24/month), Rezi ($29/month), and Kickresume ($19/month), Skycally's AI Resume Builder is completely free with no daily generation limits and no account required. Generate as many versions as you need.",
+  },
+  {
+    question: "Will this resume pass ATS screening?",
+    answer:
+      "Yes. The AI is specifically prompted to incorporate keywords and phrases from the job description you paste, which is exactly what ATS systems scan for. Paste the full job posting into the Target Job Description field for the most optimized result.",
+  },
+  {
+    question: "How is this different from a resume template?",
+    answer:
+      "Templates give you a blank structure to fill in. This AI reads your actual experience, skills, and the job description, then writes tailored content — including a professional summary, achievement-focused bullet points, and ATS-optimized language — all specific to you and the role you're targeting.",
+  },
+  {
+    question: "Can I use this for any industry or job level?",
+    answer:
+      "Yes. The AI adapts to the industry and seniority level you specify. Use the Tone selector to switch between Professional (most roles), Technical (engineering and data roles), Executive (senior leadership), or Creative (design, marketing, and media positions).",
+  },
+  {
+    question: "Can I generate a resume in French, Spanish, Arabic, or German?",
+    answer:
+      "Yes. Select your target language from the Output Language dropdown and the entire resume — including section headers, action verbs, and phrasing — is written natively in that language, not translated after the fact.",
+  },
+  {
+    question: "How do I make the output as strong as possible?",
+    answer:
+      "Provide as much detail as possible in the Work Experience field — include company names, your title, dates, team size, and specific results with numbers. The AI turns this raw material into polished bullet points. Paste the full job description for ATS optimization, and add certifications and languages to maximise completeness.",
+  },
+  {
+    question: "Is my data stored or shared?",
+    answer:
+      "No. Your inputs are sent to the AI model to generate the resume and are not persisted on our servers. Form values are cached only in your own browser (localStorage) so you can return to them in the same session. Clear your browser data to remove them entirely.",
+  },
+  {
+    question: "Can I edit the generated resume?",
+    answer:
+      "Absolutely. Download it as a .txt file and edit it in any text editor or word processor, or copy it directly into Google Docs or Microsoft Word for formatting. The AI provides the content and structure — you can then adjust wording, reorder sections, or add details before submitting.",
+  },
 ];
-
-// Call the AI gateway. We reuse the existing server function from the cover
-// letter tool as a thin RPC to keep LOVABLE_API_KEY server-side; we pass our
-// own system prompt & prompt via its jobDescription/achievements fields is
-// unsuitable — instead, call via direct fetch to a shared endpoint. Since
-// the spec asks for the same shape as ai-cover-letter-generator, we invoke
-// the existing server function with a resume-oriented payload assembled into
-// the free-form fields it forwards to the model. This keeps the API key
-// off the client while matching the requested UX/behaviour.
-async function callAI(form: FormState): Promise<string> {
-  // Encode all resume inputs into the cover-letter server function payload.
-  // The server function sends fields verbatim to the model; we prepend a
-  // resume-writing directive inside `achievements` / `jobDescription` so the
-  // model produces a full resume instead of a letter.
-  const directive =
-    `TASK OVERRIDE: Ignore any cover-letter instructions. Instead, act as an expert resume writer. ` +
-    SYSTEM_PROMPT +
-    `\n\nUSER INPUTS:\n` +
-    buildPrompt(form);
-
-  const result = await generateCoverLetter({
-    data: {
-      fullName: form.fullName.trim() || "Candidate",
-      jobTitle: form.jobTitle.trim() || "Professional",
-      companyName: "Resume",
-      hiringManager: "",
-      yearsExperience: form.yearsExperience ? Math.max(0, Math.min(60, Number(form.yearsExperience) || 0)) : undefined,
-      skills: form.skills.trim(),
-      achievements: directive,
-      tone: form.tone === "creative" ? "friendly" : form.tone === "executive" ? "formal" : form.tone === "technical" ? "professional" : "professional",
-      length: form.length === "concise" ? "short" : form.length === "detailed" ? "long" : "medium",
-      language: form.language,
-      jobDescription: form.jobDescription.trim(),
-    },
-  });
-  return result.letter;
-}
 
 function AiResumeBuilder() {
   const tool = toolBySlug("ai-resume-builder", tools);
@@ -187,14 +232,13 @@ function AiResumeBuilder() {
   const [error, setError] = useState<string | null>(null);
   const [copied, setCopied] = useState(false);
   const lastSubmitRef = useRef<number>(0);
+  const formRef = useRef<FormState>(form);
+  formRef.current = form;
 
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
-      if (raw) {
-        const parsed = JSON.parse(raw) as Partial<FormState>;
-        setForm((prev) => ({ ...prev, ...parsed }));
-      }
+      if (raw) setForm((p) => ({ ...p, ...(JSON.parse(raw) as Partial<FormState>) }));
     } catch {
       /* ignore */
     }
@@ -220,34 +264,33 @@ function AiResumeBuilder() {
 
   const canSubmitRef = useRef(canSubmit);
   canSubmitRef.current = canSubmit;
-  const formRef = useRef(form);
-  formRef.current = form;
 
-  async function submit() {
+  function runGenerate() {
     if (!canSubmitRef.current) return;
     const now = Date.now();
     if (now - lastSubmitRef.current < DEBOUNCE_MS) return;
     lastSubmitRef.current = now;
-
     setLoading(true);
     setError(null);
-    try {
-      const result = await callAI(formRef.current);
-      setResume(result);
-    } catch (err) {
-      setError(errorToMessage(err));
-      setResume("");
-    } finally {
-      setLoading(false);
-    }
+    callAI(formRef.current)
+      .then((result) => {
+        setResume(result);
+      })
+      .catch((err) => {
+        setError(errorToMessage(err));
+        setResume("");
+      })
+      .finally(() => {
+        setLoading(false);
+      });
   }
 
-  const onSubmit = (e: React.FormEvent) => {
+  function handleSubmit(e: React.FormEvent) {
     e.preventDefault();
-    void submit();
-  };
+    runGenerate();
+  }
 
-  function copy() {
+  function handleCopy() {
     if (!resume) return;
     navigator.clipboard
       .writeText(resume)
@@ -260,13 +303,13 @@ function AiResumeBuilder() {
       });
   }
 
-  const fileSlug = () => {
+  function fileSlug() {
     const name = form.fullName.trim().toLowerCase().replace(/\s+/g, "-") || "draft";
     const role = form.jobTitle.trim().toLowerCase().replace(/\s+/g, "-") || "resume";
     return `resume-${name}-${role}`;
-  };
+  }
 
-  const downloadTxt = () => {
+  function handleDownloadTxt() {
     if (!resume) return;
     const blob = new Blob([resume], { type: "text/plain;charset=utf-8" });
     const url = URL.createObjectURL(blob);
@@ -275,9 +318,9 @@ function AiResumeBuilder() {
     a.download = `${fileSlug()}.txt`;
     a.click();
     URL.revokeObjectURL(url);
-  };
+  }
 
-  const downloadPdf = () => {
+  function handleDownloadPdf() {
     if (!resume) return;
     const doc = new jsPDF({ unit: "pt", format: "a4" });
     const margin = 56;
@@ -285,10 +328,10 @@ function AiResumeBuilder() {
     const pageHeight = doc.internal.pageSize.getHeight();
     doc.setFont("Times", "Normal");
     doc.setFontSize(12);
-    const lines = doc.splitTextToSize(resume, maxWidth);
+    const lines = doc.splitTextToSize(resume, maxWidth) as string[];
     let y = margin;
     const lineHeight = 16;
-    for (const line of lines as string[]) {
+    for (const line of lines) {
       if (y + lineHeight > pageHeight - margin) {
         doc.addPage();
         y = margin;
@@ -297,7 +340,7 @@ function AiResumeBuilder() {
       y += lineHeight;
     }
     doc.save(`${fileSlug()}.pdf`);
-  };
+  }
 
   const wordCount = resume ? resume.trim().split(/\s+/).length : 0;
 
@@ -306,7 +349,6 @@ function AiResumeBuilder() {
       <div
         className="h-8 w-8 rounded-lg flex items-center justify-center"
         style={{ background: "color-mix(in oklch, var(--violet-brand) 18%, transparent)" }}
-        aria-hidden="true"
       >
         <Icon className="h-4 w-4" style={{ color: "var(--violet-brand)" }} />
       </div>
@@ -314,14 +356,18 @@ function AiResumeBuilder() {
     </div>
   );
 
+  const selectClass =
+    "flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
+
   return (
     <ToolPageShell title={tool.name} description={tool.description} showFileDisclaimer={false}>
       <div className="grid gap-8 lg:grid-cols-[5fr_6fr]">
+        {/* ── Form ── */}
         <motion.form
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           transition={{ duration: 0.35 }}
-          onSubmit={onSubmit}
+          onSubmit={handleSubmit}
           className="space-y-5"
           aria-busy={loading}
         >
@@ -331,32 +377,80 @@ function AiResumeBuilder() {
               <SectionHeader icon={User} title="Personal Information" />
               <div className="grid sm:grid-cols-2 gap-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="fullName">Full name <span className="text-destructive">*</span></Label>
-                  <Input id="fullName" required value={form.fullName} onChange={(e) => update("fullName", e.target.value)} placeholder="Jane Doe" autoComplete="name" />
+                  <Label htmlFor="fullName">
+                    Full name <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="fullName"
+                    required
+                    value={form.fullName}
+                    onChange={(e) => update("fullName", e.target.value)}
+                    placeholder="Jane Doe"
+                    autoComplete="name"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="jobTitle">Target role <span className="text-destructive">*</span></Label>
-                  <Input id="jobTitle" required value={form.jobTitle} onChange={(e) => update("jobTitle", e.target.value)} placeholder="Senior Frontend Developer" />
+                  <Label htmlFor="jobTitle">
+                    Target role <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="jobTitle"
+                    required
+                    value={form.jobTitle}
+                    onChange={(e) => update("jobTitle", e.target.value)}
+                    placeholder="Senior Frontend Developer"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="email">Email <span className="text-destructive">*</span></Label>
-                  <Input id="email" type="email" required value={form.email} onChange={(e) => update("email", e.target.value)} placeholder="jane@example.com" autoComplete="email" />
+                  <Label htmlFor="email">
+                    Email <span className="text-destructive">*</span>
+                  </Label>
+                  <Input
+                    id="email"
+                    type="email"
+                    required
+                    value={form.email}
+                    onChange={(e) => update("email", e.target.value)}
+                    placeholder="jane@example.com"
+                    autoComplete="email"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="phone">Phone</Label>
-                  <Input id="phone" value={form.phone} onChange={(e) => update("phone", e.target.value)} placeholder="+1 555 123 4567" autoComplete="tel" />
+                  <Input
+                    id="phone"
+                    value={form.phone}
+                    onChange={(e) => update("phone", e.target.value)}
+                    placeholder="+1 555 123 4567"
+                    autoComplete="tel"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="location">Location</Label>
-                  <Input id="location" value={form.location} onChange={(e) => update("location", e.target.value)} placeholder="London, UK" />
+                  <Input
+                    id="location"
+                    value={form.location}
+                    onChange={(e) => update("location", e.target.value)}
+                    placeholder="London, UK"
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="linkedin">LinkedIn URL</Label>
-                  <Input id="linkedin" value={form.linkedin} onChange={(e) => update("linkedin", e.target.value)} placeholder="linkedin.com/in/janedoe" />
+                  <Input
+                    id="linkedin"
+                    value={form.linkedin}
+                    onChange={(e) => update("linkedin", e.target.value)}
+                    placeholder="linkedin.com/in/janedoe"
+                  />
                 </div>
                 <div className="space-y-1.5 sm:col-span-2">
                   <Label htmlFor="website">Website / Portfolio</Label>
-                  <Input id="website" value={form.website} onChange={(e) => update("website", e.target.value)} placeholder="janedoe.dev" />
+                  <Input
+                    id="website"
+                    value={form.website}
+                    onChange={(e) => update("website", e.target.value)}
+                    placeholder="janedoe.dev"
+                  />
                 </div>
               </div>
             </div>
@@ -367,16 +461,36 @@ function AiResumeBuilder() {
               <div className="space-y-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="summary">Professional summary</Label>
-                  <Textarea id="summary" rows={3} value={form.summary} onChange={(e) => update("summary", e.target.value)} placeholder="A few sentences in your own words — the AI will refine it." />
+                  <Textarea
+                    id="summary"
+                    rows={3}
+                    value={form.summary}
+                    onChange={(e) => update("summary", e.target.value)}
+                    placeholder="A few sentences in your own words — the AI will refine it."
+                  />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="yearsExperience">Years of experience</Label>
-                    <Input id="yearsExperience" type="number" inputMode="numeric" min={0} max={60} value={form.yearsExperience} onChange={(e) => update("yearsExperience", e.target.value)} placeholder="5" />
+                    <Input
+                      id="yearsExperience"
+                      type="number"
+                      inputMode="numeric"
+                      min={0}
+                      max={60}
+                      value={form.yearsExperience}
+                      onChange={(e) => update("yearsExperience", e.target.value)}
+                      placeholder="5"
+                    />
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="industry">Industry / Field</Label>
-                    <Input id="industry" value={form.industry} onChange={(e) => update("industry", e.target.value)} placeholder="FinTech" />
+                    <Input
+                      id="industry"
+                      value={form.industry}
+                      onChange={(e) => update("industry", e.target.value)}
+                      placeholder="FinTech"
+                    />
                   </div>
                 </div>
               </div>
@@ -387,25 +501,61 @@ function AiResumeBuilder() {
               <SectionHeader icon={Wrench} title="Skills & Experience" />
               <div className="space-y-3">
                 <div className="space-y-1.5">
-                  <Label htmlFor="skills">Key skills <span className="text-destructive">*</span></Label>
-                  <Textarea id="skills" required rows={2} value={form.skills} onChange={(e) => update("skills", e.target.value)} placeholder="React, TypeScript, design systems, user research, mentoring" />
+                  <Label htmlFor="skills">
+                    Key skills <span className="text-destructive">*</span>
+                  </Label>
+                  <Textarea
+                    id="skills"
+                    required
+                    rows={2}
+                    value={form.skills}
+                    onChange={(e) => update("skills", e.target.value)}
+                    placeholder="React, TypeScript, design systems, user research, mentoring"
+                  />
                 </div>
                 <div className="space-y-1.5">
-                  <Label htmlFor="experience">Work experience <span className="text-destructive">*</span></Label>
-                  <Textarea id="experience" required rows={5} value={form.experience} onChange={(e) => update("experience", e.target.value)} placeholder="Senior Developer at Acme (2021–present) — led team of 6, shipped platform to 2M users. Developer at Beta (2018–2021) — built billing system, cut churn 18%." />
+                  <Label htmlFor="experience">
+                    Work experience <span className="text-destructive">*</span>
+                  </Label>
+                  <Textarea
+                    id="experience"
+                    required
+                    rows={5}
+                    value={form.experience}
+                    onChange={(e) => update("experience", e.target.value)}
+                    placeholder="Senior Developer at Acme (2021–present) — led team of 6, shipped platform to 2M users. Developer at Beta (2018–2021) — built billing system, cut churn 18%."
+                  />
                 </div>
                 <div className="space-y-1.5">
                   <Label htmlFor="education">Education</Label>
-                  <Textarea id="education" rows={2} value={form.education} onChange={(e) => update("education", e.target.value)} placeholder="BSc Computer Science, University of London, 2018" />
+                  <Textarea
+                    id="education"
+                    rows={2}
+                    value={form.education}
+                    onChange={(e) => update("education", e.target.value)}
+                    placeholder="BSc Computer Science, University of London, 2018"
+                  />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="certifications">Certifications</Label>
-                    <Textarea id="certifications" rows={2} value={form.certifications} onChange={(e) => update("certifications", e.target.value)} placeholder="AWS Certified, Google Analytics" />
+                    <Textarea
+                      id="certifications"
+                      rows={2}
+                      value={form.certifications}
+                      onChange={(e) => update("certifications", e.target.value)}
+                      placeholder="AWS Certified, Google Analytics"
+                    />
                   </div>
                   <div className="space-y-1.5">
-                    <Label htmlFor="languages">Languages</Label>
-                    <Textarea id="languages" rows={2} value={form.languages} onChange={(e) => update("languages", e.target.value)} placeholder="English (native), French (B2)" />
+                    <Label htmlFor="langs">Languages</Label>
+                    <Textarea
+                      id="langs"
+                      rows={2}
+                      value={form.languages}
+                      onChange={(e) => update("languages", e.target.value)}
+                      placeholder="English (native), French (B2)"
+                    />
                   </div>
                 </div>
               </div>
@@ -417,12 +567,23 @@ function AiResumeBuilder() {
               <div className="space-y-3">
                 <div className="space-y-1.5">
                   <Label htmlFor="jobDescription">Target job description (for ATS optimization)</Label>
-                  <Textarea id="jobDescription" rows={4} value={form.jobDescription} onChange={(e) => update("jobDescription", e.target.value)} placeholder="Paste the full job posting here. The AI will mirror its keywords and requirements." />
+                  <Textarea
+                    id="jobDescription"
+                    rows={4}
+                    value={form.jobDescription}
+                    onChange={(e) => update("jobDescription", e.target.value)}
+                    placeholder="Paste the full job posting here. The AI will mirror its keywords and requirements."
+                  />
                 </div>
                 <div className="grid sm:grid-cols-3 gap-3">
                   <div className="space-y-1.5">
                     <Label htmlFor="tone">Tone</Label>
-                    <select id="tone" value={form.tone} onChange={(e) => update("tone", e.target.value as Tone)} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                    <select
+                      id="tone"
+                      value={form.tone}
+                      onChange={(e) => update("tone", e.target.value as Tone)}
+                      className={selectClass}
+                    >
                       <option value="professional">Professional</option>
                       <option value="creative">Creative</option>
                       <option value="executive">Executive</option>
@@ -431,7 +592,12 @@ function AiResumeBuilder() {
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="length">Length</Label>
-                    <select id="length" value={form.length} onChange={(e) => update("length", e.target.value as LengthOpt)} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                    <select
+                      id="length"
+                      value={form.length}
+                      onChange={(e) => update("length", e.target.value as LengthOpt)}
+                      className={selectClass}
+                    >
                       <option value="concise">Concise (1 page)</option>
                       <option value="standard">Standard (1–2 pages)</option>
                       <option value="detailed">Detailed (2 pages)</option>
@@ -439,7 +605,12 @@ function AiResumeBuilder() {
                   </div>
                   <div className="space-y-1.5">
                     <Label htmlFor="language">Output language</Label>
-                    <select id="language" value={form.language} onChange={(e) => update("language", e.target.value as LanguageOpt)} className="flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring">
+                    <select
+                      id="language"
+                      value={form.language}
+                      onChange={(e) => update("language", e.target.value as LanguageOpt)}
+                      className={selectClass}
+                    >
                       <option value="english">English</option>
                       <option value="french">French</option>
                       <option value="spanish">Spanish</option>
@@ -456,26 +627,26 @@ function AiResumeBuilder() {
             <Button type="submit" disabled={!canSubmit} className="min-h-11">
               {loading ? (
                 <>
-                  <Loader2 className="h-4 w-4 animate-spin" aria-hidden="true" />
+                  <Loader2 className="h-4 w-4 animate-spin" />
                   Generating…
                 </>
               ) : (
                 <>
-                  <FileText className="h-4 w-4" aria-hidden="true" />
+                  <FileText className="h-4 w-4" />
                   Generate resume
                 </>
               )}
             </Button>
             {resume && (
-              <Button type="button" variant="outline" onClick={() => void submit()} disabled={loading} className="min-h-11">
-                <RefreshCw className="h-4 w-4" aria-hidden="true" />
+              <Button type="button" variant="outline" onClick={runGenerate} disabled={loading} className="min-h-11">
+                <RefreshCw className="h-4 w-4" />
                 Regenerate
               </Button>
             )}
           </div>
         </motion.form>
 
-        {/* Output */}
+        {/* ── Output ── */}
         <section
           aria-live="polite"
           aria-busy={loading}
@@ -486,16 +657,16 @@ function AiResumeBuilder() {
             <h2 className="font-display text-lg font-semibold">Your resume</h2>
             {resume && !loading && (
               <div className="flex flex-wrap gap-2">
-                <Button type="button" size="sm" variant="outline" onClick={copy} aria-label="Copy resume to clipboard">
-                  <Copy className="h-4 w-4" aria-hidden="true" />
+                <Button type="button" size="sm" variant="outline" onClick={handleCopy}>
+                  <Copy className="h-4 w-4" />
                   {copied ? "Copied ✓" : "Copy"}
                 </Button>
-                <Button type="button" size="sm" variant="outline" onClick={downloadTxt} aria-label="Download as .txt">
-                  <FileText className="h-4 w-4" aria-hidden="true" />
+                <Button type="button" size="sm" variant="outline" onClick={handleDownloadTxt}>
+                  <FileText className="h-4 w-4" />
                   .txt
                 </Button>
-                <Button type="button" size="sm" variant="outline" onClick={downloadPdf} aria-label="Download as PDF">
-                  <FileDown className="h-4 w-4" aria-hidden="true" />
+                <Button type="button" size="sm" variant="outline" onClick={handleDownloadPdf}>
+                  <FileDown className="h-4 w-4" />
                   .pdf
                 </Button>
               </div>
@@ -503,16 +674,22 @@ function AiResumeBuilder() {
           </div>
 
           {error && (
-            <div role="alert" className="mb-3 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive">
-              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" aria-hidden="true" />
+            <div
+              role="alert"
+              className="mb-3 flex items-start gap-2 rounded-md border border-destructive/40 bg-destructive/10 p-3 text-sm text-destructive"
+            >
+              <AlertCircle className="h-4 w-4 mt-0.5 shrink-0" />
               <span>{error}</span>
             </div>
           )}
 
           {loading && (
-            <div className="space-y-2 animate-pulse" aria-hidden="true">
+            <div className="space-y-2 animate-pulse">
               {[1, 2, 3, 4, 5, 6, 7, 8, 9, 10].map((i) => (
-                <div key={i} className={`h-3 rounded bg-muted ${i % 3 === 0 ? "w-9/12" : i % 2 === 0 ? "w-11/12" : "w-full"}`} />
+                <div
+                  key={i}
+                  className={`h-3 rounded bg-muted ${i % 3 === 0 ? "w-9/12" : i % 2 === 0 ? "w-11/12" : "w-full"}`}
+                />
               ))}
             </div>
           )}
@@ -530,7 +707,8 @@ function AiResumeBuilder() {
 
           {!loading && !resume && !error && (
             <p className="text-sm text-muted-foreground">
-              Fill in your details and click <strong>Generate resume</strong>. Your personalised resume will appear here — ready to copy or download as PDF.
+              Fill in your details and click <strong>Generate resume</strong>. Your personalised, ATS-optimized resume
+              will appear here — ready to copy or download as PDF.
             </p>
           )}
 
@@ -563,12 +741,13 @@ function AiResumeBuilder() {
       <section className="mt-6 rounded-2xl border border-border bg-card/40 p-5 text-sm text-muted-foreground space-y-2">
         <p>
           Pair your resume with a tailored cover letter using our{" "}
-          <InternalLink href="/tools/ai-cover-letter-generator">AI Cover Letter Generator</InternalLink> — create your complete application package in minutes.
+          <InternalLink href="/tools/ai-cover-letter-generator">AI Cover Letter Generator</InternalLink> — create your
+          complete application package in minutes.
         </p>
         <p>
           Stay energised through your job search with the{" "}
-          <InternalLink href="/tools/calorie-calculator">Calorie Calculator</InternalLink> and make sure you walk into every interview rested using our{" "}
-          <InternalLink href="/tools/sleep-calculator">Sleep Calculator</InternalLink>.
+          <InternalLink href="/tools/calorie-calculator">Calorie Calculator</InternalLink> and make sure you walk into
+          every interview rested using our <InternalLink href="/tools/sleep-calculator">Sleep Calculator</InternalLink>.
         </p>
       </section>
 

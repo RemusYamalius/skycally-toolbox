@@ -26,9 +26,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-
-// ⚠️ No createServerFn, no @/server/* imports — direct client fetch only
-// (same pattern as ai-cover-letter-generator to avoid parseAst build errors)
+import { generateResume } from "@/server/ai-resume.functions";
 
 export const Route = createFileRoute("/tools/ai-resume-builder")({
   head: () => buildToolMeta(toolBySlug("ai-resume-builder", tools)),
@@ -86,79 +84,11 @@ const DEFAULTS: FormState = {
 const STORAGE_KEY = "ai-resume-builder-inputs";
 const DEBOUNCE_MS = 500;
 
-const LENGTH_LABEL: Record<LengthOpt, string> = {
-  concise: "concise one-page",
-  standard: "standard one-to-two-page",
-  detailed: "detailed two-page",
-};
-
-const LANGUAGE_LABEL: Record<LanguageOpt, string> = {
-  english: "English",
-  french: "French",
-  spanish: "Spanish",
-  german: "German",
-  arabic: "Arabic",
-};
-
-const SYSTEM_PROMPT = `You are an expert resume writer and career coach with 15 years of experience helping candidates land jobs at top companies. You write resumes that:
-- Pass ATS (Applicant Tracking Systems) by naturally incorporating keywords from the job description
-- Open with a powerful professional summary that immediately communicates value
-- Use strong action verbs (Led, Built, Increased, Reduced, Shipped, Managed, Designed, Implemented)
-- Quantify achievements wherever possible (%, $, numbers, scale)
-- Are tailored to the specific role and industry
-- Follow a clean, scannable structure: Summary -> Experience -> Skills -> Education -> Certifications
-- Sound human and specific, never generic or templated
-- Never invent credentials, companies, or achievements not provided by the user
-Output the resume as clean plain text with clear section headers (use === or --- separators), ready to copy or save. No markdown, no asterisks, no bullet symbols other than simple dashes.`;
-
-function buildPrompt(form: FormState): string {
-  const lines: string[] = [
-    `Write a ${LENGTH_LABEL[form.length]} resume in ${LANGUAGE_LABEL[form.language]} with a ${form.tone} tone.`,
-    `Full name: ${form.fullName}`,
-    `Target role: ${form.jobTitle}`,
-    `Email: ${form.email}`,
-  ];
-  if (form.phone) lines.push(`Phone: ${form.phone}`);
-  if (form.location) lines.push(`Location: ${form.location}`);
-  if (form.linkedin) lines.push(`LinkedIn: ${form.linkedin}`);
-  if (form.website) lines.push(`Website/Portfolio: ${form.website}`);
-  if (form.yearsExperience) lines.push(`Years of experience: ${form.yearsExperience}`);
-  if (form.industry) lines.push(`Industry/Field: ${form.industry}`);
-  if (form.summary) lines.push(`Professional summary (refine this): ${form.summary}`);
-  lines.push(`Key skills: ${form.skills}`);
-  lines.push(`Work experience:\n${form.experience}`);
-  if (form.education) lines.push(`Education: ${form.education}`);
-  if (form.certifications) lines.push(`Certifications: ${form.certifications}`);
-  if (form.languages) lines.push(`Languages: ${form.languages}`);
-  if (form.jobDescription) lines.push(`Target job description (optimize for ATS):\n${form.jobDescription}`);
-  lines.push("Output only the resume content. No preamble, no commentary.");
-  return lines.join("\n");
-}
-
-// ─── Direct client-side AI call — no server function needed ─────────────────
-async function callAI(form: FormState): Promise<string> {
-  const res = await fetch("https://ai.gateway.lovable.dev/v1/chat/completions", {
-    method: "POST",
-    headers: {
-      "Content-Type": "application/json",
-      "Lovable-API-Key": (import.meta as any).env?.VITE_LOVABLE_API_KEY ?? "",
-    },
-    body: JSON.stringify({
-      model: "google/gemini-2.0-flash-001",
-      messages: [
-        { role: "system", content: SYSTEM_PROMPT },
-        { role: "user", content: buildPrompt(form) },
-      ],
-    }),
-  });
-  if (res.status === 429) throw new Error("RATE_LIMITED");
-  if (res.status === 402) throw new Error("CREDITS_EXHAUSTED");
-  if (!res.ok) throw new Error("GENERATION_FAILED");
-  const json = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> };
-  const result = json.choices?.[0]?.message?.content?.trim();
-  if (!result) throw new Error("GENERATION_FAILED");
-  return result;
-}
+const InternalLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
+  <a href={href} className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
+    {children}
+  </a>
+);
 
 function errorToMessage(err: unknown): string {
   const msg = err instanceof Error ? err.message : "";
@@ -166,12 +96,6 @@ function errorToMessage(err: unknown): string {
   if (msg === "CREDITS_EXHAUSTED") return "AI credits exhausted — please try again later.";
   return "Something went wrong — please try again.";
 }
-
-const InternalLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <a href={href} className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
-    {children}
-  </a>
-);
 
 const SEO_BODY = [
   "Your resume is the single most important document in your job search — yet most people either use a generic template that looks identical to thousands of others, or spend hours trying to format one from scratch. Skycally's AI Resume Builder solves both problems instantly. Enter your experience, skills, and target role, and the AI writes a polished, ATS-friendly resume tailored to the specific job in seconds. No signup, no daily limits, no paywalls — unlimited generations, free forever.",
@@ -270,11 +194,38 @@ function AiResumeBuilder() {
     const now = Date.now();
     if (now - lastSubmitRef.current < DEBOUNCE_MS) return;
     lastSubmitRef.current = now;
+
+    const f = formRef.current;
+    const yrs = f.yearsExperience.trim();
+
     setLoading(true);
     setError(null);
-    callAI(formRef.current)
-      .then((result) => {
-        setResume(result);
+
+    generateResume({
+      data: {
+        fullName: f.fullName.trim(),
+        jobTitle: f.jobTitle.trim(),
+        email: f.email.trim(),
+        phone: f.phone.trim(),
+        location: f.location.trim(),
+        linkedin: f.linkedin.trim(),
+        website: f.website.trim(),
+        summary: f.summary.trim(),
+        yearsExperience: yrs ? Math.max(0, Math.min(60, Number(yrs) || 0)) : undefined,
+        industry: f.industry.trim(),
+        skills: f.skills.trim(),
+        experience: f.experience.trim(),
+        education: f.education.trim(),
+        certifications: f.certifications.trim(),
+        languages: f.languages.trim(),
+        jobDescription: f.jobDescription.trim(),
+        tone: f.tone,
+        length: f.length,
+        language: f.language,
+      },
+    })
+      .then(({ resume: r }) => {
+        setResume(r);
       })
       .catch((err) => {
         setError(errorToMessage(err));
@@ -330,19 +281,20 @@ function AiResumeBuilder() {
     doc.setFontSize(12);
     const lines = doc.splitTextToSize(resume, maxWidth) as string[];
     let y = margin;
-    const lineHeight = 16;
     for (const line of lines) {
-      if (y + lineHeight > pageHeight - margin) {
+      if (y + 16 > pageHeight - margin) {
         doc.addPage();
         y = margin;
       }
       doc.text(line, margin, y);
-      y += lineHeight;
+      y += 16;
     }
     doc.save(`${fileSlug()}.pdf`);
   }
 
   const wordCount = resume ? resume.trim().split(/\s+/).length : 0;
+  const selectClass =
+    "flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
 
   const SectionHeader = ({ icon: Icon, title }: { icon: typeof User; title: string }) => (
     <div className="flex items-center gap-2 mb-3">
@@ -355,9 +307,6 @@ function AiResumeBuilder() {
       <h3 className="font-display text-base font-semibold">{title}</h3>
     </div>
   );
-
-  const selectClass =
-    "flex h-9 w-full rounded-md border border-input bg-transparent px-3 text-sm shadow-sm focus-visible:outline-none focus-visible:ring-1 focus-visible:ring-ring";
 
   return (
     <ToolPageShell title={tool.name} description={tool.description} showFileDisclaimer={false}>
@@ -398,7 +347,7 @@ function AiResumeBuilder() {
                     required
                     value={form.jobTitle}
                     onChange={(e) => update("jobTitle", e.target.value)}
-                    placeholder="Senior Frontend Developer"
+                    placeholder="Senior UX Designer"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -431,7 +380,7 @@ function AiResumeBuilder() {
                     id="location"
                     value={form.location}
                     onChange={(e) => update("location", e.target.value)}
-                    placeholder="London, UK"
+                    placeholder="San Francisco, CA"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -449,7 +398,7 @@ function AiResumeBuilder() {
                     id="website"
                     value={form.website}
                     onChange={(e) => update("website", e.target.value)}
-                    placeholder="janedoe.dev"
+                    placeholder="janedoe.design"
                   />
                 </div>
               </div>
@@ -466,7 +415,7 @@ function AiResumeBuilder() {
                     rows={3}
                     value={form.summary}
                     onChange={(e) => update("summary", e.target.value)}
-                    placeholder="A few sentences in your own words — the AI will refine it."
+                    placeholder="A few sentences in your own words — the AI will refine them."
                   />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-3">
@@ -480,7 +429,7 @@ function AiResumeBuilder() {
                       max={60}
                       value={form.yearsExperience}
                       onChange={(e) => update("yearsExperience", e.target.value)}
-                      placeholder="5"
+                      placeholder="7"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -510,7 +459,7 @@ function AiResumeBuilder() {
                     rows={2}
                     value={form.skills}
                     onChange={(e) => update("skills", e.target.value)}
-                    placeholder="React, TypeScript, design systems, user research, mentoring"
+                    placeholder="Figma, user research, prototyping, design systems, A/B testing"
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -523,7 +472,7 @@ function AiResumeBuilder() {
                     rows={5}
                     value={form.experience}
                     onChange={(e) => update("experience", e.target.value)}
-                    placeholder="Senior Developer at Acme (2021–present) — led team of 6, shipped platform to 2M users. Developer at Beta (2018–2021) — built billing system, cut churn 18%."
+                    placeholder="Senior UX Designer at Stripe (2021–present) — led redesign used by 2M+ merchants, reduced support tickets 34%. UX Designer at Airbnb (2018–2021) — increased host sign-ups 28%."
                   />
                 </div>
                 <div className="space-y-1.5">
@@ -533,7 +482,7 @@ function AiResumeBuilder() {
                     rows={2}
                     value={form.education}
                     onChange={(e) => update("education", e.target.value)}
-                    placeholder="BSc Computer Science, University of London, 2018"
+                    placeholder="BSc Interaction Design, California College of the Arts, 2018"
                   />
                 </div>
                 <div className="grid sm:grid-cols-2 gap-3">
@@ -544,7 +493,7 @@ function AiResumeBuilder() {
                       rows={2}
                       value={form.certifications}
                       onChange={(e) => update("certifications", e.target.value)}
-                      placeholder="AWS Certified, Google Analytics"
+                      placeholder="Google UX Design Certificate, Nielsen Norman Group"
                     />
                   </div>
                   <div className="space-y-1.5">
@@ -572,7 +521,7 @@ function AiResumeBuilder() {
                     rows={4}
                     value={form.jobDescription}
                     onChange={(e) => update("jobDescription", e.target.value)}
-                    placeholder="Paste the full job posting here. The AI will mirror its keywords and requirements."
+                    placeholder="Paste the full job posting here — the AI will mirror its keywords and requirements."
                   />
                 </div>
                 <div className="grid sm:grid-cols-3 gap-3">

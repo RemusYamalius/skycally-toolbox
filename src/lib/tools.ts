@@ -1127,4 +1127,14 @@ export const tools: Tool[] = [
     icon: FileSignature,
     path: "/tools/ai-cover-letter-generator",
   },
+  {
+    slug: "ai-resume-builder",
+    name: "AI Resume Builder",
+    description:
+      "Free AI resume builder — create a professional, ATS-optimized resume in seconds. No signup, no limits, download as PDF or TXT.",
+    category: "ai",
+    icon: FileText,
+    path: "/tools/ai-resume-builder",
+  },
 ];
+

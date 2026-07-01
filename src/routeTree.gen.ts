@@ -132,6 +132,7 @@ import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
+import { Route as ToolsAiResumeBuilderRouteImport } from './routes/tools.ai-resume-builder'
 import { Route as ToolsAiCoverLetterGeneratorRouteImport } from './routes/tools.ai-cover-letter-generator'
 import { Route as ToolsAgeCalculatorRouteImport } from './routes/tools.age-calculator'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
@@ -764,6 +765,11 @@ const ToolsAudioConverterRoute = ToolsAudioConverterRouteImport.update({
   path: '/tools/audio-converter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAiResumeBuilderRoute = ToolsAiResumeBuilderRouteImport.update({
+  id: '/tools/ai-resume-builder',
+  path: '/tools/ai-resume-builder',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsAiCoverLetterGeneratorRoute =
   ToolsAiCoverLetterGeneratorRouteImport.update({
     id: '/tools/ai-cover-letter-generator',
@@ -843,6 +849,7 @@ export interface FileRoutesByFullPath {
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
+  '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
@@ -979,6 +986,7 @@ export interface FileRoutesByTo {
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
+  '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
@@ -1116,6 +1124,7 @@ export interface FileRoutesById {
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
+  '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
@@ -1254,6 +1263,7 @@ export interface FileRouteTypes {
     | '/tools/add-watermark'
     | '/tools/age-calculator'
     | '/tools/ai-cover-letter-generator'
+    | '/tools/ai-resume-builder'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/ball-sort'
@@ -1390,6 +1400,7 @@ export interface FileRouteTypes {
     | '/tools/add-watermark'
     | '/tools/age-calculator'
     | '/tools/ai-cover-letter-generator'
+    | '/tools/ai-resume-builder'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/ball-sort'
@@ -1526,6 +1537,7 @@ export interface FileRouteTypes {
     | '/tools/add-watermark'
     | '/tools/age-calculator'
     | '/tools/ai-cover-letter-generator'
+    | '/tools/ai-resume-builder'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/ball-sort'
@@ -1663,6 +1675,7 @@ export interface RootRouteChildren {
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsAgeCalculatorRoute: typeof ToolsAgeCalculatorRoute
   ToolsAiCoverLetterGeneratorRoute: typeof ToolsAiCoverLetterGeneratorRoute
+  ToolsAiResumeBuilderRoute: typeof ToolsAiResumeBuilderRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBallSortRoute: typeof ToolsBallSortRoute
@@ -2646,6 +2659,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAudioConverterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/ai-resume-builder': {
+      id: '/tools/ai-resume-builder'
+      path: '/tools/ai-resume-builder'
+      fullPath: '/tools/ai-resume-builder'
+      preLoaderRoute: typeof ToolsAiResumeBuilderRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/ai-cover-letter-generator': {
       id: '/tools/ai-cover-letter-generator'
       path: '/tools/ai-cover-letter-generator'
@@ -2746,6 +2766,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsAgeCalculatorRoute: ToolsAgeCalculatorRoute,
   ToolsAiCoverLetterGeneratorRoute: ToolsAiCoverLetterGeneratorRoute,
+  ToolsAiResumeBuilderRoute: ToolsAiResumeBuilderRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBallSortRoute: ToolsBallSortRoute,

@@ -1,30 +1,54 @@
-Plan to fix `/tools/ai-resume-builder` without changing the UI:
+# Intermittent Fasting Calculator
 
-1. **Use the working Cover Letter architecture**
-   - The current working cover-letter implementation imports its AI server function from `src/lib/ai-cover-letter.functions.ts`.
-   - I will mirror that same safe pattern for Resume Builder with a server function in a client-importable server-function module.
-   - Note: this project’s current TanStack Start guard blocks client imports from `src/server/`, so using `@/server/ai-resume.functions` from the route can break builds. I will use the actual working pattern already present in the project: `src/lib/*.functions.ts`.
+New client-side tool at `/tools/intermittent-fasting-calculator` — a quiz-based fasting protocol recommender with live countdown timer, following Skycally conventions.
 
-2. **Create/fix the Resume server function**
-   - Add `src/lib/ai-resume.functions.ts` with `createServerFn` from `@tanstack/react-start`.
-   - Validate the requested fields with Zod: personal info, skills, experience, customization options, tone, length, and language.
-   - Read `process.env.LOVABLE_API_KEY` only inside the server function handler.
-   - Call `https://ai.gateway.lovable.dev/v1/chat/completions` server-side only.
-   - Use the requested system prompt exactly:
-     `You are an expert resume writer. Write ATS-optimized resumes using strong action verbs and quantified achievements. Output clean plain text with === or --- section separators. Never invent credentials.`
-   - Return `{ resume: string }`.
-   - Preserve error mapping: `429 -> RATE_LIMITED`, `402 -> CREDITS_EXHAUSTED`, all other failures -> `GENERATION_FAILED`.
+## Files
 
-3. **Update the route only where necessary**
-   - Update `src/routes/tools.ai-resume-builder.tsx` to import `generateResume` from the safe server-function path.
-   - Remove/avoid any direct browser `fetch` to `ai.gateway.lovable.dev`.
-   - Keep all current form fields, UI layout, copy/TXT/PDF actions, SEO content, and related tool sections unchanged.
-   - Keep the existing non-async submit wrapper pattern and avoid `useCallback(async () => {})` or component-level async arrow functions.
+**New:** `src/routes/tools.intermittent-fasting-calculator.tsx`
 
-4. **Clean up the unsafe duplicate**
-   - Remove or stop using the existing `src/server/ai-resume.functions.ts` file so the route does not import from the blocked server directory.
+**Edited:**
+- `src/lib/tools.ts` — register tool (Utility category, matching neighbor color)
+- `src/lib/related-tools.ts` — add mapping
+- `public/sitemap.xml` — add URL
 
-5. **Verify**
-   - Confirm there is no `ai.gateway.lovable.dev` call in the browser route file.
-   - Confirm the route imports only the server function and still calls it through TanStack’s server-function RPC.
-   - Run the relevant build/type check signal after implementation to ensure the CORS fix does not introduce the import-protection/Rollup error.
+## Structure (top-to-bottom)
+
+1. `ToolPageShell` wrapper (title + description, `showFileDisclaimer={false}`)
+2. **4-question quiz** (cards, keyboard-navigable radios):
+   - Goal: weight loss / metabolic health / longevity / muscle retention
+   - Lifestyle: early riser / night owl / shift worker / flexible
+   - Experience: beginner / intermediate / advanced
+   - Exercise timing: morning / midday / evening / none
+3. **Recommendation card** — picks one of 6 protocols with rationale:
+   - 12:12, 14:10, 16:8, 18:6, 20:4 (Warrior), OMAD (23:1)
+4. **Protocol selector** — user can override recommendation (6 chips)
+5. **Schedule builder** — user picks wake-up time; renders eating window + fasting window timeline (horizontal scroll on mobile)
+6. **Live countdown timer** — `useEffect` + `setInterval(1000)`, cleared on unmount; shows time remaining in current fast/eat phase with progress ring
+7. **Sound toggle** — Web Audio API beep on phase transition; default OFF, persisted in `localStorage` key `if-calc-sound`
+8. `AdZone id="intermittent-fasting-calculator-mid" size="728x90"`
+9. `HowToUse` (3 steps from spec)
+10. `ToolSeoContent` — SEO title, description, 3-paragraph body (~150-200 words), 4 FAQs
+11. **Internal Links section** (exact JSX from spec — links to Calorie, Sleep, Water Intake)
+12. `RelatedTools currentSlug="intermittent-fasting-calculator"`
+
+## Technical rules
+
+- No `createServerFn`, no AI calls — fully client-side
+- Plain `function` declarations only inside the component; no `async` arrow functions, no `useCallback(async...)`
+- Recommendation logic = pure sync function scoring quiz answers against protocol profiles
+- Countdown: compute next boundary from wake time + protocol; recompute on tick
+- Sound: single `AudioContext` created lazily on first user interaction; oscillator beep on phase change (only when enabled)
+- LocalStorage: quiz answers, chosen protocol, wake time, sound pref
+- Accessibility: `aria-label` on all controls, radio groups with proper labelling, focus-visible rings, WCAG AA contrast via design tokens
+- Mobile-first: quiz cards stack, timeline is `overflow-x-auto` on small screens
+- Design system: use `text-foreground`, `text-muted-foreground`, `border-border`, `bg-card`, `var(--cyan-brand)` / `var(--green-brand)` — no hardcoded colors
+
+## Registration
+
+- `tools.ts`: category `utility`, matching color of neighbors (calorie/water/heart-rate use the same purple token — verify and match)
+- `related-tools.ts`: `"intermittent-fasting-calculator": ["calorie-calculator", "sleep-calculator", "water-intake-calculator", "bmi-calculator", "heart-rate-zone-calculator"]`
+- Sitemap entry added
+
+## Out of scope
+
+No backend, no persistence beyond localStorage, no notifications API, no meal planning.

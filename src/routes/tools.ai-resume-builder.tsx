@@ -18,7 +18,7 @@ import { Input } from "@/components/ui/input";
 import { Label } from "@/components/ui/label";
 import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
-import { generateResume } from "@/server/ai-resume.functions";
+import { generateResume } from "@/lib/ai-resume.functions";
 
 export const Route = createFileRoute("/tools/ai-resume-builder")({
   head: () => buildToolMeta(toolBySlug("ai-resume-builder", tools)),

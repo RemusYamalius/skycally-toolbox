@@ -101,6 +101,7 @@ import {
   Droplets,
   HeartPulse,
   FileSignature,
+  Timer,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1109,6 +1110,15 @@ export const tools: Tool[] = [
     category: "utility",
     icon: HeartPulse,
     path: "/tools/heart-rate-zone-calculator",
+  },
+  {
+    slug: "intermittent-fasting-calculator",
+    name: "Intermittent Fasting Calculator",
+    description:
+      "Find your ideal fasting schedule with a 4-question quiz. Live countdown timer, 6 proven protocols (12:12 to OMAD), and personalized daily eating window.",
+    category: "utility",
+    icon: Timer,
+    path: "/tools/intermittent-fasting-calculator",
   },
   {
     slug: "ball-sort",

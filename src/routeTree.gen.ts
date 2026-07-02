@@ -88,6 +88,7 @@ import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shor
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsIpAddressLookupRouteImport } from './routes/tools.ip-address-lookup'
 import { Route as ToolsInvoiceGeneratorRouteImport } from './routes/tools.invoice-generator'
+import { Route as ToolsIntermittentFastingCalculatorRouteImport } from './routes/tools.intermittent-fasting-calculator'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
 import { Route as ToolsImageToSketchRouteImport } from './routes/tools.image-to-sketch'
@@ -543,6 +544,12 @@ const ToolsInvoiceGeneratorRoute = ToolsInvoiceGeneratorRouteImport.update({
   path: '/tools/invoice-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsIntermittentFastingCalculatorRoute =
+  ToolsIntermittentFastingCalculatorRouteImport.update({
+    id: '/tools/intermittent-fasting-calculator',
+    path: '/tools/intermittent-fasting-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsImageUpscalerRoute = ToolsImageUpscalerRouteImport.update({
   id: '/tools/image-upscaler',
   path: '/tools/image-upscaler',
@@ -894,6 +901,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/intermittent-fasting-calculator': typeof ToolsIntermittentFastingCalculatorRoute
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
@@ -1031,6 +1039,7 @@ export interface FileRoutesByTo {
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/intermittent-fasting-calculator': typeof ToolsIntermittentFastingCalculatorRoute
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
@@ -1169,6 +1178,7 @@ export interface FileRoutesById {
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/intermittent-fasting-calculator': typeof ToolsIntermittentFastingCalculatorRoute
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
@@ -1308,6 +1318,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/intermittent-fasting-calculator'
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
@@ -1445,6 +1456,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/intermittent-fasting-calculator'
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
@@ -1582,6 +1594,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/intermittent-fasting-calculator'
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
@@ -1720,6 +1733,7 @@ export interface RootRouteChildren {
   ToolsImageToSketchRoute: typeof ToolsImageToSketchRoute
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
+  ToolsIntermittentFastingCalculatorRoute: typeof ToolsIntermittentFastingCalculatorRoute
   ToolsInvoiceGeneratorRoute: typeof ToolsInvoiceGeneratorRoute
   ToolsIpAddressLookupRoute: typeof ToolsIpAddressLookupRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
@@ -2351,6 +2365,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsInvoiceGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/intermittent-fasting-calculator': {
+      id: '/tools/intermittent-fasting-calculator'
+      path: '/tools/intermittent-fasting-calculator'
+      fullPath: '/tools/intermittent-fasting-calculator'
+      preLoaderRoute: typeof ToolsIntermittentFastingCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/image-upscaler': {
       id: '/tools/image-upscaler'
       path: '/tools/image-upscaler'
@@ -2811,6 +2832,8 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageToSketchRoute: ToolsImageToSketchRoute,
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
+  ToolsIntermittentFastingCalculatorRoute:
+    ToolsIntermittentFastingCalculatorRoute,
   ToolsInvoiceGeneratorRoute: ToolsInvoiceGeneratorRoute,
   ToolsIpAddressLookupRoute: ToolsIpAddressLookupRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,

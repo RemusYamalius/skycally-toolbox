@@ -249,8 +249,7 @@ function playBeep(enabled: boolean, ctxRef: { current: AudioContext | null }) {
   try {
     if (!ctxRef.current) {
       const Ctor =
-        window.AudioContext ||
-        (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
+        window.AudioContext || (window as unknown as { webkitAudioContext?: typeof AudioContext }).webkitAudioContext;
       if (!Ctor) return;
       ctxRef.current = new Ctor();
     }
@@ -300,6 +299,88 @@ const EXERCISE_OPTIONS: { value: ExerciseTiming; label: string; desc: string }[]
   { value: "evening", label: "Evening", desc: "After 5pm" },
   { value: "none", label: "None", desc: "Not currently" },
 ];
+
+// ---- Body Timeline data ----
+
+const BODY_TIMELINE: { hours: string; title: string; desc: string; icon: string }[] = [
+  {
+    hours: "0–4h",
+    icon: "🍽️",
+    title: "Digestion & absorption",
+    desc: "Your body digests the last meal and absorbs nutrients. Blood glucose and insulin are elevated.",
+  },
+  {
+    hours: "4–8h",
+    icon: "📉",
+    title: "Blood sugar normalises",
+    desc: "Insulin drops, glycogen stores begin depleting. Your body starts transitioning from glucose to fat as fuel.",
+  },
+  {
+    hours: "8–12h",
+    icon: "🔥",
+    title: "Fat burning begins",
+    desc: "Glycogen is largely depleted. The liver produces ketones and fat oxidation increases significantly.",
+  },
+  {
+    hours: "12–14h",
+    icon: "🔧",
+    title: "Growth hormone rises",
+    desc: "HGH surges, supporting muscle preservation and cellular repair. Real metabolic benefits begin here.",
+  },
+  {
+    hours: "14–16h",
+    icon: "♻️",
+    title: "Autophagy begins",
+    desc: "Cells activate autophagy — breaking down and recycling damaged proteins and organelles. A key longevity mechanism.",
+  },
+  {
+    hours: "16–18h",
+    icon: "🧠",
+    title: "Deep fat oxidation & clarity",
+    desc: "Deep ketosis and peak fat burning. Many people report heightened mental clarity during this phase.",
+  },
+  {
+    hours: "18–24h",
+    icon: "⚡",
+    title: "Peak autophagy & reset",
+    desc: "Autophagy peaks. Significant metabolic reset, reduced inflammation, and immune regeneration are underway.",
+  },
+];
+
+// ---- Protocol Tips data ----
+
+const PROTOCOL_TIPS: Record<ProtocolId, string[]> = {
+  "12-12": [
+    "Finish dinner by 8 PM and eat breakfast at 8 AM — you may already be doing this without realising it.",
+    "This is a circadian-aligned fast. Avoid late-night snacking, which disrupts your body clock even within the 12-hour window.",
+    "Once comfortable after 2–3 weeks, extend to 14:10 by simply delaying breakfast by 2 hours.",
+  ],
+  "14-10": [
+    "Delay breakfast by 2 hours from your normal time — the easiest way to implement 14:10.",
+    "Black coffee or plain green tea in the morning can make the extra 2 fasting hours effortless.",
+    "Your hardest moment will be around hour 12–14. Stay hydrated — hunger typically passes in 20 minutes.",
+  ],
+  "16-8": [
+    "Break your fast with protein and healthy fat — eggs, avocado, or Greek yoghurt — rather than high-carb foods.",
+    "Black coffee, plain tea, and sparkling water are allowed during the fasting window and do not break the fast.",
+    "Hours 14–16 are typically the hardest. Stay busy, drink water — fat burning and autophagy are peaking right now.",
+  ],
+  "18-6": [
+    "With only a 6-hour window, nutrient density is critical — prioritise protein (0.8g per kg bodyweight) at every meal.",
+    "Plan 2 substantial meals rather than grazing — this keeps insulin low even during the eating phase.",
+    "Electrolytes (sodium, potassium, magnesium) become important at this fasting length. Add a pinch of salt to water.",
+  ],
+  "20-4": [
+    "Your 4-hour window ideally sits in the late afternoon (3–7 PM) — aligning with natural cortisol and insulin rhythms.",
+    "Eat a large, complete meal first, then a lighter second meal if needed. Avoid spreading calories continuously.",
+    "Track how you feel for 2 weeks before fully committing — some people thrive on 20:4, others do better at 18:6.",
+  ],
+  "23-1": [
+    "Your single meal must be nutritionally complete — include protein, complex carbs, healthy fats, and vegetables.",
+    "Eat slowly and stop before feeling overly full. Overeating in one sitting can cause discomfort and spike insulin.",
+    "Electrolytes are essential on OMAD. Supplement sodium, magnesium, and potassium daily, especially if you exercise.",
+  ],
+};
 
 function loadState(): PersistedState {
   if (typeof window === "undefined") return DEFAULT_STATE;
@@ -360,14 +441,8 @@ function IntermittentFastingCalculator() {
     return PROTOCOLS.find((p) => p.id === id) ?? recommendation.protocol;
   }, [state.protocol, recommendation.protocol]);
 
-  const phase = useMemo(
-    () => computePhase(now, state.wakeTime, activeProtocol),
-    [now, state.wakeTime, activeProtocol],
-  );
-  const windows = useMemo(
-    () => computeWindows(state.wakeTime, activeProtocol),
-    [state.wakeTime, activeProtocol],
-  );
+  const phase = useMemo(() => computePhase(now, state.wakeTime, activeProtocol), [now, state.wakeTime, activeProtocol]);
+  const windows = useMemo(() => computeWindows(state.wakeTime, activeProtocol), [state.wakeTime, activeProtocol]);
 
   // Beep on phase transition
   useEffect(() => {
@@ -377,8 +452,7 @@ function IntermittentFastingCalculator() {
     lastPhaseRef.current = phase.phase;
   }, [phase.phase, soundOn]);
 
-  const quizComplete =
-    state.quiz.goal && state.quiz.lifestyle && state.quiz.experience && state.quiz.exercise;
+  const quizComplete = state.quiz.goal && state.quiz.lifestyle && state.quiz.experience && state.quiz.exercise;
 
   function setQuiz<K extends keyof QuizState>(key: K, value: QuizState[K]) {
     setState((s) => ({ ...s, quiz: { ...s.quiz, [key]: value } }));
@@ -465,8 +539,8 @@ function IntermittentFastingCalculator() {
               {quizComplete ? "Your recommended protocol" : "Suggested starting point"}
             </h2>
             <p className="mt-1 text-sm text-muted-foreground">
-              <span className="font-semibold text-foreground">{recommendation.protocol.name}</span>{" "}
-              — {recommendation.protocol.tagline}. {recommendation.rationale}
+              <span className="font-semibold text-foreground">{recommendation.protocol.name}</span> —{" "}
+              {recommendation.protocol.tagline}. {recommendation.rationale}
             </p>
             {!quizComplete && (
               <p className="mt-2 text-xs text-muted-foreground">
@@ -482,11 +556,7 @@ function IntermittentFastingCalculator() {
         <h2 id="protocol-heading" className="font-display text-lg font-bold mb-3">
           Choose your schedule
         </h2>
-        <div
-          role="radiogroup"
-          aria-label="Fasting protocol"
-          className="flex flex-wrap gap-2"
-        >
+        <div role="radiogroup" aria-label="Fasting protocol" className="flex flex-wrap gap-2">
           {PROTOCOLS.map((p) => {
             const selected = activeProtocol.id === p.id;
             return (
@@ -501,11 +571,7 @@ function IntermittentFastingCalculator() {
                     ? "border-transparent text-background"
                     : "border-border bg-card hover:border-foreground/30 text-foreground"
                 }`}
-                style={
-                  selected
-                    ? { background: brandCyan, boxShadow: `0 0 0 1px ${brandCyan}` }
-                    : undefined
-                }
+                style={selected ? { background: brandCyan, boxShadow: `0 0 0 1px ${brandCyan}` } : undefined}
               >
                 {p.name}
               </button>
@@ -541,8 +607,7 @@ function IntermittentFastingCalculator() {
             <div className="flex justify-between">
               <span className="text-muted-foreground">Fasting window</span>
               <span className="font-medium text-foreground">
-                {formatClock(windows.eatEnd)} →{" "}
-                {formatClock(new Date(windows.eatStart.getTime() + 24 * MS_PER_HOUR))}
+                {formatClock(windows.eatEnd)} → {formatClock(new Date(windows.eatStart.getTime() + 24 * MS_PER_HOUR))}
               </span>
             </div>
             <div className="flex justify-between">
@@ -584,10 +649,7 @@ function IntermittentFastingCalculator() {
           </div>
 
           <div className="mt-6 flex items-center gap-5">
-            <ProgressRing
-              progress={phase.progress}
-              color={phase.phase === "eating" ? brandGreen : brandCyan}
-            />
+            <ProgressRing progress={phase.progress} color={phase.phase === "eating" ? brandGreen : brandCyan} />
             <div className="min-w-0">
               <div
                 className="text-[11px] font-semibold uppercase tracking-wider"
@@ -611,6 +673,83 @@ function IntermittentFastingCalculator() {
         </div>
       </section>
 
+      {/* Body Timeline — killer feature */}
+      <section aria-labelledby="body-timeline-heading" className="mt-8">
+        <h2 id="body-timeline-heading" className="font-display text-xl font-bold mb-1">
+          What happens in your body?
+        </h2>
+        <p className="text-sm text-muted-foreground mb-5">
+          Hour-by-hour biological changes during your {activeProtocol.fastHours}-hour fast. Greyed-out stages are beyond
+          your current protocol.
+        </p>
+        <div className="space-y-3">
+          {BODY_TIMELINE.map((item, i) => {
+            // Calculate midpoint hour of this stage to check if protocol reaches it
+            const startH = i === 0 ? 0 : [0, 4, 8, 12, 14, 16, 18][i];
+            const reached = activeProtocol.fastHours > startH;
+            return (
+              <div
+                key={item.hours}
+                className={`rounded-2xl border p-4 flex gap-4 items-start transition-all ${
+                  reached ? "border-border bg-card" : "border-border/40 bg-card/30 opacity-40"
+                }`}
+              >
+                <div
+                  className="shrink-0 w-10 h-10 rounded-xl flex items-center justify-center text-xl"
+                  style={{
+                    background: reached ? "color-mix(in oklab, var(--cyan-brand) 15%, transparent)" : "transparent",
+                  }}
+                  aria-hidden="true"
+                >
+                  {item.icon}
+                </div>
+                <div className="min-w-0">
+                  <div className="flex items-center gap-2 flex-wrap">
+                    <span
+                      className="text-xs font-mono font-semibold px-2 py-0.5 rounded-full"
+                      style={{
+                        background: reached
+                          ? "color-mix(in oklab, var(--cyan-brand) 20%, transparent)"
+                          : "var(--secondary)",
+                        color: reached ? "var(--cyan-brand)" : "var(--muted-foreground)",
+                      }}
+                    >
+                      {item.hours}
+                    </span>
+                    <span className="text-sm font-semibold">{item.title}</span>
+                  </div>
+                  <p className="mt-1 text-xs text-muted-foreground leading-relaxed">{item.desc}</p>
+                </div>
+              </div>
+            );
+          })}
+        </div>
+      </section>
+
+      {/* Protocol Tips */}
+      <section aria-labelledby="tips-heading" className="mt-8">
+        <h2 id="tips-heading" className="font-display text-xl font-bold mb-1">
+          Tips for {activeProtocol.name}
+        </h2>
+        <p className="text-sm text-muted-foreground mb-4">
+          The three most important practical guidelines for your chosen protocol.
+        </p>
+        <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
+          {PROTOCOL_TIPS[activeProtocol.id].map((tip, i) => (
+            <div key={i} className="flex gap-3 items-start">
+              <div
+                className="shrink-0 w-6 h-6 rounded-full flex items-center justify-center text-xs font-bold text-background mt-0.5"
+                style={{ background: "var(--cyan-brand)" }}
+                aria-hidden="true"
+              >
+                {i + 1}
+              </div>
+              <p className="text-sm leading-relaxed text-muted-foreground">{tip}</p>
+            </div>
+          ))}
+        </div>
+      </section>
+
       <AdZone id="intermittent-fasting-calculator-mid" size="728x90" />
 
       <HowToUse
@@ -628,6 +767,7 @@ function IntermittentFastingCalculator() {
           "Skycally's Intermittent Fasting Calculator turns a short 4-question quiz into a personalized fasting schedule you can start today. Tell it your goal, lifestyle, experience level, and when you exercise, and it recommends one of six proven protocols — from a gentle 12:12 circadian reset to advanced OMAD (23:1) — with a clear rationale for why that window fits you.",
           "Once you pick a protocol and set your wake-up time, the calculator builds your daily eating and fasting windows and starts a live countdown timer. The timer updates every second, shows a progress ring for the current phase, and can optionally beep when you transition between eating and fasting. Every calculation runs 100% in your browser — no account, no data sent to a server, and your preferences persist locally between visits.",
           "Intermittent fasting is not one-size-fits-all. Beginners typically do best with 14:10 or 16:8, while advanced fasters may prefer 18:6 or 20:4. Morning exercisers usually need a shorter fasting window to fuel training; those chasing longevity and metabolic benefits often lean longer. The calculator weighs all these factors so you skip the guesswork and start with a schedule that fits your real life.",
+          "The hour-by-hour body timeline shows exactly what is happening inside your body at each stage of the fast — from the initial glycogen depletion at hour 8, to the onset of autophagy at hour 14, to the peak cellular repair that occurs between hours 18 and 24. Most fasting tools tell you when to eat; this one tells you why each additional hour matters. Combine your fasting schedule with precise nutrition targets using our Calorie Calculator, and align your sleep window with your fast using the Sleep Calculator to maximise the hours you fast while asleep.",
         ]}
         faqs={[
           {
@@ -649,6 +789,26 @@ function IntermittentFastingCalculator() {
             question: "Is intermittent fasting safe for everyone?",
             answer:
               "Intermittent fasting is generally safe for healthy adults, but it is not recommended during pregnancy, breastfeeding, for people with a history of eating disorders, or those on medications that require food. Consult your doctor before starting.",
+          },
+          {
+            question: "What is autophagy and when does it start?",
+            answer:
+              "Autophagy is the body's cellular self-cleaning process — it breaks down and recycles damaged cell components. Research suggests autophagy begins around 14–16 hours of fasting in most people, with peak activity between 18 and 24 hours. This is one reason protocols like 18:6, 20:4, and OMAD have gained popularity among longevity researchers.",
+          },
+          {
+            question: "Can I drink coffee or tea during the fasting window?",
+            answer:
+              "Black coffee, plain tea, and water do not break a fast because they contain negligible calories and do not trigger an insulin response. Adding milk, sugar, cream, or sweeteners — even artificial ones — can disrupt the fasted state. Stick to plain versions during your fasting hours.",
+          },
+          {
+            question: "What is the best intermittent fasting schedule for fat loss?",
+            answer:
+              "16:8 is the most evidence-backed protocol for fat loss in most people. It creates a meaningful caloric restriction window while being sustainable long-term. Those with more experience often find 18:6 accelerates results. Breaking your fast with protein and fat rather than carbohydrates significantly improves fat oxidation.",
+          },
+          {
+            question: "How long does it take to see results from intermittent fasting?",
+            answer:
+              "Most people notice improved energy and reduced hunger within the first 1–2 weeks as the body adapts. Measurable changes in body composition typically appear within 4–8 weeks of consistent practice. Metabolic benefits such as improved insulin sensitivity develop over months. Consistency matters more than the specific protocol chosen.",
           },
         ]}
       />
@@ -705,21 +865,11 @@ interface QuizQuestionProps<T extends string> {
   options: QuizOption<T>[];
 }
 
-function QuizQuestion<T extends string>({
-  legend,
-  name,
-  value,
-  onChange,
-  options,
-}: QuizQuestionProps<T>) {
+function QuizQuestion<T extends string>({ legend, name, value, onChange, options }: QuizQuestionProps<T>) {
   return (
     <fieldset className="rounded-2xl border border-border bg-card/50 p-4 sm:p-5">
       <legend className="px-1 text-sm font-medium">{legend}</legend>
-      <div
-        role="radiogroup"
-        aria-label={legend}
-        className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4"
-      >
+      <div role="radiogroup" aria-label={legend} className="mt-3 grid gap-2 sm:grid-cols-2 lg:grid-cols-4">
         {options.map((opt) => {
           const selected = value === opt.value;
           const id = `${name}-${opt.value}`;
@@ -728,9 +878,7 @@ function QuizQuestion<T extends string>({
               key={opt.value}
               htmlFor={id}
               className={`cursor-pointer rounded-xl border p-3 transition-all focus-within:ring-2 focus-within:ring-offset-2 focus-within:ring-offset-background ${
-                selected
-                  ? "border-transparent"
-                  : "border-border bg-card hover:border-foreground/30"
+                selected ? "border-transparent" : "border-border bg-card hover:border-foreground/30"
               }`}
               style={
                 selected
@@ -807,14 +955,7 @@ function ProgressRing({ progress, color }: { progress: number; color: string }) 
   const offset = c * (1 - Math.min(1, Math.max(0, progress)));
   return (
     <svg width={size} height={size} viewBox={`0 0 ${size} ${size}`} aria-hidden="true">
-      <circle
-        cx={size / 2}
-        cy={size / 2}
-        r={r}
-        stroke="var(--border)"
-        strokeWidth={stroke}
-        fill="none"
-      />
+      <circle cx={size / 2} cy={size / 2} r={r} stroke="var(--border)" strokeWidth={stroke} fill="none" />
       <circle
         cx={size / 2}
         cy={size / 2}

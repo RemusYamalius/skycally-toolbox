@@ -1109,6 +1109,7 @@ export const tools: Tool[] = [
       "Calculate your maximum heart rate and 5 training zones using Tanaka, Fox, Gulati, Nes or the Karvonen (HRR) method. Free, private, runs in your browser.",
     category: "utility",
     icon: HeartPulse,
+    path: "/tools/heart-rate-zone-calculator",
   },
   {
     slug: "intermittent-fasting-calculator",

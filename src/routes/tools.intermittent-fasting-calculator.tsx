@@ -619,10 +619,8 @@ function IntermittentFastingCalculator() {
           </div>
 
           {/* Timeline */}
-          <div className="mt-5 -mx-1 overflow-x-auto pb-2">
-            <div className="min-w-[560px] px-1">
-              <Timeline eatHours={activeProtocol.eatHours} wakeTime={state.wakeTime} />
-            </div>
+          <div className="mt-5">
+            <Timeline eatHours={activeProtocol.eatHours} wakeTime={state.wakeTime} />
           </div>
         </div>
 
@@ -911,10 +909,9 @@ function QuizQuestion<T extends string>({ legend, name, value, onChange, options
 function Timeline({ eatHours, wakeTime }: { eatHours: number; wakeTime: string }) {
   const parsed = parseHHMM(wakeTime) ?? { h: 7, m: 0 };
   const startHour = parsed.h + parsed.m / 60;
-  // 24-hour bar starting at wake time
   const eatPct = (eatHours / 24) * 100;
   return (
-    <div>
+    <div className="w-full">
       <div
         className="relative h-8 w-full rounded-full overflow-hidden border border-border"
         style={{ background: "color-mix(in oklab, var(--cyan-brand) 18%, transparent)" }}
@@ -923,15 +920,15 @@ function Timeline({ eatHours, wakeTime }: { eatHours: number; wakeTime: string }
       >
         <div
           className="absolute inset-y-0 left-0 flex items-center justify-center text-[10px] font-semibold uppercase tracking-wider text-background"
-          style={{ width: `${eatPct}%`, background: "var(--green-brand)" }}
+          style={{ width: `${eatPct}%`, background: "var(--green-brand)", minWidth: "2rem" }}
         >
-          Eat {eatHours}h
+          {eatPct > 20 ? `Eat ${eatHours}h` : `${eatHours}h`}
         </div>
         <div
           className="absolute inset-y-0 right-0 flex items-center justify-center text-[10px] font-semibold uppercase tracking-wider"
           style={{ width: `${100 - eatPct}%`, color: "var(--cyan-brand)" }}
         >
-          Fast {24 - eatHours}h
+          {100 - eatPct > 20 ? `Fast ${24 - eatHours}h` : `${24 - eatHours}h`}
         </div>
       </div>
       <div className="mt-2 flex justify-between text-[10px] text-muted-foreground">

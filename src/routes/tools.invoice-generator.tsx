@@ -459,12 +459,21 @@ function InvoiceGeneratorPage() {
             </button>
           ))}
         </div>
-        <Button
-          onClick={downloadPDF}
-          className="bg-[var(--cyan-brand)] text-black hover:bg-[var(--cyan-brand)]/90 font-semibold px-6"
-        >
-          <Download className="w-4 h-4 mr-2" /> Download PDF
-        </Button>
+        <div className="flex flex-wrap items-center gap-2">
+          <Button
+            onClick={openEmailDialog}
+            variant="outline"
+            className="border-[var(--cyan-brand)] text-[var(--cyan-brand)] hover:bg-[var(--cyan-brand)]/10 font-semibold px-5"
+          >
+            <Mail className="w-4 h-4 mr-2" /> Send Invoice
+          </Button>
+          <Button
+            onClick={downloadPDF}
+            className="bg-[var(--cyan-brand)] text-black hover:bg-[var(--cyan-brand)]/90 font-semibold px-6"
+          >
+            <Download className="w-4 h-4 mr-2" /> Download PDF
+          </Button>
+        </div>
       </div>
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">

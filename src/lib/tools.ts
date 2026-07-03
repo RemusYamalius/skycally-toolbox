@@ -102,6 +102,7 @@ import {
   HeartPulse,
   FileSignature,
   Timer,
+  Mail,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1145,6 +1146,15 @@ export const tools: Tool[] = [
     category: "ai",
     icon: FileText,
     path: "/tools/ai-resume-builder",
+  },
+  {
+    slug: "ai-email-writer",
+    name: "AI Email Writer",
+    description:
+      "Free AI email writer — generate professional emails in seconds. Cold outreach, follow-ups, apologies, sales pitches and more. No signup, no limits.",
+    category: "ai",
+    icon: Mail,
+    path: "/tools/ai-email-writer",
   },
 ];
 

@@ -1,48 +1,52 @@
-## Plan: Add "Send Invoice by Email" to /tools/invoice-generator
+## Plan: AI Email Writer tool at `/tools/ai-email-writer`
 
-Add a Send Invoice button + modal that emails a clean HTML invoice via the **Resend connector through the Lovable gateway**. No PDF attachment (per your choice) — the email itself contains a well-formatted invoice summary.
+### Important correction before we start
 
-### Steps
+The brief says "same direct client-side fetch pattern as ai-cover-letter-generator — NO createServerFn". That's not what the cover letter tool actually does — it imports `generateCoverLetter` from `@/lib/ai-cover-letter.functions.ts`, which IS a `createServerFn`. Direct client-side calls to `ai.gateway.lovable.dev` would need `VITE_LOVABLE_API_KEY`, but Lovable only provisions `LOVABLE_API_KEY` (server-only). Shipping the gateway key to the browser would also let anyone drain your credits from the built JS bundle.
 
-1. **Link the Resend connector** to the project (if not already linked) via `standard_connectors--connect` with `connector_id: "resend"`. This provisions `RESEND_API_KEY` and `LOVABLE_API_KEY` as server env vars.
+**Recommendation:** mirror the real cover-letter pattern — a `createServerFn` in `src/lib/ai-email-writer.functions.ts` + a client route that calls it with `.then/.catch/.finally`. Same "no async arrows, no `useCallback(async)`" build-safety rules apply, and everything else in your brief (UI, SEO, FAQs, etc.) stays identical.
 
-2. **Create `src/lib/send-invoice.functions.ts`** (in `src/lib/`, not `src/server/`, to match the working cover-letter/resume pattern that avoids import-protection Rollup errors):
-   - `createServerFn({ method: "POST" })` with a Zod `inputValidator` for: `to` (email), `toName?`, `fromName`, `fromEmail?`, `invoiceNumber`, `invoiceDate`, `dueDate?`, `totalAmount`, `currency?`, `customMessage?` (max 500), plus a compact `items[]` (description, qty, price, line total) so the email body can list them.
-   - Handler POSTs to `https://connector-gateway.lovable.dev/resend/emails` with headers `Authorization: Bearer ${LOVABLE_API_KEY}` and `X-Connection-Api-Key: ${RESEND_API_KEY}`.
-   - `from` uses `onboarding@resend.dev` by default (safe for testing without a verified domain) with the sender name: `"{fromName} via Skycally <onboarding@resend.dev>"`. If the user later verifies a domain, we can swap the from address.
-   - `reply_to: fromEmail` when provided, so replies go to the sender's own email.
-   - Subject: `Invoice #{invoiceNumber} from {fromName}`.
-   - HTML body: branded, inline-styled invoice summary — header with invoice #, greeting, optional custom message block, table of line items, totals row (total in bold), due date, and a "Sent via Skycally Invoice Generator" footer. All fields HTML-escaped.
-   - Status mapping: `422 → INVALID_EMAIL`, `429 → RATE_LIMITED`, missing keys → `RESEND_NOT_CONFIGURED`, else `SEND_FAILED`.
+I'll proceed with that unless you tell me to force the raw client fetch anyway.
 
-3. **Edit `src/routes/tools.invoice-generator.tsx`**:
-   - Import `sendInvoiceEmail` from `@/lib/send-invoice.functions` and `Dialog`/`DialogContent`/`DialogHeader`/`DialogTitle`/`DialogFooter` from `@/components/ui/dialog`.
-   - Add state (`useState`): `emailOpen`, `sending`, `emailForm` (`to`, `toName`, `fromName` prefilled from `state.from.name`, `customMessage`).
-   - Add a **✉️ Send Invoice** button next to the existing Download PDF button (same size, `variant="outline"` with the cyan accent, `Mail` icon from lucide-react). Opens the dialog.
-   - Dialog layout: rounded-2xl, matches existing tool modal style. Fields:
-     - Send to (email, required)
-     - Client name (optional)
-     - Your name / business (required, prefilled)
-     - Personal note (Textarea, `maxLength={500}`, char counter)
-     - Cancel + Send buttons; Send shows spinner + "Sending…" while `sending`.
-   - `handleSend` is a **plain `function` declaration** (no async arrow, no `useCallback(async)`) that:
-     1. Validates fields (`toast.error` on missing/invalid).
-     2. Sets `sending=true`, builds the payload from current `state` + `totals` (already computed via `useMemo` in the file), then calls `sendInvoiceEmail({ data: payload }).then(...).catch(...).finally(...)`.
-     3. On success: `toast.success("Invoice sent to " + email)`, close dialog, reset the form.
-     4. On error: map `err.message` to the four user-facing messages you listed, via `toast.error`.
-   - No changes to any existing invoice-generation, PDF-download, SEO, HowToUse, RelatedTools code.
+### Files
 
-4. **No new npm packages, no new secrets to add manually** — the connector link handles `RESEND_API_KEY` automatically.
+1. **`src/lib/ai-email-writer.functions.ts`** (new)
+   - `createServerFn({ method: "POST" })` with Zod `inputValidator` for: `emailType` (8-enum), `yourName`, `yourRole?`, `recipientName?`, `recipientRole?`, `keyPoints`, `context?`, `tone` (6-enum), `length` (short|standard|detailed), `language` (5-enum), `includeSubject` (bool).
+   - Handler builds system + user prompt (exact text from brief), POSTs to `https://ai.gateway.lovable.dev/v1/chat/completions` with `Lovable-API-Key: process.env.LOVABLE_API_KEY`, model `google/gemini-2.5-flash` (2.0-flash-001 isn't on the Lovable catalog; 2.5-flash is the closest supported fast Gemini — swap in if you'd prefer `google/gemini-3-flash-preview`).
+   - Status mapping: 429→`RATE_LIMITED`, 402→`CREDITS_EXHAUSTED`, else `GENERATION_FAILED`. Returns `{ email: string }`.
 
-### Technical notes
+2. **`src/routes/tools.ai-email-writer.tsx`** (new)
+   - `createFileRoute("/tools/ai-email-writer")` with `head: () => buildToolMeta(toolBySlug("ai-email-writer", tools))`.
+   - `FormState` type + `DEFAULTS`; persist to `localStorage` key `"ai-email-writer-inputs"` via `useEffect`.
+   - `DEBOUNCE_MS = 500` gate via `useRef<number>`.
+   - Layout:
+     - `ToolPageShell` wrapper (title + description).
+     - **Email type grid**: 8 icon cards in `grid-cols-2 sm:grid-cols-4` (mobile 2×4 → desktop 4×2). Selected = cyan gradient border + soft bg; hover = border highlight + subtle scale via framer-motion.
+     - Two-column body `lg:grid-cols-[5fr_6fr]`: left = inputs (name, role, recipient name/role, key points textarea, context textarea, tone select, length radios, language select, include-subject toggle, Generate button); right = output card.
+     - Output card: subject line badge (if returned/toggled on), body in `whitespace-pre-wrap text-sm leading-relaxed`, word count, Copy / Regenerate / Open in Gmail (`mailto:`) buttons, "✨ Generated by AI" badge. Fade-in via framer-motion. Skeleton while loading. `aria-live="polite"`.
+   - Handlers as plain `function` declarations using `.then/.catch/.finally` — never `async` arrows, never `useCallback(async)`.
+   - `handleGenerate`: validate `yourName` + `keyPoints` + `emailType` (toast.error on missing), enforce debounce, set `loading=true`, call `generateEmail({ data: form })`, on success split subject/body if `Subject:` prefix present, on error map to friendly toast.
+   - `handleCopy`: writes subject + body to clipboard, button label swaps to "Copied ✓" for 1.5s via `setTimeout`.
+   - `handleRegenerate`: just calls `handleGenerate` again.
+   - `AdZone id="ai-email-writer-mid" size="728x90"` between form and SEO content.
+   - `HowToUse` with the 3 steps from the brief.
+   - `ToolSeoContent` with the 4 SEO body paragraphs + 8 FAQs exactly as provided (plain strings, no JSX in array).
+   - Internal-links footer block linking to `/tools/ai-cover-letter-generator`, `/tools/ai-resume-builder`, `/tools/invoice-generator` (plain `<a>` tags styled with `text-primary underline`, matching cover-letter's `InternalLink`).
+   - `RelatedTools` showing cover-letter, resume-builder, invoice-generator, word-counter, word-processor.
 
-- Server function lives in `src/lib/` (not `src/server/`) because the current TanStack Start template blocks `src/server/*` from the client bundle in a way that has broken past tools in this project; the cover-letter and resume server fns already live in `src/lib/` for this exact reason.
-- All async work stays server-side. The component uses only plain `function` decls and `.then/.catch/.finally` — no top-level `async` arrows, matching the build rules that already govern this project.
-- Currency symbol comes from the existing `CURRENCIES` lookup; `totalAmount` is formatted with the same helper the preview uses so the email matches the on-screen invoice.
-- Rate-limit / error toasts use `sonner`, already imported in the file.
+3. **`src/lib/tools.ts`** (edit)
+   - Add `Mail` to the lucide import block.
+   - Add tool entry `{ slug: "ai-email-writer", name: "AI Email Writer", path: "/tools/ai-email-writer", description: "Free AI email writer — generate professional emails in seconds. Cold outreach, follow-ups, apologies, sales pitches and more. No signup, no limits.", icon: Mail, category: <existing "Writing" or "Productivity" — I'll match whichever the cover-letter tool uses> }` (keeping the exact shape used by neighboring tools).
+
+4. **`public/sitemap.xml`** (edit) — add `<url><loc>https://skycally.com/tools/ai-email-writer</loc>…</url>` entry alongside other tools.
+
+### Notes
+
+- Route tree (`src/routeTree.gen.ts`) regenerates automatically — not touched by hand.
+- SEO uses `buildToolMeta`, which already emits canonical, OG, Twitter, and SoftwareApplication JSON-LD. The brief's WebApplication JSON-LD is functionally equivalent; sticking with the project's existing helper keeps consistency (`featureList` will list the same generic tool guarantees). If you want the exact custom JSON-LD from the brief, say so and I'll add a second `scripts` entry.
+- No new npm packages required.
 
 ### Out of scope
 
-- PDF attachment (skipped per your choice).
-- Sender email verification / custom from-domain: emails go from `onboarding@resend.dev` with the user's name as the display name and their own email in `reply_to`. Switching to a verified domain is a follow-up if/when you want to remove the "via" line.
-- Storing sent history, resending, CC/BCC, multi-recipient.
+- Raw client-side fetch with `VITE_LOVABLE_API_KEY` (security + missing env var — see top of plan).
+- Streaming responses, saved history, multi-recipient, attachment generation.

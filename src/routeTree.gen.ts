@@ -134,6 +134,7 @@ import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAiResumeBuilderRouteImport } from './routes/tools.ai-resume-builder'
+import { Route as ToolsAiEmailWriterRouteImport } from './routes/tools.ai-email-writer'
 import { Route as ToolsAiCoverLetterGeneratorRouteImport } from './routes/tools.ai-cover-letter-generator'
 import { Route as ToolsAgeCalculatorRouteImport } from './routes/tools.age-calculator'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
@@ -777,6 +778,11 @@ const ToolsAiResumeBuilderRoute = ToolsAiResumeBuilderRouteImport.update({
   path: '/tools/ai-resume-builder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAiEmailWriterRoute = ToolsAiEmailWriterRouteImport.update({
+  id: '/tools/ai-email-writer',
+  path: '/tools/ai-email-writer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsAiCoverLetterGeneratorRoute =
   ToolsAiCoverLetterGeneratorRouteImport.update({
     id: '/tools/ai-cover-letter-generator',
@@ -856,6 +862,7 @@ export interface FileRoutesByFullPath {
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
+  '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
@@ -994,6 +1001,7 @@ export interface FileRoutesByTo {
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
+  '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
@@ -1133,6 +1141,7 @@ export interface FileRoutesById {
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
+  '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
@@ -1273,6 +1282,7 @@ export interface FileRouteTypes {
     | '/tools/add-watermark'
     | '/tools/age-calculator'
     | '/tools/ai-cover-letter-generator'
+    | '/tools/ai-email-writer'
     | '/tools/ai-resume-builder'
     | '/tools/audio-converter'
     | '/tools/background-blur'
@@ -1411,6 +1421,7 @@ export interface FileRouteTypes {
     | '/tools/add-watermark'
     | '/tools/age-calculator'
     | '/tools/ai-cover-letter-generator'
+    | '/tools/ai-email-writer'
     | '/tools/ai-resume-builder'
     | '/tools/audio-converter'
     | '/tools/background-blur'
@@ -1549,6 +1560,7 @@ export interface FileRouteTypes {
     | '/tools/add-watermark'
     | '/tools/age-calculator'
     | '/tools/ai-cover-letter-generator'
+    | '/tools/ai-email-writer'
     | '/tools/ai-resume-builder'
     | '/tools/audio-converter'
     | '/tools/background-blur'
@@ -1688,6 +1700,7 @@ export interface RootRouteChildren {
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsAgeCalculatorRoute: typeof ToolsAgeCalculatorRoute
   ToolsAiCoverLetterGeneratorRoute: typeof ToolsAiCoverLetterGeneratorRoute
+  ToolsAiEmailWriterRoute: typeof ToolsAiEmailWriterRoute
   ToolsAiResumeBuilderRoute: typeof ToolsAiResumeBuilderRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
@@ -2687,6 +2700,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAiResumeBuilderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/ai-email-writer': {
+      id: '/tools/ai-email-writer'
+      path: '/tools/ai-email-writer'
+      fullPath: '/tools/ai-email-writer'
+      preLoaderRoute: typeof ToolsAiEmailWriterRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/ai-cover-letter-generator': {
       id: '/tools/ai-cover-letter-generator'
       path: '/tools/ai-cover-letter-generator'
@@ -2787,6 +2807,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsAgeCalculatorRoute: ToolsAgeCalculatorRoute,
   ToolsAiCoverLetterGeneratorRoute: ToolsAiCoverLetterGeneratorRoute,
+  ToolsAiEmailWriterRoute: ToolsAiEmailWriterRoute,
   ToolsAiResumeBuilderRoute: ToolsAiResumeBuilderRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,

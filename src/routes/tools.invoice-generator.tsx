@@ -476,6 +476,103 @@ function InvoiceGeneratorPage() {
         </div>
       </div>
 
+      <Dialog open={emailOpen} onOpenChange={(o) => (!sending ? setEmailOpen(o) : null)}>
+        <DialogContent className="rounded-2xl sm:max-w-[480px]">
+          <DialogHeader>
+            <DialogTitle className="flex items-center gap-2">
+              <Mail className="w-4 h-4" style={{ color: "var(--cyan-brand)" }} />
+              Send invoice by email
+            </DialogTitle>
+            <DialogDescription>
+              We'll email a clean, branded summary of this invoice to your client.
+            </DialogDescription>
+          </DialogHeader>
+
+          <div className="space-y-4 py-2">
+            <div className="space-y-1.5">
+              <Label htmlFor="email-to" className="text-xs">
+                Send to <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="email-to"
+                type="email"
+                placeholder="client@example.com"
+                value={emailTo}
+                onChange={(e) => setEmailTo(e.target.value)}
+                disabled={sending}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="email-to-name" className="text-xs">
+                Client name <span className="text-muted-foreground">(optional)</span>
+              </Label>
+              <Input
+                id="email-to-name"
+                placeholder="Jane Doe"
+                value={emailToName}
+                onChange={(e) => setEmailToName(e.target.value)}
+                disabled={sending}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <Label htmlFor="email-from-name" className="text-xs">
+                Your name / business <span className="text-destructive">*</span>
+              </Label>
+              <Input
+                id="email-from-name"
+                placeholder="Acme Studio"
+                value={emailFromName}
+                onChange={(e) => setEmailFromName(e.target.value)}
+                disabled={sending}
+              />
+            </div>
+            <div className="space-y-1.5">
+              <div className="flex items-center justify-between">
+                <Label htmlFor="email-message" className="text-xs">
+                  Add a personal note <span className="text-muted-foreground">(optional)</span>
+                </Label>
+                <span className="text-[10px] text-muted-foreground">{emailMessage.length}/500</span>
+              </div>
+              <Textarea
+                id="email-message"
+                placeholder="Hi Jane, please find your invoice attached below. Let me know if you have any questions!"
+                value={emailMessage}
+                onChange={(e) => setEmailMessage(e.target.value.slice(0, 500))}
+                maxLength={500}
+                rows={4}
+                disabled={sending}
+              />
+            </div>
+          </div>
+
+          <DialogFooter className="gap-2 sm:gap-2">
+            <Button
+              variant="ghost"
+              onClick={() => setEmailOpen(false)}
+              disabled={sending}
+            >
+              Cancel
+            </Button>
+            <Button
+              onClick={handleSendInvoice}
+              disabled={sending}
+              className="bg-[var(--cyan-brand)] text-black hover:bg-[var(--cyan-brand)]/90 font-semibold"
+            >
+              {sending ? (
+                <>
+                  <Loader2 className="w-4 h-4 mr-2 animate-spin" /> Sending...
+                </>
+              ) : (
+                <>
+                  <Mail className="w-4 h-4 mr-2" /> Send invoice
+                </>
+              )}
+            </Button>
+          </DialogFooter>
+        </DialogContent>
+      </Dialog>
+
+
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         {/* FORM */}
         <div className="space-y-5 print:hidden">

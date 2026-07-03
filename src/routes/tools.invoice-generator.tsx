@@ -14,7 +14,14 @@ import { Textarea } from "@/components/ui/textarea";
 import { Label } from "@/components/ui/label";
 import { Switch } from "@/components/ui/switch";
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
-import { Dialog, DialogContent, DialogHeader, DialogTitle, DialogFooter, DialogDescription } from "@/components/ui/dialog";
+import {
+  Dialog,
+  DialogContent,
+  DialogHeader,
+  DialogTitle,
+  DialogFooter,
+  DialogDescription,
+} from "@/components/ui/dialog";
 import { toast } from "sonner";
 import { sendInvoiceEmail } from "@/lib/send-invoice.functions";
 
@@ -483,9 +490,7 @@ function InvoiceGeneratorPage() {
               <Mail className="w-4 h-4" style={{ color: "var(--cyan-brand)" }} />
               Send invoice by email
             </DialogTitle>
-            <DialogDescription>
-              We'll email a clean, branded summary of this invoice to your client.
-            </DialogDescription>
+            <DialogDescription>We'll email a clean, branded summary of this invoice to your client.</DialogDescription>
           </DialogHeader>
 
           <div className="space-y-4 py-2">
@@ -546,11 +551,7 @@ function InvoiceGeneratorPage() {
           </div>
 
           <DialogFooter className="gap-2 sm:gap-2">
-            <Button
-              variant="ghost"
-              onClick={() => setEmailOpen(false)}
-              disabled={sending}
-            >
+            <Button variant="ghost" onClick={() => setEmailOpen(false)} disabled={sending}>
               Cancel
             </Button>
             <Button
@@ -571,7 +572,6 @@ function InvoiceGeneratorPage() {
           </DialogFooter>
         </DialogContent>
       </Dialog>
-
 
       <div className="grid gap-6 lg:grid-cols-[minmax(0,2fr)_minmax(0,3fr)]">
         {/* FORM */}
@@ -1046,20 +1046,20 @@ function InvoiceGeneratorPage() {
 
       <HowToUse
         steps={[
-          "Fill in your business details on the left, upload your logo, and add your client.",
+          "Fill in your business details on the left, upload your logo, and add your client's name and email.",
           "Add line items with description, quantity, price, and optional tax. Pick a currency and template.",
-          "Click Download PDF — a print dialog opens automatically. Select your printer or choose Save as PDF to download.",
+          "Click Download PDF to save the invoice, or click Send Invoice to email it directly to your client in seconds.",
         ]}
       />
 
       <ToolSeoContent
-        title="Free Invoice Generator — Create & Download Professional Invoices Online"
-        description="Create professional invoices online in seconds. Add your logo, line items, taxes, and discounts. Download as PDF — free, no signup, no watermark. Supports USD, EUR, GBP, MAD and 9 currencies."
+        title="Free Invoice Generator — Create, Download & Email Professional Invoices"
+        description="Create professional invoices online in seconds. Add your logo, line items, taxes, and discounts. Download as PDF or send directly to your client by email — free, no signup, no watermark. Supports 9 currencies."
         body={[
           "Skycally's Invoice Generator lets you create a professional, print-ready invoice in under a minute — completely free, with no account required and no watermark on the downloaded PDF. Fill in your business name, client details, and line items, then click Download to get a polished A4-format PDF ready to send.",
           "Three invoice templates cover every professional context: Classic for traditional businesses, Modern for tech and creative freelancers, and Minimal for consultants and legal professionals. Switch templates instantly without losing your data — the live preview updates in real time as you type. Your business details and logo are saved locally so you never have to re-enter them.",
           "Nine currencies are supported including USD, EUR, GBP, and regional currencies such as MAD (Moroccan Dirham), SAR (Saudi Riyal), and AED (UAE Dirham) — making this one of the most internationally versatile free invoice generators available. Add per-line tax rates, a global discount (flat or percentage), and custom payment terms to handle virtually any invoicing scenario.",
-          "Everything runs in your browser — your invoice data is never uploaded to any server. Invoice numbers auto-increment from INV-001 so you maintain a clean sequential record. Download as PDF with one click — no account, no watermark, completely free. Ideal for freelancers, consultants, small business owners, and anyone who needs to invoice clients quickly without expensive software.",
+          "Everything runs in your browser — your invoice data is never uploaded to any server. Invoice numbers auto-increment from INV-001 so you maintain a clean sequential record. Once your invoice is ready, send it directly to your client by email with one click — enter their email address, add an optional personal note, and the invoice summary lands in their inbox instantly via the built-in Send Invoice feature. No third-party email client needed, no copy-pasting, no attachments to manage manually. Ideal for freelancers, consultants, small business owners, and anyone who needs to invoice clients quickly without expensive software.",
         ]}
         faqs={[
           {
@@ -1096,6 +1096,11 @@ function InvoiceGeneratorPage() {
             question: "Can I print the invoice instead of downloading?",
             answer:
               "Yes. Click Download PDF — a new window opens with the invoice and your browser's print/save dialog appears automatically. Select Save as PDF to download the file.",
+          },
+          {
+            question: "Can I send the invoice directly to my client by email?",
+            answer:
+              "Yes. Click the Send Invoice button, enter your client's email address, add an optional personal note, and the invoice summary is sent to their inbox instantly. The email includes the invoice number, date, due date, line items, and total amount — no attachment needed. This feature is completely free and requires no third-party email app.",
           },
           {
             question: "What format is the downloaded file?",

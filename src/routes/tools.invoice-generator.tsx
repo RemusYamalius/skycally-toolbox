@@ -226,6 +226,78 @@ function InvoiceGeneratorPage() {
 
   const [downloading, setDownloading] = useState(false);
 
+  // Email modal state
+  const [emailOpen, setEmailOpen] = useState(false);
+  const [sending, setSending] = useState(false);
+  const [emailTo, setEmailTo] = useState("");
+  const [emailToName, setEmailToName] = useState("");
+  const [emailFromName, setEmailFromName] = useState("");
+  const [emailMessage, setEmailMessage] = useState("");
+
+  function openEmailDialog() {
+    setEmailTo(state.to.email || "");
+    setEmailToName(state.to.name || "");
+    setEmailFromName(state.from.name || "");
+    setEmailMessage("");
+    setEmailOpen(true);
+  }
+
+  function mapEmailError(msg: string): string {
+    if (msg === "INVALID_EMAIL") return "Please check the email address and try again.";
+    if (msg === "RATE_LIMITED") return "Too many requests — please wait a moment.";
+    if (msg === "RESEND_NOT_CONFIGURED") return "Email sending is not configured yet.";
+    return "Failed to send — please try again.";
+  }
+
+  function handleSendInvoice() {
+    const to = emailTo.trim();
+    const fromName = emailFromName.trim();
+    if (!to || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(to)) {
+      toast.error("Please enter a valid recipient email.");
+      return;
+    }
+    if (!fromName) {
+      toast.error("Please enter your name or business name.");
+      return;
+    }
+
+    const payload = {
+      to,
+      toName: emailToName.trim(),
+      fromName,
+      fromEmail: state.from.email || "",
+      invoiceNumber: state.number || "INV-001",
+      invoiceDate: state.date,
+      dueDate: state.dueDate,
+      currency: state.currency,
+      subtotal: fmt(totals.subtotal),
+      discount: totals.discount ? fmt(totals.discount) : "",
+      tax: totals.tax ? fmt(totals.tax) : "",
+      totalAmount: fmt(totals.total),
+      customMessage: emailMessage.trim(),
+      items: state.items.map((it) => ({
+        description: it.description,
+        qty: it.qty || 0,
+        price: it.price || 0,
+        lineTotal: fmt((it.qty || 0) * (it.price || 0)),
+      })),
+    };
+
+    setSending(true);
+    sendInvoiceEmail({ data: payload })
+      .then(() => {
+        toast.success(`Invoice sent to ${to}`);
+        setEmailOpen(false);
+      })
+      .catch((err: unknown) => {
+        const msg = err instanceof Error ? err.message : "SEND_FAILED";
+        toast.error(mapEmailError(msg));
+      })
+      .finally(() => {
+        setSending(false);
+      });
+  }
+
   const downloadPDF = () => {
     const el = document.getElementById("invoice-preview");
     if (!el) {

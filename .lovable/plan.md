@@ -1,54 +1,48 @@
-# Intermittent Fasting Calculator
+## Plan: Add "Send Invoice by Email" to /tools/invoice-generator
 
-New client-side tool at `/tools/intermittent-fasting-calculator` — a quiz-based fasting protocol recommender with live countdown timer, following Skycally conventions.
+Add a Send Invoice button + modal that emails a clean HTML invoice via the **Resend connector through the Lovable gateway**. No PDF attachment (per your choice) — the email itself contains a well-formatted invoice summary.
 
-## Files
+### Steps
 
-**New:** `src/routes/tools.intermittent-fasting-calculator.tsx`
+1. **Link the Resend connector** to the project (if not already linked) via `standard_connectors--connect` with `connector_id: "resend"`. This provisions `RESEND_API_KEY` and `LOVABLE_API_KEY` as server env vars.
 
-**Edited:**
-- `src/lib/tools.ts` — register tool (Utility category, matching neighbor color)
-- `src/lib/related-tools.ts` — add mapping
-- `public/sitemap.xml` — add URL
+2. **Create `src/lib/send-invoice.functions.ts`** (in `src/lib/`, not `src/server/`, to match the working cover-letter/resume pattern that avoids import-protection Rollup errors):
+   - `createServerFn({ method: "POST" })` with a Zod `inputValidator` for: `to` (email), `toName?`, `fromName`, `fromEmail?`, `invoiceNumber`, `invoiceDate`, `dueDate?`, `totalAmount`, `currency?`, `customMessage?` (max 500), plus a compact `items[]` (description, qty, price, line total) so the email body can list them.
+   - Handler POSTs to `https://connector-gateway.lovable.dev/resend/emails` with headers `Authorization: Bearer ${LOVABLE_API_KEY}` and `X-Connection-Api-Key: ${RESEND_API_KEY}`.
+   - `from` uses `onboarding@resend.dev` by default (safe for testing without a verified domain) with the sender name: `"{fromName} via Skycally <onboarding@resend.dev>"`. If the user later verifies a domain, we can swap the from address.
+   - `reply_to: fromEmail` when provided, so replies go to the sender's own email.
+   - Subject: `Invoice #{invoiceNumber} from {fromName}`.
+   - HTML body: branded, inline-styled invoice summary — header with invoice #, greeting, optional custom message block, table of line items, totals row (total in bold), due date, and a "Sent via Skycally Invoice Generator" footer. All fields HTML-escaped.
+   - Status mapping: `422 → INVALID_EMAIL`, `429 → RATE_LIMITED`, missing keys → `RESEND_NOT_CONFIGURED`, else `SEND_FAILED`.
 
-## Structure (top-to-bottom)
+3. **Edit `src/routes/tools.invoice-generator.tsx`**:
+   - Import `sendInvoiceEmail` from `@/lib/send-invoice.functions` and `Dialog`/`DialogContent`/`DialogHeader`/`DialogTitle`/`DialogFooter` from `@/components/ui/dialog`.
+   - Add state (`useState`): `emailOpen`, `sending`, `emailForm` (`to`, `toName`, `fromName` prefilled from `state.from.name`, `customMessage`).
+   - Add a **✉️ Send Invoice** button next to the existing Download PDF button (same size, `variant="outline"` with the cyan accent, `Mail` icon from lucide-react). Opens the dialog.
+   - Dialog layout: rounded-2xl, matches existing tool modal style. Fields:
+     - Send to (email, required)
+     - Client name (optional)
+     - Your name / business (required, prefilled)
+     - Personal note (Textarea, `maxLength={500}`, char counter)
+     - Cancel + Send buttons; Send shows spinner + "Sending…" while `sending`.
+   - `handleSend` is a **plain `function` declaration** (no async arrow, no `useCallback(async)`) that:
+     1. Validates fields (`toast.error` on missing/invalid).
+     2. Sets `sending=true`, builds the payload from current `state` + `totals` (already computed via `useMemo` in the file), then calls `sendInvoiceEmail({ data: payload }).then(...).catch(...).finally(...)`.
+     3. On success: `toast.success("Invoice sent to " + email)`, close dialog, reset the form.
+     4. On error: map `err.message` to the four user-facing messages you listed, via `toast.error`.
+   - No changes to any existing invoice-generation, PDF-download, SEO, HowToUse, RelatedTools code.
 
-1. `ToolPageShell` wrapper (title + description, `showFileDisclaimer={false}`)
-2. **4-question quiz** (cards, keyboard-navigable radios):
-   - Goal: weight loss / metabolic health / longevity / muscle retention
-   - Lifestyle: early riser / night owl / shift worker / flexible
-   - Experience: beginner / intermediate / advanced
-   - Exercise timing: morning / midday / evening / none
-3. **Recommendation card** — picks one of 6 protocols with rationale:
-   - 12:12, 14:10, 16:8, 18:6, 20:4 (Warrior), OMAD (23:1)
-4. **Protocol selector** — user can override recommendation (6 chips)
-5. **Schedule builder** — user picks wake-up time; renders eating window + fasting window timeline (horizontal scroll on mobile)
-6. **Live countdown timer** — `useEffect` + `setInterval(1000)`, cleared on unmount; shows time remaining in current fast/eat phase with progress ring
-7. **Sound toggle** — Web Audio API beep on phase transition; default OFF, persisted in `localStorage` key `if-calc-sound`
-8. `AdZone id="intermittent-fasting-calculator-mid" size="728x90"`
-9. `HowToUse` (3 steps from spec)
-10. `ToolSeoContent` — SEO title, description, 3-paragraph body (~150-200 words), 4 FAQs
-11. **Internal Links section** (exact JSX from spec — links to Calorie, Sleep, Water Intake)
-12. `RelatedTools currentSlug="intermittent-fasting-calculator"`
+4. **No new npm packages, no new secrets to add manually** — the connector link handles `RESEND_API_KEY` automatically.
 
-## Technical rules
+### Technical notes
 
-- No `createServerFn`, no AI calls — fully client-side
-- Plain `function` declarations only inside the component; no `async` arrow functions, no `useCallback(async...)`
-- Recommendation logic = pure sync function scoring quiz answers against protocol profiles
-- Countdown: compute next boundary from wake time + protocol; recompute on tick
-- Sound: single `AudioContext` created lazily on first user interaction; oscillator beep on phase change (only when enabled)
-- LocalStorage: quiz answers, chosen protocol, wake time, sound pref
-- Accessibility: `aria-label` on all controls, radio groups with proper labelling, focus-visible rings, WCAG AA contrast via design tokens
-- Mobile-first: quiz cards stack, timeline is `overflow-x-auto` on small screens
-- Design system: use `text-foreground`, `text-muted-foreground`, `border-border`, `bg-card`, `var(--cyan-brand)` / `var(--green-brand)` — no hardcoded colors
+- Server function lives in `src/lib/` (not `src/server/`) because the current TanStack Start template blocks `src/server/*` from the client bundle in a way that has broken past tools in this project; the cover-letter and resume server fns already live in `src/lib/` for this exact reason.
+- All async work stays server-side. The component uses only plain `function` decls and `.then/.catch/.finally` — no top-level `async` arrows, matching the build rules that already govern this project.
+- Currency symbol comes from the existing `CURRENCIES` lookup; `totalAmount` is formatted with the same helper the preview uses so the email matches the on-screen invoice.
+- Rate-limit / error toasts use `sonner`, already imported in the file.
 
-## Registration
+### Out of scope
 
-- `tools.ts`: category `utility`, matching color of neighbors (calorie/water/heart-rate use the same purple token — verify and match)
-- `related-tools.ts`: `"intermittent-fasting-calculator": ["calorie-calculator", "sleep-calculator", "water-intake-calculator", "bmi-calculator", "heart-rate-zone-calculator"]`
-- Sitemap entry added
-
-## Out of scope
-
-No backend, no persistence beyond localStorage, no notifications API, no meal planning.
+- PDF attachment (skipped per your choice).
+- Sender email verification / custom from-domain: emails go from `onboarding@resend.dev` with the user's name as the display name and their own email in `reply_to`. Switching to a verified domain is a follow-up if/when you want to remove the "via" line.
+- Storing sent history, resending, CC/BCC, multi-recipient.

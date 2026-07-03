@@ -130,7 +130,8 @@ export const sendInvoiceEmail = createServerFn({ method: "POST" })
     const resendKey = process.env.RESEND_API_KEY;
     if (!lovableKey || !resendKey) throw new Error("RESEND_NOT_CONFIGURED");
 
-    const displayFrom = `${data.fromName} via Skycally <onboarding@resend.dev>`;
+    const safeName = data.fromName.replace(/[<>"\\]/g, "").trim() || "Skycally";
+    const displayFrom = `${safeName} via Skycally <invoices@skycally.com>`;
     const body: Record<string, unknown> = {
       from: displayFrom,
       to: [data.to],

@@ -1160,6 +1160,62 @@ function PdfWatermarkRemover() {
           </div>
         )}
 
+        {stage === "preview" && currentCandidate && (
+          <div className="bg-[#0d1526] border border-cyan-500/40 rounded-2xl p-5 space-y-4">
+            <div className="space-y-1">
+              <p className="text-cyan-300 text-sm font-semibold">
+                Repeating element detected on {currentCandidate.count} of {currentCandidate.sampled} scanned pages
+              </p>
+              <p className="text-muted-foreground text-xs">
+                Is this the watermark you want to remove from every page?
+              </p>
+            </div>
+
+            {previewUrl ? (
+              <div className="rounded-xl overflow-hidden border border-border bg-black/40 flex items-center justify-center">
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                <img src={previewUrl} alt="Detected watermark preview" className="max-h-96 w-auto" />
+              </div>
+            ) : currentCandidate.kind === "text" ? (
+              <div className="rounded-xl border border-border bg-background/40 p-6 text-center">
+                <p className="text-xs text-muted-foreground mb-2">Detected repeating text:</p>
+                <p className="text-lg font-semibold text-foreground break-words">
+                  "{currentCandidate.sampleText}"
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-border bg-background/40 p-6 text-center text-sm text-muted-foreground">
+                Preparing preview...
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={confirmCandidate}
+                className="flex-1 min-w-[140px] px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm transition-all"
+              >
+                Yes, remove it
+              </button>
+              {previewCandidateIdx < candidates.length - 1 ? (
+                <button
+                  onClick={tryNextCandidate}
+                  className="px-4 py-2.5 rounded-xl border border-border text-foreground hover:bg-secondary text-sm transition-all"
+                >
+                  Show next candidate
+                </button>
+              ) : null}
+              <button
+                onClick={rejectCandidates}
+                className="px-4 py-2.5 rounded-xl border border-border text-muted-foreground hover:text-foreground text-sm transition-all"
+              >
+                Not a watermark — try manual detection
+              </button>
+            </div>
+          </div>
+        )}
+
+
+
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
             <p className="text-red-400 text-sm">{error}</p>

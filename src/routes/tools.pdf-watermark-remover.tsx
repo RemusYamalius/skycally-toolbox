@@ -1005,21 +1005,32 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
   const datas = canvases.map((c) => c.getContext("2d")!.getImageData(0, 0, targetW, targetH).data);
   const N = targetW * targetH;
   const raw = new Uint8Array(N);
-  const DARK_TH = 235; // pixel is non-white if any channel below
   const SIM_TH = 28; // max per-channel delta across pages
+  const WM_MIN_LUMA = 140; // exclude dark ink (logo, borders, body text)
+  const WM_MAX_LUMA = 228; // exclude paper white
+  const NEUTRAL_TH = 25; // watermark tint must be near-neutral gray
+
+  const inBand = (r: number, g: number, b: number): boolean => {
+    const luma = 0.299 * r + 0.587 * g + 0.114 * b;
+    if (luma < WM_MIN_LUMA || luma > WM_MAX_LUMA) return false;
+    const mx = Math.max(r, g, b);
+    const mn = Math.min(r, g, b);
+    if (mx - mn > NEUTRAL_TH) return false;
+    return true;
+  };
 
   for (let p = 0; p < N; p++) {
     const off = p * 4;
     const r0 = datas[0][off];
     const g0 = datas[0][off + 1];
     const b0 = datas[0][off + 2];
-    if (r0 > DARK_TH && g0 > DARK_TH && b0 > DARK_TH) continue;
+    if (!inBand(r0, g0, b0)) continue;
     let ok = true;
     for (let s = 1; s < datas.length; s++) {
       const r = datas[s][off];
       const g = datas[s][off + 1];
       const b = datas[s][off + 2];
-      if (r > DARK_TH && g > DARK_TH && b > DARK_TH) {
+      if (!inBand(r, g, b)) {
         ok = false;
         break;
       }
@@ -1031,7 +1042,7 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
     if (ok) raw[p] = 1;
   }
 
-  const dilated = dilateMask(raw, targetW, targetH, 2);
+  const dilated = dilateMask(raw, targetW, targetH, 1);
   let count = 0;
   for (let i = 0; i < N; i++) if (dilated[i]) count++;
   const coverage = count / N;

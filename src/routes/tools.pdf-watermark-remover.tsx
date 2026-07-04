@@ -1036,6 +1036,40 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
   for (let i = 0; i < N; i++) if (dilated[i]) count++;
   const coverage = count / N;
 
+  // Sample average watermark color: pixels in raw mask whose 3x3 neighborhood
+  // on other sample pages is near-white (i.e. watermark is over blank background).
+  let sumR = 0, sumG = 0, sumB = 0, samples = 0;
+  for (let p = 0; p < N && samples < 4000; p++) {
+    if (!raw[p]) continue;
+    const off = p * 4;
+    // Prefer samples where at least one other page is near-white here (no text underneath)
+    let cleanBg = false;
+    for (let s = 1; s < datas.length; s++) {
+      const r = datas[s][off], g = datas[s][off + 1], b = datas[s][off + 2];
+      if (r > DARK_TH && g > DARK_TH && b > DARK_TH) { cleanBg = true; break; }
+    }
+    if (!cleanBg) continue;
+    sumR += datas[0][off];
+    sumG += datas[0][off + 1];
+    sumB += datas[0][off + 2];
+    samples++;
+  }
+  let wmR = 200, wmG = 200, wmB = 200;
+  if (samples > 20) {
+    wmR = sumR / samples;
+    wmG = sumG / samples;
+    wmB = sumB / samples;
+  } else {
+    // Fallback: average all masked pixels on page 0
+    let sr = 0, sg = 0, sb = 0, n = 0;
+    for (let p = 0; p < N; p++) {
+      if (!raw[p]) continue;
+      const off = p * 4;
+      sr += datas[0][off]; sg += datas[0][off + 1]; sb += datas[0][off + 2]; n++;
+    }
+    if (n > 0) { wmR = sr / n; wmG = sg / n; wmB = sb / n; }
+  }
+
   // Paint red overlay on preview
   const pctx = previewCanvas.getContext("2d")!;
   const img = pctx.getImageData(0, 0, targetW, targetH);
@@ -1055,7 +1089,7 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
   const valid = coverage >= 0.0005 && coverage <= 0.35;
   return {
     mask: valid
-      ? { width: targetW, height: targetH, data: dilated, coveragePct: coverage * 100 }
+      ? { width: targetW, height: targetH, data: dilated, coveragePct: coverage * 100, wmR, wmG, wmB }
       : null,
     previewDataUrl,
     sampledPages: canvases.length,

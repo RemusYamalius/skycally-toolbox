@@ -1,81 +1,51 @@
-# PDF Watermark Remover — Definitive Fix
+# Preserve text under the watermark
 
-## Why the current tool fails on your file
+## Problem
 
-Your `123.pdf` uses an Arabic diagonal text watermark ("فروجكس"). In PDF content streams this is drawn as either:
-- CID-encoded text (bytes like `<001A00FF...>` — no readable string to fingerprint), or
-- Outlined vector glyphs (hundreds of tiny path ops per page, never identical byte-for-byte).
+The current pixel pipeline builds a binary mask of "watermark pixels" and fills every masked pixel with white. Where the watermark crosses body text, the mask covers the text too, so cleaning wipes both the watermark glyphs AND the letters beneath them. Result: readable pages become blank stripes where "فروجكس" used to cross.
 
-Strategy 6's fingerprinting compares text strings and path-op hashes. Neither survives Arabic CID text or glyph outlining, so **zero candidates are found → preview never opens → the "no watermark detected" banner appears**. Strategies 1–5 also miss it (no `/Artifact`, no low opacity, no keyword, no XObject named "Watermark"). This is a dead end at the PDF-object level for this class of file.
+## Root cause
 
-## New approach — pixel-based detection (works on any watermark)
+A watermark is a *semi-transparent overlay*, not a solid shape. A masked pixel can be one of two things:
+1. Watermark over white background → pixel color ≈ watermark color (light gray).
+2. Watermark over black text → pixel color = watermark blended with black text → noticeably darker than the watermark color.
 
-Rasterize a few pages, find pixels that repeat at the **same position across pages but differ from the page background** — that is, by definition, the watermark. Then rebuild the PDF with those pixels erased. No dependency on text encoding, opacity, keywords, or object names.
+Treating both the same and painting white is what deletes the text.
 
-```text
-[Upload PDF]
-     ↓
-Rasterize pages 1, mid, last at 150 DPI (pdfjs, already in project)
-     ↓
-Build watermark mask:
-  mask[x,y] = 1  if  all sampled pages have a non-white pixel
-              AND those pixels are ~identical (ΔE < threshold)
-     ↓
-Show REAL preview: page 1 thumbnail + red overlay of the mask
-     ↓
-User confirms →
-  For every page:
-    rasterize → inpaint masked pixels with local background (white/near-white) → embed as JPEG
-  Rebuild PDF (image-per-page, same page size)
-     ↓
-Download
-```
+## Fix — color-aware removal
 
-## What changes in the UI
+Only whiten pixels that actually look like the watermark. Keep (or restore) pixels that are darker, because those carry underlying text.
 
-The preview area is the core fix — it will **always** render once scanning finishes:
+### Steps (all inside `src/routes/tools.pdf-watermark-remover.tsx`, no new deps)
 
-- **Left**: page 1 thumbnail with the detected watermark highlighted in red.
-- **Right**: coverage stats ("Detected on 3/3 sampled pages, covers 4.2% of page area") + three buttons: **Remove watermark**, **Try another sample**, **Cancel**.
-- If the mask is empty (truly no repeating mark), show a clear empty-state with an explicit **Advanced rebuild** button instead of silently falling through.
+1. **Sample the watermark color during detection.**
+   In `detectWatermarkMask`, after building the intersection mask, average the RGB of masked pixels across all sample pages where the local neighborhood is otherwise near-white. That gives `wmColor = {r,g,b}` — the true watermark tint (typically light gray, ~180–220).
 
-The current bug where the preview panel doesn't appear is fixed by making preview stage unconditional after scan — it either shows the candidate OR shows the empty-state, never nothing.
+2. **Store `wmColor` alongside the mask** in `ScanResult`.
 
-## Removal quality
+3. **Rewrite `rebuildWithoutMask` per-pixel logic.** For every masked pixel on each page:
+   - Compute `d = ΔE(pixel, wmColor)` and `lum = perceived luminance`.
+   - If `d < TOL` (pixel matches watermark) → paint white/background. Watermark gone.
+   - Else if `lum < wmLum - MARGIN` (pixel is darker than watermark → text underneath) → **keep the pixel as-is**, or optionally lighten it slightly to compensate for the overlay. Text preserved.
+   - Else → leave unchanged (safety fallback).
 
-- Output is raster (image-per-page) PDF — this is the only reliable way to erase a burned-in vector/CID watermark. Text becomes non-selectable on cleaned pages, matching how LightPDF / Unwatermark.ai deliver these files.
-- 150 DPI default (readable, ~same size as input). Toggle for 200 DPI if user wants sharper.
-- Mask is dilated by 2px so anti-aliased glyph edges are fully covered.
-- Inpaint = fill with median color of a 12px ring around each masked pixel (fast, works because watermarks sit over near-uniform backgrounds).
+   Constants: `TOL = 18` in RGB Euclidean distance, `MARGIN = 25` in luma. Tunable.
 
-## Files to change
+4. **Optional refinement (cheap):** for kept "text" pixels, subtract the watermark contribution:
+   `out = clamp((pixel - wmColor*α) / (1-α))` with α estimated from average opacity (~0.35). This recovers original text darkness. Skip if it introduces noise — the "keep as-is" branch already fixes the visible bug.
 
-Only `src/routes/tools.pdf-watermark-remover.tsx`. All logic client-side, no new npm packages (pdfjs-dist + pdf-lib + canvas already in project).
+5. **Preview overlay unchanged** — user still sees the red mask on page 1.
 
-### Structure
+## What the user sees
 
-1. **Remove Strategy 6 fingerprint code** (it can't handle CID/outlined text — replaced entirely).
-2. **Add `detectWatermarkMask(file)`**: rasterize 3 sample pages via pdfjs → per-pixel intersection → return `{ maskCanvas, coveragePct, sampleThumb }`.
-3. **Add `rebuildWithoutMask(file, mask, dpi)`**: for each page rasterize → apply mask + inpaint → `pdf-lib` new doc with JPEG per page.
-4. **Rewrite the run pipeline**: `idle → scanning → preview (always) → processing → done`.
-5. **Preview stage always renders** the panel with either the candidate or the empty state — this is what the user reported missing.
-6. Keep strategies 1–5 as a fallback path behind an "Object-mode (experimental)" toggle for edge cases where the user explicitly wants selectable text preserved.
-
-### Technical notes
-
-- Rasterization via `pdfjs-dist` `getDocument` + `page.render` to an `OffscreenCanvas` (already used in `pdf-to-images` tool — same import path).
-- Per-page canvas is reused (single buffer, cleared between pages) to keep memory flat for 30+ page PDFs.
-- Final PDF assembly uses `pdf-lib` `embedJpg` + `drawImage` at original page dimensions in points.
-- Progress reported per page in the existing status UI.
+- Before: watermark gone, but every line of text the watermark crossed is missing.
+- After: watermark gone, and text under it stays legible.
 
 ## Out of scope
 
-- OCR to re-inject selectable text after rasterization.
-- Preserving original vector text on cleaned pages (impossible without object-level match, which failed for this file class).
-- Detecting watermarks that appear only on a subset of pages (< 60% coverage across samples).
+- OCR reconstruction of text that was fully opaque under the mark.
+- Handling watermarks with dark colors that overlap dark text (rare; would need a different heuristic).
 
-## Success criteria
+## Success check
 
-1. Upload `123.pdf` → preview panel appears with red overlay on the "فروجكس" text on page 1.
-2. Click **Remove watermark** → downloaded `123-clean.pdf` has no watermark on any of the 34 pages.
-3. Upload a PDF with no watermark → preview shows empty-state with "no repeating mark found", never a blank screen.
+Re-run on `123.pdf`: the "فروجكس" mark is removed and the code sample text underneath (`import { useState, useRef } from "react"` etc.) remains fully readable on every page.

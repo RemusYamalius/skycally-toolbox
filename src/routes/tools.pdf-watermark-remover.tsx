@@ -1005,18 +1005,28 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
   const datas = canvases.map((c) => c.getContext("2d")!.getImageData(0, 0, targetW, targetH).data);
   const N = targetW * targetH;
   const raw = new Uint8Array(N);
-  const SIM_TH = 28; // max per-channel delta across pages
+  const SIM_TH = 34; // max per-channel delta across pages
   const WM_MIN_LUMA = 140; // exclude dark ink (logo, borders, body text)
-  const WM_MAX_LUMA = 228; // exclude paper white
-  const NEUTRAL_TH = 25; // watermark tint must be near-neutral gray
+  const WM_MAX_LUMA = 240; // exclude paper white
+  const NEUTRAL_TH = 25; // gray watermark tint must be near-neutral
 
   const inBand = (r: number, g: number, b: number): boolean => {
     const luma = 0.299 * r + 0.587 * g + 0.114 * b;
     if (luma < WM_MIN_LUMA || luma > WM_MAX_LUMA) return false;
     const mx = Math.max(r, g, b);
     const mn = Math.min(r, g, b);
-    if (mx - mn > NEUTRAL_TH) return false;
-    return true;
+    const isNeutralGray = mx - mn <= NEUTRAL_TH;
+    const redLift = r - Math.max(g, b);
+    const channelSpread = mx - mn;
+    const isPalePink =
+      r >= 205 &&
+      g >= 150 &&
+      b >= 150 &&
+      redLift >= 18 &&
+      redLift <= 82 &&
+      channelSpread <= 95 &&
+      luma >= 175;
+    return isNeutralGray || isPalePink;
   };
 
   for (let p = 0; p < N; p++) {
@@ -1136,19 +1146,22 @@ async function rebuildWithoutMask(
     const d = img.data;
     const wmR = mask.wmR, wmG = mask.wmG, wmB = mask.wmB;
     const wmLum = 0.299 * wmR + 0.587 * wmG + 0.114 * wmB;
-    const TOL2 = 32 * 32; // squared RGB distance for "matches watermark"
-    const MARGIN = 22;    // luma below wm => underlying text, keep pixel
+    const isPinkWatermark = wmR - Math.max(wmG, wmB) > 14;
+    const TOL2 = (isPinkWatermark ? 46 : 34) ** 2; // squared RGB distance for "matches watermark"
+    const MARGIN = isPinkWatermark ? 30 : 22; // luma below wm => underlying text, keep pixel
 
     const clean = (off: number) => {
       const r = d[off], g = d[off + 1], b = d[off + 2];
       const dr = r - wmR, dg = g - wmG, db = b - wmB;
       const dist2 = dr * dr + dg * dg + db * db;
-      if (dist2 < TOL2) {
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      const redLift = r - Math.max(g, b);
+      const stillLooksPink = isPinkWatermark && r > 190 && g > 130 && b > 130 && redLift > 10;
+      if (dist2 < TOL2 || stillLooksPink) {
         // Pure watermark over background -> whiten
         d[off] = 255; d[off + 1] = 255; d[off + 2] = 255;
         return;
       }
-      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
       if (lum < wmLum - MARGIN) {
         // Text underneath the watermark: keep as-is (do not erase)
         return;

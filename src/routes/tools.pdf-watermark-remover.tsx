@@ -903,6 +903,9 @@ type WatermarkMask = {
   height: number;
   data: Uint8Array; // 1 = masked
   coveragePct: number;
+  wmR: number;
+  wmG: number;
+  wmB: number;
 };
 
 async function loadPdfjs() {
@@ -1033,6 +1036,40 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
   for (let i = 0; i < N; i++) if (dilated[i]) count++;
   const coverage = count / N;
 
+  // Sample average watermark color: pixels in raw mask whose 3x3 neighborhood
+  // on other sample pages is near-white (i.e. watermark is over blank background).
+  let sumR = 0, sumG = 0, sumB = 0, samples = 0;
+  for (let p = 0; p < N && samples < 4000; p++) {
+    if (!raw[p]) continue;
+    const off = p * 4;
+    // Prefer samples where at least one other page is near-white here (no text underneath)
+    let cleanBg = false;
+    for (let s = 1; s < datas.length; s++) {
+      const r = datas[s][off], g = datas[s][off + 1], b = datas[s][off + 2];
+      if (r > DARK_TH && g > DARK_TH && b > DARK_TH) { cleanBg = true; break; }
+    }
+    if (!cleanBg) continue;
+    sumR += datas[0][off];
+    sumG += datas[0][off + 1];
+    sumB += datas[0][off + 2];
+    samples++;
+  }
+  let wmR = 200, wmG = 200, wmB = 200;
+  if (samples > 20) {
+    wmR = sumR / samples;
+    wmG = sumG / samples;
+    wmB = sumB / samples;
+  } else {
+    // Fallback: average all masked pixels on page 0
+    let sr = 0, sg = 0, sb = 0, n = 0;
+    for (let p = 0; p < N; p++) {
+      if (!raw[p]) continue;
+      const off = p * 4;
+      sr += datas[0][off]; sg += datas[0][off + 1]; sb += datas[0][off + 2]; n++;
+    }
+    if (n > 0) { wmR = sr / n; wmG = sg / n; wmB = sb / n; }
+  }
+
   // Paint red overlay on preview
   const pctx = previewCanvas.getContext("2d")!;
   const img = pctx.getImageData(0, 0, targetW, targetH);
@@ -1052,7 +1089,7 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
   const valid = coverage >= 0.0005 && coverage <= 0.35;
   return {
     mask: valid
-      ? { width: targetW, height: targetH, data: dilated, coveragePct: coverage * 100 }
+      ? { width: targetW, height: targetH, data: dilated, coveragePct: coverage * 100, wmR, wmG, wmB }
       : null,
     previewDataUrl,
     sampledPages: canvases.length,
@@ -1086,29 +1123,41 @@ async function rebuildWithoutMask(
 
     const img = ctx.getImageData(0, 0, w, h);
     const d = img.data;
+    const wmR = mask.wmR, wmG = mask.wmG, wmB = mask.wmB;
+    const wmLum = 0.299 * wmR + 0.587 * wmG + 0.114 * wmB;
+    const TOL2 = 32 * 32; // squared RGB distance for "matches watermark"
+    const MARGIN = 22;    // luma below wm => underlying text, keep pixel
+
+    const clean = (off: number) => {
+      const r = d[off], g = d[off + 1], b = d[off + 2];
+      const dr = r - wmR, dg = g - wmG, db = b - wmB;
+      const dist2 = dr * dr + dg * dg + db * db;
+      if (dist2 < TOL2) {
+        // Pure watermark over background -> whiten
+        d[off] = 255; d[off + 1] = 255; d[off + 2] = 255;
+        return;
+      }
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      if (lum < wmLum - MARGIN) {
+        // Text underneath the watermark: keep as-is (do not erase)
+        return;
+      }
+      // Ambiguous / lighter than watermark -> whiten to remove residual
+      d[off] = 255; d[off + 1] = 255; d[off + 2] = 255;
+    };
+
     if (w === mask.width && h === mask.height) {
       for (let p = 0; p < mask.data.length; p++) {
-        if (mask.data[p]) {
-          const off = p * 4;
-          d[off] = 255;
-          d[off + 1] = 255;
-          d[off + 2] = 255;
-        }
+        if (mask.data[p]) clean(p * 4);
       }
     } else {
-      // Scale mask lookup for mismatched page sizes
       for (let y = 0; y < h; y++) {
         const my = Math.min(mask.height - 1, Math.floor((y / h) * mask.height));
         const rowM = my * mask.width;
         const rowD = y * w * 4;
         for (let x = 0; x < w; x++) {
           const mx = Math.min(mask.width - 1, Math.floor((x / w) * mask.width));
-          if (mask.data[rowM + mx]) {
-            const off = rowD + x * 4;
-            d[off] = 255;
-            d[off + 1] = 255;
-            d[off + 2] = 255;
-          }
+          if (mask.data[rowM + mx]) clean(rowD + x * 4);
         }
       }
     }

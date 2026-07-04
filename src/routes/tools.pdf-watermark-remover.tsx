@@ -1145,7 +1145,11 @@ function PdfWatermarkRemover() {
         {busy && (
           <div className="bg-[#0d1526] border border-border rounded-2xl p-4 space-y-2">
             <p className="text-sm text-foreground">
-              {stage === "advanced" ? "Processing in advanced mode..." : "Removing watermark..."}
+              {stage === "advanced"
+                ? "Processing in advanced mode..."
+                : stage === "scanning"
+                  ? "Scanning pages for repeated watermark elements..."
+                  : "Removing watermark..."}
             </p>
             <div className="h-2 rounded-full bg-background overflow-hidden">
               <div

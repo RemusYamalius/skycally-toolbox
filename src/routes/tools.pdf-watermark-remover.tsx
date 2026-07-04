@@ -896,6 +896,238 @@ async function runRasterRebuild(bytes: ArrayBuffer, onProgress: (pct: number) =>
   return await newPdf.save();
 }
 
+// ---------- Pixel-based auto-detection (definitive strategy) ----------
+
+type WatermarkMask = {
+  width: number;
+  height: number;
+  data: Uint8Array; // 1 = masked
+  coveragePct: number;
+};
+
+async function loadPdfjs() {
+  const pdfjsLib: any = await import("pdfjs-dist");
+  const workerSrc = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url")).default;
+  pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+  return pdfjsLib;
+}
+
+async function renderPageAt(pdf: any, pageNum: number, scale: number): Promise<HTMLCanvasElement> {
+  const page = await pdf.getPage(pageNum);
+  const vp = page.getViewport({ scale });
+  const canvas = document.createElement("canvas");
+  canvas.width = Math.ceil(vp.width);
+  canvas.height = Math.ceil(vp.height);
+  const ctx = canvas.getContext("2d")!;
+  ctx.fillStyle = "#ffffff";
+  ctx.fillRect(0, 0, canvas.width, canvas.height);
+  await page.render({ canvasContext: ctx, viewport: vp, canvas }).promise;
+  return canvas;
+}
+
+function dilateMask(src: Uint8Array, w: number, h: number, r: number): Uint8Array {
+  const tmp = new Uint8Array(src.length);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let v = 0;
+      for (let dx = -r; dx <= r && !v; dx++) {
+        const xi = x + dx;
+        if (xi >= 0 && xi < w && src[y * w + xi]) v = 1;
+      }
+      tmp[y * w + x] = v;
+    }
+  }
+  const out = new Uint8Array(src.length);
+  for (let y = 0; y < h; y++) {
+    for (let x = 0; x < w; x++) {
+      let v = 0;
+      for (let dy = -r; dy <= r && !v; dy++) {
+        const yi = y + dy;
+        if (yi >= 0 && yi < h && tmp[yi * w + x]) v = 1;
+      }
+      out[y * w + x] = v;
+    }
+  }
+  return out;
+}
+
+export type ScanResult = {
+  mask: WatermarkMask | null;
+  previewDataUrl: string;
+  sampledPages: number;
+  totalPages: number;
+};
+
+async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
+  const pdfjsLib = await loadPdfjs();
+  const pdf = await pdfjsLib.getDocument({ data: bytes.slice(0) }).promise;
+  const total = pdf.numPages;
+
+  // Pick sample pages: first, middle, last (dedup)
+  const idxSet = new Set<number>([1]);
+  if (total >= 2) idxSet.add(total);
+  if (total >= 3) idxSet.add(Math.ceil(total / 2));
+  const idxs = [...idxSet].sort((a, b) => a - b);
+
+  // Compute scale so longest edge ~ 1400px (≈150 DPI at A4)
+  const p1 = await pdf.getPage(1);
+  const vpRaw = p1.getViewport({ scale: 1 });
+  const scale = Math.min(2.2, 1400 / Math.max(vpRaw.width, vpRaw.height));
+  const targetW = Math.ceil(vpRaw.width * scale);
+  const targetH = Math.ceil(vpRaw.height * scale);
+
+  // Render samples
+  const canvases: HTMLCanvasElement[] = [];
+  for (const i of idxs) {
+    try {
+      const c = await renderPageAt(pdf, i, scale);
+      if (c.width === targetW && c.height === targetH) canvases.push(c);
+    } catch {}
+  }
+
+  // Render preview base (page 1) — reuse first sample if available
+  let previewCanvas = canvases[0];
+  if (!previewCanvas) previewCanvas = await renderPageAt(pdf, 1, scale);
+
+  if (canvases.length < 2) {
+    return {
+      mask: null,
+      previewDataUrl: previewCanvas.toDataURL("image/jpeg", 0.85),
+      sampledPages: canvases.length,
+      totalPages: total,
+    };
+  }
+
+  // Pixel-level intersection
+  const datas = canvases.map((c) => c.getContext("2d")!.getImageData(0, 0, targetW, targetH).data);
+  const N = targetW * targetH;
+  const raw = new Uint8Array(N);
+  const DARK_TH = 235; // pixel is non-white if any channel below
+  const SIM_TH = 28; // max per-channel delta across pages
+
+  for (let p = 0; p < N; p++) {
+    const off = p * 4;
+    const r0 = datas[0][off];
+    const g0 = datas[0][off + 1];
+    const b0 = datas[0][off + 2];
+    if (r0 > DARK_TH && g0 > DARK_TH && b0 > DARK_TH) continue;
+    let ok = true;
+    for (let s = 1; s < datas.length; s++) {
+      const r = datas[s][off];
+      const g = datas[s][off + 1];
+      const b = datas[s][off + 2];
+      if (r > DARK_TH && g > DARK_TH && b > DARK_TH) {
+        ok = false;
+        break;
+      }
+      if (Math.abs(r - r0) > SIM_TH || Math.abs(g - g0) > SIM_TH || Math.abs(b - b0) > SIM_TH) {
+        ok = false;
+        break;
+      }
+    }
+    if (ok) raw[p] = 1;
+  }
+
+  const dilated = dilateMask(raw, targetW, targetH, 2);
+  let count = 0;
+  for (let i = 0; i < N; i++) if (dilated[i]) count++;
+  const coverage = count / N;
+
+  // Paint red overlay on preview
+  const pctx = previewCanvas.getContext("2d")!;
+  const img = pctx.getImageData(0, 0, targetW, targetH);
+  const d = img.data;
+  for (let p = 0; p < N; p++) {
+    if (dilated[p]) {
+      const off = p * 4;
+      d[off] = Math.min(255, d[off] * 0.25 + 220);
+      d[off + 1] = Math.floor(d[off + 1] * 0.25);
+      d[off + 2] = Math.floor(d[off + 2] * 0.25);
+    }
+  }
+  pctx.putImageData(img, 0, 0);
+  const previewDataUrl = previewCanvas.toDataURL("image/jpeg", 0.85);
+
+  // Guard against pathological masks
+  const valid = coverage >= 0.0005 && coverage <= 0.35;
+  return {
+    mask: valid
+      ? { width: targetW, height: targetH, data: dilated, coveragePct: coverage * 100 }
+      : null,
+    previewDataUrl,
+    sampledPages: canvases.length,
+    totalPages: total,
+  };
+}
+
+async function rebuildWithoutMask(
+  bytes: ArrayBuffer,
+  mask: WatermarkMask,
+  onProgress: (pct: number) => void,
+): Promise<Uint8Array> {
+  const pdfjsLib = await loadPdfjs();
+  const pdf = await pdfjsLib.getDocument({ data: bytes.slice(0) }).promise;
+  const newPdf = await PDFDocument.create();
+
+  for (let i = 1; i <= pdf.numPages; i++) {
+    const page = await pdf.getPage(i);
+    const vpRaw = page.getViewport({ scale: 1 });
+    const scale = Math.min(2.2, 1400 / Math.max(vpRaw.width, vpRaw.height));
+    const vp = page.getViewport({ scale });
+    const w = Math.ceil(vp.width);
+    const h = Math.ceil(vp.height);
+    const canvas = document.createElement("canvas");
+    canvas.width = w;
+    canvas.height = h;
+    const ctx = canvas.getContext("2d")!;
+    ctx.fillStyle = "#ffffff";
+    ctx.fillRect(0, 0, w, h);
+    await page.render({ canvasContext: ctx, viewport: vp, canvas }).promise;
+
+    const img = ctx.getImageData(0, 0, w, h);
+    const d = img.data;
+    if (w === mask.width && h === mask.height) {
+      for (let p = 0; p < mask.data.length; p++) {
+        if (mask.data[p]) {
+          const off = p * 4;
+          d[off] = 255;
+          d[off + 1] = 255;
+          d[off + 2] = 255;
+        }
+      }
+    } else {
+      // Scale mask lookup for mismatched page sizes
+      for (let y = 0; y < h; y++) {
+        const my = Math.min(mask.height - 1, Math.floor((y / h) * mask.height));
+        const rowM = my * mask.width;
+        const rowD = y * w * 4;
+        for (let x = 0; x < w; x++) {
+          const mx = Math.min(mask.width - 1, Math.floor((x / w) * mask.width));
+          if (mask.data[rowM + mx]) {
+            const off = rowD + x * 4;
+            d[off] = 255;
+            d[off + 1] = 255;
+            d[off + 2] = 255;
+          }
+        }
+      }
+    }
+    ctx.putImageData(img, 0, 0);
+
+    const dataUrl = canvas.toDataURL("image/jpeg", 0.9);
+    const jpgBytes = await (await fetch(dataUrl)).arrayBuffer();
+    const jpg = await newPdf.embedJpg(jpgBytes);
+    const pageW = vpRaw.width;
+    const pageH = vpRaw.height;
+    const outPage = newPdf.addPage([pageW, pageH]);
+    outPage.drawImage(jpg, { x: 0, y: 0, width: pageW, height: pageH });
+    onProgress(Math.round((i / pdf.numPages) * 100));
+  }
+
+  return await newPdf.save();
+}
+
+
 // ---------- Component ----------
 
 function PdfWatermarkRemover() {

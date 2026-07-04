@@ -1057,7 +1057,7 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
     let cleanBg = false;
     for (let s = 1; s < datas.length; s++) {
       const r = datas[s][off], g = datas[s][off + 1], b = datas[s][off + 2];
-      if (r > DARK_TH && g > DARK_TH && b > DARK_TH) { cleanBg = true; break; }
+      if (r > 235 && g > 235 && b > 235) { cleanBg = true; break; }
     }
     if (!cleanBg) continue;
     sumR += datas[0][off];

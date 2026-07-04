@@ -903,6 +903,9 @@ type WatermarkMask = {
   height: number;
   data: Uint8Array; // 1 = masked
   coveragePct: number;
+  wmR: number;
+  wmG: number;
+  wmB: number;
 };
 
 async function loadPdfjs() {

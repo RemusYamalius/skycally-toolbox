@@ -1123,29 +1123,41 @@ async function rebuildWithoutMask(
 
     const img = ctx.getImageData(0, 0, w, h);
     const d = img.data;
+    const wmR = mask.wmR, wmG = mask.wmG, wmB = mask.wmB;
+    const wmLum = 0.299 * wmR + 0.587 * wmG + 0.114 * wmB;
+    const TOL2 = 32 * 32; // squared RGB distance for "matches watermark"
+    const MARGIN = 22;    // luma below wm => underlying text, keep pixel
+
+    const clean = (off: number) => {
+      const r = d[off], g = d[off + 1], b = d[off + 2];
+      const dr = r - wmR, dg = g - wmG, db = b - wmB;
+      const dist2 = dr * dr + dg * dg + db * db;
+      if (dist2 < TOL2) {
+        // Pure watermark over background -> whiten
+        d[off] = 255; d[off + 1] = 255; d[off + 2] = 255;
+        return;
+      }
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      if (lum < wmLum - MARGIN) {
+        // Text underneath the watermark: keep as-is (do not erase)
+        return;
+      }
+      // Ambiguous / lighter than watermark -> whiten to remove residual
+      d[off] = 255; d[off + 1] = 255; d[off + 2] = 255;
+    };
+
     if (w === mask.width && h === mask.height) {
       for (let p = 0; p < mask.data.length; p++) {
-        if (mask.data[p]) {
-          const off = p * 4;
-          d[off] = 255;
-          d[off + 1] = 255;
-          d[off + 2] = 255;
-        }
+        if (mask.data[p]) clean(p * 4);
       }
     } else {
-      // Scale mask lookup for mismatched page sizes
       for (let y = 0; y < h; y++) {
         const my = Math.min(mask.height - 1, Math.floor((y / h) * mask.height));
         const rowM = my * mask.width;
         const rowD = y * w * 4;
         for (let x = 0; x < w; x++) {
           const mx = Math.min(mask.width - 1, Math.floor((x / w) * mask.width));
-          if (mask.data[rowM + mx]) {
-            const off = rowD + x * 4;
-            d[off] = 255;
-            d[off + 1] = 255;
-            d[off + 2] = 255;
-          }
+          if (mask.data[rowM + mx]) clean(rowD + x * 4);
         }
       }
     }

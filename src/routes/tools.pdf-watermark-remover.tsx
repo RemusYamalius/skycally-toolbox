@@ -468,6 +468,331 @@ function stripWordWatermarkXObjects(page: any, pdf: any): number {
   return removed;
 }
 
+// ---------- Strategy 6: repetition-based auto-detection ----------
+// Analyze the first N pages, fingerprint every top-level q...Q graphics block,
+// and find any block (image, form, text, or vector) that appears at roughly the
+// same position on 80%+ of the sampled pages. The user confirms via preview,
+// then we remove matches from every page in one pass.
+
+export type WatermarkFingerprint = {
+  kind: "xobject" | "text" | "vector";
+  id: string;
+  x: number;
+  y: number;
+  w: number;
+  h: number;
+};
+
+export type WatermarkCandidate = {
+  kind: "xobject" | "text" | "vector";
+  id: string;
+  count: number;
+  sampled: number;
+  avgX: number;
+  avgY: number;
+  avgW: number;
+  avgH: number;
+  sampleText?: string;
+};
+
+function fingerprintBlock(block: string): WatermarkFingerprint | null {
+  // Read last cm matrix in the block (position + scale in the CTM).
+  const cmRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+cm/g;
+  let a = 1,
+    d = 1,
+    e = 0,
+    f = 0;
+  let m: RegExpExecArray | null;
+  while ((m = cmRe.exec(block)) !== null) {
+    a = parseFloat(m[1]);
+    d = parseFloat(m[4]);
+    e = parseFloat(m[5]);
+    f = parseFloat(m[6]);
+  }
+
+  // XObject draw (/Name Do).
+  const doMatch = block.match(/\/([A-Za-z0-9_.+-]+)\s+Do\b/);
+  if (doMatch) {
+    return {
+      kind: "xobject",
+      id: doMatch[1],
+      x: e,
+      y: f,
+      w: Math.abs(a),
+      h: Math.abs(d),
+    };
+  }
+
+  // Text.
+  if (/\bBT\b/.test(block)) {
+    const strings = extractShownStrings(block)
+      .map((s) => s.trim())
+      .filter((s) => s.length > 0);
+    if (strings.length === 0) return null;
+    let tx = e;
+    let ty = f;
+    const btMatch = block.match(/BT\b([\s\S]*?)\bET\b/);
+    if (btMatch) {
+      const tmRe = /(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+(-?[\d.]+)\s+Tm/g;
+      let tm: RegExpExecArray | null;
+      while ((tm = tmRe.exec(btMatch[1])) !== null) {
+        tx = e + parseFloat(tm[5]);
+        ty = f + parseFloat(tm[6]);
+      }
+    }
+    return {
+      kind: "text",
+      id: strings.join("|"),
+      x: tx,
+      y: ty,
+      w: 0,
+      h: 0,
+    };
+  }
+
+  // Vector paths (no text, no XObject).
+  if (/\b[mcl]\b/.test(block)) {
+    const opsMatch = block.match(/\b[mMlLcChHvVyYfFsSbBnW]\b/g) || [];
+    const ops = opsMatch.join("");
+    if (ops.length < 6) return null;
+    let hash = 0;
+    for (let i = 0; i < ops.length; i++) hash = ((hash << 5) - hash + ops.charCodeAt(i)) | 0;
+    return {
+      kind: "vector",
+      id: `v${ops.length}_${hash}`,
+      x: e,
+      y: f,
+      w: Math.abs(a),
+      h: Math.abs(d),
+    };
+  }
+
+  return null;
+}
+
+function forEachTopLevelBlock(content: string, cb: (block: string) => void): void {
+  const tokens = content.split(/(\bq\b|\bQ\b)/);
+  let depth = 0;
+  let buf = "";
+  for (const tok of tokens) {
+    if (tok === "q") {
+      if (depth === 0) buf = "";
+      else buf += "q";
+      depth++;
+    } else if (tok === "Q") {
+      depth--;
+      if (depth <= 0) {
+        cb(buf);
+        buf = "";
+        depth = 0;
+      } else {
+        buf += "Q";
+      }
+    } else if (depth > 0) {
+      buf += tok;
+    }
+  }
+}
+
+function extractPageFingerprints(content: string): WatermarkFingerprint[] {
+  const out: WatermarkFingerprint[] = [];
+  forEachTopLevelBlock(content, (block) => {
+    const fp = fingerprintBlock(block);
+    if (fp) out.push(fp);
+  });
+  return out;
+}
+
+function findRepeatedCandidates(perPage: WatermarkFingerprint[][], threshold = 0.8): WatermarkCandidate[] {
+  const sampled = perPage.length;
+  if (sampled < 2) return [];
+
+  const buckets = new Map<string, WatermarkFingerprint[]>();
+  const pagesOf = new Map<string, Set<number>>();
+  perPage.forEach((fps, pageIdx) => {
+    const seenThisPage = new Set<string>();
+    for (const fp of fps) {
+      const key = `${fp.kind}:${fp.id}`;
+      if (seenThisPage.has(key)) continue;
+      seenThisPage.add(key);
+      if (!buckets.has(key)) {
+        buckets.set(key, []);
+        pagesOf.set(key, new Set());
+      }
+      buckets.get(key)!.push(fp);
+      pagesOf.get(key)!.add(pageIdx);
+    }
+  });
+
+  const avg = (a: number[]) => a.reduce((s, x) => s + x, 0) / Math.max(1, a.length);
+  const results: WatermarkCandidate[] = [];
+  for (const [key, fps] of buckets) {
+    const pageSet = pagesOf.get(key)!;
+    if (pageSet.size / sampled < threshold) continue;
+
+    const xs = fps.map((f) => f.x);
+    const ys = fps.map((f) => f.y);
+    const xRange = Math.max(...xs) - Math.min(...xs);
+    const yRange = Math.max(...ys) - Math.min(...ys);
+    if (xRange > 40 || yRange > 40) continue;
+
+    const kind = fps[0].kind;
+    const id = fps[0].id;
+    if (kind === "text" && id.replace(/[\s|]/g, "").length < 2) continue;
+
+    results.push({
+      kind,
+      id,
+      count: pageSet.size,
+      sampled,
+      avgX: avg(xs),
+      avgY: avg(ys),
+      avgW: avg(fps.map((f) => f.w)),
+      avgH: avg(fps.map((f) => f.h)),
+      sampleText: kind === "text" ? id.replace(/\|/g, " ") : undefined,
+    });
+  }
+
+  return results
+    .sort((a, b) => b.count - a.count || b.avgW * b.avgH - a.avgW * a.avgH)
+    .slice(0, 3);
+}
+
+function matchesCandidate(fp: WatermarkFingerprint, c: WatermarkCandidate): boolean {
+  if (fp.kind !== c.kind) return false;
+  if (fp.id !== c.id) return false;
+  if (Math.abs(fp.x - c.avgX) > 30) return false;
+  if (Math.abs(fp.y - c.avgY) > 30) return false;
+  return true;
+}
+
+function stripCandidateFromContent(content: string, cand: WatermarkCandidate): { out: string; removed: number } {
+  let removed = 0;
+  let out = "";
+  const tokens = content.split(/(\bq\b|\bQ\b)/);
+  let depth = 0;
+  let buf = "";
+  for (const tok of tokens) {
+    if (tok === "q") {
+      if (depth === 0) buf = "";
+      else buf += "q";
+      depth++;
+    } else if (tok === "Q") {
+      depth--;
+      if (depth <= 0) {
+        const fp = fingerprintBlock(buf);
+        if (fp && matchesCandidate(fp, cand)) {
+          removed++;
+        } else {
+          out += "q" + buf + "Q";
+        }
+        buf = "";
+        depth = 0;
+      } else {
+        buf += "Q";
+      }
+    } else if (depth > 0) {
+      buf += tok;
+    } else {
+      out += tok;
+    }
+  }
+  return { out, removed };
+}
+
+async function scanForRepeatedWatermarks(
+  bytes: ArrayBuffer,
+): Promise<{ candidates: WatermarkCandidate[]; pageWidth: number; pageHeight: number }> {
+  const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
+  const pages = pdf.getPages();
+  const sampleCount = Math.min(5, pages.length);
+  if (sampleCount < 2) return { candidates: [], pageWidth: 0, pageHeight: 0 };
+
+  const perPage: WatermarkFingerprint[][] = [];
+  for (let i = 0; i < sampleCount; i++) {
+    const content = getPageContents(pages[i], pdf);
+    perPage.push(content ? extractPageFingerprints(content) : []);
+  }
+  const candidates = findRepeatedCandidates(perPage, 0.8);
+  const { width, height } = pages[0].getSize();
+  return { candidates, pageWidth: width, pageHeight: height };
+}
+
+async function removeCandidateFromDoc(bytes: ArrayBuffer, cand: WatermarkCandidate): Promise<{ pdfBytes: Uint8Array; removed: number }> {
+  const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
+  const pages = pdf.getPages();
+  let totalRemoved = 0;
+
+  pages.forEach((page: any) => {
+    const content = getPageContents(page, pdf);
+    if (!content) return;
+    const { out, removed } = stripCandidateFromContent(content, cand);
+    if (removed > 0) {
+      totalRemoved += removed;
+      const contentBytes = latin1ToBytes(out);
+      const newStream = pdf.context.stream(contentBytes, {
+        Length: pdf.context.obj(contentBytes.length),
+      });
+      newStream.dict.delete(PDFName.of("Filter"));
+      newStream.dict.delete(PDFName.of("DecodeParms"));
+      const ref = pdf.context.register(newStream);
+      page.node.set(PDFName.of("Contents"), ref);
+    }
+  });
+
+  // If it was an XObject, also delete it from every page's /Resources /XObject
+  if (cand.kind === "xobject") {
+    pages.forEach((page: any) => {
+      try {
+        const res = page.node.Resources();
+        if (!res) return;
+        const xobj = res.lookup(PDFName.of("XObject"));
+        if (xobj instanceof PDFDict) {
+          try {
+            xobj.delete(PDFName.of(cand.id));
+          } catch {}
+        }
+      } catch {}
+    });
+  }
+
+  const pdfBytes = await pdf.save();
+  return { pdfBytes, removed: totalRemoved };
+}
+
+async function renderCandidatePreview(bytes: ArrayBuffer, cand: WatermarkCandidate): Promise<string | null> {
+  try {
+    const pdfjsLib: any = await import("pdfjs-dist");
+    const workerSrc = (await import("pdfjs-dist/build/pdf.worker.min.mjs?url")).default;
+    pdfjsLib.GlobalWorkerOptions.workerSrc = workerSrc;
+    const doc = await pdfjsLib.getDocument({ data: bytes.slice(0) }).promise;
+    const page = await doc.getPage(1);
+    const scale = 1.2;
+    const viewport = page.getViewport({ scale });
+    const canvas = document.createElement("canvas");
+    canvas.width = Math.ceil(viewport.width);
+    canvas.height = Math.ceil(viewport.height);
+    const ctx = canvas.getContext("2d")!;
+    await page.render({ canvasContext: ctx, viewport, canvas }).promise;
+
+    // Overlay a red highlight rectangle at candidate location
+    const x = cand.avgX * scale;
+    const yPdf = cand.avgY * scale;
+    const w = Math.max(40, cand.avgW * scale);
+    const h = Math.max(40, cand.avgH * scale || 40);
+    const yCanvas = canvas.height - yPdf - h;
+    ctx.strokeStyle = "rgba(239, 68, 68, 0.95)";
+    ctx.lineWidth = 4;
+    ctx.strokeRect(x, yCanvas, w, h);
+    ctx.fillStyle = "rgba(239, 68, 68, 0.15)";
+    ctx.fillRect(x, yCanvas, w, h);
+
+    return canvas.toDataURL("image/jpeg", 0.82);
+  } catch {
+    return null;
+  }
+}
+
 // ---------- Pipeline (strategies 1-4) ----------
 
 async function runStrategies1to3(bytes: ArrayBuffer): Promise<{ pdfBytes: Uint8Array; removed: number }> {
@@ -575,12 +900,16 @@ async function runRasterRebuild(bytes: ArrayBuffer, onProgress: (pct: number) =>
 
 function PdfWatermarkRemover() {
   const [file, setFile] = useState<File | null>(null);
-  const [stage, setStage] = useState<"idle" | "processing" | "advanced" | "done">("idle");
+  const [stage, setStage] = useState<"idle" | "scanning" | "preview" | "processing" | "advanced" | "done">("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const [removedCount, setRemovedCount] = useState(0);
   const [downloadUrl, setDownloadUrl] = useState("");
   const [askAdvanced, setAskAdvanced] = useState(false);
+  const [candidates, setCandidates] = useState<WatermarkCandidate[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [previewCandidateIdx, setPreviewCandidateIdx] = useState(0);
+  const pendingBytesRef = useRef<ArrayBuffer | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
@@ -592,6 +921,10 @@ function PdfWatermarkRemover() {
     setRemovedCount(0);
     setDownloadUrl("");
     setAskAdvanced(false);
+    setCandidates([]);
+    setPreviewUrl("");
+    setPreviewCandidateIdx(0);
+    pendingBytesRef.current = null;
   };
 
   const onFile = (f: File) => {
@@ -607,6 +940,10 @@ function PdfWatermarkRemover() {
     setRemovedCount(0);
     setDownloadUrl("");
     setAskAdvanced(false);
+    setCandidates([]);
+    setPreviewUrl("");
+    setPreviewCandidateIdx(0);
+    pendingBytesRef.current = null;
   };
 
   const buildDownload = (bytes: Uint8Array, suffix: string) => {
@@ -619,22 +956,96 @@ function PdfWatermarkRemover() {
     a.click();
   };
 
+  const runFallback = async (buf: ArrayBuffer) => {
+    setStage("processing");
+    setProgress(50);
+    const { pdfBytes, removed } = await runStrategies1to3(buf);
+    setProgress(90);
+    setRemovedCount(removed);
+    buildDownload(pdfBytes, "-clean");
+    setStage("done");
+    setProgress(100);
+    if (removed === 0) setAskAdvanced(true);
+  };
+
   const run = async () => {
     if (!file) return;
-    setStage("processing");
-    setProgress(10);
     setError("");
     setAskAdvanced(false);
+    setStage("scanning");
+    setProgress(15);
     try {
       const buf = await file.arrayBuffer();
-      setProgress(30);
-      const { pdfBytes, removed } = await runStrategies1to3(buf);
+      pendingBytesRef.current = buf;
+      // Strategy 6 — scan first 5 pages for repeated elements
+      const { candidates: found } = await scanForRepeatedWatermarks(buf);
+      if (found.length > 0) {
+        setCandidates(found);
+        setPreviewCandidateIdx(0);
+        setProgress(50);
+        const preview = await renderCandidatePreview(buf, found[0]);
+        setPreviewUrl(preview || "");
+        setStage("preview");
+        setProgress(0);
+        return;
+      }
+      // No repeating element detected → fall back to strategies 1-5
+      await runFallback(buf);
+    } catch (e: any) {
+      setError(e?.message || "Failed to process the file.");
+      setStage("idle");
+    }
+  };
+
+  const confirmCandidate = async () => {
+    const buf = pendingBytesRef.current;
+    const cand = candidates[previewCandidateIdx];
+    if (!buf || !cand) return;
+    setStage("processing");
+    setProgress(40);
+    setError("");
+    try {
+      const { pdfBytes, removed } = await removeCandidateFromDoc(buf, cand);
       setProgress(90);
       setRemovedCount(removed);
       buildDownload(pdfBytes, "-clean");
       setStage("done");
       setProgress(100);
       if (removed === 0) setAskAdvanced(true);
+    } catch (e: any) {
+      setError(e?.message || "Failed to remove the watermark.");
+      setStage("idle");
+    }
+  };
+
+  const tryNextCandidate = async () => {
+    const buf = pendingBytesRef.current;
+    if (!buf) return;
+    const next = previewCandidateIdx + 1;
+    if (next < candidates.length) {
+      setPreviewCandidateIdx(next);
+      setPreviewUrl("");
+      const preview = await renderCandidatePreview(buf, candidates[next]);
+      setPreviewUrl(preview || "");
+    } else {
+      // No more candidates → fall through to manual strategies
+      setStage("scanning");
+      try {
+        await runFallback(buf);
+      } catch (e: any) {
+        setError(e?.message || "Failed to process the file.");
+        setStage("idle");
+      }
+    }
+  };
+
+  const rejectCandidates = async () => {
+    const buf = pendingBytesRef.current;
+    if (!buf) return;
+    setStage("scanning");
+    setError("");
+    try {
+      await runFallback(buf);
     } catch (e: any) {
       setError(e?.message || "Failed to process the file.");
       setStage("idle");
@@ -666,7 +1077,8 @@ function PdfWatermarkRemover() {
     if (f) onFile(f);
   };
 
-  const busy = stage === "processing" || stage === "advanced";
+  const busy = stage === "processing" || stage === "advanced" || stage === "scanning";
+  const currentCandidate = candidates[previewCandidateIdx];
 
   return (
     <ToolPageShell
@@ -733,7 +1145,11 @@ function PdfWatermarkRemover() {
         {busy && (
           <div className="bg-[#0d1526] border border-border rounded-2xl p-4 space-y-2">
             <p className="text-sm text-foreground">
-              {stage === "advanced" ? "Processing in advanced mode..." : "Removing watermark..."}
+              {stage === "advanced"
+                ? "Processing in advanced mode..."
+                : stage === "scanning"
+                  ? "Scanning pages for repeated watermark elements..."
+                  : "Removing watermark..."}
             </p>
             <div className="h-2 rounded-full bg-background overflow-hidden">
               <div
@@ -743,6 +1159,62 @@ function PdfWatermarkRemover() {
             </div>
           </div>
         )}
+
+        {stage === "preview" && currentCandidate && (
+          <div className="bg-[#0d1526] border border-cyan-500/40 rounded-2xl p-5 space-y-4">
+            <div className="space-y-1">
+              <p className="text-cyan-300 text-sm font-semibold">
+                Repeating element detected on {currentCandidate.count} of {currentCandidate.sampled} scanned pages
+              </p>
+              <p className="text-muted-foreground text-xs">
+                Is this the watermark you want to remove from every page?
+              </p>
+            </div>
+
+            {previewUrl ? (
+              <div className="rounded-xl overflow-hidden border border-border bg-black/40 flex items-center justify-center">
+                {/* eslint-disable-next-line jsx-a11y/alt-text */}
+                <img src={previewUrl} alt="Detected watermark preview" className="max-h-96 w-auto" />
+              </div>
+            ) : currentCandidate.kind === "text" ? (
+              <div className="rounded-xl border border-border bg-background/40 p-6 text-center">
+                <p className="text-xs text-muted-foreground mb-2">Detected repeating text:</p>
+                <p className="text-lg font-semibold text-foreground break-words">
+                  "{currentCandidate.sampleText}"
+                </p>
+              </div>
+            ) : (
+              <div className="rounded-xl border border-border bg-background/40 p-6 text-center text-sm text-muted-foreground">
+                Preparing preview...
+              </div>
+            )}
+
+            <div className="flex flex-wrap gap-2">
+              <button
+                onClick={confirmCandidate}
+                className="flex-1 min-w-[140px] px-4 py-2.5 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 text-white font-semibold text-sm transition-all"
+              >
+                Yes, remove it
+              </button>
+              {previewCandidateIdx < candidates.length - 1 ? (
+                <button
+                  onClick={tryNextCandidate}
+                  className="px-4 py-2.5 rounded-xl border border-border text-foreground hover:bg-secondary text-sm transition-all"
+                >
+                  Show next candidate
+                </button>
+              ) : null}
+              <button
+                onClick={rejectCandidates}
+                className="px-4 py-2.5 rounded-xl border border-border text-muted-foreground hover:text-foreground text-sm transition-all"
+              >
+                Not a watermark — try manual detection
+              </button>
+            </div>
+          </div>
+        )}
+
+
 
         {error && (
           <div className="bg-red-500/10 border border-red-500/20 rounded-xl p-3">
@@ -782,7 +1254,7 @@ function PdfWatermarkRemover() {
           </div>
         )}
 
-        {file && stage !== "done" && (
+        {file && stage !== "done" && stage !== "preview" && (
           <button
             onClick={run}
             disabled={busy}

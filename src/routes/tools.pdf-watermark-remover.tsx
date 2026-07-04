@@ -900,12 +900,16 @@ async function runRasterRebuild(bytes: ArrayBuffer, onProgress: (pct: number) =>
 
 function PdfWatermarkRemover() {
   const [file, setFile] = useState<File | null>(null);
-  const [stage, setStage] = useState<"idle" | "processing" | "advanced" | "done">("idle");
+  const [stage, setStage] = useState<"idle" | "scanning" | "preview" | "processing" | "advanced" | "done">("idle");
   const [progress, setProgress] = useState(0);
   const [error, setError] = useState("");
   const [removedCount, setRemovedCount] = useState(0);
   const [downloadUrl, setDownloadUrl] = useState("");
   const [askAdvanced, setAskAdvanced] = useState(false);
+  const [candidates, setCandidates] = useState<WatermarkCandidate[]>([]);
+  const [previewUrl, setPreviewUrl] = useState<string>("");
+  const [previewCandidateIdx, setPreviewCandidateIdx] = useState(0);
+  const pendingBytesRef = useRef<ArrayBuffer | null>(null);
   const inputRef = useRef<HTMLInputElement>(null);
 
   const reset = () => {
@@ -917,6 +921,10 @@ function PdfWatermarkRemover() {
     setRemovedCount(0);
     setDownloadUrl("");
     setAskAdvanced(false);
+    setCandidates([]);
+    setPreviewUrl("");
+    setPreviewCandidateIdx(0);
+    pendingBytesRef.current = null;
   };
 
   const onFile = (f: File) => {
@@ -932,6 +940,10 @@ function PdfWatermarkRemover() {
     setRemovedCount(0);
     setDownloadUrl("");
     setAskAdvanced(false);
+    setCandidates([]);
+    setPreviewUrl("");
+    setPreviewCandidateIdx(0);
+    pendingBytesRef.current = null;
   };
 
   const buildDownload = (bytes: Uint8Array, suffix: string) => {
@@ -944,22 +956,96 @@ function PdfWatermarkRemover() {
     a.click();
   };
 
+  const runFallback = async (buf: ArrayBuffer) => {
+    setStage("processing");
+    setProgress(50);
+    const { pdfBytes, removed } = await runStrategies1to3(buf);
+    setProgress(90);
+    setRemovedCount(removed);
+    buildDownload(pdfBytes, "-clean");
+    setStage("done");
+    setProgress(100);
+    if (removed === 0) setAskAdvanced(true);
+  };
+
   const run = async () => {
     if (!file) return;
-    setStage("processing");
-    setProgress(10);
     setError("");
     setAskAdvanced(false);
+    setStage("scanning");
+    setProgress(15);
     try {
       const buf = await file.arrayBuffer();
-      setProgress(30);
-      const { pdfBytes, removed } = await runStrategies1to3(buf);
+      pendingBytesRef.current = buf;
+      // Strategy 6 — scan first 5 pages for repeated elements
+      const { candidates: found } = await scanForRepeatedWatermarks(buf);
+      if (found.length > 0) {
+        setCandidates(found);
+        setPreviewCandidateIdx(0);
+        setProgress(50);
+        const preview = await renderCandidatePreview(buf, found[0]);
+        setPreviewUrl(preview || "");
+        setStage("preview");
+        setProgress(0);
+        return;
+      }
+      // No repeating element detected → fall back to strategies 1-5
+      await runFallback(buf);
+    } catch (e: any) {
+      setError(e?.message || "Failed to process the file.");
+      setStage("idle");
+    }
+  };
+
+  const confirmCandidate = async () => {
+    const buf = pendingBytesRef.current;
+    const cand = candidates[previewCandidateIdx];
+    if (!buf || !cand) return;
+    setStage("processing");
+    setProgress(40);
+    setError("");
+    try {
+      const { pdfBytes, removed } = await removeCandidateFromDoc(buf, cand);
       setProgress(90);
       setRemovedCount(removed);
       buildDownload(pdfBytes, "-clean");
       setStage("done");
       setProgress(100);
       if (removed === 0) setAskAdvanced(true);
+    } catch (e: any) {
+      setError(e?.message || "Failed to remove the watermark.");
+      setStage("idle");
+    }
+  };
+
+  const tryNextCandidate = async () => {
+    const buf = pendingBytesRef.current;
+    if (!buf) return;
+    const next = previewCandidateIdx + 1;
+    if (next < candidates.length) {
+      setPreviewCandidateIdx(next);
+      setPreviewUrl("");
+      const preview = await renderCandidatePreview(buf, candidates[next]);
+      setPreviewUrl(preview || "");
+    } else {
+      // No more candidates → fall through to manual strategies
+      setStage("scanning");
+      try {
+        await runFallback(buf);
+      } catch (e: any) {
+        setError(e?.message || "Failed to process the file.");
+        setStage("idle");
+      }
+    }
+  };
+
+  const rejectCandidates = async () => {
+    const buf = pendingBytesRef.current;
+    if (!buf) return;
+    setStage("scanning");
+    setError("");
+    try {
+      await runFallback(buf);
     } catch (e: any) {
       setError(e?.message || "Failed to process the file.");
       setStage("idle");
@@ -991,7 +1077,8 @@ function PdfWatermarkRemover() {
     if (f) onFile(f);
   };
 
-  const busy = stage === "processing" || stage === "advanced";
+  const busy = stage === "processing" || stage === "advanced" || stage === "scanning";
+  const currentCandidate = candidates[previewCandidateIdx];
 
   return (
     <ToolPageShell

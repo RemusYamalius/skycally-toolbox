@@ -1254,7 +1254,7 @@ function PdfWatermarkRemover() {
           </div>
         )}
 
-        {file && stage !== "done" && (
+        {file && stage !== "done" && stage !== "preview" && (
           <button
             onClick={run}
             disabled={busy}

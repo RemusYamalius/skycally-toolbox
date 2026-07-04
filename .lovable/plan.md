@@ -1,84 +1,81 @@
-# Plan: Smart Watermark Auto-Detection (Strategy 6)
+# PDF Watermark Remover — Definitive Fix
 
-## Problem
-Current strategies (1-5) rely on fixed patterns: rotation, low opacity, keywords, `/Artifact` blocks, and Form XObjects named "Watermark". Many real PDFs (especially exported from LightPDF, Unwatermark.ai targets, custom exporters, scanned + stamped docs) use watermarks that don't match any of these signatures — they're just an image or text drawn identically on every page. Detection fails silently, nothing gets removed.
+## Why the current tool fails on your file
 
-## Solution — Repetition-Based Detection with Preview
-Add a **Strategy 6** that runs **before** strategies 1-5. It analyzes the first 5 pages, finds any drawing element (image XObject, Form XObject, or text block) that appears at approximately the same position on ≥ 80% of sampled pages, shows the candidates to the user as a visual preview, and on confirmation removes them from **all** pages in one pass.
+Your `123.pdf` uses an Arabic diagonal text watermark ("فروجكس"). In PDF content streams this is drawn as either:
+- CID-encoded text (bytes like `<001A00FF...>` — no readable string to fingerprint), or
+- Outlined vector glyphs (hundreds of tiny path ops per page, never identical byte-for-byte).
 
-## User Flow
+Strategy 6's fingerprinting compares text strings and path-op hashes. Neither survives Arabic CID text or glyph outlining, so **zero candidates are found → preview never opens → the "no watermark detected" banner appears**. Strategies 1–5 also miss it (no `/Artifact`, no low opacity, no keyword, no XObject named "Watermark"). This is a dead end at the PDF-object level for this class of file.
+
+## New approach — pixel-based detection (works on any watermark)
+
+Rasterize a few pages, find pixels that repeat at the **same position across pages but differ from the page background** — that is, by definition, the watermark. Then rebuild the PDF with those pixels erased. No dependency on text encoding, opacity, keywords, or object names.
+
 ```text
 [Upload PDF]
      ↓
-[Auto-Scan first 5 pages]          ← Strategy 6 detection
+Rasterize pages 1, mid, last at 150 DPI (pdfjs, already in project)
      ↓
-Found repeated element?
-   ├─ YES → [Preview Modal]
-   │         "We found this repeating element on 5/5 pages.
-   │          Is this the watermark you want to remove?"
-   │         ┌──────────────────┐
-   │         │  🖼️ thumbnail    │   [✓ Remove it]
-   │         │  or text snippet │   [✗ Not a watermark]
-   │         └──────────────────┘   [Try manual detection]
-   │
-   └─ NO  → Fall back to Strategies 1-5 automatically
+Build watermark mask:
+  mask[x,y] = 1  if  all sampled pages have a non-white pixel
+              AND those pixels are ~identical (ΔE < threshold)
+     ↓
+Show REAL preview: page 1 thumbnail + red overlay of the mask
+     ↓
+User confirms →
+  For every page:
+    rasterize → inpaint masked pixels with local background (white/near-white) → embed as JPEG
+  Rebuild PDF (image-per-page, same page size)
+     ↓
+Download
 ```
 
-If the user confirms → remove the confirmed element(s) from every page and download.
-If the user rejects → run Strategies 1-5 as today.
+## What changes in the UI
 
-## Detection Algorithm
-For each of the first `min(5, pageCount)` pages:
-1. Walk the content stream, splitting into `q ... Q` graphics blocks (reuse existing stack parser).
-2. For each block, extract a **fingerprint**:
-   - **XObject block**: `{ kind: "xobject", name, x, y, w, h }` from the last `cm` matrix + `/Name Do`.
-   - **Text block**: `{ kind: "text", strings: shown[], x, y }` from `BT ... ET`.
-   - **Vector block** (paths only, no BT): `{ kind: "vector", bbox, hash }` — hash the path operators.
-3. Bucket fingerprints across pages by:
-   - Same `kind` + same `name`/`strings`/`hash`
-   - Position match: `|Δx| < 20pt` AND `|Δy| < 20pt` (tolerates small page-to-page jitter)
-4. Any bucket with `count / sampledPages ≥ 0.8` becomes a **watermark candidate**.
-5. Rank candidates by (repetition count desc, then size desc). Show top 3 max.
+The preview area is the core fix — it will **always** render once scanning finishes:
 
-## Preview Rendering
-- **Image / Form XObject candidate**: render just that XObject to a canvas thumbnail using `pdfjs-dist` (already in the project via other PDF tools) at ~200×200. Show it in the modal.
-- **Text candidate**: show the extracted string(s) as a styled quote, e.g. `"CONFIDENTIAL"`.
-- **Vector candidate**: render the bbox area of page 1 cropped to that region.
+- **Left**: page 1 thumbnail with the detected watermark highlighted in red.
+- **Right**: coverage stats ("Detected on 3/3 sampled pages, covers 4.2% of page area") + three buttons: **Remove watermark**, **Try another sample**, **Cancel**.
+- If the mask is empty (truly no repeating mark), show a clear empty-state with an explicit **Advanced rebuild** button instead of silently falling through.
 
-## Removal
-When user confirms candidate `C`:
-- For every page in the doc, walk `q ... Q` blocks and drop any block whose fingerprint matches `C` (same name / same text / same path hash + position within tolerance).
-- Re-encode the content stream (reuse existing `latin1ToBytes` + `pdf.context.stream` path from Strategy 4).
-- If candidate is a Form XObject, also delete it from `/Resources /XObject`.
-- Report `removed` count in the existing status UI.
+The current bug where the preview panel doesn't appear is fixed by making preview stage unconditional after scan — it either shows the candidate OR shows the empty-state, never nothing.
 
-## Files to Change
-- **`src/routes/tools.pdf-watermark-remover.tsx`** (single file, all logic lives here today):
-  - Add new helpers near the top of the strategies section:
-    - `extractPageFingerprints(page, pdf, content) → Fingerprint[]`
-    - `findRepeatedCandidates(perPageFingerprints, threshold=0.8) → Candidate[]`
-    - `renderCandidateThumbnail(pdf, candidate) → Promise<string>` (data URL via pdfjs)
-    - `removeCandidateFromAllPages(pdf, candidate) → number`
-  - Refactor the run pipeline:
-    1. Load PDF, scan first 5 pages → candidates.
-    2. If candidates found → set React state to open a **`<WatermarkPreviewDialog />`** (new inline component using existing `@/components/ui/dialog`).
-    3. On confirm → call `removeCandidateFromAllPages`, then save + download.
-    4. On reject → continue to `runStrategies1to3` (existing) + strategies 4/5.
-  - Add state: `candidates`, `showPreview`, `pendingPdf`, `pendingBytes`.
+## Removal quality
 
-## Technical Notes
-- No new npm packages. `pdf-lib` handles parsing/writing; `pdfjs-dist` is already in the project for thumbnail rendering (used by pdf-reader / pdf-to-images tools).
-- Position tolerance `20pt` handles Word/LibreOffice re-flow between pages.
-- Threshold `0.8` matches LightPDF/Unwatermark heuristics; single-page PDFs skip Strategy 6 and go straight to 1-5.
-- All-client-side, no server calls — keeps the tool's "your file never leaves your device" guarantee.
-- English-only UI copy (per project memory).
+- Output is raster (image-per-page) PDF — this is the only reliable way to erase a burned-in vector/CID watermark. Text becomes non-selectable on cleaned pages, matching how LightPDF / Unwatermark.ai deliver these files.
+- 150 DPI default (readable, ~same size as input). Toggle for 200 DPI if user wants sharper.
+- Mask is dilated by 2px so anti-aliased glyph edges are fully covered.
+- Inpaint = fill with median color of a 12px ring around each masked pixel (fast, works because watermarks sit over near-uniform backgrounds).
 
-## Out of Scope
-- Rasterizing every page to run pixel-diff detection (too slow, memory-heavy in browser).
-- OCR-based watermark text detection.
-- Multiple simultaneous watermark removal in one confirmation (user picks one at a time; can re-run tool if needed).
+## Files to change
 
-## Success Criteria
-1. On a PDF where every page has the same centered image, Strategy 6 detects it, previews it, and removes it on confirmation — even when opacity is 1.0 and no keyword matches.
-2. On a PDF with no repeating elements, Strategy 6 is silent and strategies 1-5 run unchanged.
-3. User can reject the preview and still get the old behavior.
+Only `src/routes/tools.pdf-watermark-remover.tsx`. All logic client-side, no new npm packages (pdfjs-dist + pdf-lib + canvas already in project).
+
+### Structure
+
+1. **Remove Strategy 6 fingerprint code** (it can't handle CID/outlined text — replaced entirely).
+2. **Add `detectWatermarkMask(file)`**: rasterize 3 sample pages via pdfjs → per-pixel intersection → return `{ maskCanvas, coveragePct, sampleThumb }`.
+3. **Add `rebuildWithoutMask(file, mask, dpi)`**: for each page rasterize → apply mask + inpaint → `pdf-lib` new doc with JPEG per page.
+4. **Rewrite the run pipeline**: `idle → scanning → preview (always) → processing → done`.
+5. **Preview stage always renders** the panel with either the candidate or the empty state — this is what the user reported missing.
+6. Keep strategies 1–5 as a fallback path behind an "Object-mode (experimental)" toggle for edge cases where the user explicitly wants selectable text preserved.
+
+### Technical notes
+
+- Rasterization via `pdfjs-dist` `getDocument` + `page.render` to an `OffscreenCanvas` (already used in `pdf-to-images` tool — same import path).
+- Per-page canvas is reused (single buffer, cleared between pages) to keep memory flat for 30+ page PDFs.
+- Final PDF assembly uses `pdf-lib` `embedJpg` + `drawImage` at original page dimensions in points.
+- Progress reported per page in the existing status UI.
+
+## Out of scope
+
+- OCR to re-inject selectable text after rasterization.
+- Preserving original vector text on cleaned pages (impossible without object-level match, which failed for this file class).
+- Detecting watermarks that appear only on a subset of pages (< 60% coverage across samples).
+
+## Success criteria
+
+1. Upload `123.pdf` → preview panel appears with red overlay on the "فروجكس" text on page 1.
+2. Click **Remove watermark** → downloaded `123-clean.pdf` has no watermark on any of the 34 pages.
+3. Upload a PDF with no watermark → preview shows empty-state with "no repeating mark found", never a blank screen.

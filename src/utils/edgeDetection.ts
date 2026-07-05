@@ -13,6 +13,105 @@ export interface DocumentCorners {
 
 const clamp = (v: number, lo: number, hi: number) => Math.max(lo, Math.min(hi, v));
 
+function polygonArea(pts: Point[]): number {
+  let area = 0;
+  for (let i = 0; i < pts.length; i++) {
+    const a = pts[i];
+    const b = pts[(i + 1) % pts.length];
+    area += a.x * b.y - b.x * a.y;
+  }
+  return area / 2;
+}
+
+export function normalizeCornerOrder(pts: Point[]): [Point, Point, Point, Point] | null {
+  if (pts.length !== 4 || pts.some((p) => !Number.isFinite(p.x) || !Number.isFinite(p.y))) return null;
+
+  const cx = pts.reduce((s, p) => s + p.x, 0) / 4;
+  const cy = pts.reduce((s, p) => s + p.y, 0) / 4;
+  const ordered = pts.slice().sort((a, b) => Math.atan2(a.y - cy, a.x - cx) - Math.atan2(b.y - cy, b.x - cx));
+  const start = ordered.reduce((best, p, i) => (p.x + p.y < ordered[best].x + ordered[best].y ? i : best), 0);
+  const rotated = [...ordered.slice(start), ...ordered.slice(0, start)];
+
+  // Expected order is tl, tr, br, bl. If the polygon is counter-ordered after
+  // rotation, swap the right-side points to make a convex clockwise quad.
+  const quad = rotated as [Point, Point, Point, Point];
+  if (polygonArea(quad) < 0) return [quad[0], quad[3], quad[2], quad[1]];
+  return quad;
+}
+
+function quadBounds(quad: Point[]) {
+  return {
+    minX: Math.min(...quad.map((p) => p.x)),
+    maxX: Math.max(...quad.map((p) => p.x)),
+    minY: Math.min(...quad.map((p) => p.y)),
+    maxY: Math.max(...quad.map((p) => p.y)),
+  };
+}
+
+function isConvexQuad(quad: Point[]) {
+  if (quad.length !== 4) return false;
+  let sign = 0;
+  for (let i = 0; i < 4; i++) {
+    const a = quad[i];
+    const b = quad[(i + 1) % 4];
+    const c = quad[(i + 2) % 4];
+    const cross = (b.x - a.x) * (c.y - b.y) - (b.y - a.y) * (c.x - b.x);
+    if (Math.abs(cross) < 1e-3) return false;
+    const currentSign = Math.sign(cross);
+    if (!sign) sign = currentSign;
+    else if (sign !== currentSign) return false;
+  }
+  return true;
+}
+
+export function validateDocumentQuad(pts: Point[], width: number, height: number): [Point, Point, Point, Point] | null {
+  const quad = normalizeCornerOrder(pts);
+  if (!quad || !isConvexQuad(quad)) return null;
+
+  const bounds = quadBounds(quad);
+  if (bounds.minX < -width * 0.03 || bounds.maxX > width * 1.03) return null;
+  if (bounds.minY < -height * 0.03 || bounds.maxY > height * 1.03) return null;
+
+  const area = Math.abs(polygonArea(quad));
+  const areaFrac = area / Math.max(1, width * height);
+  if (areaFrac < 0.025 || areaFrac > 0.94) return null;
+
+  const topW = Math.hypot(quad[1].x - quad[0].x, quad[1].y - quad[0].y);
+  const botW = Math.hypot(quad[2].x - quad[3].x, quad[2].y - quad[3].y);
+  const leftH = Math.hypot(quad[3].x - quad[0].x, quad[3].y - quad[0].y);
+  const rightH = Math.hypot(quad[2].x - quad[1].x, quad[2].y - quad[1].y);
+  const minSide = Math.min(width, height);
+  if (Math.min(topW, botW) < minSide * 0.08 || Math.min(leftH, rightH) < minSide * 0.12) return null;
+  if (Math.min(topW, botW) / Math.max(topW, botW) < 0.45) return null;
+  if (Math.min(leftH, rightH) / Math.max(leftH, rightH) < 0.62) return null;
+
+  const avgW = (topW + botW) / 2;
+  const avgH = (leftH + rightH) / 2;
+  const aspect = Math.max(avgW / Math.max(avgH, 1), avgH / Math.max(avgW, 1));
+  if (aspect > 6.5) return null;
+
+  return quad;
+}
+
+function scoreDocumentQuad(quad: Point[], width: number, height: number, areaHint?: number) {
+  const bounds = quadBounds(quad);
+  const quadArea = Math.abs(polygonArea(quad));
+  const areaFrac = quadArea / Math.max(1, width * height);
+  const bboxAreaFrac = ((bounds.maxX - bounds.minX) * (bounds.maxY - bounds.minY)) / Math.max(1, width * height);
+  const margin = Math.min(width, height) * 0.025;
+  const touches = quad.filter(
+    (p) => p.x <= margin || p.x >= width - margin || p.y <= margin || p.y >= height - margin,
+  ).length;
+  const centerX = (bounds.minX + bounds.maxX) / 2;
+  const centerY = (bounds.minY + bounds.maxY) / 2;
+  const centerBias = 1 - Math.min(1, Math.hypot(centerX - width / 2, centerY - height / 2) / Math.hypot(width / 2, height / 2));
+  const documentSized = areaFrac > 0.06 && areaFrac < 0.78 ? 1 : 0.55;
+  const borderPenalty = touches >= 3 ? 1.8 : touches >= 2 ? 0.9 : touches ? 0.35 : 0;
+  const hugeOuterPenalty = bboxAreaFrac > 0.82 ? 1.2 : 0;
+  const filledBonus = areaHint ? Math.min(1, areaHint / Math.max(1, quadArea)) : 0.5;
+  return areaFrac * 2.2 + bboxAreaFrac * 0.55 + centerBias * 0.45 + documentSized + filledBonus * 0.35 - borderPenalty - hugeOuterPenalty;
+}
+
 export const fallbackCorners = (w: number, h: number): DocumentCorners => ({
   topLeft: { x: w * 0.08, y: h * 0.08 },
   topRight: { x: w * 0.92, y: h * 0.08 },
@@ -21,24 +120,6 @@ export const fallbackCorners = (w: number, h: number): DocumentCorners => ({
   detected: false,
 });
 
-function sortCorners(pts: Point[]): [Point, Point, Point, Point] | null {
-  if (pts.length !== 4) return null;
-  const cx = pts.reduce((s, p) => s + p.x, 0) / 4;
-  const cy = pts.reduce((s, p) => s + p.y, 0) / 4;
-  const tl = pts.filter((p) => p.x <= cx && p.y <= cy);
-  const tr = pts.filter((p) => p.x > cx && p.y <= cy);
-  const br = pts.filter((p) => p.x > cx && p.y > cy);
-  const bl = pts.filter((p) => p.x <= cx && p.y > cy);
-  if (!tl.length || !tr.length || !br.length || !bl.length) return null;
-  const pick = (arr: Point[], fn: (a: Point, b: Point) => Point) => arr.reduce((best, p) => fn(best, p));
-  return [
-    pick(tl, (a, b) => (a.x + a.y < b.x + b.y ? a : b)),
-    pick(tr, (a, b) => (b.x - b.y < a.x - a.y ? a : b)),
-    pick(br, (a, b) => (a.x + a.y > b.x + b.y ? a : b)),
-    pick(bl, (a, b) => (b.x - b.y > a.x - a.y ? a : b)),
-  ];
-}
-
 // ─── Main export ─────────────────────────────────────────────────────────────
 
 export async function detectDocumentCorners(
@@ -46,10 +127,15 @@ export async function detectDocumentCorners(
   width: number,
   height: number,
 ): Promise<DocumentCorners> {
-  // Multiple strategies, first success wins
+  // Multiple strategies, first success wins. The order matters: robust contour
+  // and paper-mask strategies run before broad background/flood-fill fallbacks
+  // so screenshots and camera frames do not get mistaken for the document.
   const strategies = [
-    () => detectByFloodFill(imageElement, width, height),
+    () => detectByPaperProjection(imageElement, width, height),
+    () => detectByPaperMask(imageElement, width, height),
+    () => detectByOpenCVContours(imageElement, width, height),
     () => detectByLargestBlob(imageElement, width, height),
+    () => detectByFloodFill(imageElement, width, height),
     () => detectBySobel(imageElement, width, height),
   ];
 
@@ -63,6 +149,305 @@ export async function detectDocumentCorners(
   }
 
   return fallbackCorners(width, height);
+}
+
+function detectByPaperProjection(
+  imageElement: HTMLImageElement | HTMLCanvasElement,
+  width: number,
+  height: number,
+): DocumentCorners | null {
+  const scale = Math.min(1, 700 / Math.max(width, height));
+  const sw = Math.max(1, Math.round(width * scale));
+  const sh = Math.max(1, Math.round(height * scale));
+  const canvas = document.createElement("canvas");
+  canvas.width = sw;
+  canvas.height = sh;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(imageElement as CanvasImageSource, 0, 0, sw, sh);
+  const { data } = ctx.getImageData(0, 0, sw, sh);
+  const mask = new Uint8Array(sw * sh);
+  const col = new Uint16Array(sw);
+  const row = new Uint16Array(sh);
+
+  for (let y = 0; y < sh; y++) {
+    for (let x = 0; x < sw; x++) {
+      const i = (y * sw + x) * 4;
+      const r = data[i],
+        g = data[i + 1],
+        b = data[i + 2];
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      const mx = Math.max(r, g, b);
+      const mn = Math.min(r, g, b);
+      const sat = mx ? (mx - mn) / mx : 0;
+      if (lum > 68 && sat < 0.34) {
+        mask[y * sw + x] = 1;
+        col[x]++;
+        row[y]++;
+      }
+    }
+  }
+
+  const longestRun = (arr: Uint16Array, threshold: number, minRun: number) => {
+    let bestStart = -1,
+      bestEnd = -1,
+      start = -1;
+    for (let i = 0; i <= arr.length; i++) {
+      const on = i < arr.length && arr[i] >= threshold;
+      if (on && start < 0) start = i;
+      if ((!on || i === arr.length) && start >= 0) {
+        const end = i - 1;
+        if (end - start + 1 >= minRun && end - start > bestEnd - bestStart) {
+          bestStart = start;
+          bestEnd = end;
+        }
+        start = -1;
+      }
+    }
+    return bestStart >= 0 ? { start: bestStart, end: bestEnd } : null;
+  };
+
+  const xr = longestRun(col, sh * 0.1, sw * 0.08);
+  const yr = longestRun(row, sw * 0.07, sh * 0.12);
+  if (!xr || !yr) return null;
+
+  // Tighten bounds inside the coarse projected page area.
+  let minX = xr.end,
+    maxX = xr.start,
+    minY = yr.end,
+    maxY = yr.start;
+  for (let y = yr.start; y <= yr.end; y++) {
+    for (let x = xr.start; x <= xr.end; x++) {
+      if (!mask[y * sw + x]) continue;
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+    }
+  }
+
+  const pad = Math.max(2, Math.round(Math.min(sw, sh) * 0.01));
+  const raw = [
+    { x: (minX - pad) / scale, y: (minY - pad) / scale },
+    { x: (maxX + pad) / scale, y: (minY - pad) / scale },
+    { x: (maxX + pad) / scale, y: (maxY + pad) / scale },
+    { x: (minX - pad) / scale, y: (maxY + pad) / scale },
+  ];
+  const quad = validateDocumentQuad(raw, width, height);
+  if (!quad) return null;
+  return { topLeft: quad[0], topRight: quad[1], bottomRight: quad[2], bottomLeft: quad[3], detected: true };
+}
+
+// ─── Strategy 0: OpenCV contour quadrilateral detection ─────────────────────
+// This is the closest browser equivalent to native scanner apps: detect strong
+// contours, approximate them to 4-point polygons, then score the candidate that
+// most looks like the actual paper rather than the outer photo/window frame.
+
+function detectByOpenCVContours(
+  imageElement: HTMLImageElement | HTMLCanvasElement,
+  width: number,
+  height: number,
+): DocumentCorners | null {
+  const cv = typeof window !== "undefined" ? (window as any).cv : null;
+  if (!cv?.Mat || !cv?.findContours) return null;
+
+  const scale = Math.min(1, 900 / Math.max(width, height));
+  const sw = Math.max(1, Math.round(width * scale));
+  const sh = Math.max(1, Math.round(height * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = sw;
+  canvas.height = sh;
+  canvas.getContext("2d")!.drawImage(imageElement as CanvasImageSource, 0, 0, sw, sh);
+
+  let src: any;
+  let gray: any;
+  let blurred: any;
+  let edges: any;
+  let closed: any;
+  let contours: any;
+  let hierarchy: any;
+  let kernel: any;
+  const candidates: { quad: [Point, Point, Point, Point]; area: number; score: number }[] = [];
+
+  try {
+    src = cv.imread(canvas);
+    gray = new cv.Mat();
+    blurred = new cv.Mat();
+    edges = new cv.Mat();
+    closed = new cv.Mat();
+    contours = new cv.MatVector();
+    hierarchy = new cv.Mat();
+    kernel = cv.Mat.ones(5, 5, cv.CV_8U);
+
+    cv.cvtColor(src, gray, cv.COLOR_RGBA2GRAY);
+    cv.GaussianBlur(gray, blurred, new cv.Size(5, 5), 0);
+    cv.Canny(blurred, edges, 45, 135, 3, false);
+    cv.morphologyEx(edges, closed, cv.MORPH_CLOSE, kernel);
+    cv.findContours(closed, contours, hierarchy, cv.RETR_LIST, cv.CHAIN_APPROX_SIMPLE);
+
+    for (let i = 0; i < contours.size(); i++) {
+      const contour = contours.get(i);
+      const approx = new cv.Mat();
+      try {
+        const peri = cv.arcLength(contour, true);
+        cv.approxPolyDP(contour, approx, 0.025 * peri, true);
+        const area = Math.abs(cv.contourArea(contour, false));
+        if (approx.rows !== 4 || area < sw * sh * 0.025) continue;
+
+        const data = approx.data32S;
+        const raw: Point[] = [
+          { x: data[0] / scale, y: data[1] / scale },
+          { x: data[2] / scale, y: data[3] / scale },
+          { x: data[4] / scale, y: data[5] / scale },
+          { x: data[6] / scale, y: data[7] / scale },
+        ];
+        const quad = validateDocumentQuad(raw, width, height);
+        if (!quad) continue;
+        candidates.push({ quad, area: area / (scale * scale), score: scoreDocumentQuad(quad, width, height, area / (scale * scale)) });
+      } finally {
+        approx.delete?.();
+        contour.delete?.();
+      }
+    }
+  } catch (e) {
+    console.warn("OpenCV contour detection failed:", e);
+  } finally {
+    [src, gray, blurred, edges, closed, contours, hierarchy, kernel].forEach((m) => {
+      try {
+        m?.delete?.();
+      } catch {}
+    });
+  }
+
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => b.score - a.score);
+  const best = candidates[0].quad;
+  return {
+    topLeft: best[0],
+    topRight: best[1],
+    bottomRight: best[2],
+    bottomLeft: best[3],
+    detected: true,
+  };
+}
+
+// ─── Strategy 1: paper-colour connected components ──────────────────────────
+// Scanner photos usually contain an off-white/grey low-saturation page even
+// when the surroundings are complex. This mask finds paper-like components and
+// rejects giant frames/background strips.
+
+function detectByPaperMask(
+  imageElement: HTMLImageElement | HTMLCanvasElement,
+  width: number,
+  height: number,
+): DocumentCorners | null {
+  const scale = Math.min(1, 620 / Math.max(width, height));
+  const sw = Math.max(1, Math.round(width * scale));
+  const sh = Math.max(1, Math.round(height * scale));
+
+  const canvas = document.createElement("canvas");
+  canvas.width = sw;
+  canvas.height = sh;
+  const ctx = canvas.getContext("2d")!;
+  ctx.drawImage(imageElement as CanvasImageSource, 0, 0, sw, sh);
+  const { data } = ctx.getImageData(0, 0, sw, sh);
+
+  const brightness = new Uint8Array(sw * sh);
+  let sum = 0;
+  for (let i = 0; i < sw * sh; i++) {
+    const r = data[i * 4];
+    const g = data[i * 4 + 1];
+    const b = data[i * 4 + 2];
+    const mx = Math.max(r, g, b);
+    const mn = Math.min(r, g, b);
+    const sat = mx ? (mx - mn) / mx : 0;
+    const lum = Math.round(0.299 * r + 0.587 * g + 0.114 * b);
+    brightness[i] = lum;
+    sum += lum;
+    const likelyPaper = lum > 92 && sat < 0.28 && r > 75 && g > 75 && b > 75;
+    brightness[i] = likelyPaper ? lum : 0;
+  }
+
+  const mean = sum / Math.max(1, sw * sh);
+  const mask = new Uint8Array(sw * sh);
+  for (let i = 0; i < mask.length; i++) mask[i] = brightness[i] > Math.max(88, mean * 0.68) ? 1 : 0;
+
+  // Light morphological close/dilate so document text and fold shadows do not
+  // split the paper into many small pieces.
+  const closed = new Uint8Array(mask.length);
+  for (let y = 1; y < sh - 1; y++) {
+    for (let x = 1; x < sw - 1; x++) {
+      let count = 0;
+      for (let dy = -1; dy <= 1; dy++) for (let dx = -1; dx <= 1; dx++) count += mask[(y + dy) * sw + x + dx];
+      closed[y * sw + x] = count >= 3 ? 1 : 0;
+    }
+  }
+
+  const labels = new Int32Array(sw * sh).fill(-1);
+  const candidates: { quad: [Point, Point, Point, Point]; area: number; score: number }[] = [];
+  let label = 0;
+
+  for (let start = 0; start < sw * sh; start++) {
+    if (!closed[start] || labels[start] >= 0) continue;
+    const queue = [start];
+    labels[start] = label;
+    let qi = 0;
+    let size = 0;
+    let minX = sw,
+      maxX = 0,
+      minY = sh,
+      maxY = 0;
+
+    while (qi < queue.length) {
+      const idx = queue[qi++];
+      size++;
+      const x = idx % sw;
+      const y = Math.floor(idx / sw);
+      if (x < minX) minX = x;
+      if (x > maxX) maxX = x;
+      if (y < minY) minY = y;
+      if (y > maxY) maxY = y;
+      const neighbors = [x > 0 ? idx - 1 : -1, x < sw - 1 ? idx + 1 : -1, y > 0 ? idx - sw : -1, y < sh - 1 ? idx + sw : -1];
+      for (const n of neighbors) {
+        if (n >= 0 && closed[n] && labels[n] < 0) {
+          labels[n] = label;
+          queue.push(n);
+        }
+      }
+    }
+
+    const areaFrac = size / Math.max(1, sw * sh);
+    const bw = maxX - minX + 1;
+    const bh = maxY - minY + 1;
+    if (areaFrac < 0.018 || bw < sw * 0.08 || bh < sh * 0.1) {
+      label++;
+      continue;
+    }
+
+    const docMask = new Uint8Array(sw * sh).fill(1);
+    for (let i = 0; i < labels.length; i++) if (labels[i] === label) docMask[i] = 0;
+    const pad = Math.max(2, Math.round(Math.min(sw, sh) * 0.01));
+    const raw = [
+      { x: (minX - pad) / scale, y: (minY - pad) / scale },
+      { x: (maxX + pad) / scale, y: (minY - pad) / scale },
+      { x: (maxX + pad) / scale, y: (maxY + pad) / scale },
+      { x: (minX - pad) / scale, y: (maxY + pad) / scale },
+    ];
+    const quad = validateDocumentQuad(raw, width, height);
+    if (quad) candidates.push({ quad, area: size / (scale * scale), score: scoreDocumentQuad(quad, width, height, size / (scale * scale)) });
+    label++;
+  }
+
+  if (!candidates.length) return null;
+  candidates.sort((a, b) => b.score - a.score);
+  const best = candidates[0].quad;
+  return {
+    topLeft: best[0],
+    topRight: best[1],
+    bottomRight: best[2],
+    bottomLeft: best[3],
+    detected: true,
+  };
 }
 
 // ─── Strategy 1: Flood-fill from corners to isolate background ───────────────
@@ -189,12 +574,19 @@ function detectByFloodFill(
   const corners = findDocumentCorners(visited, sw, sh, minX, maxX, minY, maxY);
   if (!corners) return null;
 
+  const quad = validateDocumentQuad(
+    corners.map((p) => ({ x: p.x / scale, y: p.y / scale })),
+    width,
+    height,
+  );
+  if (!quad) return null;
+
   // Scale back to original dimensions
   return {
-    topLeft: { x: corners[0].x / scale, y: corners[0].y / scale },
-    topRight: { x: corners[1].x / scale, y: corners[1].y / scale },
-    bottomRight: { x: corners[2].x / scale, y: corners[2].y / scale },
-    bottomLeft: { x: corners[3].x / scale, y: corners[3].y / scale },
+    topLeft: quad[0],
+    topRight: quad[1],
+    bottomRight: quad[2],
+    bottomLeft: quad[3],
     detected: true,
   };
 }
@@ -417,12 +809,18 @@ function detectByLargestBlob(
 
   const corners = findDocumentCorners(blobMask, sw, sh, minX, maxX, minY, maxY);
   if (!corners) return null;
+  const quad = validateDocumentQuad(
+    corners.map((p) => ({ x: p.x / scale, y: p.y / scale })),
+    width,
+    height,
+  );
+  if (!quad) return null;
 
   return {
-    topLeft: { x: corners[0].x / scale, y: corners[0].y / scale },
-    topRight: { x: corners[1].x / scale, y: corners[1].y / scale },
-    bottomRight: { x: corners[2].x / scale, y: corners[2].y / scale },
-    bottomLeft: { x: corners[3].x / scale, y: corners[3].y / scale },
+    topLeft: quad[0],
+    topRight: quad[1],
+    bottomRight: quad[2],
+    bottomLeft: quad[3],
     detected: true,
   };
 }
@@ -581,11 +979,8 @@ function detectBySobel(
     }
   }
 
-  const quad = [scores.tl.p, scores.tr.p, scores.br.p, scores.bl.p];
-  const area =
-    0.5 *
-    Math.abs((quad[1].x - quad[3].x) * (quad[2].y - quad[0].y) - (quad[2].x - quad[0].x) * (quad[1].y - quad[3].y));
-  if (area < width * height * 0.1) return null;
+  const quad = validateDocumentQuad([scores.tl.p, scores.tr.p, scores.br.p, scores.bl.p], width, height);
+  if (!quad) return null;
 
   return {
     topLeft: quad[0],

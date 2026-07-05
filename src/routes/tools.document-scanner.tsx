@@ -18,6 +18,7 @@ import {
   ChevronUp,
   CheckCircle2,
   AlertTriangle,
+  RefreshCw,
 } from "lucide-react";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -26,7 +27,7 @@ import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { loadOpenCV } from "@/utils/opencvLoader";
-import { detectDocumentCorners, fallbackCorners, type Point } from "@/utils/edgeDetection";
+import { detectDocumentCorners, fallbackCorners, validateDocumentQuad, type Point } from "@/utils/edgeDetection";
 import { detectDocument } from "@/lib/document-detect.functions";
 
 // Downscale an image to a max dimension and return base64 (JPEG) for AI vision
@@ -46,17 +47,78 @@ async function imageToDownscaledBase64(
   return { base64, mimeType: "image/jpeg" };
 }
 
-function validateCornerQuad(pts: Point[], w: number, h: number): boolean {
-  if (pts.length !== 4) return false;
-  const [tl, tr, br, bl] = pts;
-  const minSide = Math.min(w, h);
-  const topW = Math.hypot(tr.x - tl.x, tr.y - tl.y);
-  const botW = Math.hypot(br.x - bl.x, br.y - bl.y);
-  const leftH = Math.hypot(bl.x - tl.x, bl.y - tl.y);
-  const rightH = Math.hypot(br.x - tr.x, br.y - tr.y);
-  // Reject degenerate quads (too small or too skewed)
-  if (topW < minSide * 0.15 || botW < minSide * 0.15) return false;
-  if (leftH < minSide * 0.15 || rightH < minSide * 0.15) return false;
+function clampCorners(pts: Point[], w: number, h: number): Point[] {
+  return pts.map((p) => ({ x: Math.max(0, Math.min(w, p.x)), y: Math.max(0, Math.min(h, p.y)) }));
+}
+
+function pointInsideSelection(x: number, y: number, quad: Point[]) {
+  let inside = false;
+  for (let i = 0, j = quad.length - 1; i < quad.length; j = i++) {
+    const a = quad[i];
+    const b = quad[j];
+    if (a.y > y !== b.y > y && x < ((b.x - a.x) * (y - a.y)) / (b.y - a.y + 1e-9) + a.x) inside = !inside;
+  }
+  return inside;
+}
+
+function selectionLooksLikeDocument(img: HTMLImageElement, quad: Point[]) {
+  const bounds = {
+    minX: Math.max(0, Math.floor(Math.min(...quad.map((p) => p.x)))),
+    maxX: Math.min(img.width - 1, Math.ceil(Math.max(...quad.map((p) => p.x)))),
+    minY: Math.max(0, Math.floor(Math.min(...quad.map((p) => p.y)))),
+    maxY: Math.min(img.height - 1, Math.ceil(Math.max(...quad.map((p) => p.y)))),
+  };
+  const canvas = document.createElement("canvas");
+  canvas.width = img.width;
+  canvas.height = img.height;
+  const ctx = canvas.getContext("2d", { willReadFrequently: true })!;
+  ctx.drawImage(img, 0, 0);
+  const data = ctx.getImageData(0, 0, img.width, img.height).data;
+  let samples = 0;
+  let dark = 0;
+  let paperLike = 0;
+  const steps = 42;
+  for (let gy = 0; gy < steps; gy++) {
+    const y = bounds.minY + ((gy + 0.5) / steps) * (bounds.maxY - bounds.minY);
+    for (let gx = 0; gx < steps; gx++) {
+      const x = bounds.minX + ((gx + 0.5) / steps) * (bounds.maxX - bounds.minX);
+      if (!pointInsideSelection(x, y, quad)) continue;
+      const px = Math.max(0, Math.min(img.width - 1, Math.round(x)));
+      const py = Math.max(0, Math.min(img.height - 1, Math.round(y)));
+      const i = (py * img.width + px) * 4;
+      const r = data[i],
+        g = data[i + 1],
+        b = data[i + 2];
+      const lum = 0.299 * r + 0.587 * g + 0.114 * b;
+      const mx = Math.max(r, g, b);
+      const mn = Math.min(r, g, b);
+      const sat = mx ? (mx - mn) / mx : 0;
+      samples++;
+      if (lum < 45) dark++;
+      if (lum > 72 && sat < 0.36) paperLike++;
+    }
+  }
+  if (!samples) return false;
+  const darkRatio = dark / samples;
+  const paperRatio = paperLike / samples;
+  return darkRatio < 0.24 && paperRatio > 0.34;
+}
+
+function isAutoDetectionPlausible(quad: Point[], w: number, h: number, img?: HTMLImageElement) {
+  const minX = Math.min(...quad.map((p) => p.x));
+  const maxX = Math.max(...quad.map((p) => p.x));
+  const minY = Math.min(...quad.map((p) => p.y));
+  const maxY = Math.max(...quad.map((p) => p.y));
+  const bboxFrac = ((maxX - minX) * (maxY - minY)) / Math.max(1, w * h);
+  const margin = Math.min(w, h) * 0.025;
+  const touches = [minX <= margin, minY <= margin, maxX >= w - margin, maxY >= h - margin].filter(Boolean).length;
+
+  // A scanner target should be the inner paper, not the full screenshot/window.
+  // Very large selections that touch multiple image borders are almost always
+  // false positives in screenshots and camera previews.
+  if (bboxFrac > 0.82 && touches >= 2) return false;
+  if (bboxFrac > 0.9) return false;
+  if (img && !selectionLooksLikeDocument(img, quad)) return false;
   return true;
 }
 
@@ -209,7 +271,9 @@ function dist2(a: Point, b: Point) {
 }
 
 async function warpToCanvas(img: HTMLImageElement, corners: Point[]): Promise<HTMLCanvasElement> {
-  const [tl, tr, br, bl] = corners;
+  const ordered = validateDocumentQuad(corners, img.width, img.height);
+  if (!ordered) throw new Error("Invalid document corners");
+  const [tl, tr, br, bl] = ordered;
   const w = Math.max(1, Math.round(Math.max(dist2(tl, tr), dist2(bl, br))));
   const h = Math.max(1, Math.round(Math.max(dist2(tl, bl), dist2(tr, br))));
 
@@ -225,9 +289,9 @@ async function warpToCanvas(img: HTMLImageElement, corners: Point[]): Promise<HT
       src = cv.imread(img);
       dst = new cv.Mat();
       srcPts = cv.matFromArray(4, 1, cv.CV_32FC2, [tl.x, tl.y, tr.x, tr.y, br.x, br.y, bl.x, bl.y]);
-      dstPts = cv.matFromArray(4, 1, cv.CV_32FC2, [0, 0, w, 0, w, h, 0, h]);
+      dstPts = cv.matFromArray(4, 1, cv.CV_32FC2, [0, 0, w - 1, 0, w - 1, h - 1, 0, h - 1]);
       M = cv.getPerspectiveTransform(srcPts, dstPts);
-      cv.warpPerspective(src, dst, M, new cv.Size(w, h), cv.INTER_LINEAR, cv.BORDER_CONSTANT, new cv.Scalar());
+      cv.warpPerspective(src, dst, M, new cv.Size(w, h), cv.INTER_CUBIC, cv.BORDER_REPLICATE, new cv.Scalar());
       cv.imshow(out, dst);
       return out;
     } catch (e) {
@@ -241,8 +305,7 @@ async function warpToCanvas(img: HTMLImageElement, corners: Point[]): Promise<HT
     }
   }
 
-  // Pure-Canvas fallback: bilinear perspective warp
-  // Uses scanline rendering with barycentric interpolation
+  // Pure-Canvas fallback: true projective warp with bilinear pixel sampling.
   const srcCanvas = document.createElement("canvas");
   srcCanvas.width = img.width;
   srcCanvas.height = img.height;
@@ -254,36 +317,53 @@ async function warpToCanvas(img: HTMLImageElement, corners: Point[]): Promise<HT
   const outData = outCtx.createImageData(w, h);
   const od = outData.data;
 
-  // Compute inverse perspective matrix
-  // Map each output pixel back to source
-  const pts = [
-    [tl.x, tl.y],
-    [tr.x, tr.y],
-    [br.x, br.y],
-    [bl.x, bl.y],
-  ];
-  const dst2src = (dx: number, dy: number): [number, number] => {
-    // Bilinear interpolation of source coordinates
-    const tx = dx / w,
-      ty = dy / h;
-    const sx =
-      (1 - tx) * (1 - ty) * pts[0][0] + tx * (1 - ty) * pts[1][0] + tx * ty * pts[2][0] + (1 - tx) * ty * pts[3][0];
-    const sy =
-      (1 - tx) * (1 - ty) * pts[0][1] + tx * (1 - ty) * pts[1][1] + tx * ty * pts[2][1] + (1 - tx) * ty * pts[3][1];
-    return [sx, sy];
+  const sx = tl.x - tr.x + br.x - bl.x;
+  const sy = tl.y - tr.y + br.y - bl.y;
+  const dx1 = tr.x - br.x;
+  const dy1 = tr.y - br.y;
+  const dx2 = bl.x - br.x;
+  const dy2 = bl.y - br.y;
+  const denom = dx1 * dy2 - dx2 * dy1;
+  const g = Math.abs(denom) < 1e-9 ? 0 : (sx * dy2 - dx2 * sy) / denom;
+  const hh = Math.abs(denom) < 1e-9 ? 0 : (dx1 * sy - sx * dy1) / denom;
+  const a = tr.x - tl.x + g * tr.x;
+  const b = bl.x - tl.x + hh * bl.x;
+  const c = tl.x;
+  const d = tr.y - tl.y + g * tr.y;
+  const e = bl.y - tl.y + hh * bl.y;
+  const f = tl.y;
+
+  const sample = (sxPos: number, syPos: number, channel: number) => {
+    const x0 = Math.max(0, Math.min(img.width - 1, Math.floor(sxPos)));
+    const y0 = Math.max(0, Math.min(img.height - 1, Math.floor(syPos)));
+    const x1 = Math.max(0, Math.min(img.width - 1, x0 + 1));
+    const y1 = Math.max(0, Math.min(img.height - 1, y0 + 1));
+    const fx = sxPos - x0;
+    const fy = syPos - y0;
+    const i00 = (y0 * img.width + x0) * 4 + channel;
+    const i10 = (y0 * img.width + x1) * 4 + channel;
+    const i01 = (y1 * img.width + x0) * 4 + channel;
+    const i11 = (y1 * img.width + x1) * 4 + channel;
+    return (
+      srcData[i00] * (1 - fx) * (1 - fy) +
+      srcData[i10] * fx * (1 - fy) +
+      srcData[i01] * (1 - fx) * fy +
+      srcData[i11] * fx * fy
+    );
   };
 
   for (let dy = 0; dy < h; dy++) {
     for (let dx = 0; dx < w; dx++) {
-      const [sx, sy] = dst2src(dx, dy);
-      const x = Math.max(0, Math.min(img.width - 1, Math.round(sx)));
-      const y = Math.max(0, Math.min(img.height - 1, Math.round(sy)));
-      const si = (y * img.width + x) * 4;
+      const u = w <= 1 ? 0 : dx / (w - 1);
+      const v = h <= 1 ? 0 : dy / (h - 1);
+      const z = g * u + hh * v + 1;
+      const sxPos = Math.max(0, Math.min(img.width - 1, (a * u + b * v + c) / z));
+      const syPos = Math.max(0, Math.min(img.height - 1, (d * u + e * v + f) / z));
       const di = (dy * w + dx) * 4;
-      od[di] = srcData[si];
-      od[di + 1] = srcData[si + 1];
-      od[di + 2] = srcData[si + 2];
-      od[di + 3] = srcData[si + 3];
+      od[di] = sample(sxPos, syPos, 0);
+      od[di + 1] = sample(sxPos, syPos, 1);
+      od[di + 2] = sample(sxPos, syPos, 2);
+      od[di + 3] = sample(sxPos, syPos, 3);
     }
   }
   outCtx.putImageData(outData, 0, 0);
@@ -375,7 +455,38 @@ function DocumentScanner() {
     setCorners([fb.topLeft, fb.topRight, fb.bottomRight, fb.bottomLeft]);
     setDetectionStatus("loading");
 
-    // Strategy 1: AI vision (Gemini) — handles cases heuristics can't
+    await runAutoDetection(img);
+  };
+
+  const runAutoDetection = async (img: HTMLImageElement) => {
+    setDetectionStatus("loading");
+
+    // Strategy 1: local scanner pipeline (OpenCV contours + Canvas fallbacks).
+    // This avoids mistaking full screenshots/windows for the inner paper and is
+    // fast enough for camera use.
+    try {
+      await Promise.race([loadOpenCV(), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000))]);
+    } catch {
+      // OpenCV unavailable — pure-Canvas fallbacks still run below.
+    }
+
+    try {
+      const result = await detectDocumentCorners(img, img.width, img.height);
+      const quad = validateDocumentQuad(
+        clampCorners([result.topLeft, result.topRight, result.bottomRight, result.bottomLeft], img.width, img.height),
+        img.width,
+        img.height,
+      );
+      if (result.detected && quad && isAutoDetectionPlausible(quad, img.width, img.height, img)) {
+        setCorners(quad);
+        setDetectionStatus("detected");
+        return;
+      }
+    } catch (e) {
+      console.warn("Local detection failed, trying AI vision:", e);
+    }
+
+    // Strategy 2: AI vision fallback — handles unusual cases heuristics can't
     // (paper inside a screenshot, low-contrast, uneven lighting, etc.)
     try {
       const { base64, mimeType } = await imageToDownscaledBase64(img, 1024);
@@ -389,29 +500,25 @@ function DocumentScanner() {
         { x: ai.bottomRight.x * img.width, y: ai.bottomRight.y * img.height },
         { x: ai.bottomLeft.x * img.width, y: ai.bottomLeft.y * img.height },
       ];
-      if (validateCornerQuad(pts, img.width, img.height)) {
-        setCorners(pts);
+      const quad = validateDocumentQuad(clampCorners(pts, img.width, img.height), img.width, img.height);
+      if (quad && isAutoDetectionPlausible(quad, img.width, img.height, img)) {
+        setCorners(quad);
         setDetectionStatus("detected");
         return;
       }
     } catch (e) {
-      console.warn("AI detection unavailable, falling back to heuristics:", e);
+      console.warn("AI detection unavailable:", e);
     }
 
-    // Strategy 2: Heuristic pipeline (OpenCV / Sobel / flood-fill)
-    try {
-      await Promise.race([loadOpenCV(), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000))]);
-    } catch {
-      // OpenCV unavailable — pure-Canvas will handle it
-    }
+    const fb = fallbackCorners(img.width, img.height);
+    setCorners([fb.topLeft, fb.topRight, fb.bottomRight, fb.bottomLeft]);
+    setDetectionStatus("fallback");
+  };
 
-    try {
-      const result = await detectDocumentCorners(img, img.width, img.height);
-      setCorners([result.topLeft, result.topRight, result.bottomRight, result.bottomLeft]);
-      setDetectionStatus(result.detected ? "detected" : "fallback");
-    } catch {
-      setDetectionStatus("fallback");
-    }
+  const redetectCurrentPage = async () => {
+    if (!editing) return;
+    const img = await loadImage(editing);
+    await runAutoDetection(img);
   };
 
   const captureFromCamera = async () => {
@@ -628,6 +735,7 @@ function DocumentScanner() {
           filter={filter}
           setFilter={setFilter}
           status={detectionStatus}
+          onRedetect={redetectCurrentPage}
           onCancel={() => {
             setEditing(null);
             setDetectionStatus("idle");
@@ -785,6 +893,7 @@ function EditPanel({
   filter,
   setFilter,
   status,
+  onRedetect,
   onCancel,
   onApply,
 }: {
@@ -795,6 +904,7 @@ function EditPanel({
   filter: FilterMode;
   setFilter: (f: FilterMode) => void;
   status: DetectionStatus;
+  onRedetect: () => void;
   onCancel: () => void;
   onApply: () => void;
 }) {
@@ -990,16 +1100,26 @@ function EditPanel({
         ))}
       </div>
 
-      <div className="mt-4 flex justify-between gap-3">
+      <div className="mt-4 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
         <button
           onClick={onCancel}
           className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-secondary"
         >
           Cancel
         </button>
-        <button onClick={onApply} className="rounded-lg bg-foreground text-background font-medium px-5 py-2">
-          Add page →
-        </button>
+        <div className="flex flex-col gap-3 sm:flex-row">
+          <button
+            onClick={onRedetect}
+            disabled={status === "loading"}
+            className="rounded-lg border border-border px-4 py-2 text-sm font-medium hover:bg-secondary disabled:opacity-50 inline-flex items-center justify-center gap-2"
+          >
+            {status === "loading" ? <Loader2 className="w-4 h-4 animate-spin" /> : <RefreshCw className="w-4 h-4" />}
+            Auto-detect again
+          </button>
+          <button onClick={onApply} className="rounded-lg bg-foreground text-background font-medium px-5 py-2">
+            Add page →
+          </button>
+        </div>
       </div>
     </div>
   );

@@ -27,6 +27,38 @@ import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { loadOpenCV } from "@/utils/opencvLoader";
 import { detectDocumentCorners, fallbackCorners, type Point } from "@/utils/edgeDetection";
+import { detectDocument } from "@/lib/document-detect.functions";
+
+// Downscale an image to a max dimension and return base64 (JPEG) for AI vision
+async function imageToDownscaledBase64(
+  img: HTMLImageElement,
+  maxDim = 1024,
+): Promise<{ base64: string; mimeType: string }> {
+  const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+  const w = Math.max(1, Math.round(img.width * scale));
+  const h = Math.max(1, Math.round(img.height * scale));
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  c.getContext("2d")!.drawImage(img, 0, 0, w, h);
+  const dataUrl = c.toDataURL("image/jpeg", 0.85);
+  const base64 = dataUrl.split(",")[1] ?? "";
+  return { base64, mimeType: "image/jpeg" };
+}
+
+function validateCornerQuad(pts: Point[], w: number, h: number): boolean {
+  if (pts.length !== 4) return false;
+  const [tl, tr, br, bl] = pts;
+  const minSide = Math.min(w, h);
+  const topW = Math.hypot(tr.x - tl.x, tr.y - tl.y);
+  const botW = Math.hypot(br.x - bl.x, br.y - bl.y);
+  const leftH = Math.hypot(bl.x - tl.x, bl.y - tl.y);
+  const rightH = Math.hypot(br.x - tr.x, br.y - tr.y);
+  // Reject degenerate quads (too small or too skewed)
+  if (topW < minSide * 0.15 || botW < minSide * 0.15) return false;
+  if (leftH < minSide * 0.15 || rightH < minSide * 0.15) return false;
+  return true;
+}
 
 export const Route = createFileRoute("/tools/document-scanner")({
   head: () => buildToolMeta(toolBySlug("document-scanner", tools)),
@@ -343,7 +375,30 @@ function DocumentScanner() {
     setCorners([fb.topLeft, fb.topRight, fb.bottomRight, fb.bottomLeft]);
     setDetectionStatus("loading");
 
-    // Try to load OpenCV in background (don't block UI)
+    // Strategy 1: AI vision (Gemini) — handles cases heuristics can't
+    // (paper inside a screenshot, low-contrast, uneven lighting, etc.)
+    try {
+      const { base64, mimeType } = await imageToDownscaledBase64(img, 1024);
+      const ai = await Promise.race([
+        detectDocument({ data: { imageBase64: base64, mimeType } }),
+        new Promise<never>((_, rej) => setTimeout(() => rej(new Error("ai-timeout")), 15000)),
+      ]);
+      const pts: Point[] = [
+        { x: ai.topLeft.x * img.width, y: ai.topLeft.y * img.height },
+        { x: ai.topRight.x * img.width, y: ai.topRight.y * img.height },
+        { x: ai.bottomRight.x * img.width, y: ai.bottomRight.y * img.height },
+        { x: ai.bottomLeft.x * img.width, y: ai.bottomLeft.y * img.height },
+      ];
+      if (validateCornerQuad(pts, img.width, img.height)) {
+        setCorners(pts);
+        setDetectionStatus("detected");
+        return;
+      }
+    } catch (e) {
+      console.warn("AI detection unavailable, falling back to heuristics:", e);
+    }
+
+    // Strategy 2: Heuristic pipeline (OpenCV / Sobel / flood-fill)
     try {
       await Promise.race([loadOpenCV(), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000))]);
     } catch {

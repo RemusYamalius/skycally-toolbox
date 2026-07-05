@@ -129,8 +129,8 @@ export async function detectDocumentCorners(
   // and paper-mask strategies run before broad background/flood-fill fallbacks
   // so screenshots and camera frames do not get mistaken for the document.
   const strategies = [
-    () => detectByPaperMask(imageElement, width, height),
     () => detectByPaperProjection(imageElement, width, height),
+    () => detectByPaperMask(imageElement, width, height),
     () => detectByOpenCVContours(imageElement, width, height),
     () => detectByLargestBlob(imageElement, width, height),
     () => detectByFloodFill(imageElement, width, height),

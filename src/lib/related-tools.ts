@@ -102,8 +102,9 @@ export const relatedToolsMap: Record<string, string[]> = {
   "heart-rate-zone-calculator": ["calorie-calculator", "bmi-calculator", "sleep-calculator", "water-intake-calculator", "unit-converter"],
   "intermittent-fasting-calculator": ["calorie-calculator", "sleep-calculator", "water-intake-calculator", "bmi-calculator", "heart-rate-zone-calculator"],
   "invoice-generator": ["qr-generator", "business-card-generator", "currency-converter", "pdf-reader", "word-processor"],
-  "ai-cover-letter-generator": ["ai-resume-builder", "word-processor", "word-to-pdf", "pdf-text-extractor", "word-counter"],
-  "ai-resume-builder": ["ai-cover-letter-generator", "word-processor", "word-to-pdf", "pdf-text-extractor", "word-counter"],
+  "ai-cover-letter-generator": ["ai-writing-assistant", "ai-resume-builder", "word-processor", "word-to-pdf", "pdf-text-extractor", "word-counter"],
+  "ai-resume-builder": ["ai-writing-assistant", "ai-cover-letter-generator", "word-processor", "word-to-pdf", "pdf-text-extractor", "word-counter"],
+  "ai-writing-assistant": ["ai-email-writer", "ai-cover-letter-generator", "ai-resume-builder", "word-counter", "word-processor"],
 };
 
 

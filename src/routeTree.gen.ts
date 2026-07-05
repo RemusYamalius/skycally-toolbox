@@ -133,6 +133,7 @@ import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
+import { Route as ToolsAiWritingAssistantRouteImport } from './routes/tools.ai-writing-assistant'
 import { Route as ToolsAiResumeBuilderRouteImport } from './routes/tools.ai-resume-builder'
 import { Route as ToolsAiEmailWriterRouteImport } from './routes/tools.ai-email-writer'
 import { Route as ToolsAiCoverLetterGeneratorRouteImport } from './routes/tools.ai-cover-letter-generator'
@@ -773,6 +774,11 @@ const ToolsAudioConverterRoute = ToolsAudioConverterRouteImport.update({
   path: '/tools/audio-converter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAiWritingAssistantRoute = ToolsAiWritingAssistantRouteImport.update({
+  id: '/tools/ai-writing-assistant',
+  path: '/tools/ai-writing-assistant',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsAiResumeBuilderRoute = ToolsAiResumeBuilderRouteImport.update({
   id: '/tools/ai-resume-builder',
   path: '/tools/ai-resume-builder',
@@ -864,6 +870,7 @@ export interface FileRoutesByFullPath {
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
+  '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
@@ -1003,6 +1010,7 @@ export interface FileRoutesByTo {
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
+  '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
@@ -1143,6 +1151,7 @@ export interface FileRoutesById {
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
+  '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
@@ -1284,6 +1293,7 @@ export interface FileRouteTypes {
     | '/tools/ai-cover-letter-generator'
     | '/tools/ai-email-writer'
     | '/tools/ai-resume-builder'
+    | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/ball-sort'
@@ -1423,6 +1433,7 @@ export interface FileRouteTypes {
     | '/tools/ai-cover-letter-generator'
     | '/tools/ai-email-writer'
     | '/tools/ai-resume-builder'
+    | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/ball-sort'
@@ -1562,6 +1573,7 @@ export interface FileRouteTypes {
     | '/tools/ai-cover-letter-generator'
     | '/tools/ai-email-writer'
     | '/tools/ai-resume-builder'
+    | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/ball-sort'
@@ -1702,6 +1714,7 @@ export interface RootRouteChildren {
   ToolsAiCoverLetterGeneratorRoute: typeof ToolsAiCoverLetterGeneratorRoute
   ToolsAiEmailWriterRoute: typeof ToolsAiEmailWriterRoute
   ToolsAiResumeBuilderRoute: typeof ToolsAiResumeBuilderRoute
+  ToolsAiWritingAssistantRoute: typeof ToolsAiWritingAssistantRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBallSortRoute: typeof ToolsBallSortRoute
@@ -2693,6 +2706,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAudioConverterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/ai-writing-assistant': {
+      id: '/tools/ai-writing-assistant'
+      path: '/tools/ai-writing-assistant'
+      fullPath: '/tools/ai-writing-assistant'
+      preLoaderRoute: typeof ToolsAiWritingAssistantRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/ai-resume-builder': {
       id: '/tools/ai-resume-builder'
       path: '/tools/ai-resume-builder'
@@ -2809,6 +2829,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAiCoverLetterGeneratorRoute: ToolsAiCoverLetterGeneratorRoute,
   ToolsAiEmailWriterRoute: ToolsAiEmailWriterRoute,
   ToolsAiResumeBuilderRoute: ToolsAiResumeBuilderRoute,
+  ToolsAiWritingAssistantRoute: ToolsAiWritingAssistantRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBallSortRoute: ToolsBallSortRoute,

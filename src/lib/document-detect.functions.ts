@@ -15,9 +15,11 @@ export interface NormalizedCorners {
   bottomLeft: { x: number; y: number };
 }
 
-const SYSTEM_PROMPT = `You are a document-boundary detector for a scanner app.
-Look at the image and find the SINGLE MOST PROMINENT paper / document / receipt / card / screen that the user wants to scan.
-If the image contains a photo of a computer screen or a window showing a document, detect the piece of paper INSIDE that screen (the actual document content), NOT the outer screen or window frame.
+const SYSTEM_PROMPT = `You are a professional document-boundary detector for a scanner app.
+Find the exact four visible corners of the actual paper/document/receipt/card page the user wants to scan.
+Ignore every outer container: phone screen, monitor screen, browser window, PDF reader window, Adobe Reader UI, black camera bars, table/background, shadows, page preview frame, and any crop already drawn by the app.
+If a screenshot or camera photo contains a document inside another screen/window, detect ONLY the inner paper/document content, not the outer screen/window/viewer frame.
+Prefer the page boundary even when the paper is grey, low contrast, skewed, folded, or partly surrounded by dark margins.
 Return ONLY a compact JSON object — no prose, no markdown, no code fences — with this exact shape:
 {"tl":{"x":0.00,"y":0.00},"tr":{"x":1.00,"y":0.00},"br":{"x":1.00,"y":1.00},"bl":{"x":0.00,"y":1.00}}
 All x/y are normalized floats in [0,1] relative to image width/height (x = horizontal, y = vertical from top).

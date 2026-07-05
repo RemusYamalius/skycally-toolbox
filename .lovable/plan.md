@@ -1,51 +1,58 @@
-## AI Writing Assistant — Implementation Plan
+## تقييم المشكلة
 
-Build a new tool at `/tools/ai-writing-assistant` combining Grammar Checker, Paraphraser, and Text Summarizer in a tabbed interface, matching the project's existing tool patterns.
+المشكل واضح من الصورتين: الأداة لا تميّز “الورقة/المستند” كهدف مستقل، بل تختار أحياناً إطار الصورة أو مساحة سوداء/نافذة البرنامج المحيطة بالمستند. لذلك تظهر نقاط القص على حدود خاطئة، وبعد الضغط على Add page لا يحدث تحويل احترافي إلى ورقة مستقيمة بزوايا قائمة.
 
-### ⚠️ One deviation from the spec (security)
+السبب التقني الرئيسي:
+- الاكتشاف الحالي يعتمد كثيراً على أكبر منطقة فاتحة/حواف عامة، وهذا يفشل عندما تكون الصورة لقطة شاشة فيها نافذة PDF، أو ورقة فوق خلفية قريبة اللون، أو مستند صغير وسط إطار كبير.
+- دالة التحقق من النتيجة تقبل رباعياً كبيراً جداً حتى لو لم يكن هو الورقة الفعلية.
+- التحويل المنظوري موجود، لكنه لا يعطي نتيجة صحيحة إذا كانت الزوايا المدخلة خاطئة.
+- لا يوجد “اختبار جودة” بعد الاكتشاف لرفض الإطار الخارجي والبحث عن مستند داخلي أصغر وأكثر منطقية.
 
-The spec says to call the Lovable AI gateway directly from the browser using `VITE_LOVABLE_API_KEY`. I will **not** do that. Reasons:
+## خطة الإصلاح
 
-- `LOVABLE_API_KEY` is a workspace-billed secret that must stay server-side. Exposing it via `VITE_*` puts it in the client bundle where anyone can extract and drain project credits.
-- The reference tool the spec points to (`tools.ai-cover-letter-generator.tsx`) does **not** use client-side fetch — it calls `generateCoverLetter` from `src/lib/ai-cover-letter.functions.ts`, a `createServerFn`. I'll follow that exact same pattern.
+1. تحسين منطق اكتشاف المستند في `src/utils/edgeDetection.ts`
+   - إضافة مسار OpenCV حقيقي يعتمد على:
+     - grayscale + blur
+     - adaptive/Canny edges
+     - morphology close/open
+     - `findContours`
+     - `approxPolyDP`
+     - اختيار أفضل رباعي مستند حسب المساحة، التحدب، النسبة، وموقعه داخل الصورة.
+   - البحث عن المستند الداخلي وليس الإطار الخارجي عبر استبعاد الرباعيات التي تلامس حواف الصورة كثيراً أو تغطي مساحة مبالغاً فيها عندما يوجد رباعي داخلي أفضل.
+   - دعم صور مثل المرفقات: مستند داخل نافذة PDF أو مستند داخل مساحة سوداء/كاميرا.
 
-The spec's "no createServerFn / no useCallback(async)" rule was to avoid a specific Rollup build error. I'll still avoid `useCallback(async …)` at component level and use plain function declarations with `.then/.catch/.finally` on the client — that constraint stands. Only the transport changes to a server function.
+2. تحسين AI vision fallback في `src/lib/document-detect.functions.ts`
+   - تعديل البرومبت ليطلب صراحةً تجاهل: شاشة الكمبيوتر، قارئ PDF، الخلفية السوداء، النافذة، الهوامش، وأي إطار خارجي.
+   - إرجاع درجة ثقة تقريبية/سبب اختياري إن أمكن، أو على الأقل جعل اختيار الورقة الفعلية أكثر صرامة.
+   - الحفاظ على المفتاح في السيرفر فقط كما هو الآن.
 
-If you want the insecure client-side fetch anyway, tell me and I'll switch it.
+3. إضافة طبقة تحقق وترتيب للزوايا في `src/routes/tools.document-scanner.tsx`
+   - رفض أي اكتشاف يغطي تقريباً الصورة كلها إذا كان المستند المرئي أصغر.
+   - إعادة ترتيب الزوايا دائماً قبل العرض والتحويل.
+   - تقليص/ضبط الزوايا إلى حدود الصورة ومنع الرباعيات المتقاطعة أو غير المحدبة.
+   - عند فشل AI أو OpenCV، إظهار fallback واضح فقط، لا رسالة “Document detected” على اختيار غير صحيح.
 
-### Files to create
+4. تحسين التحويل المنظوري وجودة الناتج
+   - ضبط أبعاد الإخراج لتكون مستنداً قائماً بنسبة منطقية، مع تدوير تلقائي إذا كان العرض/الطول معكوساً.
+   - استخدام OpenCV `warpPerspective` كمسار أساسي عندما يكون متاحاً، مع fallback Canvas فقط عند الضرورة.
+   - تطبيق فلتر Magic بعد القص على الورقة فقط، وليس على الصورة الكاملة.
 
-1. **`src/lib/ai-writing-assistant.functions.ts`** — one `createServerFn` (`runWritingAssistant`) with a Zod validator dispatching on `mode: "grammar" | "paraphrase" | "summarize"` plus per-mode options (paraphrase style; summary length & format). Reads `LOVABLE_API_KEY` inside `.handler()`, calls `google/gemini-3-flash-preview` (project default — spec's `gemini-2.0-flash-001` is not in the allowlist), maps 429/402/other to `RATE_LIMITED`/`CREDITS_EXHAUSTED`/`GENERATION_FAILED`.
+5. تحسين تجربة المستخدم داخل لوحة التحرير
+   - إضافة زر “Auto-detect again” لإعادة المحاولة دون إعادة رفع الصورة.
+   - جعل رسالة الحالة أكثر صدقاً: Detected / Needs adjustment / Manual selection.
+   - إبقاء إمكانية السحب اليدوي، لكنها تصبح خيار تصحيح لا الحل الأساسي.
 
-2. **`src/routes/tools.ai-writing-assistant.tsx`** — the route/UI:
-   - `Route` with `head: () => buildToolMeta(toolBySlug("ai-writing-assistant", tools))`
-   - `ToolPageShell` → Tabs (Grammar / Paraphrase / Summarize) → per-tab input+output → `AdZone id="ai-writing-assistant-mid" size="728x90"` → `HowToUse` → `ToolSeoContent` → `RelatedTools`
-   - Two-column desktop / single-column mobile
-   - Char counters (5000 / 3000 / 8000), clear button, copy button, skeleton loader, `aria-live="polite"` output, fade-in via framer-motion
-   - Paraphrase: 6 pill modes + regenerate + optional "Show comparison" toggle (naive word-diff between original and paraphrase, red strikethrough on removed / green highlight on added)
-   - Summarize: length radio (short/medium/detailed, default medium) + style pills (paragraph/bullets/takeaways)
-   - Handlers as plain `function submitGrammar() { … .then().catch().finally() }`, guarded by a `useRef<number>` 500ms debounce
-   - Persist `{ activeTab, grammarInput, paraphraseInput, paraphraseMode, summarizeInput, summarizeLength, summarizeStyle }` to `localStorage["ai-writing-assistant-state"]`
-   - Word-count comparison badge on paraphrase; "Reduced from X → Y (Z% shorter)" badge on summary; grammar output splits on `--- Changes ---` to render corrected text card + changes list
+6. التحقق العملي
+   - اختبار الأداة على الصورتين المرفقتين عبر المتصفح.
+   - التأكد أن الإطار الأزرق يحيط بالورقة نفسها في كل صورة، لا النافذة أو الخلفية.
+   - التأكد بعد Add page أن الناتج ورقة مستقيمة بزوايا قائمة قدر الإمكان.
 
-### Files to edit
+## النتيجة المتوقعة
 
-3. **`src/lib/tools.ts`** — register the new tool (slug `ai-writing-assistant`, name "AI Writing Assistant", `PenLine` icon, path `/tools/ai-writing-assistant`, category matching existing AI tools, the SEO description from the spec).
-4. **`src/lib/related-tools.ts`** — if it uses an explicit map, add related list: `ai-email-writer`, `ai-cover-letter-generator`, `ai-resume-builder`, `word-counter`, `word-processor`. Otherwise rely on category matching.
-5. **`public/sitemap.xml`** — add the new URL.
+بعد التنفيذ، يجب أن تتعامل الأداة باحترافية مع الحالات الواقعية التالية:
+- ورقة داخل لقطة شاشة أو PDF viewer.
+- ورقة مصورة من كاميرا مع ميلان/اعوجاج.
+- ورقة على خلفية سوداء أو غير متجانسة.
+- مستند صغير نسبياً داخل صورة أكبر.
 
-`src/routeTree.gen.ts` regenerates automatically — I won't touch it.
-
-### SEO
-
-Use the spec's title, description, 4 SEO paragraphs, and 8 FAQs verbatim via `ToolSeoContent`. `SoftwareApplication` JSON-LD is emitted by `buildToolMeta` already. Canonical + og:url resolve to `https://skycally.com/tools/ai-writing-assistant` via `buildToolMeta`.
-
-### Prompts
-
-Grammar / paraphrase / summarize system prompts exactly as in the spec, including the "corrected text + blank line + `--- Changes ---` + bullet list" grammar format so the UI can split it.
-
-### Non-goals
-
-- No new npm packages.
-- No changes to existing tools.
-- No server route under `src/routes/api/` — server function is the right surface for this typed RPC.
+الهدف ليس مجرد تحسين بسيط، بل نقل الأداة من “تخمين مستطيل عام” إلى pipeline أقرب لتطبيقات Scanner الاحترافية: اكتشاف رباعي صحيح، رفض النتائج الخاطئة، ثم تصحيح منظور فعلي.

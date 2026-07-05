@@ -103,6 +103,7 @@ import {
   FileSignature,
   Timer,
   Mail,
+  PenLine,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1155,6 +1156,16 @@ export const tools: Tool[] = [
     category: "ai",
     icon: Mail,
     path: "/tools/ai-email-writer",
+  },
+  {
+    slug: "ai-writing-assistant",
+    name: "AI Writing Assistant",
+    description:
+      "Free AI writing assistant — check grammar, paraphrase text, and summarize documents instantly. No signup, no limits, powered by AI.",
+    category: "ai",
+    categories: ["ai", "text"],
+    icon: PenLine,
+    path: "/tools/ai-writing-assistant",
   },
 ];
 

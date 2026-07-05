@@ -27,6 +27,38 @@ import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { loadOpenCV } from "@/utils/opencvLoader";
 import { detectDocumentCorners, fallbackCorners, type Point } from "@/utils/edgeDetection";
+import { detectDocument } from "@/lib/document-detect.functions";
+
+// Downscale an image to a max dimension and return base64 (JPEG) for AI vision
+async function imageToDownscaledBase64(
+  img: HTMLImageElement,
+  maxDim = 1024,
+): Promise<{ base64: string; mimeType: string }> {
+  const scale = Math.min(1, maxDim / Math.max(img.width, img.height));
+  const w = Math.max(1, Math.round(img.width * scale));
+  const h = Math.max(1, Math.round(img.height * scale));
+  const c = document.createElement("canvas");
+  c.width = w;
+  c.height = h;
+  c.getContext("2d")!.drawImage(img, 0, 0, w, h);
+  const dataUrl = c.toDataURL("image/jpeg", 0.85);
+  const base64 = dataUrl.split(",")[1] ?? "";
+  return { base64, mimeType: "image/jpeg" };
+}
+
+function validateCornerQuad(pts: Point[], w: number, h: number): boolean {
+  if (pts.length !== 4) return false;
+  const [tl, tr, br, bl] = pts;
+  const minSide = Math.min(w, h);
+  const topW = Math.hypot(tr.x - tl.x, tr.y - tl.y);
+  const botW = Math.hypot(br.x - bl.x, br.y - bl.y);
+  const leftH = Math.hypot(bl.x - tl.x, bl.y - tl.y);
+  const rightH = Math.hypot(br.x - tr.x, br.y - tr.y);
+  // Reject degenerate quads (too small or too skewed)
+  if (topW < minSide * 0.15 || botW < minSide * 0.15) return false;
+  if (leftH < minSide * 0.15 || rightH < minSide * 0.15) return false;
+  return true;
+}
 
 export const Route = createFileRoute("/tools/document-scanner")({
   head: () => buildToolMeta(toolBySlug("document-scanner", tools)),

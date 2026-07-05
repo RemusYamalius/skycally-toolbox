@@ -82,6 +82,8 @@ export function validateDocumentQuad(pts: Point[], width: number, height: number
   const rightH = Math.hypot(quad[2].x - quad[1].x, quad[2].y - quad[1].y);
   const minSide = Math.min(width, height);
   if (Math.min(topW, botW) < minSide * 0.08 || Math.min(leftH, rightH) < minSide * 0.12) return null;
+  if (Math.min(topW, botW) / Math.max(topW, botW) < 0.45) return null;
+  if (Math.min(leftH, rightH) / Math.max(leftH, rightH) < 0.62) return null;
 
   const avgW = (topW + botW) / 2;
   const avgH = (leftH + rightH) / 2;

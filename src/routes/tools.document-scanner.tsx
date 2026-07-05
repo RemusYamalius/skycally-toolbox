@@ -375,7 +375,30 @@ function DocumentScanner() {
     setCorners([fb.topLeft, fb.topRight, fb.bottomRight, fb.bottomLeft]);
     setDetectionStatus("loading");
 
-    // Try to load OpenCV in background (don't block UI)
+    // Strategy 1: AI vision (Gemini) — handles cases heuristics can't
+    // (paper inside a screenshot, low-contrast, uneven lighting, etc.)
+    try {
+      const { base64, mimeType } = await imageToDownscaledBase64(img, 1024);
+      const ai = await Promise.race([
+        detectDocument({ data: { imageBase64: base64, mimeType } }),
+        new Promise<never>((_, rej) => setTimeout(() => rej(new Error("ai-timeout")), 15000)),
+      ]);
+      const pts: Point[] = [
+        { x: ai.topLeft.x * img.width, y: ai.topLeft.y * img.height },
+        { x: ai.topRight.x * img.width, y: ai.topRight.y * img.height },
+        { x: ai.bottomRight.x * img.width, y: ai.bottomRight.y * img.height },
+        { x: ai.bottomLeft.x * img.width, y: ai.bottomLeft.y * img.height },
+      ];
+      if (validateCornerQuad(pts, img.width, img.height)) {
+        setCorners(pts);
+        setDetectionStatus("detected");
+        return;
+      }
+    } catch (e) {
+      console.warn("AI detection unavailable, falling back to heuristics:", e);
+    }
+
+    // Strategy 2: Heuristic pipeline (OpenCV / Sobel / flood-fill)
     try {
       await Promise.race([loadOpenCV(), new Promise((_, rej) => setTimeout(() => rej(new Error("timeout")), 8000))]);
     } catch {

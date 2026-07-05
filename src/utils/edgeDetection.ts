@@ -204,8 +204,8 @@ function detectByPaperProjection(
     return bestStart >= 0 ? { start: bestStart, end: bestEnd } : null;
   };
 
-  const xr = longestRun(col, sh * 0.16, sw * 0.08);
-  const yr = longestRun(row, sw * 0.12, sh * 0.12);
+  const xr = longestRun(col, sh * 0.1, sw * 0.08);
+  const yr = longestRun(row, sw * 0.07, sh * 0.12);
   if (!xr || !yr) return null;
 
   // Tighten bounds inside the coarse projected page area.
@@ -424,12 +424,15 @@ function detectByPaperMask(
 
     const docMask = new Uint8Array(sw * sh).fill(1);
     for (let i = 0; i < labels.length; i++) if (labels[i] === label) docMask[i] = 0;
-    const corners = findDocumentCorners(docMask, sw, sh, minX, maxX, minY, maxY);
-    if (corners) {
-      const raw = corners.map((p) => ({ x: p.x / scale, y: p.y / scale }));
-      const quad = validateDocumentQuad(raw, width, height);
-      if (quad) candidates.push({ quad, area: size / (scale * scale), score: scoreDocumentQuad(quad, width, height, size / (scale * scale)) });
-    }
+    const pad = Math.max(2, Math.round(Math.min(sw, sh) * 0.01));
+    const raw = [
+      { x: (minX - pad) / scale, y: (minY - pad) / scale },
+      { x: (maxX + pad) / scale, y: (minY - pad) / scale },
+      { x: (maxX + pad) / scale, y: (maxY + pad) / scale },
+      { x: (minX - pad) / scale, y: (maxY + pad) / scale },
+    ];
+    const quad = validateDocumentQuad(raw, width, height);
+    if (quad) candidates.push({ quad, area: size / (scale * scale), score: scoreDocumentQuad(quad, width, height, size / (scale * scale)) });
     label++;
   }
 

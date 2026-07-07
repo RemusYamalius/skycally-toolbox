@@ -161,7 +161,7 @@ function ImageResizer() {
       ) : (
         <div className="grid gap-6 lg:grid-cols-[1fr_320px]">
           <div className="rounded-2xl border border-border bg-card p-4 flex items-center justify-center min-h-[320px]">
-            <img src={previewUrl.current} alt="preview" className="max-h-[420px] w-auto rounded-xl" />
+            <img src={previewUrl.current} alt="Image resizing preview" className="max-h-[420px] w-auto rounded-xl" />
           </div>
           <div className="space-y-5">
             <div className="rounded-xl border border-border bg-card/50 p-4 text-sm">

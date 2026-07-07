@@ -43,7 +43,7 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/png", href: "/favicon.png?v=2" },
       { rel: "shortcut icon", type: "image/png", href: "/favicon.png?v=2" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png?v=2" },
-      { rel: "stylesheet", href: appCss },
+      { rel: "stylesheet", href: appCss, fetchpriority: "high" } as any,
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "preload", as: "style", href: FONTS_HREF },

@@ -27,6 +27,7 @@ export const Route = createRootRoute({
     meta: [
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
+      { name: "google-site-verification", content: "2hyKSKE090h_itU_-4tDUKfls2uyYJjxHoPwWazd__A" },
       { title: "Skycally — Every Tool You Need, Free" },
       { name: "description", content: "Download videos from TikTok, Instagram & YouTube. Convert images, merge PDFs, remove backgrounds — free, fast, no signup." },
       { property: "og:title", content: "Skycally — Every Tool You Need, Free" },

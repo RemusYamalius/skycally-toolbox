@@ -1,82 +1,65 @@
-## PageSpeed Insights — تشخيص وحلول
+## تشخيص دقيق للتراجع (75 → 64)
 
-### النتائج
-- **Mobile**: Performance 75 · FCP 3.9s · LCP 4.4s · Speed Index 3.9s
-- **Desktop**: Performance 97 (ممتاز، لا تغييرات ضرورية)
-- Accessibility 94 · Best Practices 100 · SEO 100
+قراءة الصور المرفقة بندًا ببند:
 
-المشاكل الحقيقية تخص الموبايل فقط.
+| المقياس | قبل | الآن | الحكم |
+|---|---|---|---|
+| Performance | 75 | **64** | تراجُع |
+| FCP | 3.9s | 1.7s | تحسّن |
+| LCP | 4.4s | 4.3s | ثابت |
+| **CLS** | ~0 | **0.484** | كارثي — جديد |
+| TBT | – | 40ms | جيد |
 
-### المشاكل المكتشفة من التقارير
+### السبب الجذري للتراجع
+"Layout shift culprits" يشير مباشرةً إلى `<main class="flex-1">` بقيمة **0.482** — أي أن الجولة السابقة (تحويل `styles.css` إلى `preload` + قلب `media` بعد التحميل) جعلت الصفحة تُرسم أولاً بلا Tailwind ثم تقفز عند وصول CSS. هذا هو ما أسقط الأداء من 75 إلى 64. FCP تحسّن ظاهريًا لأنه يقيس أول بكسل مرسوم — ولو كان بلا أنماط.
 
-1. **Render-blocking CSS (~50ms + سلسلة حرجة 1.27s)**
-   `styles.css` (26 KB) و `main.css` (1.5 KB) يُحمَّلان بشكل متسلسل ويحجبان أول رسم للصفحة. هذا هو السبب الرئيسي لـ LCP=4.4s على الموبايل.
-
-2. **Use efficient cache lifetimes (توفير 25 KiB)**
-   - `/logo.webp`: PSI يقرأ Cache-Control = None رغم وجود القاعدة في `public/_headers`. القاعدة صحيحة لكن يبدو أنها لا تُطبَّق على ملفات الجذر (`public/*`) — فقط `/assets/*` تعمل.
-   - `~flockjs` (25m) و `productHunt` badge (4h / 1d) — طرف ثالث، لا نتحكم بأعمارها.
-
-3. **Improve image delivery (~9 KB)**
-   `logo.webp` (10 KB) يمكن تصغيره قليلاً بأبعاد أدق.
-
-4. **Network dependency chain**
-   HTML → styles.css → main.css. طول المسار الحرج 1268ms على الموبايل.
-
----
-
-### خطة الإصلاح
-
-**1. إلغاء حجب CSS للعرض الأولي** (المكسب الأكبر ~1.5-2s على LCP للموبايل)
-
-في `src/routes/__root.tsx`: تحويل تحميل الـ stylesheet الرئيسي (`appCss`) إلى تحميل غير حاجب باستخدام حيلة `media="print"` + `onload="this.media='all'"`، مع إبقاء الـ inline critical CSS الحالي في `RootShell` كما هو حتى لا يظهر flash of unstyled content.
-
-```tsx
-// بدل: { rel: "stylesheet", href: appCss }
-// نستخدم:
-{ rel: "preload", as: "style", href: appCss },
-// ونضيف سكربت صغير مثل الذي يحمّل الخطوط، يقلب media إلى 'all' بعد التحميل
-// مع <noscript><link rel="stylesheet" href={appCss} /></noscript> للاحتياط
-```
-
-هذا يزيل الحاجب الرئيسي دون أي تغيير بصري.
-
-**2. توسيع critical CSS المضمَّن (inline)**
-
-الـ inline style block الحالي في `RootShell` صغير جداً. سأضيف إليه القواعد الأساسية للـ hero + header فقط (bg-hero gradient, layout dimensions, نص العنوان) لضمان LCP نظيف قبل وصول الـ CSS الرئيسي. ~1-2 KB إضافية inline فقط.
-
-**3. تصحيح رؤوس الكاش لملفات الجذر**
-
-تعديل `public/_headers` ليشمل قواعد صريحة لكل ملف ثابت في الجذر:
-```
-/logo.webp        → immutable 1y
-/favicon.png      → immutable 1y
-/apple-touch-icon.png → immutable 1y
-/robots.txt       → max-age=3600
-/sitemap.xml      → max-age=3600
-```
-مع التحقق من أن Lovable/Cloudflare يطبّق `_headers` على مسارات الجذر (سنعرف من فحص PSI التالي بعد النشر).
-
-**4. لا نغيّر ما هو خارج نطاقنا**
-- `~flockjs` هو سكربت Lovable analytics (شارة الموقع). لا تعديل.
-- Product Hunt badge — طرف ثالث.
-- الخطوط والـ Google Analytics: مؤجلة بالفعل بشكل صحيح.
+### باقي المشاكل من الصور
+1. **Render-blocking**: `main-BTstU0EP.css` (1.8KB, 450ms) — chunk تلقائي من Vite، ليس `styles.css`.
+2. **Cache "None" على `/logo.webp`**: قواعد `public/_headers` موجودة لكن استضافة Lovable لا تُطبّقها على ملفات الجذر (فقط `/assets/*` تعمل). خارج تحكّمنا.
+3. **Improve image delivery**: `logo.webp` = 400×69 بينما يُعرض بـ 200×35 (خسارة ~6KB).
+4. **Fazier badge**: `width=120` بدون `height` → مساهم صغير في CLS.
+5. **Reduce unused JS 240KB**: `main-*.js` 330KB — الصفحة الرئيسية تحمّل framer-motion + كل بطاقات الأدوات. تحسين حقيقي لكنه إعادة هيكلة كبيرة، ليس هدف هذه الجولة.
+6. **`~flockjs` و Product Hunt و gtag**: طرف ثالث، مؤجّل بالفعل.
 
 ---
 
-### ما لن أفعله (وأسبابه)
-- **لن أُزيل framer-motion أو أعيد كتابة الصفحة الرئيسية.** المشكلة CSS-blocking وليست JS.
-- **لن ألمس Desktop** — 97/100 لا يحتاج شيئاً.
-- **لن أُقلّل حجم Tailwind CSS** — 26KB (مضغوط ~7KB) طبيعي ومقبول بمجرد إزالة الحجب.
+## الإصلاحات المقترحة (نطاق ضيق ومحسوب)
+
+### 1. التراجع عن تأجيل CSS — الأولوية القصوى
+في `src/routes/__root.tsx`:
+- إعادة `appCss` إلى `{ rel: "stylesheet", href: appCss }` (تحميل حاجب طبيعي).
+- إبقاء الخطوط مؤجّلة (`preload as=style` + قلب `media`) — الخطوط لا تسبب CLS لأن `font-display: swap` وسنستخدم `system-ui` أثناء التبديل، والنص في الـ hero ليس LCP.
+- تبسيط سكربت `load()` ليحمّل الخطوط فقط، لا `appCss`.
+- تنظيف `<noscript>`.
+- إبقاء الـ inline critical CSS الحالي (لا ضرر منه).
+
+النتيجة المتوقعة: **CLS يعود إلى 0**، LCP يتحسّن قليلاً لأن CSS الحاجب صغير جدًا (~7KB مضغوط)، والأداء يعود إلى 90+ بدلًا من 64.
+
+### 2. تصغير `logo.webp` إلى الحجم المعروض فعليًا
+- إعادة تشفير `public/logo.webp` بأبعاد 240×41 (2× للشاشات عالية الكثافة، بدل 400×69).
+- الحجم المتوقع: ~4-5KB بدل 10KB.
+- لا تغيير على `<img>` (يبقى `width=200 height=35`).
+
+### 3. Fazier badge — إضافة `height`
+في `src/components/site-footer.tsx` السطر 226: إضافة `height={26}` بجانب `width={120}` لإزالة CLS الصغير.
+
+### 4. لن نلمس
+- `_headers` (القواعد صحيحة، المشكلة في الاستضافة).
+- `main-*.js` (240KB unused) — إعادة هيكلة كبيرة تستحق جولة منفصلة.
+- Desktop 97 — لا داعي.
 
 ---
 
-### التحقق بعد التطبيق
-بعد النشر، أعد تشغيل PSI. المتوقع:
-- Mobile LCP: 4.4s → ~2.5s
-- Mobile FCP: 3.9s → ~2.0s
-- Mobile Performance: 75 → 90+
-- Cache lifetimes: يجب أن تختفي `logo.webp` من قائمة "None"
+## الملفات المتغيّرة
+- `src/routes/__root.tsx` — تراجع عن defer لـ appCss فقط، إبقاء تأجيل الخطوط.
+- `public/logo.webp` — إعادة تشفير بأبعاد أصغر (سكربت Python + Pillow).
+- `src/components/site-footer.tsx` — إضافة `height` لبادج Fazier.
 
-### الملفات المتغيّرة
-- `src/routes/__root.tsx` — تحويل appCss إلى تحميل async + توسيع critical inline CSS
-- `public/_headers` — إضافة قواعد كاش لملفات الجذر
+## المتوقّع بعد النشر
+- Mobile Performance: 64 → **90+**
+- CLS: 0.484 → **< 0.05**
+- LCP: 4.3s → **~2.2s**
+- Total transfer: -6KB (logo)
+
+## اعتذار صريح
+الجولة السابقة كانت خطأ في الحكم: مقايضة LCP نظرية مقابل CLS حقيقي. أعتذر عن التراجع، والخطة أعلاه تُصحّحه بدقة.

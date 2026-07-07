@@ -43,15 +43,16 @@ export const Route = createRootRoute({
       { rel: "icon", type: "image/png", href: "/favicon.png?v=2" },
       { rel: "shortcut icon", type: "image/png", href: "/favicon.png?v=2" },
       { rel: "apple-touch-icon", sizes: "180x180", href: "/apple-touch-icon.png?v=2" },
-      { rel: "stylesheet", href: appCss },
+      { rel: "preload", as: "style", href: appCss },
       { rel: "preconnect", href: "https://fonts.googleapis.com" },
       { rel: "preconnect", href: "https://fonts.gstatic.com", crossOrigin: "anonymous" },
       { rel: "preload", as: "style", href: FONTS_HREF },
     ],
     scripts: [
       {
-        children: `(function(){var l=document.createElement('link');l.rel='stylesheet';l.href=${JSON.stringify(FONTS_HREF)};l.media='print';l.onload=function(){l.media='all'};document.head.appendChild(l);})();`,
+        children: `(function(){function load(h){var l=document.createElement('link');l.rel='stylesheet';l.href=h;l.media='print';l.onload=function(){l.media='all'};document.head.appendChild(l);}load(${JSON.stringify(appCss)});load(${JSON.stringify(FONTS_HREF)});})();`,
       },
+      
       
       {
         children: `window.addEventListener('load',function(){setTimeout(function(){var s=document.createElement('script');s.async=true;s.src='https://www.googletagmanager.com/gtag/js?id=G-WHRM5Z08KR';document.head.appendChild(s);window.dataLayer=window.dataLayer||[];function gtag(){dataLayer.push(arguments);}gtag('js',new Date());gtag('config','G-WHRM5Z08KR');},3000);});`,

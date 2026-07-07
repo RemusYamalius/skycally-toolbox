@@ -1,42 +1,82 @@
-## Goal
+## PageSpeed Insights — تشخيص وحلول
 
-Fix the failing "Google Search Console isn't fully set up" finding by connecting GSC to the project, verifying ownership of `https://skycally.com/`, and submitting the sitemap.
+### النتائج
+- **Mobile**: Performance 75 · FCP 3.9s · LCP 4.4s · Speed Index 3.9s
+- **Desktop**: Performance 97 (ممتاز، لا تغييرات ضرورية)
+- Accessibility 94 · Best Practices 100 · SEO 100
 
-## Steps
+المشاكل الحقيقية تخص الموبايل فقط.
 
-1. **Trigger the GSC connector**
-   - Call `standard_connectors--connect` with `connector_id: "google_search_console"`.
-   - This opens the OAuth authorization card in chat. You sign in with the Google account that will own the Search Console property.
-   - Wait for the connection to land before continuing.
+### المشاكل المكتشفة من التقارير
 
-2. **Request a META verification token**
-   - Call the Site Verification API through the connector gateway to request a `META` token for `https://skycally.com/`.
-   - The response is a full `google-site-verification` content string.
+1. **Render-blocking CSS (~50ms + سلسلة حرجة 1.27s)**
+   `styles.css` (26 KB) و `main.css` (1.5 KB) يُحمَّلان بشكل متسلسل ويحجبان أول رسم للصفحة. هذا هو السبب الرئيسي لـ LCP=4.4s على الموبايل.
 
-3. **Add the verification meta tag to the site**
-   - Insert `<meta name="google-site-verification" content="…" />` into the `head()` of `src/routes/__root.tsx` so it renders on every page (including the homepage that Google will fetch).
-   - This requires a build-mode edit and a publish so the tag is live on `https://skycally.com/`.
+2. **Use efficient cache lifetimes (توفير 25 KiB)**
+   - `/logo.webp`: PSI يقرأ Cache-Control = None رغم وجود القاعدة في `public/_headers`. القاعدة صحيحة لكن يبدو أنها لا تُطبَّق على ملفات الجذر (`public/*`) — فقط `/assets/*` تعمل.
+   - `~flockjs` (25m) و `productHunt` badge (4h / 1d) — طرف ثالث، لا نتحكم بأعمارها.
 
-4. **Ask Google to verify**
-   - Once the site is republished, call the Site Verification `webResource?verificationMethod=META` endpoint.
-   - A 200 means verified. A 400 `failedToFindMetaTag` means the deploy hasn't propagated yet — retry after a moment.
+3. **Improve image delivery (~9 KB)**
+   `logo.webp` (10 KB) يمكن تصغيره قليلاً بأبعاد أدق.
 
-5. **Add the site to Search Console**
-   - Call `PUT /webmasters/v3/sites/https%3A%2F%2Fskycally.com%2F` so the property appears in the user's Search Console list.
+4. **Network dependency chain**
+   HTML → styles.css → main.css. طول المسار الحرج 1268ms على الموبايل.
 
-6. **Submit the sitemap**
-   - Call `PUT /webmasters/v3/sites/https%3A%2F%2Fskycally.com%2F/sitemaps/https%3A%2F%2Fskycally.com%2Fsitemap.xml` to register the existing sitemap.
+---
 
-7. **Mark the SEO finding fixed**
-   - After verification and sitemap submission succeed, call `seo_chat--update_findings` on `gsc:gsc` with `state: "fixed"`.
+### خطة الإصلاح
 
-## What you need to do
+**1. إلغاء حجب CSS للعرض الأولي** (المكسب الأكبر ~1.5-2s على LCP للموبايل)
 
-- Approve the connector card when it appears and sign in to Google with the account that should own the Search Console property for skycally.com.
-- **Publish** the project after I add the verification meta tag, so Google can fetch it from the live domain. Verification will not succeed against the preview URL.
+في `src/routes/__root.tsx`: تحويل تحميل الـ stylesheet الرئيسي (`appCss`) إلى تحميل غير حاجب باستخدام حيلة `media="print"` + `onload="this.media='all'"`، مع إبقاء الـ inline critical CSS الحالي في `RootShell` كما هو حتى لا يظهر flash of unstyled content.
 
-## Notes
+```tsx
+// بدل: { rel: "stylesheet", href: appCss }
+// نستخدم:
+{ rel: "preload", as: "style", href: appCss },
+// ونضيف سكربت صغير مثل الذي يحمّل الخطوط، يقلب media إلى 'all' بعد التحميل
+// مع <noscript><link rel="stylesheet" href={appCss} /></noscript> للاحتياط
+```
 
-- Only the META verification method is used — DNS, file-upload, and Analytics methods aren't available in this workflow.
-- The meta tag is harmless to keep in place after verification; it stays as proof of ownership.
-- No existing head metadata is removed; the verification tag is added alongside current tags in `__root.tsx`.
+هذا يزيل الحاجب الرئيسي دون أي تغيير بصري.
+
+**2. توسيع critical CSS المضمَّن (inline)**
+
+الـ inline style block الحالي في `RootShell` صغير جداً. سأضيف إليه القواعد الأساسية للـ hero + header فقط (bg-hero gradient, layout dimensions, نص العنوان) لضمان LCP نظيف قبل وصول الـ CSS الرئيسي. ~1-2 KB إضافية inline فقط.
+
+**3. تصحيح رؤوس الكاش لملفات الجذر**
+
+تعديل `public/_headers` ليشمل قواعد صريحة لكل ملف ثابت في الجذر:
+```
+/logo.webp        → immutable 1y
+/favicon.png      → immutable 1y
+/apple-touch-icon.png → immutable 1y
+/robots.txt       → max-age=3600
+/sitemap.xml      → max-age=3600
+```
+مع التحقق من أن Lovable/Cloudflare يطبّق `_headers` على مسارات الجذر (سنعرف من فحص PSI التالي بعد النشر).
+
+**4. لا نغيّر ما هو خارج نطاقنا**
+- `~flockjs` هو سكربت Lovable analytics (شارة الموقع). لا تعديل.
+- Product Hunt badge — طرف ثالث.
+- الخطوط والـ Google Analytics: مؤجلة بالفعل بشكل صحيح.
+
+---
+
+### ما لن أفعله (وأسبابه)
+- **لن أُزيل framer-motion أو أعيد كتابة الصفحة الرئيسية.** المشكلة CSS-blocking وليست JS.
+- **لن ألمس Desktop** — 97/100 لا يحتاج شيئاً.
+- **لن أُقلّل حجم Tailwind CSS** — 26KB (مضغوط ~7KB) طبيعي ومقبول بمجرد إزالة الحجب.
+
+---
+
+### التحقق بعد التطبيق
+بعد النشر، أعد تشغيل PSI. المتوقع:
+- Mobile LCP: 4.4s → ~2.5s
+- Mobile FCP: 3.9s → ~2.0s
+- Mobile Performance: 75 → 90+
+- Cache lifetimes: يجب أن تختفي `logo.webp` من قائمة "None"
+
+### الملفات المتغيّرة
+- `src/routes/__root.tsx` — تحويل appCss إلى تحميل async + توسيع critical inline CSS
+- `public/_headers` — إضافة قواعد كاش لملفات الجذر

@@ -75,6 +75,15 @@
 - [BMI Calculator](/tools/bmi-calculator): Body mass index.
 - [Age Calculator](/tools/age-calculator): Exact age from a birthdate.
 
+## SEO Tools
+
+- [Keyword Research Tool](/tools/keyword-research): Real Google search volume, CPC, competition and related keywords, powered by Semrush.
+- [Website Traffic Checker](/tools/domain-analysis): Estimate any domain's organic traffic, keyword count and top ranking pages.
+- [Backlink Checker](/tools/backlink-checker): Authority score, total backlinks, referring domains and top referrers.
+- [Keyword Difficulty Checker](/tools/keyword-difficulty): Bulk Google ranking difficulty for up to 10 keywords with volume and CPC.
+- [Competitor Analysis Tool](/tools/competitor-analysis): Auto-discover real search competitors, keyword overlap and traffic.
+- [Page SEO Analyzer](/tools/page-seo-analyzer): See every Google keyword any URL ranks for, with positions and traffic share.
+
 ## Optional
 
 - [Games](/tools?cat=games): Casual browser games (Sudoku, Chess, 2048, Wordle and more).

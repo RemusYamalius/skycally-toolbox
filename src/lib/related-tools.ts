@@ -106,6 +106,14 @@ export const relatedToolsMap: Record<string, string[]> = {
   "ai-cover-letter-generator": ["ai-writing-assistant", "ai-resume-builder", "word-processor", "word-to-pdf", "pdf-text-extractor", "word-counter"],
   "ai-resume-builder": ["ai-writing-assistant", "ai-cover-letter-generator", "word-processor", "word-to-pdf", "pdf-text-extractor", "word-counter"],
   "ai-writing-assistant": ["ai-email-writer", "ai-cover-letter-generator", "ai-resume-builder", "word-counter", "word-processor"],
+
+  // SEO (Semrush)
+  "keyword-research": ["keyword-difficulty", "competitor-analysis", "domain-analysis", "page-seo-analyzer", "backlink-checker"],
+  "domain-analysis": ["competitor-analysis", "backlink-checker", "page-seo-analyzer", "keyword-research", "keyword-difficulty"],
+  "backlink-checker": ["domain-analysis", "competitor-analysis", "page-seo-analyzer", "keyword-research", "keyword-difficulty"],
+  "keyword-difficulty": ["keyword-research", "competitor-analysis", "page-seo-analyzer", "domain-analysis", "backlink-checker"],
+  "competitor-analysis": ["domain-analysis", "backlink-checker", "keyword-research", "keyword-difficulty", "page-seo-analyzer"],
+  "page-seo-analyzer": ["keyword-research", "domain-analysis", "keyword-difficulty", "competitor-analysis", "backlink-checker"],
 };
 
 

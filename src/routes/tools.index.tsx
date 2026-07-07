@@ -5,7 +5,7 @@ import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/to
 import { ToolCard } from "@/components/tool-card";
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
 
-const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text", "ai", "utility", "games", "minigames"] as const;
+const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text", "ai", "utility", "seo", "games", "minigames"] as const;
 type CatParam = (typeof VALID_CATS)[number];
 
 export const Route = createFileRoute("/tools/")({
@@ -51,7 +51,7 @@ export const Route = createFileRoute("/tools/")({
   component: ToolsPage,
 });
 
-const cats: ("all" | ToolCategory)[] = ["all", "ai", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"];
+const cats: ("all" | ToolCategory)[] = ["all", "ai", "seo", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"];
 
 function ToolsPage() {
   const search = Route.useSearch();
@@ -97,7 +97,7 @@ function ToolsPage() {
 
       {cat === "all" ? (
         <div className="space-y-14">
-          {(["ai", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"] as ToolCategory[]).map((c) => {
+          {(["ai", "seo", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"] as ToolCategory[]).map((c) => {
             const groupList = list.filter((t) => toolInCategory(t, c));
             if (groupList.length === 0) return null;
             const meta = categoryMeta[c];

@@ -15,6 +15,7 @@ import {
   Zap,
   Shield,
   Star,
+  BarChart3,
 } from "lucide-react";
 
 import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
@@ -59,6 +60,7 @@ const QUICK_CATS = [
   { icon: Music, label: "Audio", cat: "audio" as const },
   { icon: FileText, label: "PDF", cat: "pdf" as const },
   { icon: Type, label: "Text", cat: "text" as const },
+  { icon: BarChart3, label: "SEO", cat: "seo" as const },
   { icon: Wrench, label: "Utility", cat: "utility" as const },
   { icon: Gamepad2, label: "Games", cat: "games" as const },
   { icon: Joystick, label: "Mini Games", cat: "minigames" as const },

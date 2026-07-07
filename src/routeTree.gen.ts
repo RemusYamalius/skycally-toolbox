@@ -72,6 +72,7 @@ import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-te
 import { Route as ToolsPdfReaderRouteImport } from './routes/tools.pdf-reader'
 import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page-numbers'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
+import { Route as ToolsPageSeoAnalyzerRouteImport } from './routes/tools.page-seo-analyzer'
 import { Route as ToolsPacManRouteImport } from './routes/tools.pac-man'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
 import { Route as ToolsNetworkSpeedTestRouteImport } from './routes/tools.network-speed-test'
@@ -86,6 +87,8 @@ import { Route as ToolsMahjongRouteImport } from './routes/tools.mahjong'
 import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
 import { Route as ToolsLoanCalculatorRouteImport } from './routes/tools.loan-calculator'
 import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
+import { Route as ToolsKeywordResearchRouteImport } from './routes/tools.keyword-research'
+import { Route as ToolsKeywordDifficultyRouteImport } from './routes/tools.keyword-difficulty'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsIpAddressLookupRouteImport } from './routes/tools.ip-address-lookup'
 import { Route as ToolsInvoiceGeneratorRouteImport } from './routes/tools.invoice-generator'
@@ -111,6 +114,7 @@ import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-land
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsEmiCalculatorRouteImport } from './routes/tools.emi-calculator'
 import { Route as ToolsElementMixerRouteImport } from './routes/tools.element-mixer'
+import { Route as ToolsDomainAnalysisRouteImport } from './routes/tools.domain-analysis'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
 import { Route as ToolsDnsLeakTestRouteImport } from './routes/tools.dns-leak-test'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
@@ -120,6 +124,7 @@ import { Route as ToolsCountryInfoRouteImport } from './routes/tools.country-inf
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsCompoundInterestRouteImport } from './routes/tools.compound-interest'
+import { Route as ToolsCompetitorAnalysisRouteImport } from './routes/tools.competitor-analysis'
 import { Route as ToolsColorPickerRouteImport } from './routes/tools.color-picker'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
@@ -132,6 +137,7 @@ import { Route as ToolsBreakoutRouteImport } from './routes/tools.breakout'
 import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calculator'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
+import { Route as ToolsBacklinkCheckerRouteImport } from './routes/tools.backlink-checker'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAiWritingAssistantRouteImport } from './routes/tools.ai-writing-assistant'
@@ -467,6 +473,11 @@ const ToolsPasswordGeneratorRoute = ToolsPasswordGeneratorRouteImport.update({
   path: '/tools/password-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsPageSeoAnalyzerRoute = ToolsPageSeoAnalyzerRouteImport.update({
+  id: '/tools/page-seo-analyzer',
+  path: '/tools/page-seo-analyzer',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsPacManRoute = ToolsPacManRouteImport.update({
   id: '/tools/pac-man',
   path: '/tools/pac-man',
@@ -535,6 +546,16 @@ const ToolsLoanCalculatorRoute = ToolsLoanCalculatorRouteImport.update({
 const ToolsLinkShortenerRoute = ToolsLinkShortenerRouteImport.update({
   id: '/tools/link-shortener',
   path: '/tools/link-shortener',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsKeywordResearchRoute = ToolsKeywordResearchRouteImport.update({
+  id: '/tools/keyword-research',
+  path: '/tools/keyword-research',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsKeywordDifficultyRoute = ToolsKeywordDifficultyRouteImport.update({
+  id: '/tools/keyword-difficulty',
+  path: '/tools/keyword-difficulty',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsJsonFormatterRoute = ToolsJsonFormatterRouteImport.update({
@@ -664,6 +685,11 @@ const ToolsElementMixerRoute = ToolsElementMixerRouteImport.update({
   path: '/tools/element-mixer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsDomainAnalysisRoute = ToolsDomainAnalysisRouteImport.update({
+  id: '/tools/domain-analysis',
+  path: '/tools/domain-analysis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsDocumentScannerRoute = ToolsDocumentScannerRouteImport.update({
   id: '/tools/document-scanner',
   path: '/tools/document-scanner',
@@ -707,6 +733,11 @@ const ToolsCompressPdfRoute = ToolsCompressPdfRouteImport.update({
 const ToolsCompoundInterestRoute = ToolsCompoundInterestRouteImport.update({
   id: '/tools/compound-interest',
   path: '/tools/compound-interest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsCompetitorAnalysisRoute = ToolsCompetitorAnalysisRouteImport.update({
+  id: '/tools/competitor-analysis',
+  path: '/tools/competitor-analysis',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsColorPickerRoute = ToolsColorPickerRouteImport.update({
@@ -768,6 +799,11 @@ const ToolsBase64Route = ToolsBase64RouteImport.update({
 const ToolsBallSortRoute = ToolsBallSortRouteImport.update({
   id: '/tools/ball-sort',
   path: '/tools/ball-sort',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsBacklinkCheckerRoute = ToolsBacklinkCheckerRouteImport.update({
+  id: '/tools/backlink-checker',
+  path: '/tools/backlink-checker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsBackgroundBlurRoute = ToolsBackgroundBlurRouteImport.update({
@@ -879,6 +915,7 @@ export interface FileRoutesByFullPath {
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
+  '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
@@ -891,6 +928,7 @@ export interface FileRoutesByFullPath {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/color-picker': typeof ToolsColorPickerRoute
+  '/tools/competitor-analysis': typeof ToolsCompetitorAnalysisRoute
   '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
@@ -900,6 +938,7 @@ export interface FileRoutesByFullPath {
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
+  '/tools/domain-analysis': typeof ToolsDomainAnalysisRoute
   '/tools/element-mixer': typeof ToolsElementMixerRoute
   '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
@@ -925,6 +964,8 @@ export interface FileRoutesByFullPath {
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/keyword-difficulty': typeof ToolsKeywordDifficultyRoute
+  '/tools/keyword-research': typeof ToolsKeywordResearchRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
@@ -939,6 +980,7 @@ export interface FileRoutesByFullPath {
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
+  '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
@@ -1020,6 +1062,7 @@ export interface FileRoutesByTo {
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
+  '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
@@ -1032,6 +1075,7 @@ export interface FileRoutesByTo {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/color-picker': typeof ToolsColorPickerRoute
+  '/tools/competitor-analysis': typeof ToolsCompetitorAnalysisRoute
   '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
@@ -1041,6 +1085,7 @@ export interface FileRoutesByTo {
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
+  '/tools/domain-analysis': typeof ToolsDomainAnalysisRoute
   '/tools/element-mixer': typeof ToolsElementMixerRoute
   '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
@@ -1066,6 +1111,8 @@ export interface FileRoutesByTo {
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/keyword-difficulty': typeof ToolsKeywordDifficultyRoute
+  '/tools/keyword-research': typeof ToolsKeywordResearchRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
@@ -1080,6 +1127,7 @@ export interface FileRoutesByTo {
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
+  '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
@@ -1162,6 +1210,7 @@ export interface FileRoutesById {
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
+  '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
@@ -1174,6 +1223,7 @@ export interface FileRoutesById {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/color-picker': typeof ToolsColorPickerRoute
+  '/tools/competitor-analysis': typeof ToolsCompetitorAnalysisRoute
   '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
@@ -1183,6 +1233,7 @@ export interface FileRoutesById {
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
+  '/tools/domain-analysis': typeof ToolsDomainAnalysisRoute
   '/tools/element-mixer': typeof ToolsElementMixerRoute
   '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
@@ -1208,6 +1259,8 @@ export interface FileRoutesById {
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/keyword-difficulty': typeof ToolsKeywordDifficultyRoute
+  '/tools/keyword-research': typeof ToolsKeywordResearchRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
@@ -1222,6 +1275,7 @@ export interface FileRoutesById {
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
+  '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
@@ -1305,6 +1359,7 @@ export interface FileRouteTypes {
     | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
     | '/tools/background-blur'
+    | '/tools/backlink-checker'
     | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/bmi-calculator'
@@ -1317,6 +1372,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/color-picker'
+    | '/tools/competitor-analysis'
     | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
@@ -1326,6 +1382,7 @@ export interface FileRouteTypes {
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
+    | '/tools/domain-analysis'
     | '/tools/element-mixer'
     | '/tools/emi-calculator'
     | '/tools/extract-audio'
@@ -1351,6 +1408,8 @@ export interface FileRouteTypes {
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
+    | '/tools/keyword-difficulty'
+    | '/tools/keyword-research'
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
@@ -1365,6 +1424,7 @@ export interface FileRouteTypes {
     | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
+    | '/tools/page-seo-analyzer'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
@@ -1446,6 +1506,7 @@ export interface FileRouteTypes {
     | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
     | '/tools/background-blur'
+    | '/tools/backlink-checker'
     | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/bmi-calculator'
@@ -1458,6 +1519,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/color-picker'
+    | '/tools/competitor-analysis'
     | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
@@ -1467,6 +1529,7 @@ export interface FileRouteTypes {
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
+    | '/tools/domain-analysis'
     | '/tools/element-mixer'
     | '/tools/emi-calculator'
     | '/tools/extract-audio'
@@ -1492,6 +1555,8 @@ export interface FileRouteTypes {
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
+    | '/tools/keyword-difficulty'
+    | '/tools/keyword-research'
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
@@ -1506,6 +1571,7 @@ export interface FileRouteTypes {
     | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
+    | '/tools/page-seo-analyzer'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
@@ -1587,6 +1653,7 @@ export interface FileRouteTypes {
     | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
     | '/tools/background-blur'
+    | '/tools/backlink-checker'
     | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/bmi-calculator'
@@ -1599,6 +1666,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/color-picker'
+    | '/tools/competitor-analysis'
     | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
@@ -1608,6 +1676,7 @@ export interface FileRouteTypes {
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
+    | '/tools/domain-analysis'
     | '/tools/element-mixer'
     | '/tools/emi-calculator'
     | '/tools/extract-audio'
@@ -1633,6 +1702,8 @@ export interface FileRouteTypes {
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
+    | '/tools/keyword-difficulty'
+    | '/tools/keyword-research'
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
@@ -1647,6 +1718,7 @@ export interface FileRouteTypes {
     | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
+    | '/tools/page-seo-analyzer'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
@@ -1729,6 +1801,7 @@ export interface RootRouteChildren {
   ToolsAiWritingAssistantRoute: typeof ToolsAiWritingAssistantRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
+  ToolsBacklinkCheckerRoute: typeof ToolsBacklinkCheckerRoute
   ToolsBallSortRoute: typeof ToolsBallSortRoute
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsBmiCalculatorRoute: typeof ToolsBmiCalculatorRoute
@@ -1741,6 +1814,7 @@ export interface RootRouteChildren {
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsColorPickerRoute: typeof ToolsColorPickerRoute
+  ToolsCompetitorAnalysisRoute: typeof ToolsCompetitorAnalysisRoute
   ToolsCompoundInterestRoute: typeof ToolsCompoundInterestRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
@@ -1750,6 +1824,7 @@ export interface RootRouteChildren {
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDnsLeakTestRoute: typeof ToolsDnsLeakTestRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
+  ToolsDomainAnalysisRoute: typeof ToolsDomainAnalysisRoute
   ToolsElementMixerRoute: typeof ToolsElementMixerRoute
   ToolsEmiCalculatorRoute: typeof ToolsEmiCalculatorRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
@@ -1775,6 +1850,8 @@ export interface RootRouteChildren {
   ToolsInvoiceGeneratorRoute: typeof ToolsInvoiceGeneratorRoute
   ToolsIpAddressLookupRoute: typeof ToolsIpAddressLookupRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
+  ToolsKeywordDifficultyRoute: typeof ToolsKeywordDifficultyRoute
+  ToolsKeywordResearchRoute: typeof ToolsKeywordResearchRoute
   ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
   ToolsLoanCalculatorRoute: typeof ToolsLoanCalculatorRoute
   ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
@@ -1789,6 +1866,7 @@ export interface RootRouteChildren {
   ToolsNetworkSpeedTestRoute: typeof ToolsNetworkSpeedTestRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPacManRoute: typeof ToolsPacManRoute
+  ToolsPageSeoAnalyzerRoute: typeof ToolsPageSeoAnalyzerRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPdfPageNumbersRoute: typeof ToolsPdfPageNumbersRoute
   ToolsPdfReaderRoute: typeof ToolsPdfReaderRoute
@@ -2292,6 +2370,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsPasswordGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/page-seo-analyzer': {
+      id: '/tools/page-seo-analyzer'
+      path: '/tools/page-seo-analyzer'
+      fullPath: '/tools/page-seo-analyzer'
+      preLoaderRoute: typeof ToolsPageSeoAnalyzerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/pac-man': {
       id: '/tools/pac-man'
       path: '/tools/pac-man'
@@ -2388,6 +2473,20 @@ declare module '@tanstack/react-router' {
       path: '/tools/link-shortener'
       fullPath: '/tools/link-shortener'
       preLoaderRoute: typeof ToolsLinkShortenerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/keyword-research': {
+      id: '/tools/keyword-research'
+      path: '/tools/keyword-research'
+      fullPath: '/tools/keyword-research'
+      preLoaderRoute: typeof ToolsKeywordResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/keyword-difficulty': {
+      id: '/tools/keyword-difficulty'
+      path: '/tools/keyword-difficulty'
+      fullPath: '/tools/keyword-difficulty'
+      preLoaderRoute: typeof ToolsKeywordDifficultyRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/json-formatter': {
@@ -2565,6 +2664,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsElementMixerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/domain-analysis': {
+      id: '/tools/domain-analysis'
+      path: '/tools/domain-analysis'
+      fullPath: '/tools/domain-analysis'
+      preLoaderRoute: typeof ToolsDomainAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/document-scanner': {
       id: '/tools/document-scanner'
       path: '/tools/document-scanner'
@@ -2626,6 +2732,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/compound-interest'
       fullPath: '/tools/compound-interest'
       preLoaderRoute: typeof ToolsCompoundInterestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/competitor-analysis': {
+      id: '/tools/competitor-analysis'
+      path: '/tools/competitor-analysis'
+      fullPath: '/tools/competitor-analysis'
+      preLoaderRoute: typeof ToolsCompetitorAnalysisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/color-picker': {
@@ -2710,6 +2823,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/ball-sort'
       fullPath: '/tools/ball-sort'
       preLoaderRoute: typeof ToolsBallSortRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/backlink-checker': {
+      id: '/tools/backlink-checker'
+      path: '/tools/backlink-checker'
+      fullPath: '/tools/backlink-checker'
+      preLoaderRoute: typeof ToolsBacklinkCheckerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/background-blur': {
@@ -2852,6 +2972,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAiWritingAssistantRoute: ToolsAiWritingAssistantRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
+  ToolsBacklinkCheckerRoute: ToolsBacklinkCheckerRoute,
   ToolsBallSortRoute: ToolsBallSortRoute,
   ToolsBase64Route: ToolsBase64Route,
   ToolsBmiCalculatorRoute: ToolsBmiCalculatorRoute,
@@ -2864,6 +2985,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsColorPickerRoute: ToolsColorPickerRoute,
+  ToolsCompetitorAnalysisRoute: ToolsCompetitorAnalysisRoute,
   ToolsCompoundInterestRoute: ToolsCompoundInterestRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsConnectFourRoute: ToolsConnectFourRoute,
@@ -2873,6 +2995,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDnsLeakTestRoute: ToolsDnsLeakTestRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
+  ToolsDomainAnalysisRoute: ToolsDomainAnalysisRoute,
   ToolsElementMixerRoute: ToolsElementMixerRoute,
   ToolsEmiCalculatorRoute: ToolsEmiCalculatorRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
@@ -2899,6 +3022,8 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsInvoiceGeneratorRoute: ToolsInvoiceGeneratorRoute,
   ToolsIpAddressLookupRoute: ToolsIpAddressLookupRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
+  ToolsKeywordDifficultyRoute: ToolsKeywordDifficultyRoute,
+  ToolsKeywordResearchRoute: ToolsKeywordResearchRoute,
   ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
   ToolsLoanCalculatorRoute: ToolsLoanCalculatorRoute,
   ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,
@@ -2913,6 +3038,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsNetworkSpeedTestRoute: ToolsNetworkSpeedTestRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPacManRoute: ToolsPacManRoute,
+  ToolsPageSeoAnalyzerRoute: ToolsPageSeoAnalyzerRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPdfPageNumbersRoute: ToolsPdfPageNumbersRoute,
   ToolsPdfReaderRoute: ToolsPdfReaderRoute,

@@ -1,65 +1,67 @@
-## تشخيص دقيق للتراجع (75 → 64)
+## تشخيص دقيق للموبايل (75)
 
-قراءة الصور المرفقة بندًا ببند:
+من الصور الثلاث:
 
-| المقياس | قبل | الآن | الحكم |
-|---|---|---|---|
-| Performance | 75 | **64** | تراجُع |
-| FCP | 3.9s | 1.7s | تحسّن |
-| LCP | 4.4s | 4.3s | ثابت |
-| **CLS** | ~0 | **0.484** | كارثي — جديد |
-| TBT | – | 40ms | جيد |
+| المقياس | القيمة | الحكم |
+|---|---|---|
+| Performance | 75 | متوسط |
+| FCP | 3.9s | ضعيف |
+| LCP | 4.2s | ضعيف |
+| CLS | 0.002 | ممتاز ✓ |
+| TBT | 30ms | ممتاز ✓ |
+| Speed Index | 5.0s | ضعيف |
 
-### السبب الجذري للتراجع
-"Layout shift culprits" يشير مباشرةً إلى `<main class="flex-1">` بقيمة **0.482** — أي أن الجولة السابقة (تحويل `styles.css` إلى `preload` + قلب `media` بعد التحميل) جعلت الصفحة تُرسم أولاً بلا Tailwind ثم تقفز عند وصول CSS. هذا هو ما أسقط الأداء من 75 إلى 64. FCP تحسّن ظاهريًا لأنه يقيس أول بكسل مرسوم — ولو كان بلا أنماط.
+**المشاكل من قائمة Insights/Diagnostics:**
+1. **Reduce unused JavaScript — 241KB** (السبب الأكبر). `main-*.js` ~330KB يحتوي على `framer-motion` كامل + كل بطاقات الأدوات + أيقونات lucide كثيرة، بينما الشاشة الأولى على الموبايل لا تحتاج منها إلا الـ hero.
+2. **LCP breakdown + Network dependency tree** — عنصر LCP على الموبايل هو نص الـ hero "The Free Tool for Your Images"، وهو ينتظر تحميل `main.js` + `styles.css` + الخطوط قبل أن يظهر.
+3. **Use efficient cache lifetimes — 22 KiB** — أصول طرف ثالث (Product Hunt/Fazier badges, gtag). خارج تحكمنا.
+4. **Improve image delivery — 5 KiB** — logo بقي أكبر قليلاً من الحاجة (مقبول، عالجناه سابقًا).
+5. **Render-blocking requests** — `styles.css` صغير ولن نلمسه (السبب الأخير في CLS 0.484).
+6. **Minify JS — 2 KiB** — قزم، تلقائي.
 
-### باقي المشاكل من الصور
-1. **Render-blocking**: `main-BTstU0EP.css` (1.8KB, 450ms) — chunk تلقائي من Vite، ليس `styles.css`.
-2. **Cache "None" على `/logo.webp`**: قواعد `public/_headers` موجودة لكن استضافة Lovable لا تُطبّقها على ملفات الجذر (فقط `/assets/*` تعمل). خارج تحكّمنا.
-3. **Improve image delivery**: `logo.webp` = 400×69 بينما يُعرض بـ 200×35 (خسارة ~6KB).
-4. **Fazier badge**: `width=120` بدون `height` → مساهم صغير في CLS.
-5. **Reduce unused JS 240KB**: `main-*.js` 330KB — الصفحة الرئيسية تحمّل framer-motion + كل بطاقات الأدوات. تحسين حقيقي لكنه إعادة هيكلة كبيرة، ليس هدف هذه الجولة.
-6. **`~flockjs` و Product Hunt و gtag**: طرف ثالث، مؤجّل بالفعل.
+الديسكتوب 96 مع نفس الكود يؤكد أن المشكلة قدرة معالجة الموبايل مع JS ضخم — الحل هو تقليل JS للشاشة الأولى.
 
 ---
 
-## الإصلاحات المقترحة (نطاق ضيق ومحسوب)
+## خطة الإصلاح (نطاق مضبوط، بلا مقايضات خطرة)
 
-### 1. التراجع عن تأجيل CSS — الأولوية القصوى
-في `src/routes/__root.tsx`:
-- إعادة `appCss` إلى `{ rel: "stylesheet", href: appCss }` (تحميل حاجب طبيعي).
-- إبقاء الخطوط مؤجّلة (`preload as=style` + قلب `media`) — الخطوط لا تسبب CLS لأن `font-display: swap` وسنستخدم `system-ui` أثناء التبديل، والنص في الـ hero ليس LCP.
-- تبسيط سكربت `load()` ليحمّل الخطوط فقط، لا `appCss`.
-- تنظيف `<noscript>`.
-- إبقاء الـ inline critical CSS الحالي (لا ضرر منه).
+### 1. تخفيف `framer-motion` من الصفحة الرئيسية — الأثر الأكبر
 
-النتيجة المتوقعة: **CLS يعود إلى 0**، LCP يتحسّن قليلاً لأن CSS الحاجب صغير جدًا (~7KB مضغوط)، والأداء يعود إلى 90+ بدلًا من 64.
+الـ hero حاليًا يستورد ويستخدم `motion`, `useScroll`, `useTransform`, `AnimatePresence` من `framer-motion` (28 استخدامًا). الحزمة ~90KB gzipped وتُحمَّل قبل رسم الـ LCP.
 
-### 2. تصغير `logo.webp` إلى الحجم المعروض فعليًا
-- إعادة تشفير `public/logo.webp` بأبعاد 240×41 (2× للشاشات عالية الكثافة، بدل 400×69).
-- الحجم المتوقع: ~4-5KB بدل 10KB.
-- لا تغيير على `<img>` (يبقى `width=200 height=35`).
+- **hero (فوق الطية)**: استبدال `motion.h1/motion.p/motion.div` بعناصر HTML عادية مع كلاسات CSS للحركة (`hero-fade-up` الموجودة بالفعل في `styles.css`). الحركة تبقى بصريًا نفسها.
+- **الأقسام تحت الطية** (بطاقات الأدوات، الشرائح، الشهادات، إلخ): إبقاء `framer-motion` لكن **lazy-load** عبر `React.lazy` — لن يُحمَّل حتى ينتهي الرسم الأول.
+- النتيجة المتوقعة: `main.js` ينخفض ~100KB، LCP ينخفض ~1.5s على الموبايل.
 
-### 3. Fazier badge — إضافة `height`
-في `src/components/site-footer.tsx` السطر 226: إضافة `height={26}` بجانب `width={120}` لإزالة CLS الصغير.
+### 2. Preload لعنصر LCP (نص الـ hero)
 
-### 4. لن نلمس
-- `_headers` (القواعد صحيحة، المشكلة في الاستضافة).
-- `main-*.js` (240KB unused) — إعادة هيكلة كبيرة تستحق جولة منفصلة.
-- Desktop 97 — لا داعي.
+لا يمكن preload لنص، لكن يمكن ضمان أن CSS + الخط الحرج جاهزان بلا انتظار:
+- الخط الرئيسي `Inter` مؤجّل حاليًا — نُبقيه (font-display: swap يجعل النص يظهر بـ system-ui فورًا).
+- `fetchpriority="high"` على `<link rel="stylesheet" href={appCss}>` لضمان أن الـ CSS يسبق أي شيء آخر.
+
+### 3. تقسيم أيقونات lucide
+
+`import { Search, Upload, Wand2, Video, ImageIcon, ... } from "lucide-react"` يجلب الشجرة بأكملها في بعض bundlers. سنتحقق من `vite.config.ts` أن `lucide-react` يُشجَّر بشكل صحيح؛ إذا لا، نُبدّل إلى import من `lucide-react/dist/esm/icons/<icon>` للأيقونات الأكثر ثقلاً في الصفحة الرئيسية.
+
+### 4. تأجيل قسم "Popular tools" و "Categories"
+
+استخدام `<Suspense>` + `React.lazy` لعزل هذين القسمين في chunks منفصلة تُحمَّل بعد الرسم الأول للـ hero.
 
 ---
 
 ## الملفات المتغيّرة
-- `src/routes/__root.tsx` — تراجع عن defer لـ appCss فقط، إبقاء تأجيل الخطوط.
-- `public/logo.webp` — إعادة تشفير بأبعاد أصغر (سكربت Python + Pillow).
-- `src/components/site-footer.tsx` — إضافة `height` لبادج Fazier.
+- `src/routes/index.tsx` — استبدال `motion.*` في الـ hero بعناصر HTML + CSS، تأجيل الأقسام السفلية عبر `React.lazy`.
+- `src/routes/__root.tsx` — إضافة `fetchpriority="high"` لـ appCss link.
+- (اختياري) `vite.config.ts` — التحقق من manualChunks لعزل `framer-motion` في chunk خاص.
 
-## المتوقّع بعد النشر
-- Mobile Performance: 64 → **90+**
-- CLS: 0.484 → **< 0.05**
-- LCP: 4.3s → **~2.2s**
-- Total transfer: -6KB (logo)
+## المتوقّع
+- Mobile Performance: **75 → 90+**
+- LCP: 4.2s → **~2.2s**
+- FCP: 3.9s → **~1.5s**
+- Unused JS: -100 to -150 KB
+- Desktop 96 يبقى كما هو أو يتحسن.
 
-## اعتذار صريح
-الجولة السابقة كانت خطأ في الحكم: مقايضة LCP نظرية مقابل CLS حقيقي. أعتذر عن التراجع، والخطة أعلاه تُصحّحه بدقة.
+## خارج النطاق
+- الكاش على `/logo.webp` (استضافة).
+- طرف ثالث (Fazier/ProductHunt/gtag) — مؤجّل بالفعل.
+- CSS defer (لن نكرر خطأ CLS السابق).

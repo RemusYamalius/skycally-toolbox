@@ -30,7 +30,7 @@ export function BlogCard({ post }: { post: BlogPost }) {
             {post.dateLabel}
           </time>
           <span className="inline-flex items-center gap-1.5 text-sm font-medium text-primary">
-            Read more <ArrowRight className="w-4 h-4 transition group-hover:translate-x-1" />
+            Read post<span className="sr-only">: {post.title}</span> <ArrowRight className="w-4 h-4 transition group-hover:translate-x-1" aria-hidden="true" />
           </span>
         </div>
       </div>

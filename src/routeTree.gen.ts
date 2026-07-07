@@ -87,6 +87,7 @@ import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
 import { Route as ToolsLoanCalculatorRouteImport } from './routes/tools.loan-calculator'
 import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
 import { Route as ToolsKeywordResearchRouteImport } from './routes/tools.keyword-research'
+import { Route as ToolsKeywordDifficultyRouteImport } from './routes/tools.keyword-difficulty'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsIpAddressLookupRouteImport } from './routes/tools.ip-address-lookup'
 import { Route as ToolsInvoiceGeneratorRouteImport } from './routes/tools.invoice-generator'
@@ -122,6 +123,7 @@ import { Route as ToolsCountryInfoRouteImport } from './routes/tools.country-inf
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsCompoundInterestRouteImport } from './routes/tools.compound-interest'
+import { Route as ToolsCompetitorAnalysisRouteImport } from './routes/tools.competitor-analysis'
 import { Route as ToolsColorPickerRouteImport } from './routes/tools.color-picker'
 import { Route as ToolsColorPaletteRouteImport } from './routes/tools.color-palette'
 import { Route as ToolsCollageMakerRouteImport } from './routes/tools.collage-maker'
@@ -545,6 +547,11 @@ const ToolsKeywordResearchRoute = ToolsKeywordResearchRouteImport.update({
   path: '/tools/keyword-research',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsKeywordDifficultyRoute = ToolsKeywordDifficultyRouteImport.update({
+  id: '/tools/keyword-difficulty',
+  path: '/tools/keyword-difficulty',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsJsonFormatterRoute = ToolsJsonFormatterRouteImport.update({
   id: '/tools/json-formatter',
   path: '/tools/json-formatter',
@@ -720,6 +727,11 @@ const ToolsCompressPdfRoute = ToolsCompressPdfRouteImport.update({
 const ToolsCompoundInterestRoute = ToolsCompoundInterestRouteImport.update({
   id: '/tools/compound-interest',
   path: '/tools/compound-interest',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsCompetitorAnalysisRoute = ToolsCompetitorAnalysisRouteImport.update({
+  id: '/tools/competitor-analysis',
+  path: '/tools/competitor-analysis',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsColorPickerRoute = ToolsColorPickerRouteImport.update({
@@ -910,6 +922,7 @@ export interface FileRoutesByFullPath {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/color-picker': typeof ToolsColorPickerRoute
+  '/tools/competitor-analysis': typeof ToolsCompetitorAnalysisRoute
   '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
@@ -945,6 +958,7 @@ export interface FileRoutesByFullPath {
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/keyword-difficulty': typeof ToolsKeywordDifficultyRoute
   '/tools/keyword-research': typeof ToolsKeywordResearchRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
@@ -1054,6 +1068,7 @@ export interface FileRoutesByTo {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/color-picker': typeof ToolsColorPickerRoute
+  '/tools/competitor-analysis': typeof ToolsCompetitorAnalysisRoute
   '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
@@ -1089,6 +1104,7 @@ export interface FileRoutesByTo {
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/keyword-difficulty': typeof ToolsKeywordDifficultyRoute
   '/tools/keyword-research': typeof ToolsKeywordResearchRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
@@ -1199,6 +1215,7 @@ export interface FileRoutesById {
   '/tools/collage-maker': typeof ToolsCollageMakerRoute
   '/tools/color-palette': typeof ToolsColorPaletteRoute
   '/tools/color-picker': typeof ToolsColorPickerRoute
+  '/tools/competitor-analysis': typeof ToolsCompetitorAnalysisRoute
   '/tools/compound-interest': typeof ToolsCompoundInterestRoute
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
@@ -1234,6 +1251,7 @@ export interface FileRoutesById {
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/keyword-difficulty': typeof ToolsKeywordDifficultyRoute
   '/tools/keyword-research': typeof ToolsKeywordResearchRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
@@ -1345,6 +1363,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/color-picker'
+    | '/tools/competitor-analysis'
     | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
@@ -1380,6 +1399,7 @@ export interface FileRouteTypes {
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
+    | '/tools/keyword-difficulty'
     | '/tools/keyword-research'
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
@@ -1489,6 +1509,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/color-picker'
+    | '/tools/competitor-analysis'
     | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
@@ -1524,6 +1545,7 @@ export interface FileRouteTypes {
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
+    | '/tools/keyword-difficulty'
     | '/tools/keyword-research'
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
@@ -1633,6 +1655,7 @@ export interface FileRouteTypes {
     | '/tools/collage-maker'
     | '/tools/color-palette'
     | '/tools/color-picker'
+    | '/tools/competitor-analysis'
     | '/tools/compound-interest'
     | '/tools/compress-pdf'
     | '/tools/connect-four'
@@ -1668,6 +1691,7 @@ export interface FileRouteTypes {
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
+    | '/tools/keyword-difficulty'
     | '/tools/keyword-research'
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
@@ -1778,6 +1802,7 @@ export interface RootRouteChildren {
   ToolsCollageMakerRoute: typeof ToolsCollageMakerRoute
   ToolsColorPaletteRoute: typeof ToolsColorPaletteRoute
   ToolsColorPickerRoute: typeof ToolsColorPickerRoute
+  ToolsCompetitorAnalysisRoute: typeof ToolsCompetitorAnalysisRoute
   ToolsCompoundInterestRoute: typeof ToolsCompoundInterestRoute
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
@@ -1813,6 +1838,7 @@ export interface RootRouteChildren {
   ToolsInvoiceGeneratorRoute: typeof ToolsInvoiceGeneratorRoute
   ToolsIpAddressLookupRoute: typeof ToolsIpAddressLookupRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
+  ToolsKeywordDifficultyRoute: typeof ToolsKeywordDifficultyRoute
   ToolsKeywordResearchRoute: typeof ToolsKeywordResearchRoute
   ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
   ToolsLoanCalculatorRoute: typeof ToolsLoanCalculatorRoute
@@ -2436,6 +2462,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsKeywordResearchRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/keyword-difficulty': {
+      id: '/tools/keyword-difficulty'
+      path: '/tools/keyword-difficulty'
+      fullPath: '/tools/keyword-difficulty'
+      preLoaderRoute: typeof ToolsKeywordDifficultyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/json-formatter': {
       id: '/tools/json-formatter'
       path: '/tools/json-formatter'
@@ -2679,6 +2712,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/compound-interest'
       fullPath: '/tools/compound-interest'
       preLoaderRoute: typeof ToolsCompoundInterestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/competitor-analysis': {
+      id: '/tools/competitor-analysis'
+      path: '/tools/competitor-analysis'
+      fullPath: '/tools/competitor-analysis'
+      preLoaderRoute: typeof ToolsCompetitorAnalysisRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/color-picker': {
@@ -2925,6 +2965,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCollageMakerRoute: ToolsCollageMakerRoute,
   ToolsColorPaletteRoute: ToolsColorPaletteRoute,
   ToolsColorPickerRoute: ToolsColorPickerRoute,
+  ToolsCompetitorAnalysisRoute: ToolsCompetitorAnalysisRoute,
   ToolsCompoundInterestRoute: ToolsCompoundInterestRoute,
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsConnectFourRoute: ToolsConnectFourRoute,
@@ -2961,6 +3002,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsInvoiceGeneratorRoute: ToolsInvoiceGeneratorRoute,
   ToolsIpAddressLookupRoute: ToolsIpAddressLookupRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
+  ToolsKeywordDifficultyRoute: ToolsKeywordDifficultyRoute,
   ToolsKeywordResearchRoute: ToolsKeywordResearchRoute,
   ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
   ToolsLoanCalculatorRoute: ToolsLoanCalculatorRoute,

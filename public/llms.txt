@@ -1,0 +1,80 @@
+# Skycally
+
+> Skycally is a free online toolbox with 100+ browser-based tools for images, PDFs, video, audio, text, AI writing, calculators, and casual games. No signup, no uploads to external servers where possible — most tools run entirely in the browser.
+
+## Pages
+
+- [Home](/): Overview of Skycally and featured tools.
+- [All Tools](/tools): Full catalog of every tool, grouped by category.
+- [Blog](/blog): Guides and tutorials for using free online tools.
+- [About](/about): What Skycally is and who builds it.
+- [Contact](/contact): How to reach the Skycally team.
+- [Privacy](/privacy): Privacy policy.
+- [Terms](/terms): Terms of service.
+
+## AI & Writing
+
+- [AI Writing Assistant](/tools/ai-writing-assistant): Grammar checker, paraphraser and text summarizer in one tool.
+- [AI Email Writer](/tools/ai-email-writer): Draft professional emails from a short brief.
+- [AI Cover Letter Generator](/tools/ai-cover-letter-generator): Generate tailored cover letters.
+- [AI Resume Builder](/tools/ai-resume-builder): Build a clean resume from a form.
+- [Word Counter](/tools/word-counter): Count words, characters and reading time.
+- [Word Processor](/tools/word-processor): Rich-text editor with export to DOCX and PDF.
+- [Speech to Text](/tools/speech-to-text): Transcribe audio to text.
+- [Text to Speech](/tools/text-to-speech): Convert text to natural voice.
+
+## Image
+
+- [Image Compressor](/tools/image-compressor): Shrink JPG, PNG and WebP files.
+- [Image Converter](/tools/image-converter): Convert between JPG, PNG, WebP and more.
+- [Image Resizer](/tools/image-resizer): Resize by pixels, percentage or social preset.
+- [Image Cropper](/tools/image-cropper): Crop images to any aspect ratio.
+- [Remove Background](/tools/remove-bg): Erase image backgrounds in the browser.
+- [Image Upscaler](/tools/image-upscaler): Enlarge images with AI.
+- [Add Text to Image](/tools/add-text-to-image): Overlay custom text on any image.
+- [Meme Generator](/tools/meme-generator): Build memes with classic templates.
+- [Collage Maker](/tools/collage-maker): Combine photos into a collage.
+- [Color Picker](/tools/color-picker): Pick colors from images and swatches.
+
+## PDF
+
+- [Compress PDF](/tools/compress-pdf): Reduce PDF file size.
+- [Merge PDF](/tools/merge-pdf): Combine multiple PDFs into one.
+- [Split PDF](/tools/split-pdf): Split a PDF into pages or ranges.
+- [Rotate PDF](/tools/rotate-pdf): Rotate PDF pages.
+- [PDF to Images](/tools/pdf-to-images): Export PDF pages as PNG or JPG.
+- [Image to PDF](/tools/image-to-pdf): Turn images into a single PDF.
+- [PDF to Word](/tools/pdf-to-word): Convert PDF to editable DOCX.
+- [Word to PDF](/tools/word-to-pdf): Convert DOCX to PDF.
+- [Protect PDF](/tools/protect-pdf): Password-protect a PDF.
+- [Document Scanner](/tools/document-scanner): Scan documents from the camera.
+
+## Video & Audio
+
+- [Video Compressor](/tools/video-compressor): Compress video files in the browser.
+- [Video Trimmer](/tools/video-trimmer): Trim video clips.
+- [Video Merger](/tools/video-merger): Merge multiple clips.
+- [Video to GIF](/tools/video-to-gif): Convert video segments to GIF.
+- [Add Subtitles](/tools/add-subtitles): Burn subtitles into a video.
+- [Extract Audio](/tools/extract-audio): Extract the audio track from a video.
+- [Audio Converter](/tools/audio-converter): Convert between MP3, WAV, OGG and more.
+- [Screen Recorder](/tools/screen-recorder): Record your screen in the browser.
+
+## Utilities & Calculators
+
+- [QR Generator](/tools/qr-generator): Create QR codes.
+- [QR Reader](/tools/qr-reader): Scan QR codes from image or camera.
+- [Password Generator](/tools/password-generator): Generate strong passwords.
+- [Hash Generator](/tools/hash-generator): MD5, SHA-1, SHA-256 hashes.
+- [Base64 Encoder](/tools/base64): Encode and decode Base64.
+- [JSON Formatter](/tools/json-formatter): Format and validate JSON.
+- [Unit Converter](/tools/unit-converter): Convert length, mass, temperature and more.
+- [Currency Converter](/tools/currency-converter): Live currency rates.
+- [Loan Calculator](/tools/loan-calculator): Personal loan payments.
+- [Mortgage Calculator](/tools/mortgage-calculator): Home loan payments.
+- [BMI Calculator](/tools/bmi-calculator): Body mass index.
+- [Age Calculator](/tools/age-calculator): Exact age from a birthdate.
+
+## Optional
+
+- [Games](/tools?cat=games): Casual browser games (Sudoku, Chess, 2048, Wordle and more).

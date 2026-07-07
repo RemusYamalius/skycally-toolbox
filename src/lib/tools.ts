@@ -51,6 +51,7 @@ import {
   Clock,
   Moon,
   Calculator,
+  Percent,
   Activity,
   CalendarDays,
   Link2,

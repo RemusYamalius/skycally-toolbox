@@ -86,6 +86,7 @@ import { Route as ToolsMahjongRouteImport } from './routes/tools.mahjong'
 import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
 import { Route as ToolsLoanCalculatorRouteImport } from './routes/tools.loan-calculator'
 import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
+import { Route as ToolsKeywordResearchRouteImport } from './routes/tools.keyword-research'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsIpAddressLookupRouteImport } from './routes/tools.ip-address-lookup'
 import { Route as ToolsInvoiceGeneratorRouteImport } from './routes/tools.invoice-generator'
@@ -111,6 +112,7 @@ import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-land
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsEmiCalculatorRouteImport } from './routes/tools.emi-calculator'
 import { Route as ToolsElementMixerRouteImport } from './routes/tools.element-mixer'
+import { Route as ToolsDomainAnalysisRouteImport } from './routes/tools.domain-analysis'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
 import { Route as ToolsDnsLeakTestRouteImport } from './routes/tools.dns-leak-test'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
@@ -132,6 +134,7 @@ import { Route as ToolsBreakoutRouteImport } from './routes/tools.breakout'
 import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calculator'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
+import { Route as ToolsBacklinkCheckerRouteImport } from './routes/tools.backlink-checker'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAiWritingAssistantRouteImport } from './routes/tools.ai-writing-assistant'
@@ -537,6 +540,11 @@ const ToolsLinkShortenerRoute = ToolsLinkShortenerRouteImport.update({
   path: '/tools/link-shortener',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsKeywordResearchRoute = ToolsKeywordResearchRouteImport.update({
+  id: '/tools/keyword-research',
+  path: '/tools/keyword-research',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsJsonFormatterRoute = ToolsJsonFormatterRouteImport.update({
   id: '/tools/json-formatter',
   path: '/tools/json-formatter',
@@ -664,6 +672,11 @@ const ToolsElementMixerRoute = ToolsElementMixerRouteImport.update({
   path: '/tools/element-mixer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsDomainAnalysisRoute = ToolsDomainAnalysisRouteImport.update({
+  id: '/tools/domain-analysis',
+  path: '/tools/domain-analysis',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsDocumentScannerRoute = ToolsDocumentScannerRouteImport.update({
   id: '/tools/document-scanner',
   path: '/tools/document-scanner',
@@ -768,6 +781,11 @@ const ToolsBase64Route = ToolsBase64RouteImport.update({
 const ToolsBallSortRoute = ToolsBallSortRouteImport.update({
   id: '/tools/ball-sort',
   path: '/tools/ball-sort',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsBacklinkCheckerRoute = ToolsBacklinkCheckerRouteImport.update({
+  id: '/tools/backlink-checker',
+  path: '/tools/backlink-checker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsBackgroundBlurRoute = ToolsBackgroundBlurRouteImport.update({
@@ -879,6 +897,7 @@ export interface FileRoutesByFullPath {
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
+  '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
@@ -900,6 +919,7 @@ export interface FileRoutesByFullPath {
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
+  '/tools/domain-analysis': typeof ToolsDomainAnalysisRoute
   '/tools/element-mixer': typeof ToolsElementMixerRoute
   '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
@@ -925,6 +945,7 @@ export interface FileRoutesByFullPath {
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/keyword-research': typeof ToolsKeywordResearchRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
@@ -1020,6 +1041,7 @@ export interface FileRoutesByTo {
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
+  '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
@@ -1041,6 +1063,7 @@ export interface FileRoutesByTo {
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
+  '/tools/domain-analysis': typeof ToolsDomainAnalysisRoute
   '/tools/element-mixer': typeof ToolsElementMixerRoute
   '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
@@ -1066,6 +1089,7 @@ export interface FileRoutesByTo {
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/keyword-research': typeof ToolsKeywordResearchRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
@@ -1162,6 +1186,7 @@ export interface FileRoutesById {
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
+  '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
@@ -1183,6 +1208,7 @@ export interface FileRoutesById {
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
+  '/tools/domain-analysis': typeof ToolsDomainAnalysisRoute
   '/tools/element-mixer': typeof ToolsElementMixerRoute
   '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
@@ -1208,6 +1234,7 @@ export interface FileRoutesById {
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
+  '/tools/keyword-research': typeof ToolsKeywordResearchRoute
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
@@ -1305,6 +1332,7 @@ export interface FileRouteTypes {
     | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
     | '/tools/background-blur'
+    | '/tools/backlink-checker'
     | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/bmi-calculator'
@@ -1326,6 +1354,7 @@ export interface FileRouteTypes {
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
+    | '/tools/domain-analysis'
     | '/tools/element-mixer'
     | '/tools/emi-calculator'
     | '/tools/extract-audio'
@@ -1351,6 +1380,7 @@ export interface FileRouteTypes {
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
+    | '/tools/keyword-research'
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
@@ -1446,6 +1476,7 @@ export interface FileRouteTypes {
     | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
     | '/tools/background-blur'
+    | '/tools/backlink-checker'
     | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/bmi-calculator'
@@ -1467,6 +1498,7 @@ export interface FileRouteTypes {
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
+    | '/tools/domain-analysis'
     | '/tools/element-mixer'
     | '/tools/emi-calculator'
     | '/tools/extract-audio'
@@ -1492,6 +1524,7 @@ export interface FileRouteTypes {
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
+    | '/tools/keyword-research'
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
@@ -1587,6 +1620,7 @@ export interface FileRouteTypes {
     | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
     | '/tools/background-blur'
+    | '/tools/backlink-checker'
     | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/bmi-calculator'
@@ -1608,6 +1642,7 @@ export interface FileRouteTypes {
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
+    | '/tools/domain-analysis'
     | '/tools/element-mixer'
     | '/tools/emi-calculator'
     | '/tools/extract-audio'
@@ -1633,6 +1668,7 @@ export interface FileRouteTypes {
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
     | '/tools/json-formatter'
+    | '/tools/keyword-research'
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
@@ -1729,6 +1765,7 @@ export interface RootRouteChildren {
   ToolsAiWritingAssistantRoute: typeof ToolsAiWritingAssistantRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
+  ToolsBacklinkCheckerRoute: typeof ToolsBacklinkCheckerRoute
   ToolsBallSortRoute: typeof ToolsBallSortRoute
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsBmiCalculatorRoute: typeof ToolsBmiCalculatorRoute
@@ -1750,6 +1787,7 @@ export interface RootRouteChildren {
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDnsLeakTestRoute: typeof ToolsDnsLeakTestRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
+  ToolsDomainAnalysisRoute: typeof ToolsDomainAnalysisRoute
   ToolsElementMixerRoute: typeof ToolsElementMixerRoute
   ToolsEmiCalculatorRoute: typeof ToolsEmiCalculatorRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
@@ -1775,6 +1813,7 @@ export interface RootRouteChildren {
   ToolsInvoiceGeneratorRoute: typeof ToolsInvoiceGeneratorRoute
   ToolsIpAddressLookupRoute: typeof ToolsIpAddressLookupRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
+  ToolsKeywordResearchRoute: typeof ToolsKeywordResearchRoute
   ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
   ToolsLoanCalculatorRoute: typeof ToolsLoanCalculatorRoute
   ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
@@ -2390,6 +2429,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsLinkShortenerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/keyword-research': {
+      id: '/tools/keyword-research'
+      path: '/tools/keyword-research'
+      fullPath: '/tools/keyword-research'
+      preLoaderRoute: typeof ToolsKeywordResearchRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/json-formatter': {
       id: '/tools/json-formatter'
       path: '/tools/json-formatter'
@@ -2565,6 +2611,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsElementMixerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/domain-analysis': {
+      id: '/tools/domain-analysis'
+      path: '/tools/domain-analysis'
+      fullPath: '/tools/domain-analysis'
+      preLoaderRoute: typeof ToolsDomainAnalysisRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/document-scanner': {
       id: '/tools/document-scanner'
       path: '/tools/document-scanner'
@@ -2712,6 +2765,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsBallSortRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/backlink-checker': {
+      id: '/tools/backlink-checker'
+      path: '/tools/backlink-checker'
+      fullPath: '/tools/backlink-checker'
+      preLoaderRoute: typeof ToolsBacklinkCheckerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/background-blur': {
       id: '/tools/background-blur'
       path: '/tools/background-blur'
@@ -2852,6 +2912,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAiWritingAssistantRoute: ToolsAiWritingAssistantRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
+  ToolsBacklinkCheckerRoute: ToolsBacklinkCheckerRoute,
   ToolsBallSortRoute: ToolsBallSortRoute,
   ToolsBase64Route: ToolsBase64Route,
   ToolsBmiCalculatorRoute: ToolsBmiCalculatorRoute,
@@ -2873,6 +2934,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDnsLeakTestRoute: ToolsDnsLeakTestRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
+  ToolsDomainAnalysisRoute: ToolsDomainAnalysisRoute,
   ToolsElementMixerRoute: ToolsElementMixerRoute,
   ToolsEmiCalculatorRoute: ToolsEmiCalculatorRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
@@ -2899,6 +2961,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsInvoiceGeneratorRoute: ToolsInvoiceGeneratorRoute,
   ToolsIpAddressLookupRoute: ToolsIpAddressLookupRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
+  ToolsKeywordResearchRoute: ToolsKeywordResearchRoute,
   ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
   ToolsLoanCalculatorRoute: ToolsLoanCalculatorRoute,
   ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,

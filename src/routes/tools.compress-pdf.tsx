@@ -140,9 +140,10 @@ function CompressPdfPage() {
               </div>
               <button
                 onClick={reset}
+                aria-label="Remove file and reset"
                 className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition shrink-0"
               >
-                <X className="w-4 h-4" />
+                <X className="w-4 h-4" aria-hidden="true" />
               </button>
             </div>
 

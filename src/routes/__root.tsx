@@ -71,7 +71,6 @@ function RootShell({ children }: { children: React.ReactNode }) {
         <style dangerouslySetInnerHTML={{ __html: `*,::before,::after{box-sizing:border-box}body{margin:0;font-family:system-ui,-apple-system,"Inter",sans-serif;background:#ffffff;color:#0f172a}.dark body{background:#0a0f1e;color:#fff}.bg-hero{background:linear-gradient(135deg,#0a0f1e 0%,#0d1b3e 100%);color:#fff}h1{margin:0}.min-h-screen{min-height:100vh}.flex{display:flex}.flex-col{flex-direction:column}.flex-1{flex:1 1 0%}` }} />
         <HeadContent />
         <noscript>
-          <link rel="stylesheet" href={appCss} />
           <link rel="stylesheet" href={FONTS_HREF} />
         </noscript>
       </head>

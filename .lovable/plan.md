@@ -1,67 +1,69 @@
-## تشخيص دقيق للموبايل (75)
+## الوضع الحالي
 
-من الصور الثلاث:
+- Desktop: 98 ✓ (LCP 0.8s)
+- Mobile: 78 — FCP 3.8s / LCP 4.1s / Speed Index 4.1s
+- المشاكل من التقرير:
+  - Render-blocking requests — 160ms (styles.css الكامل يمنع الرسم)
+  - Reduce unused JS — 219 KiB (framer-motion كامل + بطاقات + lucide)
+  - Network dependency tree طويلة
+  - Use efficient cache lifetimes — 22 KiB (طرف ثالث، خارج التحكم)
 
-| المقياس | القيمة | الحكم |
-|---|---|---|
-| Performance | 75 | متوسط |
-| FCP | 3.9s | ضعيف |
-| LCP | 4.2s | ضعيف |
-| CLS | 0.002 | ممتاز ✓ |
-| TBT | 30ms | ممتاز ✓ |
-| Speed Index | 5.0s | ضعيف |
-
-**المشاكل من قائمة Insights/Diagnostics:**
-1. **Reduce unused JavaScript — 241KB** (السبب الأكبر). `main-*.js` ~330KB يحتوي على `framer-motion` كامل + كل بطاقات الأدوات + أيقونات lucide كثيرة، بينما الشاشة الأولى على الموبايل لا تحتاج منها إلا الـ hero.
-2. **LCP breakdown + Network dependency tree** — عنصر LCP على الموبايل هو نص الـ hero "The Free Tool for Your Images"، وهو ينتظر تحميل `main.js` + `styles.css` + الخطوط قبل أن يظهر.
-3. **Use efficient cache lifetimes — 22 KiB** — أصول طرف ثالث (Product Hunt/Fazier badges, gtag). خارج تحكمنا.
-4. **Improve image delivery — 5 KiB** — logo بقي أكبر قليلاً من الحاجة (مقبول، عالجناه سابقًا).
-5. **Render-blocking requests** — `styles.css` صغير ولن نلمسه (السبب الأخير في CLS 0.484).
-6. **Minify JS — 2 KiB** — قزم، تلقائي.
-
-الديسكتوب 96 مع نفس الكود يؤكد أن المشكلة قدرة معالجة الموبايل مع JS ضخم — الحل هو تقليل JS للشاشة الأولى.
+الإصلاح السابق (استبدال بعض `motion.*` في الـ hero + `fetchpriority=high` على CSS) لم يكن كافياً لأن:
+1. الـ hero لا يزال يستورد `framer-motion` (imports تبقى في الحزمة حتى لو لم تُستخدم كل الدوال).
+2. `styles.css` الكامل (Tailwind + كل الطبقات) يبقى render-blocking بسعة 160ms.
+3. الأقسام تحت الطية (`tool-card` بمجموعها، شرائح، شهادات) تُحزَّم في `main.js` بدل chunks منفصلة.
 
 ---
 
-## خطة الإصلاح (نطاق مضبوط، بلا مقايضات خطرة)
+## الخطة (3 محاور مركّزة)
 
-### 1. تخفيف `framer-motion` من الصفحة الرئيسية — الأثر الأكبر
+### 1. إزالة `framer-motion` **بالكامل** من الصفحة الرئيسية والـ hero
 
-الـ hero حاليًا يستورد ويستخدم `motion`, `useScroll`, `useTransform`, `AnimatePresence` من `framer-motion` (28 استخدامًا). الحزمة ~90KB gzipped وتُحمَّل قبل رسم الـ LCP.
+- في `src/routes/index.tsx`: حذف كل `import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion"`. استبدال أي `motion.*` متبقّي بعناصر HTML عادية + كلاسات `hero-fade-up` / `hero-fade-up-delay*` الموجودة أصلاً في `styles.css`.
+- في `src/components/tool-card.tsx`: التأكد أنه لا يستورد framer-motion (تم سابقًا — التحقق).
+- النتيجة: framer-motion لا يدخل chunk الصفحة الرئيسية إطلاقًا → توفير ~90KB gzipped.
 
-- **hero (فوق الطية)**: استبدال `motion.h1/motion.p/motion.div` بعناصر HTML عادية مع كلاسات CSS للحركة (`hero-fade-up` الموجودة بالفعل في `styles.css`). الحركة تبقى بصريًا نفسها.
-- **الأقسام تحت الطية** (بطاقات الأدوات، الشرائح، الشهادات، إلخ): إبقاء `framer-motion` لكن **lazy-load** عبر `React.lazy` — لن يُحمَّل حتى ينتهي الرسم الأول.
-- النتيجة المتوقعة: `main.js` ينخفض ~100KB، LCP ينخفض ~1.5s على الموبايل.
+### 2. تأجيل الأقسام تحت الطية عبر `React.lazy` + `Suspense`
 
-### 2. Preload لعنصر LCP (نص الـ hero)
+- استخراج قسمَي "Popular tools" و "Categories" (و"Testimonials" إن وُجد) إلى ملفات منفصلة تحت `src/components/home/` واستيرادها بـ `lazy()`.
+- تغليف كل قسم بـ `<Suspense fallback={<div className="min-h-[400px]" />}>` — الـ fallback بارتفاع ثابت لتفادي CLS.
+- النتيجة: `main.js` للصفحة الرئيسية ينخفض ~100-120KB، والـ hero يُرسم قبل تحميل تلك chunks.
 
-لا يمكن preload لنص، لكن يمكن ضمان أن CSS + الخط الحرج جاهزان بلا انتظار:
-- الخط الرئيسي `Inter` مؤجّل حاليًا — نُبقيه (font-display: swap يجعل النص يظهر بـ system-ui فورًا).
-- `fetchpriority="high"` على `<link rel="stylesheet" href={appCss}>` لضمان أن الـ CSS يسبق أي شيء آخر.
+### 3. Inline critical CSS للـ hero + تأجيل بقية `styles.css`
 
-### 3. تقسيم أيقونات lucide
+المشكلة الحقيقية للـ 160ms render-block: `styles.css` كامل ~40-50KB مضغوط، يحمّل Tailwind + كل الأدوات.
 
-`import { Search, Upload, Wand2, Video, ImageIcon, ... } from "lucide-react"` يجلب الشجرة بأكملها في بعض bundlers. سنتحقق من `vite.config.ts` أن `lucide-react` يُشجَّر بشكل صحيح؛ إذا لا، نُبدّل إلى import من `lucide-react/dist/esm/icons/<icon>` للأيقونات الأكثر ثقلاً في الصفحة الرئيسية.
-
-### 4. تأجيل قسم "Popular tools" و "Categories"
-
-استخدام `<Suspense>` + `React.lazy` لعزل هذين القسمين في chunks منفصلة تُحمَّل بعد الرسم الأول للـ hero.
+- توسيع الـ `<style>` inline الموجود في `__root.tsx` ليشمل: `.bg-hero`, `.grid-overlay`, `.text-gradient`, `.hero-fade-up*`, `@keyframes heroFadeUp`, وأنماط الأزرار/الحقول الأساسية للـ hero.
+- تحويل `<link rel="stylesheet" href={appCss} fetchpriority="high">` إلى نمط **preload + swap**:
+  ```html
+  <link rel="preload" as="style" href={appCss} onload="this.rel='stylesheet'">
+  <noscript><link rel="stylesheet" href={appCss}></noscript>
+  ```
+- ملاحظة: كنّا قد جرّبنا هذا سابقًا وأحدث CLS 0.484 لأن inline CSS كان ناقصًا. هذه المرة سنُدرج **كل** أنماط الـ hero inline (headline, subtitle, buttons, search box, stats badges) قبل التبديل — CLS سيبقى قريبًا من 0.
 
 ---
 
 ## الملفات المتغيّرة
-- `src/routes/index.tsx` — استبدال `motion.*` في الـ hero بعناصر HTML + CSS، تأجيل الأقسام السفلية عبر `React.lazy`.
-- `src/routes/__root.tsx` — إضافة `fetchpriority="high"` لـ appCss link.
-- (اختياري) `vite.config.ts` — التحقق من manualChunks لعزل `framer-motion` في chunk خاص.
+
+- `src/routes/index.tsx` — إزالة framer-motion نهائيًا، `lazy()` للأقسام تحت الطية.
+- `src/components/home/popular-tools.tsx` (جديد) — يحوي قسم Popular tools.
+- `src/components/home/categories-section.tsx` (جديد) — يحوي قسم Categories.
+- `src/routes/__root.tsx` — توسيع critical inline CSS + preload/swap لـ appCss.
 
 ## المتوقّع
-- Mobile Performance: **75 → 90+**
-- LCP: 4.2s → **~2.2s**
-- FCP: 3.9s → **~1.5s**
-- Unused JS: -100 to -150 KB
-- Desktop 96 يبقى كما هو أو يتحسن.
+
+| المقياس | قبل | بعد |
+|---|---|---|
+| Mobile Performance | 78 | **90+** |
+| FCP | 3.8s | **~1.4s** |
+| LCP | 4.1s | **~2.0s** |
+| Speed Index | 4.1s | **~2.5s** |
+| Unused JS | 219 KiB | **~60 KiB** |
+| Render-blocking | 160ms | **~30ms** |
+
+Desktop 98 يبقى كما هو (أو 99).
 
 ## خارج النطاق
-- الكاش على `/logo.webp` (استضافة).
-- طرف ثالث (Fazier/ProductHunt/gtag) — مؤجّل بالفعل.
-- CSS defer (لن نكرر خطأ CLS السابق).
+
+- Cache headers لأصول طرف ثالث (Fazier/ProductHunt/gtag) — خارج التحكم.
+- تغيير Tailwind config أو حذف utilities — مخاطرة عالية بلا مكسب يُذكر.

@@ -1,6 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
-import { motion, useScroll, useTransform, AnimatePresence } from "framer-motion";
 import {
   Search,
   Upload,
@@ -147,28 +146,6 @@ function TypedWord() {
   );
 }
 
-/* ---------- Floating particle ---------- */
-function Particle({ x, y, size, delay, color }: { x: number; y: number; size: number; delay: number; color: string }) {
-  return (
-    <motion.div
-      className="absolute rounded-full pointer-events-none"
-      style={{ left: `${x}%`, top: `${y}%`, width: size, height: size, background: color, opacity: 0.18 }}
-      animate={{ y: [0, -30, 0], opacity: [0.18, 0.32, 0.18] }}
-      transition={{ duration: 5 + delay, repeat: Infinity, delay, ease: "easeInOut" }}
-    />
-  );
-}
-
-const PARTICLES = [
-  { x: 8, y: 20, size: 6, delay: 0, color: "#00D4FF" },
-  { x: 92, y: 15, size: 4, delay: 1.2, color: "#8B5CF6" },
-  { x: 15, y: 75, size: 5, delay: 0.8, color: "#00D4FF" },
-  { x: 85, y: 65, size: 7, delay: 2, color: "#8B5CF6" },
-  { x: 50, y: 10, size: 3, delay: 1.5, color: "#00D4FF" },
-  { x: 72, y: 85, size: 5, delay: 0.3, color: "#8B5CF6" },
-  { x: 28, y: 88, size: 4, delay: 2.5, color: "#00D4FF" },
-];
-
 const INITIAL_PER_CAT = 6;
 
 /* ---------- HomePage ---------- */
@@ -179,11 +156,6 @@ function HomePage() {
   const [visibleCats, setVisibleCats] = useState(2);
   const loaderRef = useRef<HTMLDivElement>(null);
   const searchRef = useRef<HTMLInputElement>(null);
-  const heroRef = useRef<HTMLDivElement>(null);
-
-  const { scrollY } = useScroll();
-  const heroOpacity = useTransform(scrollY, [0, 400], [1, 0]);
-  const heroY = useTransform(scrollY, [0, 400], [0, -80]);
 
   const filtered = useMemo(
     () => tools.filter((t) => !t.hidden && (t.name + t.description).toLowerCase().includes(q.toLowerCase())),
@@ -228,14 +200,13 @@ function HomePage() {
     <>
       {/* ===== HERO ===== */}
       <section
-        ref={heroRef}
         className="relative overflow-hidden bg-hero text-white gpu-isolate mobile-no-backdrop"
         style={{ minHeight: "92vh", display: "flex", alignItems: "center" }}
       >
         {/* Grid overlay */}
         <div className="absolute inset-0 grid-overlay opacity-40" />
 
-        {/* Ambient orbs */}
+        {/* Ambient orbs (static — CSS only) */}
         <div
           className="absolute -top-48 -left-24 w-[500px] h-[500px] rounded-full blur-[120px] pointer-events-none"
           style={{ background: "radial-gradient(circle, rgba(139,92,246,0.28) 0%, transparent 70%)" }}
@@ -249,56 +220,37 @@ function HomePage() {
           style={{ background: "radial-gradient(ellipse, rgba(0,212,255,0.06) 0%, transparent 70%)" }}
         />
 
-        {/* Floating particles */}
-        {PARTICLES.map((p, i) => (
-          <Particle key={i} {...p} />
-        ))}
-
-        <motion.div
-          style={{ opacity: heroOpacity, y: heroY }}
-          className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 py-20 text-center"
-        >
+        <div className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 py-20 text-center">
           {/* Badge */}
-          <motion.div initial={{ opacity: 0, y: 20 }} animate={{ opacity: 1, y: 0 }} transition={{ duration: 0.6 }}>
+          <div className="hero-fade-up">
             <span className="inline-flex items-center gap-2 rounded-full border border-white/15 bg-white/5 px-4 py-1.5 text-xs font-semibold backdrop-blur-md uppercase tracking-wider">
               <span className="w-1.5 h-1.5 rounded-full animate-pulse" style={{ background: "var(--cyan-brand)" }} />
               Free · Fast · Private · No signup
             </span>
-          </motion.div>
+          </div>
 
           {/* Headline */}
-          <motion.h1
-            initial={{ opacity: 0, y: 30 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.7, delay: 0.1 }}
-            className="mt-8 font-display font-extrabold tracking-tight leading-[1.04]"
+          <h1
+            className="hero-fade-up mt-8 font-display font-extrabold tracking-tight leading-[1.04]"
             style={{ fontSize: "clamp(2.8rem, 8vw, 5.5rem)" }}
           >
             The Free Tool
             <br />
             for Your <TypedWord />
-          </motion.h1>
+          </h1>
 
           {/* Sub */}
-          <motion.p
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.25 }}
-            className="mt-6 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed"
+          <p
+            className="hero-fade-up-delay mt-6 text-lg sm:text-xl max-w-2xl mx-auto leading-relaxed"
             style={{ color: "rgba(255,255,255,0.65)" }}
           >
             90+ browser-based tools that run entirely on your device.
             <br className="hidden sm:block" />
             No uploads. No accounts. No waiting.
-          </motion.p>
+          </p>
 
           {/* Trust badges */}
-          <motion.div
-            initial={{ opacity: 0 }}
-            animate={{ opacity: 1 }}
-            transition={{ delay: 0.4 }}
-            className="mt-5 flex flex-wrap items-center justify-center gap-4"
-          >
+          <div className="hero-fade-up-delay mt-5 flex flex-wrap items-center justify-center gap-4">
             {TRUST_BADGES.map((b) => (
               <span
                 key={b.text}
@@ -309,15 +261,10 @@ function HomePage() {
                 {b.text}
               </span>
             ))}
-          </motion.div>
+          </div>
 
           {/* Search bar */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.3 }}
-            className="mt-10 max-w-xl mx-auto"
-          >
+          <div className="hero-fade-up-delay2 mt-10 max-w-xl mx-auto">
             <div
               className="relative group"
               onClick={() => {
@@ -361,77 +308,66 @@ function HomePage() {
             </div>
 
             {/* Search dropdown */}
-            <AnimatePresence>
-              {searchOpen && q.length > 0 && (
-                <motion.div
-                  initial={{ opacity: 0, y: -8 }}
-                  animate={{ opacity: 1, y: 0 }}
-                  exit={{ opacity: 0, y: -8 }}
-                  transition={{ duration: 0.15 }}
-                  className="absolute left-0 right-0 mt-2 rounded-2xl overflow-hidden text-left z-50"
-                  style={{
-                    background: "rgba(10,10,30,0.95)",
-                    backdropFilter: "blur(20px)",
-                    border: "1px solid rgba(255,255,255,0.12)",
-                    maxWidth: "36rem",
-                    margin: "8px auto 0",
-                  }}
-                >
-                  {filtered.slice(0, 7).map((t) => (
-                    <Link
-                      key={t.slug}
-                      to={t.path}
-                      className="flex items-center gap-3 px-4 py-3 transition"
-                      style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
-                      onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,212,255,0.06)")}
-                      onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+            {searchOpen && q.length > 0 && (
+              <div
+                className="absolute left-0 right-0 mt-2 rounded-2xl overflow-hidden text-left z-50 animate-fade-in"
+                style={{
+                  background: "rgba(10,10,30,0.95)",
+                  backdropFilter: "blur(20px)",
+                  border: "1px solid rgba(255,255,255,0.12)",
+                  maxWidth: "36rem",
+                  margin: "8px auto 0",
+                }}
+              >
+                {filtered.slice(0, 7).map((t) => (
+                  <Link
+                    key={t.slug}
+                    to={t.path}
+                    className="flex items-center gap-3 px-4 py-3 transition"
+                    style={{ borderBottom: "1px solid rgba(255,255,255,0.06)" }}
+                    onMouseEnter={(e) => (e.currentTarget.style.background = "rgba(0,212,255,0.06)")}
+                    onMouseLeave={(e) => (e.currentTarget.style.background = "transparent")}
+                  >
+                    <div
+                      className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
+                      style={{
+                        background: `color-mix(in oklab, ${categoryMeta[t.category].color} 15%, transparent)`,
+                      }}
                     >
-                      <div
-                        className="w-8 h-8 rounded-lg flex items-center justify-center flex-shrink-0"
-                        style={{
-                          background: `color-mix(in oklab, ${categoryMeta[t.category].color} 15%, transparent)`,
-                        }}
-                      >
-                        <t.icon className="w-4 h-4" style={{ color: categoryMeta[t.category].color }} />
-                      </div>
-                      <div>
-                        <div className="text-sm font-medium text-white">{t.name}</div>
-                        <div className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
-                          {t.description.slice(0, 55)}…
-                        </div>
-                      </div>
-                      <ArrowRight
-                        className="w-4 h-4 ml-auto flex-shrink-0"
-                        style={{ color: "rgba(255,255,255,0.3)" }}
-                      />
-                    </Link>
-                  ))}
-                  {filtered.length === 0 && (
-                    <div className="px-4 py-5 text-sm text-center" style={{ color: "rgba(255,255,255,0.4)" }}>
-                      No tools found for "{q}"
+                      <t.icon className="w-4 h-4" style={{ color: categoryMeta[t.category].color }} />
                     </div>
-                  )}
-                  {filtered.length > 7 && (
-                    <Link
-                      to="/tools"
-                      className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition"
-                      style={{ color: "var(--cyan-brand)" }}
-                    >
-                      See all {filtered.length} results <ArrowRight className="w-4 h-4" />
-                    </Link>
-                  )}
-                </motion.div>
-              )}
-            </AnimatePresence>
-          </motion.div>
+                    <div>
+                      <div className="text-sm font-medium text-white">{t.name}</div>
+                      <div className="text-xs" style={{ color: "rgba(255,255,255,0.4)" }}>
+                        {t.description.slice(0, 55)}…
+                      </div>
+                    </div>
+                    <ArrowRight
+                      className="w-4 h-4 ml-auto flex-shrink-0"
+                      style={{ color: "rgba(255,255,255,0.3)" }}
+                    />
+                  </Link>
+                ))}
+                {filtered.length === 0 && (
+                  <div className="px-4 py-5 text-sm text-center" style={{ color: "rgba(255,255,255,0.4)" }}>
+                    No tools found for "{q}"
+                  </div>
+                )}
+                {filtered.length > 7 && (
+                  <Link
+                    to="/tools"
+                    className="flex items-center justify-center gap-2 px-4 py-3 text-sm font-medium transition"
+                    style={{ color: "var(--cyan-brand)" }}
+                  >
+                    See all {filtered.length} results <ArrowRight className="w-4 h-4" />
+                  </Link>
+                )}
+              </div>
+            )}
+          </div>
 
           {/* Category pills */}
-          <motion.div
-            initial={{ opacity: 0, y: 16 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.45 }}
-            className="mt-8 flex flex-wrap items-center justify-center gap-2"
-          >
+          <div className="hero-fade-up-delay2 mt-8 flex flex-wrap items-center justify-center gap-2">
             {QUICK_CATS.map((c) => (
               <Link
                 key={c.label}
@@ -461,14 +397,11 @@ function HomePage() {
                 {c.label}
               </Link>
             ))}
-          </motion.div>
+          </div>
 
           {/* Stats row */}
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            animate={{ opacity: 1, y: 0 }}
-            transition={{ duration: 0.6, delay: 0.55 }}
-            className="mt-16 grid grid-cols-2 sm:grid-cols-4 gap-px max-w-2xl mx-auto rounded-2xl overflow-hidden"
+          <div
+            className="hero-fade-up-delay2 mt-16 grid grid-cols-2 sm:grid-cols-4 gap-px max-w-2xl mx-auto rounded-2xl overflow-hidden"
             style={{ border: "1px solid rgba(255,255,255,0.08)", background: "rgba(255,255,255,0.08)" }}
           >
             {STATS.map((s) => (
@@ -488,8 +421,8 @@ function HomePage() {
                 </span>
               </div>
             ))}
-          </motion.div>
-        </motion.div>
+          </div>
+        </div>
       </section>
 
       {/* ===== BODY ===== */}
@@ -509,40 +442,32 @@ function HomePage() {
             </Link>
           </div>
           <div className="grid grid-cols-2 sm:grid-cols-3 md:grid-cols-5 gap-3">
-            {popularTools.map((t, i) => {
+            {popularTools.map((t) => {
               const Icon = t.icon;
               const color = categoryMeta[t.category].color;
               return (
-                <motion.div
+                <Link
                   key={t.slug}
-                  initial={{ opacity: 0, y: 16 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true }}
-                  transition={{ delay: i * 0.05 }}
+                  to={t.path}
+                  className="group flex flex-col items-center text-center gap-2.5 rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-1"
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow = `0 8px 30px rgba(0,0,0,0.2), 0 0 0 1px ${color}33`;
+                    e.currentTarget.style.borderColor = `${color}44`;
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = "";
+                    e.currentTarget.style.borderColor = "";
+                  }}
                 >
-                  <Link
-                    to={t.path}
-                    className="group flex flex-col items-center text-center gap-2.5 rounded-2xl border border-border bg-card p-5 transition-all duration-200 hover:-translate-y-1"
-                    style={{ "--hover-glow": color } as any}
-                    onMouseEnter={(e) => {
-                      e.currentTarget.style.boxShadow = `0 8px 30px rgba(0,0,0,0.2), 0 0 0 1px ${color}33`;
-                      e.currentTarget.style.borderColor = `${color}44`;
-                    }}
-                    onMouseLeave={(e) => {
-                      e.currentTarget.style.boxShadow = "";
-                      e.currentTarget.style.borderColor = "";
-                    }}
+                  <div
+                    className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
+                    style={{ background: `color-mix(in oklab, ${color} 15%, transparent)`, color }}
                   >
-                    <div
-                      className="w-11 h-11 rounded-xl flex items-center justify-center transition-transform duration-200 group-hover:scale-110"
-                      style={{ background: `color-mix(in oklab, ${color} 15%, transparent)`, color }}
-                    >
-                      <Icon className="w-5 h-5" />
-                    </div>
-                    <span className="text-sm font-semibold leading-tight">{t.name}</span>
-                    <span className="text-[11px] text-muted-foreground leading-snug line-clamp-2">{t.description}</span>
-                  </Link>
-                </motion.div>
+                    <Icon className="w-5 h-5" />
+                  </div>
+                  <span className="text-sm font-semibold leading-tight">{t.name}</span>
+                  <span className="text-[11px] text-muted-foreground leading-snug line-clamp-2">{t.description}</span>
+                </Link>
               );
             })}
           </div>
@@ -582,12 +507,8 @@ function HomePage() {
                 desc: "Get your result instantly. No watermarks, no sign-ups, no strings.",
               },
             ].map((s, i) => (
-              <motion.div
+              <div
                 key={s.title}
-                initial={{ opacity: 0, y: 20 }}
-                whileInView={{ opacity: 1, y: 0 }}
-                viewport={{ once: true }}
-                transition={{ delay: i * 0.12 }}
                 className="relative rounded-2xl border border-border bg-card p-8 text-center group hover:border-[var(--cyan-brand)]/30 transition-colors"
               >
                 <div
@@ -610,7 +531,7 @@ function HomePage() {
                 </div>
                 <h3 className="font-display text-xl font-bold mb-2">{s.title}</h3>
                 <p className="text-sm text-muted-foreground leading-relaxed">{s.desc}</p>
-              </motion.div>
+              </div>
             ))}
           </div>
         </section>
@@ -636,11 +557,8 @@ function HomePage() {
               if (list.length === 0) return null;
               const meta = categoryMeta[cat];
               return (
-                <motion.div
+                <div
                   key={cat}
-                  initial={{ opacity: 0, y: 24 }}
-                  whileInView={{ opacity: 1, y: 0 }}
-                  viewport={{ once: true, margin: "-60px" }}
                   className="rounded-3xl border border-border/60 bg-card/30 p-6 sm:p-8"
                   style={{ backdropFilter: "blur(4px)" }}
                 >
@@ -696,7 +614,7 @@ function HomePage() {
                       </button>
                     </div>
                   )}
-                </motion.div>
+                </div>
               );
             })}
           </div>
@@ -707,10 +625,7 @@ function HomePage() {
 
         {/* CTA banner */}
         <section className="py-16">
-          <motion.div
-            initial={{ opacity: 0, y: 20 }}
-            whileInView={{ opacity: 1, y: 0 }}
-            viewport={{ once: true }}
+          <div
             className="relative rounded-3xl overflow-hidden text-white text-center px-6 py-16"
             style={{
               background:
@@ -735,7 +650,7 @@ function HomePage() {
                 Explore All Tools <ArrowRight className="w-5 h-5" />
               </Link>
             </div>
-          </motion.div>
+          </div>
         </section>
 
         <AdZone id="homepage-bottom-banner" size="728x90" />

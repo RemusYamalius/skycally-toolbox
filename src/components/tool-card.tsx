@@ -1,25 +1,13 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { motion } from "framer-motion";
 import { categoryMeta, type Tool } from "@/lib/tools";
-import { useIsMobile } from "@/hooks/use-mobile";
 
-export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
+export function ToolCard({ tool }: { tool: Tool; index?: number }) {
   const Icon = tool.icon;
   const color = categoryMeta[tool.category].color;
-  const isMobile = useIsMobile();
-
-  const motionProps = isMobile
-    ? { initial: false, animate: { opacity: 1, y: 0 } }
-    : {
-        initial: { opacity: 0, y: 16 },
-        whileInView: { opacity: 1, y: 0 },
-        viewport: { once: true, margin: "-50px" },
-        transition: { duration: 0.4, delay: index * 0.04 },
-      };
 
   return (
-    <motion.div {...motionProps} style={{ opacity: 1 }}>
+    <div>
       <Link
         to={tool.path}
         className="group relative block rounded-2xl border border-border bg-card p-6 transition-all md:hover:-translate-y-1 md:hover:shadow-[var(--shadow-elevated)]"
@@ -46,6 +34,6 @@ export function ToolCard({ tool, index = 0 }: { tool: Tool; index?: number }) {
           Try it <ArrowRight className="w-4 h-4 transition group-hover:translate-x-1" />
         </span>
       </Link>
-    </motion.div>
+    </div>
   );
 }

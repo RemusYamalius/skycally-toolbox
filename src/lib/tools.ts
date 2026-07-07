@@ -108,7 +108,7 @@ import {
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
-export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "games" | "minigames";
+export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "seo" | "games" | "minigames";
 
 export const categoryMeta: Record<ToolCategory, { label: string; color: string; icon: string }> = {
   video: { label: "Video Tools", color: "var(--cyan-brand)", icon: "🎬" },
@@ -118,6 +118,7 @@ export const categoryMeta: Record<ToolCategory, { label: string; color: string; 
   text: { label: "Text Tools", color: "var(--green-brand)", icon: "✍️" },
   ai: { label: "AI Tools", color: "var(--violet-brand)", icon: "🤖" },
   utility: { label: "Utility Tools", color: "var(--green-brand)", icon: "🛠️" },
+  seo: { label: "SEO Tools", color: "var(--cyan-brand)", icon: "🔎" },
   games: { label: "Game Tools", color: "var(--violet-brand)", icon: "🎲" },
   minigames: { label: "Mini Games", color: "var(--cyan-brand)", icon: "🕹️" },
 };
@@ -1175,6 +1176,62 @@ export const tools: Tool[] = [
     categories: ["ai", "text"],
     icon: PenLine,
     path: "/tools/ai-writing-assistant",
+  },
+
+  // ── SEO Tools (Semrush-powered) ────────────────────────────────
+  {
+    slug: "keyword-research",
+    name: "Keyword Research Tool",
+    description:
+      "Free keyword research with real monthly search volume, CPC, competition and related keywords. Live Semrush data, no signup.",
+    category: "seo",
+    icon: Search,
+    path: "/tools/keyword-research",
+  },
+  {
+    slug: "domain-analysis",
+    name: "Website Traffic Checker",
+    description:
+      "Estimate any website's organic traffic, keyword count and top ranking pages. Free domain SEO overview powered by Semrush.",
+    category: "seo",
+    icon: Globe,
+    path: "/tools/domain-analysis",
+  },
+  {
+    slug: "backlink-checker",
+    name: "Backlink Checker",
+    description:
+      "Check any domain's backlink profile — authority score, total backlinks, referring domains and top referrers. Free, no signup.",
+    category: "seo",
+    icon: Link2,
+    path: "/tools/backlink-checker",
+  },
+  {
+    slug: "keyword-difficulty",
+    name: "Keyword Difficulty Checker",
+    description:
+      "Check how hard it is to rank on Google for up to 10 keywords at once. Real Semrush KD scores, volume and CPC. Free.",
+    category: "seo",
+    icon: Target,
+    path: "/tools/keyword-difficulty",
+  },
+  {
+    slug: "competitor-analysis",
+    name: "Competitor Analysis Tool",
+    description:
+      "Discover your real Google search competitors in seconds. See keyword overlap, total keywords ranked and estimated traffic.",
+    category: "seo",
+    icon: Users,
+    path: "/tools/competitor-analysis",
+  },
+  {
+    slug: "page-seo-analyzer",
+    name: "Page SEO Analyzer",
+    description:
+      "Paste any URL and see every Google keyword it ranks for, positions, volumes and traffic share. Perfect for on-page SEO audits.",
+    category: "seo",
+    icon: FileSearch,
+    path: "/tools/page-seo-analyzer",
   },
 ];
 

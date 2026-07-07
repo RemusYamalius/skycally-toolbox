@@ -72,6 +72,7 @@ import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-te
 import { Route as ToolsPdfReaderRouteImport } from './routes/tools.pdf-reader'
 import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page-numbers'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
+import { Route as ToolsPageSeoAnalyzerRouteImport } from './routes/tools.page-seo-analyzer'
 import { Route as ToolsPacManRouteImport } from './routes/tools.pac-man'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
 import { Route as ToolsNetworkSpeedTestRouteImport } from './routes/tools.network-speed-test'
@@ -470,6 +471,11 @@ const ToolsPdfPageNumbersRoute = ToolsPdfPageNumbersRouteImport.update({
 const ToolsPasswordGeneratorRoute = ToolsPasswordGeneratorRouteImport.update({
   id: '/tools/password-generator',
   path: '/tools/password-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPageSeoAnalyzerRoute = ToolsPageSeoAnalyzerRouteImport.update({
+  id: '/tools/page-seo-analyzer',
+  path: '/tools/page-seo-analyzer',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsPacManRoute = ToolsPacManRouteImport.update({
@@ -974,6 +980,7 @@ export interface FileRoutesByFullPath {
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
+  '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
@@ -1120,6 +1127,7 @@ export interface FileRoutesByTo {
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
+  '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
@@ -1267,6 +1275,7 @@ export interface FileRoutesById {
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
+  '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
@@ -1415,6 +1424,7 @@ export interface FileRouteTypes {
     | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
+    | '/tools/page-seo-analyzer'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
@@ -1561,6 +1571,7 @@ export interface FileRouteTypes {
     | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
+    | '/tools/page-seo-analyzer'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
@@ -1707,6 +1718,7 @@ export interface FileRouteTypes {
     | '/tools/network-speed-test'
     | '/tools/object-detection'
     | '/tools/pac-man'
+    | '/tools/page-seo-analyzer'
     | '/tools/password-generator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
@@ -1854,6 +1866,7 @@ export interface RootRouteChildren {
   ToolsNetworkSpeedTestRoute: typeof ToolsNetworkSpeedTestRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPacManRoute: typeof ToolsPacManRoute
+  ToolsPageSeoAnalyzerRoute: typeof ToolsPageSeoAnalyzerRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPdfPageNumbersRoute: typeof ToolsPdfPageNumbersRoute
   ToolsPdfReaderRoute: typeof ToolsPdfReaderRoute
@@ -2355,6 +2368,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/password-generator'
       fullPath: '/tools/password-generator'
       preLoaderRoute: typeof ToolsPasswordGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/page-seo-analyzer': {
+      id: '/tools/page-seo-analyzer'
+      path: '/tools/page-seo-analyzer'
+      fullPath: '/tools/page-seo-analyzer'
+      preLoaderRoute: typeof ToolsPageSeoAnalyzerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/pac-man': {
@@ -3018,6 +3038,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsNetworkSpeedTestRoute: ToolsNetworkSpeedTestRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPacManRoute: ToolsPacManRoute,
+  ToolsPageSeoAnalyzerRoute: ToolsPageSeoAnalyzerRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPdfPageNumbersRoute: ToolsPdfPageNumbersRoute,
   ToolsPdfReaderRoute: ToolsPdfReaderRoute,

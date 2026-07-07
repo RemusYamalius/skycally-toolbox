@@ -610,6 +610,14 @@ export const tools: Tool[] = [
     path: "/tools/tip-calculator",
   },
   {
+    slug: "margin-calculator",
+    name: "Margin Calculator",
+    description: "Calculate gross margin, markup and profit from cost and revenue.",
+    category: "utility",
+    icon: Percent,
+    path: "/tools/margin-calculator",
+  },
+  {
     slug: "bmi-calculator",
     name: "BMI Calculator",
     description: "Calculate your Body Mass Index and healthy weight range.",

@@ -18,7 +18,7 @@ const POPULAR_SLUGS = [
   "ball-sort",
 ];
 
-const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games", "minigames", "ai"];
+const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "seo", "games", "minigames", "ai"];
 
 const CATEGORY_TAGLINES: Record<ToolCategory, string> = {
   ai: "Run AI models in your browser — no server, no cost.",
@@ -28,6 +28,7 @@ const CATEGORY_TAGLINES: Record<ToolCategory, string> = {
   pdf: "Merge, split, convert and extract from PDFs.",
   text: "Generate, format, encode and analyze text effortlessly.",
   utility: "Calculators, converters and everyday utilities.",
+  seo: "Real Semrush data — keyword research, backlinks, competitors and more.",
   games: "Spinning wheels, role assignments, team makers and more.",
   minigames: "Play Wordle, 2048, Ball Sort and more — no download needed.",
 };

@@ -81,6 +81,7 @@ import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMemoryMatchRouteImport } from './routes/tools.memory-match'
 import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
+import { Route as ToolsMarginCalculatorRouteImport } from './routes/tools.margin-calculator'
 import { Route as ToolsMahjongRouteImport } from './routes/tools.mahjong'
 import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
 import { Route as ToolsLoanCalculatorRouteImport } from './routes/tools.loan-calculator'
@@ -511,6 +512,11 @@ const ToolsMarkdownToHtmlRoute = ToolsMarkdownToHtmlRouteImport.update({
   path: '/tools/markdown-to-html',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMarginCalculatorRoute = ToolsMarginCalculatorRouteImport.update({
+  id: '/tools/margin-calculator',
+  path: '/tools/margin-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsMahjongRoute = ToolsMahjongRouteImport.update({
   id: '/tools/mahjong',
   path: '/tools/mahjong',
@@ -923,6 +929,7 @@ export interface FileRoutesByFullPath {
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/mahjong': typeof ToolsMahjongRoute
+  '/tools/margin-calculator': typeof ToolsMarginCalculatorRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
@@ -1063,6 +1070,7 @@ export interface FileRoutesByTo {
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/mahjong': typeof ToolsMahjongRoute
+  '/tools/margin-calculator': typeof ToolsMarginCalculatorRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
@@ -1204,6 +1212,7 @@ export interface FileRoutesById {
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
   '/tools/mahjong': typeof ToolsMahjongRoute
+  '/tools/margin-calculator': typeof ToolsMarginCalculatorRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
@@ -1346,6 +1355,7 @@ export interface FileRouteTypes {
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
     | '/tools/mahjong'
+    | '/tools/margin-calculator'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/memory-match'
@@ -1486,6 +1496,7 @@ export interface FileRouteTypes {
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
     | '/tools/mahjong'
+    | '/tools/margin-calculator'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/memory-match'
@@ -1626,6 +1637,7 @@ export interface FileRouteTypes {
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
     | '/tools/mahjong'
+    | '/tools/margin-calculator'
     | '/tools/markdown-to-html'
     | '/tools/meme-generator'
     | '/tools/memory-match'
@@ -1767,6 +1779,7 @@ export interface RootRouteChildren {
   ToolsLoanCalculatorRoute: typeof ToolsLoanCalculatorRoute
   ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
   ToolsMahjongRoute: typeof ToolsMahjongRoute
+  ToolsMarginCalculatorRoute: typeof ToolsMarginCalculatorRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
   ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
   ToolsMemoryMatchRoute: typeof ToolsMemoryMatchRoute
@@ -2342,6 +2355,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMarkdownToHtmlRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/margin-calculator': {
+      id: '/tools/margin-calculator'
+      path: '/tools/margin-calculator'
+      fullPath: '/tools/margin-calculator'
+      preLoaderRoute: typeof ToolsMarginCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/mahjong': {
       id: '/tools/mahjong'
       path: '/tools/mahjong'
@@ -2883,6 +2903,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsLoanCalculatorRoute: ToolsLoanCalculatorRoute,
   ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,
   ToolsMahjongRoute: ToolsMahjongRoute,
+  ToolsMarginCalculatorRoute: ToolsMarginCalculatorRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
   ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
   ToolsMemoryMatchRoute: ToolsMemoryMatchRoute,

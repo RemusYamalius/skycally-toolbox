@@ -51,6 +51,7 @@ import {
   Clock,
   Moon,
   Calculator,
+  Percent,
   Activity,
   CalendarDays,
   Link2,
@@ -607,6 +608,14 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Calculator,
     path: "/tools/tip-calculator",
+  },
+  {
+    slug: "margin-calculator",
+    name: "Margin Calculator",
+    description: "Calculate gross margin, markup and profit from cost and revenue.",
+    category: "utility",
+    icon: Percent,
+    path: "/tools/margin-calculator",
   },
   {
     slug: "bmi-calculator",

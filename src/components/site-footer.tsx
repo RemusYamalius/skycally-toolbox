@@ -224,6 +224,7 @@ export function SiteFooter() {
               <img
                 src="https://fazier.com/api/v1/public/badges/launch_badges.svg?badge_type=launched&theme=dark"
                 width={120}
+                height={26}
                 alt="Launched on Fazier"
                 className="opacity-70 hover:opacity-100 transition-opacity"
               />

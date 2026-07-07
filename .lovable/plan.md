@@ -1,58 +1,42 @@
-## تقييم المشكلة
+## Goal
 
-المشكل واضح من الصورتين: الأداة لا تميّز “الورقة/المستند” كهدف مستقل، بل تختار أحياناً إطار الصورة أو مساحة سوداء/نافذة البرنامج المحيطة بالمستند. لذلك تظهر نقاط القص على حدود خاطئة، وبعد الضغط على Add page لا يحدث تحويل احترافي إلى ورقة مستقيمة بزوايا قائمة.
+Fix the failing "Google Search Console isn't fully set up" finding by connecting GSC to the project, verifying ownership of `https://skycally.com/`, and submitting the sitemap.
 
-السبب التقني الرئيسي:
-- الاكتشاف الحالي يعتمد كثيراً على أكبر منطقة فاتحة/حواف عامة، وهذا يفشل عندما تكون الصورة لقطة شاشة فيها نافذة PDF، أو ورقة فوق خلفية قريبة اللون، أو مستند صغير وسط إطار كبير.
-- دالة التحقق من النتيجة تقبل رباعياً كبيراً جداً حتى لو لم يكن هو الورقة الفعلية.
-- التحويل المنظوري موجود، لكنه لا يعطي نتيجة صحيحة إذا كانت الزوايا المدخلة خاطئة.
-- لا يوجد “اختبار جودة” بعد الاكتشاف لرفض الإطار الخارجي والبحث عن مستند داخلي أصغر وأكثر منطقية.
+## Steps
 
-## خطة الإصلاح
+1. **Trigger the GSC connector**
+   - Call `standard_connectors--connect` with `connector_id: "google_search_console"`.
+   - This opens the OAuth authorization card in chat. You sign in with the Google account that will own the Search Console property.
+   - Wait for the connection to land before continuing.
 
-1. تحسين منطق اكتشاف المستند في `src/utils/edgeDetection.ts`
-   - إضافة مسار OpenCV حقيقي يعتمد على:
-     - grayscale + blur
-     - adaptive/Canny edges
-     - morphology close/open
-     - `findContours`
-     - `approxPolyDP`
-     - اختيار أفضل رباعي مستند حسب المساحة، التحدب، النسبة، وموقعه داخل الصورة.
-   - البحث عن المستند الداخلي وليس الإطار الخارجي عبر استبعاد الرباعيات التي تلامس حواف الصورة كثيراً أو تغطي مساحة مبالغاً فيها عندما يوجد رباعي داخلي أفضل.
-   - دعم صور مثل المرفقات: مستند داخل نافذة PDF أو مستند داخل مساحة سوداء/كاميرا.
+2. **Request a META verification token**
+   - Call the Site Verification API through the connector gateway to request a `META` token for `https://skycally.com/`.
+   - The response is a full `google-site-verification` content string.
 
-2. تحسين AI vision fallback في `src/lib/document-detect.functions.ts`
-   - تعديل البرومبت ليطلب صراحةً تجاهل: شاشة الكمبيوتر، قارئ PDF، الخلفية السوداء، النافذة، الهوامش، وأي إطار خارجي.
-   - إرجاع درجة ثقة تقريبية/سبب اختياري إن أمكن، أو على الأقل جعل اختيار الورقة الفعلية أكثر صرامة.
-   - الحفاظ على المفتاح في السيرفر فقط كما هو الآن.
+3. **Add the verification meta tag to the site**
+   - Insert `<meta name="google-site-verification" content="…" />` into the `head()` of `src/routes/__root.tsx` so it renders on every page (including the homepage that Google will fetch).
+   - This requires a build-mode edit and a publish so the tag is live on `https://skycally.com/`.
 
-3. إضافة طبقة تحقق وترتيب للزوايا في `src/routes/tools.document-scanner.tsx`
-   - رفض أي اكتشاف يغطي تقريباً الصورة كلها إذا كان المستند المرئي أصغر.
-   - إعادة ترتيب الزوايا دائماً قبل العرض والتحويل.
-   - تقليص/ضبط الزوايا إلى حدود الصورة ومنع الرباعيات المتقاطعة أو غير المحدبة.
-   - عند فشل AI أو OpenCV، إظهار fallback واضح فقط، لا رسالة “Document detected” على اختيار غير صحيح.
+4. **Ask Google to verify**
+   - Once the site is republished, call the Site Verification `webResource?verificationMethod=META` endpoint.
+   - A 200 means verified. A 400 `failedToFindMetaTag` means the deploy hasn't propagated yet — retry after a moment.
 
-4. تحسين التحويل المنظوري وجودة الناتج
-   - ضبط أبعاد الإخراج لتكون مستنداً قائماً بنسبة منطقية، مع تدوير تلقائي إذا كان العرض/الطول معكوساً.
-   - استخدام OpenCV `warpPerspective` كمسار أساسي عندما يكون متاحاً، مع fallback Canvas فقط عند الضرورة.
-   - تطبيق فلتر Magic بعد القص على الورقة فقط، وليس على الصورة الكاملة.
+5. **Add the site to Search Console**
+   - Call `PUT /webmasters/v3/sites/https%3A%2F%2Fskycally.com%2F` so the property appears in the user's Search Console list.
 
-5. تحسين تجربة المستخدم داخل لوحة التحرير
-   - إضافة زر “Auto-detect again” لإعادة المحاولة دون إعادة رفع الصورة.
-   - جعل رسالة الحالة أكثر صدقاً: Detected / Needs adjustment / Manual selection.
-   - إبقاء إمكانية السحب اليدوي، لكنها تصبح خيار تصحيح لا الحل الأساسي.
+6. **Submit the sitemap**
+   - Call `PUT /webmasters/v3/sites/https%3A%2F%2Fskycally.com%2F/sitemaps/https%3A%2F%2Fskycally.com%2Fsitemap.xml` to register the existing sitemap.
 
-6. التحقق العملي
-   - اختبار الأداة على الصورتين المرفقتين عبر المتصفح.
-   - التأكد أن الإطار الأزرق يحيط بالورقة نفسها في كل صورة، لا النافذة أو الخلفية.
-   - التأكد بعد Add page أن الناتج ورقة مستقيمة بزوايا قائمة قدر الإمكان.
+7. **Mark the SEO finding fixed**
+   - After verification and sitemap submission succeed, call `seo_chat--update_findings` on `gsc:gsc` with `state: "fixed"`.
 
-## النتيجة المتوقعة
+## What you need to do
 
-بعد التنفيذ، يجب أن تتعامل الأداة باحترافية مع الحالات الواقعية التالية:
-- ورقة داخل لقطة شاشة أو PDF viewer.
-- ورقة مصورة من كاميرا مع ميلان/اعوجاج.
-- ورقة على خلفية سوداء أو غير متجانسة.
-- مستند صغير نسبياً داخل صورة أكبر.
+- Approve the connector card when it appears and sign in to Google with the account that should own the Search Console property for skycally.com.
+- **Publish** the project after I add the verification meta tag, so Google can fetch it from the live domain. Verification will not succeed against the preview URL.
 
-الهدف ليس مجرد تحسين بسيط، بل نقل الأداة من “تخمين مستطيل عام” إلى pipeline أقرب لتطبيقات Scanner الاحترافية: اكتشاف رباعي صحيح، رفض النتائج الخاطئة، ثم تصحيح منظور فعلي.
+## Notes
+
+- Only the META verification method is used — DNS, file-upload, and Analytics methods aren't available in this workflow.
+- The meta tag is harmless to keep in place after verification; it stays as proof of ownership.
+- No existing head metadata is removed; the verification tag is added alongside current tags in `__root.tsx`.

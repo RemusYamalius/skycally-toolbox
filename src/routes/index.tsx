@@ -265,7 +265,7 @@ function HomePage() {
             ))}
           </div>
 
-          <div className="hero-fade-up-delay2 mt-10 max-w-xl mx-auto">
+          <div className="hero-fade-up-delay2 mt-10 max-w-xl mx-auto relative">
             <div
               className="relative group"
               onClick={() => {
@@ -278,7 +278,7 @@ function HomePage() {
                 style={{
                   background: "linear-gradient(135deg, rgba(0,212,255,0.5), rgba(139,92,246,0.5))",
                   opacity: searchOpen ? 1 : 0,
-                  borderRadius: "inherit",
+                  borderRadius: "1rem",
                 }}
               />
               <div
@@ -315,9 +315,8 @@ function HomePage() {
                   background: "rgba(10,10,30,0.95)",
                   backdropFilter: "blur(20px)",
                   border: "1px solid rgba(255,255,255,0.12)",
-                  maxWidth: "36rem",
-                  margin: "8px auto 0",
                 }}
+                onMouseDown={(e) => e.preventDefault()}
               >
                 {filtered.slice(0, 7).map((t) => (
                   <Link

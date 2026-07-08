@@ -278,7 +278,7 @@ function HomePage() {
                 style={{
                   background: "linear-gradient(135deg, rgba(0,212,255,0.5), rgba(139,92,246,0.5))",
                   opacity: searchOpen ? 1 : 0,
-                  borderRadius: "inherit",
+                  borderRadius: "1rem",
                 }}
               />
               <div

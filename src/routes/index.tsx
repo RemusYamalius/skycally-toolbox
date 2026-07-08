@@ -82,6 +82,31 @@ const TRUST_BADGES = [
 
 const TYPED_WORDS = ["Images", "Videos", "PDFs", "Audio", "Text", "Links"];
 
+type Particle = {
+  top: number; left: number; size: number; opacity: number;
+  delay: number; duration: number; violet?: boolean; blur?: number;
+};
+const PARTICLES: Particle[] = [
+  { top: 12, left: 8, size: 4, opacity: 0.55, delay: 0, duration: 6 },
+  { top: 22, left: 84, size: 3, opacity: 0.45, delay: 1.2, duration: 7 },
+  { top: 35, left: 18, size: 5, opacity: 0.5, delay: 2.4, duration: 6.5, violet: true },
+  { top: 48, left: 92, size: 2, opacity: 0.4, delay: 0.6, duration: 8 },
+  { top: 62, left: 6, size: 6, opacity: 0.5, delay: 1.8, duration: 7.5, violet: true },
+  { top: 74, left: 76, size: 3, opacity: 0.45, delay: 3, duration: 6 },
+  { top: 82, left: 28, size: 4, opacity: 0.5, delay: 0.9, duration: 7 },
+  { top: 18, left: 52, size: 2, opacity: 0.35, delay: 2.1, duration: 8.5 },
+  { top: 42, left: 62, size: 3, opacity: 0.45, delay: 1.5, duration: 6.8, violet: true },
+  { top: 55, left: 38, size: 5, opacity: 0.4, delay: 0.3, duration: 7.2 },
+  { top: 68, left: 48, size: 2, opacity: 0.4, delay: 2.7, duration: 6.4 },
+  { top: 28, left: 32, size: 4, opacity: 0.5, delay: 1.1, duration: 7.8, violet: true },
+  { top: 88, left: 58, size: 3, opacity: 0.4, delay: 3.3, duration: 6.2 },
+  { top: 8, left: 68, size: 5, opacity: 0.45, delay: 0.7, duration: 8 },
+  { top: 58, left: 14, size: 2, opacity: 0.35, delay: 2.5, duration: 7 },
+  { top: 15, left: 40, size: 10, opacity: 0.25, delay: 1.4, duration: 9, blur: 2, violet: true },
+  { top: 70, left: 88, size: 12, opacity: 0.2, delay: 0.5, duration: 10, blur: 3 },
+  { top: 45, left: 4, size: 8, opacity: 0.25, delay: 2.2, duration: 9.5, blur: 2 },
+];
+
 function TypedWord() {
   const [idx, setIdx] = useState(0);
   const [displayed, setDisplayed] = useState("");
@@ -177,6 +202,29 @@ function HomePage() {
           className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-[800px] h-[400px] rounded-full blur-[160px] pointer-events-none"
           style={{ background: "radial-gradient(ellipse, rgba(0,212,255,0.06) 0%, transparent 70%)" }}
         />
+
+        {/* Floating particles */}
+        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
+          {PARTICLES.map((p, i) => (
+            <span
+              key={i}
+              className="absolute rounded-full animate-float"
+              style={{
+                top: `${p.top}%`,
+                left: `${p.left}%`,
+                width: `${p.size}px`,
+                height: `${p.size}px`,
+                background: p.violet ? "var(--violet-brand)" : "var(--cyan-brand)",
+                opacity: p.opacity,
+                filter: p.blur ? `blur(${p.blur}px)` : undefined,
+                boxShadow: `0 0 ${p.size * 3}px currentColor`,
+                color: p.violet ? "var(--violet-brand)" : "var(--cyan-brand)",
+                animationDelay: `${p.delay}s`,
+                animationDuration: `${p.duration}s`,
+              }}
+            />
+          ))}
+        </div>
 
         <div className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 py-20 text-center">
           <div className="hero-fade-up">

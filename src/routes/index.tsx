@@ -265,7 +265,7 @@ function HomePage() {
             ))}
           </div>
 
-          <div className="hero-fade-up-delay2 mt-10 max-w-xl mx-auto relative">
+          <div className="hero-fade-up-delay2 relative z-[70] mt-10 max-w-xl mx-auto">
             <div
               className="relative group"
               onClick={() => {
@@ -310,11 +310,11 @@ function HomePage() {
 
             {searchOpen && q.length > 0 && (
               <div
-                className="absolute left-0 right-0 mt-2 rounded-2xl overflow-hidden text-left z-50 animate-fade-in"
+                className="absolute left-0 right-0 top-full mt-2 rounded-2xl overflow-hidden text-left z-[80] animate-fade-in"
                 style={{
-                  background: "rgba(10,10,30,0.95)",
-                  backdropFilter: "blur(20px)",
-                  border: "1px solid rgba(255,255,255,0.12)",
+                  background: "linear-gradient(180deg, oklch(0.17 0.045 270), oklch(0.125 0.04 270))",
+                  border: "1px solid rgba(255,255,255,0.16)",
+                  boxShadow: "0 24px 70px rgba(0,0,0,0.55), 0 0 0 1px rgba(0,212,255,0.08)",
                 }}
                 onMouseDown={(e) => e.preventDefault()}
               >

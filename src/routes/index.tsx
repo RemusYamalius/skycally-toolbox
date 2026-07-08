@@ -315,9 +315,8 @@ function HomePage() {
                   background: "rgba(10,10,30,0.95)",
                   backdropFilter: "blur(20px)",
                   border: "1px solid rgba(255,255,255,0.12)",
-                  maxWidth: "36rem",
-                  margin: "8px auto 0",
                 }}
+                onMouseDown={(e) => e.preventDefault()}
               >
                 {filtered.slice(0, 7).map((t) => (
                   <Link

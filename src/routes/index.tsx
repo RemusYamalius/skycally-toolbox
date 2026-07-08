@@ -265,7 +265,7 @@ function HomePage() {
             ))}
           </div>
 
-          <div className="hero-fade-up-delay2 mt-10 max-w-xl mx-auto">
+          <div className="hero-fade-up-delay2 mt-10 max-w-xl mx-auto relative">
             <div
               className="relative group"
               onClick={() => {

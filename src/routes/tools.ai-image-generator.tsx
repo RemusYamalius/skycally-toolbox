@@ -293,6 +293,7 @@ function AiImageGeneratorPage() {
         setHistory((prev) => [item, ...prev].slice(0, 8));
       })
       .catch((err) => {
+        console.error("[ai-image-generator] generateImage failed:", err);
         const code = err instanceof Error ? err.message : "GENERATION_FAILED";
         setError(ERROR_COPY[code] ?? ERROR_COPY.GENERATION_FAILED);
       })
@@ -477,12 +478,7 @@ function AiImageGeneratorPage() {
       {/* Style presets */}
       <section className="mt-6">
         <h2 className="text-sm font-medium text-muted-foreground mb-3">Style preset</h2>
-        <div
-          className="flex gap-2 overflow-x-auto pb-2 -mx-1 px-1"
-          style={{ scrollbarWidth: "thin" }}
-          role="radiogroup"
-          aria-label="Art style preset"
-        >
+        <div className="flex flex-wrap gap-2" role="radiogroup" aria-label="Art style preset">
           {STYLE_PRESETS.map((s) => {
             const active = s.id === styleId;
             return (
@@ -651,26 +647,44 @@ function AiImageGeneratorPage() {
               <ImagePlus className="w-4 h-4" aria-hidden />
               Need inspiration? Try one of these
             </h2>
-            <div className="grid grid-cols-2 sm:grid-cols-3 gap-3">
-              {EXAMPLES.map((ex) => (
+            <div className="grid grid-cols-1 sm:grid-cols-2 gap-3">
+              {EXAMPLES.map((ex, i) => (
                 <button
                   key={ex.seed}
                   type="button"
                   onClick={() => onExampleClick(ex.prompt)}
-                  className="group relative aspect-square overflow-hidden rounded-2xl border border-border bg-secondary/40 transition-all hover:border-transparent focus:outline-none focus:ring-2 focus:ring-ring"
-                  style={{ boxShadow: "0 0 0 0 transparent" }}
+                  className="group relative flex items-start gap-3 overflow-hidden rounded-2xl border border-border bg-secondary/30 p-4 text-left transition-all hover:border-transparent hover:-translate-y-0.5 focus:outline-none focus:ring-2 focus:ring-ring"
+                  style={{
+                    boxShadow: "0 0 0 1px transparent",
+                  }}
+                  onMouseEnter={(e) => {
+                    e.currentTarget.style.boxShadow =
+                      "0 0 0 2px var(--cyan-brand), 0 12px 30px -12px color-mix(in oklab, var(--cyan-brand) 40%, transparent)";
+                  }}
+                  onMouseLeave={(e) => {
+                    e.currentTarget.style.boxShadow = "0 0 0 1px transparent";
+                  }}
                   aria-label={`Use prompt: ${ex.prompt}`}
                 >
-                  <img
-                    src={`https://picsum.photos/seed/${ex.seed}/600/600`}
-                    alt=""
-                    loading="lazy"
-                    className="absolute inset-0 w-full h-full object-cover transition-transform duration-500 group-hover:scale-105"
-                  />
-                  <div className="absolute inset-0 bg-gradient-to-t from-black/85 via-black/30 to-transparent opacity-0 group-hover:opacity-100 transition-opacity" />
-                  <div className="absolute inset-x-0 bottom-0 p-3 text-left text-xs text-white opacity-0 group-hover:opacity-100 transition-opacity line-clamp-3">
-                    {ex.prompt}
-                  </div>
+                  <span
+                    aria-hidden
+                    className="shrink-0 inline-flex items-center justify-center w-9 h-9 rounded-xl text-base"
+                    style={{
+                      background:
+                        "linear-gradient(135deg, color-mix(in oklab, var(--cyan-brand) 25%, transparent), color-mix(in oklab, var(--violet-brand) 25%, transparent))",
+                    }}
+                  >
+                    {STYLE_PRESETS[(i % (STYLE_PRESETS.length - 1)) + 1].emoji}
+                  </span>
+                  <span className="flex-1 min-w-0">
+                    <span className="block text-sm leading-snug line-clamp-2">{ex.prompt}</span>
+                    <span
+                      className="mt-1.5 inline-flex items-center gap-1 text-xs font-medium opacity-70 group-hover:opacity-100 transition-opacity"
+                      style={{ color: "var(--cyan-brand)" }}
+                    >
+                      Use this prompt <span aria-hidden>→</span>
+                    </span>
+                  </span>
                 </button>
               ))}
             </div>

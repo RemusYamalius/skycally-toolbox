@@ -1177,6 +1177,17 @@ export const tools: Tool[] = [
     icon: PenLine,
     path: "/tools/ai-writing-assistant",
   },
+  {
+    slug: "ai-image-generator",
+    name: "AI Image Generator",
+    description:
+      "Free AI image generator — create stunning images from text in seconds. No signup, no limits, no watermark. Powered by Flux.",
+    category: "ai",
+    categories: ["ai", "image"],
+    icon: Sparkles,
+    path: "/tools/ai-image-generator",
+  },
+
 
   // ── SEO Tools (Semrush-powered) ────────────────────────────────
   {

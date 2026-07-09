@@ -25,8 +25,6 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
-import { generateImage } from "@/lib/generate-image.functions";
-import { enhancePrompt } from "@/lib/enhance-prompt.functions";
 import { cn } from "@/lib/utils";
 
 export const Route = createFileRoute("/tools/ai-image-generator")({
@@ -208,11 +206,63 @@ const EXAMPLES = [
 ];
 
 const ERROR_COPY: Record<string, string> = {
-  RATE_LIMITED: "Too many requests — please wait a moment and try again.",
-  REPLICATE_NOT_CONFIGURED: "Image generation is being set up. Please try again shortly.",
+  RATE_LIMITED: "Too many requests right now — please wait a moment and try again.",
   GENERATION_FAILED: "Generation failed — try a different prompt or style.",
-  CREDITS_EXHAUSTED: "AI credits exhausted. Please try again later.",
 };
+
+// ─── Pollinations.ai helpers ────────────────────────────────────────────
+// Free, keyless, called directly from the browser — no server, no signup,
+// nothing to hide. If this site ever needs higher throughput, get a free
+// "publishable" key at https://enter.pollinations.ai and append
+// `&key=pk_xxx` to the two URLs below — everything else stays the same.
+const POLLINATIONS_IMAGE = "https://image.pollinations.ai/prompt";
+const POLLINATIONS_TEXT = "https://gen.pollinations.ai/text";
+
+// Pollinations takes width/height rather than a named aspect ratio, so we
+// derive pixel dimensions from the ratio + a quality-driven target size.
+const QUALITY_BASE_PX: Record<Quality, number> = {
+  draft: 512,
+  standard: 768,
+  high: 1024,
+};
+
+function dimensionsFor(aspect: AspectOption, quality: Quality): { width: number; height: number } {
+  const base = QUALITY_BASE_PX[quality];
+  const round8 = (n: number) => Math.round(n / 8) * 8;
+  if (aspect.ratio >= 1) {
+    return { width: round8(base * aspect.ratio), height: round8(base) };
+  }
+  return { width: round8(base), height: round8(base / aspect.ratio) };
+}
+
+function buildImageUrl(params: {
+  prompt: string;
+  negativePrompt: string;
+  width: number;
+  height: number;
+  seed: number;
+}): string {
+  const search = new URLSearchParams({
+    width: String(params.width),
+    height: String(params.height),
+    seed: String(params.seed),
+    nologo: "true",
+    model: "flux",
+  });
+  if (params.negativePrompt) search.set("negative_prompt", params.negativePrompt);
+  return `${POLLINATIONS_IMAGE}/${encodeURIComponent(params.prompt)}?${search.toString()}`;
+}
+
+async function enhancePromptWithPollinations(original: string): Promise<string> {
+  const instruction =
+    `Rewrite this into one detailed, vivid AI image generation prompt. ` +
+    `Add lighting, mood, composition and quality descriptors. ` +
+    `Reply with ONLY the rewritten prompt, no quotes, no explanation: ${original}`;
+  const res = await fetch(`${POLLINATIONS_TEXT}/${encodeURIComponent(instruction)}`);
+  if (!res.ok) throw new Error("GENERATION_FAILED");
+  const text = (await res.text()).trim();
+  return text.length > 0 ? text : original;
+}
 
 // ─── Component ────────────────────────────────────────────────────────────
 function AiImageGeneratorPage() {
@@ -247,8 +297,8 @@ function AiImageGeneratorPage() {
     setEnhancing(true);
     setError(null);
     const original = prompt;
-    enhancePrompt({ data: { prompt: original } })
-      .then(({ enhanced }) => {
+    enhancePromptWithPollinations(original)
+      .then((enhanced) => {
         originalPromptRef.current = original;
         setPrompt(enhanced);
       })
@@ -272,28 +322,37 @@ function AiImageGeneratorPage() {
     if (clean.length < 3 || busy) return;
     setBusy(true);
     setError(null);
-    generateImage({
-      data: {
-        prompt: clean,
-        negativePrompt: negativePrompt.trim(),
-        aspectRatio,
-        style: selectedStyle.prompt,
-        quality,
-      },
-    })
-      .then(({ imageUrl }) => {
+    const fullPrompt = selectedStyle.prompt ? `${clean}, ${selectedStyle.prompt}` : clean;
+    const { width, height } = dimensionsFor(selectedAspect, quality);
+    const seed = Math.floor(Math.random() * 1_000_000);
+    const url = buildImageUrl({
+      prompt: fullPrompt,
+      negativePrompt: negativePrompt.trim(),
+      width,
+      height,
+      seed,
+    });
+
+    fetch(url)
+      .then((res) => {
+        if (res.status === 429) throw new Error("RATE_LIMITED");
+        if (!res.ok) throw new Error("GENERATION_FAILED");
+        return res.blob();
+      })
+      .then((blob) => {
+        const objectUrl = URL.createObjectURL(blob);
         const item: HistoryItem = {
           id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-          imageUrl,
+          imageUrl: objectUrl,
           prompt: clean,
-          fullPrompt: selectedStyle.prompt ? `${clean}, ${selectedStyle.prompt}` : clean,
+          fullPrompt,
           aspectRatio,
         };
         setCurrent(item);
         setHistory((prev) => [item, ...prev].slice(0, 8));
       })
       .catch((err) => {
-        console.error("[ai-image-generator] generateImage failed:", err);
+        console.error("[ai-image-generator] Pollinations generation failed:", err);
         const code = err instanceof Error ? err.message : "GENERATION_FAILED";
         setError(ERROR_COPY[code] ?? ERROR_COPY.GENERATION_FAILED);
       })

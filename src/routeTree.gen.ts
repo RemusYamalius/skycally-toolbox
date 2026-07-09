@@ -142,6 +142,7 @@ import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.backgrou
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
 import { Route as ToolsAiWritingAssistantRouteImport } from './routes/tools.ai-writing-assistant'
 import { Route as ToolsAiResumeBuilderRouteImport } from './routes/tools.ai-resume-builder'
+import { Route as ToolsAiImageGeneratorRouteImport } from './routes/tools.ai-image-generator'
 import { Route as ToolsAiEmailWriterRouteImport } from './routes/tools.ai-email-writer'
 import { Route as ToolsAiCoverLetterGeneratorRouteImport } from './routes/tools.ai-cover-letter-generator'
 import { Route as ToolsAgeCalculatorRouteImport } from './routes/tools.age-calculator'
@@ -826,6 +827,11 @@ const ToolsAiResumeBuilderRoute = ToolsAiResumeBuilderRouteImport.update({
   path: '/tools/ai-resume-builder',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAiImageGeneratorRoute = ToolsAiImageGeneratorRouteImport.update({
+  id: '/tools/ai-image-generator',
+  path: '/tools/ai-image-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsAiEmailWriterRoute = ToolsAiEmailWriterRouteImport.update({
   id: '/tools/ai-email-writer',
   path: '/tools/ai-email-writer',
@@ -911,6 +917,7 @@ export interface FileRoutesByFullPath {
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
+  '/tools/ai-image-generator': typeof ToolsAiImageGeneratorRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
@@ -1058,6 +1065,7 @@ export interface FileRoutesByTo {
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
+  '/tools/ai-image-generator': typeof ToolsAiImageGeneratorRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
@@ -1206,6 +1214,7 @@ export interface FileRoutesById {
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
+  '/tools/ai-image-generator': typeof ToolsAiImageGeneratorRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
@@ -1355,6 +1364,7 @@ export interface FileRouteTypes {
     | '/tools/age-calculator'
     | '/tools/ai-cover-letter-generator'
     | '/tools/ai-email-writer'
+    | '/tools/ai-image-generator'
     | '/tools/ai-resume-builder'
     | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
@@ -1502,6 +1512,7 @@ export interface FileRouteTypes {
     | '/tools/age-calculator'
     | '/tools/ai-cover-letter-generator'
     | '/tools/ai-email-writer'
+    | '/tools/ai-image-generator'
     | '/tools/ai-resume-builder'
     | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
@@ -1649,6 +1660,7 @@ export interface FileRouteTypes {
     | '/tools/age-calculator'
     | '/tools/ai-cover-letter-generator'
     | '/tools/ai-email-writer'
+    | '/tools/ai-image-generator'
     | '/tools/ai-resume-builder'
     | '/tools/ai-writing-assistant'
     | '/tools/audio-converter'
@@ -1797,6 +1809,7 @@ export interface RootRouteChildren {
   ToolsAgeCalculatorRoute: typeof ToolsAgeCalculatorRoute
   ToolsAiCoverLetterGeneratorRoute: typeof ToolsAiCoverLetterGeneratorRoute
   ToolsAiEmailWriterRoute: typeof ToolsAiEmailWriterRoute
+  ToolsAiImageGeneratorRoute: typeof ToolsAiImageGeneratorRoute
   ToolsAiResumeBuilderRoute: typeof ToolsAiResumeBuilderRoute
   ToolsAiWritingAssistantRoute: typeof ToolsAiWritingAssistantRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
@@ -2860,6 +2873,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAiResumeBuilderRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/ai-image-generator': {
+      id: '/tools/ai-image-generator'
+      path: '/tools/ai-image-generator'
+      fullPath: '/tools/ai-image-generator'
+      preLoaderRoute: typeof ToolsAiImageGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/ai-email-writer': {
       id: '/tools/ai-email-writer'
       path: '/tools/ai-email-writer'
@@ -2968,6 +2988,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAgeCalculatorRoute: ToolsAgeCalculatorRoute,
   ToolsAiCoverLetterGeneratorRoute: ToolsAiCoverLetterGeneratorRoute,
   ToolsAiEmailWriterRoute: ToolsAiEmailWriterRoute,
+  ToolsAiImageGeneratorRoute: ToolsAiImageGeneratorRoute,
   ToolsAiResumeBuilderRoute: ToolsAiResumeBuilderRoute,
   ToolsAiWritingAssistantRoute: ToolsAiWritingAssistantRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,

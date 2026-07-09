@@ -14,6 +14,7 @@
 
 ## AI & Writing
 
+- [AI Image Generator](/tools/ai-image-generator): Free text-to-image generator powered by Flux. 15 styles, 5 aspect ratios, no watermark.
 - [AI Writing Assistant](/tools/ai-writing-assistant): Grammar checker, paraphraser and text summarizer in one tool.
 - [AI Email Writer](/tools/ai-email-writer): Draft professional emails from a short brief.
 - [AI Cover Letter Generator](/tools/ai-cover-letter-generator): Generate tailored cover letters.

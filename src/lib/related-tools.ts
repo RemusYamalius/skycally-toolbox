@@ -17,6 +17,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "hand-gesture": ["face-landmarks", "background-blur", "object-detection"],
   "object-detection": ["hand-gesture", "face-landmarks", "sentiment-analysis"],
   "sentiment-analysis": ["object-detection", "word-counter", "text-to-speech"],
+  "ai-image-generator": ["image-filters", "image-resizer", "remove-bg", "collage-maker", "add-watermark", "image-upscaler", "meme-generator", "business-card-generator"],
 
   // Video
   "video-downloader": ["video-to-gif", "video-compressor", "extract-audio"],

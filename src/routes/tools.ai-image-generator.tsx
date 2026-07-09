@@ -47,20 +47,80 @@ interface StylePreset {
 
 const STYLE_PRESETS: StylePreset[] = [
   { id: "none", label: "No style", emoji: "✨", prompt: "" },
-  { id: "photorealistic", label: "Photorealistic", emoji: "📷", prompt: "photorealistic, 8k, DSLR, sharp focus, natural lighting" },
-  { id: "cinematic", label: "Cinematic", emoji: "🎬", prompt: "cinematic, movie still, dramatic lighting, anamorphic lens, film grain" },
+  {
+    id: "photorealistic",
+    label: "Photorealistic",
+    emoji: "📷",
+    prompt: "photorealistic, 8k, DSLR, sharp focus, natural lighting",
+  },
+  {
+    id: "cinematic",
+    label: "Cinematic",
+    emoji: "🎬",
+    prompt: "cinematic, movie still, dramatic lighting, anamorphic lens, film grain",
+  },
   { id: "anime", label: "Anime", emoji: "⛩️", prompt: "anime style, manga, Studio Ghibli inspired, cel shading" },
-  { id: "oil-painting", label: "Oil Painting", emoji: "🖼️", prompt: "oil painting, classical art, museum quality, rich textures, Renaissance style" },
-  { id: "watercolor", label: "Watercolor", emoji: "🎨", prompt: "watercolor painting, soft edges, flowing colors, artistic" },
+  {
+    id: "oil-painting",
+    label: "Oil Painting",
+    emoji: "🖼️",
+    prompt: "oil painting, classical art, museum quality, rich textures, Renaissance style",
+  },
+  {
+    id: "watercolor",
+    label: "Watercolor",
+    emoji: "🎨",
+    prompt: "watercolor painting, soft edges, flowing colors, artistic",
+  },
   { id: "pixel-art", label: "Pixel Art", emoji: "👾", prompt: "pixel art, 16-bit, retro game style, crisp pixels" },
-  { id: "3d-render", label: "3D Render", emoji: "💎", prompt: "3D render, octane render, volumetric lighting, subsurface scattering" },
-  { id: "cyberpunk", label: "Cyberpunk", emoji: "🌆", prompt: "cyberpunk, neon lights, futuristic city, blade runner aesthetic, rain" },
-  { id: "fantasy", label: "Fantasy", emoji: "🐉", prompt: "fantasy art, magical, epic, detailed, digital painting, artstation" },
-  { id: "minimalist", label: "Minimalist", emoji: "⬜", prompt: "minimalist, clean, simple, geometric, flat design, white background" },
-  { id: "vintage", label: "Vintage", emoji: "📻", prompt: "vintage, retro, 1970s aesthetic, film photography, faded colors, grain" },
-  { id: "sketch", label: "Pencil Sketch", emoji: "✏️", prompt: "pencil sketch, hand drawn, graphite, detailed linework, black and white" },
-  { id: "neon", label: "Neon Art", emoji: "💜", prompt: "neon art, glowing, dark background, electric colors, synthwave" },
-  { id: "logo", label: "Logo / Icon", emoji: "🔷", prompt: "logo design, vector style, clean, professional, minimal, isolated on white" },
+  {
+    id: "3d-render",
+    label: "3D Render",
+    emoji: "💎",
+    prompt: "3D render, octane render, volumetric lighting, subsurface scattering",
+  },
+  {
+    id: "cyberpunk",
+    label: "Cyberpunk",
+    emoji: "🌆",
+    prompt: "cyberpunk, neon lights, futuristic city, blade runner aesthetic, rain",
+  },
+  {
+    id: "fantasy",
+    label: "Fantasy",
+    emoji: "🐉",
+    prompt: "fantasy art, magical, epic, detailed, digital painting, artstation",
+  },
+  {
+    id: "minimalist",
+    label: "Minimalist",
+    emoji: "⬜",
+    prompt: "minimalist, clean, simple, geometric, flat design, white background",
+  },
+  {
+    id: "vintage",
+    label: "Vintage",
+    emoji: "📻",
+    prompt: "vintage, retro, 1970s aesthetic, film photography, faded colors, grain",
+  },
+  {
+    id: "sketch",
+    label: "Pencil Sketch",
+    emoji: "✏️",
+    prompt: "pencil sketch, hand drawn, graphite, detailed linework, black and white",
+  },
+  {
+    id: "neon",
+    label: "Neon Art",
+    emoji: "💜",
+    prompt: "neon art, glowing, dark background, electric colors, synthwave",
+  },
+  {
+    id: "logo",
+    label: "Logo / Icon",
+    emoji: "🔷",
+    prompt: "logo design, vector style, clean, professional, minimal, isolated on white",
+  },
 ];
 
 const RANDOM_PROMPTS = [
@@ -173,14 +233,8 @@ function AiImageGeneratorPage() {
 
   const originalPromptRef = useRef<string | null>(null);
 
-  const selectedStyle = useMemo(
-    () => STYLE_PRESETS.find((s) => s.id === styleId) ?? STYLE_PRESETS[0],
-    [styleId],
-  );
-  const selectedAspect = useMemo(
-    () => ASPECTS.find((a) => a.id === aspectRatio) ?? ASPECTS[0],
-    [aspectRatio],
-  );
+  const selectedStyle = useMemo(() => STYLE_PRESETS.find((s) => s.id === styleId) ?? STYLE_PRESETS[0], [styleId]);
+  const selectedAspect = useMemo(() => ASPECTS.find((a) => a.id === aspectRatio) ?? ASPECTS[0], [aspectRatio]);
 
   const onRandom = () => {
     const next = RANDOM_PROMPTS[Math.floor(Math.random() * RANDOM_PROMPTS.length)];
@@ -188,21 +242,23 @@ function AiImageGeneratorPage() {
     originalPromptRef.current = null;
   };
 
-  const onEnhance = async () => {
+  function onEnhance() {
     if (!prompt.trim() || enhancing) return;
     setEnhancing(true);
     setError(null);
     const original = prompt;
-    try {
-      const { enhanced } = await enhancePrompt({ data: { prompt: original } });
-      originalPromptRef.current = original;
-      setPrompt(enhanced);
-    } catch {
-      // silent fallback — keep original
-    } finally {
-      setEnhancing(false);
-    }
-  };
+    enhancePrompt({ data: { prompt: original } })
+      .then(({ enhanced }) => {
+        originalPromptRef.current = original;
+        setPrompt(enhanced);
+      })
+      .catch(() => {
+        // silent fallback — keep original
+      })
+      .finally(() => {
+        setEnhancing(false);
+      });
+  }
 
   const onUndoEnhance = () => {
     if (originalPromptRef.current != null) {
@@ -211,70 +267,75 @@ function AiImageGeneratorPage() {
     }
   };
 
-  const onGenerate = async () => {
+  function onGenerate() {
     const clean = prompt.trim();
     if (clean.length < 3 || busy) return;
     setBusy(true);
     setError(null);
-    try {
-      const { imageUrl } = await generateImage({
-        data: {
-          prompt: clean,
-          negativePrompt: negativePrompt.trim(),
-          aspectRatio,
-          style: selectedStyle.prompt,
-          quality,
-        },
-      });
-      const item: HistoryItem = {
-        id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
-        imageUrl,
+    generateImage({
+      data: {
         prompt: clean,
-        fullPrompt: selectedStyle.prompt ? `${clean}, ${selectedStyle.prompt}` : clean,
+        negativePrompt: negativePrompt.trim(),
         aspectRatio,
-      };
-      setCurrent(item);
-      setHistory((prev) => [item, ...prev].slice(0, 8));
-    } catch (err) {
-      const code = err instanceof Error ? err.message : "GENERATION_FAILED";
-      setError(ERROR_COPY[code] ?? ERROR_COPY.GENERATION_FAILED);
-    } finally {
-      setBusy(false);
-    }
-  };
+        style: selectedStyle.prompt,
+        quality,
+      },
+    })
+      .then(({ imageUrl }) => {
+        const item: HistoryItem = {
+          id: `${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
+          imageUrl,
+          prompt: clean,
+          fullPrompt: selectedStyle.prompt ? `${clean}, ${selectedStyle.prompt}` : clean,
+          aspectRatio,
+        };
+        setCurrent(item);
+        setHistory((prev) => [item, ...prev].slice(0, 8));
+      })
+      .catch((err) => {
+        const code = err instanceof Error ? err.message : "GENERATION_FAILED";
+        setError(ERROR_COPY[code] ?? ERROR_COPY.GENERATION_FAILED);
+      })
+      .finally(() => {
+        setBusy(false);
+      });
+  }
 
-  const onDownload = async () => {
+  function onDownload() {
     if (!current) return;
-    try {
-      const res = await fetch(current.imageUrl);
-      const blob = await res.blob();
-      const url = URL.createObjectURL(blob);
-      const a = document.createElement("a");
-      a.href = url;
-      a.download = `skycally-ai-${Date.now()}.webp`;
-      document.body.appendChild(a);
-      a.click();
-      a.remove();
-      setTimeout(() => URL.revokeObjectURL(url), 1000);
-    } catch {
-      setError(ERROR_COPY.GENERATION_FAILED);
-    }
-  };
+    fetch(current.imageUrl)
+      .then((res) => res.blob())
+      .then((blob) => {
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a");
+        a.href = url;
+        a.download = `skycally-ai-${Date.now()}.webp`;
+        document.body.appendChild(a);
+        a.click();
+        a.remove();
+        setTimeout(() => URL.revokeObjectURL(url), 1000);
+      })
+      .catch(() => {
+        setError(ERROR_COPY.GENERATION_FAILED);
+      });
+  }
 
-  const onCopyPrompt = async () => {
+  function onCopyPrompt() {
     if (!current) return;
-    try {
-      await navigator.clipboard.writeText(current.fullPrompt);
-      setCopied(true);
-      setTimeout(() => setCopied(false), 1500);
-    } catch {
-      /* noop */
-    }
-  };
+    navigator.clipboard
+      .writeText(current.fullPrompt)
+      .then(() => {
+        setCopied(true);
+        setTimeout(() => setCopied(false), 1500);
+      })
+      .catch(() => {
+        /* noop */
+      });
+  }
 
   const onVariations = () => {
     if (!current || busy) return;
-    void onGenerate();
+    onGenerate();
   };
 
   const onExampleClick = (p: string) => {
@@ -315,7 +376,8 @@ function AiImageGeneratorPage() {
         style={{
           background:
             "linear-gradient(180deg, color-mix(in oklab, var(--card) 88%, transparent), color-mix(in oklab, var(--card) 65%, transparent))",
-          boxShadow: "0 20px 60px -20px rgba(0,0,0,0.5), 0 0 0 1px color-mix(in oklab, var(--cyan-brand) 6%, transparent)",
+          boxShadow:
+            "0 20px 60px -20px rgba(0,0,0,0.5), 0 0 0 1px color-mix(in oklab, var(--cyan-brand) 6%, transparent)",
         }}
       >
         <label htmlFor="ai-prompt" className="block text-sm font-medium mb-2 flex items-center gap-2">
@@ -335,7 +397,8 @@ function AiImageGeneratorPage() {
               boxShadow: "0 0 0 1px color-mix(in oklab, var(--cyan-brand) 12%, transparent)",
             }}
             onFocus={(e) => {
-              e.currentTarget.style.boxShadow = "0 0 0 2px var(--cyan-brand), 0 0 24px -6px color-mix(in oklab, var(--cyan-brand) 60%, transparent)";
+              e.currentTarget.style.boxShadow =
+                "0 0 0 2px var(--cyan-brand), 0 0 24px -6px color-mix(in oklab, var(--cyan-brand) 60%, transparent)";
             }}
             onBlur={(e) => {
               e.currentTarget.style.boxShadow = "0 0 0 1px color-mix(in oklab, var(--cyan-brand) 12%, transparent)";
@@ -362,7 +425,11 @@ function AiImageGeneratorPage() {
             disabled={busy || enhancing || prompt.trim().length < 2}
             className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/60 hover:bg-secondary px-3.5 py-2 text-sm font-medium transition-colors disabled:opacity-50"
           >
-            {enhancing ? <Loader2 className="w-4 h-4 animate-spin" aria-hidden /> : <Wand2 className="w-4 h-4" aria-hidden />}
+            {enhancing ? (
+              <Loader2 className="w-4 h-4 animate-spin" aria-hidden />
+            ) : (
+              <Wand2 className="w-4 h-4" aria-hidden />
+            )}
             {enhancing ? "Enhancing…" : "Enhance prompt"}
           </button>
           {originalPromptRef.current != null && !enhancing && (
@@ -434,9 +501,9 @@ function AiImageGeneratorPage() {
                 style={
                   active
                     ? {
-                        background:
-                          "color-mix(in oklab, var(--cyan-brand) 12%, var(--card))",
-                        boxShadow: "0 0 0 2px var(--cyan-brand), 0 0 20px -6px color-mix(in oklab, var(--cyan-brand) 50%, transparent)",
+                        background: "color-mix(in oklab, var(--cyan-brand) 12%, var(--card))",
+                        boxShadow:
+                          "0 0 0 2px var(--cyan-brand), 0 0 20px -6px color-mix(in oklab, var(--cyan-brand) 50%, transparent)",
                       }
                     : undefined
                 }
@@ -461,7 +528,9 @@ function AiImageGeneratorPage() {
         >
           <Settings2 className="w-4 h-4" aria-hidden />
           Advanced options
-          <span aria-hidden className={cn("transition-transform text-xs", advancedOpen && "rotate-180")}>▾</span>
+          <span aria-hidden className={cn("transition-transform text-xs", advancedOpen && "rotate-180")}>
+            ▾
+          </span>
         </button>
 
         <AnimatePresence initial={false}>
@@ -609,7 +678,10 @@ function AiImageGeneratorPage() {
         )}
 
         {busy && (
-          <div className="relative w-full rounded-3xl overflow-hidden border border-border" style={{ paddingBottom: aspectPaddingPct }}>
+          <div
+            className="relative w-full rounded-3xl overflow-hidden border border-border"
+            style={{ paddingBottom: aspectPaddingPct }}
+          >
             <div
               className="absolute inset-0 animate-pulse"
               style={{
@@ -741,22 +813,82 @@ function AiImageGeneratorPage() {
       <section className="mt-8 rounded-2xl border border-border bg-card/40 p-5 text-sm text-muted-foreground space-y-2">
         <p>
           Take your generated images further with Skycally's full image toolkit:{" "}
-          <a href="/tools/image-filters" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Image Filters</a>,{" "}
-          <a href="/tools/image-resizer" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Image Resizer</a>,{" "}
-          <a href="/tools/remove-bg" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Remove Background</a>, and{" "}
-          <a href="/tools/add-watermark" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Add Watermark</a>.
+          <a
+            href="/tools/image-filters"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Image Filters
+          </a>
+          ,{" "}
+          <a
+            href="/tools/image-resizer"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Image Resizer
+          </a>
+          ,{" "}
+          <a
+            href="/tools/remove-bg"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Remove Background
+          </a>
+          , and{" "}
+          <a
+            href="/tools/add-watermark"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Add Watermark
+          </a>
+          .
         </p>
         <p>
           Combine multiple AI-generated images into a single composition with the{" "}
-          <a href="/tools/collage-maker" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Photo Collage Maker</a>, or convert them to PDF with{" "}
-          <a href="/tools/image-to-pdf" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Image to PDF</a>. Need a logo? Try the{" "}
-          <a href="/tools/business-card-generator" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Business Card Generator</a> with your AI-generated artwork.
+          <a
+            href="/tools/collage-maker"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Photo Collage Maker
+          </a>
+          , or convert them to PDF with{" "}
+          <a
+            href="/tools/image-to-pdf"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Image to PDF
+          </a>
+          . Need a logo? Try the{" "}
+          <a
+            href="/tools/business-card-generator"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Business Card Generator
+          </a>{" "}
+          with your AI-generated artwork.
         </p>
         <p>
           Add custom text overlays with{" "}
-          <a href="/tools/add-text-to-image" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Add Text to Image</a>, create viral content with the{" "}
-          <a href="/tools/meme-generator" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Meme Generator</a>, or upscale low-resolution results with{" "}
-          <a href="/tools/image-upscaler" className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">Image Upscaler</a>.
+          <a
+            href="/tools/add-text-to-image"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Add Text to Image
+          </a>
+          , create viral content with the{" "}
+          <a
+            href="/tools/meme-generator"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Meme Generator
+          </a>
+          , or upscale low-resolution results with{" "}
+          <a
+            href="/tools/image-upscaler"
+            className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+          >
+            Image Upscaler
+          </a>
+          .
         </p>
       </section>
 

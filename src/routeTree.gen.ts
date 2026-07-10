@@ -102,6 +102,7 @@ import { Route as ToolsImageFiltersRouteImport } from './routes/tools.image-filt
 import { Route as ToolsImageCropperRouteImport } from './routes/tools.image-cropper'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
+import { Route as ToolsImageAnimatorRouteImport } from './routes/tools.image-animator'
 import { Route as ToolsHolidayCheckerRouteImport } from './routes/tools.holiday-checker'
 import { Route as ToolsHeartRateZoneCalculatorRouteImport } from './routes/tools.heart-rate-zone-calculator'
 import { Route as ToolsHashGeneratorRouteImport } from './routes/tools.hash-generator'
@@ -625,6 +626,11 @@ const ToolsImageCompressorRoute = ToolsImageCompressorRouteImport.update({
   path: '/tools/image-compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsImageAnimatorRoute = ToolsImageAnimatorRouteImport.update({
+  id: '/tools/image-animator',
+  path: '/tools/image-animator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsHolidayCheckerRoute = ToolsHolidayCheckerRouteImport.update({
   id: '/tools/holiday-checker',
   path: '/tools/holiday-checker',
@@ -958,6 +964,7 @@ export interface FileRoutesByFullPath {
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/heart-rate-zone-calculator': typeof ToolsHeartRateZoneCalculatorRoute
   '/tools/holiday-checker': typeof ToolsHolidayCheckerRoute
+  '/tools/image-animator': typeof ToolsImageAnimatorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-cropper': typeof ToolsImageCropperRoute
@@ -1106,6 +1113,7 @@ export interface FileRoutesByTo {
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/heart-rate-zone-calculator': typeof ToolsHeartRateZoneCalculatorRoute
   '/tools/holiday-checker': typeof ToolsHolidayCheckerRoute
+  '/tools/image-animator': typeof ToolsImageAnimatorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-cropper': typeof ToolsImageCropperRoute
@@ -1255,6 +1263,7 @@ export interface FileRoutesById {
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/heart-rate-zone-calculator': typeof ToolsHeartRateZoneCalculatorRoute
   '/tools/holiday-checker': typeof ToolsHolidayCheckerRoute
+  '/tools/image-animator': typeof ToolsImageAnimatorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
   '/tools/image-cropper': typeof ToolsImageCropperRoute
@@ -1405,6 +1414,7 @@ export interface FileRouteTypes {
     | '/tools/hash-generator'
     | '/tools/heart-rate-zone-calculator'
     | '/tools/holiday-checker'
+    | '/tools/image-animator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-cropper'
@@ -1553,6 +1563,7 @@ export interface FileRouteTypes {
     | '/tools/hash-generator'
     | '/tools/heart-rate-zone-calculator'
     | '/tools/holiday-checker'
+    | '/tools/image-animator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-cropper'
@@ -1701,6 +1712,7 @@ export interface FileRouteTypes {
     | '/tools/hash-generator'
     | '/tools/heart-rate-zone-calculator'
     | '/tools/holiday-checker'
+    | '/tools/image-animator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
     | '/tools/image-cropper'
@@ -1850,6 +1862,7 @@ export interface RootRouteChildren {
   ToolsHashGeneratorRoute: typeof ToolsHashGeneratorRoute
   ToolsHeartRateZoneCalculatorRoute: typeof ToolsHeartRateZoneCalculatorRoute
   ToolsHolidayCheckerRoute: typeof ToolsHolidayCheckerRoute
+  ToolsImageAnimatorRoute: typeof ToolsImageAnimatorRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
   ToolsImageCropperRoute: typeof ToolsImageCropperRoute
@@ -2593,6 +2606,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsImageCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/image-animator': {
+      id: '/tools/image-animator'
+      path: '/tools/image-animator'
+      fullPath: '/tools/image-animator'
+      preLoaderRoute: typeof ToolsImageAnimatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/holiday-checker': {
       id: '/tools/holiday-checker'
       path: '/tools/holiday-checker'
@@ -3029,6 +3049,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsHashGeneratorRoute: ToolsHashGeneratorRoute,
   ToolsHeartRateZoneCalculatorRoute: ToolsHeartRateZoneCalculatorRoute,
   ToolsHolidayCheckerRoute: ToolsHolidayCheckerRoute,
+  ToolsImageAnimatorRoute: ToolsImageAnimatorRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
   ToolsImageCropperRoute: ToolsImageCropperRoute,

@@ -105,6 +105,8 @@ import {
   Timer,
   Mail,
   PenLine,
+  Clapperboard,
+
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1187,6 +1189,17 @@ export const tools: Tool[] = [
     icon: Sparkles,
     path: "/tools/ai-image-generator",
   },
+  {
+    slug: "image-animator",
+    name: "AI Image Animator",
+    description:
+      "Free AI image animator — bring any photo to life with cinematic motion effects. Export as MP4 or GIF, no signup, no limits.",
+    category: "image",
+    categories: ["image", "video", "ai"],
+    icon: Clapperboard,
+    path: "/tools/image-animator",
+  },
+
 
 
   // ── SEO Tools (Semrush-powered) ────────────────────────────────

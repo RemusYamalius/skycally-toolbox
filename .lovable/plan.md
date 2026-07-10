@@ -1,84 +1,64 @@
-# AI Image Generator — Implementation Plan
+## AI Image Animator — Implementation Plan
 
-A production-ready `/tools/ai-image-generator` route matching Skycally's tool conventions (`ToolPageShell` + `HowToUse` + `AdZone` + `ToolSeoContent` + `RelatedTools`), powered by Replicate's `black-forest-labs/flux-schnell` for generation and Lovable AI Gateway for prompt enhancement.
+Build a fully client-side image-to-video animator at `/tools/image-animator` using Canvas API + MediaRecorder + the existing gif.js pipeline. No server functions, no external APIs.
 
-## 1. Backend — Server functions
+### Files to create
 
-**`src/lib/generate-image.functions.ts`** (client-safe path, per project conventions)
+1. **`src/routes/tools.image-animator.tsx`** — the tool route
+   - `createFileRoute("/tools/image-animator")` with `head()` using `buildToolMeta`
+   - Wraps UI in `ToolPageShell`, ends with `HowToUse` + `AdZone` (id `image-animator-mid`, 728x90) + `ToolSeoContent` + `RelatedTools`
+   - Two-column layout (controls / preview), single column on mobile
+   - Detects `?from=generator` search param → shows tip banner
+   - Reads image via `DropZone` (accept `image/*`, max 20MB, warning above 10MB)
+   - 8 effect cards in 2×4 grid with cyan gradient border on selected
+   - Live CSS preview: applies alternating transform with `transition: transform 2s ease-in-out` to the uploaded image while no render is running
+   - Settings: duration (3/5/8/10s), fps (24/30), format (MP4/GIF), resolution (480/720/1080), loop toggle, easing (linear / ease-in-out)
+   - Generate button (cyan→violet gradient, shimmer on hover, disabled until image loaded)
+   - Progress bar + live canvas preview during render; final `<video autoplay loop muted playsinline>` for MP4 or `<img>` for GIF
+   - Post-render actions: Download, Re-animate, Try another effect, Open in Image Filters
+   - Cleanup: revoke object URLs on unmount + before each new render
 
-- `generateImage` — `createServerFn({ method: "POST" })` with a Zod validator for `{ prompt, negativePrompt?, aspectRatio, style?, quality }`.
-- Calls the Replicate connector through the Lovable connector gateway (NOT `api.replicate.com` directly — per project's `replicate` guidance):
-  - URL: `https://connector-gateway.lovable.dev/replicate/v1/models/black-forest-labs/flux-schnell/predictions`
-  - Headers: `Authorization: Bearer ${LOVABLE_API_KEY}` + `X-Connection-Api-Key: ${LOVABLE_CONNECTOR_REPLICATE_API_KEY}`
-  - Body: `{ input: { prompt, negative_prompt, num_inference_steps (draft=2/standard=4/high=8), aspect_ratio, output_format:"webp", output_quality:90 } }` with `Prefer: wait` header for a synchronous response.
-  - Falls back to a poll loop on `/v1/predictions/{id}` (3s→10s, 3 min cap) if the `Prefer: wait` response comes back non-terminal.
-- Returns `{ imageUrl }`. Surfaces provider status + body via typed errors: `REPLICATE_NOT_CONFIGURED` (missing env), `RATE_LIMITED` (429), `GENERATION_FAILED` (anything else) — logged server-side.
+2. **`src/lib/image-animator/effects.ts`** — the 8 effect definitions
+   - `EffectId` union + `Effect` interface (`id`, `label`, `emoji`, `description`, `animate(ctx, img, progress, w, h)`, `cssPreview` string)
+   - Exports `EFFECTS` array exactly as specified in the request
 
-**`src/lib/enhance-prompt.functions.ts`**
+3. **`src/lib/image-animator/render.ts`** — rendering engine
+   - `getOutputDimensions(img, resolution)` (rounds to even numbers)
+   - `renderVideo(img, settings, effect, onProgress, onPreviewFrame)` — uses `canvas.captureStream(fps)` + `MediaRecorder`; picks `video/mp4` when supported else falls back to `video/webm;codecs=vp9` (returned blob type reflects actual encoding so download extension matches)
+   - `renderGif(img, settings, effect, onProgress)` — reuses the existing gif.js loader used by the Video to GIF tool (I'll locate its helpers in the codebase and import them; if they aren't reusable I'll add a small `gif-loader.ts` mirroring that setup)
+   - Applies ease-in-out per frame; uses `setTimeout(0)` between frames to keep UI responsive
+   - Plain function declarations, `.then().catch()` at call sites — no `useCallback(async…)`
 
-- `enhancePrompt` server fn — calls Lovable AI Gateway (`google/gemini-2.5-flash`, non-streaming `generateText`) with the "professional art prompt engineer" system prompt (from user spec). Returns `{ enhanced }`. This lives server-side so `LOVABLE_API_KEY` never leaks to the client (the user's original snippet used `VITE_LOVABLE_API_KEY` which is unsafe — we correct this).
+### Files to edit
 
-**Note on Replicate connector**: the project already has `LOVABLE_CONNECTOR_REPLICATE_API_KEY` if the Replicate connector is linked. If not, `generateImage` returns `REPLICATE_NOT_CONFIGURED` and the UI shows a helpful "Image generation is being set up" state. I'll verify the connector status when we switch to build mode and link it via `standard_connectors--connect` if missing.
+4. **`src/lib/tools.ts`** — register the new tool
+   - Add entry with slug `image-animator`, icon `Clapperboard`, path `/tools/image-animator`, listed under both Image Tools and Video Tools (or the closest existing categorisation — I'll match how other dual-category tools are handled)
 
-## 2. Route — `src/routes/tools.ai-image-generator.tsx`
+5. **`src/lib/related-tools.ts`** — add mapping
+   - `"image-animator": ["ai-image-generator", "video-to-gif", "image-filters", "image-resizer", "remove-bg", "collage-maker", "video-trimmer"]`
+   - Add `image-animator` into the related lists of `ai-image-generator`, `video-to-gif`, `image-filters`, `image-resizer`, `remove-bg`, `collage-maker`
 
-Structure inside `<ToolPageShell title="AI Image Generator" description="..." showFileDisclaimer={false}>`:
+6. **`src/routes/tools.ai-image-generator.tsx`** — add "✨ Animate this image →" link on the generated-image result panel, pointing to `/tools/image-animator?from=generator`
 
-1. **Prompt panel** — large glass-morphism textarea with focus glow, character counter, and 3 actions:
-   - 🎲 Random (picks from a 50-entry `RANDOM_PROMPTS` array in a local const)
-   - ✨ Enhance (calls `enhancePrompt`, stores original in a ref for undo, shows spinner on the button)
-   - Generate (gradient cyan→violet, shimmer on hover, disabled while pending)
-2. **Style preset pills** (15 presets from spec) — horizontal scroll on mobile, selected state = glowing border + checkmark.
-3. **Advanced options** (collapsible) — aspect ratio button group (5 options with square/landscape/portrait icons), quality radio (draft/standard/high), negative prompt textarea.
-4. **Generation area**:
-   - Empty state: 3×2 inspiration gallery (6 curated examples with prompt + hover overlay; clicking fills the prompt). Uses picsum placeholders keyed by a stable seed.
-   - Loading: animated gradient shimmer sized to the selected aspect ratio, `aria-live="polite"` "✨ Creating your image…" + indeterminate progress bar.
-   - Result: image fades in (scale 0.95→1). Action row: Download (blob→ObjectURL→click), Copy prompt, Variations (regenerate with fresh nonce appended to prompt), and cross-tool links (Image Filters, Collage Maker, Add Watermark, Image Resizer).
-5. **Session history strip** — last 8 generations in React state only (no localStorage, per privacy). Clicking a thumb restores it + its prompt.
-6. **Cross-tool links section** (the block from the spec).
-7. `<AdZone id="ai-image-generator-mid" size="728x90" />`
-8. `<HowToUse steps={[…3 steps from spec]} />`
-9. `<ToolSeoContent title description body={SEO_BODY} faqs={SEO_FAQS} />` (4 paragraphs + 8 FAQs, all from spec).
-10. `<RelatedTools currentSlug="ai-image-generator" />`
+7. **`public/sitemap.xml`** and **`public/llms.txt`** — add the new URL/entry
 
-Route `head()` sets title/description/canonical/og per project's `head-meta` rules, plus a `SoftwareApplication` JSON-LD (spec).
+### SEO
 
-## 3. Tool registry & discovery
+- `head()` returns title `Free AI Image Animator — Bring Photos to Life | Skycally`, meta description as specified, canonical, OG/Twitter tags (via `buildPageMeta`), plus a `SoftwareApplication` / `WebApplication` JSON-LD script matching the spec
+- `ToolSeoContent` receives the 4 body paragraphs and 8 FAQs verbatim; the FAQPage JSON-LD is emitted by the component
 
-- **`src/lib/tools.ts`** — add the tool entry with `category: "ai"` and (per spec) an additional `categories: ["ai", "image"]` field. Confirm the existing `Tool` shape supports multi-category or extend `toolInCategory()` accordingly. Icon: `Sparkles`. Featured flag so it appears at the top of the Image tab too.
-- **`src/lib/related-tools.ts`** — add curated relations (Image Filters, Image Resizer, Remove Background, Collage Maker, Add Watermark, Image Upscaler, Meme Generator, Business Card Generator).
-- **`public/sitemap.xml`** and **`public/llms.txt`** — add the new URL.
+### Quality gates
 
-## 4. UX polish details
+- TypeScript strict, no `any` on public surfaces
+- All async work uses plain function declarations + `.then().catch()`; no async arrow event handlers, no `useCallback(async …)`
+- MediaRecorder MIME probed at runtime with graceful WebM fallback (download filename adjusts to `.webm` when MP4 unsupported)
+- Canvas `crossOrigin = "anonymous"` on the loaded image element
+- Aria-live region for progress, aria-label on the preview canvas naming the current effect
+- Amber warning banner if the uploaded file is > 10 MB
+- Object URLs revoked on unmount + before each new generation
+- Verify build with tsgo after wiring
 
-- Dark navy hero backdrop with two blurred gradient orbs (cyan + violet), reuses the app's existing `--cyan-brand` / `--violet-brand` semantic tokens (no hardcoded hex).
-- All Tailwind uses semantic tokens; no `bg-black`/`text-white`.
-- English UI throughout (per project memory).
-- Accessibility: labelled buttons, aria-live for status, alt text = full prompt, focus rings on all interactive elements, keyboard-scrollable pill row.
-- Mobile-first: presets scroll horizontally; controls stack; history scrolls horizontally.
+### Out of scope
 
-## 5. Error & rate handling
-
-- Toast + inline error card mapping the three server error codes to the user-facing copy in the spec.
-- Enhance failure: silent fallback to original prompt + subtle toast.
-- Generate button disables during in-flight requests; second click cancels via `AbortController`.
-
-## 6. Verification steps (build mode)
-
-1. `standard_connectors--list_connections` → ensure Replicate is linked; if not, call `standard_connectors--connect` for `replicate`.
-2. `bun run typecheck` (automatic).
-3. Playwright smoke: load `/tools/ai-image-generator`, screenshot empty state, type a prompt, click Generate, verify image renders + Download works, screenshot final state.
-4. Confirm `/tools?cat=ai` and `/tools?cat=image` both list the new card.
-
-## Out of scope (per spec)
-
-- No persistent history (session-only React state).
-- No user accounts / no watermark / no limits.
-- No commercial licence handling beyond the FAQ copy.
-
----
-
-**Assumptions to confirm** (I'll proceed with these unless you say otherwise):
-- Route via Lovable's Replicate **connector** (gateway), not raw `REPLICATE_API_TOKEN`, matching the project's connector guidance.
-- Prompt enhance runs server-side via Lovable AI Gateway (not `VITE_LOVABLE_API_KEY` in the browser).
-- The existing `tools.ts` schema can accept multi-category placement; if it can't, I'll extend `toolInCategory` minimally.
+- No real AI/ML model — "AI" in the tool name refers to the same marketing convention already used across Skycally tools (matches user's spec)
+- No server functions, no new npm dependencies (gif.js is already in the project)

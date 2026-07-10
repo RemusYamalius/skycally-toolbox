@@ -16,7 +16,9 @@ import {
   Square,
   RectangleHorizontal,
   RectangleVertical,
+  Clapperboard,
 } from "lucide-react";
+
 
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -827,11 +829,18 @@ function AiImageGeneratorPage() {
                 <RefreshCw className="w-4 h-4" aria-hidden /> Variations
               </button>
               <a
+                href={`/tools/image-animator?from=generator`}
+                className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/60 hover:bg-secondary px-4 py-2 text-sm font-medium transition-colors"
+              >
+                <Clapperboard className="w-4 h-4" aria-hidden /> Animate this image
+              </a>
+              <a
                 href="/tools/image-filters"
                 className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/60 hover:bg-secondary px-4 py-2 text-sm font-medium transition-colors"
               >
                 ✏️ Image Filters
               </a>
+
               <a
                 href="/tools/collage-maker"
                 className="inline-flex items-center gap-1.5 rounded-full border border-border bg-secondary/60 hover:bg-secondary px-4 py-2 text-sm font-medium transition-colors"

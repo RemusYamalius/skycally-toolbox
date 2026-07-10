@@ -105,6 +105,8 @@ import {
   Timer,
   Mail,
   PenLine,
+  Clapperboard,
+
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 

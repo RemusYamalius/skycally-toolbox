@@ -29,11 +29,38 @@ export function buildWorld(M: MatterGlobal, level: Level): WorldRefs {
   const engine = M.Engine.create({ gravity: { x: 0, y: 0, scale: 0 } });
 
   const wallOpts = { isStatic: true, restitution: 0.85, friction: 0.02, label: "wall" };
+  const WALL_THICK = 20;
+
+  // Walls sit flush with the felt boundary (RAIL) rather than the outer
+  // table edge — previously the felt started at RAIL but the walls were at
+  // the table's outer edge, leaving a dead zone where balls could drift
+  // onto the wooden rail. Each side is also split into two segments with a
+  // real gap around every pocket, so a ball only falls in when it actually
+  // travels through the opening — not just by passing within POCKET_R of a
+  // pocket that had no physical wall guarding it.
+  const midX = TABLE_W / 2;
+  const pocketGap = POCKET_R; // half-width of the opening left at each pocket
+  const topY = RAIL - WALL_THICK / 2;
+  const bottomY = TABLE_H - RAIL + WALL_THICK / 2;
+  const leftX = RAIL - WALL_THICK / 2;
+  const rightX = TABLE_W - RAIL + WALL_THICK / 2;
+
+  const hSeg = (xFrom: number, xTo: number, y: number) =>
+    M.Bodies.rectangle((xFrom + xTo) / 2, y, xTo - xFrom, WALL_THICK, wallOpts);
+  const vSeg = (yFrom: number, yTo: number, x: number) =>
+    M.Bodies.rectangle(x, (yFrom + yTo) / 2, WALL_THICK, yTo - yFrom, wallOpts);
+
   M.World.add(engine.world, [
-    M.Bodies.rectangle(TABLE_W / 2, -10, TABLE_W, 20, wallOpts),
-    M.Bodies.rectangle(TABLE_W / 2, TABLE_H + 10, TABLE_W, 20, wallOpts),
-    M.Bodies.rectangle(-10, TABLE_H / 2, 20, TABLE_H, wallOpts),
-    M.Bodies.rectangle(TABLE_W + 10, TABLE_H / 2, 20, TABLE_H, wallOpts),
+    // Top rail, gapped at the top-middle pocket (corner pockets carve the ends)
+    hSeg(RAIL + pocketGap, midX - pocketGap, topY),
+    hSeg(midX + pocketGap, TABLE_W - RAIL - pocketGap, topY),
+    // Bottom rail
+    hSeg(RAIL + pocketGap, midX - pocketGap, bottomY),
+    hSeg(midX + pocketGap, TABLE_W - RAIL - pocketGap, bottomY),
+    // Left rail (gapped only at the two corner pockets)
+    vSeg(RAIL + pocketGap, TABLE_H - RAIL - pocketGap, leftX),
+    // Right rail
+    vSeg(RAIL + pocketGap, TABLE_H - RAIL - pocketGap, rightX),
   ]);
 
   // Pockets as static sensors

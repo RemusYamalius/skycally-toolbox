@@ -119,8 +119,8 @@ export function areBallsSettled(refs: WorldRefs): boolean {
 // With frictionAir = 0.018 (see ballOpts above), a ball's total travel
 // distance before stopping is approximately v0 / frictionAir, so these
 // speeds are chosen to land in the ~140–780 unit range on an 800-unit table.
-const MIN_SHOT_SPEED = 2.5;
-const MAX_SHOT_SPEED = 14;
+const MIN_SHOT_SPEED = 3.5;
+const MAX_SHOT_SPEED = 20;
 
 export function shootCue(M: MatterGlobal, cue: MatterBody, dirX: number, dirY: number, power: number): void {
   const mag = Math.hypot(dirX, dirY) || 1;

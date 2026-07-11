@@ -87,11 +87,22 @@ export function areBallsSettled(refs: WorldRefs): boolean {
   return true;
 }
 
+// A full-power shot should be able to cross most of the table; a very light
+// tap should still travel a meaningful distance rather than barely creeping.
+// With frictionAir = 0.018 (see ballOpts above), a ball's total travel
+// distance before stopping is approximately v0 / frictionAir, so these
+// speeds are chosen to land in the ~140–780 unit range on an 800-unit table.
+const MIN_SHOT_SPEED = 2.5;
+const MAX_SHOT_SPEED = 14;
+
 export function shootCue(M: MatterGlobal, cue: MatterBody, dirX: number, dirY: number, power: number): void {
   const mag = Math.hypot(dirX, dirY) || 1;
   const nx = dirX / mag;
   const ny = dirY / mag;
-  const force = 0.006 * power; // power 0..1
-  M.Body.setVelocity(cue, { x: 0, y: 0 });
-  M.Body.applyForce(cue, cue.position, { x: nx * force, y: ny * force });
+  const clampedPower = Math.max(0, Math.min(1, power));
+  const speed = MIN_SHOT_SPEED + (MAX_SHOT_SPEED - MIN_SHOT_SPEED) * clampedPower;
+  // Setting velocity directly (rather than Body.applyForce, which only
+  // contributes force/mass * deltaTime^2 for a single physics step) gives a
+  // predictable, visible shot regardless of frame timing or ball mass.
+  M.Body.setVelocity(cue, { x: nx * speed, y: ny * speed });
 }

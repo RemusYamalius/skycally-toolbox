@@ -62,6 +62,10 @@ export const Route = createFileRoute("/tools/shooting-ball")({
 
 type Screen = "menu" | "levels" | "playing" | "won" | "lost";
 
+// How long a ball takes to visually sink into a pocket (slide toward the
+// pocket center while shrinking) before it's actually removed/respawned.
+const FALL_DURATION_MS = 220;
+
 function ShootingBallPage() {
   const [ready, setReady] = useState(false);
   const [error, setError] = useState<string | null>(null);
@@ -81,6 +85,21 @@ function ShootingBallPage() {
   const lastTsRef = useRef<number>(0);
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const containerRef = useRef<HTMLDivElement | null>(null);
+
+  // Balls currently mid-pocketing animation: frozen physically, animated by
+  // hand (position + shrink) over FALL_DURATION_MS, then either removed
+  // (colored ball) or respawned (cue ball scratch).
+  const fallingRef = useRef<
+    Array<{
+      body: MatterBody;
+      isCue: boolean;
+      pocketX: number;
+      pocketY: number;
+      startX: number;
+      startY: number;
+      startTime: number;
+    }>
+  >([]);
 
   // Aim state (imperative for perf; mirrored in ref)
   const aimRef = useRef<{ active: boolean; dx: number; dy: number; power: number }>({
@@ -120,6 +139,7 @@ function ShootingBallPage() {
     engineRef.current = null;
     cueRef.current = null;
     ballsRef.current = [];
+    fallingRef.current = [];
   }, []);
 
   // Start / restart a level
@@ -149,17 +169,29 @@ function ShootingBallPage() {
               ? [pair.bodyA, pair.bodyB]
               : [pair.bodyB, pair.bodyA];
           if (!pocket.label.startsWith("pocket-")) continue;
+          // Already sinking into a pocket — ignore further contacts.
+          if (fallingRef.current.some((f) => f.body.id === ball.id)) continue;
+
+          // Freeze the ball physically; we animate its position/size by hand
+          // from here so it visibly slides into the pocket instead of
+          // vanishing the instant it grazes the sensor's outer edge.
+          M.Body.setVelocity(ball, { x: 0, y: 0 });
+          M.Body.setStatic(ball, true);
+          ball.isSensor = true;
+          fallingRef.current.push({
+            body: ball,
+            isCue: ball.label === "cue",
+            pocketX: pocket.position.x,
+            pocketY: pocket.position.y,
+            startX: ball.position.x,
+            startY: ball.position.y,
+            startTime: performance.now(),
+          });
+
           if (ball.label === "cue") {
-            // Scratch: respawn cue, cost life
-            M.Body.setVelocity(ball, { x: 0, y: 0 });
-            M.Body.setPosition(ball, { x: CUE_START.x, y: CUE_START.y });
             playSound("lose");
             setLivesLeft((v) => v - 1);
-            continue;
-          }
-          if (ball.label === "ball") {
-            // Remove from world
-            M.World.remove(refs.engine.world, ball);
+          } else {
             ballsRef.current = ballsRef.current.filter((b) => b.id !== ball.id);
             playSound("score");
             setRemaining((v) => v - 1);
@@ -198,7 +230,10 @@ function ShootingBallPage() {
       const M = matterRef.current;
       const engine = engineRef.current;
       if (!M || !engine) return;
-      if (areBallsSettled({ engine, cue: cueRef.current!, balls: ballsRef.current, pockets: [] })) {
+      if (
+        areBallsSettled({ engine, cue: cueRef.current!, balls: ballsRef.current, pockets: [] }) &&
+        fallingRef.current.length === 0
+      ) {
         settlingRef.current = false;
         checkGameState();
       }
@@ -243,7 +278,40 @@ function ShootingBallPage() {
       drawTable(ctx);
       drawPegs(ctx, currentLevel.pegs);
       for (const b of ballsRef.current) drawBall(ctx, b);
-      drawBall(ctx, cue);
+      const cueFalling = fallingRef.current.some((f) => f.isCue);
+      if (!cueFalling) drawBall(ctx, cue);
+
+      if (fallingRef.current.length > 0) {
+        const now = performance.now();
+        fallingRef.current = fallingRef.current.filter((f) => {
+          const t = Math.min(1, (now - f.startTime) / FALL_DURATION_MS);
+          const ease = 1 - Math.pow(1 - t, 3); // ease-out: quick pull into the pocket
+          const fx = f.startX + (f.pocketX - f.startX) * ease;
+          const fy = f.startY + (f.pocketY - f.startY) * ease;
+          const shrink = Math.max(0.001, 1 - ease);
+
+          M.Body.setPosition(f.body, { x: fx, y: fy });
+          ctx.save();
+          ctx.globalAlpha = Math.max(0, 1 - t * 0.9);
+          ctx.translate(fx, fy);
+          ctx.scale(shrink, shrink);
+          ctx.translate(-fx, -fy);
+          drawBall(ctx, f.body);
+          ctx.restore();
+
+          if (t < 1) return true;
+
+          if (f.isCue) {
+            M.Body.setStatic(f.body, false);
+            f.body.isSensor = false;
+            M.Body.setPosition(f.body, { x: CUE_START.x, y: CUE_START.y });
+            M.Body.setVelocity(f.body, { x: 0, y: 0 });
+          } else {
+            M.World.remove(engine.world, f.body);
+          }
+          return false;
+        });
+      }
 
       if (aimRef.current.active && !settlingRef.current) {
         drawAim(ctx, cue.position.x, cue.position.y, aimRef.current.dx, aimRef.current.dy, aimRef.current.power);
@@ -297,7 +365,7 @@ function ShootingBallPage() {
       aimRef.current.dx = dx;
       aimRef.current.dy = dy;
       const dist = Math.hypot(dx, dy);
-      aimRef.current.power = Math.min(1, dist / 240);
+      aimRef.current.power = Math.min(1, dist / 180);
     };
     const onUp = (e: PointerEvent) => {
       const M = matterRef.current;

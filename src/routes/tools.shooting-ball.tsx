@@ -83,7 +83,12 @@ function ShootingBallPage() {
   const containerRef = useRef<HTMLDivElement | null>(null);
 
   // Aim state (imperative for perf; mirrored in ref)
-  const aimRef = useRef<{ active: boolean; dx: number; dy: number; power: number }>({ active: false, dx: 1, dy: 0, power: 0 });
+  const aimRef = useRef<{ active: boolean; dx: number; dy: number; power: number }>({
+    active: false,
+    dx: 1,
+    dy: 0,
+    power: 0,
+  });
   const settlingRef = useRef(false);
   const currentLevel = useMemo<Level>(() => LEVELS.find((l) => l.id === levelId) ?? LEVELS[0], [levelId]);
 
@@ -350,7 +355,9 @@ function ShootingBallPage() {
 
       {ready && screen === "menu" && (
         <div className="mx-auto max-w-xl text-center rounded-2xl border border-border bg-card p-8">
-          <div className="text-6xl mb-3" aria-hidden>🎱</div>
+          <div className="text-6xl mb-3" aria-hidden>
+            🎱
+          </div>
           <h2 className="font-display text-3xl font-bold">Shooting Ball</h2>
           <p className="mt-2 text-muted-foreground">
             Pocket every colored ball before you run out of shots. Cleaner runs earn more stars.
@@ -443,9 +450,15 @@ function ShootingBallPage() {
               </button>
             </div>
             <div className="flex gap-3 text-sm">
-              <div className="rounded-lg bg-secondary/60 px-3 py-1.5">Level <b>{levelId}</b></div>
-              <div className="rounded-lg bg-secondary/60 px-3 py-1.5">Balls <b>{remaining}</b></div>
-              <div className="rounded-lg bg-secondary/60 px-3 py-1.5">Shots <b>{Math.max(0, livesLeft)}</b></div>
+              <div className="rounded-lg bg-secondary/60 px-3 py-1.5">
+                Level <b>{levelId}</b>
+              </div>
+              <div className="rounded-lg bg-secondary/60 px-3 py-1.5">
+                Balls <b>{remaining}</b>
+              </div>
+              <div className="rounded-lg bg-secondary/60 px-3 py-1.5">
+                Shots <b>{Math.max(0, livesLeft)}</b>
+              </div>
             </div>
           </div>
 
@@ -465,7 +478,9 @@ function ShootingBallPage() {
                     <Star key={i} className="w-8 h-8" fill={i <= finalStars ? "#facc15" : "none"} stroke="#facc15" />
                   ))}
                 </div>
-                <p className="mt-2 text-sm text-white/80">{shots} shots · par {currentLevel.par}</p>
+                <p className="mt-2 text-sm text-white/80">
+                  {shots} shots · par {currentLevel.par}
+                </p>
                 <div className="mt-5 flex gap-3">
                   <button
                     onClick={() => startLevel(Math.min(LEVELS.length, levelId + 1))}
@@ -521,23 +536,68 @@ function ShootingBallPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="shooting-ball" />
-
       <ToolSeoContent
         title="Shooting Ball Game — Free Billiard Puzzle Online"
         description="Play Shooting Ball free online — an addictive billiard puzzle where you aim, shoot and pocket colored balls with realistic physics. 20 levels, no download, no signup."
         body={[
           "Shooting Ball is a free browser billiard puzzle inspired by pool and Ball Blast. Every level tasks you with pocketing every colored ball on the table before running out of shots. Realistic 2D physics powered by Matter.js models spin, restitution and friction so every carom feels authentic.",
           "Drag from the white cue ball to aim, then pull back further for more power — release to strike. Chain combos, ricochet off rails, and use the fewest shots possible to earn three stars on each of the 20 hand-crafted levels.",
-          "The game runs entirely in your browser on desktop and mobile. No download, no signup, no ads during gameplay. Progress and stars are saved locally in your browser.",
+          "Unlike traditional 8-ball or 9-ball pool, Shooting Ball is built as a puzzle: every level has a fixed layout of pegs, colored balls and pockets, and a limited number of shots to clear it. This turns each level into a small physics riddle — sometimes the fastest route is a direct pot, other times you need a bank shot off a rail or a peg to reach a ball tucked in a corner.",
+          "The game runs entirely in your browser on desktop and mobile, with no download and no signup required. Progress, unlocked levels and star ratings are all saved locally in your browser, so you can close the tab and pick up right where you left off.",
         ]}
         faqs={[
-          { question: "Is Shooting Ball really free?", answer: "Yes. Every level and feature is completely free with no signup, no download, and no in-app purchases." },
-          { question: "How do I earn 3 stars on a level?", answer: "Clear the level using no more shots than the level's par. One or two shots above par earns 2 stars; clearing at all earns 1 star." },
-          { question: "What happens if the cue ball is pocketed?", answer: "That's a scratch — the cue ball respawns on the left side of the table and you lose one shot from your remaining shots." },
-          { question: "Does it work on mobile?", answer: "Yes. Shooting Ball uses touch pointer events, so you can aim and shoot on any modern phone or tablet." },
+          {
+            question: "Is Shooting Ball really free?",
+            answer:
+              "Yes. Every level and feature is completely free with no signup, no download, and no in-app purchases.",
+          },
+          {
+            question: "How do I earn 3 stars on a level?",
+            answer:
+              "Clear the level using no more shots than the level's par. One or two shots above par earns 2 stars; clearing at all earns 1 star.",
+          },
+          {
+            question: "What happens if the cue ball is pocketed?",
+            answer:
+              "That's a scratch — the cue ball respawns on the left side of the table and you lose one shot from your remaining shots.",
+          },
+          {
+            question: "Does it work on mobile?",
+            answer:
+              "Yes. Shooting Ball uses touch pointer events, so you can aim and shoot on any modern phone or tablet.",
+          },
+          {
+            question: "How many levels are there?",
+            answer:
+              "There are 20 hand-crafted levels, each with its own layout of pegs, colored balls and pockets, and increasing in difficulty as you progress.",
+          },
+          {
+            question: "Do I need to install anything to play?",
+            answer:
+              "No. Shooting Ball runs entirely in your browser using HTML canvas and JavaScript physics — there is nothing to download or install.",
+          },
+          {
+            question: "Is my progress saved if I close the browser?",
+            answer:
+              "Yes. Your unlocked levels and star ratings are saved locally in your browser's storage, so they'll still be there next time you visit.",
+          },
+          {
+            question: "What do the pegs on the table do?",
+            answer:
+              "Pegs act as obstacles and rebound points. Balls bounce off them just like rails, so you can use pegs to redirect a shot around a blocker toward a pocket.",
+          },
+          {
+            question: "Can I mute the game's sound effects?",
+            answer: "Yes. Use the speaker icon on the level select screen to toggle sound on or off at any time.",
+          },
+          {
+            question: "What happens if I run out of shots before clearing the table?",
+            answer: "The level ends and you can either retry the same level or return to the level select screen.",
+          },
         ]}
       />
+
+      <RelatedTools currentSlug="shooting-ball" />
     </ToolPageShell>
   );
 }

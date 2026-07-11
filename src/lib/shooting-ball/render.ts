@@ -46,7 +46,11 @@ export function drawPegs(ctx: CanvasRenderingContext2D, pegs?: Array<{ x: number
   }
 }
 
-interface BallPlugin { color: string; number: number; stripe: boolean }
+interface BallPlugin {
+  color: string;
+  number: number;
+  stripe: boolean;
+}
 
 export function drawBall(ctx: CanvasRenderingContext2D, body: MatterBody): void {
   const plugin = (body.plugin ?? {}) as Partial<BallPlugin>;
@@ -92,12 +96,49 @@ export function drawBall(ctx: CanvasRenderingContext2D, body: MatterBody): void 
   }
 
   // Highlight
-  const hl = ctx.createRadialGradient(x - BALL_R * 0.4, y - BALL_R * 0.4, 1, x - BALL_R * 0.4, y - BALL_R * 0.4, BALL_R * 0.7);
+  const hl = ctx.createRadialGradient(
+    x - BALL_R * 0.4,
+    y - BALL_R * 0.4,
+    1,
+    x - BALL_R * 0.4,
+    y - BALL_R * 0.4,
+    BALL_R * 0.7,
+  );
   hl.addColorStop(0, "rgba(255,255,255,0.7)");
   hl.addColorStop(1, "rgba(255,255,255,0)");
   ctx.fillStyle = hl;
   ctx.beginPath();
   ctx.arc(x, y, BALL_R, 0, Math.PI * 2);
+  ctx.fill();
+}
+
+// Draws a straight tapered quad from (x1,y1) [width w1] to (x2,y2) [width w2].
+// Used to build a cue stick out of segments that each vary in thickness,
+// which a plain ctx.stroke() (constant lineWidth) can't do on its own.
+function drawTaperedSegment(
+  ctx: CanvasRenderingContext2D,
+  x1: number,
+  y1: number,
+  x2: number,
+  y2: number,
+  w1: number,
+  w2: number,
+  fillStyle: string | CanvasGradient,
+): void {
+  const dx = x2 - x1;
+  const dy = y2 - y1;
+  const len = Math.hypot(dx, dy) || 1;
+  const px = -dy / len;
+  const py = dx / len;
+  const h1 = w1 / 2;
+  const h2 = w2 / 2;
+  ctx.beginPath();
+  ctx.moveTo(x1 + px * h1, y1 + py * h1);
+  ctx.lineTo(x2 + px * h2, y2 + py * h2);
+  ctx.lineTo(x2 - px * h2, y2 - py * h2);
+  ctx.lineTo(x1 - px * h1, y1 - py * h1);
+  ctx.closePath();
+  ctx.fillStyle = fillStyle;
   ctx.fill();
 }
 
@@ -113,6 +154,7 @@ export function drawAim(
   const nx = dirX / mag;
   const ny = dirY / mag;
 
+  // Dashed guide line showing the shot direction
   ctx.save();
   ctx.setLineDash([6, 6]);
   ctx.strokeStyle = "rgba(255,255,255,0.85)";
@@ -123,20 +165,47 @@ export function drawAim(
   ctx.stroke();
   ctx.restore();
 
-  // Cue stick behind the ball
-  const stickLen = 140 + power * 80;
-  const bx = cx - nx * (BALL_R + 6 + power * 40);
-  const by = cy - ny * (BALL_R + 6 + power * 40);
-  const ex = bx - nx * stickLen;
-  const ey = by - ny * stickLen;
-  const grad = ctx.createLinearGradient(bx, by, ex, ey);
-  grad.addColorStop(0, "#f5deb3");
-  grad.addColorStop(1, "#6b4423");
-  ctx.strokeStyle = grad;
-  ctx.lineWidth = 5;
-  ctx.lineCap = "round";
-  ctx.beginPath();
-  ctx.moveTo(bx, by);
-  ctx.lineTo(ex, ey);
-  ctx.stroke();
+  // Cue stick behind the ball, pulled further back as power increases.
+  // ux/uy point from the tip (near the ball) toward the butt (far end).
+  const ux = -nx;
+  const uy = -ny;
+  const tipX = cx - nx * (BALL_R + 6 + power * 40);
+  const tipY = cy - ny * (BALL_R + 6 + power * 40);
+  const stickLen = 150 + power * 90;
+
+  const ferruleLen = 14;
+  const wrapLen = 26;
+  const buttCapLen = 8;
+  const shaftLen = Math.max(10, stickLen - ferruleLen - wrapLen - buttCapLen);
+
+  const at = (t: number) => ({ x: tipX + ux * t, y: tipY + uy * t });
+
+  const p0 = at(0); // tip / ferrule start (touches near the ball)
+  const p1 = at(ferruleLen); // ferrule end / shaft start
+  const p2 = at(ferruleLen + shaftLen); // shaft end / grip wrap start
+  const p3 = at(ferruleLen + shaftLen + wrapLen); // wrap end / butt cap start
+  const p4 = at(stickLen); // butt end
+
+  ctx.save();
+  ctx.shadowColor = "rgba(0,0,0,0.4)";
+  ctx.shadowBlur = 4;
+  ctx.shadowOffsetX = 1;
+  ctx.shadowOffsetY = 2;
+
+  // Ferrule (ivory tip)
+  drawTaperedSegment(ctx, p0.x, p0.y, p1.x, p1.y, 5, 6, "#f1e9d2");
+
+  // Wood shaft, tapering thin (near ball) -> thick (toward grip)
+  const shaftGrad = ctx.createLinearGradient(p1.x, p1.y, p2.x, p2.y);
+  shaftGrad.addColorStop(0, "#d8b27c");
+  shaftGrad.addColorStop(1, "#8a5a2e");
+  drawTaperedSegment(ctx, p1.x, p1.y, p2.x, p2.y, 6, 12, shaftGrad);
+
+  // Grip wrap (dark band, constant width)
+  drawTaperedSegment(ctx, p2.x, p2.y, p3.x, p3.y, 12, 12, "#1f2937");
+
+  // Butt cap
+  drawTaperedSegment(ctx, p3.x, p3.y, p4.x, p4.y, 12, 9, "#0b0f19");
+
+  ctx.restore();
 }

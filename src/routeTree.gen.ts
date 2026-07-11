@@ -53,6 +53,7 @@ import { Route as ToolsSolitaireRouteImport } from './routes/tools.solitaire'
 import { Route as ToolsSnakeRouteImport } from './routes/tools.snake'
 import { Route as ToolsSlidingPuzzleRouteImport } from './routes/tools.sliding-puzzle'
 import { Route as ToolsSleepCalculatorRouteImport } from './routes/tools.sleep-calculator'
+import { Route as ToolsShootingBallRouteImport } from './routes/tools.shooting-ball'
 import { Route as ToolsSentimentAnalysisRouteImport } from './routes/tools.sentiment-analysis'
 import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-recorder'
 import { Route as ToolsSatoshiConverterRouteImport } from './routes/tools.satoshi-converter'
@@ -377,6 +378,11 @@ const ToolsSlidingPuzzleRoute = ToolsSlidingPuzzleRouteImport.update({
 const ToolsSleepCalculatorRoute = ToolsSleepCalculatorRouteImport.update({
   id: '/tools/sleep-calculator',
   path: '/tools/sleep-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsShootingBallRoute = ToolsShootingBallRouteImport.update({
+  id: '/tools/shooting-ball',
+  path: '/tools/shooting-ball',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsSentimentAnalysisRoute = ToolsSentimentAnalysisRouteImport.update({
@@ -1014,6 +1020,7 @@ export interface FileRoutesByFullPath {
   '/tools/satoshi-converter': typeof ToolsSatoshiConverterRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
+  '/tools/shooting-ball': typeof ToolsShootingBallRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
   '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
@@ -1163,6 +1170,7 @@ export interface FileRoutesByTo {
   '/tools/satoshi-converter': typeof ToolsSatoshiConverterRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
+  '/tools/shooting-ball': typeof ToolsShootingBallRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
   '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
@@ -1313,6 +1321,7 @@ export interface FileRoutesById {
   '/tools/satoshi-converter': typeof ToolsSatoshiConverterRoute
   '/tools/screen-recorder': typeof ToolsScreenRecorderRoute
   '/tools/sentiment-analysis': typeof ToolsSentimentAnalysisRoute
+  '/tools/shooting-ball': typeof ToolsShootingBallRoute
   '/tools/sleep-calculator': typeof ToolsSleepCalculatorRoute
   '/tools/sliding-puzzle': typeof ToolsSlidingPuzzleRoute
   '/tools/snake': typeof ToolsSnakeRoute
@@ -1464,6 +1473,7 @@ export interface FileRouteTypes {
     | '/tools/satoshi-converter'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
+    | '/tools/shooting-ball'
     | '/tools/sleep-calculator'
     | '/tools/sliding-puzzle'
     | '/tools/snake'
@@ -1613,6 +1623,7 @@ export interface FileRouteTypes {
     | '/tools/satoshi-converter'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
+    | '/tools/shooting-ball'
     | '/tools/sleep-calculator'
     | '/tools/sliding-puzzle'
     | '/tools/snake'
@@ -1762,6 +1773,7 @@ export interface FileRouteTypes {
     | '/tools/satoshi-converter'
     | '/tools/screen-recorder'
     | '/tools/sentiment-analysis'
+    | '/tools/shooting-ball'
     | '/tools/sleep-calculator'
     | '/tools/sliding-puzzle'
     | '/tools/snake'
@@ -1912,6 +1924,7 @@ export interface RootRouteChildren {
   ToolsSatoshiConverterRoute: typeof ToolsSatoshiConverterRoute
   ToolsScreenRecorderRoute: typeof ToolsScreenRecorderRoute
   ToolsSentimentAnalysisRoute: typeof ToolsSentimentAnalysisRoute
+  ToolsShootingBallRoute: typeof ToolsShootingBallRoute
   ToolsSleepCalculatorRoute: typeof ToolsSleepCalculatorRoute
   ToolsSlidingPuzzleRoute: typeof ToolsSlidingPuzzleRoute
   ToolsSnakeRoute: typeof ToolsSnakeRoute
@@ -2261,6 +2274,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/sleep-calculator'
       fullPath: '/tools/sleep-calculator'
       preLoaderRoute: typeof ToolsSleepCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/shooting-ball': {
+      id: '/tools/shooting-ball'
+      path: '/tools/shooting-ball'
+      fullPath: '/tools/shooting-ball'
+      preLoaderRoute: typeof ToolsShootingBallRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/sentiment-analysis': {
@@ -3100,6 +3120,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSatoshiConverterRoute: ToolsSatoshiConverterRoute,
   ToolsScreenRecorderRoute: ToolsScreenRecorderRoute,
   ToolsSentimentAnalysisRoute: ToolsSentimentAnalysisRoute,
+  ToolsShootingBallRoute: ToolsShootingBallRoute,
   ToolsSleepCalculatorRoute: ToolsSleepCalculatorRoute,
   ToolsSlidingPuzzleRoute: ToolsSlidingPuzzleRoute,
   ToolsSnakeRoute: ToolsSnakeRoute,

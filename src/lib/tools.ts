@@ -1143,6 +1143,14 @@ export const tools: Tool[] = [
     path: "/tools/ball-sort",
   },
   {
+    slug: "shooting-ball",
+    name: "Shooting Ball",
+    description: "Aim and shoot the white ball to pocket colored balls. 20 free billiard puzzle levels, no download.",
+    category: "minigames",
+    icon: Target,
+    path: "/tools/shooting-ball",
+  },
+  {
     slug: "ai-cover-letter-generator",
     name: "AI Cover Letter Generator",
     description:

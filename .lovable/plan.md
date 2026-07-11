@@ -1,64 +1,52 @@
-## AI Image Animator — Implementation Plan
+# Shooting Ball — Billiard Puzzle Game
 
-Build a fully client-side image-to-video animator at `/tools/image-animator` using Canvas API + MediaRecorder + the existing gif.js pipeline. No server functions, no external APIs.
+Build a production-ready billiard/pool puzzle game at `/tools/shooting-ball` under Mini Games, using Matter.js loaded via CDN (matching the existing `loadScript` pattern used by gif.js, TF.js, COCO-SSD).
 
-### Files to create
+## Files
 
-1. **`src/routes/tools.image-animator.tsx`** — the tool route
-   - `createFileRoute("/tools/image-animator")` with `head()` using `buildToolMeta`
-   - Wraps UI in `ToolPageShell`, ends with `HowToUse` + `AdZone` (id `image-animator-mid`, 728x90) + `ToolSeoContent` + `RelatedTools`
-   - Two-column layout (controls / preview), single column on mobile
-   - Detects `?from=generator` search param → shows tip banner
-   - Reads image via `DropZone` (accept `image/*`, max 20MB, warning above 10MB)
-   - 8 effect cards in 2×4 grid with cyan gradient border on selected
-   - Live CSS preview: applies alternating transform with `transition: transform 2s ease-in-out` to the uploaded image while no render is running
-   - Settings: duration (3/5/8/10s), fps (24/30), format (MP4/GIF), resolution (480/720/1080), loop toggle, easing (linear / ease-in-out)
-   - Generate button (cyan→violet gradient, shimmer on hover, disabled until image loaded)
-   - Progress bar + live canvas preview during render; final `<video autoplay loop muted playsinline>` for MP4 or `<img>` for GIF
-   - Post-render actions: Download, Re-animate, Try another effect, Open in Image Filters
-   - Cleanup: revoke object URLs on unmount + before each new render
+**New**
+- `src/routes/tools.shooting-ball.tsx` — full game route: `ToolPageShell`, screens (Menu → Level Select → Game → Win/Lose → Settings), canvas rendering, aim UI, HUD, HowToUse, `ToolSeoContent`, `RelatedTools`, `AdZone` on Level Select only.
+- `src/lib/shooting-ball/physics.ts` — Matter.js world setup, wall/ball bodies, pocket sensors, restitution/friction tuning, cue-strike impulse.
+- `src/lib/shooting-ball/levels.ts` — level definitions (ball layout, required pockets, lives, par shots, goal type per level).
+- `src/lib/shooting-ball/render.ts` — canvas draw: felt table, rails, pockets, balls with numbers/stripes, cue stick, aim line with predicted trajectory (dashed), power meter.
+- `src/lib/shooting-ball/storage.ts` — localStorage for unlocked levels, stars, best scores, sound/vibration prefs.
+- `src/lib/shooting-ball/matter-loader.ts` — mirrors `gif-loader.ts`: `loadMatterJs()` via `loadScript("https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js")`, typed `window.Matter` global.
 
-2. **`src/lib/image-animator/effects.ts`** — the 8 effect definitions
-   - `EffectId` union + `Effect` interface (`id`, `label`, `emoji`, `description`, `animate(ctx, img, progress, w, h)`, `cssPreview` string)
-   - Exports `EFFECTS` array exactly as specified in the request
+**Edited**
+- `src/lib/tools.ts` — register `shooting-ball` under Mini Games with 🎱 icon.
+- `src/lib/related-tools.ts` — add to Bubble Shooter, Breakout, Ball Sort related arrays; give Shooting Ball its own related list.
+- `public/sitemap.xml`, `public/llms.txt` — new URL entry.
+- `src/routeTree.gen.ts` — auto handled by plugin; not manually edited.
 
-3. **`src/lib/image-animator/render.ts`** — rendering engine
-   - `getOutputDimensions(img, resolution)` (rounds to even numbers)
-   - `renderVideo(img, settings, effect, onProgress, onPreviewFrame)` — uses `canvas.captureStream(fps)` + `MediaRecorder`; picks `video/mp4` when supported else falls back to `video/webm;codecs=vp9` (returned blob type reflects actual encoding so download extension matches)
-   - `renderGif(img, settings, effect, onProgress)` — reuses the existing gif.js loader used by the Video to GIF tool (I'll locate its helpers in the codebase and import them; if they aren't reusable I'll add a small `gif-loader.ts` mirroring that setup)
-   - Applies ease-in-out per frame; uses `setTimeout(0)` between frames to keep UI responsive
-   - Plain function declarations, `.then().catch()` at call sites — no `useCallback(async…)`
+## Game architecture
 
-### Files to edit
+- **Screens**: state machine `"menu" | "levels" | "playing" | "won" | "lost" | "settings"`. Rendered conditionally inside ToolPageShell.
+- **Physics**: Matter.js Engine + World running at 60fps via `Engine.update` in a `requestAnimationFrame` loop. Cue ball is a dynamic circle; colored balls dynamic; pockets are static sensor bodies detected via `Events.on(engine, "collisionStart")` to remove balls and score.
+- **Aim**: on mousedown/touchstart on cue ball → drag to set direction + power (distance capped). Release applies `Body.applyForce`. Show dashed predicted line (raycast against nearest wall/ball, one bounce).
+- **Levels**: 20 levels, increasing ball counts, obstacles (static pegs), and pocket-color constraints. Stars: 3 (par), 2 (par+2), 1 (any clear).
+- **Lives**: shots remaining per level; scratch (cue ball pocketed) costs a life and respawns cue ball.
+- **Assets**: pure canvas — no images. Felt gradient, wood rail, glossy ball shading via radial gradient.
+- **Sounds**: reuse `src/lib/sound.ts` for hit/pocket/win/lose (WebAudio tones), gated by settings toggle.
+- **Persistence**: `skycally.shooting-ball.v1` in localStorage.
 
-4. **`src/lib/tools.ts`** — register the new tool
-   - Add entry with slug `image-animator`, icon `Clapperboard`, path `/tools/image-animator`, listed under both Image Tools and Video Tools (or the closest existing categorisation — I'll match how other dual-category tools are handled)
+## Integration
 
-5. **`src/lib/related-tools.ts`** — add mapping
-   - `"image-animator": ["ai-image-generator", "video-to-gif", "image-filters", "image-resizer", "remove-bg", "collage-maker", "video-trimmer"]`
-   - Add `image-animator` into the related lists of `ai-image-generator`, `video-to-gif`, `image-filters`, `image-resizer`, `remove-bg`, `collage-maker`
+- Register only under Mini Games (per spec).
+- Related: Bubble Shooter, Breakout, Ball Sort.
+- SEO head(): title "Shooting Ball — Free Billiard Puzzle Game Online | Skycally", meta description with target keywords, OG/Twitter, `VideoGame` JSON-LD.
+- `ToolSeoContent` with body + 4 FAQs (memory rule).
+- `AdZone id="shooting-ball-mid" size="728x90"` rendered only on Level Select screen.
 
-6. **`src/routes/tools.ai-image-generator.tsx`** — add "✨ Animate this image →" link on the generated-image result panel, pointing to `/tools/image-animator?from=generator`
+## Quality gates
 
-7. **`public/sitemap.xml`** and **`public/llms.txt`** — add the new URL/entry
+- Matter.js loaded once, cached via existing `loadScript`; loading skeleton until ready.
+- Cleanup: on unmount, `Engine.clear`, `World.clear`, cancel RAF, remove event listeners.
+- Touch + mouse pointer events unified via Pointer Events API.
+- Canvas resizes to container with `devicePixelRatio` scaling; logical table 800×450.
+- No async event handlers; no `useCallback(async …)` at top level.
+- TypeScript strict; declare `window.Matter` type in a local `.d.ts` block inside `matter-loader.ts`.
+- English-only UI (memory rule).
 
-### SEO
+## Out of scope
 
-- `head()` returns title `Free AI Image Animator — Bring Photos to Life | Skycally`, meta description as specified, canonical, OG/Twitter tags (via `buildPageMeta`), plus a `SoftwareApplication` / `WebApplication` JSON-LD script matching the spec
-- `ToolSeoContent` receives the 4 body paragraphs and 8 FAQs verbatim; the FAQPage JSON-LD is emitted by the component
-
-### Quality gates
-
-- TypeScript strict, no `any` on public surfaces
-- All async work uses plain function declarations + `.then().catch()`; no async arrow event handlers, no `useCallback(async …)`
-- MediaRecorder MIME probed at runtime with graceful WebM fallback (download filename adjusts to `.webm` when MP4 unsupported)
-- Canvas `crossOrigin = "anonymous"` on the loaded image element
-- Aria-live region for progress, aria-label on the preview canvas naming the current effect
-- Amber warning banner if the uploaded file is > 10 MB
-- Object URLs revoked on unmount + before each new generation
-- Verify build with tsgo after wiring
-
-### Out of scope
-
-- No real AI/ML model — "AI" in the tool name refers to the same marketing convention already used across Skycally tools (matches user's spec)
-- No server functions, no new npm dependencies (gif.js is already in the project)
+- No multiplayer, no leaderboards server-side, no npm dep (CDN only), no new images.

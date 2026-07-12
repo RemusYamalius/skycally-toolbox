@@ -1,52 +1,58 @@
-# Shooting Ball — Billiard Puzzle Game
+# Pregnancy Week Calculator
 
-Build a production-ready billiard/pool puzzle game at `/tools/shooting-ball` under Mini Games, using Matter.js loaded via CDN (matching the existing `loadScript` pattern used by gif.js, TF.js, COCO-SSD).
+Build a fully client-side pregnancy calculator at `/tools/pregnancy-calculator` under Health & Fitness, matching the detailed spec.
 
 ## Files
 
 **New**
-- `src/routes/tools.shooting-ball.tsx` — full game route: `ToolPageShell`, screens (Menu → Level Select → Game → Win/Lose → Settings), canvas rendering, aim UI, HUD, HowToUse, `ToolSeoContent`, `RelatedTools`, `AdZone` on Level Select only.
-- `src/lib/shooting-ball/physics.ts` — Matter.js world setup, wall/ball bodies, pocket sensors, restitution/friction tuning, cue-strike impulse.
-- `src/lib/shooting-ball/levels.ts` — level definitions (ball layout, required pockets, lives, par shots, goal type per level).
-- `src/lib/shooting-ball/render.ts` — canvas draw: felt table, rails, pockets, balls with numbers/stripes, cue stick, aim line with predicted trajectory (dashed), power meter.
-- `src/lib/shooting-ball/storage.ts` — localStorage for unlocked levels, stars, best scores, sound/vibration prefs.
-- `src/lib/shooting-ball/matter-loader.ts` — mirrors `gif-loader.ts`: `loadMatterJs()` via `loadScript("https://cdnjs.cloudflare.com/ajax/libs/matter-js/0.19.0/matter.min.js")`, typed `window.Matter` global.
+- `src/routes/tools.pregnancy-calculator.tsx` — full page: `ToolPageShell`, 3-method input toggle (LMP / Due Date / Conception), hero card with weeks+days+due date+progress, baby size card, weekly development card, milestone banner, trimester timeline, key dates card, medical disclaimer, internal-links block, `AdZone`, `HowToUse`, `ToolSeoContent`, `RelatedTools`.
+- `src/lib/pregnancy/data.ts` — `BABY_SIZES` (weeks 4–40) and `WEEKLY_DATA` (with milestone entries) exactly as specified.
+- `src/lib/pregnancy/calc.ts` — pure functions using `date-fns`: `computeFromLMP`, `computeFromDueDate`, `computeFromConception`, cycle-length adjustment, trimester derivation, nearest-week lookup for baby size / weekly data, key-dates builder.
 
 **Edited**
-- `src/lib/tools.ts` — register `shooting-ball` under Mini Games with 🎱 icon.
-- `src/lib/related-tools.ts` — add to Bubble Shooter, Breakout, Ball Sort related arrays; give Shooting Ball its own related list.
-- `public/sitemap.xml`, `public/llms.txt` — new URL entry.
-- `src/routeTree.gen.ts` — auto handled by plugin; not manually edited.
+- `src/lib/tools.ts` — register `pregnancy-calculator` under Health & Fitness (`Baby` from lucide-react).
+- `src/lib/related-tools.ts` — related list: Water Intake, Sleep, Calorie, BMI, Age.
+- `public/sitemap.xml`, `public/llms.txt` — add new URL.
 
-## Game architecture
+## Calculation logic
 
-- **Screens**: state machine `"menu" | "levels" | "playing" | "won" | "lost" | "settings"`. Rendered conditionally inside ToolPageShell.
-- **Physics**: Matter.js Engine + World running at 60fps via `Engine.update` in a `requestAnimationFrame` loop. Cue ball is a dynamic circle; colored balls dynamic; pockets are static sensor bodies detected via `Events.on(engine, "collisionStart")` to remove balls and score.
-- **Aim**: on mousedown/touchstart on cue ball → drag to set direction + power (distance capped). Release applies `Body.applyForce`. Show dashed predicted line (raycast against nearest wall/ball, one bounce).
-- **Levels**: 20 levels, increasing ball counts, obstacles (static pegs), and pocket-color constraints. Stars: 3 (par), 2 (par+2), 1 (any clear).
-- **Lives**: shots remaining per level; scratch (cue ball pocketed) costs a life and respawns cue ball.
-- **Assets**: pure canvas — no images. Felt gradient, wood rail, glossy ball shading via radial gradient.
-- **Sounds**: reuse `src/lib/sound.ts` for hit/pocket/win/lose (WebAudio tones), gated by settings toggle.
-- **Persistence**: `skycally.shooting-ball.v1` in localStorage.
+- LMP: `gestDays = differenceInDays(today, lmp) + (cycleLen - 28)` adjustment applied to due date (`addDays(lmp, 280 + (cycleLen - 28))`); weeks/days from gestDays.
+- Due Date: derive LMP as `addDays(due, -280)`, then compute like LMP.
+- Conception: `lmp = addDays(conception, -14)`, then LMP flow.
+- Progress %: `clamp(gestDays / 280 * 100)`.
+- Nearest week for `BABY_SIZES` / `WEEKLY_DATA`: floor to greatest defined key ≤ current week.
+
+## Edge cases
+
+- Future LMP / due / conception → inline validation error, no results.
+- Week < 4 → early-pregnancy notice above hero.
+- gestDays > 294 (>42w) → overdue notice suggesting medical contact.
+- 280–294 days → "X days overdue" friendly message.
+- Cycle length clamped 20–45, default 28.
+
+## UI
+
+- Two-column desktop (inputs 2fr / results 3fr), single column mobile.
+- Method toggle: 3 pill buttons with icons.
+- Hero card: rose→pink→violet gradient (`#f43f5e → #ec4899 → #a855f7`), fade+scale mount, animated progress bar fill.
+- Baby size card: emoji with subtle bounce.
+- Trimester timeline: horizontal 3-segment bar with current-position marker.
+- Key dates: 7-row list mapping weeks to calendar dates via `addWeeks(lmp, N)` formatted `MMM d, yyyy`.
+- Milestone banner: shown only when current week has a `milestone` field.
+- Medical disclaimer: subtle bordered note under hero.
+- Accessibility: labeled inputs, `aria-live="polite"` on results region, semantic headings.
+
+## SEO
+
+- `head()` with title, description, keywords, canonical, og:title/description/type=website, twitter card, WebApplication JSON-LD (spec verbatim).
+- `ToolSeoContent` with the 4 spec paragraphs + 8 FAQs (FAQPage JSON-LD auto-emitted by the component).
 
 ## Integration
 
-- Register only under Mini Games (per spec).
-- Related: Bubble Shooter, Breakout, Ball Sort.
-- SEO head(): title "Shooting Ball — Free Billiard Puzzle Game Online | Skycally", meta description with target keywords, OG/Twitter, `VideoGame` JSON-LD.
-- `ToolSeoContent` with body + 4 FAQs (memory rule).
-- `AdZone id="shooting-ball-mid" size="728x90"` rendered only on Level Select screen.
-
-## Quality gates
-
-- Matter.js loaded once, cached via existing `loadScript`; loading skeleton until ready.
-- Cleanup: on unmount, `Engine.clear`, `World.clear`, cancel RAF, remove event listeners.
-- Touch + mouse pointer events unified via Pointer Events API.
-- Canvas resizes to container with `devicePixelRatio` scaling; logical table 800×450.
-- No async event handlers; no `useCallback(async …)` at top level.
-- TypeScript strict; declare `window.Matter` type in a local `.d.ts` block inside `matter-loader.ts`.
-- English-only UI (memory rule).
+- Category: Health & Fitness, icon `Baby`.
+- AdZone `id="pregnancy-calculator-mid" size="728x90"` between results and HowToUse.
+- English-only strings, no external APIs, no server functions, TypeScript strict, no async component handlers.
 
 ## Out of scope
 
-- No multiplayer, no leaderboards server-side, no npm dep (CDN only), no new images.
+- No account/save, no push notifications, no charts library (timeline is CSS), no i18n.

@@ -76,6 +76,7 @@
 - [Mortgage Calculator](/tools/mortgage-calculator): Home loan payments.
 - [BMI Calculator](/tools/bmi-calculator): Body mass index.
 - [Age Calculator](/tools/age-calculator): Exact age from a birthdate.
+- [Pregnancy Week Calculator](/tools/pregnancy-calculator): How far along am I — weeks, due date, baby size and week-by-week development.
 
 ## SEO Tools
 

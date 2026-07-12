@@ -64,6 +64,7 @@ import { Route as ToolsRandomTeamMakerRouteImport } from './routes/tools.random-
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsProtectPdfRouteImport } from './routes/tools.protect-pdf'
+import { Route as ToolsPregnancyCalculatorRouteImport } from './routes/tools.pregnancy-calculator'
 import { Route as ToolsPortCheckerRouteImport } from './routes/tools.port-checker'
 import { Route as ToolsPinballRouteImport } from './routes/tools.pinball'
 import { Route as ToolsPdfWatermarkRemoverRouteImport } from './routes/tools.pdf-watermark-remover'
@@ -435,6 +436,12 @@ const ToolsProtectPdfRoute = ToolsProtectPdfRouteImport.update({
   path: '/tools/protect-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsPregnancyCalculatorRoute =
+  ToolsPregnancyCalculatorRouteImport.update({
+    id: '/tools/pregnancy-calculator',
+    path: '/tools/pregnancy-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsPortCheckerRoute = ToolsPortCheckerRouteImport.update({
   id: '/tools/port-checker',
   path: '/tools/port-checker',
@@ -1010,6 +1017,7 @@ export interface FileRoutesByFullPath {
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
   '/tools/pinball': typeof ToolsPinballRoute
   '/tools/port-checker': typeof ToolsPortCheckerRoute
+  '/tools/pregnancy-calculator': typeof ToolsPregnancyCalculatorRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -1160,6 +1168,7 @@ export interface FileRoutesByTo {
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
   '/tools/pinball': typeof ToolsPinballRoute
   '/tools/port-checker': typeof ToolsPortCheckerRoute
+  '/tools/pregnancy-calculator': typeof ToolsPregnancyCalculatorRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -1311,6 +1320,7 @@ export interface FileRoutesById {
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
   '/tools/pinball': typeof ToolsPinballRoute
   '/tools/port-checker': typeof ToolsPortCheckerRoute
+  '/tools/pregnancy-calculator': typeof ToolsPregnancyCalculatorRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
@@ -1463,6 +1473,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-watermark-remover'
     | '/tools/pinball'
     | '/tools/port-checker'
+    | '/tools/pregnancy-calculator'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -1613,6 +1624,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-watermark-remover'
     | '/tools/pinball'
     | '/tools/port-checker'
+    | '/tools/pregnancy-calculator'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -1763,6 +1775,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-watermark-remover'
     | '/tools/pinball'
     | '/tools/port-checker'
+    | '/tools/pregnancy-calculator'
     | '/tools/protect-pdf'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
@@ -1914,6 +1927,7 @@ export interface RootRouteChildren {
   ToolsPdfWatermarkRemoverRoute: typeof ToolsPdfWatermarkRemoverRoute
   ToolsPinballRoute: typeof ToolsPinballRoute
   ToolsPortCheckerRoute: typeof ToolsPortCheckerRoute
+  ToolsPregnancyCalculatorRoute: typeof ToolsPregnancyCalculatorRoute
   ToolsProtectPdfRoute: typeof ToolsProtectPdfRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
@@ -2351,6 +2365,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/protect-pdf'
       fullPath: '/tools/protect-pdf'
       preLoaderRoute: typeof ToolsProtectPdfRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/pregnancy-calculator': {
+      id: '/tools/pregnancy-calculator'
+      path: '/tools/pregnancy-calculator'
+      fullPath: '/tools/pregnancy-calculator'
+      preLoaderRoute: typeof ToolsPregnancyCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/port-checker': {
@@ -3110,6 +3131,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsPdfWatermarkRemoverRoute: ToolsPdfWatermarkRemoverRoute,
   ToolsPinballRoute: ToolsPinballRoute,
   ToolsPortCheckerRoute: ToolsPortCheckerRoute,
+  ToolsPregnancyCalculatorRoute: ToolsPregnancyCalculatorRoute,
   ToolsProtectPdfRoute: ToolsProtectPdfRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,

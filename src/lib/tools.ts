@@ -106,6 +106,9 @@ import {
   Mail,
   PenLine,
   Clapperboard,
+  Baby,
+
+
 
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
@@ -1115,6 +1118,15 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Droplets,
     path: "/tools/water-intake-calculator",
+  },
+  {
+    slug: "pregnancy-calculator",
+    name: "Pregnancy Week Calculator",
+    description:
+      "Find out how far along you are, your due date, and what's happening with your baby this week. Week-by-week development guide with baby size, milestones and key dates.",
+    category: "utility",
+    icon: Baby,
+    path: "/tools/pregnancy-calculator",
   },
   {
     slug: "heart-rate-zone-calculator",

@@ -119,12 +119,7 @@ function PregnancyCalculatorPage() {
           <div className="mt-4 rounded-2xl border border-border bg-card p-5 space-y-4">
             {method === "lmp" && (
               <>
-                <FieldDate
-                  label="First day of last period"
-                  value={lmpStr}
-                  onChange={setLmpStr}
-                  max={todayISO()}
-                />
+                <FieldDate label="First day of last period" value={lmpStr} onChange={setLmpStr} max={todayISO()} />
                 <div>
                   <label className="block text-sm font-medium mb-2">Average cycle length (days)</label>
                   <Input
@@ -136,28 +131,19 @@ function PregnancyCalculatorPage() {
                     className="text-lg"
                     aria-label="Average cycle length in days"
                   />
-                  <p className="mt-1 text-xs text-muted-foreground">
-                    Typical range is 20–45 days. Default 28.
-                  </p>
+                  <p className="mt-1 text-xs text-muted-foreground">Typical range is 20–45 days. Default 28.</p>
                 </div>
               </>
             )}
-            {method === "due" && (
-              <FieldDate label="Known due date" value={dueStr} onChange={setDueStr} />
-            )}
+            {method === "due" && <FieldDate label="Known due date" value={dueStr} onChange={setDueStr} />}
             {method === "conception" && (
-              <FieldDate
-                label="Conception date"
-                value={conceptionStr}
-                onChange={setConceptionStr}
-                max={todayISO()}
-              />
+              <FieldDate label="Conception date" value={conceptionStr} onChange={setConceptionStr} max={todayISO()} />
             )}
 
             <p className="text-xs text-muted-foreground pt-2 border-t border-border">
               <Info className="inline w-3.5 h-3.5 mr-1 -mt-0.5" aria-hidden="true" />
-              This tool is for informational purposes only and is not a substitute for medical
-              advice. Always consult your healthcare provider.
+              This tool is for informational purposes only and is not a substitute for medical advice. Always consult
+              your healthcare provider.
             </p>
           </div>
         </aside>
@@ -275,8 +261,7 @@ function MethodToggle({ method, onChange }: { method: Method; onChange: (m: Meth
             style={
               active
                 ? {
-                    background:
-                      "linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #a855f7 100%)",
+                    background: "linear-gradient(135deg, #f43f5e 0%, #ec4899 50%, #a855f7 100%)",
                   }
                 : undefined
             }
@@ -306,13 +291,7 @@ function FieldDate({
   return (
     <div>
       <label className="block text-sm font-medium mb-2">{label}</label>
-      <Input
-        type="date"
-        value={value}
-        onChange={(e) => onChange(e.target.value)}
-        max={max}
-        className="text-lg"
-      />
+      <Input type="date" value={value} onChange={(e) => onChange(e.target.value)} max={max} className="text-lg" />
     </div>
   );
 }
@@ -329,47 +308,41 @@ function Results({ r }: { r: PregnancyResult }) {
 
       {r.status === "very-early" && (
         <InfoBanner tone="warn">
-          Very early pregnancy — calculations may be less accurate before week 4. Consider taking a
-          test or consulting your healthcare provider.
+          Very early pregnancy — calculations may be less accurate before week 4. Consider taking a test or consulting
+          your healthcare provider.
         </InfoBanner>
       )}
       {r.status === "overdue" && (
         <InfoBanner tone="warn">
-          You are {r.overdueDays} {r.overdueDays === 1 ? "day" : "days"} past your estimated due
-          date. Most babies arrive within 2 weeks either side of the due date.
+          You are {r.overdueDays} {r.overdueDays === 1 ? "day" : "days"} past your estimated due date. Most babies
+          arrive within 2 weeks either side of the due date.
         </InfoBanner>
       )}
       {r.status === "very-overdue" && (
         <InfoBanner tone="danger">
-          You are {r.overdueDays} days past your due date (over 42 weeks). Please contact your
-          healthcare provider.
+          You are {r.overdueDays} days past your due date (over 42 weeks). Please contact your healthcare provider.
         </InfoBanner>
       )}
 
-      {weeklyEntry?.value.milestone && (
+      {weeklyEntry?.key === currentWeek && weeklyEntry.value.milestone && (
         <motion.div
           initial={{ opacity: 0, y: 8 }}
           animate={{ opacity: 1, y: 0 }}
           className="rounded-2xl border p-4 text-center"
           style={{
-            background:
-              "linear-gradient(135deg, rgba(244,63,94,0.15), rgba(168,85,247,0.15))",
+            background: "linear-gradient(135deg, rgba(244,63,94,0.15), rgba(168,85,247,0.15))",
             borderColor: "#ec4899",
           }}
         >
           <p className="text-2xl mb-1">{weeklyEntry.value.milestone}</p>
-          <p className="text-sm text-muted-foreground">
-            This is a special week in your pregnancy journey!
-          </p>
+          <p className="text-sm text-muted-foreground">This is a special week in your pregnancy journey!</p>
         </motion.div>
       )}
 
       <div className="grid gap-5 md:grid-cols-2">
-        {sizeEntry && (
-          <BabySizeCard week={sizeEntry.key} size={sizeEntry.value} />
-        )}
+        {sizeEntry && <BabySizeCard week={sizeEntry.key} size={sizeEntry.value} />}
         {weeklyEntry && (
-          <WeeklyCard week={weeklyEntry.key} data={weeklyEntry.value} />
+          <WeeklyCard week={weeklyEntry.key} data={weeklyEntry.value} isCurrentWeek={weeklyEntry.key === currentWeek} />
         )}
       </div>
 
@@ -456,9 +429,7 @@ function BabySizeCard({
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
-      <p className="text-xs uppercase tracking-wider text-muted-foreground">
-        Baby size · week {week}
-      </p>
+      <p className="text-xs uppercase tracking-wider text-muted-foreground">Baby size · week {week}</p>
       <div className="mt-2 flex items-center gap-4">
         <motion.div
           animate={{ y: [0, -6, 0] }}
@@ -488,14 +459,16 @@ function BabySizeCard({
 function WeeklyCard({
   week,
   data,
+  isCurrentWeek,
 }: {
   week: number;
   data: { babyDev: string; momChanges: string; tip: string };
+  isCurrentWeek: boolean;
 }) {
   return (
     <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
       <p className="text-xs uppercase tracking-wider text-muted-foreground">
-        This week · week {week}
+        {isCurrentWeek ? "This week" : "Latest update"} · week {week}
       </p>
       <div>
         <h3 className="text-sm font-semibold mb-1">Baby development</h3>
@@ -525,9 +498,7 @@ function TrimesterTimeline({ weeks }: { weeks: number }) {
   ];
   return (
     <div className="rounded-2xl border border-border bg-card p-5">
-      <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">
-        Pregnancy timeline
-      </p>
+      <p className="text-xs uppercase tracking-wider text-muted-foreground mb-3">Pregnancy timeline</p>
       <div className="relative">
         <div className="flex h-3 rounded-full overflow-hidden">
           {segments.map((s) => (
@@ -586,9 +557,7 @@ function KeyDatesCard({
                 <div className="flex items-center gap-2 min-w-0">
                   <span
                     aria-hidden="true"
-                    className={`w-2 h-2 rounded-full shrink-0 ${
-                      passed ? "" : "opacity-40"
-                    }`}
+                    className={`w-2 h-2 rounded-full shrink-0 ${passed ? "" : "opacity-40"}`}
                     style={{ background: passed ? "#ec4899" : "var(--muted-foreground)" }}
                   />
                   <span className="text-sm truncate">{row.label}</span>
@@ -606,13 +575,7 @@ function KeyDatesCard({
   );
 }
 
-function InfoBanner({
-  tone,
-  children,
-}: {
-  tone: "warn" | "danger";
-  children: React.ReactNode;
-}) {
+function InfoBanner({ tone, children }: { tone: "warn" | "danger"; children: React.ReactNode }) {
   const color = tone === "danger" ? "#ef4444" : "#f59e0b";
   return (
     <div

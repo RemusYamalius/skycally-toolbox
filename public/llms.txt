@@ -73,6 +73,7 @@
 - [Unit Converter](/tools/unit-converter): Convert length, mass, temperature and more.
 - [Currency Converter](/tools/currency-converter): Live currency rates.
 - [Loan Calculator](/tools/loan-calculator): Personal loan payments.
+- [Paycheck Calculator](/tools/paycheck-calculator): US take-home pay after federal tax, state tax, FICA and pre-tax deductions — with state-vs-state comparison.
 - [Mortgage Calculator](/tools/mortgage-calculator): Home loan payments.
 - [BMI Calculator](/tools/bmi-calculator): Body mass index.
 - [Age Calculator](/tools/age-calculator): Exact age from a birthdate.

@@ -73,6 +73,7 @@ import { Route as ToolsPdfToImagesRouteImport } from './routes/tools.pdf-to-imag
 import { Route as ToolsPdfTextExtractorRouteImport } from './routes/tools.pdf-text-extractor'
 import { Route as ToolsPdfReaderRouteImport } from './routes/tools.pdf-reader'
 import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page-numbers'
+import { Route as ToolsPaycheckCalculatorRouteImport } from './routes/tools.paycheck-calculator'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
 import { Route as ToolsPageSeoAnalyzerRouteImport } from './routes/tools.page-seo-analyzer'
 import { Route as ToolsPacManRouteImport } from './routes/tools.pac-man'
@@ -481,6 +482,11 @@ const ToolsPdfReaderRoute = ToolsPdfReaderRouteImport.update({
 const ToolsPdfPageNumbersRoute = ToolsPdfPageNumbersRouteImport.update({
   id: '/tools/pdf-page-numbers',
   path: '/tools/pdf-page-numbers',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPaycheckCalculatorRoute = ToolsPaycheckCalculatorRouteImport.update({
+  id: '/tools/paycheck-calculator',
+  path: '/tools/paycheck-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsPasswordGeneratorRoute = ToolsPasswordGeneratorRouteImport.update({
@@ -1009,6 +1015,7 @@ export interface FileRoutesByFullPath {
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
+  '/tools/paycheck-calculator': typeof ToolsPaycheckCalculatorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
@@ -1160,6 +1167,7 @@ export interface FileRoutesByTo {
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
+  '/tools/paycheck-calculator': typeof ToolsPaycheckCalculatorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
@@ -1312,6 +1320,7 @@ export interface FileRoutesById {
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
+  '/tools/paycheck-calculator': typeof ToolsPaycheckCalculatorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
   '/tools/pdf-reader': typeof ToolsPdfReaderRoute
   '/tools/pdf-text-extractor': typeof ToolsPdfTextExtractorRoute
@@ -1465,6 +1474,7 @@ export interface FileRouteTypes {
     | '/tools/pac-man'
     | '/tools/page-seo-analyzer'
     | '/tools/password-generator'
+    | '/tools/paycheck-calculator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
     | '/tools/pdf-text-extractor'
@@ -1616,6 +1626,7 @@ export interface FileRouteTypes {
     | '/tools/pac-man'
     | '/tools/page-seo-analyzer'
     | '/tools/password-generator'
+    | '/tools/paycheck-calculator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
     | '/tools/pdf-text-extractor'
@@ -1767,6 +1778,7 @@ export interface FileRouteTypes {
     | '/tools/pac-man'
     | '/tools/page-seo-analyzer'
     | '/tools/password-generator'
+    | '/tools/paycheck-calculator'
     | '/tools/pdf-page-numbers'
     | '/tools/pdf-reader'
     | '/tools/pdf-text-extractor'
@@ -1919,6 +1931,7 @@ export interface RootRouteChildren {
   ToolsPacManRoute: typeof ToolsPacManRoute
   ToolsPageSeoAnalyzerRoute: typeof ToolsPageSeoAnalyzerRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
+  ToolsPaycheckCalculatorRoute: typeof ToolsPaycheckCalculatorRoute
   ToolsPdfPageNumbersRoute: typeof ToolsPdfPageNumbersRoute
   ToolsPdfReaderRoute: typeof ToolsPdfReaderRoute
   ToolsPdfTextExtractorRoute: typeof ToolsPdfTextExtractorRoute
@@ -2428,6 +2441,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/pdf-page-numbers'
       fullPath: '/tools/pdf-page-numbers'
       preLoaderRoute: typeof ToolsPdfPageNumbersRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/paycheck-calculator': {
+      id: '/tools/paycheck-calculator'
+      path: '/tools/paycheck-calculator'
+      fullPath: '/tools/paycheck-calculator'
+      preLoaderRoute: typeof ToolsPaycheckCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/password-generator': {
@@ -3123,6 +3143,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsPacManRoute: ToolsPacManRoute,
   ToolsPageSeoAnalyzerRoute: ToolsPageSeoAnalyzerRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
+  ToolsPaycheckCalculatorRoute: ToolsPaycheckCalculatorRoute,
   ToolsPdfPageNumbersRoute: ToolsPdfPageNumbersRoute,
   ToolsPdfReaderRoute: ToolsPdfReaderRoute,
   ToolsPdfTextExtractorRoute: ToolsPdfTextExtractorRoute,

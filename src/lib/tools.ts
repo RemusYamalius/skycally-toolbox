@@ -107,6 +107,7 @@ import {
   PenLine,
   Clapperboard,
   Baby,
+  Wallet,
 
 
 
@@ -1065,6 +1066,14 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Calculator,
     path: "/tools/compound-interest",
+  },
+  {
+    slug: "paycheck-calculator",
+    name: "Paycheck Calculator",
+    description: "Estimate US take-home pay after federal tax, state tax, FICA and pre-tax deductions.",
+    category: "utility",
+    icon: Wallet,
+    path: "/tools/paycheck-calculator",
   },
   {
     slug: "color-picker",

@@ -10,6 +10,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "car-loan-calculator": ["loan-calculator", "emi-calculator", "mortgage-calculator", "tip-calculator", "currency-converter"],
   "compound-interest": ["loan-calculator", "emi-calculator", "mortgage-calculator", "tip-calculator", "currency-converter"],
   "margin-calculator": ["tip-calculator", "currency-converter", "compound-interest", "loan-calculator", "unit-converter"],
+  "paycheck-calculator": ["loan-calculator", "mortgage-calculator", "compound-interest", "currency-converter", "tip-calculator"],
   "color-picker": ["color-palette", "image-filters", "meme-generator", "qr-generator", "add-text-to-image"],
   // AI
   "background-blur": ["face-landmarks", "hand-gesture", "remove-bg"],

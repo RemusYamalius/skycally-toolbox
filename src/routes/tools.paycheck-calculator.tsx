@@ -410,7 +410,6 @@ function HeroCard({ r, frequency }: { r: PaycheckResult; frequency: PayFrequency
         <Wallet className="w-6 h-6" aria-hidden="true" />
         <div>
           <p className="text-xs uppercase tracking-wide opacity-90">Estimated take-home pay</p>
-          <p className="text-sm opacity-90">{FILING_LABELS[/* narrow */ "single" as FilingStatus] ? "" : ""}</p>
         </div>
       </div>
       <div className="grid gap-4 sm:grid-cols-2">

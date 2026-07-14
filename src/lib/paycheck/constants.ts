@@ -1,14 +1,24 @@
 /**
  * PAYCHECK CALCULATOR — TAX CONSTANTS
  *
- * ⚠️ VERIFY BEFORE LAUNCH ⚠️
- * These figures are 2025 IRS-published values used as a stable baseline
- * for the 2026 tax year. The IRS typically publishes final 2026 numbers
- * (Rev. Proc.) in Oct–Nov 2025 and finalizes state brackets rolling into
- * January. Before shipping, cross-check every value below against:
- *   - IRS Rev. Proc. (federal brackets, standard deduction, wage base)
- *   - SSA Fact Sheet (Social Security wage base)
- *   - Each state's Department of Revenue for state brackets
+ * ✅ Updated to verified 2026 figures for: federal brackets (all filing
+ * statuses), federal standard deduction, Social Security wage base, Ohio,
+ * North Carolina, and Georgia — cross-checked against IRS.gov (Rev. Proc.
+ * 2025-32), Tax Foundation, SSA, ATR, and TurboTax as of this update.
+ *
+ * ⚠️ STILL VERIFY BEFORE LAUNCH ⚠️
+ * - MFS federal brackets are derived from a documented IRS pattern, not an
+ *   independently located citation — confirm against Rev. Proc. 2025-32 §1(f).
+ * - Georgia: one source cited an intermediate 5.09% rate vs. the 4.99% used
+ *   here — confirm with the Georgia DOR.
+ * - CA and NY brackets are intentionally left at their 2025-published values:
+ *   their tax authorities (FTB / NY DTF) had not yet published final 2026
+ *   inflation-indexed thresholds as of this update (typically released in
+ *   fall each year, same timing as the IRS). Re-check and update once
+ *   published, likely Q4 2026.
+ * - NJ and VA brackets were not independently re-verified this round.
+ * - Local/city taxes (e.g. NYC, Ohio municipal income tax) are still not
+ *   modeled anywhere in this file — this remains a known simplification.
  *
  * All calculations are estimates for informational purposes only.
  */
@@ -40,12 +50,12 @@ export const FREQUENCY_LABELS: Record<PayFrequency, string> = {
   annual: "Annual (1/yr)",
 };
 
-/** Federal standard deduction — 2025 baseline; verify for 2026. */
+/** Federal standard deduction — 2026 IRS Rev. Proc. 2025-32 (confirmed via IRS.gov). */
 export const STANDARD_DEDUCTION: Record<FilingStatus, number> = {
-  single: 15000,
-  mfj: 30000,
-  mfs: 15000,
-  hoh: 22500,
+  single: 16100,
+  mfj: 32200,
+  mfs: 16100,
+  hoh: 24150,
 };
 
 export interface Bracket {
@@ -53,49 +63,55 @@ export interface Bracket {
   upTo: number; // upper bound of this bracket; Infinity for top bracket
 }
 
-/** 2025 federal income tax brackets — verify for 2026. */
+/** 2026 federal income tax brackets — confirmed via Tax Foundation, citing IRS Rev. Proc. 2025-32. */
 export const FEDERAL_BRACKETS: Record<FilingStatus, Bracket[]> = {
   single: [
-    { rate: 0.10, upTo: 11925 },
-    { rate: 0.12, upTo: 48475 },
-    { rate: 0.22, upTo: 103350 },
-    { rate: 0.24, upTo: 197300 },
-    { rate: 0.32, upTo: 250525 },
-    { rate: 0.35, upTo: 626350 },
+    { rate: 0.1, upTo: 12400 },
+    { rate: 0.12, upTo: 50400 },
+    { rate: 0.22, upTo: 105700 },
+    { rate: 0.24, upTo: 201775 },
+    { rate: 0.32, upTo: 256225 },
+    { rate: 0.35, upTo: 640600 },
     { rate: 0.37, upTo: Infinity },
   ],
   mfj: [
-    { rate: 0.10, upTo: 23850 },
-    { rate: 0.12, upTo: 96950 },
-    { rate: 0.22, upTo: 206700 },
-    { rate: 0.24, upTo: 394600 },
-    { rate: 0.32, upTo: 501050 },
-    { rate: 0.35, upTo: 751600 },
+    { rate: 0.1, upTo: 24800 },
+    { rate: 0.12, upTo: 100800 },
+    { rate: 0.22, upTo: 211400 },
+    { rate: 0.24, upTo: 403550 },
+    { rate: 0.32, upTo: 512450 },
+    { rate: 0.35, upTo: 768700 },
     { rate: 0.37, upTo: Infinity },
   ],
+  // MFS is not published as a separate table by Tax Foundation. Derived using
+  // the IRS's documented convention (confirmed against the 2025 baseline
+  // previously in this file): MFS matches Single through the 32% bracket,
+  // then caps the 35% bracket at exactly half of the MFJ threshold. Verify
+  // against IRS Rev. Proc. 2025-32 §1(f) directly before launch — this is a
+  // high-confidence pattern match, not an independently located citation.
   mfs: [
-    { rate: 0.10, upTo: 11925 },
-    { rate: 0.12, upTo: 48475 },
-    { rate: 0.22, upTo: 103350 },
-    { rate: 0.24, upTo: 197300 },
-    { rate: 0.32, upTo: 250525 },
-    { rate: 0.35, upTo: 375800 },
+    { rate: 0.1, upTo: 12400 },
+    { rate: 0.12, upTo: 50400 },
+    { rate: 0.22, upTo: 105700 },
+    { rate: 0.24, upTo: 201775 },
+    { rate: 0.32, upTo: 256225 },
+    { rate: 0.35, upTo: 384350 },
     { rate: 0.37, upTo: Infinity },
   ],
   hoh: [
-    { rate: 0.10, upTo: 17000 },
-    { rate: 0.12, upTo: 64850 },
-    { rate: 0.22, upTo: 103350 },
-    { rate: 0.24, upTo: 197300 },
-    { rate: 0.32, upTo: 250500 },
-    { rate: 0.35, upTo: 626350 },
+    { rate: 0.1, upTo: 17700 },
+    { rate: 0.12, upTo: 67450 },
+    { rate: 0.22, upTo: 105700 },
+    { rate: 0.24, upTo: 201775 },
+    { rate: 0.32, upTo: 256200 },
+    { rate: 0.35, upTo: 640600 },
     { rate: 0.37, upTo: Infinity },
   ],
 };
 
-/** FICA constants — 2025 baseline; SSA typically raises wage base each year. */
+/** FICA constants — 2026. */
 export const SS_RATE = 0.062;
-export const SS_WAGE_BASE = 176100; // 2025 SSA wage base — verify for 2026
+export const SS_WAGE_BASE = 184500; // 2026 SSA wage base (confirmed via SSA October 2025 announcement)
 export const MEDICARE_RATE = 0.0145;
 export const ADDITIONAL_MEDICARE_RATE = 0.009;
 export const ADDITIONAL_MEDICARE_THRESHOLD: Record<FilingStatus, number> = {
@@ -261,41 +277,45 @@ export const STATES: StateInfo[] = [
   {
     code: "OH",
     name: "Ohio",
+    // Ohio completed its transition to a flat tax for 2026 (HB96): 0% up to
+    // $26,050, then a single flat 2.75% on all non-business income above
+    // that — the prior 3.5% top tier no longer exists.
     tax: {
       kind: "brackets",
       brackets: {
         single: [
           { rate: 0, upTo: 26050 },
-          { rate: 0.0275, upTo: 100000 },
-          { rate: 0.035, upTo: Infinity },
+          { rate: 0.0275, upTo: Infinity },
         ],
         mfj: [
           { rate: 0, upTo: 26050 },
-          { rate: 0.0275, upTo: 100000 },
-          { rate: 0.035, upTo: Infinity },
+          { rate: 0.0275, upTo: Infinity },
         ],
         mfs: [
           { rate: 0, upTo: 26050 },
-          { rate: 0.0275, upTo: 100000 },
-          { rate: 0.035, upTo: Infinity },
+          { rate: 0.0275, upTo: Infinity },
         ],
         hoh: [
           { rate: 0, upTo: 26050 },
-          { rate: 0.0275, upTo: 100000 },
-          { rate: 0.035, upTo: Infinity },
+          { rate: 0.0275, upTo: Infinity },
         ],
       },
     },
   },
   {
     code: "GA",
+    // Georgia's flat rate dropped to 4.99% for tax year 2026 (per TurboTax
+    // and CountryTaxCalc; one source cites an intermediate 5.09% step —
+    // confirm against the Georgia DOR directly before launch).
     name: "Georgia",
-    tax: { kind: "flat", rate: 0.0539 },
+    tax: { kind: "flat", rate: 0.0499 },
   },
   {
     code: "NC",
+    // North Carolina's phased-down flat rate reached its final step of
+    // 3.99% for tax year 2026 (confirmed by 7+ independent sources).
     name: "North Carolina",
-    tax: { kind: "flat", rate: 0.0425 },
+    tax: { kind: "flat", rate: 0.0399 },
   },
   {
     code: "MI",

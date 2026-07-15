@@ -1076,6 +1076,14 @@ export const tools: Tool[] = [
     path: "/tools/paycheck-calculator",
   },
   {
+    slug: "debt-payoff-calculator",
+    name: "Debt Payoff Calculator",
+    description: "Compare debt snowball vs avalanche side by side. Enter your debts and see months to debt-free, total interest, and interest saved.",
+    category: "utility",
+    icon: TrendingDown,
+    path: "/tools/debt-payoff-calculator",
+  },
+  {
     slug: "color-picker",
     name: "Color Picker",
     description:

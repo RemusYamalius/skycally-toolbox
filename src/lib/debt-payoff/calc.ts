@@ -124,15 +124,7 @@ export function simulate(input: SimInput, strategy: Strategy): SimResult {
     // freed mins already included in sumMinsAllDefined; keep freed logic clear:
     void freedFromCleared;
 
-    // 3. Underwater check: if total budget can't cover total accrued interest, we'll never converge.
-    const totalInterestThisMonth = activeDebts.reduce(
-      (s, d) => s + (balances[d.id] * (d.apr / 100)) / 12 / (1 + d.apr / 100 / 12), // interest just accrued portion
-      0,
-    );
-    // A cleaner underwater signal: after min payments, is the priority debt still growing?
-    // We'll detect it below after applying payments.
-
-    // 4. Apply minimums to each active debt (cap at balance)
+    // 3. Apply minimums to each active debt (cap at balance)
     for (const d of activeDebts) {
       const pay = Math.min(d.minPayment, balances[d.id]);
       balances[d.id] -= pay;

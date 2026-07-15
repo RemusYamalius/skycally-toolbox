@@ -171,7 +171,7 @@ export function simulate(input: SimInput, strategy: Strategy): SimResult {
       }
     }
 
-    void totalInterestThisMonth;
+    
   }
 
   if (month >= MAX_MONTHS && Object.values(balances).some((b) => b > 0.005)) {

@@ -123,6 +123,7 @@ import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.documen
 import { Route as ToolsDnsLeakTestRouteImport } from './routes/tools.dns-leak-test'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
+import { Route as ToolsDebtPayoffCalculatorRouteImport } from './routes/tools.debt-payoff-calculator'
 import { Route as ToolsCurrencyConverterRouteImport } from './routes/tools.currency-converter'
 import { Route as ToolsCountryInfoRouteImport } from './routes/tools.country-info'
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
@@ -736,6 +737,12 @@ const ToolsDeletePdfPagesRoute = ToolsDeletePdfPagesRouteImport.update({
   path: '/tools/delete-pdf-pages',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsDebtPayoffCalculatorRoute =
+  ToolsDebtPayoffCalculatorRouteImport.update({
+    id: '/tools/debt-payoff-calculator',
+    path: '/tools/debt-payoff-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsCurrencyConverterRoute = ToolsCurrencyConverterRouteImport.update({
   id: '/tools/currency-converter',
   path: '/tools/currency-converter',
@@ -966,6 +973,7 @@ export interface FileRoutesByFullPath {
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
   '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
+  '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
@@ -1118,6 +1126,7 @@ export interface FileRoutesByTo {
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
   '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
+  '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
@@ -1271,6 +1280,7 @@ export interface FileRoutesById {
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
   '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
+  '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
@@ -1425,6 +1435,7 @@ export interface FileRouteTypes {
     | '/tools/connect-four'
     | '/tools/country-info'
     | '/tools/currency-converter'
+    | '/tools/debt-payoff-calculator'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
@@ -1577,6 +1588,7 @@ export interface FileRouteTypes {
     | '/tools/connect-four'
     | '/tools/country-info'
     | '/tools/currency-converter'
+    | '/tools/debt-payoff-calculator'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
@@ -1729,6 +1741,7 @@ export interface FileRouteTypes {
     | '/tools/connect-four'
     | '/tools/country-info'
     | '/tools/currency-converter'
+    | '/tools/debt-payoff-calculator'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
     | '/tools/dns-leak-test'
@@ -1882,6 +1895,7 @@ export interface RootRouteChildren {
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
   ToolsCountryInfoRoute: typeof ToolsCountryInfoRoute
   ToolsCurrencyConverterRoute: typeof ToolsCurrencyConverterRoute
+  ToolsDebtPayoffCalculatorRoute: typeof ToolsDebtPayoffCalculatorRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
   ToolsDnsLeakTestRoute: typeof ToolsDnsLeakTestRoute
@@ -2793,6 +2807,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsDeletePdfPagesRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/debt-payoff-calculator': {
+      id: '/tools/debt-payoff-calculator'
+      path: '/tools/debt-payoff-calculator'
+      fullPath: '/tools/debt-payoff-calculator'
+      preLoaderRoute: typeof ToolsDebtPayoffCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/currency-converter': {
       id: '/tools/currency-converter'
       path: '/tools/currency-converter'
@@ -3093,6 +3114,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsConnectFourRoute: ToolsConnectFourRoute,
   ToolsCountryInfoRoute: ToolsCountryInfoRoute,
   ToolsCurrencyConverterRoute: ToolsCurrencyConverterRoute,
+  ToolsDebtPayoffCalculatorRoute: ToolsDebtPayoffCalculatorRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
   ToolsDnsLeakTestRoute: ToolsDnsLeakTestRoute,

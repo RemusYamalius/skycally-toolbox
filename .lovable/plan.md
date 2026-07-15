@@ -1,57 +1,52 @@
-## Paycheck / Take-Home Pay Calculator
+# Debt Payoff Calculator — Snowball vs Avalanche
 
-New tool at `/tools/paycheck-calculator` under Finance category, matching the site's calculator architecture (ToolPageShell → results → AdZone → HowToUse → ToolSeoContent → RelatedTools).
+New tool at `/tools/debt-payoff-calculator` under the Finance grouping, matching the existing calculator architecture (ToolPageShell → results → AdZone → HowToUse → ToolSeoContent → RelatedTools).
 
-### Files
+## Files
 
 **New**
-- `src/routes/tools.paycheck-calculator.tsx` — page: two-column layout (inputs 2fr / results 3fr, mobile stacked). Inputs: gross pay, pay frequency (weekly / biweekly / semi-monthly / monthly / annual), filing status (single / MFJ / MFS / HoH), state (dropdown), 401(k) %, HSA $, health insurance premium $, post-tax deductions $, one-time bonus/overtime $, self-employed toggle. Results panel: gross → itemized (federal, state, SS, Medicare + Additional Medicare, SE tax if 1099, pre-tax, post-tax) → net, shown per-paycheck AND annualized side-by-side. Marginal vs effective rate cards. Donut breakdown chart (pure SVG/CSS, no lib — matches existing pattern). State-comparison section below main results (pick up to 3 states, side-by-side net pay bars). Disclaimer note styled like pregnancy calc's medical disclaimer. Contextual InternalLinks block (loan, mortgage, compound-interest, currency-converter) with full-sentence framing.
-- `src/lib/paycheck/constants.ts` — 2026 federal brackets by filing status, standard deductions, SS wage base + rate, Medicare rate + Additional Medicare thresholds, supplemental wage flat rate (22%), SE tax rate (15.3%) with SS portion cap. State registry: no-tax states flagged $0; bracket/flat-rate data for CA, NY, PA, IL, OH, GA, NC, MI, NJ, VA. **Flagged as "verify before launch"** in a top-of-file comment — I will hardcode current best-known 2026 figures but explicitly call out in the response that exact bracket cutoffs need human verification against IRS Rev. Proc. and each state DOR before publishing.
-- `src/lib/paycheck/calc.ts` — pure functions: `annualize(gross, frequency)`, `computeFederal(taxable, filing)` (progressive), `computeState(taxable, state, filing)`, `computeFICA(annualGross, filing)` (SS with cap, Medicare + 0.9% additional), `computeSE(netSE)` (15.3% with SS cap), `applySupplemental(bonus)` (22% flat + FICA), `computePaycheck(input)` returning full breakdown, `compareStates(input, stateList)`, `marginalRate/effectiveRate` helpers.
+- `src/lib/debt-payoff/calc.ts` — pure simulation engine. Types: `Debt { id, name, balance, apr, minPayment }`, `Strategy = "snowball" | "avalanche"`, `LumpSum { month, amount }`, `SimInput`, `MonthSnapshot`, `SimResult { months, totalInterest, totalPaid, payoffDate, timeline: MonthSnapshot[], perDebt: { id, monthsToPayoff, interestPaid }[], warning?: "underwater" }`. Functions: `simulate(input, strategy)` runs month-by-month amortization (accrue interest = balance × apr/12, apply minimum to each debt, roll leftover budget + freed minimums into priority debt per strategy, apply lump sum on its month), cap at 600 months and return `warning: "underwater"` when a debt's minimum can't cover monthly interest. Tie-break: snowball = smallest balance, then highest APR; avalanche = highest APR, then highest balance. `compare(input)` returns `{ snowball, avalanche, interestSavedVsAvalanche, monthsSavedVsAvalanche, interestSavedByExtra }` where the last is `simulate({...input, extraMonthly:0, lumpSum:undefined}, chosenStrategy).totalInterest - result.totalInterest`.
+- `src/lib/debt-payoff/samples.ts` — 3 pre-filled default debts (Credit Card $4,800 @ 22.9% min $120; Car Loan $8,500 @ 6.9% min $220; Store Card $1,200 @ 26.9% min $40).
+- `src/routes/tools.debt-payoff-calculator.tsx` — full page. Layout: inputs column (debt list as stacked cards on all breakpoints — name / balance / APR / min payment inputs per card, add + remove buttons; extra monthly payment input; optional lump-sum amount + month picker; strategy toggle for the timeline chart's active view) and results column with two side-by-side cards (Snowball / Avalanche) each showing debt-free date, total months, total interest, with the winning-on-interest card badged "Lowest total interest" and even-handed helper text noting snowball's motivational value. A prominent "Interest saved with your extra payment" callout compares chosen-strategy totals against a $0-extra baseline. Balance timeline uses recharts `AreaChart` (stacked per-debt areas declining to zero, one chart per strategy tab). Disclaimer note styled like the pregnancy calc medical disclaimer. Underwater warning banner when `warning === "underwater"`. Contextual InternalLinks block with full-sentence framing (paycheck, compound-interest, loan). Section order: results → AdZone (`id="debt-payoff-calculator-mid" size="728x90"`) → HowToUse → ToolSeoContent → RelatedTools.
 
 **Edited**
-- `src/lib/tools.ts` — register `paycheck-calculator` under Finance category with `Wallet` icon from lucide-react.
-- `src/lib/related-tools.ts` — add `paycheck-calculator`: `["loan-calculator", "mortgage-calculator", "compound-interest", "currency-converter", "tip-calculator"]`; also add it to reverse maps for those tools.
-- `public/sitemap.xml`, `public/llms.txt` — add new URL.
+- `src/lib/tools.ts` — register `debt-payoff-calculator` with `TrendingDown` (lucide) icon under the same finance grouping as loan/paycheck.
+- `src/lib/related-tools.ts` — add `"debt-payoff-calculator": ["paycheck-calculator", "loan-calculator", "compound-interest", "mortgage-calculator", "currency-converter"]` and add it to the reverse maps for paycheck, loan, compound-interest.
+- `public/sitemap.xml`, `public/llms.txt` — add the new URL.
 
-### Calculation logic
+## Calculation logic
 
-- Annual taxable federal = `annualGross - standardDeduction(filing) - preTaxAnnual (401k% of gross + HSA + health premium)`.
-- Federal tax = progressive across bracket table for filing status.
-- State tax = per-state function; no-tax → 0; flat-rate states → rate × taxable; bracket states → progressive on state-specific taxable (state std deduction where it materially differs, otherwise federal AGI approximation with a code comment).
-- FICA: SS = 6.2% × min(annualGross, wageBase); Medicare = 1.45% × annualGross + 0.9% × max(0, annualGross − filing-specific threshold).
-- Self-employed mode: SE tax = 15.3% on 92.35% of net SE earnings (SS portion capped at wage base); half deductible for income-tax calc; framed as "quarterly estimate = annual/4".
-- Bonus/overtime: IRS supplemental flat 22% federal + state supplemental (fallback to regular rate where undefined) + full FICA; add to totals separately so per-paycheck view shows a "this period includes bonus" note.
-- Marginal rate = federal top bracket + state top bracket + FICA marginal. Effective = totalTax / annualGross.
-- Per-paycheck = annualized / periodsPerYear (weekly 52, biweekly 26, semi-monthly 24, monthly 12, annual 1).
+- Monthly interest: `interest = balance * (apr / 100) / 12`; balance grows by interest, then payment applied, floor at 0.
+- Budget each month: `sum(minPayments of unpaid debts) + extraMonthly + (lumpSum if month matches)`. Minimums applied to every unpaid debt first; remainder + any minimums freed by cleared debts stack onto the priority debt.
+- Snowball priority: smallest current balance among unpaid; tie → highest APR. Avalanche: highest APR; tie → highest balance.
+- Underwater detection: at start of any month, if a debt's `minPayment < interest` AND total remaining budget for that debt (after other minimums) is also `< interest`, mark `warning: "underwater"` and stop at 600 months.
+- Payoff date: `addMonths(startOfCurrentMonth, months)` via `date-fns`.
+- Interest saved by extra = baseline (extra=0, no lump) total interest − current total interest, per active strategy.
 
-### UI
+## UI
 
-- Dark theme, gradient hero card (emerald→teal→cyan) with big "Net take-home" number, annual + per-paycheck side-by-side.
-- Donut chart: 5 slices (Federal, State, FICA, Pre-tax, Net) via SVG stroke-dasharray, animated on mount.
-- State-comparison: multiselect chips (max 3), horizontal bar chart of net pay.
-- Marginal vs effective: two labeled cards with tooltip Info icon explaining the difference.
-- Disclaimer: bordered note under hero — "Estimates only, not tax advice. Actual withholding depends on your W-4, employer processing, and local/city taxes not modeled here."
-- Accessibility: labeled inputs, `aria-live="polite"` on results, semantic headings.
+- Reuse existing shadcn primitives (`Input`, `Button`, `Label`, `Select`, `Tabs`) and the dark gradient hero style used by paycheck/pregnancy calculators.
+- Two result cards side-by-side desktop, stacked mobile; winning card gets a subtle emerald ring + badge.
+- Timeline: `Tabs` for Snowball / Avalanche, each rendering a stacked `AreaChart` from recharts with one series per debt using the site's semantic color tokens.
+- Debt entry: stacked cards at every breakpoint (no horizontal table), each card 2×2 grid of labeled inputs plus a trash button; "Add debt" button below.
+- Prominent "Interest saved with your extra payment" callout above the two result cards.
+- Disclaimer: bordered note — "Estimates for informational and planning purposes only. Not financial advice. Actual payoff depends on your lender's exact compounding, fees, and any new debt added during payoff." Copy also states: "Runs entirely in your browser. No account, no signup, nothing sent to a server."
+- Accessibility: labeled inputs, `aria-live="polite"` on the results/callout, semantic headings, keyboard-friendly add/remove.
 
-### SEO
+## SEO
 
-- `head()` — title front-loads "Paycheck Calculator — Take-Home Pay After Taxes (2026) | Skycally"; description targets "paycheck calculator, take-home pay, salary after taxes". Canonical + og:*. WebApplication JSON-LD with accurate featureList (multi-frequency, 4 filing statuses, 2026 federal brackets, FICA + Additional Medicare, 10 state calculators + no-tax flags, 401k/HSA/health pre-tax, self-employed SE tax, supplemental bonus withholding, marginal vs effective, state-vs-state comparison, donut breakdown).
-- `ToolSeoContent`: 4 body paragraphs (what the tool does / how US withholding works / state-by-state differences / using take-home for budgeting) + 8 FAQs matching the spec's PAA queries.
+- `head()` — title front-loads "Debt Payoff Calculator — Snowball vs Avalanche (Free, No Signup) | Skycally"; description targets "debt payoff calculator, debt snowball calculator, debt avalanche calculator". Canonical + og:*. WebApplication JSON-LD with accurate featureList (unlimited debts, snowball + avalanche side-by-side, extra monthly payment, one-time lump-sum with month picker, per-debt balance timeline chart, interest-saved highlight, underwater-debt warning, fully client-side, no signup).
+- `ToolSeoContent`: 4 body paragraphs (what the tool does / snowball vs avalanche and when each makes sense / how extra + lump-sum payments change the math / how debt payoff fits a broader budget plan) + 8 FAQs matching the spec.
 
-### Integration
+## Integration
 
-- Category: Finance (`utility`/finance section per tools.ts convention — will match existing loan/mortgage grouping).
-- AdZone `id="paycheck-calculator-mid" size="728x90"` between results and HowToUse.
-- Section order enforced: HowToUse → ToolSeoContent → RelatedTools (last).
-- English-only, no external APIs, no server functions, TypeScript strict, fully client-side.
+- Category: finance section per tools.ts convention.
+- Related tools mapping described above.
+- English only, no external APIs, no server functions, TypeScript strict, fully client-side.
 
-### Out of scope
+## Out of scope
 
-- Local/city taxes (NYC, SF, etc.) — noted in disclaimer, not modeled.
-- Pre-2026 tax years, non-US payroll, W-4 line-by-line simulation, retirement catch-up contribution logic beyond flat %.
-- No chart library; no save/account.
-
-### Verification callout
-
-After implementation I will explicitly list in the response every hardcoded 2026 figure (federal brackets per filing status, standard deductions, SS wage base, Additional Medicare thresholds, each state's brackets/flat rate) so you can verify against IRS Rev. Proc. and each state DOR before launch — competitors get these wrong every January and it's the one thing worth double-checking manually.
+- Debt consolidation loan modeling (linked out to loan calculator instead).
+- Credit-score impact modeling, promotional/intro APR windows, variable-rate schedules.
+- Saving/loading debt lists (no account, no persistence beyond the session).
+- Non-USD locales (numbers formatted as USD; disclaimer notes this).

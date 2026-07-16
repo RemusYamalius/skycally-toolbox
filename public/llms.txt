@@ -75,6 +75,7 @@
 - [Loan Calculator](/tools/loan-calculator): Personal loan payments.
 - [Paycheck Calculator](/tools/paycheck-calculator): US take-home pay after federal tax, state tax, FICA and pre-tax deductions — with state-vs-state comparison.
 - [Debt Payoff Calculator](/tools/debt-payoff-calculator): Compare debt snowball vs avalanche side by side. Timeline chart, extra-payment and lump-sum modeling, fully client-side, no signup.
+- [Rent vs Buy Calculator](/tools/rent-vs-buy-calculator): Find your breakeven year for renting vs buying. Models full ownership costs and the opportunity cost of your down payment, with live sliders for appreciation, rent growth and investment return.
 - [Mortgage Calculator](/tools/mortgage-calculator): Home loan payments.
 - [BMI Calculator](/tools/bmi-calculator): Body mass index.
 - [Age Calculator](/tools/age-calculator): Exact age from a birthdate.

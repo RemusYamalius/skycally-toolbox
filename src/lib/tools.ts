@@ -109,6 +109,7 @@ import {
   Baby,
   Wallet,
   TrendingDown,
+  Home,
 
 
 
@@ -1083,6 +1084,14 @@ export const tools: Tool[] = [
     category: "utility",
     icon: TrendingDown,
     path: "/tools/debt-payoff-calculator",
+  },
+  {
+    slug: "rent-vs-buy-calculator",
+    name: "Rent vs Buy Calculator",
+    description: "Find your breakeven year for buying vs renting. Full cost of ownership, opportunity cost of the down payment, and interactive assumptions.",
+    category: "utility",
+    icon: Home,
+    path: "/tools/rent-vs-buy-calculator",
   },
   {
     slug: "color-picker",

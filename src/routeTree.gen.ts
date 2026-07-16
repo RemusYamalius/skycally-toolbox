@@ -59,6 +59,7 @@ import { Route as ToolsScreenRecorderRouteImport } from './routes/tools.screen-r
 import { Route as ToolsSatoshiConverterRouteImport } from './routes/tools.satoshi-converter'
 import { Route as ToolsRotatePdfRouteImport } from './routes/tools.rotate-pdf'
 import { Route as ToolsRoleSpinnerRouteImport } from './routes/tools.role-spinner'
+import { Route as ToolsRentVsBuyCalculatorRouteImport } from './routes/tools.rent-vs-buy-calculator'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsRandomTeamMakerRouteImport } from './routes/tools.random-team-maker'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
@@ -413,6 +414,12 @@ const ToolsRoleSpinnerRoute = ToolsRoleSpinnerRouteImport.update({
   path: '/tools/role-spinner',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsRentVsBuyCalculatorRoute =
+  ToolsRentVsBuyCalculatorRouteImport.update({
+    id: '/tools/rent-vs-buy-calculator',
+    path: '/tools/rent-vs-buy-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
   id: '/tools/remove-bg',
   path: '/tools/remove-bg',
@@ -1038,6 +1045,7 @@ export interface FileRoutesByFullPath {
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/rent-vs-buy-calculator': typeof ToolsRentVsBuyCalculatorRoute
   '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/satoshi-converter': typeof ToolsSatoshiConverterRoute
@@ -1191,6 +1199,7 @@ export interface FileRoutesByTo {
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/rent-vs-buy-calculator': typeof ToolsRentVsBuyCalculatorRoute
   '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/satoshi-converter': typeof ToolsSatoshiConverterRoute
@@ -1345,6 +1354,7 @@ export interface FileRoutesById {
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
+  '/tools/rent-vs-buy-calculator': typeof ToolsRentVsBuyCalculatorRoute
   '/tools/role-spinner': typeof ToolsRoleSpinnerRoute
   '/tools/rotate-pdf': typeof ToolsRotatePdfRoute
   '/tools/satoshi-converter': typeof ToolsSatoshiConverterRoute
@@ -1500,6 +1510,7 @@ export interface FileRouteTypes {
     | '/tools/qr-reader'
     | '/tools/random-team-maker'
     | '/tools/remove-bg'
+    | '/tools/rent-vs-buy-calculator'
     | '/tools/role-spinner'
     | '/tools/rotate-pdf'
     | '/tools/satoshi-converter'
@@ -1653,6 +1664,7 @@ export interface FileRouteTypes {
     | '/tools/qr-reader'
     | '/tools/random-team-maker'
     | '/tools/remove-bg'
+    | '/tools/rent-vs-buy-calculator'
     | '/tools/role-spinner'
     | '/tools/rotate-pdf'
     | '/tools/satoshi-converter'
@@ -1806,6 +1818,7 @@ export interface FileRouteTypes {
     | '/tools/qr-reader'
     | '/tools/random-team-maker'
     | '/tools/remove-bg'
+    | '/tools/rent-vs-buy-calculator'
     | '/tools/role-spinner'
     | '/tools/rotate-pdf'
     | '/tools/satoshi-converter'
@@ -1960,6 +1973,7 @@ export interface RootRouteChildren {
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRandomTeamMakerRoute: typeof ToolsRandomTeamMakerRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
+  ToolsRentVsBuyCalculatorRoute: typeof ToolsRentVsBuyCalculatorRoute
   ToolsRoleSpinnerRoute: typeof ToolsRoleSpinnerRoute
   ToolsRotatePdfRoute: typeof ToolsRotatePdfRoute
   ToolsSatoshiConverterRoute: typeof ToolsSatoshiConverterRoute
@@ -2357,6 +2371,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/role-spinner'
       fullPath: '/tools/role-spinner'
       preLoaderRoute: typeof ToolsRoleSpinnerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/rent-vs-buy-calculator': {
+      id: '/tools/rent-vs-buy-calculator'
+      path: '/tools/rent-vs-buy-calculator'
+      fullPath: '/tools/rent-vs-buy-calculator'
+      preLoaderRoute: typeof ToolsRentVsBuyCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/remove-bg': {
@@ -3180,6 +3201,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRandomTeamMakerRoute: ToolsRandomTeamMakerRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
+  ToolsRentVsBuyCalculatorRoute: ToolsRentVsBuyCalculatorRoute,
   ToolsRoleSpinnerRoute: ToolsRoleSpinnerRoute,
   ToolsRotatePdfRoute: ToolsRotatePdfRoute,
   ToolsSatoshiConverterRoute: ToolsSatoshiConverterRoute,
@@ -3229,12 +3251,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

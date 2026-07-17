@@ -102,7 +102,7 @@ export const PUZZLES: Puzzle[] = [
     ["Kitchen appliances", ["BLENDER", "TOASTER", "KETTLE", "OVEN"]],
     ["Card game actions", ["DEAL", "SHUFFLE", "DRAW", "FOLD"]],
     ["Laundry cycles", ["WASH", "RINSE", "SPIN", "DRY"]],
-    ["Types of humor", ["DRY", "DARK", "SLAPSTICK", "DEADPAN"]],
+    ["Types of humor", ["WITTY", "DARK", "SLAPSTICK", "DEADPAN"]],
   ),
   P(12,
     ["Types of nut", ["ALMOND", "CASHEW", "PECAN", "WALNUT"]],

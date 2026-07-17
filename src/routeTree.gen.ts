@@ -22,6 +22,7 @@ import { Route as ToolsWordleRouteImport } from './routes/tools.wordle'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
 import { Route as ToolsWordSearchRouteImport } from './routes/tools.word-search'
 import { Route as ToolsWordProcessorRouteImport } from './routes/tools.word-processor'
+import { Route as ToolsWordGroupsRouteImport } from './routes/tools.word-groups'
 import { Route as ToolsWordCounterRouteImport } from './routes/tools.word-counter'
 import { Route as ToolsWhackAMoleRouteImport } from './routes/tools.whack-a-mole'
 import { Route as ToolsWebrtcLeakTestRouteImport } from './routes/tools.webrtc-leak-test'
@@ -226,6 +227,11 @@ const ToolsWordSearchRoute = ToolsWordSearchRouteImport.update({
 const ToolsWordProcessorRoute = ToolsWordProcessorRouteImport.update({
   id: '/tools/word-processor',
   path: '/tools/word-processor',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsWordGroupsRoute = ToolsWordGroupsRouteImport.update({
+  id: '/tools/word-groups',
+  path: '/tools/word-groups',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsWordCounterRoute = ToolsWordCounterRouteImport.update({
@@ -1083,6 +1089,7 @@ export interface FileRoutesByFullPath {
   '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
+  '/tools/word-groups': typeof ToolsWordGroupsRoute
   '/tools/word-processor': typeof ToolsWordProcessorRoute
   '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -1237,6 +1244,7 @@ export interface FileRoutesByTo {
   '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
+  '/tools/word-groups': typeof ToolsWordGroupsRoute
   '/tools/word-processor': typeof ToolsWordProcessorRoute
   '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -1392,6 +1400,7 @@ export interface FileRoutesById {
   '/tools/webrtc-leak-test': typeof ToolsWebrtcLeakTestRoute
   '/tools/whack-a-mole': typeof ToolsWhackAMoleRoute
   '/tools/word-counter': typeof ToolsWordCounterRoute
+  '/tools/word-groups': typeof ToolsWordGroupsRoute
   '/tools/word-processor': typeof ToolsWordProcessorRoute
   '/tools/word-search': typeof ToolsWordSearchRoute
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
@@ -1548,6 +1557,7 @@ export interface FileRouteTypes {
     | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
     | '/tools/word-counter'
+    | '/tools/word-groups'
     | '/tools/word-processor'
     | '/tools/word-search'
     | '/tools/word-to-pdf'
@@ -1702,6 +1712,7 @@ export interface FileRouteTypes {
     | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
     | '/tools/word-counter'
+    | '/tools/word-groups'
     | '/tools/word-processor'
     | '/tools/word-search'
     | '/tools/word-to-pdf'
@@ -1856,6 +1867,7 @@ export interface FileRouteTypes {
     | '/tools/webrtc-leak-test'
     | '/tools/whack-a-mole'
     | '/tools/word-counter'
+    | '/tools/word-groups'
     | '/tools/word-processor'
     | '/tools/word-search'
     | '/tools/word-to-pdf'
@@ -2011,6 +2023,7 @@ export interface RootRouteChildren {
   ToolsWebrtcLeakTestRoute: typeof ToolsWebrtcLeakTestRoute
   ToolsWhackAMoleRoute: typeof ToolsWhackAMoleRoute
   ToolsWordCounterRoute: typeof ToolsWordCounterRoute
+  ToolsWordGroupsRoute: typeof ToolsWordGroupsRoute
   ToolsWordProcessorRoute: typeof ToolsWordProcessorRoute
   ToolsWordSearchRoute: typeof ToolsWordSearchRoute
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
@@ -2112,6 +2125,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/word-processor'
       fullPath: '/tools/word-processor'
       preLoaderRoute: typeof ToolsWordProcessorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/word-groups': {
+      id: '/tools/word-groups'
+      path: '/tools/word-groups'
+      fullPath: '/tools/word-groups'
+      preLoaderRoute: typeof ToolsWordGroupsRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/word-counter': {
@@ -3239,6 +3259,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsWebrtcLeakTestRoute: ToolsWebrtcLeakTestRoute,
   ToolsWhackAMoleRoute: ToolsWhackAMoleRoute,
   ToolsWordCounterRoute: ToolsWordCounterRoute,
+  ToolsWordGroupsRoute: ToolsWordGroupsRoute,
   ToolsWordProcessorRoute: ToolsWordProcessorRoute,
   ToolsWordSearchRoute: ToolsWordSearchRoute,
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
@@ -3251,12 +3272,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

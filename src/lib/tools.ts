@@ -803,6 +803,15 @@ export const tools: Tool[] = [
     path: "/tools/word-search",
   },
   {
+    slug: "word-groups",
+    name: "Word Groups",
+    description:
+      "Sort 16 words into 4 hidden groups in this free connections-style daily word puzzle. New puzzle every day, unlimited practice mode, and free archive of every past puzzle.",
+    category: "minigames",
+    icon: LayoutGrid,
+    path: "/tools/word-groups",
+  },
+  {
     slug: "typing-speed",
     name: "Typing Speed Test",
     description: "Test your typing speed and accuracy! How many words per minute can you type?",

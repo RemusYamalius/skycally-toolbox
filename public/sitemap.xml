@@ -632,6 +632,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://skycally.com/tools/word-groups</loc>
+    <lastmod>2026-07-17</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://skycally.com/tools/2048</loc>
     <lastmod>2026-06-26</lastmod>
     <changefreq>weekly</changefreq>

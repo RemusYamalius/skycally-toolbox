@@ -15,6 +15,14 @@
  *     by State" (2024) and NAIC Auto Insurance Database Report (2020 latest,
  *     inflation-adjusted). All numbers are ANNUAL premiums for full coverage
  *     for a 40-year-old driver, clean record, $500 deductible.
+ *   - ⚠️ These are 2024 figures. National full-coverage auto premiums rose
+ *     roughly 17% in 2024 and another ~7–8% in 2025 (multiple industry
+ *     trackers — ValuePenguin/LendingTree, MoneyGeek, Insurify — report 2026
+ *     state averages that differ from one another by up to ~2× for the same
+ *     state, so there is no single higher-confidence "2026" table to swap
+ *     in). Rather than replace these with a different single source of
+ *     similar uncertainty, the UI must disclose that actual current costs
+ *     are likely meaningfully higher than the figures below.
  *
  * Multipliers (age brackets, health class, smoker, term, coverage tiers,
  * deductible, driving record) are directional ratios drawn from public
@@ -86,15 +94,15 @@ export const TERM_MULT: Record<TermYears, number> = {
   30: 1.5, // UNVERIFIED — confirm
 };
 
-/** Ratio to scale premium from the $500k base to another coverage amount.
- *  Premium does NOT scale perfectly linearly (per-thousand rate drops with
- *  size) — this is a mild concave curve. */
-export function coverageScale(coverage: number): number {
-  const base = 500_000;
-  const ratio = coverage / base;
-  // Concave: sqrt-blend so $1M is ~1.85×, not 2×.
-  return 0.6 * ratio + 0.4 * Math.sqrt(ratio) * Math.sqrt(ratio) + 0.0; // simple linear-ish
-}
+// NOTE: coverage-amount scaling (concave — the per-thousand rate softens as
+// face amount grows, so $1M isn't simply 2× the $500k base) is computed
+// directly inside computeLifePremium() in calc.ts, not here. A duplicate
+// `coverageScale()` helper used to live in this file but its formula
+// (`0.6*ratio + 0.4*Math.sqrt(ratio)*Math.sqrt(ratio)`) algebraically
+// collapses to pure linear scaling (sqrt(x)*sqrt(x) === x), which silently
+// contradicted its own comment and was never actually used by calc.ts. It
+// has been removed rather than fixed-in-place to avoid two competing
+// implementations of the same curve drifting apart again in the future.
 
 /* ============================================================
  * CAR INSURANCE
@@ -136,7 +144,8 @@ export const VEHICLE_AGE_LABELS: Record<VehicleAge, string> = {
 
 /**
  * State average ANNUAL premium for FULL coverage — 40yr old, clean record,
- * $500 deductible. Bankrate 2024 published state averages.
+ * $500 deductible. Bankrate 2024 published state averages. See the file
+ * header for why these have not been swapped for a "2026" source.
  */
 export interface StateAuto {
   code: string;

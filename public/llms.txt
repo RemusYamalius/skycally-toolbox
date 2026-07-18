@@ -74,6 +74,7 @@
 - [Currency Converter](/tools/currency-converter): Live currency rates.
 - [Loan Calculator](/tools/loan-calculator): Personal loan payments.
 - [Paycheck Calculator](/tools/paycheck-calculator): US take-home pay after federal tax, state tax, FICA and pre-tax deductions — with state-vs-state comparison.
+- [Insurance Estimator](/tools/insurance-estimator): Ballpark life (DIME + income multiplier) and car insurance premiums with a factor-by-factor breakdown. No email, no signup.
 - [Debt Payoff Calculator](/tools/debt-payoff-calculator): Compare debt snowball vs avalanche side by side. Timeline chart, extra-payment and lump-sum modeling, fully client-side, no signup.
 - [Rent vs Buy Calculator](/tools/rent-vs-buy-calculator): Find your breakeven year for renting vs buying. Models full ownership costs and the opportunity cost of your down payment, with live sliders for appreciation, rent growth and investment return.
 - [Mortgage Calculator](/tools/mortgage-calculator): Home loan payments.

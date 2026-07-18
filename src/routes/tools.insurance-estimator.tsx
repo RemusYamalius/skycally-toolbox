@@ -11,12 +11,7 @@ import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { Input } from "@/components/ui/input";
 
-import {
-  computeLifeNeed,
-  computeLifePremium,
-  computeCarPremium,
-  fmtUSD0,
-} from "@/lib/insurance/calc";
+import { computeLifeNeed, computeLifePremium, computeCarPremium, fmtUSD0 } from "@/lib/insurance/calc";
 import {
   HEALTH_LABELS,
   TERM_OPTIONS,
@@ -93,11 +88,11 @@ function InsuranceEstimatorPage() {
       >
         <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" style={{ color: "#f59e0b" }} aria-hidden="true" />
         <p className="text-sm text-foreground">
-          <strong>Ballpark estimate — not a real quote.</strong> These numbers come from published
-          industry-average data. Real premiums depend on underwriting factors (medical exam,
-          motor-vehicle report, credit-based insurance score, carrier appetite) that no calculator
-          can see. <strong>We never ask for your email or phone number.</strong> Take these figures
-          to a licensed agent for an actual quote.
+          <strong>Ballpark estimate — not a real quote.</strong> These numbers come from published industry-average
+          data. Real premiums depend on underwriting factors (medical exam, motor-vehicle report, credit-based insurance
+          score, carrier appetite) that no calculator can see.{" "}
+          <strong>We never ask for your email or phone number.</strong> Take these figures to a licensed agent for an
+          actual quote.
         </p>
       </div>
 
@@ -135,7 +130,7 @@ function InsuranceEstimatorPage() {
         body={[
           "Skycally's Insurance Estimator gives you an honest ballpark of what life insurance you actually need and what car insurance typically costs — in seconds, with no email gate. The Life Insurance mode uses the DIME method (Debt, Income replacement, Mortgage, Education) alongside the classic 10-to-15-times-income rule so you can sanity-check both against each other. The Car Insurance mode starts from your state's published average full-coverage premium and applies transparent multipliers for driver age, vehicle age, driving record, coverage level, and deductible — so you see exactly where the number came from.",
           "The DIME method beats the income-multiplier rule for most families because it adds up the actual dollar obligations your family would have to cover. Debt covers credit cards, personal loans, and auto loans. Income replaces your paycheck for the number of years dependents need support (5–15 years is typical). Mortgage pays off what's left on the house. Education budgets for future college costs per child. The sum is the amount of term-life coverage that would let your survivors keep their standard of living without financial pressure. Because term life is dramatically cheaper than most people expect, buying enough coverage is usually more important than buying the cheapest policy.",
-          "Car insurance premiums vary enormously — Florida drivers pay roughly 3× what Vermont drivers pay for the same coverage — but the drivers of that difference are consistent. State-level litigation and repair costs set the base. Coverage level is the single biggest lever a driver can pull: dropping from full coverage to state-minimum liability cuts most premiums by 55–60%, at the cost of losing collision and comprehensive protection. Age matters enormously in the teens and eases off after 25. A single at-fault accident adds roughly 20–25% for three years; a DUI can nearly double your rate. Raising your deductible from $500 to $1000 typically shaves 8–10% off the comp/collision portion.",
+          "Car insurance premiums vary enormously — Florida drivers pay roughly 3× what Vermont drivers pay for the same coverage — but the drivers of that difference are consistent. State-level litigation and repair costs set the base. Coverage level is the single biggest lever a driver can pull: dropping from full coverage to state-minimum liability cuts most premiums by 55–60%, at the cost of losing collision and comprehensive protection. Age matters enormously in the teens and eases off after 25. A single at-fault accident adds roughly 20–25% for three years; a DUI can nearly double your rate. Raising your deductible from $500 to $1000 typically shaves 8–10% off the comp/collision portion. One more thing worth knowing: national full-coverage premiums rose roughly 17% in 2024 and another 7–8% in 2025, so whatever base figure you start from — ours included — is likely lower than what you'd actually be quoted today.",
           "Skycally is different from most 'free insurance calculators' online because we don't sell your data. Every calculation runs in your browser — nothing is transmitted, nothing is stored on our servers, and there is no email or phone field anywhere. Compare us to the typical lead-gen calculator that gates the actual number behind a form and then sells your info to a dozen agents who will call you for weeks. Use this tool to walk into a real quote conversation already knowing what a fair number looks like — and if you want to see how a monthly premium fits your budget, run it through our Paycheck Calculator or Debt Payoff Calculator.",
         ]}
         faqs={[
@@ -349,8 +344,7 @@ function LifeMode() {
             </div>
           </div>
           <p className="mt-3 text-xs text-muted-foreground">
-            A simpler rule of thumb; DIME is usually more accurate because it looks at your actual
-            obligations.
+            A simpler rule of thumb; DIME is usually more accurate because it looks at your actual obligations.
           </p>
         </div>
 
@@ -381,6 +375,11 @@ function LifeMode() {
             <Chip>{HEALTH_LABELS[health]}</Chip>
             <Chip>{term}-year term</Chip>
           </div>
+          <p className="mt-3 text-xs text-muted-foreground">
+            <Info className="inline w-3.5 h-3.5 mr-1 -mt-0.5" aria-hidden="true" />
+            Based on Policygenius/Term4Sale 2024 published average rates. Individual quotes depend on your actual
+            medical exam and insurer.
+          </p>
         </div>
 
         {/* Contextual links */}
@@ -485,20 +484,16 @@ function CarMode() {
           <Field label="Deductible">
             <div className="grid grid-cols-4 gap-2">
               {([250, 500, 1000, 1500] as Deductible[]).map((d) => (
-                <PillToggle
-                  key={d}
-                  active={deductible === d}
-                  onClick={() => setDeductible(d)}
-                  label={`$${d}`}
-                />
+                <PillToggle key={d} active={deductible === d} onClick={() => setDeductible(d)} label={`$${d}`} />
               ))}
             </div>
           </Field>
 
           <p className="text-xs text-muted-foreground pt-2 border-t border-border">
             <Info className="inline w-3.5 h-3.5 mr-1 -mt-0.5" aria-hidden="true" />
-            Base premium sourced from Bankrate's 2024 state-average full-coverage data. Adjustment
-            factors reflect industry norms; your actual quote will vary.
+            Base premium sourced from Bankrate's 2024 state-average full-coverage data. Adjustment factors reflect
+            industry norms. National full-coverage rates rose roughly 17% in 2024 and another 7–8% in 2025, so actual
+            current costs are likely meaningfully higher than the figures shown here — your real quote will vary.
           </p>
         </div>
       </aside>
@@ -523,16 +518,12 @@ function CarMode() {
                 >
                   <div className="text-xs text-muted-foreground mb-1">{COVERAGE_LABELS[lvl]}</div>
                   <div className="font-display text-2xl font-bold">{fmtUSD0(annual)}</div>
-                  <div className="text-xs text-muted-foreground">
-                    {fmtUSD0(annual / 12)}/mo
-                  </div>
+                  <div className="text-xs text-muted-foreground">{fmtUSD0(annual / 12)}/mo</div>
                 </button>
               );
             })}
           </div>
-          <p className="mt-3 text-xs text-muted-foreground">
-            Tap a tier to see how the number was built.
-          </p>
+          <p className="mt-3 text-xs text-muted-foreground">Tap a tier to see how the number was built.</p>
         </div>
 
         {/* Transparency breakdown */}
@@ -611,7 +602,9 @@ function PillToggle({ active, onClick, label }: { active: boolean; onClick: () =
       onClick={onClick}
       aria-pressed={active}
       className={`flex-1 rounded-md px-3 py-1.5 text-sm font-medium transition border ${
-        active ? "border-primary bg-primary/10 text-foreground" : "border-border bg-transparent text-muted-foreground hover:text-foreground"
+        active
+          ? "border-primary bg-primary/10 text-foreground"
+          : "border-border bg-transparent text-muted-foreground hover:text-foreground"
       }`}
     >
       {label}

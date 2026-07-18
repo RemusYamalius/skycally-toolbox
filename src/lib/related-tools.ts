@@ -4,15 +4,16 @@ import { tools, type Tool } from "./tools";
 // Names not present in the registry are normalized to the closest existing slug.
 export const relatedToolsMap: Record<string, string[]> = {
   "file-viewer": ["pdf-to-word", "word-processor", "pdf-reader", "pdf-text-extractor", "image-to-text"],
-  "loan-calculator": ["emi-calculator", "mortgage-calculator", "car-loan-calculator", "tip-calculator", "currency-converter"],
+  "loan-calculator": ["emi-calculator", "mortgage-calculator", "car-loan-calculator", "tip-calculator", "currency-converter", "insurance-estimator"],
   "emi-calculator": ["loan-calculator", "mortgage-calculator", "car-loan-calculator", "tip-calculator", "currency-converter"],
-  "mortgage-calculator": ["rent-vs-buy-calculator", "loan-calculator", "emi-calculator", "car-loan-calculator", "compound-interest", "currency-converter"],
+  "mortgage-calculator": ["rent-vs-buy-calculator", "loan-calculator", "emi-calculator", "car-loan-calculator", "compound-interest", "currency-converter", "insurance-estimator"],
   "car-loan-calculator": ["loan-calculator", "emi-calculator", "mortgage-calculator", "tip-calculator", "currency-converter"],
   "compound-interest": ["rent-vs-buy-calculator", "loan-calculator", "emi-calculator", "mortgage-calculator", "tip-calculator", "currency-converter"],
   "margin-calculator": ["tip-calculator", "currency-converter", "compound-interest", "loan-calculator", "unit-converter"],
-  "paycheck-calculator": ["rent-vs-buy-calculator", "loan-calculator", "mortgage-calculator", "compound-interest", "currency-converter", "debt-payoff-calculator"],
-  "debt-payoff-calculator": ["paycheck-calculator", "loan-calculator", "compound-interest", "mortgage-calculator", "currency-converter"],
-  "rent-vs-buy-calculator": ["mortgage-calculator", "compound-interest", "paycheck-calculator", "loan-calculator", "debt-payoff-calculator"],
+  "paycheck-calculator": ["rent-vs-buy-calculator", "loan-calculator", "mortgage-calculator", "compound-interest", "currency-converter", "debt-payoff-calculator", "insurance-estimator"],
+  "debt-payoff-calculator": ["paycheck-calculator", "loan-calculator", "compound-interest", "mortgage-calculator", "currency-converter", "insurance-estimator"],
+  "rent-vs-buy-calculator": ["mortgage-calculator", "compound-interest", "paycheck-calculator", "loan-calculator", "debt-payoff-calculator", "insurance-estimator"],
+  "insurance-estimator": ["paycheck-calculator", "debt-payoff-calculator", "mortgage-calculator", "rent-vs-buy-calculator", "loan-calculator"],
   "color-picker": ["color-palette", "image-filters", "meme-generator", "qr-generator", "add-text-to-image"],
   // AI
   "background-blur": ["face-landmarks", "hand-gesture", "remove-bg"],

@@ -1087,6 +1087,14 @@ export const tools: Tool[] = [
     path: "/tools/paycheck-calculator",
   },
   {
+    slug: "insurance-estimator",
+    name: "Insurance Estimator",
+    description: "Estimate life insurance coverage needs and car insurance premiums — no signup, no email.",
+    category: "utility",
+    icon: Shield,
+    path: "/tools/insurance-estimator",
+  },
+  {
     slug: "debt-payoff-calculator",
     name: "Debt Payoff Calculator",
     description: "Compare debt snowball vs avalanche side by side. Enter your debts and see months to debt-free, total interest, and interest saved.",

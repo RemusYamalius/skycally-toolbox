@@ -318,28 +318,8 @@ function HomePage() {
           style={{ background: "radial-gradient(ellipse, rgba(0,212,255,0.06) 0%, transparent 70%)" }}
         />
 
-        {/* Floating particles */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-          {PARTICLES.map((p, i) => (
-            <span
-              key={i}
-              className="absolute rounded-full animate-float"
-              style={{
-                top: `${p.top}%`,
-                left: `${p.left}%`,
-                width: `${p.size}px`,
-                height: `${p.size}px`,
-                background: p.violet ? "var(--violet-brand)" : "var(--cyan-brand)",
-                opacity: p.opacity,
-                filter: p.blur ? `blur(${p.blur}px)` : undefined,
-                boxShadow: `0 0 ${p.size * 3}px currentColor`,
-                color: p.violet ? "var(--violet-brand)" : "var(--cyan-brand)",
-                animationDelay: `${p.delay}s`,
-                animationDuration: `${p.duration}s`,
-              }}
-            />
-          ))}
-        </div>
+        {/* Floating particles (canvas — animates on desktop AND mobile) */}
+        <HeroParticles />
 
         <div className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 py-20 text-center">
           <div className="hero-fade-up">

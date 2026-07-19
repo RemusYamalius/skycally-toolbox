@@ -82,30 +82,145 @@ const TRUST_BADGES = [
 
 const TYPED_WORDS = ["Images", "Videos", "PDFs", "Audio", "Text", "Links"];
 
-type Particle = {
-  top: number; left: number; size: number; opacity: number;
-  delay: number; duration: number; violet?: boolean; blur?: number;
-};
-const PARTICLES: Particle[] = [
-  { top: 12, left: 8, size: 4, opacity: 0.55, delay: 0, duration: 6 },
-  { top: 22, left: 84, size: 3, opacity: 0.45, delay: 1.2, duration: 7 },
-  { top: 35, left: 18, size: 5, opacity: 0.5, delay: 2.4, duration: 6.5, violet: true },
-  { top: 48, left: 92, size: 2, opacity: 0.4, delay: 0.6, duration: 8 },
-  { top: 62, left: 6, size: 6, opacity: 0.5, delay: 1.8, duration: 7.5, violet: true },
-  { top: 74, left: 76, size: 3, opacity: 0.45, delay: 3, duration: 6 },
-  { top: 82, left: 28, size: 4, opacity: 0.5, delay: 0.9, duration: 7 },
-  { top: 18, left: 52, size: 2, opacity: 0.35, delay: 2.1, duration: 8.5 },
-  { top: 42, left: 62, size: 3, opacity: 0.45, delay: 1.5, duration: 6.8, violet: true },
-  { top: 55, left: 38, size: 5, opacity: 0.4, delay: 0.3, duration: 7.2 },
-  { top: 68, left: 48, size: 2, opacity: 0.4, delay: 2.7, duration: 6.4 },
-  { top: 28, left: 32, size: 4, opacity: 0.5, delay: 1.1, duration: 7.8, violet: true },
-  { top: 88, left: 58, size: 3, opacity: 0.4, delay: 3.3, duration: 6.2 },
-  { top: 8, left: 68, size: 5, opacity: 0.45, delay: 0.7, duration: 8 },
-  { top: 58, left: 14, size: 2, opacity: 0.35, delay: 2.5, duration: 7 },
-  { top: 15, left: 40, size: 10, opacity: 0.25, delay: 1.4, duration: 9, blur: 2, violet: true },
-  { top: 70, left: 88, size: 12, opacity: 0.2, delay: 0.5, duration: 10, blur: 3 },
-  { top: 45, left: 4, size: 8, opacity: 0.25, delay: 2.2, duration: 9.5, blur: 2 },
-];
+function HeroParticles() {
+  const canvasRef = useRef<HTMLCanvasElement | null>(null);
+
+  useEffect(() => {
+    const canvas = canvasRef.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+
+    const parent = canvas.parentElement!;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
+    type P = {
+      x: number; y: number; vx: number; vy: number;
+      r: number; baseOpacity: number; color: string;
+      wobbleAmp: number; wobbleSpeed: number; wobblePhase: number;
+      pulseSpeed: number; pulsePhase: number;
+    };
+
+    let w = 0, h = 0, dpr = 1;
+    let particles: P[] = [];
+
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
+
+    const makeParticles = () => {
+      const isMobile = w < 640;
+      const count = isMobile ? 28 : 48;
+      particles = new Array(count).fill(0).map(() => {
+        const big = Math.random() < 0.15;
+        const violet = Math.random() < 0.45;
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: rand(-35, 35),
+          vy: rand(-30, 30),
+          r: big ? rand(6, 11) : rand(1.2, 3.8),
+          baseOpacity: big ? rand(0.15, 0.28) : rand(0.35, 0.7),
+          color: violet ? "139, 92, 246" : "0, 212, 255",
+          wobbleAmp: rand(8, 26),
+          wobbleSpeed: rand(0.4, 1.2),
+          wobblePhase: Math.random() * Math.PI * 2,
+          pulseSpeed: rand(0.6, 1.8),
+          pulsePhase: Math.random() * Math.PI * 2,
+        };
+      });
+    };
+
+    const resize = () => {
+      const rect = parent.getBoundingClientRect();
+      w = rect.width; h = rect.height;
+      dpr = Math.min(window.devicePixelRatio || 1, 2);
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      canvas.style.width = `${w}px`;
+      canvas.style.height = `${h}px`;
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      if (particles.length === 0) makeParticles();
+    };
+
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(parent);
+
+    let last = performance.now();
+    let rafId = 0;
+    let running = true;
+
+    const step = (now: number) => {
+      const dt = Math.min(0.05, (now - last) / 1000);
+      last = now;
+      ctx.clearRect(0, 0, w, h);
+      ctx.globalCompositeOperation = "lighter";
+
+      const t = now / 1000;
+      for (const p of particles) {
+        p.x += (p.vx + Math.sin(t * p.wobbleSpeed + p.wobblePhase) * p.wobbleAmp * 0.15) * dt;
+        p.y += (p.vy + Math.cos(t * p.wobbleSpeed * 0.8 + p.wobblePhase) * p.wobbleAmp * 0.1) * dt;
+
+        if (p.x < -20) p.x = w + 20;
+        else if (p.x > w + 20) p.x = -20;
+        if (p.y < -20) p.y = h + 20;
+        else if (p.y > h + 20) p.y = -20;
+
+        const pulse = 0.75 + 0.25 * Math.sin(t * p.pulseSpeed + p.pulsePhase);
+        const op = p.baseOpacity * pulse;
+        const grad = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        grad.addColorStop(0, `rgba(${p.color}, ${op})`);
+        grad.addColorStop(0.4, `rgba(${p.color}, ${op * 0.4})`);
+        grad.addColorStop(1, `rgba(${p.color}, 0)`);
+        ctx.fillStyle = grad;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+        ctx.fill();
+
+        ctx.fillStyle = `rgba(${p.color}, ${Math.min(1, op * 1.6)})`;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+
+      if (running) rafId = requestAnimationFrame(step);
+    };
+
+    if (reduced) {
+      // draw a single static frame
+      step(performance.now());
+      running = false;
+    } else {
+      rafId = requestAnimationFrame(step);
+    }
+
+    const onVis = () => {
+      if (document.hidden) {
+        running = false;
+        cancelAnimationFrame(rafId);
+      } else if (!reduced && !running) {
+        running = true;
+        last = performance.now();
+        rafId = requestAnimationFrame(step);
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+
+    return () => {
+      running = false;
+      cancelAnimationFrame(rafId);
+      ro.disconnect();
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+
+  return (
+    <canvas
+      ref={canvasRef}
+      className="absolute inset-0 w-full h-full pointer-events-none"
+      aria-hidden="true"
+    />
+  );
+}
 
 function TypedWord() {
   const [idx, setIdx] = useState(0);
@@ -203,28 +318,8 @@ function HomePage() {
           style={{ background: "radial-gradient(ellipse, rgba(0,212,255,0.06) 0%, transparent 70%)" }}
         />
 
-        {/* Floating particles */}
-        <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
-          {PARTICLES.map((p, i) => (
-            <span
-              key={i}
-              className="absolute rounded-full animate-float"
-              style={{
-                top: `${p.top}%`,
-                left: `${p.left}%`,
-                width: `${p.size}px`,
-                height: `${p.size}px`,
-                background: p.violet ? "var(--violet-brand)" : "var(--cyan-brand)",
-                opacity: p.opacity,
-                filter: p.blur ? `blur(${p.blur}px)` : undefined,
-                boxShadow: `0 0 ${p.size * 3}px currentColor`,
-                color: p.violet ? "var(--violet-brand)" : "var(--cyan-brand)",
-                animationDelay: `${p.delay}s`,
-                animationDuration: `${p.duration}s`,
-              }}
-            />
-          ))}
-        </div>
+        {/* Floating particles (canvas — animates on desktop AND mobile) */}
+        <HeroParticles />
 
         <div className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 py-20 text-center">
           <div className="hero-fade-up">

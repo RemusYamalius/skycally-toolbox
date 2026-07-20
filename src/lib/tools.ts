@@ -51,7 +51,6 @@ import {
   Clock,
   Moon,
   Calculator,
-  PiggyBank,
   Percent,
   Activity,
   CalendarDays,
@@ -111,13 +110,20 @@ import {
   Wallet,
   TrendingDown,
   Home,
-
-
-
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
-export type ToolCategory = "video" | "image" | "pdf" | "text" | "audio" | "ai" | "utility" | "seo" | "games" | "minigames";
+export type ToolCategory =
+  | "video"
+  | "image"
+  | "pdf"
+  | "text"
+  | "audio"
+  | "ai"
+  | "utility"
+  | "seo"
+  | "games"
+  | "minigames";
 
 export const categoryMeta: Record<ToolCategory, { label: string; color: string; icon: string }> = {
   video: { label: "Video Tools", color: "var(--cyan-brand)", icon: "🎬" },
@@ -141,9 +147,23 @@ export interface Tool {
   icon: typeof Download;
   path: string;
   hidden?: boolean;
+  /** ISO date ("YYYY-MM-DD") the tool shipped. Drives the "New" badge via
+   *  isNewTool() below — no manual boolean to remember to unset later. */
+  dateAdded?: string;
 }
 
 export const toolInCategory = (t: Tool, c: ToolCategory) => t.category === c || (t.categories?.includes(c) ?? false);
+
+/** How long a tool shows a "New" badge after its dateAdded. */
+export const NEW_TOOL_WINDOW_DAYS = 45;
+
+export function isNewTool(t: Tool): boolean {
+  if (!t.dateAdded) return false;
+  const added = new Date(`${t.dateAdded}T00:00:00Z`).getTime();
+  if (Number.isNaN(added)) return false;
+  const days = (Date.now() - added) / 86_400_000;
+  return days >= 0 && days <= NEW_TOOL_WINDOW_DAYS;
+}
 
 export const tools: Tool[] = [
   {
@@ -811,6 +831,7 @@ export const tools: Tool[] = [
     category: "minigames",
     icon: LayoutGrid,
     path: "/tools/word-groups",
+    dateAdded: "2026-07-15",
   },
   {
     slug: "typing-speed",
@@ -1086,6 +1107,7 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Wallet,
     path: "/tools/paycheck-calculator",
+    dateAdded: "2026-07-15",
   },
   {
     slug: "insurance-estimator",
@@ -1094,30 +1116,27 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Shield,
     path: "/tools/insurance-estimator",
+    dateAdded: "2026-07-15",
   },
   {
     slug: "debt-payoff-calculator",
     name: "Debt Payoff Calculator",
-    description: "Compare debt snowball vs avalanche side by side. Enter your debts and see months to debt-free, total interest, and interest saved.",
+    description:
+      "Compare debt snowball vs avalanche side by side. Enter your debts and see months to debt-free, total interest, and interest saved.",
     category: "utility",
     icon: TrendingDown,
     path: "/tools/debt-payoff-calculator",
+    dateAdded: "2026-07-15",
   },
   {
     slug: "rent-vs-buy-calculator",
     name: "Rent vs Buy Calculator",
-    description: "Find your breakeven year for buying vs renting. Full cost of ownership, opportunity cost of the down payment, and interactive assumptions.",
+    description:
+      "Find your breakeven year for buying vs renting. Full cost of ownership, opportunity cost of the down payment, and interactive assumptions.",
     category: "utility",
     icon: Home,
     path: "/tools/rent-vs-buy-calculator",
-  },
-  {
-    slug: "retirement-calculator",
-    name: "Retirement Calculator",
-    description: "Project your 401(k) balance at retirement as a conservative-to-optimistic range, model a real tiered employer match, and estimate monthly retirement income. No account linking, no signup.",
-    category: "utility",
-    icon: PiggyBank,
-    path: "/tools/retirement-calculator",
+    dateAdded: "2026-07-15",
   },
   {
     slug: "color-picker",
@@ -1273,8 +1292,6 @@ export const tools: Tool[] = [
     path: "/tools/image-animator",
   },
 
-
-
   // ── SEO Tools (Semrush-powered) ────────────────────────────────
   {
     slug: "keyword-research",
@@ -1331,4 +1348,3 @@ export const tools: Tool[] = [
     path: "/tools/page-seo-analyzer",
   },
 ];
-

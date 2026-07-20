@@ -1,7 +1,7 @@
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Link } from "@tanstack/react-router";
-import { Upload, Wand2, ArrowDown, ArrowRight } from "lucide-react";
-import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
+import { Upload, Wand2, ArrowDown, ArrowRight, Sparkles } from "lucide-react";
+import { tools, categoryMeta, toolInCategory, isNewTool, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 import { AdZone } from "@/components/ad-zone";
 
@@ -18,7 +18,18 @@ const POPULAR_SLUGS = [
   "ball-sort",
 ];
 
-const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "seo", "games", "minigames", "ai"];
+const ALL_CATS: ToolCategory[] = [
+  "video",
+  "image",
+  "audio",
+  "pdf",
+  "text",
+  "utility",
+  "seo",
+  "games",
+  "minigames",
+  "ai",
+];
 
 const CATEGORY_TAGLINES: Record<ToolCategory, string> = {
   ai: "Run AI models in your browser — no server, no cost.",
@@ -58,8 +69,37 @@ export default function HomeBelowFold() {
     [],
   );
 
+  // Newest tools — sorted most-recent first. Naturally empty and hidden
+  // once every tool's dateAdded window passes 45 days, so nobody has to
+  // remember to remove this section by hand later.
+  const newTools = useMemo(
+    () =>
+      tools
+        .filter((t) => !t.hidden && isNewTool(t))
+        .sort((a, b) => (b.dateAdded ?? "").localeCompare(a.dateAdded ?? "")),
+    [],
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6">
+      {/* New & Noteworthy — only rendered while at least one tool qualifies */}
+      {newTools.length > 0 && (
+        <section className="pt-16 pb-4">
+          <div className="flex items-center gap-2 mb-6">
+            <Sparkles className="w-5 h-5" style={{ color: "var(--cyan-brand)" }} aria-hidden="true" />
+            <div>
+              <h2 className="font-display text-2xl font-bold">New &amp; Noteworthy</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">Just shipped — take a look</p>
+            </div>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {newTools.map((t, i) => (
+              <ToolCard key={t.slug} tool={t} index={i} />
+            ))}
+          </div>
+        </section>
+      )}
+
       {/* Popular Tools */}
       <section className="pt-16 pb-4">
         <div className="flex items-center justify-between mb-6">

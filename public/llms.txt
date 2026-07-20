@@ -77,6 +77,7 @@
 - [Insurance Estimator](/tools/insurance-estimator): Ballpark life (DIME + income multiplier) and car insurance premiums with a factor-by-factor breakdown. No email, no signup.
 - [Debt Payoff Calculator](/tools/debt-payoff-calculator): Compare debt snowball vs avalanche side by side. Timeline chart, extra-payment and lump-sum modeling, fully client-side, no signup.
 - [Rent vs Buy Calculator](/tools/rent-vs-buy-calculator): Find your breakeven year for renting vs buying. Models full ownership costs and the opportunity cost of your down payment, with live sliders for appreciation, rent growth and investment return.
+- [Retirement Calculator](/tools/retirement-calculator): Project your 401(k) balance at retirement as a conservative-to-optimistic range with inflation-adjusted values, model a real tiered employer match, and estimate monthly retirement income under the 4% rule. No account linking, no signup.
 - [Mortgage Calculator](/tools/mortgage-calculator): Home loan payments.
 - [BMI Calculator](/tools/bmi-calculator): Body mass index.
 - [Age Calculator](/tools/age-calculator): Exact age from a birthdate.

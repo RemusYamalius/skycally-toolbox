@@ -1,11 +1,11 @@
 import { Link } from "@tanstack/react-router";
 import { ArrowRight } from "lucide-react";
-import { categoryMeta, type Tool } from "@/lib/tools";
+import { categoryMeta, isNewTool, type Tool } from "@/lib/tools";
 
 export function ToolCard({ tool }: { tool: Tool; index?: number }) {
   const Icon = tool.icon;
   const color = categoryMeta[tool.category].color;
-
+  const isNew = isNewTool(tool);
   return (
     <div>
       <Link
@@ -17,6 +17,14 @@ export function ToolCard({ tool }: { tool: Tool; index?: number }) {
           className="hidden md:block absolute inset-0 rounded-2xl opacity-0 group-hover:opacity-100 transition pointer-events-none"
           style={{ boxShadow: `0 0 60px -20px ${color}` }}
         />
+        {isNew && (
+          <span
+            className="absolute -top-2 -right-2 rounded-full px-2 py-0.5 text-[10px] font-bold uppercase tracking-wider text-white"
+            style={{ background: "linear-gradient(135deg, var(--cyan-brand), var(--violet-brand))" }}
+          >
+            New
+          </span>
+        )}
         <div className="flex items-center justify-between mb-5">
           <div
             className="w-12 h-12 rounded-xl flex items-center justify-center"

@@ -51,6 +51,7 @@ import {
   Clock,
   Moon,
   Calculator,
+  PiggyBank,
   Percent,
   Activity,
   CalendarDays,
@@ -1109,6 +1110,14 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Home,
     path: "/tools/rent-vs-buy-calculator",
+  },
+  {
+    slug: "retirement-calculator",
+    name: "Retirement Calculator",
+    description: "Project your 401(k) balance at retirement as a conservative-to-optimistic range, model a real tiered employer match, and estimate monthly retirement income. No account linking, no signup.",
+    category: "utility",
+    icon: PiggyBank,
+    path: "/tools/retirement-calculator",
   },
   {
     slug: "color-picker",

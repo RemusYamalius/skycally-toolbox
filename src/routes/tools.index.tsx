@@ -5,20 +5,43 @@ import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/to
 import { ToolCard } from "@/components/tool-card";
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
 
-const VALID_CATS = ["all", "video", "image", "audio", "pdf", "text", "ai", "utility", "seo", "games", "minigames"] as const;
+const VALID_CATS = [
+  "all",
+  "video",
+  "image",
+  "audio",
+  "pdf",
+  "text",
+  "ai",
+  "utility",
+  "seo",
+  "games",
+  "minigames",
+] as const;
 type CatParam = (typeof VALID_CATS)[number];
 
+const TOOL_COUNT = tools.filter((t) => !t.hidden).length;
+
 export const Route = createFileRoute("/tools/")({
-  validateSearch: (search: Record<string, unknown>): { cat?: CatParam } => {
+  validateSearch: (search: Record<string, unknown>): { cat?: CatParam; q?: string } => {
+    const result: { cat?: CatParam; q?: string } = {};
     const cat = search.cat;
     if (typeof cat === "string" && (VALID_CATS as readonly string[]).includes(cat)) {
-      return { cat: cat as CatParam };
+      result.cat = cat as CatParam;
     }
-    return {};
+    // Previously missing entirely — the home page's hero search and its
+    // JSON-LD SearchAction both link to /tools?q=..., but this route never
+    // read the q param, so a query typed on the home page (or a click from
+    // Google's sitelinks search box) silently landed on the full, unfiltered
+    // tool list instead of the expected search results.
+    if (typeof search.q === "string" && search.q.length > 0) {
+      result.q = search.q;
+    }
+    return result;
   },
   head: () => {
     const title = "All Free Online Tools — Skycally";
-    const description = "Browse 40+ free tools: compress images, convert PDFs, generate QR codes, download videos and more. All free, all private.";
+    const description = `Browse ${TOOL_COUNT}+ free tools: compress images, convert PDFs, generate QR codes, download videos and more. All free, all private.`;
     const base = buildPageMeta({ title, description, path: "/tools" });
     const visible = tools.filter((t) => !t.hidden);
     return {
@@ -51,24 +74,53 @@ export const Route = createFileRoute("/tools/")({
   component: ToolsPage,
 });
 
-const cats: ("all" | ToolCategory)[] = ["all", "ai", "seo", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"];
+const cats: ("all" | ToolCategory)[] = [
+  "all",
+  "ai",
+  "seo",
+  "video",
+  "image",
+  "audio",
+  "pdf",
+  "text",
+  "utility",
+  "games",
+  "minigames",
+];
 
 function ToolsPage() {
   const search = Route.useSearch();
   const navigate = useNavigate({ from: "/tools" });
   const [cat, setCat] = useState<"all" | ToolCategory>(search.cat ?? "all");
-  const [q, setQ] = useState("");
+  const [q, setQ] = useState(search.q ?? "");
 
+  // Sync local state from the URL whenever it changes externally (initial
+  // load with ?q=..., browser back/forward, or a Link with a search param) —
+  // this does not fight with the user's own typing below, since typing here
+  // doesn't itself change the URL.
   useEffect(() => {
     setCat(search.cat ?? "all");
-  }, [search.cat]);
+    setQ(search.q ?? "");
+  }, [search.cat, search.q]);
 
   const onPickCat = (c: "all" | ToolCategory) => {
     setCat(c);
-    navigate({ search: c === "all" ? {} : { cat: c }, replace: true });
+    navigate({
+      search: (prev) => ({ ...(c === "all" ? {} : { cat: c }), ...(prev.q ? { q: prev.q } : {}) }),
+      replace: true,
+    });
   };
 
-  const list = useMemo(() => tools.filter((t) => !t.hidden && (cat === "all" || toolInCategory(t, cat)) && (t.name + t.description).toLowerCase().includes(q.toLowerCase())), [cat, q]);
+  const list = useMemo(
+    () =>
+      tools.filter(
+        (t) =>
+          !t.hidden &&
+          (cat === "all" || toolInCategory(t, cat)) &&
+          (t.name + t.description).toLowerCase().includes(q.toLowerCase()),
+      ),
+    [cat, q],
+  );
 
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
@@ -80,7 +132,12 @@ function ToolsPage() {
       <div className="flex flex-col sm:flex-row gap-3 mb-8">
         <div className="relative flex-1">
           <Search className="absolute left-3.5 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
-          <input value={q} onChange={(e) => setQ(e.target.value)} placeholder="Search tools..." className="w-full rounded-xl border border-border bg-card pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring" />
+          <input
+            value={q}
+            onChange={(e) => setQ(e.target.value)}
+            placeholder="Search tools..."
+            className="w-full rounded-xl border border-border bg-card pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
+          />
         </div>
         <div className="flex flex-wrap gap-2">
           {cats.map((c) => (
@@ -97,7 +154,9 @@ function ToolsPage() {
 
       {cat === "all" ? (
         <div className="space-y-14">
-          {(["ai", "seo", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"] as ToolCategory[]).map((c) => {
+          {(
+            ["ai", "seo", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"] as ToolCategory[]
+          ).map((c) => {
             const groupList = list.filter((t) => toolInCategory(t, c));
             if (groupList.length === 0) return null;
             const meta = categoryMeta[c];
@@ -121,7 +180,9 @@ function ToolsPage() {
                   </span>
                 </div>
                 <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-                  {groupList.map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
+                  {groupList.map((t, i) => (
+                    <ToolCard key={t.slug} tool={t} index={i} />
+                  ))}
                 </div>
               </section>
             );
@@ -129,7 +190,9 @@ function ToolsPage() {
         </div>
       ) : (
         <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-          {list.map((t, i) => <ToolCard key={t.slug} tool={t} index={i} />)}
+          {list.map((t, i) => (
+            <ToolCard key={t.slug} tool={t} index={i} />
+          ))}
         </div>
       )}
       {list.length === 0 && <p className="text-center py-20 text-muted-foreground">No tools match your search.</p>}
@@ -137,9 +200,13 @@ function ToolsPage() {
       {/* SEO: static crawlable index of every tool — visually hidden */}
       <nav aria-label="All tools" className="sr-only">
         <ul>
-          {tools.filter((t) => !t.hidden).map((t) => (
-            <li key={t.slug}><Link to={t.path}>{t.name}</Link></li>
-          ))}
+          {tools
+            .filter((t) => !t.hidden)
+            .map((t) => (
+              <li key={t.slug}>
+                <Link to={t.path}>{t.name}</Link>
+              </li>
+            ))}
         </ul>
       </nav>
     </div>

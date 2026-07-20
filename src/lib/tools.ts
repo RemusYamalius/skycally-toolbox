@@ -51,6 +51,7 @@ import {
   Clock,
   Moon,
   Calculator,
+  PiggyBank,
   Percent,
   Activity,
   CalendarDays,

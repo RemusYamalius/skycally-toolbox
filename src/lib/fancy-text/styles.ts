@@ -451,11 +451,8 @@ export const STYLES: FancyStyle[] = [
     name: "S p a c e d",
     category: "Symbols & Decorative",
     transform: (input) => [...input].join(" "),
-  },
-
-  // Silence unused-linter for the wrapChars helper (kept for future styles).
-  ...(false ? [{ id: "_unused", name: "_", category: "Symbols & Decorative" as StyleCategory, transform: wrapChars("", "") }] : []),
 ];
+
 
 // Post-process: circled digits 1-9 use a separate range from letters. Patch
 // the "circled" style so digits map correctly (not via the letter base).

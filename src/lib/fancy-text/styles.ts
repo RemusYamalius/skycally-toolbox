@@ -69,14 +69,6 @@ function makeTableStyle(table: Record<string, string>) {
   };
 }
 
-/** Wrap each visible character (or word) between two decorative pieces. */
-function wrapChars(left: string, right: string) {
-  return (input: string) => {
-    let out = "";
-    for (const ch of input) out += ch === " " ? " " : `${left}${ch}${right}`;
-    return out;
-  };
-}
 
 /** Insert a combining mark after every non-space character. */
 function combining(mark: string) {

@@ -451,7 +451,9 @@ export const STYLES: FancyStyle[] = [
     name: "S p a c e d",
     category: "Symbols & Decorative",
     transform: (input) => [...input].join(" "),
+  },
 ];
+
 
 
 // Post-process: circled digits 1-9 use a separate range from letters. Patch

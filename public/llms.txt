@@ -21,6 +21,7 @@
 - [AI Cover Letter Generator](/tools/ai-cover-letter-generator): Generate tailored cover letters.
 - [AI Resume Builder](/tools/ai-resume-builder): Build a clean resume from a form.
 - [Word Counter](/tools/word-counter): Count words, characters and reading time.
+- [Fancy Text Generator](/tools/fancy-text-generator): Convert text into 40+ decorative Unicode styles.
 - [Word Processor](/tools/word-processor): Rich-text editor with export to DOCX and PDF.
 - [Speech to Text](/tools/speech-to-text): Transcribe audio to text.
 - [Text to Speech](/tools/text-to-speech): Convert text to natural voice.

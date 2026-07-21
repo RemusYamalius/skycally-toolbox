@@ -90,7 +90,7 @@ const cats: ("all" | ToolCategory)[] = [
 
 function ToolsPage() {
   const search = Route.useSearch();
-  const navigate = useNavigate({ from: "/tools" });
+  const navigate = Route.useNavigate();
   const [cat, setCat] = useState<"all" | ToolCategory>(search.cat ?? "all");
   const [q, setQ] = useState(search.q ?? "");
 
@@ -106,7 +106,8 @@ function ToolsPage() {
   const onPickCat = (c: "all" | ToolCategory) => {
     setCat(c);
     navigate({
-      search: (prev) => ({ ...(c === "all" ? {} : { cat: c }), ...(prev.q ? { q: prev.q } : {}) }),
+      to: ".",
+      search: { ...(c === "all" ? {} : { cat: c }), ...(search.q ? { q: search.q } : {}) },
       replace: true,
     });
   };

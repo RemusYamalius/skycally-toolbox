@@ -329,6 +329,14 @@ export const tools: Tool[] = [
     path: "/tools/word-counter",
   },
   {
+    slug: "fancy-text-generator",
+    name: "Fancy Text Generator",
+    description: "Convert plain text into 40+ decorative Unicode styles — bold, italic, cursive, bubble, gothic, upside-down. Instant, copyable.",
+    category: "text",
+    icon: Sparkles,
+    path: "/tools/fancy-text-generator",
+  },
+  {
     slug: "json-formatter",
     name: "JSON Formatter",
     description: "Format, prettify and minify JSON instantly.",

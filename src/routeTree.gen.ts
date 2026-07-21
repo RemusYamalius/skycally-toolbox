@@ -118,6 +118,7 @@ import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gestur
 import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time-fixer'
 import { Route as ToolsFlappyBirdRouteImport } from './routes/tools.flappy-bird'
 import { Route as ToolsFileViewerRouteImport } from './routes/tools.file-viewer'
+import { Route as ToolsFancyTextGeneratorRouteImport } from './routes/tools.fancy-text-generator'
 import { Route as ToolsFaceLandmarksRouteImport } from './routes/tools.face-landmarks'
 import { Route as ToolsExtractAudioRouteImport } from './routes/tools.extract-audio'
 import { Route as ToolsEmiCalculatorRouteImport } from './routes/tools.emi-calculator'
@@ -718,6 +719,11 @@ const ToolsFileViewerRoute = ToolsFileViewerRouteImport.update({
   path: '/tools/file-viewer',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsFancyTextGeneratorRoute = ToolsFancyTextGeneratorRouteImport.update({
+  id: '/tools/fancy-text-generator',
+  path: '/tools/fancy-text-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsFaceLandmarksRoute = ToolsFaceLandmarksRouteImport.update({
   id: '/tools/face-landmarks',
   path: '/tools/face-landmarks',
@@ -1009,6 +1015,7 @@ export interface FileRoutesByFullPath {
   '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/fancy-text-generator': typeof ToolsFancyTextGeneratorRoute
   '/tools/file-viewer': typeof ToolsFileViewerRoute
   '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
@@ -1166,6 +1173,7 @@ export interface FileRoutesByTo {
   '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/fancy-text-generator': typeof ToolsFancyTextGeneratorRoute
   '/tools/file-viewer': typeof ToolsFileViewerRoute
   '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
@@ -1324,6 +1332,7 @@ export interface FileRoutesById {
   '/tools/emi-calculator': typeof ToolsEmiCalculatorRoute
   '/tools/extract-audio': typeof ToolsExtractAudioRoute
   '/tools/face-landmarks': typeof ToolsFaceLandmarksRoute
+  '/tools/fancy-text-generator': typeof ToolsFancyTextGeneratorRoute
   '/tools/file-viewer': typeof ToolsFileViewerRoute
   '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
@@ -1483,6 +1492,7 @@ export interface FileRouteTypes {
     | '/tools/emi-calculator'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/fancy-text-generator'
     | '/tools/file-viewer'
     | '/tools/flappy-bird'
     | '/tools/free-time-fixer'
@@ -1640,6 +1650,7 @@ export interface FileRouteTypes {
     | '/tools/emi-calculator'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/fancy-text-generator'
     | '/tools/file-viewer'
     | '/tools/flappy-bird'
     | '/tools/free-time-fixer'
@@ -1797,6 +1808,7 @@ export interface FileRouteTypes {
     | '/tools/emi-calculator'
     | '/tools/extract-audio'
     | '/tools/face-landmarks'
+    | '/tools/fancy-text-generator'
     | '/tools/file-viewer'
     | '/tools/flappy-bird'
     | '/tools/free-time-fixer'
@@ -1955,6 +1967,7 @@ export interface RootRouteChildren {
   ToolsEmiCalculatorRoute: typeof ToolsEmiCalculatorRoute
   ToolsExtractAudioRoute: typeof ToolsExtractAudioRoute
   ToolsFaceLandmarksRoute: typeof ToolsFaceLandmarksRoute
+  ToolsFancyTextGeneratorRoute: typeof ToolsFancyTextGeneratorRoute
   ToolsFileViewerRoute: typeof ToolsFileViewerRoute
   ToolsFlappyBirdRoute: typeof ToolsFlappyBirdRoute
   ToolsFreeTimeFixerRoute: typeof ToolsFreeTimeFixerRoute
@@ -2826,6 +2839,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsFileViewerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/fancy-text-generator': {
+      id: '/tools/fancy-text-generator'
+      path: '/tools/fancy-text-generator'
+      fullPath: '/tools/fancy-text-generator'
+      preLoaderRoute: typeof ToolsFancyTextGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/face-landmarks': {
       id: '/tools/face-landmarks'
       path: '/tools/face-landmarks'
@@ -3206,6 +3226,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsEmiCalculatorRoute: ToolsEmiCalculatorRoute,
   ToolsExtractAudioRoute: ToolsExtractAudioRoute,
   ToolsFaceLandmarksRoute: ToolsFaceLandmarksRoute,
+  ToolsFancyTextGeneratorRoute: ToolsFancyTextGeneratorRoute,
   ToolsFileViewerRoute: ToolsFileViewerRoute,
   ToolsFlappyBirdRoute: ToolsFlappyBirdRoute,
   ToolsFreeTimeFixerRoute: ToolsFreeTimeFixerRoute,

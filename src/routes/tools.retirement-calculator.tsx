@@ -123,11 +123,9 @@ function RetirementCalculatorPage() {
     [inputs.currentAge, inputs.currentBalance, inputs.annualSalary],
   );
 
-  const set = <K extends keyof RetirementInputs>(k: K, v: RetirementInputs[K]) =>
-    setInputs((s) => ({ ...s, [k]: v }));
+  const set = <K extends keyof RetirementInputs>(k: K, v: RetirementInputs[K]) => setInputs((s) => ({ ...s, [k]: v }));
 
-  const setTier1 = (patch: Partial<MatchTier>) =>
-    setInputs((s) => ({ ...s, tier1: { ...s.tier1, ...patch } }));
+  const setTier1 = (patch: Partial<MatchTier>) => setInputs((s) => ({ ...s, tier1: { ...s.tier1, ...patch } }));
   const setTier2 = (patch: Partial<MatchTier>) =>
     setInputs((s) => ({
       ...s,
@@ -174,8 +172,8 @@ function RetirementCalculatorPage() {
               A realistic range, not one false-precision number
             </h2>
             <p className="text-sm text-muted-foreground max-w-2xl mb-6">
-              Over {result.years} year{result.years === 1 ? "" : "s"}, here's what your balance could look like
-              across a conservative and an optimistic return assumption — with the
+              Over {result.years} year{result.years === 1 ? "" : "s"}, here's what your balance could look like across a
+              conservative and an optimistic return assumption — with the
               <span className="text-foreground font-medium"> today's-dollars </span>
               value shown alongside so inflation doesn't distort the headline.
             </p>
@@ -203,9 +201,9 @@ function RetirementCalculatorPage() {
 
             <p className="mt-4 text-xs text-muted-foreground flex items-start gap-2">
               <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" aria-hidden="true" />
-              Monthly income shown is under the <span className="text-foreground">4% safe-withdrawal rule</span>{" "}
-              applied to the <span className="text-foreground">today's-dollars</span> balance — the honest number
-              for what your savings would actually buy.
+              Monthly income shown is under the <span className="text-foreground">4% safe-withdrawal rule</span> applied
+              to the <span className="text-foreground">today's-dollars</span> balance — the honest number for what your
+              savings would actually buy.
             </p>
           </>
         )}
@@ -356,9 +354,7 @@ function RetirementCalculatorPage() {
 
           {/* Growth assumptions */}
           <div className="rounded-2xl border border-border bg-card p-5 space-y-3">
-            <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">
-              Growth assumptions
-            </h3>
+            <h3 className="font-semibold text-sm uppercase tracking-wide text-muted-foreground">Growth assumptions</h3>
             <div className="grid grid-cols-2 gap-3">
               <Field label="Salary growth (%/yr)" htmlFor="sg">
                 <NumberInput
@@ -418,8 +414,8 @@ function RetirementCalculatorPage() {
               <div>
                 <h3 className="font-semibold">Balance projection</h3>
                 <p className="text-xs text-muted-foreground mt-0.5">
-                  Nominal balance from age {inputs.currentAge} to {inputs.retirementAge}. The shaded gap is your
-                  honest range of outcomes.
+                  Nominal balance from age {inputs.currentAge} to {inputs.retirementAge}. The shaded gap is your honest
+                  range of outcomes.
                 </p>
               </div>
               <div className="hidden sm:flex items-center gap-3 text-xs">
@@ -528,11 +524,7 @@ function RetirementCalculatorPage() {
                         : "var(--violet-brand)",
                 }}
               >
-                {bench.status === "ahead"
-                  ? "Ahead of pace"
-                  : bench.status === "on-track"
-                    ? "On pace"
-                    : "Behind pace"}
+                {bench.status === "ahead" ? "Ahead of pace" : bench.status === "on-track" ? "On pace" : "Behind pace"}
               </span>
             </div>
             <div className="mt-4 grid grid-cols-2 sm:grid-cols-3 gap-3 text-sm">
@@ -565,8 +557,8 @@ function RetirementCalculatorPage() {
           {/* Employer match breakdown */}
           <div className="rounded-2xl border border-border bg-card p-5">
             <h3 className="font-semibold flex items-center gap-2">
-              <Gift className="w-4 h-4" style={{ color: "var(--green-brand)" }} aria-hidden="true" /> Employer
-              match — what actually goes in
+              <Gift className="w-4 h-4" style={{ color: "var(--green-brand)" }} aria-hidden="true" /> Employer match —
+              what actually goes in
             </h3>
             <p className="text-xs text-muted-foreground mt-0.5 mb-4">
               First-year breakdown. Match recomputes against your current-year salary every year in the projection.
@@ -596,28 +588,31 @@ function RetirementCalculatorPage() {
                   style={{ color: "var(--green-brand)" }}
                   aria-hidden="true"
                 />
-                That's{" "}
-                <span className="text-foreground font-semibold">{fmtUSD(result.firstYear.employerMatch)}</span> of
-                free money each year — over {result.years} years that alone is roughly{" "}
+                That's <span className="text-foreground font-semibold">{fmtUSD(result.firstYear.employerMatch)}</span>{" "}
+                of free money each year — over {result.years} years that alone is roughly{" "}
                 <span className="text-foreground font-semibold">
                   {fmtUSD(result.firstYear.employerMatch * result.years)}
                 </span>{" "}
                 of contributions before any market growth.
               </p>
             )}
-            {inputs.employeeContribPct < inputs.tier1.capPct + (tier2Enabled ? inputs.tier1.capPct * 0 + (inputs.tier2?.capPct ?? 0) : 0) && (
-              <p className="mt-3 rounded-lg border border-border p-3 text-xs flex items-start gap-2" style={{ background: "color-mix(in oklab, var(--violet-brand) 8%, transparent)" }}>
+            {inputs.employeeContribPct <
+              inputs.tier1.capPct + (tier2Enabled ? inputs.tier1.capPct * 0 + (inputs.tier2?.capPct ?? 0) : 0) && (
+              <p
+                className="mt-3 rounded-lg border border-border p-3 text-xs flex items-start gap-2"
+                style={{ background: "color-mix(in oklab, var(--violet-brand) 8%, transparent)" }}
+              >
                 <AlertTriangle
                   className="w-3.5 h-3.5 mt-0.5 shrink-0"
                   style={{ color: "var(--violet-brand)" }}
                   aria-hidden="true"
                 />
                 <span>
-                  You're contributing <span className="text-foreground font-medium">{inputs.employeeContribPct}%</span>
-                  , which is below the full-match threshold — you're leaving employer money on the table. Raise your
+                  You're contributing <span className="text-foreground font-medium">{inputs.employeeContribPct}%</span>,
+                  which is below the full-match threshold — you're leaving employer money on the table. Raise your
                   contribution to at least{" "}
                   <span className="text-foreground font-medium">
-                    {inputs.tier1.capPct + (tier2Enabled ? inputs.tier2?.capPct ?? 0 : 0)}%
+                    {inputs.tier1.capPct + (tier2Enabled ? (inputs.tier2?.capPct ?? 0) : 0)}%
                   </span>{" "}
                   to capture the full match.
                 </span>
@@ -633,21 +628,18 @@ function RetirementCalculatorPage() {
       <section className="mt-8 rounded-2xl border border-border bg-card/40 p-6">
         <h2 className="font-display text-lg font-bold mb-2">Traditional vs. Roth 401(k) — the honest one-liner</h2>
         <p className="text-xs text-muted-foreground mb-4">
-          This is an informational explainer, not a second calculation mode. Both options grow tax-free while
-          invested — the difference is <em>when</em> the tax hits.
+          This is an informational explainer, not a second calculation mode. Both options grow tax-free while invested —
+          the difference is <em>when</em> the tax hits.
         </p>
         <div className="grid gap-4 md:grid-cols-2">
           <div className="rounded-xl border border-border p-4">
-            <p
-              className="text-xs uppercase tracking-wider font-semibold mb-1"
-              style={{ color: "var(--cyan-brand)" }}
-            >
+            <p className="text-xs uppercase tracking-wider font-semibold mb-1" style={{ color: "var(--cyan-brand)" }}>
               Traditional 401(k)
             </p>
             <p className="text-sm text-muted-foreground">
-              Contributions come out of your paycheck <span className="text-foreground">before</span> federal income
-              tax — you get the tax break today, which lowers your taxable income now. In retirement, every dollar
-              you withdraw is taxed as ordinary income at whatever bracket you're in then.
+              Contributions come out of your paycheck <span className="text-foreground">before</span> federal income tax
+              — you get the tax break today, which lowers your taxable income now. In retirement, every dollar you
+              withdraw is taxed as ordinary income at whatever bracket you're in then.
             </p>
             <p className="mt-2 text-xs text-muted-foreground">
               Often better if you expect to be in a <span className="text-foreground">lower</span> tax bracket in
@@ -655,10 +647,7 @@ function RetirementCalculatorPage() {
             </p>
           </div>
           <div className="rounded-xl border border-border p-4">
-            <p
-              className="text-xs uppercase tracking-wider font-semibold mb-1"
-              style={{ color: "var(--green-brand)" }}
-            >
+            <p className="text-xs uppercase tracking-wider font-semibold mb-1" style={{ color: "var(--green-brand)" }}>
               Roth 401(k)
             </p>
             <p className="text-sm text-muted-foreground">
@@ -675,8 +664,8 @@ function RetirementCalculatorPage() {
         <p className="mt-4 text-xs text-muted-foreground flex items-start gap-2">
           <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" aria-hidden="true" />
           Employer match dollars are always deposited on a traditional (pre-tax) basis, even in a Roth plan. The
-          projection above intentionally doesn't model the tax bill either way — the balance shown is the
-          pre-withdrawal number for both.
+          projection above intentionally doesn't model the tax bill either way — the balance shown is the pre-withdrawal
+          number for both.
         </p>
       </section>
 
@@ -708,7 +697,7 @@ function RetirementCalculatorPage() {
           "Skycally's Retirement Calculator answers the question every 401(k) or IRA calculator is trying to answer — 'how much will I have?' — but does it honestly. Most retirement calculators, including the ones from big personal-finance sites, show a single confident number like '$1,842,391 at retirement!' as if the market's next 30 years were already decided. Nobody knows what returns will look like over 20 to 40 years, so this tool projects your balance across two return assumptions side by side — a conservative one and an optimistic one — and shows both. That's the same 'range, not false precision' honesty principle we apply everywhere else on the site. The number that matters isn't a single point estimate; it's how wide the range is and whether the low end still gets you where you need to be.",
           "The other honesty problem in these calculators is how they model your employer's 401(k) match. Almost every competitor models it as a flat 'add X%' — which is wrong. Real matches are tiered, structured like 'we'll match 100% of the first 3% of salary you contribute, plus 50% of the next 2%.' That formula means the match amount changes with your contribution rate and your salary, and it caps out at a threshold most people don't realize is a threshold. This calculator models the match the way it actually works: two configurable tiers (matchPct + salary-cap%), recomputed against your current-year salary every year of the projection, with a first-year breakdown showing exactly how much 'free money' the match adds. If you're contributing below the match cap, we call it out — that gap is one of the highest-leverage fixes in personal finance.",
           "The third honesty problem is inflation. A 'you'll have $2M at 65!' headline over a 35-year horizon can be almost entirely inflation illusion — at 2.5% inflation, $2M in 35 years buys roughly what $842K buys today. That's why every projection here shows both the nominal (future-dollar) balance and its inflation-adjusted value in today's dollars, clearly labeled. The monthly-income estimate under the classic 4% safe-withdrawal rule is computed on the today's-dollars number, because that's the figure that actually reflects what your savings would buy at the grocery store, not what the printed statement will say. If your projection halves after inflation, that's not a bug in the tool — it's the number every other calculator is quietly hiding from you.",
-          "This calculator fits alongside Skycally's other financial planning tools. Use the <Link to=\"/tools/compound-interest\">Compound Interest Calculator</Link> to model a separate taxable investment account alongside your 401(k) projection. Use the <Link to=\"/tools/paycheck-calculator\">Paycheck Calculator</Link> to see exactly how a higher contribution percentage changes your real take-home pay after federal, state, and FICA. And if you're weighing 401(k) contributions against paying down high-interest debt, the <Link to=\"/tools/debt-payoff-calculator\">Debt Payoff Calculator</Link> compares the classic trade-off: paying down debt faster versus contributing more to retirement, month by month. Every tool runs 100% in your browser — no account linking, no signup, no data sent anywhere.",
+          "This calculator fits alongside Skycally's other financial planning tools: the Compound Interest Calculator to model a separate taxable investment account alongside your 401(k) projection, the Paycheck Calculator to see exactly how a higher contribution percentage changes your real take-home pay after federal, state, and FICA, and the Debt Payoff Calculator if you're weighing 401(k) contributions against paying down high-interest debt faster. Every tool runs 100% in your browser — no account linking, no signup, no data sent anywhere.",
         ]}
         faqs={[
           {
@@ -772,15 +761,7 @@ function Field({ label, htmlFor, children }: { label: string; htmlFor?: string; 
   );
 }
 
-function MoneyInput({
-  id,
-  value,
-  onChange,
-}: {
-  id?: string;
-  value: number;
-  onChange: (v: number) => void;
-}) {
+function MoneyInput({ id, value, onChange }: { id?: string; value: number; onChange: (v: number) => void }) {
   return (
     <div className="relative">
       <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground text-sm pointer-events-none">
@@ -906,10 +887,7 @@ function BreakdownCell({
       style={{ background: "color-mix(in oklab, " + accent + " 6%, transparent)" }}
     >
       <p className="text-[11px] uppercase tracking-wider text-muted-foreground">{label}</p>
-      <p
-        className={`tabular-nums ${bold ? "text-xl font-bold" : "text-lg font-semibold"}`}
-        style={{ color: accent }}
-      >
+      <p className={`tabular-nums ${bold ? "text-xl font-bold" : "text-lg font-semibold"}`} style={{ color: accent }}>
         {fmtUSD(value)}
       </p>
     </div>
@@ -954,10 +932,7 @@ function InternalLinks() {
               className="group block rounded-xl border border-border p-4 hover:border-foreground/40 transition h-full"
             >
               <p className="font-semibold group-hover:underline flex items-center gap-1">
-                <TrendingUp
-                  className="w-4 h-4 text-muted-foreground group-hover:text-foreground"
-                  aria-hidden="true"
-                />
+                <TrendingUp className="w-4 h-4 text-muted-foreground group-hover:text-foreground" aria-hidden="true" />
                 {it.title}
               </p>
               <p className="text-sm text-muted-foreground mt-1">{it.body}</p>

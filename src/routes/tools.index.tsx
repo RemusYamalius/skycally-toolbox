@@ -107,7 +107,7 @@ function ToolsPage() {
     setCat(c);
     navigate({
       to: ".",
-      search: (prev) => ({ ...(c === "all" ? {} : { cat: c }), ...(prev.q ? { q: prev.q } : {}) }),
+      search: { ...(c === "all" ? {} : { cat: c }), ...(search.q ? { q: search.q } : {}) },
       replace: true,
     });
   };

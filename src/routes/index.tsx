@@ -85,36 +85,120 @@ const TRUST_BADGES = [
 
 const TYPED_WORDS = ["Images", "Videos", "PDFs", "Audio", "Text", "Links"];
 
-type Particle = {
-  top: number;
-  left: number;
-  size: number;
-  opacity: number;
-  delay: number;
-  duration: number;
-  violet?: boolean;
-  blur?: number;
-};
-const PARTICLES: Particle[] = [
-  { top: 12, left: 8, size: 4, opacity: 0.55, delay: 0, duration: 6 },
-  { top: 22, left: 84, size: 3, opacity: 0.45, delay: 1.2, duration: 7 },
-  { top: 35, left: 18, size: 5, opacity: 0.5, delay: 2.4, duration: 6.5, violet: true },
-  { top: 48, left: 92, size: 2, opacity: 0.4, delay: 0.6, duration: 8 },
-  { top: 62, left: 6, size: 6, opacity: 0.5, delay: 1.8, duration: 7.5, violet: true },
-  { top: 74, left: 76, size: 3, opacity: 0.45, delay: 3, duration: 6 },
-  { top: 82, left: 28, size: 4, opacity: 0.5, delay: 0.9, duration: 7 },
-  { top: 18, left: 52, size: 2, opacity: 0.35, delay: 2.1, duration: 8.5 },
-  { top: 42, left: 62, size: 3, opacity: 0.45, delay: 1.5, duration: 6.8, violet: true },
-  { top: 55, left: 38, size: 5, opacity: 0.4, delay: 0.3, duration: 7.2 },
-  { top: 68, left: 48, size: 2, opacity: 0.4, delay: 2.7, duration: 6.4 },
-  { top: 28, left: 32, size: 4, opacity: 0.5, delay: 1.1, duration: 7.8, violet: true },
-  { top: 88, left: 58, size: 3, opacity: 0.4, delay: 3.3, duration: 6.2 },
-  { top: 8, left: 68, size: 5, opacity: 0.45, delay: 0.7, duration: 8 },
-  { top: 58, left: 14, size: 2, opacity: 0.35, delay: 2.5, duration: 7 },
-  { top: 15, left: 40, size: 10, opacity: 0.25, delay: 1.4, duration: 9, blur: 2, violet: true },
-  { top: 70, left: 88, size: 12, opacity: 0.2, delay: 0.5, duration: 10, blur: 3 },
-  { top: 45, left: 4, size: 8, opacity: 0.25, delay: 2.2, duration: 9.5, blur: 2 },
-];
+function HeroParticles() {
+  const ref = useRef<HTMLCanvasElement>(null);
+  useEffect(() => {
+    const canvas = ref.current;
+    if (!canvas) return;
+    const ctx = canvas.getContext("2d");
+    if (!ctx) return;
+    const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+    const dpr = Math.min(window.devicePixelRatio || 1, 2);
+
+    type P = { x: number; y: number; vx: number; vy: number; r: number; hue: 0 | 1; base: number; phase: number; freq: number };
+    let particles: P[] = [];
+    let w = 0, h = 0;
+    let raf = 0;
+    let last = performance.now();
+    let running = true;
+
+    const rand = (a: number, b: number) => a + Math.random() * (b - a);
+
+    const seed = () => {
+      const isMobile = window.innerWidth < 768;
+      const count = isMobile ? 32 : 56;
+      particles = Array.from({ length: count }, () => {
+        const big = Math.random() < 0.15;
+        return {
+          x: Math.random() * w,
+          y: Math.random() * h,
+          vx: rand(-40, 40) / 60,
+          vy: rand(-40, 40) / 60,
+          r: big ? rand(6, 11) : rand(1.5, 4),
+          hue: (Math.random() < 0.4 ? 1 : 0) as 0 | 1,
+          base: big ? rand(0.15, 0.28) : rand(0.35, 0.6),
+          phase: Math.random() * Math.PI * 2,
+          freq: rand(0.4, 1.2),
+        };
+      });
+    };
+
+    const resize = () => {
+      const rect = canvas.getBoundingClientRect();
+      w = rect.width;
+      h = rect.height;
+      canvas.width = Math.floor(w * dpr);
+      canvas.height = Math.floor(h * dpr);
+      ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+      seed();
+    };
+    resize();
+    const ro = new ResizeObserver(resize);
+    ro.observe(canvas);
+
+    const CYAN = "rgba(0, 212, 255, ";
+    const VIOLET = "rgba(139, 92, 246, ";
+
+    const draw = (now: number) => {
+      const dt = Math.min(64, now - last);
+      last = now;
+      ctx.clearRect(0, 0, w, h);
+      ctx.globalCompositeOperation = "lighter";
+      for (const p of particles) {
+        if (!reduced) {
+          p.x += p.vx * dt * 0.06;
+          p.y += p.vy * dt * 0.06;
+          p.phase += (dt / 1000) * p.freq;
+          // gentle wobble
+          p.x += Math.sin(p.phase) * 0.15;
+          p.y += Math.cos(p.phase * 0.8) * 0.15;
+          if (p.x < -20) p.x = w + 20;
+          if (p.x > w + 20) p.x = -20;
+          if (p.y < -20) p.y = h + 20;
+          if (p.y > h + 20) p.y = -20;
+        }
+        const pulse = 0.75 + Math.sin(p.phase * 1.4) * 0.25;
+        const alpha = p.base * pulse;
+        const color = p.hue === 1 ? VIOLET : CYAN;
+        const glow = ctx.createRadialGradient(p.x, p.y, 0, p.x, p.y, p.r * 4);
+        glow.addColorStop(0, color + alpha + ")");
+        glow.addColorStop(0.4, color + alpha * 0.4 + ")");
+        glow.addColorStop(1, color + "0)");
+        ctx.fillStyle = glow;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r * 4, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.fillStyle = color + Math.min(1, alpha * 1.6) + ")";
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.r, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      if (running) raf = requestAnimationFrame(draw);
+    };
+    raf = requestAnimationFrame(draw);
+
+    const onVis = () => {
+      if (document.hidden) {
+        running = false;
+        cancelAnimationFrame(raf);
+      } else if (!running) {
+        running = true;
+        last = performance.now();
+        raf = requestAnimationFrame(draw);
+      }
+    };
+    document.addEventListener("visibilitychange", onVis);
+
+    return () => {
+      running = false;
+      cancelAnimationFrame(raf);
+      ro.disconnect();
+      document.removeEventListener("visibilitychange", onVis);
+    };
+  }, []);
+  return <canvas ref={ref} className="absolute inset-0 w-full h-full" aria-hidden="true" />;
+}
+
 
 function TypedWord() {
   const [idx, setIdx] = useState(0);

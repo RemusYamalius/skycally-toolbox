@@ -109,6 +109,7 @@ import {
   Baby,
   Wallet,
   TrendingDown,
+  PiggyBank,
   Home,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
@@ -1137,6 +1138,16 @@ export const tools: Tool[] = [
     icon: Home,
     path: "/tools/rent-vs-buy-calculator",
     dateAdded: "2026-07-15",
+  },
+  {
+    slug: "retirement-calculator",
+    name: "Retirement Calculator",
+    description:
+      "Project your 401(k) at retirement as a conservative-to-optimistic range with real tiered employer match and inflation-adjusted values. No signup.",
+    category: "utility",
+    icon: PiggyBank,
+    path: "/tools/retirement-calculator",
+    dateAdded: "2026-07-18",
   },
   {
     slug: "color-picker",

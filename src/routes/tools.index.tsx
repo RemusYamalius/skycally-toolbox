@@ -106,6 +106,7 @@ function ToolsPage() {
   const onPickCat = (c: "all" | ToolCategory) => {
     setCat(c);
     navigate({
+      to: ".",
       search: (prev) => ({ ...(c === "all" ? {} : { cat: c }), ...(prev.q ? { q: prev.q } : {}) }),
       replace: true,
     });

@@ -109,6 +109,7 @@ import {
   Baby,
   Wallet,
   TrendingDown,
+  PiggyBank,
   Home,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.

@@ -145,6 +145,7 @@ import { Route as ToolsBusinessCardGeneratorRouteImport } from './routes/tools.b
 import { Route as ToolsBubbleShooterRouteImport } from './routes/tools.bubble-shooter'
 import { Route as ToolsBreakoutRouteImport } from './routes/tools.breakout'
 import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calculator'
+import { Route as ToolsBigFivePersonalityTestRouteImport } from './routes/tools.big-five-personality-test'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
 import { Route as ToolsBacklinkCheckerRouteImport } from './routes/tools.backlink-checker'
@@ -856,6 +857,12 @@ const ToolsBmiCalculatorRoute = ToolsBmiCalculatorRouteImport.update({
   path: '/tools/bmi-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsBigFivePersonalityTestRoute =
+  ToolsBigFivePersonalityTestRouteImport.update({
+    id: '/tools/big-five-personality-test',
+    path: '/tools/big-five-personality-test',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsBase64Route = ToolsBase64RouteImport.update({
   id: '/tools/base64',
   path: '/tools/base64',
@@ -989,6 +996,7 @@ export interface FileRoutesByFullPath {
   '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/big-five-personality-test': typeof ToolsBigFivePersonalityTestRoute
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
@@ -1147,6 +1155,7 @@ export interface FileRoutesByTo {
   '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/big-five-personality-test': typeof ToolsBigFivePersonalityTestRoute
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
@@ -1306,6 +1315,7 @@ export interface FileRoutesById {
   '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
+  '/tools/big-five-personality-test': typeof ToolsBigFivePersonalityTestRoute
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
@@ -1466,6 +1476,7 @@ export interface FileRouteTypes {
     | '/tools/backlink-checker'
     | '/tools/ball-sort'
     | '/tools/base64'
+    | '/tools/big-five-personality-test'
     | '/tools/bmi-calculator'
     | '/tools/breakout'
     | '/tools/bubble-shooter'
@@ -1624,6 +1635,7 @@ export interface FileRouteTypes {
     | '/tools/backlink-checker'
     | '/tools/ball-sort'
     | '/tools/base64'
+    | '/tools/big-five-personality-test'
     | '/tools/bmi-calculator'
     | '/tools/breakout'
     | '/tools/bubble-shooter'
@@ -1782,6 +1794,7 @@ export interface FileRouteTypes {
     | '/tools/backlink-checker'
     | '/tools/ball-sort'
     | '/tools/base64'
+    | '/tools/big-five-personality-test'
     | '/tools/bmi-calculator'
     | '/tools/breakout'
     | '/tools/bubble-shooter'
@@ -1941,6 +1954,7 @@ export interface RootRouteChildren {
   ToolsBacklinkCheckerRoute: typeof ToolsBacklinkCheckerRoute
   ToolsBallSortRoute: typeof ToolsBallSortRoute
   ToolsBase64Route: typeof ToolsBase64Route
+  ToolsBigFivePersonalityTestRoute: typeof ToolsBigFivePersonalityTestRoute
   ToolsBmiCalculatorRoute: typeof ToolsBmiCalculatorRoute
   ToolsBreakoutRoute: typeof ToolsBreakoutRoute
   ToolsBubbleShooterRoute: typeof ToolsBubbleShooterRoute
@@ -3028,6 +3042,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsBmiCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/big-five-personality-test': {
+      id: '/tools/big-five-personality-test'
+      path: '/tools/big-five-personality-test'
+      fullPath: '/tools/big-five-personality-test'
+      preLoaderRoute: typeof ToolsBigFivePersonalityTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/base64': {
       id: '/tools/base64'
       path: '/tools/base64'
@@ -3200,6 +3221,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsBacklinkCheckerRoute: ToolsBacklinkCheckerRoute,
   ToolsBallSortRoute: ToolsBallSortRoute,
   ToolsBase64Route: ToolsBase64Route,
+  ToolsBigFivePersonalityTestRoute: ToolsBigFivePersonalityTestRoute,
   ToolsBmiCalculatorRoute: ToolsBmiCalculatorRoute,
   ToolsBreakoutRoute: ToolsBreakoutRoute,
   ToolsBubbleShooterRoute: ToolsBubbleShooterRoute,
@@ -3336,12 +3358,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

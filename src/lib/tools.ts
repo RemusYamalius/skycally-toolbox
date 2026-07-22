@@ -111,6 +111,7 @@ import {
   TrendingDown,
   PiggyBank,
   Home,
+  BrainCircuit,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1218,6 +1219,15 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Baby,
     path: "/tools/pregnancy-calculator",
+  },
+  {
+    slug: "big-five-personality-test",
+    name: "Big Five Personality Test",
+    description:
+      "Free scientifically-grounded Big Five (OCEAN) personality quiz — 50 IPIP-based questions, full results shown immediately, no signup, no paywall, no email.",
+    category: "utility",
+    icon: BrainCircuit,
+    path: "/tools/big-five-personality-test",
   },
   {
     slug: "heart-rate-zone-calculator",

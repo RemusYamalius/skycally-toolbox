@@ -1,5 +1,5 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildToolMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useMemo, useState } from "react";
 import { Copy, Check, Star, AlertTriangle, Sparkles } from "lucide-react";
@@ -12,8 +12,41 @@ import { RelatedTools } from "@/components/related-tools";
 import { AdZone } from "@/components/ad-zone";
 import { STYLES, CATEGORIES, platformLength, visibleLength, type StyleCategory } from "@/lib/fancy-text/styles";
 
+const SLUG = "fancy-text-generator";
+
 export const Route = createFileRoute("/tools/fancy-text-generator")({
-  head: () => buildToolMeta(toolBySlug("fancy-text-generator", tools)),
+  head: () => {
+    const tool = toolBySlug(SLUG, tools);
+    const base = buildToolMeta(tool);
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "Fancy Text Generator",
+            description:
+              "Free fancy text / font generator. Turn plain text into 40+ decorative Unicode styles — bold, italic, cursive, bubble, gothic, upside-down and more. Instant, copyable, no signup.",
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            url: `${SITE_URL}/tools/fancy-text-generator`,
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            featureList: [
+              "40+ decorative Unicode text styles generated live as you type",
+              "One-click copy per style",
+              "Filter styles by category — Bold & Italic, Cursive & Script, Bubble & Circled, Gothic & Fancy, Upside-Down & Mirrored, Small & Tiny, Symbols & Decorative",
+              "Dual character counter (visible vs. platform count) that warns before you exceed Instagram/TikTok bio limits",
+              "Pin favorite styles to the top for the session",
+              "Works across Instagram, TikTok, Discord, X, WhatsApp and more since it's standard Unicode, not custom fonts",
+              "No signup, no download, no watermark — runs fully in your browser",
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: FancyTextGeneratorPage,
 });
 
@@ -27,10 +60,7 @@ function FancyTextGeneratorPage() {
 
   const filtered = useMemo(() => {
     const list = activeCategory === "All" ? STYLES : STYLES.filter((s) => s.category === activeCategory);
-    return [
-      ...list.filter((s) => pinned.has(s.id)),
-      ...list.filter((s) => !pinned.has(s.id)),
-    ];
+    return [...list.filter((s) => pinned.has(s.id)), ...list.filter((s) => !pinned.has(s.id))];
   }, [activeCategory, pinned]);
 
   const rendered = useMemo(
@@ -98,9 +128,8 @@ function FancyTextGeneratorPage() {
             <p className="flex items-start gap-1.5 text-[11px] text-muted-foreground">
               <AlertTriangle className="w-3 h-3 shrink-0 mt-0.5 text-amber-400" />
               <span>
-                Many fancy Unicode characters use 2 UTF-16 code units each, so Instagram, TikTok, and X count
-                them as 2 characters toward your bio/caption limit — even though you see one. That's why the
-                two numbers differ.
+                Many fancy Unicode characters use 2 UTF-16 code units each, so Instagram, TikTok, and X count them as 2
+                characters toward your bio/caption limit — even though you see one. That's why the two numbers differ.
               </span>
             </p>
           )}
@@ -137,9 +166,7 @@ function FancyTextGeneratorPage() {
               className="flex items-center gap-2 rounded-xl border border-border bg-secondary/40 px-3 py-2.5 sm:px-4 sm:py-3"
             >
               <div className="min-w-0 flex-1">
-                <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70">
-                  {style.category}
-                </div>
+                <div className="text-[10px] uppercase tracking-wider text-muted-foreground/70">{style.category}</div>
                 <div className="mt-0.5 break-words text-base sm:text-lg" style={{ wordBreak: "break-word" }}>
                   {output || <span className="text-muted-foreground italic">—</span>}
                 </div>
@@ -160,16 +187,45 @@ function FancyTextGeneratorPage() {
                 aria-label="Copy fancy text"
                 className="shrink-0 rounded-lg border border-border bg-card p-2 transition hover:bg-secondary"
               >
-                {copiedId === style.id ? (
-                  <Check className="h-4 w-4 text-green-400" />
-                ) : (
-                  <Copy className="h-4 w-4" />
-                )}
+                {copiedId === style.id ? <Check className="h-4 w-4 text-green-400" /> : <Copy className="h-4 w-4" />}
               </button>
             </div>
           );
         })}
       </div>
+
+      {/* ── Internal links — moved up here, right after the style list, so it's
+          visible without scrolling past the full SEO block below. Every prior
+          tool on the site places its contextual links near the main content,
+          not buried after the FAQs. ──────────────────────────────────────── */}
+      <section className="mt-8 rounded-2xl border border-border bg-card/40 p-6">
+        <h2 className="font-display text-lg font-bold mb-3">Pair it with</h2>
+        <ul className="space-y-2 text-sm text-muted-foreground">
+          <li>
+            <Link to="/tools/word-counter" className="text-foreground hover:underline">
+              Word Counter
+            </Link>
+            {" — "}
+            check exactly how long your bio or caption is before you paste your fancy text in, since some platforms
+            count these characters differently.
+          </li>
+          <li>
+            <Link to="/tools/add-text-to-image" className="text-foreground hover:underline">
+              Add Text to Image
+            </Link>
+            {" — "}
+            turn your fancy text into a styled image instead, for platforms that don't render Unicode text the way you
+            want.
+          </li>
+          <li>
+            <Link to="/tools/meme-generator" className="text-foreground hover:underline">
+              Meme Generator
+            </Link>
+            {" — "}
+            drop your new stylish text straight onto a meme template.
+          </li>
+        </ul>
+      </section>
 
       <AdZone id="fancy-text-bottom" size="728x90" />
 
@@ -234,28 +290,7 @@ function FancyTextGeneratorPage() {
         ]}
       />
 
-      <section className="mt-16 rounded-2xl border border-border bg-card/40 p-6">
-        <h2 className="font-display text-lg font-bold mb-3">Pair it with</h2>
-        <ul className="space-y-2 text-sm text-muted-foreground">
-          <li>
-            <Link to="/tools/word-counter" className="text-foreground hover:underline">Word Counter</Link>
-            {" — "}
-            check exactly how long your bio or caption is before you paste your fancy text in, since some platforms count these characters differently.
-          </li>
-          <li>
-            <Link to="/tools/add-text-to-image" className="text-foreground hover:underline">Add Text to Image</Link>
-            {" — "}
-            turn your fancy text into a styled image instead, for platforms that don't render Unicode text the way you want.
-          </li>
-          <li>
-            <Link to="/tools/meme-generator" className="text-foreground hover:underline">Meme Generator</Link>
-            {" — "}
-            drop your new stylish text straight onto a meme template.
-          </li>
-        </ul>
-      </section>
-
-      <RelatedTools currentSlug="fancy-text-generator" />
+      <RelatedTools currentSlug={SLUG} />
     </ToolPageShell>
   );
 }

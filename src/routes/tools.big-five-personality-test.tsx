@@ -4,15 +4,7 @@ import { tools } from "@/lib/tools";
 import { useMemo, useState } from "react";
 import { Copy, RotateCcw, ArrowRight, BrainCircuit, CheckCircle2 } from "lucide-react";
 import { toast } from "sonner";
-import {
-  BarChart,
-  Bar,
-  XAxis,
-  YAxis,
-  ResponsiveContainer,
-  Cell,
-  Tooltip,
-} from "recharts";
+import { BarChart, Bar, XAxis, YAxis, ResponsiveContainer, Cell, Tooltip } from "recharts";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
@@ -102,10 +94,7 @@ function BigFivePage() {
   const total = items.length;
   const complete = answered === total;
 
-  const scores = useMemo(() => (screen === "results" ? scoreResponses(responses) : null), [
-    screen,
-    responses,
-  ]);
+  const scores = useMemo(() => (screen === "results" ? scoreResponses(responses) : null), [screen, responses]);
 
   const handleAnswer = (id: number, value: Response) => {
     setResponses((prev) => ({ ...prev, [id]: value }));
@@ -140,9 +129,7 @@ function BigFivePage() {
       description="A short, scientifically-grounded personality quiz based on the Big Five (OCEAN) model. 50 questions, full results immediately, no signup, no paywall."
       showFileDisclaimer={false}
     >
-      {screen === "intro" && (
-        <IntroCard onStart={() => setScreen("quiz")} />
-      )}
+      {screen === "intro" && <IntroCard onStart={() => setScreen("quiz")} />}
 
       {screen === "quiz" && (
         <QuizPanel
@@ -156,9 +143,7 @@ function BigFivePage() {
         />
       )}
 
-      {screen === "results" && scores && (
-        <ResultsPanel scores={scores} onRetake={handleRetake} onShare={handleShare} />
-      )}
+      {screen === "results" && scores && <ResultsPanel scores={scores} onRetake={handleRetake} onShare={handleShare} />}
 
       <HowToUse
         steps={[
@@ -241,9 +226,8 @@ function IntroCard({ onStart }: { onStart: () => void }) {
         <div className="min-w-0 flex-1">
           <h2 className="font-display text-2xl font-bold">Ready to start?</h2>
           <p className="mt-2 text-sm text-muted-foreground">
-            50 short statements, about 5–8 minutes. Answer based on how you generally are. There
-            are no right or wrong answers. Your complete results appear the moment you finish —
-            no email, no signup, no paywall.
+            50 short statements, about 5–8 minutes. Answer based on how you generally are. There are no right or wrong
+            answers. Your complete results appear the moment you finish — no email, no signup, no paywall.
           </p>
           <ul className="mt-4 space-y-1.5 text-sm text-muted-foreground">
             <li className="flex items-start gap-2">
@@ -266,8 +250,7 @@ function IntroCard({ onStart }: { onStart: () => void }) {
             Start the quiz <ArrowRight className="w-4 h-4" />
           </button>
           <p className="mt-4 text-xs text-muted-foreground">
-            Note: this is a self-report tool for personal insight, not a clinical, diagnostic, or
-            medical assessment.
+            Note: this is a self-report tool for personal insight, not a clinical, diagnostic, or medical assessment.
           </p>
         </div>
       </div>
@@ -305,30 +288,20 @@ function QuizPanel({
           <span className="text-muted-foreground">{pct}%</span>
         </div>
         <div className="mt-2 h-1.5 w-full overflow-hidden rounded-full bg-secondary">
-          <div
-            className="h-full transition-all"
-            style={{ width: `${pct}%`, background: "var(--cyan-brand)" }}
-          />
+          <div className="h-full transition-all" style={{ width: `${pct}%`, background: "var(--cyan-brand)" }} />
         </div>
       </div>
 
       <ol className="space-y-3">
         {items.map((item, idx) => (
-          <li
-            key={item.id}
-            className="rounded-xl border border-border bg-card p-4 sm:p-5"
-          >
+          <li key={item.id} className="rounded-xl border border-border bg-card p-4 sm:p-5">
             <div className="flex items-start gap-3">
               <span className="mt-0.5 shrink-0 rounded-full bg-secondary px-2 py-0.5 text-xs font-mono text-muted-foreground">
                 {idx + 1}
               </span>
               <p className="text-base font-medium leading-snug">{item.text}</p>
             </div>
-            <div
-              role="radiogroup"
-              aria-label={item.text}
-              className="mt-3 grid grid-cols-5 gap-1.5 sm:gap-2"
-            >
+            <div role="radiogroup" aria-label={item.text} className="mt-3 grid grid-cols-5 gap-1.5 sm:gap-2">
               {LIKERT.map((opt) => {
                 const active = responses[item.id] === opt.value;
                 return (
@@ -411,16 +384,14 @@ function ResultsPanel({
           </div>
         </div>
 
+        {/* Chart: YAxis width increased 110 -> 152 and tick font-size trimmed
+            13 -> 12 so the longest label ("Conscientiousness") always has
+            enough room and never gets clipped at its left edge. */}
         <div className="mt-6 h-64 w-full">
           <ResponsiveContainer width="100%" height="100%">
             <BarChart data={chartData} layout="vertical" margin={{ left: 8, right: 24, top: 4, bottom: 4 }}>
               <XAxis type="number" domain={[0, 100]} tick={{ fill: "var(--muted-foreground)", fontSize: 12 }} />
-              <YAxis
-                type="category"
-                dataKey="trait"
-                tick={{ fill: "var(--foreground)", fontSize: 13 }}
-                width={110}
-              />
+              <YAxis type="category" dataKey="trait" tick={{ fill: "var(--foreground)", fontSize: 12 }} width={152} />
               <Tooltip
                 cursor={{ fill: "color-mix(in oklab, var(--foreground) 8%, transparent)" }}
                 contentStyle={{
@@ -450,19 +421,14 @@ function ResultsPanel({
               <div className="flex items-start justify-between gap-3">
                 <div className="min-w-0">
                   <div className="flex items-center gap-2">
-                    <span
-                      className="inline-block w-2.5 h-2.5 rounded-full"
-                      style={{ background: meta.color }}
-                    />
+                    <span className="inline-block w-2.5 h-2.5 rounded-full" style={{ background: meta.color }} />
                     <h3 className="font-display text-lg font-bold">{meta.name}</h3>
                   </div>
                   <p className="mt-0.5 text-xs text-muted-foreground">{meta.blurb}</p>
                 </div>
                 <div className="text-right shrink-0">
                   <div className="text-2xl font-mono font-bold">{r.score0to100}</div>
-                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">
-                    / 100
-                  </div>
+                  <div className="text-[10px] uppercase tracking-wider text-muted-foreground">/ 100</div>
                 </div>
               </div>
               <div className="mt-3">
@@ -475,9 +441,7 @@ function ResultsPanel({
                 >
                   {r.band}
                 </span>
-                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">
-                  {BAND_DESCRIPTIONS[t][r.band]}
-                </p>
+                <p className="mt-2 text-sm text-muted-foreground leading-relaxed">{BAND_DESCRIPTIONS[t][r.band]}</p>
               </div>
             </div>
           );
@@ -489,12 +453,11 @@ function ResultsPanel({
         role="note"
         className="rounded-xl border border-border bg-secondary/40 p-4 text-xs text-muted-foreground leading-relaxed"
       >
-        <strong className="text-foreground">A note on these scores.</strong> The 0–100 numbers
-        above are relative scores from this specific set of answers, not true population
-        percentiles — this tool doesn't have a representative reference sample. Your Big Five
-        profile reflects how you described yourself today; scores can shift over time and with
-        major life changes. This is a self-report tool for personal insight, not a clinical,
-        diagnostic, or medical assessment.
+        <strong className="text-foreground">A note on these scores.</strong> The 0–100 numbers above are relative scores
+        from this specific set of answers, not true population percentiles — this tool doesn't have a representative
+        reference sample. Your Big Five profile reflects how you described yourself today; scores can shift over time
+        and with major life changes. This is a self-report tool for personal insight, not a clinical, diagnostic, or
+        medical assessment.
       </div>
 
       {/* Contextual internal links — placed HERE, near results, above HowToUse/SEO block. */}
@@ -506,8 +469,7 @@ function ResultsPanel({
               Fancy Text Generator
             </Link>
             {" — "}
-            style your shareable result with decorative Unicode before you post it to Instagram,
-            TikTok, or your bio.
+            style your shareable result with decorative Unicode before you post it to Instagram, TikTok, or your bio.
           </li>
           <li>
             <Link to="/tools/word-groups" className="text-foreground hover:underline">

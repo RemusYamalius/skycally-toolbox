@@ -1045,6 +1045,15 @@ export const tools: Tool[] = [
     path: "/tools/country-info",
   },
   {
+    slug: "time-zone-converter",
+    name: "Time Zone Converter",
+    description:
+      "Convert time between any two cities instantly. Live world clock for 90+ cities, meeting planner for remote teams, and specific time converter. Free, no signup.",
+    category: "utility",
+    icon: Clock,
+    path: "/tools/time-zone-converter",
+  },
+  {
     slug: "currency-converter",
     name: "Currency Converter",
     description: "Convert between 170+ currencies with live exchange rates.",

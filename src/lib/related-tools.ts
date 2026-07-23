@@ -83,6 +83,7 @@ export const relatedToolsMap: Record<string, string[]> = {
 
   // Finance / Travel
   "currency-converter": ["holiday-checker", "weather-checker", "country-info"],
+  "time-zone-converter": ["currency-converter", "country-info", "holiday-checker", "weather-checker", "age-calculator", "unit-converter"],
   "satoshi-converter": ["currency-converter", "compound-interest", "loan-calculator", "tip-calculator", "qr-generator"],
   "unit-converter": ["currency-converter", "satoshi-converter", "color-picker", "qr-generator", "json-formatter"],
 

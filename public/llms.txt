@@ -98,3 +98,4 @@
 
 - [Games](/tools?cat=games): Casual browser games (Sudoku, Chess, 2048, Wordle and more).
 - [Shooting Ball](/tools/shooting-ball): Free billiard puzzle game — aim, shoot and pocket colored balls across 20 levels.
+- [Time Zone Converter](/tools/time-zone-converter): Convert time between 90+ cities with a live world clock and meeting planner for remote teams.

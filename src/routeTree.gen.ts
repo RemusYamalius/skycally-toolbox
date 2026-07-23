@@ -41,6 +41,7 @@ import { Route as ToolsTunnelDashRouteImport } from './routes/tools.tunnel-dash'
 import { Route as ToolsTruthOrDareRouteImport } from './routes/tools.truth-or-dare'
 import { Route as ToolsTipCalculatorRouteImport } from './routes/tools.tip-calculator'
 import { Route as ToolsTimetableGeneratorRouteImport } from './routes/tools.timetable-generator'
+import { Route as ToolsTimeZoneConverterRouteImport } from './routes/tools.time-zone-converter'
 import { Route as ToolsTicTacToeRouteImport } from './routes/tools.tic-tac-toe'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
 import { Route as ToolsTetrisRouteImport } from './routes/tools.tetris'
@@ -327,6 +328,11 @@ const ToolsTipCalculatorRoute = ToolsTipCalculatorRouteImport.update({
 const ToolsTimetableGeneratorRoute = ToolsTimetableGeneratorRouteImport.update({
   id: '/tools/timetable-generator',
   path: '/tools/timetable-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsTimeZoneConverterRoute = ToolsTimeZoneConverterRouteImport.update({
+  id: '/tools/time-zone-converter',
+  path: '/tools/time-zone-converter',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsTicTacToeRoute = ToolsTicTacToeRouteImport.update({
@@ -1101,6 +1107,7 @@ export interface FileRoutesByFullPath {
   '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
+  '/tools/time-zone-converter': typeof ToolsTimeZoneConverterRoute
   '/tools/timetable-generator': typeof ToolsTimetableGeneratorRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
@@ -1260,6 +1267,7 @@ export interface FileRoutesByTo {
   '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
+  '/tools/time-zone-converter': typeof ToolsTimeZoneConverterRoute
   '/tools/timetable-generator': typeof ToolsTimetableGeneratorRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
@@ -1420,6 +1428,7 @@ export interface FileRoutesById {
   '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
   '/tools/tic-tac-toe': typeof ToolsTicTacToeRoute
+  '/tools/time-zone-converter': typeof ToolsTimeZoneConverterRoute
   '/tools/timetable-generator': typeof ToolsTimetableGeneratorRoute
   '/tools/tip-calculator': typeof ToolsTipCalculatorRoute
   '/tools/truth-or-dare': typeof ToolsTruthOrDareRoute
@@ -1581,6 +1590,7 @@ export interface FileRouteTypes {
     | '/tools/tetris'
     | '/tools/text-to-speech'
     | '/tools/tic-tac-toe'
+    | '/tools/time-zone-converter'
     | '/tools/timetable-generator'
     | '/tools/tip-calculator'
     | '/tools/truth-or-dare'
@@ -1740,6 +1750,7 @@ export interface FileRouteTypes {
     | '/tools/tetris'
     | '/tools/text-to-speech'
     | '/tools/tic-tac-toe'
+    | '/tools/time-zone-converter'
     | '/tools/timetable-generator'
     | '/tools/tip-calculator'
     | '/tools/truth-or-dare'
@@ -1899,6 +1910,7 @@ export interface FileRouteTypes {
     | '/tools/tetris'
     | '/tools/text-to-speech'
     | '/tools/tic-tac-toe'
+    | '/tools/time-zone-converter'
     | '/tools/timetable-generator'
     | '/tools/tip-calculator'
     | '/tools/truth-or-dare'
@@ -2059,6 +2071,7 @@ export interface RootRouteChildren {
   ToolsTetrisRoute: typeof ToolsTetrisRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
   ToolsTicTacToeRoute: typeof ToolsTicTacToeRoute
+  ToolsTimeZoneConverterRoute: typeof ToolsTimeZoneConverterRoute
   ToolsTimetableGeneratorRoute: typeof ToolsTimetableGeneratorRoute
   ToolsTipCalculatorRoute: typeof ToolsTipCalculatorRoute
   ToolsTruthOrDareRoute: typeof ToolsTruthOrDareRoute
@@ -2312,6 +2325,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/timetable-generator'
       fullPath: '/tools/timetable-generator'
       preLoaderRoute: typeof ToolsTimetableGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/time-zone-converter': {
+      id: '/tools/time-zone-converter'
+      path: '/tools/time-zone-converter'
+      fullPath: '/tools/time-zone-converter'
+      preLoaderRoute: typeof ToolsTimeZoneConverterRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/tic-tac-toe': {
@@ -3327,6 +3347,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsTetrisRoute: ToolsTetrisRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
   ToolsTicTacToeRoute: ToolsTicTacToeRoute,
+  ToolsTimeZoneConverterRoute: ToolsTimeZoneConverterRoute,
   ToolsTimetableGeneratorRoute: ToolsTimetableGeneratorRoute,
   ToolsTipCalculatorRoute: ToolsTipCalculatorRoute,
   ToolsTruthOrDareRoute: ToolsTruthOrDareRoute,

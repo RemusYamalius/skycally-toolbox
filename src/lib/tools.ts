@@ -105,6 +105,7 @@ import {
   Timer,
   Mail,
   PenLine,
+  UserRound,
   Clapperboard,
   Baby,
   Wallet,

@@ -1300,6 +1300,15 @@ export const tools: Tool[] = [
     path: "/tools/ai-email-writer",
   },
   {
+    slug: "ai-bio-generator",
+    name: "AI Bio Generator",
+    description:
+      "Free AI bio generator — Instagram, TikTok, X, LinkedIn and dating app bios with accurate platform character limits. No signup, no credit limits.",
+    category: "ai",
+    icon: UserRound,
+    path: "/tools/ai-bio-generator",
+  },
+  {
     slug: "ai-writing-assistant",
     name: "AI Writing Assistant",
     description:

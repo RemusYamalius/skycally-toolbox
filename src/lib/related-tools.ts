@@ -121,6 +121,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "ai-cover-letter-generator": ["ai-writing-assistant", "ai-resume-builder", "word-processor", "word-to-pdf", "pdf-text-extractor", "word-counter"],
   "ai-resume-builder": ["ai-writing-assistant", "ai-cover-letter-generator", "word-processor", "word-to-pdf", "pdf-text-extractor", "word-counter"],
   "ai-writing-assistant": ["ai-email-writer", "ai-cover-letter-generator", "ai-resume-builder", "word-counter", "word-processor"],
+  "ai-bio-generator": ["fancy-text-generator", "ai-writing-assistant", "ai-email-writer", "word-counter", "meme-generator"],
 
   // SEO (Semrush)
   "keyword-research": ["keyword-difficulty", "competitor-analysis", "domain-analysis", "page-seo-analyzer", "backlink-checker"],

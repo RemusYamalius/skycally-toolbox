@@ -23,7 +23,7 @@ export function SiteFooter() {
             />
           </Link>
           <p className="mt-3 text-sm text-muted-foreground max-w-xs leading-relaxed">
-            90+ free browser-based tools — no signup, no uploads, no limits. Fast, private, and always free.
+            {TOOL_COUNT}+ free browser-based tools — no signup, no uploads, no limits. Fast, private, and always free.
           </p>
           <div className="mt-5 flex flex-wrap gap-3">
             <a

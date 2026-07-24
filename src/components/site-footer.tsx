@@ -1,6 +1,8 @@
 import { Link } from "@tanstack/react-router";
 import { tools, categoryMeta, toolInCategory, type ToolCategory } from "@/lib/tools";
 
+const TOOL_COUNT = tools.filter((t) => !t.hidden).length;
+
 const categoryOrder: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games", "minigames", "ai"];
 
 export function SiteFooter() {

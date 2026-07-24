@@ -105,6 +105,7 @@ import {
   Timer,
   Mail,
   PenLine,
+  UserRound,
   Clapperboard,
   Baby,
   Wallet,
@@ -1298,6 +1299,15 @@ export const tools: Tool[] = [
     category: "ai",
     icon: Mail,
     path: "/tools/ai-email-writer",
+  },
+  {
+    slug: "ai-bio-generator",
+    name: "AI Bio Generator",
+    description:
+      "Free AI bio generator — Instagram, TikTok, X, LinkedIn and dating app bios with accurate platform character limits. No signup, no credit limits.",
+    category: "ai",
+    icon: UserRound,
+    path: "/tools/ai-bio-generator",
   },
   {
     slug: "ai-writing-assistant",

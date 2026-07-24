@@ -157,6 +157,7 @@ import { Route as ToolsAiResumeBuilderRouteImport } from './routes/tools.ai-resu
 import { Route as ToolsAiImageGeneratorRouteImport } from './routes/tools.ai-image-generator'
 import { Route as ToolsAiEmailWriterRouteImport } from './routes/tools.ai-email-writer'
 import { Route as ToolsAiCoverLetterGeneratorRouteImport } from './routes/tools.ai-cover-letter-generator'
+import { Route as ToolsAiBioGeneratorRouteImport } from './routes/tools.ai-bio-generator'
 import { Route as ToolsAgeCalculatorRouteImport } from './routes/tools.age-calculator'
 import { Route as ToolsAddWatermarkRouteImport } from './routes/tools.add-watermark'
 import { Route as ToolsAddTextToImageRouteImport } from './routes/tools.add-text-to-image'
@@ -920,6 +921,11 @@ const ToolsAiCoverLetterGeneratorRoute =
     path: '/tools/ai-cover-letter-generator',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ToolsAiBioGeneratorRoute = ToolsAiBioGeneratorRouteImport.update({
+  id: '/tools/ai-bio-generator',
+  path: '/tools/ai-bio-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsAgeCalculatorRoute = ToolsAgeCalculatorRouteImport.update({
   id: '/tools/age-calculator',
   path: '/tools/age-calculator',
@@ -992,6 +998,7 @@ export interface FileRoutesByFullPath {
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
+  '/tools/ai-bio-generator': typeof ToolsAiBioGeneratorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
   '/tools/ai-image-generator': typeof ToolsAiImageGeneratorRoute
@@ -1152,6 +1159,7 @@ export interface FileRoutesByTo {
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
+  '/tools/ai-bio-generator': typeof ToolsAiBioGeneratorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
   '/tools/ai-image-generator': typeof ToolsAiImageGeneratorRoute
@@ -1313,6 +1321,7 @@ export interface FileRoutesById {
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
   '/tools/add-watermark': typeof ToolsAddWatermarkRoute
   '/tools/age-calculator': typeof ToolsAgeCalculatorRoute
+  '/tools/ai-bio-generator': typeof ToolsAiBioGeneratorRoute
   '/tools/ai-cover-letter-generator': typeof ToolsAiCoverLetterGeneratorRoute
   '/tools/ai-email-writer': typeof ToolsAiEmailWriterRoute
   '/tools/ai-image-generator': typeof ToolsAiImageGeneratorRoute
@@ -1475,6 +1484,7 @@ export interface FileRouteTypes {
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/age-calculator'
+    | '/tools/ai-bio-generator'
     | '/tools/ai-cover-letter-generator'
     | '/tools/ai-email-writer'
     | '/tools/ai-image-generator'
@@ -1635,6 +1645,7 @@ export interface FileRouteTypes {
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/age-calculator'
+    | '/tools/ai-bio-generator'
     | '/tools/ai-cover-letter-generator'
     | '/tools/ai-email-writer'
     | '/tools/ai-image-generator'
@@ -1795,6 +1806,7 @@ export interface FileRouteTypes {
     | '/tools/add-text-to-image'
     | '/tools/add-watermark'
     | '/tools/age-calculator'
+    | '/tools/ai-bio-generator'
     | '/tools/ai-cover-letter-generator'
     | '/tools/ai-email-writer'
     | '/tools/ai-image-generator'
@@ -1956,6 +1968,7 @@ export interface RootRouteChildren {
   ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
   ToolsAddWatermarkRoute: typeof ToolsAddWatermarkRoute
   ToolsAgeCalculatorRoute: typeof ToolsAgeCalculatorRoute
+  ToolsAiBioGeneratorRoute: typeof ToolsAiBioGeneratorRoute
   ToolsAiCoverLetterGeneratorRoute: typeof ToolsAiCoverLetterGeneratorRoute
   ToolsAiEmailWriterRoute: typeof ToolsAiEmailWriterRoute
   ToolsAiImageGeneratorRoute: typeof ToolsAiImageGeneratorRoute
@@ -3139,6 +3152,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAiCoverLetterGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/ai-bio-generator': {
+      id: '/tools/ai-bio-generator'
+      path: '/tools/ai-bio-generator'
+      fullPath: '/tools/ai-bio-generator'
+      preLoaderRoute: typeof ToolsAiBioGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/age-calculator': {
       id: '/tools/age-calculator'
       path: '/tools/age-calculator'
@@ -3231,6 +3251,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,
   ToolsAddWatermarkRoute: ToolsAddWatermarkRoute,
   ToolsAgeCalculatorRoute: ToolsAgeCalculatorRoute,
+  ToolsAiBioGeneratorRoute: ToolsAiBioGeneratorRoute,
   ToolsAiCoverLetterGeneratorRoute: ToolsAiCoverLetterGeneratorRoute,
   ToolsAiEmailWriterRoute: ToolsAiEmailWriterRoute,
   ToolsAiImageGeneratorRoute: ToolsAiImageGeneratorRoute,
@@ -3379,12 +3400,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

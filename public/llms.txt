@@ -18,6 +18,7 @@
 - [AI Image Animator](/tools/image-animator): Animate any photo with cinematic Ken Burns, zoom, pan and parallax effects. Export MP4 or GIF, no signup.
 - [AI Writing Assistant](/tools/ai-writing-assistant): Grammar checker, paraphraser and text summarizer in one tool.
 - [AI Email Writer](/tools/ai-email-writer): Draft professional emails from a short brief.
+- [AI Bio Generator](/tools/ai-bio-generator): Instagram, TikTok, X, LinkedIn and dating app bios with accurate character-limit counting.
 - [AI Cover Letter Generator](/tools/ai-cover-letter-generator): Generate tailored cover letters.
 - [AI Resume Builder](/tools/ai-resume-builder): Build a clean resume from a form.
 - [Word Counter](/tools/word-counter): Count words, characters and reading time.

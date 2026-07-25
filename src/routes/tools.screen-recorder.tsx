@@ -336,8 +336,8 @@ function ScreenRecorderDesktop() {
               </button>
               {ext === "webm" && (
                 <p className="text-xs text-muted-foreground text-center">
-                  💡 WebM plays in Chrome & Firefox. To open in VLC or Windows Media Player, convert to MP4 using our{" "}
-                  <strong>Video Converter</strong> tool.
+                  💡 WebM plays natively in Chrome, Firefox, Edge, and VLC. If a specific app you use doesn't support
+                  it, you may need a separate converter to get an MP4 version.
                 </p>
               )}
               <button
@@ -594,7 +594,7 @@ function ScreenRecorderPage() {
                 "Choose your options — turn audio on or off, pick 720p or 1080p quality.",
                 "Click Start Recording. Your browser will ask which screen, window or tab to share — choose one and click Share.",
                 "Use Pause / Resume to control the recording. Click Stop when finished.",
-                "Preview the result and download it as a .webm file. You can convert it to MP4 using our Video Converter tool.",
+                "Preview the result and download it as a .webm file — a modern, widely-supported video format that plays natively in Chrome, Firefox, Edge and VLC.",
               ]
         }
       />
@@ -605,7 +605,8 @@ function ScreenRecorderPage() {
         body={[
           "Skycally's Screen Recorder lets you capture your screen directly in the browser using the native MediaRecorder and getDisplayMedia APIs — no browser extension, no desktop application, and no account required. On desktop, you can record your entire screen, a specific application window, or a single browser tab, with or without audio. On mobile, the tool switches automatically to a camera recorder, letting you record using your front or rear camera. All processing happens locally: your recording never leaves your device.",
           "Screen recording is useful across dozens of workflows: software developers record bug reports to share with teammates; educators and content creators record tutorials and walkthroughs; remote workers capture meeting highlights; gamers record gameplay sessions. The desktop recorder supports up to 1080p at 30 frames per second, includes system audio and microphone capture, and supports pause/resume so you can skip unwanted sections without editing. Recordings download as WebM files — the open-source video format natively supported by Chrome, Firefox and Edge.",
-          "WebM is a modern, efficient video format that produces smaller files than MP4 at comparable quality. It plays natively in all Chromium-based browsers and Firefox. If you need MP4 for wider compatibility (Windows Media Player, social media uploads, video editors), use our Video Converter tool to convert the downloaded WebM file to MP4 in seconds — also free, also fully in-browser.",
+          "WebM is a modern, efficient video format that produces smaller files than MP4 at comparable quality. It plays natively in all Chromium-based browsers and Firefox. If you need to trim, compress, or extract a still frame from your recording afterward, our Video Trimmer and Video Compressor tools accept WebM files directly and run entirely in your browser too.",
+          "Because there's no upload step, recordings of any length are limited only by your device's available memory and storage — useful for longer tutorials or meeting captures where a cloud-based recorder might cut you off or require a paid tier past a few minutes.",
         ]}
         faqs={[
           {
@@ -621,7 +622,7 @@ function ScreenRecorderPage() {
           {
             question: "What format are recordings saved in?",
             answer:
-              "Recordings are saved as .webm files. WebM is a modern open-source video format supported natively by Chrome, Firefox and Edge. If you need MP4 for social media, video editors, or Windows Media Player, use our Video Converter tool to convert the file.",
+              "Recordings are saved as .webm files. WebM is a modern open-source video format supported natively by Chrome, Firefox, Edge and VLC. Most modern video editors and social platforms accept WebM directly; if a specific app you use doesn't, you may need a separate converter to get an MP4 version.",
           },
           {
             question: "Can I record audio along with the screen?",

@@ -152,6 +152,7 @@ function Base64Tool() {
           "Base64 is an encoding scheme that converts binary or text data into a string of ASCII characters, making it safe to transmit through systems that only handle text. It is one of the most commonly used encoding formats in web development, appearing in email attachments, data URIs, API authentication headers, and JSON payloads.",
           "This tool handles full Unicode text — including Arabic, Chinese, accented characters, and emojis — using the correct UTF-8 encoding pipeline (encodeURIComponent + btoa). Many simpler Base64 tools fail on non-ASCII characters. The Swap button lets you instantly reverse the operation: encode your output, then decode it again to verify round-trip fidelity.",
           "Base64 encoding increases data size by approximately 33% — every 3 bytes of input become 4 Base64 characters. This trade-off is acceptable for small payloads like authentication tokens or image data URIs, but Base64 is not suitable for large binary files where size matters.",
+          "One important distinction: Base64 is encoding, not encryption. Anyone can decode a Base64 string back to its original content instantly — there is no secret key involved, so it provides no confidentiality or security. Developers sometimes mistakenly use Base64 to 'hide' sensitive data like passwords or tokens, but this only obscures the data from a casual glance; it should never be relied on to protect genuinely sensitive information.",
         ]}
         faqs={[
           {

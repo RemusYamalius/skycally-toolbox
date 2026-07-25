@@ -17,14 +17,15 @@ import {
   Star,
 } from "lucide-react";
 
-import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
+import { tools, categoryMeta, TOOL_COUNT, type ToolCategory } from "@/lib/tools";
 import { buildPageMeta } from "@/lib/seo";
 
 const HomeBelowFold = lazy(() => import("@/components/home/home-below-fold"));
 
 // Single source of truth for the tool count — derive it, never hardcode it in
 // multiple places (this file previously said "90+" while /tools said "40+").
-export const TOOL_COUNT = tools.filter((t) => !t.hidden).length;
+// TOOL_COUNT is imported from @/lib/tools — single source of truth shared
+// with the About page (previously duplicated here and hardcoded there).
 
 const HOME_META = buildPageMeta({
   title: `Skycally — ${TOOL_COUNT}+ Free Online Tools, No Signup Required`,

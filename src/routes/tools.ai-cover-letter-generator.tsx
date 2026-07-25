@@ -1,10 +1,10 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { FileSignature, Loader2, Copy, FileDown, FileText, RefreshCw, AlertCircle } from "lucide-react";
 import jsPDF from "jspdf";
 
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildToolMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
@@ -17,8 +17,40 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { generateCoverLetter } from "@/lib/ai-cover-letter.functions";
 
+const SLUG = "ai-cover-letter-generator";
+
 export const Route = createFileRoute("/tools/ai-cover-letter-generator")({
-  head: () => buildToolMeta(toolBySlug("ai-cover-letter-generator", tools)),
+  head: () => {
+    const tool = toolBySlug(SLUG, tools);
+    const base = buildToolMeta(tool);
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "AI Cover Letter Generator",
+            description:
+              "Free AI cover letter generator. Personalised, ATS-friendly cover letters in seconds, in English, French, Spanish, German or Arabic. No signup, no daily limits.",
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            url: `${SITE_URL}/tools/ai-cover-letter-generator`,
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            featureList: [
+              "AI-generated, personalised cover letters tailored to a specific job description",
+              "4 tone options and 3 length options",
+              "5 languages: English, Spanish, French, German, Arabic",
+              "ATS-friendly keyword matching from a pasted job description",
+              "Copy to clipboard, download as .txt or PDF",
+              "Free — no signup, no daily generation limits",
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: AiCoverLetterGenerator,
 });
 
@@ -57,12 +89,6 @@ const DEFAULTS: FormState = {
 const STORAGE_KEY = "ai-cover-letter-inputs";
 const DEBOUNCE_MS = 500;
 
-const InternalLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <a href={href} className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors">
-    {children}
-  </a>
-);
-
 function errorToMessage(err: unknown): string {
   const msg = err instanceof Error ? err.message : "";
   if (msg === "RATE_LIMITED") return "Too many requests — please wait a moment and try again.";
@@ -71,25 +97,21 @@ function errorToMessage(err: unknown): string {
 }
 
 // ─── SEO content nodes (plain strings — no JSX) ─────────────────────────────
-// ToolSeoContent accepts string[] for body and string answers for faqs.
-// Internal links inside body/faq answers are handled via a post-render
-// dangerouslySetInnerHTML pattern in the parent component below.
-// We keep them as plain strings here so Rollup never chokes on JSX-in-array.
 const SEO_BODY = [
-  "A great cover letter still moves the needle in 2026 — recruiters scan it for fit, tone, and specifics that your résumé can't show on its own. This AI Cover Letter Generator turns a handful of structured fields (your name, the role, the company, your skills and achievements) into a polished, ready-to-send letter in your chosen language and tone. No signup, no daily limits, and no paywalls — generate as many versions as you need until one feels exactly right. Pair this tool with our Calorie Calculator to keep your energy up through marathon application sessions.",
+  "A great cover letter still moves the needle in 2026 — recruiters scan it for fit, tone, and specifics that your résumé can't show on its own. This AI Cover Letter Generator turns a handful of structured fields (your name, the role, the company, your skills and achievements) into a polished, ready-to-send letter in your chosen language and tone. No signup, no daily limits, and no paywalls — generate as many versions as you need until one feels exactly right.",
 
   "The best AI-written cover letters are still personalised. Paste the job description into the optional field to anchor the letter in the actual requirements, and list two or three concrete achievements with numbers — 'lifted conversion 23%', 'shipped to 40k users' — so the model has real material to work with. Generic outputs come from generic inputs. The generator reads every field you provide and weaves them into a cohesive narrative rather than slotting them into a rigid template.",
 
   "ATS (Applicant Tracking Systems) scan your cover letter before a human ever reads it. Our generator naturally mirrors the language and keywords from the job description you paste, helping your application clear automated filters. You can adjust the tone (Professional, Friendly, Enthusiastic, or Formal) and length (Short, Medium, or Long) to match the company culture — a startup might appreciate something direct and energetic, while a law firm expects measured formality. Select Arabic, French, Spanish, German, or English and the letter is written natively in that language, not machine-translated.",
 
-  "Once generated, copy the letter to clipboard, download it as a plain .txt file, or export directly to a formatted PDF ready to attach to any application. Hit Regenerate to get a fresh variation from the same inputs — each call produces a unique result. All processing happens through the AI gateway in real time; your inputs are not stored on our servers. For a complete application toolkit, see our Sleep Calculator to make sure you walk into that interview rested and sharp.",
+  "Once generated, copy the letter to clipboard, download it as a plain .txt file, or export directly to a formatted PDF ready to attach to any application. Hit Regenerate to get a fresh variation from the same inputs — each call produces a unique result. All processing happens through the AI gateway in real time; your inputs are not stored on our servers.",
 ];
 
 const SEO_FAQS = [
   {
     question: "Is this cover letter generator free with no limits?",
     answer:
-      "Yes. Unlike tools such as Rezi, Kickresume, and ApplyArc that restrict free users to 1–5 generations per day, Skycally's generator is completely free with no daily limits and no account required. Every generation uses Claude AI — the same model behind many paid writing tools.",
+      "Yes. Unlike tools such as Rezi, Kickresume, and ApplyArc that restrict free users to 1–5 generations per day, Skycally's generator is completely free with no daily limits and no account required.",
   },
   {
     question: "Is my data stored or shared?",
@@ -130,7 +152,7 @@ const SEO_FAQS = [
 // ─────────────────────────────────────────────────────────────────────────────
 
 function AiCoverLetterGenerator() {
-  const tool = toolBySlug("ai-cover-letter-generator", tools);
+  const tool = toolBySlug(SLUG, tools);
 
   const [form, setForm] = useState<FormState>(DEFAULTS);
   const [letter, setLetter] = useState<string>("");
@@ -139,7 +161,6 @@ function AiCoverLetterGenerator() {
   const [copied, setCopied] = useState(false);
   const lastSubmitRef = useRef<number>(0);
 
-  // Restore inputs
   useEffect(() => {
     try {
       const raw = localStorage.getItem(STORAGE_KEY);
@@ -152,7 +173,6 @@ function AiCoverLetterGenerator() {
     }
   }, []);
 
-  // Persist
   useEffect(() => {
     try {
       localStorage.setItem(STORAGE_KEY, JSON.stringify(form));
@@ -169,10 +189,6 @@ function AiCoverLetterGenerator() {
     form.companyName.trim().length > 0 &&
     !loading;
 
-  // ⚠️ Must NOT use useCallback(async () => ...) here — TanStack Start's
-  // Rollup plugin tries to analyse every async arrow function for 'use server'
-  // directives and chokes on async callbacks, causing the red/parseAst.js
-  // build error. A plain async function stored in a ref is the safe pattern.
   const canSubmitRef = useRef(canSubmit);
   canSubmitRef.current = canSubmit;
   const formRef = useRef(form);
@@ -302,6 +318,7 @@ function AiCoverLetterGenerator() {
                   onChange={(e) => update("fullName", e.target.value)}
                   placeholder="Jane Doe"
                   autoComplete="name"
+                  maxLength={120}
                 />
               </div>
               <div className="space-y-1.5">
@@ -314,6 +331,7 @@ function AiCoverLetterGenerator() {
                   value={form.jobTitle}
                   onChange={(e) => update("jobTitle", e.target.value)}
                   placeholder="Senior Product Designer"
+                  maxLength={160}
                 />
               </div>
             </div>
@@ -330,6 +348,7 @@ function AiCoverLetterGenerator() {
                   onChange={(e) => update("companyName", e.target.value)}
                   placeholder="Acme Inc."
                   autoComplete="organization"
+                  maxLength={160}
                 />
               </div>
               <div className="space-y-1.5">
@@ -339,6 +358,7 @@ function AiCoverLetterGenerator() {
                   value={form.hiringManager}
                   onChange={(e) => update("hiringManager", e.target.value)}
                   placeholder="Alex Johnson"
+                  maxLength={120}
                 />
               </div>
             </div>
@@ -412,6 +432,7 @@ function AiCoverLetterGenerator() {
                 value={form.skills}
                 onChange={(e) => update("skills", e.target.value)}
                 placeholder="React, design systems, user research, mentoring"
+                maxLength={800}
               />
             </div>
 
@@ -423,6 +444,7 @@ function AiCoverLetterGenerator() {
                 value={form.achievements}
                 onChange={(e) => update("achievements", e.target.value)}
                 placeholder="Shipped a redesign that lifted conversion 23%."
+                maxLength={1200}
               />
             </div>
 
@@ -434,6 +456,7 @@ function AiCoverLetterGenerator() {
                 value={form.jobDescription}
                 onChange={(e) => update("jobDescription", e.target.value)}
                 placeholder="Paste the full job posting here. The AI will mirror its keywords and requirements."
+                maxLength={4000}
               />
             </div>
           </fieldset>
@@ -532,6 +555,39 @@ function AiCoverLetterGenerator() {
         </section>
       </div>
 
+      {/* Contextual internal links — moved here, right under the output, above AdZone/HowToUse/SEO */}
+      {letter && !loading && (
+        <section className="mt-6 rounded-2xl border border-border bg-card/40 p-5 text-sm text-muted-foreground space-y-2">
+          <p>
+            Pair this letter with a matching resume using the{" "}
+            <Link
+              to="/tools/ai-resume-builder"
+              className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+            >
+              AI Resume Builder
+            </Link>{" "}
+            — build your complete application package in minutes.
+          </p>
+          <p>
+            Following up after applying? Draft it with the{" "}
+            <Link
+              to="/tools/ai-email-writer"
+              className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+            >
+              AI Email Writer
+            </Link>
+            . Want to double-check your letter's length against the company's stated preference? Use the{" "}
+            <Link
+              to="/tools/word-counter"
+              className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+            >
+              Word Counter
+            </Link>
+            .
+          </p>
+        </section>
+      )}
+
       <AdZone id="ai-cover-letter-generator-mid" size="728x90" />
 
       <HowToUse
@@ -542,30 +598,14 @@ function AiCoverLetterGenerator() {
         ]}
       />
 
-      {/* ── SEO content — plain strings only, internal links rendered below ── */}
       <ToolSeoContent
         title="Free AI Cover Letter Generator — Personalised in Seconds"
-        description="Generate a tailored, ATS-friendly cover letter in seconds using Claude AI. No signup, no daily limits. Supports English, French, Spanish, German and Arabic."
+        description="Generate a tailored, ATS-friendly cover letter in seconds using AI. No signup, no daily limits. Supports English, French, Spanish, German and Arabic."
         body={SEO_BODY}
         faqs={SEO_FAQS}
       />
 
-      {/* ── Internal links section rendered outside ToolSeoContent ─────────── */}
-      <section className="mt-6 rounded-2xl border border-border bg-card/40 p-5 text-sm text-muted-foreground space-y-2">
-        <p>
-          Pair this tool with the <InternalLink href="/tools/calorie-calculator">Calorie Calculator</InternalLink> to
-          fuel long application sessions, and the{" "}
-          <InternalLink href="/tools/sleep-calculator">Sleep Calculator</InternalLink> to make sure you walk into your
-          interview rested and sharp.
-        </p>
-        <p>
-          Need to format or convert your final letter? Use our{" "}
-          <InternalLink href="/tools/water-intake-calculator">Water Intake Calculator</InternalLink> to stay hydrated
-          through the job-search marathon.
-        </p>
-      </section>
-
-      <RelatedTools currentSlug="ai-cover-letter-generator" />
+      <RelatedTools currentSlug={SLUG} />
     </ToolPageShell>
   );
 }

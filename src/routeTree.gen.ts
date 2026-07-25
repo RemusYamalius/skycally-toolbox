@@ -91,6 +91,7 @@ import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-gene
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
 import { Route as ToolsMarginCalculatorRouteImport } from './routes/tools.margin-calculator'
 import { Route as ToolsMahjongRouteImport } from './routes/tools.mahjong'
+import { Route as ToolsMacroCalculatorRouteImport } from './routes/tools.macro-calculator'
 import { Route as ToolsLoremIpsumRouteImport } from './routes/tools.lorem-ipsum'
 import { Route as ToolsLoanCalculatorRouteImport } from './routes/tools.loan-calculator'
 import { Route as ToolsLinkShortenerRouteImport } from './routes/tools.link-shortener'
@@ -585,6 +586,11 @@ const ToolsMahjongRoute = ToolsMahjongRouteImport.update({
   path: '/tools/mahjong',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMacroCalculatorRoute = ToolsMacroCalculatorRouteImport.update({
+  id: '/tools/macro-calculator',
+  path: '/tools/macro-calculator',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsLoremIpsumRoute = ToolsLoremIpsumRouteImport.update({
   id: '/tools/lorem-ipsum',
   path: '/tools/lorem-ipsum',
@@ -1065,6 +1071,7 @@ export interface FileRoutesByFullPath {
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
+  '/tools/macro-calculator': typeof ToolsMacroCalculatorRoute
   '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/margin-calculator': typeof ToolsMarginCalculatorRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
@@ -1226,6 +1233,7 @@ export interface FileRoutesByTo {
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
+  '/tools/macro-calculator': typeof ToolsMacroCalculatorRoute
   '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/margin-calculator': typeof ToolsMarginCalculatorRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
@@ -1388,6 +1396,7 @@ export interface FileRoutesById {
   '/tools/link-shortener': typeof ToolsLinkShortenerRoute
   '/tools/loan-calculator': typeof ToolsLoanCalculatorRoute
   '/tools/lorem-ipsum': typeof ToolsLoremIpsumRoute
+  '/tools/macro-calculator': typeof ToolsMacroCalculatorRoute
   '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/margin-calculator': typeof ToolsMarginCalculatorRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
@@ -1551,6 +1560,7 @@ export interface FileRouteTypes {
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
+    | '/tools/macro-calculator'
     | '/tools/mahjong'
     | '/tools/margin-calculator'
     | '/tools/markdown-to-html'
@@ -1712,6 +1722,7 @@ export interface FileRouteTypes {
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
+    | '/tools/macro-calculator'
     | '/tools/mahjong'
     | '/tools/margin-calculator'
     | '/tools/markdown-to-html'
@@ -1873,6 +1884,7 @@ export interface FileRouteTypes {
     | '/tools/link-shortener'
     | '/tools/loan-calculator'
     | '/tools/lorem-ipsum'
+    | '/tools/macro-calculator'
     | '/tools/mahjong'
     | '/tools/margin-calculator'
     | '/tools/markdown-to-html'
@@ -2035,6 +2047,7 @@ export interface RootRouteChildren {
   ToolsLinkShortenerRoute: typeof ToolsLinkShortenerRoute
   ToolsLoanCalculatorRoute: typeof ToolsLoanCalculatorRoute
   ToolsLoremIpsumRoute: typeof ToolsLoremIpsumRoute
+  ToolsMacroCalculatorRoute: typeof ToolsMacroCalculatorRoute
   ToolsMahjongRoute: typeof ToolsMahjongRoute
   ToolsMarginCalculatorRoute: typeof ToolsMarginCalculatorRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
@@ -2690,6 +2703,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMahjongRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/macro-calculator': {
+      id: '/tools/macro-calculator'
+      path: '/tools/macro-calculator'
+      fullPath: '/tools/macro-calculator'
+      preLoaderRoute: typeof ToolsMacroCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/lorem-ipsum': {
       id: '/tools/lorem-ipsum'
       path: '/tools/lorem-ipsum'
@@ -3319,6 +3339,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsLinkShortenerRoute: ToolsLinkShortenerRoute,
   ToolsLoanCalculatorRoute: ToolsLoanCalculatorRoute,
   ToolsLoremIpsumRoute: ToolsLoremIpsumRoute,
+  ToolsMacroCalculatorRoute: ToolsMacroCalculatorRoute,
   ToolsMahjongRoute: ToolsMahjongRoute,
   ToolsMarginCalculatorRoute: ToolsMarginCalculatorRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,

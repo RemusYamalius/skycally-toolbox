@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { motion } from "framer-motion";
 import {
@@ -17,7 +17,7 @@ import {
   Sparkles,
 } from "lucide-react";
 
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildToolMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
@@ -30,8 +30,40 @@ import { Textarea } from "@/components/ui/textarea";
 import { Button } from "@/components/ui/button";
 import { generateEmail } from "@/lib/ai-email-writer.functions";
 
+const SLUG = "ai-email-writer";
+
 export const Route = createFileRoute("/tools/ai-email-writer")({
-  head: () => buildToolMeta(toolBySlug("ai-email-writer", tools)),
+  head: () => {
+    const tool = toolBySlug(SLUG, tools);
+    const base = buildToolMeta(tool);
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "AI Email Writer",
+            description:
+              "Free AI email writer. Professional emails in seconds across 8 categories — cold outreach, follow-ups, apologies, sales pitches, job applications and more. No signup, no daily limits.",
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            url: `${SITE_URL}/tools/ai-email-writer`,
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            featureList: [
+              "8 email types: cold outreach, follow-up, apology, sales pitch, job application, thank-you, meeting request, complaint",
+              "6 tone options and 3 length options",
+              "5 languages: English, French, Spanish, Arabic, German",
+              "Optional AI-generated subject line",
+              "Copy to clipboard or open directly in your email client",
+              "Free — no signup, no daily generation limits",
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: AiEmailWriter,
 });
 
@@ -45,13 +77,7 @@ type EmailType =
   | "meeting-request"
   | "complaint";
 
-type Tone =
-  | "professional"
-  | "friendly"
-  | "formal"
-  | "concise"
-  | "persuasive"
-  | "empathetic";
+type Tone = "professional" | "friendly" | "formal" | "concise" | "persuasive" | "empathetic";
 
 type LengthOpt = "short" | "standard" | "detailed";
 type LanguageOpt = "english" | "french" | "spanish" | "arabic" | "german";
@@ -103,15 +129,6 @@ const EMAIL_TYPES: Array<{
   { id: "complaint", label: "Complaint", desc: "Raise an issue", Icon: AlertCircle },
 ];
 
-const InternalLink = ({ href, children }: { href: string; children: React.ReactNode }) => (
-  <a
-    href={href}
-    className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
-  >
-    {children}
-  </a>
-);
-
 function errorToMessage(err: unknown): string {
   const msg = err instanceof Error ? err.message : "";
   if (msg === "RATE_LIMITED") return "Too many requests — please wait a moment and try again.";
@@ -126,7 +143,7 @@ function splitSubject(text: string): { subject: string; body: string } {
 }
 
 const SEO_BODY = [
-  "Writing the perfect professional email is one of the most time-consuming tasks in any workday — especially when the stakes are high. Skycally's AI Email Writer generates polished, context-aware emails in seconds across 8 categories: cold outreach, follow-ups, apologies, sales pitches, job applications, thank-you notes, meeting requests, and professional complaints. Fill in who you are, who you're writing to, and what you need to say — the AI handles structure, tone, and wording. No signup, no daily limits, free forever. Pair this with our AI Cover Letter Generator for a complete professional writing toolkit.",
+  "Writing the perfect professional email is one of the most time-consuming tasks in any workday — especially when the stakes are high. Skycally's AI Email Writer generates polished, context-aware emails in seconds across 8 categories: cold outreach, follow-ups, apologies, sales pitches, job applications, thank-you notes, meeting requests, and professional complaints. Fill in who you are, who you're writing to, and what you need to say — the AI handles structure, tone, and wording. No signup, no daily limits, free forever.",
   "The tone selector is where this tool separates itself from generic email templates. A cold outreach email to a startup founder needs a completely different voice than a formal complaint to a vendor or an empathetic apology to a client. Choose from Professional, Friendly & Warm, Formal & Authoritative, Concise & Direct, Persuasive, or Empathetic — and the AI adjusts not just word choice but structure, opening hook, and call to action to match.",
   "Subject lines account for over 47% of email open rates according to email marketing research. Toggle on subject line generation and the AI produces a compelling subject alongside the body — one that avoids spam trigger words and matches the tone and context of the email. For cold outreach and sales pitches in particular, a great subject line is often the difference between a reply and a delete.",
   "Every email is generated in real time and never stored on our servers. Regenerate as many times as needed to get a version that feels right — each call produces a unique result from the same inputs. The Copy button captures both the subject line and body together, ready to paste directly into Gmail, Outlook, or any email client. For multilingual teams and international outreach, the tool supports English, French, Spanish, Arabic, and German.",
@@ -176,7 +193,7 @@ const SEO_FAQS = [
 ];
 
 function AiEmailWriter() {
-  const tool = toolBySlug("ai-email-writer", tools);
+  const tool = toolBySlug(SLUG, tools);
 
   const [form, setForm] = useState<FormState>(DEFAULTS);
   const [subject, setSubject] = useState<string>("");
@@ -206,11 +223,9 @@ function AiEmailWriter() {
     }
   }, [form]);
 
-  const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
-    setForm((p) => ({ ...p, [k]: v }));
+  const update = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((p) => ({ ...p, [k]: v }));
 
-  const canSubmit =
-    form.yourName.trim().length > 0 && form.keyPoints.trim().length > 0 && !loading;
+  const canSubmit = form.yourName.trim().length > 0 && form.keyPoints.trim().length > 0 && !loading;
 
   const canSubmitRef = useRef(canSubmit);
   canSubmitRef.current = canSubmit;
@@ -279,10 +294,7 @@ function AiEmailWriter() {
     window.location.href = url;
   }
 
-  const wordCount = useMemo(
-    () => (body ? body.trim().split(/\s+/).filter(Boolean).length : 0),
-    [body],
-  );
+  const wordCount = useMemo(() => (body ? body.trim().split(/\s+/).filter(Boolean).length : 0), [body]);
 
   return (
     <ToolPageShell title={tool.name} description={tool.description} showFileDisclaimer={false}>
@@ -310,8 +322,7 @@ function AiEmailWriter() {
                 style={
                   active
                     ? {
-                        background:
-                          "color-mix(in oklch, var(--cyan-brand) 12%, var(--card))",
+                        background: "color-mix(in oklch, var(--cyan-brand) 12%, var(--card))",
                       }
                     : undefined
                 }
@@ -533,23 +544,11 @@ function AiEmailWriter() {
             <h2 className="font-display text-lg font-semibold">Your email</h2>
             {body && !loading && (
               <div className="flex flex-wrap gap-2">
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={copy}
-                  aria-label="Copy email to clipboard"
-                >
+                <Button type="button" size="sm" variant="outline" onClick={copy} aria-label="Copy email to clipboard">
                   <Copy className="h-4 w-4" aria-hidden="true" />
                   {copied ? "Copied ✓" : "Copy"}
                 </Button>
-                <Button
-                  type="button"
-                  size="sm"
-                  variant="outline"
-                  onClick={openGmail}
-                  aria-label="Open in email client"
-                >
+                <Button type="button" size="sm" variant="outline" onClick={openGmail} aria-label="Open in email client">
                   <Mail className="h-4 w-4" aria-hidden="true" />
                   Open in email
                 </Button>
@@ -587,23 +586,19 @@ function AiEmailWriter() {
             >
               {subject && (
                 <div className="mb-3 rounded-md border border-border bg-secondary/50 px-3 py-2 text-sm">
-                  <span className="text-xs uppercase tracking-wide text-muted-foreground mr-2">
-                    Subject
-                  </span>
+                  <span className="text-xs uppercase tracking-wide text-muted-foreground mr-2">Subject</span>
                   <span className="font-medium">{subject}</span>
                 </div>
               )}
-              <article className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                {body}
-              </article>
+              <article className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{body}</article>
               <p className="mt-3 text-xs text-muted-foreground/70">{wordCount} words</p>
             </motion.div>
           )}
 
           {!loading && !body && !error && (
             <p className="text-sm text-muted-foreground">
-              Pick an email type, fill in your details, and click <strong>Generate email</strong>.
-              Your email will appear here — ready to copy or send.
+              Pick an email type, fill in your details, and click <strong>Generate email</strong>. Your email will
+              appear here — ready to copy or send.
             </p>
           )}
 
@@ -614,6 +609,39 @@ function AiEmailWriter() {
           )}
         </section>
       </div>
+
+      {/* Contextual internal links — moved here, right under the output */}
+      {body && !loading && (
+        <section className="mt-6 rounded-2xl border border-border bg-card/40 p-5 text-sm text-muted-foreground space-y-2">
+          <p>
+            Writing a job application email? Pair it with our{" "}
+            <Link
+              to="/tools/ai-cover-letter-generator"
+              className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+            >
+              AI Cover Letter Generator
+            </Link>{" "}
+            and{" "}
+            <Link
+              to="/tools/ai-resume-builder"
+              className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+            >
+              AI Resume Builder
+            </Link>{" "}
+            for a complete application package.
+          </p>
+          <p>
+            Sending invoices by email? Use our{" "}
+            <Link
+              to="/tools/invoice-generator"
+              className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
+            >
+              Invoice Generator
+            </Link>{" "}
+            to create and send professional invoices directly to your clients.
+          </p>
+        </section>
+      )}
 
       <AdZone id="ai-email-writer-mid" size="728x90" />
 
@@ -632,21 +660,7 @@ function AiEmailWriter() {
         faqs={SEO_FAQS}
       />
 
-      <section className="mt-6 rounded-2xl border border-border bg-card/40 p-5 text-sm text-muted-foreground space-y-2">
-        <p>
-          Writing a job application email? Pair it with our{" "}
-          <InternalLink href="/tools/ai-cover-letter-generator">AI Cover Letter Generator</InternalLink>{" "}
-          and <InternalLink href="/tools/ai-resume-builder">AI Resume Builder</InternalLink> for a
-          complete application package.
-        </p>
-        <p>
-          Sending invoices by email? Use our{" "}
-          <InternalLink href="/tools/invoice-generator">Invoice Generator</InternalLink> to create
-          and send professional invoices directly to your clients.
-        </p>
-      </section>
-
-      <RelatedTools currentSlug="ai-email-writer" />
+      <RelatedTools currentSlug={SLUG} />
     </ToolPageShell>
   );
 }

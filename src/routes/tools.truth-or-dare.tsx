@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { Flame, Skull, Plus, Trash2, RefreshCw, Settings2, ChevronDown } from "lucide-react";
@@ -16,7 +16,33 @@ import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/truth-or-dare")({
-  head: () => buildToolMeta(toolBySlug("truth-or-dare", tools)),
+  head: () => {
+    const tool = toolBySlug("truth-or-dare", tools);
+    const title = "Truth or Dare Online — Free Generator with Custom Questions | Skycally";
+    const description =
+      "Play Truth or Dare online free. 40+ built-in questions and dares, custom mode to add your own. No signup, browser-based, works with friends anywhere.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Truth or Dare",
+            alternateName: ["Truth or Dare Online", "Truth or Dare Generator", "Custom Truth or Dare"],
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: TruthOrDare,
 });
 
@@ -317,6 +343,11 @@ function TruthOrDare() {
           "Works for sleepovers, road trips, dinner parties, team ice-breakers, first dates, and any social gathering where you want to spark conversation and laughter. No physical cards needed — just open the tool and pass the phone around. Everything runs in your browser with no account required.",
         ]}
         faqs={[
+          {
+            question: "Can we play together online without meeting in person?",
+            answer:
+              "Yes. Share your screen on a video call, or open the same custom question set on separate devices, and take turns spinning. It works just as well remotely as it does in person, which is why so many people search for a version they can play 'online' rather than with a physical card deck.",
+          },
           {
             question: "How many questions and dares are included?",
             answer:

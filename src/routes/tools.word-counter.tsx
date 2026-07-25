@@ -407,6 +407,11 @@ function WordCounterPage() {
             answer:
               "Results are very close. Microsoft Word counts contractions (like 'don't') as one word — so does Skycally's counter. Minor differences can occur with hyphenated words or punctuation-heavy text, but for standard prose the counts will match.",
           },
+          {
+            question: "How many words is my essay or document?",
+            answer:
+              "Paste the full text into the box above and the word count updates instantly — no need to manually count words or guess. This works whether you're checking 'how many words is this' for an essay, a cover letter, or any other document with a required length.",
+          },
         ]}
       />
 

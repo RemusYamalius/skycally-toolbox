@@ -51,12 +51,17 @@ function PrivacyPage() {
           locally on your device and stops when you close the tab.
         </p>
 
-        <h3>Server-side tools</h3>
+        <h3>Server-side and AI-powered tools</h3>
         <p>
-          A small number of tools require server-side processing (currently Audio Converter and Video Downloader). When
-          you use these tools, your files are transmitted securely over HTTPS to our processing server hosted on
-          Railway. Files are processed immediately and <strong>deleted automatically within seconds</strong> of the
-          operation completing. They are never stored, indexed, shared, or accessed by any person.
+          A small number of tools require server-side processing. This includes our <strong>AI generation tools</strong>{" "}
+          (AI Cover Letter Generator, AI Resume Builder, AI Email Writer, AI Bio Generator, and AI Image Generator),
+          which send the text or prompt you enter to an AI provider in order to generate a result, and a small number of{" "}
+          <strong>media-processing tools</strong> (such as Audio Converter) that require brief server-side processing.
+          In all cases, data is transmitted securely over HTTPS. We do not sell your inputs to these tools or use them
+          for advertising, and we do not keep a permanent copy of your prompts or generated results on our own servers
+          beyond what is needed to return the result to you. Because these tools rely on a third-party AI provider,
+          please avoid entering sensitive personal information you would not want processed by that provider — see
+          Section 6 for the services involved.
         </p>
 
         <h2>2. Information We Collect Automatically</h2>
@@ -137,6 +142,11 @@ function PrivacyPage() {
             <strong>Media.net</strong> — advertising
           </li>
           <li>
+            <strong>AI Gateway (Lovable AI / underlying model providers)</strong> — powers our AI generation tools
+            (cover letters, resumes, emails, bios, and image generation). Prompts and generated results pass through
+            this gateway to an underlying AI model provider.
+          </li>
+          <li>
             <strong>Cloudflare</strong> — content delivery network and DDoS protection
           </li>
           <li>
@@ -172,7 +182,7 @@ function PrivacyPage() {
         <p>
           Our legal basis for processing analytics data is <strong>legitimate interest</strong> (understanding and
           improving our service). For advertising cookies, the legal basis is <strong>consent</strong>. To exercise any
-          GDPR right, contact us at <a href="mailto:hello@skycally.com">hello@skycally.com</a>.
+          GDPR right, contact us at <a href="mailto:skycally.tools@gmail.com">skycally.tools@gmail.com</a>.
         </p>
 
         <h2>8. Children's Privacy</h2>
@@ -199,7 +209,7 @@ function PrivacyPage() {
         <h2>11. Contact Us</h2>
         <p>If you have questions, requests, or concerns about this Privacy Policy or your data, please contact us:</p>
         <p>
-          Email: <a href="mailto:hello@skycally.com">hello@skycally.com</a>
+          Email: <a href="mailto:skycally.tools@gmail.com">skycally.tools@gmail.com</a>
           <br />
           Website: <Link to="/contact">skycally.com/contact</Link>
         </p>

@@ -122,7 +122,7 @@ export function SiteFooter() {
               </Link>
             </li>
             <li>
-              <Link to="/tools/remove-background" className="hover:text-foreground transition">
+              <Link to="/tools/remove-bg" className="hover:text-foreground transition">
                 Remove Background
               </Link>
             </li>

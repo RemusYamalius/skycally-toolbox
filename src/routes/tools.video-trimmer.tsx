@@ -260,7 +260,7 @@ function Page() {
           "Skycally's Video Trimmer lets you cut any video to the exact clip you need, directly in your browser. Upload your video, drag the start and end sliders to your desired range, and download the trimmed result in seconds. No server upload is required — everything runs locally using your browser's built-in MediaRecorder API.",
           "Unlike desktop software, this trimmer requires no installation and works on any device with a modern browser. It supports MP4, MOV, AVI, MKV, and WEBM input formats and outputs a clean WebM file ready for sharing, uploading, or further editing.",
           "Video trimming is one of the most common editing tasks — whether you're removing a silent intro, cutting out a blooper, isolating a highlight, or shortening a clip for social media. This tool handles all of those needs in a clean, distraction-free interface with no ads interrupting your workflow.",
-          "The output file is saved as WebM (VP9), which is widely supported by Chrome, Firefox, Android, and most modern platforms. If you need MP4 output for specific platforms, you can convert the WebM using the Video Converter after trimming.",
+          "The output file is saved as WebM (VP9), which is widely supported by Chrome, Firefox, Android, VLC, and most modern platforms. If you need to shrink the trimmed clip further, our Video Compressor accepts WebM directly with no extra conversion step.",
         ]}
         faqs={[
           {

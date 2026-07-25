@@ -28,7 +28,11 @@ const clamp = (n: number, lo = 0, hi = 255) => Math.max(lo, Math.min(hi, n));
 
 function hexToRgb(hex: string): RGB {
   let h = hex.replace("#", "").trim();
-  if (h.length === 3) h = h.split("").map((c) => c + c).join("");
+  if (h.length === 3)
+    h = h
+      .split("")
+      .map((c) => c + c)
+      .join("");
   if (h.length === 8) h = h.slice(0, 6);
   if (!/^[0-9a-fA-F]{6}$/.test(h)) return { r: 0, g: 0, b: 0 };
   return {
@@ -44,17 +48,27 @@ function rgbToHex({ r, g, b }: RGB): string {
 }
 
 function rgbToHsl({ r, g, b }: RGB): HSL {
-  const R = r / 255, G = g / 255, B = b / 255;
-  const max = Math.max(R, G, B), min = Math.min(R, G, B);
-  let h = 0, s = 0;
+  const R = r / 255,
+    G = g / 255,
+    B = b / 255;
+  const max = Math.max(R, G, B),
+    min = Math.min(R, G, B);
+  let h = 0,
+    s = 0;
   const l = (max + min) / 2;
   const d = max - min;
   if (d !== 0) {
     s = l > 0.5 ? d / (2 - max - min) : d / (max + min);
     switch (max) {
-      case R: h = ((G - B) / d + (G < B ? 6 : 0)); break;
-      case G: h = (B - R) / d + 2; break;
-      case B: h = (R - G) / d + 4; break;
+      case R:
+        h = (G - B) / d + (G < B ? 6 : 0);
+        break;
+      case G:
+        h = (B - R) / d + 2;
+        break;
+      case B:
+        h = (R - G) / d + 4;
+        break;
     }
     h *= 60;
   }
@@ -62,11 +76,14 @@ function rgbToHsl({ r, g, b }: RGB): HSL {
 }
 
 function hslToRgb({ h, s, l }: HSL): RGB {
-  const S = s / 100, L = l / 100;
+  const S = s / 100,
+    L = l / 100;
   const c = (1 - Math.abs(2 * L - 1)) * S;
-  const hp = ((h % 360) + 360) % 360 / 60;
+  const hp = (((h % 360) + 360) % 360) / 60;
   const x = c * (1 - Math.abs((hp % 2) - 1));
-  let r1 = 0, g1 = 0, b1 = 0;
+  let r1 = 0,
+    g1 = 0,
+    b1 = 0;
   if (hp < 1) [r1, g1, b1] = [c, x, 0];
   else if (hp < 2) [r1, g1, b1] = [x, c, 0];
   else if (hp < 3) [r1, g1, b1] = [0, c, x];
@@ -78,15 +95,24 @@ function hslToRgb({ h, s, l }: HSL): RGB {
 }
 
 function rgbToHsb({ r, g, b }: RGB): HSB {
-  const R = r / 255, G = g / 255, B = b / 255;
-  const max = Math.max(R, G, B), min = Math.min(R, G, B);
+  const R = r / 255,
+    G = g / 255,
+    B = b / 255;
+  const max = Math.max(R, G, B),
+    min = Math.min(R, G, B);
   const d = max - min;
   let h = 0;
   if (d !== 0) {
     switch (max) {
-      case R: h = ((G - B) / d + (G < B ? 6 : 0)); break;
-      case G: h = (B - R) / d + 2; break;
-      case B: h = (R - G) / d + 4; break;
+      case R:
+        h = (G - B) / d + (G < B ? 6 : 0);
+        break;
+      case G:
+        h = (B - R) / d + 2;
+        break;
+      case B:
+        h = (R - G) / d + 4;
+        break;
     }
     h *= 60;
   }
@@ -95,11 +121,14 @@ function rgbToHsb({ r, g, b }: RGB): HSB {
 }
 
 function hsbToRgb({ h, s, v }: HSB): RGB {
-  const S = s / 100, V = v / 100;
+  const S = s / 100,
+    V = v / 100;
   const c = V * S;
-  const hp = ((h % 360) + 360) % 360 / 60;
+  const hp = (((h % 360) + 360) % 360) / 60;
   const x = c * (1 - Math.abs((hp % 2) - 1));
-  let r1 = 0, g1 = 0, b1 = 0;
+  let r1 = 0,
+    g1 = 0,
+    b1 = 0;
   if (hp < 1) [r1, g1, b1] = [c, x, 0];
   else if (hp < 2) [r1, g1, b1] = [x, c, 0];
   else if (hp < 3) [r1, g1, b1] = [0, c, x];
@@ -111,7 +140,9 @@ function hsbToRgb({ h, s, v }: HSB): RGB {
 }
 
 function rgbToCmyk({ r, g, b }: RGB): CMYK {
-  const R = r / 255, G = g / 255, B = b / 255;
+  const R = r / 255,
+    G = g / 255,
+    B = b / 255;
   const k = 1 - Math.max(R, G, B);
   if (k === 1) return { c: 0, m: 0, y: 0, k: 100 };
   return {
@@ -143,26 +174,27 @@ function getHarmonyColors(hex: string, mode: HarmonyMode): string[] {
   const hsl = rgbToHsl(hexToRgb(hex));
   const shift = (deg: number) => rgbToHex(hslToRgb({ ...hsl, h: (hsl.h + deg + 360) % 360 }));
   switch (mode) {
-    case "complementary": return [hex, shift(180)];
-    case "analogous": return [shift(-30), hex, shift(30)];
-    case "triadic": return [hex, shift(120), shift(240)];
-    case "split": return [hex, shift(150), shift(210)];
-    case "tetradic": return [hex, shift(90), shift(180), shift(270)];
+    case "complementary":
+      return [hex, shift(180)];
+    case "analogous":
+      return [shift(-30), hex, shift(30)];
+    case "triadic":
+      return [hex, shift(120), shift(240)];
+    case "split":
+      return [hex, shift(150), shift(210)];
+    case "tetradic":
+      return [hex, shift(90), shift(180), shift(270)];
   }
 }
 
 function getShades(hex: string): string[] {
   const hsl = rgbToHsl(hexToRgb(hex));
-  return [0.8, 0.6, 0.4, 0.25, 0.12].map((f) =>
-    rgbToHex(hslToRgb({ ...hsl, l: hsl.l * f })),
-  );
+  return [0.8, 0.6, 0.4, 0.25, 0.12].map((f) => rgbToHex(hslToRgb({ ...hsl, l: hsl.l * f })));
 }
 
 function getTints(hex: string): string[] {
   const hsl = rgbToHsl(hexToRgb(hex));
-  return [0.2, 0.4, 0.6, 0.8].map((f) =>
-    rgbToHex(hslToRgb({ ...hsl, l: hsl.l + (100 - hsl.l) * f })),
-  );
+  return [0.2, 0.4, 0.6, 0.8].map((f) => rgbToHex(hslToRgb({ ...hsl, l: hsl.l + (100 - hsl.l) * f })));
 }
 
 function getRandomColor(): string {
@@ -174,28 +206,292 @@ function getRandomColor(): string {
 
 /* Tailwind v3 palette (slate → rose, 50-950). Hardcoded for offline lookup. */
 const TAILWIND_COLORS: Record<string, Record<string, string>> = {
-  slate: { "50": "#f8fafc", "100": "#f1f5f9", "200": "#e2e8f0", "300": "#cbd5e1", "400": "#94a3b8", "500": "#64748b", "600": "#475569", "700": "#334155", "800": "#1e293b", "900": "#0f172a", "950": "#020617" },
-  gray: { "50": "#f9fafb", "100": "#f3f4f6", "200": "#e5e7eb", "300": "#d1d5db", "400": "#9ca3af", "500": "#6b7280", "600": "#4b5563", "700": "#374151", "800": "#1f2937", "900": "#111827", "950": "#030712" },
-  zinc: { "50": "#fafafa", "100": "#f4f4f5", "200": "#e4e4e7", "300": "#d4d4d8", "400": "#a1a1aa", "500": "#71717a", "600": "#52525b", "700": "#3f3f46", "800": "#27272a", "900": "#18181b", "950": "#09090b" },
-  neutral: { "50": "#fafafa", "100": "#f5f5f5", "200": "#e5e5e5", "300": "#d4d4d4", "400": "#a3a3a3", "500": "#737373", "600": "#525252", "700": "#404040", "800": "#262626", "900": "#171717", "950": "#0a0a0a" },
-  stone: { "50": "#fafaf9", "100": "#f5f5f4", "200": "#e7e5e4", "300": "#d6d3d1", "400": "#a8a29e", "500": "#78716c", "600": "#57534e", "700": "#44403c", "800": "#292524", "900": "#1c1917", "950": "#0c0a09" },
-  red: { "50": "#fef2f2", "100": "#fee2e2", "200": "#fecaca", "300": "#fca5a5", "400": "#f87171", "500": "#ef4444", "600": "#dc2626", "700": "#b91c1c", "800": "#991b1b", "900": "#7f1d1d", "950": "#450a0a" },
-  orange: { "50": "#fff7ed", "100": "#ffedd5", "200": "#fed7aa", "300": "#fdba74", "400": "#fb923c", "500": "#f97316", "600": "#ea580c", "700": "#c2410c", "800": "#9a3412", "900": "#7c2d12", "950": "#431407" },
-  amber: { "50": "#fffbeb", "100": "#fef3c7", "200": "#fde68a", "300": "#fcd34d", "400": "#fbbf24", "500": "#f59e0b", "600": "#d97706", "700": "#b45309", "800": "#92400e", "900": "#78350f", "950": "#451a03" },
-  yellow: { "50": "#fefce8", "100": "#fef9c3", "200": "#fef08a", "300": "#fde047", "400": "#facc15", "500": "#eab308", "600": "#ca8a04", "700": "#a16207", "800": "#854d0e", "900": "#713f12", "950": "#422006" },
-  lime: { "50": "#f7fee7", "100": "#ecfccb", "200": "#d9f99d", "300": "#bef264", "400": "#a3e635", "500": "#84cc16", "600": "#65a30d", "700": "#4d7c0f", "800": "#3f6212", "900": "#365314", "950": "#1a2e05" },
-  green: { "50": "#f0fdf4", "100": "#dcfce7", "200": "#bbf7d0", "300": "#86efac", "400": "#4ade80", "500": "#22c55e", "600": "#16a34a", "700": "#15803d", "800": "#166534", "900": "#14532d", "950": "#052e16" },
-  emerald: { "50": "#ecfdf5", "100": "#d1fae5", "200": "#a7f3d0", "300": "#6ee7b7", "400": "#34d399", "500": "#10b981", "600": "#059669", "700": "#047857", "800": "#065f46", "900": "#064e3b", "950": "#022c22" },
-  teal: { "50": "#f0fdfa", "100": "#ccfbf1", "200": "#99f6e4", "300": "#5eead4", "400": "#2dd4bf", "500": "#14b8a6", "600": "#0d9488", "700": "#0f766e", "800": "#115e59", "900": "#134e4a", "950": "#042f2e" },
-  cyan: { "50": "#ecfeff", "100": "#cffafe", "200": "#a5f3fc", "300": "#67e8f9", "400": "#22d3ee", "500": "#06b6d4", "600": "#0891b2", "700": "#0e7490", "800": "#155e75", "900": "#164e63", "950": "#083344" },
-  sky: { "50": "#f0f9ff", "100": "#e0f2fe", "200": "#bae6fd", "300": "#7dd3fc", "400": "#38bdf8", "500": "#0ea5e9", "600": "#0284c7", "700": "#0369a1", "800": "#075985", "900": "#0c4a6e", "950": "#082f49" },
-  blue: { "50": "#eff6ff", "100": "#dbeafe", "200": "#bfdbfe", "300": "#93c5fd", "400": "#60a5fa", "500": "#3b82f6", "600": "#2563eb", "700": "#1d4ed8", "800": "#1e40af", "900": "#1e3a8a", "950": "#172554" },
-  indigo: { "50": "#eef2ff", "100": "#e0e7ff", "200": "#c7d2fe", "300": "#a5b4fc", "400": "#818cf8", "500": "#6366f1", "600": "#4f46e5", "700": "#4338ca", "800": "#3730a3", "900": "#312e81", "950": "#1e1b4b" },
-  violet: { "50": "#f5f3ff", "100": "#ede9fe", "200": "#ddd6fe", "300": "#c4b5fd", "400": "#a78bfa", "500": "#8b5cf6", "600": "#7c3aed", "700": "#6d28d9", "800": "#5b21b6", "900": "#4c1d95", "950": "#2e1065" },
-  purple: { "50": "#faf5ff", "100": "#f3e8ff", "200": "#e9d5ff", "300": "#d8b4fe", "400": "#c084fc", "500": "#a855f7", "600": "#9333ea", "700": "#7e22ce", "800": "#6b21a8", "900": "#581c87", "950": "#3b0764" },
-  fuchsia: { "50": "#fdf4ff", "100": "#fae8ff", "200": "#f5d0fe", "300": "#f0abfc", "400": "#e879f9", "500": "#d946ef", "600": "#c026d3", "700": "#a21caf", "800": "#86198f", "900": "#701a75", "950": "#4a044e" },
-  pink: { "50": "#fdf2f8", "100": "#fce7f3", "200": "#fbcfe8", "300": "#f9a8d4", "400": "#f472b6", "500": "#ec4899", "600": "#db2777", "700": "#be185d", "800": "#9d174d", "900": "#831843", "950": "#500724" },
-  rose: { "50": "#fff1f2", "100": "#ffe4e6", "200": "#fecdd3", "300": "#fda4af", "400": "#fb7185", "500": "#f43f5e", "600": "#e11d48", "700": "#be123c", "800": "#9f1239", "900": "#881337", "950": "#4c0519" },
+  slate: {
+    "50": "#f8fafc",
+    "100": "#f1f5f9",
+    "200": "#e2e8f0",
+    "300": "#cbd5e1",
+    "400": "#94a3b8",
+    "500": "#64748b",
+    "600": "#475569",
+    "700": "#334155",
+    "800": "#1e293b",
+    "900": "#0f172a",
+    "950": "#020617",
+  },
+  gray: {
+    "50": "#f9fafb",
+    "100": "#f3f4f6",
+    "200": "#e5e7eb",
+    "300": "#d1d5db",
+    "400": "#9ca3af",
+    "500": "#6b7280",
+    "600": "#4b5563",
+    "700": "#374151",
+    "800": "#1f2937",
+    "900": "#111827",
+    "950": "#030712",
+  },
+  zinc: {
+    "50": "#fafafa",
+    "100": "#f4f4f5",
+    "200": "#e4e4e7",
+    "300": "#d4d4d8",
+    "400": "#a1a1aa",
+    "500": "#71717a",
+    "600": "#52525b",
+    "700": "#3f3f46",
+    "800": "#27272a",
+    "900": "#18181b",
+    "950": "#09090b",
+  },
+  neutral: {
+    "50": "#fafafa",
+    "100": "#f5f5f5",
+    "200": "#e5e5e5",
+    "300": "#d4d4d4",
+    "400": "#a3a3a3",
+    "500": "#737373",
+    "600": "#525252",
+    "700": "#404040",
+    "800": "#262626",
+    "900": "#171717",
+    "950": "#0a0a0a",
+  },
+  stone: {
+    "50": "#fafaf9",
+    "100": "#f5f5f4",
+    "200": "#e7e5e4",
+    "300": "#d6d3d1",
+    "400": "#a8a29e",
+    "500": "#78716c",
+    "600": "#57534e",
+    "700": "#44403c",
+    "800": "#292524",
+    "900": "#1c1917",
+    "950": "#0c0a09",
+  },
+  red: {
+    "50": "#fef2f2",
+    "100": "#fee2e2",
+    "200": "#fecaca",
+    "300": "#fca5a5",
+    "400": "#f87171",
+    "500": "#ef4444",
+    "600": "#dc2626",
+    "700": "#b91c1c",
+    "800": "#991b1b",
+    "900": "#7f1d1d",
+    "950": "#450a0a",
+  },
+  orange: {
+    "50": "#fff7ed",
+    "100": "#ffedd5",
+    "200": "#fed7aa",
+    "300": "#fdba74",
+    "400": "#fb923c",
+    "500": "#f97316",
+    "600": "#ea580c",
+    "700": "#c2410c",
+    "800": "#9a3412",
+    "900": "#7c2d12",
+    "950": "#431407",
+  },
+  amber: {
+    "50": "#fffbeb",
+    "100": "#fef3c7",
+    "200": "#fde68a",
+    "300": "#fcd34d",
+    "400": "#fbbf24",
+    "500": "#f59e0b",
+    "600": "#d97706",
+    "700": "#b45309",
+    "800": "#92400e",
+    "900": "#78350f",
+    "950": "#451a03",
+  },
+  yellow: {
+    "50": "#fefce8",
+    "100": "#fef9c3",
+    "200": "#fef08a",
+    "300": "#fde047",
+    "400": "#facc15",
+    "500": "#eab308",
+    "600": "#ca8a04",
+    "700": "#a16207",
+    "800": "#854d0e",
+    "900": "#713f12",
+    "950": "#422006",
+  },
+  lime: {
+    "50": "#f7fee7",
+    "100": "#ecfccb",
+    "200": "#d9f99d",
+    "300": "#bef264",
+    "400": "#a3e635",
+    "500": "#84cc16",
+    "600": "#65a30d",
+    "700": "#4d7c0f",
+    "800": "#3f6212",
+    "900": "#365314",
+    "950": "#1a2e05",
+  },
+  green: {
+    "50": "#f0fdf4",
+    "100": "#dcfce7",
+    "200": "#bbf7d0",
+    "300": "#86efac",
+    "400": "#4ade80",
+    "500": "#22c55e",
+    "600": "#16a34a",
+    "700": "#15803d",
+    "800": "#166534",
+    "900": "#14532d",
+    "950": "#052e16",
+  },
+  emerald: {
+    "50": "#ecfdf5",
+    "100": "#d1fae5",
+    "200": "#a7f3d0",
+    "300": "#6ee7b7",
+    "400": "#34d399",
+    "500": "#10b981",
+    "600": "#059669",
+    "700": "#047857",
+    "800": "#065f46",
+    "900": "#064e3b",
+    "950": "#022c22",
+  },
+  teal: {
+    "50": "#f0fdfa",
+    "100": "#ccfbf1",
+    "200": "#99f6e4",
+    "300": "#5eead4",
+    "400": "#2dd4bf",
+    "500": "#14b8a6",
+    "600": "#0d9488",
+    "700": "#0f766e",
+    "800": "#115e59",
+    "900": "#134e4a",
+    "950": "#042f2e",
+  },
+  cyan: {
+    "50": "#ecfeff",
+    "100": "#cffafe",
+    "200": "#a5f3fc",
+    "300": "#67e8f9",
+    "400": "#22d3ee",
+    "500": "#06b6d4",
+    "600": "#0891b2",
+    "700": "#0e7490",
+    "800": "#155e75",
+    "900": "#164e63",
+    "950": "#083344",
+  },
+  sky: {
+    "50": "#f0f9ff",
+    "100": "#e0f2fe",
+    "200": "#bae6fd",
+    "300": "#7dd3fc",
+    "400": "#38bdf8",
+    "500": "#0ea5e9",
+    "600": "#0284c7",
+    "700": "#0369a1",
+    "800": "#075985",
+    "900": "#0c4a6e",
+    "950": "#082f49",
+  },
+  blue: {
+    "50": "#eff6ff",
+    "100": "#dbeafe",
+    "200": "#bfdbfe",
+    "300": "#93c5fd",
+    "400": "#60a5fa",
+    "500": "#3b82f6",
+    "600": "#2563eb",
+    "700": "#1d4ed8",
+    "800": "#1e40af",
+    "900": "#1e3a8a",
+    "950": "#172554",
+  },
+  indigo: {
+    "50": "#eef2ff",
+    "100": "#e0e7ff",
+    "200": "#c7d2fe",
+    "300": "#a5b4fc",
+    "400": "#818cf8",
+    "500": "#6366f1",
+    "600": "#4f46e5",
+    "700": "#4338ca",
+    "800": "#3730a3",
+    "900": "#312e81",
+    "950": "#1e1b4b",
+  },
+  violet: {
+    "50": "#f5f3ff",
+    "100": "#ede9fe",
+    "200": "#ddd6fe",
+    "300": "#c4b5fd",
+    "400": "#a78bfa",
+    "500": "#8b5cf6",
+    "600": "#7c3aed",
+    "700": "#6d28d9",
+    "800": "#5b21b6",
+    "900": "#4c1d95",
+    "950": "#2e1065",
+  },
+  purple: {
+    "50": "#faf5ff",
+    "100": "#f3e8ff",
+    "200": "#e9d5ff",
+    "300": "#d8b4fe",
+    "400": "#c084fc",
+    "500": "#a855f7",
+    "600": "#9333ea",
+    "700": "#7e22ce",
+    "800": "#6b21a8",
+    "900": "#581c87",
+    "950": "#3b0764",
+  },
+  fuchsia: {
+    "50": "#fdf4ff",
+    "100": "#fae8ff",
+    "200": "#f5d0fe",
+    "300": "#f0abfc",
+    "400": "#e879f9",
+    "500": "#d946ef",
+    "600": "#c026d3",
+    "700": "#a21caf",
+    "800": "#86198f",
+    "900": "#701a75",
+    "950": "#4a044e",
+  },
+  pink: {
+    "50": "#fdf2f8",
+    "100": "#fce7f3",
+    "200": "#fbcfe8",
+    "300": "#f9a8d4",
+    "400": "#f472b6",
+    "500": "#ec4899",
+    "600": "#db2777",
+    "700": "#be185d",
+    "800": "#9d174d",
+    "900": "#831843",
+    "950": "#500724",
+  },
+  rose: {
+    "50": "#fff1f2",
+    "100": "#ffe4e6",
+    "200": "#fecdd3",
+    "300": "#fda4af",
+    "400": "#fb7185",
+    "500": "#f43f5e",
+    "600": "#e11d48",
+    "700": "#be123c",
+    "800": "#9f1239",
+    "900": "#881337",
+    "950": "#4c0519",
+  },
 };
 
 function findClosestTailwindColor(hex: string): { name: string; hex: string } {
@@ -226,7 +522,17 @@ function useCopy() {
   return { copiedKey, copy };
 }
 
-function CopyBtn({ value, k, copiedKey, copy }: { value: string; k: string; copiedKey: string | null; copy: (v: string, k: string) => void }) {
+function CopyBtn({
+  value,
+  k,
+  copiedKey,
+  copy,
+}: {
+  value: string;
+  k: string;
+  copiedKey: string | null;
+  copy: (v: string, k: string) => void;
+}) {
   const done = copiedKey === k;
   return (
     <button
@@ -280,11 +586,7 @@ function Swatch({
           {done ? "Copied!" : hex.toUpperCase()}
         </button>
         {removable && (
-          <button
-            onClick={onRemove}
-            className="text-muted-foreground hover:text-destructive p-0.5"
-            aria-label="Remove"
-          >
+          <button onClick={onRemove} className="text-muted-foreground hover:text-destructive p-0.5" aria-label="Remove">
             <XIcon className="w-3 h-3" />
           </button>
         )}
@@ -316,7 +618,11 @@ function ColorPickerPage() {
   const cmyk = useMemo(() => rgbToCmyk(rgb), [rgb]);
   const tw = useMemo(() => findClosestTailwindColor(hex), [hex]);
 
-  const hexA = hex + Math.round(alpha * 255).toString(16).padStart(2, "0");
+  const hexA =
+    hex +
+    Math.round(alpha * 255)
+      .toString(16)
+      .padStart(2, "0");
   const rgba = `rgba(${rgb.r}, ${rgb.g}, ${rgb.b}, ${alpha.toFixed(2)})`;
   const rgbStr = `rgb(${rgb.r}, ${rgb.g}, ${rgb.b})`;
   const hslStr = `hsl(${Math.round(hsl.h)}, ${Math.round(hsl.s)}%, ${Math.round(hsl.l)}%)`;
@@ -343,7 +649,9 @@ function ColorPickerPage() {
     const id = setTimeout(() => {
       setRecent((prev) => {
         const next = [hex, ...prev.filter((c) => c.toLowerCase() !== hex.toLowerCase())].slice(0, 12);
-        try { localStorage.setItem(LS_RECENT, JSON.stringify(next)); } catch {}
+        try {
+          localStorage.setItem(LS_RECENT, JSON.stringify(next));
+        } catch {}
         return next;
       });
     }, 500);
@@ -368,20 +676,26 @@ function ColorPickerPage() {
     setSaved((prev) => {
       if (prev.includes(hex)) return prev;
       const next = [hex, ...prev].slice(0, 20);
-      try { localStorage.setItem(LS_SAVED, JSON.stringify(next)); } catch {}
+      try {
+        localStorage.setItem(LS_SAVED, JSON.stringify(next));
+      } catch {}
       return next;
     });
   };
   const removeSaved = (h: string) => {
     setSaved((prev) => {
       const next = prev.filter((x) => x !== h);
-      try { localStorage.setItem(LS_SAVED, JSON.stringify(next)); } catch {}
+      try {
+        localStorage.setItem(LS_SAVED, JSON.stringify(next));
+      } catch {}
       return next;
     });
   };
   const clearSaved = () => {
     setSaved([]);
-    try { localStorage.removeItem(LS_SAVED); } catch {}
+    try {
+      localStorage.removeItem(LS_SAVED);
+    } catch {}
   };
 
   // SV canvas drag
@@ -397,8 +711,12 @@ function ColorPickerPage() {
     setVal((1 - y) * 100);
   };
   useEffect(() => {
-    const move = (e: PointerEvent) => { if (draggingSV.current) updateSV(e.clientX, e.clientY); };
-    const up = () => { draggingSV.current = false; };
+    const move = (e: PointerEvent) => {
+      if (draggingSV.current) updateSV(e.clientX, e.clientY);
+    };
+    const up = () => {
+      draggingSV.current = false;
+    };
     window.addEventListener("pointermove", move);
     window.addEventListener("pointerup", up);
     return () => {
@@ -433,11 +751,21 @@ function ColorPickerPage() {
 
       <Tabs defaultValue="picker" className="cp-tabs">
         <TabsList className="w-full grid grid-cols-5 h-auto">
-          <TabsTrigger value="picker" className="py-2">Picker</TabsTrigger>
-          <TabsTrigger value="harmony" className="py-2">Harmony</TabsTrigger>
-          <TabsTrigger value="contrast" className="py-2">Contrast</TabsTrigger>
-          <TabsTrigger value="gradient" className="py-2">Gradient</TabsTrigger>
-          <TabsTrigger value="extract" className="py-2">Extract</TabsTrigger>
+          <TabsTrigger value="picker" className="py-2">
+            Picker
+          </TabsTrigger>
+          <TabsTrigger value="harmony" className="py-2">
+            Harmony
+          </TabsTrigger>
+          <TabsTrigger value="contrast" className="py-2">
+            Contrast
+          </TabsTrigger>
+          <TabsTrigger value="gradient" className="py-2">
+            Gradient
+          </TabsTrigger>
+          <TabsTrigger value="extract" className="py-2">
+            Extract
+          </TabsTrigger>
         </TabsList>
 
         {/* PICKER */}
@@ -481,14 +809,17 @@ function ColorPickerPage() {
                   onChange={(e) => setHue(parseFloat(e.target.value))}
                   className="w-full h-3 rounded-full appearance-none cursor-pointer"
                   style={{
-                    background: "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
+                    background:
+                      "linear-gradient(to right, #f00 0%, #ff0 17%, #0f0 33%, #0ff 50%, #00f 67%, #f0f 83%, #f00 100%)",
                   }}
                 />
               </div>
 
               {/* Alpha */}
               <div>
-                <label className="block text-xs text-muted-foreground mb-1.5">Opacity — {Math.round(alpha * 100)}%</label>
+                <label className="block text-xs text-muted-foreground mb-1.5">
+                  Opacity — {Math.round(alpha * 100)}%
+                </label>
                 <div
                   className="rounded-full"
                   style={{
@@ -515,10 +846,7 @@ function ColorPickerPage() {
 
               {/* Preview + actions */}
               <div className="flex items-stretch gap-3">
-                <div
-                  className="flex-1 h-20 rounded-xl border border-border"
-                  style={{ background: hexA }}
-                />
+                <div className="flex-1 h-20 rounded-xl border border-border" style={{ background: hexA }} />
                 <div className="flex flex-col gap-2">
                   <Button
                     type="button"
@@ -555,7 +883,10 @@ function ColorPickerPage() {
                       onDoubleClick={() => copy(c, "st" + i)}
                       title={c + " — click to use, double-click to copy"}
                       className="h-10 rounded-md border border-border hover:scale-110 transition"
-                      style={{ background: c, outline: c.toLowerCase() === hex.toLowerCase() ? `2px solid ${hex}` : undefined }}
+                      style={{
+                        background: c,
+                        outline: c.toLowerCase() === hex.toLowerCase() ? `2px solid ${hex}` : undefined,
+                      }}
                     />
                   ))}
                 </div>
@@ -611,7 +942,9 @@ function ColorPickerPage() {
           {/* Saved palette */}
           <div className="mt-4 rounded-2xl border border-border bg-card p-4">
             <div className="flex items-center justify-between mb-3 flex-wrap gap-2">
-              <h2 className="font-display text-base font-semibold">Saved Palette <span className="text-xs text-muted-foreground font-normal">({saved.length} / 20)</span></h2>
+              <h2 className="font-display text-base font-semibold">
+                Saved Palette <span className="text-xs text-muted-foreground font-normal">({saved.length} / 20)</span>
+              </h2>
               <div className="flex items-center gap-2">
                 <button
                   onClick={() => copy(JSON.stringify(saved), "saved-arr")}
@@ -687,6 +1020,7 @@ function ColorPickerPage() {
           "Skycally's color picker is built for designers, developers, and anyone who needs precise colors fast. Drag the saturation/brightness canvas, scrub the hue slider, and read your color back in every format you use — HEX, HEX with alpha, RGB, RGBA, HSL, HSLA, HSB/HSV, CMYK, a CSS custom property, and the closest matching Tailwind class. Every format is a single click to copy, and the picker remembers your last twelve colors plus up to twenty pinned to a saved palette.",
           "Beyond the picker, five focused tabs cover the most common color workflows. The harmony generator builds complementary, analogous, triadic, split-complementary, and tetradic palettes from any base color. The contrast checker enforces WCAG 2.1 AA and AAA ratios for normal and large text with a live preview, so you can ship accessible UI without leaving the page. The gradient builder gives you up to five stops, full direction control, linear and radial modes, and copy-ready CSS plus a Tailwind class. The image extractor pulls the eight most dominant colors from any photo you drop in — purely in your browser, nothing uploaded.",
           "Everything runs client-side. Your colors, your saved palettes, and your uploaded images never leave your device — there is no account, no tracking, and no server round-trip. Bookmark the page, pin it as a tab, or use it on mobile with full touch support for the canvas and sliders.",
+          "This is one tool covering what usually takes three or four separate sites: a color converter, a palette generator, an accessibility contrast checker, and an image color extractor. Designers building a brand palette can move from picking a base color, to generating a harmony, to verifying every text/background pairing meets WCAG contrast requirements, all without switching tabs or re-entering values.",
         ]}
         faqs={[
           {
@@ -784,7 +1118,8 @@ function HarmonyPanel({
         ))}
       </div>
 
-      <div className={`grid gap-3 grid-cols-${Math.min(colors.length, 4)} sm:grid-cols-${colors.length}`}
+      <div
+        className={`grid gap-3 grid-cols-${Math.min(colors.length, 4)} sm:grid-cols-${colors.length}`}
         style={{ gridTemplateColumns: `repeat(${colors.length}, minmax(0, 1fr))` }}
       >
         {colors.map((c, i) => (
@@ -817,7 +1152,9 @@ function ContrastPanel({ currentHex }: { currentHex: string }) {
     <span
       className="inline-flex items-center gap-1 rounded-full px-2.5 py-1 text-xs font-medium"
       style={{
-        background: ok ? "color-mix(in oklab, #10b981 18%, transparent)" : "color-mix(in oklab, #ef4444 18%, transparent)",
+        background: ok
+          ? "color-mix(in oklab, #10b981 18%, transparent)"
+          : "color-mix(in oklab, #ef4444 18%, transparent)",
         color: ok ? "#10b981" : "#ef4444",
       }}
     >
@@ -853,7 +1190,9 @@ function ContrastPanel({ currentHex }: { currentHex: string }) {
     <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
       <div>
         <h2 className="font-display text-lg font-semibold mb-2">WCAG Contrast Checker</h2>
-        <p className="text-sm text-muted-foreground">Check accessibility-compliant text/background contrast (WCAG 2.1).</p>
+        <p className="text-sm text-muted-foreground">
+          Check accessibility-compliant text/background contrast (WCAG 2.1).
+        </p>
       </div>
 
       <div className="grid gap-4 sm:grid-cols-2">
@@ -883,7 +1222,15 @@ function ContrastPanel({ currentHex }: { currentHex: string }) {
 
 type GStop = { color: string; pos: number };
 
-function GradientPanel({ currentHex, copy, copiedKey }: { currentHex: string; copy: (v: string, k: string) => void; copiedKey: string | null }) {
+function GradientPanel({
+  currentHex,
+  copy,
+  copiedKey,
+}: {
+  currentHex: string;
+  copy: (v: string, k: string) => void;
+  copiedKey: string | null;
+}) {
   const [stops, setStops] = useState<GStop[]>([
     { color: currentHex, pos: 0 },
     { color: "#7c3aed", pos: 100 },
@@ -1019,11 +1366,15 @@ function GradientPanel({ currentHex, copy, copiedKey }: { currentHex: string; co
 
       <div className="space-y-2">
         <div className="flex items-center gap-2">
-          <div className="flex-1 min-w-0 rounded-md border border-border bg-background px-2 py-1.5 font-mono text-xs truncate">{css}</div>
+          <div className="flex-1 min-w-0 rounded-md border border-border bg-background px-2 py-1.5 font-mono text-xs truncate">
+            {css}
+          </div>
           <CopyBtn value={css} k="grad-css" copiedKey={copiedKey} copy={copy} />
         </div>
         <div className="flex items-center gap-2">
-          <div className="flex-1 min-w-0 rounded-md border border-border bg-background px-2 py-1.5 font-mono text-xs truncate">{tw}</div>
+          <div className="flex-1 min-w-0 rounded-md border border-border bg-background px-2 py-1.5 font-mono text-xs truncate">
+            {tw}
+          </div>
           <CopyBtn value={tw} k="grad-tw" copiedKey={copiedKey} copy={copy} />
         </div>
       </div>
@@ -1063,9 +1414,13 @@ function ExtractPanel({
       const w = Math.max(1, Math.round(img.width * scale));
       const h = Math.max(1, Math.round(img.height * scale));
       const c = document.createElement("canvas");
-      c.width = w; c.height = h;
+      c.width = w;
+      c.height = h;
       const ctx = c.getContext("2d");
-      if (!ctx) { setBusy(false); return; }
+      if (!ctx) {
+        setBusy(false);
+        return;
+      }
       ctx.drawImage(img, 0, 0, w, h);
       const data = ctx.getImageData(0, 0, w, h).data;
       const buckets = new Map<string, { count: number; r: number; g: number; b: number }>();
@@ -1101,12 +1456,19 @@ function ExtractPanel({
     <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
       <div>
         <h2 className="font-display text-lg font-semibold mb-2">Image Color Extractor</h2>
-        <p className="text-sm text-muted-foreground">Upload any image to extract its 8 dominant colors. Runs entirely in your browser.</p>
+        <p className="text-sm text-muted-foreground">
+          Upload any image to extract its 8 dominant colors. Runs entirely in your browser.
+        </p>
       </div>
 
       <label
-        onDragOver={(e) => { e.preventDefault(); }}
-        onDrop={(e) => { e.preventDefault(); onFile(e.dataTransfer.files?.[0]); }}
+        onDragOver={(e) => {
+          e.preventDefault();
+        }}
+        onDrop={(e) => {
+          e.preventDefault();
+          onFile(e.dataTransfer.files?.[0]);
+        }}
         className="block rounded-xl border-2 border-dashed border-border p-8 text-center cursor-pointer hover:bg-secondary/40 transition"
       >
         <Upload className="w-6 h-6 mx-auto mb-2 text-muted-foreground" />
@@ -1122,9 +1484,15 @@ function ExtractPanel({
 
       {src && (
         <div className="grid gap-4 md:grid-cols-2">
-          <img src={src} alt="Source" className="rounded-xl border border-border max-h-72 w-full object-contain bg-secondary/30" />
+          <img
+            src={src}
+            alt="Source"
+            className="rounded-xl border border-border max-h-72 w-full object-contain bg-secondary/30"
+          />
           <div>
-            <h3 className="text-sm font-medium mb-2">Dominant colors {busy && <span className="text-xs text-muted-foreground">(analyzing…)</span>}</h3>
+            <h3 className="text-sm font-medium mb-2">
+              Dominant colors {busy && <span className="text-xs text-muted-foreground">(analyzing…)</span>}
+            </h3>
             <div className="grid grid-cols-4 gap-2">
               {palette.map((c, i) => (
                 <Swatch

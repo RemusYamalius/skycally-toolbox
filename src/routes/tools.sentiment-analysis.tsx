@@ -39,7 +39,7 @@ export const Route = createFileRoute("/tools/sentiment-analysis")({
             "@context": "https://schema.org",
             "@type": "SoftwareApplication",
             name: "Sentiment Analysis Online",
-            alternateName: ["AI Sentiment Analysis", "Text Sentiment Checker"],
+            alternateName: ["AI Sentiment Analysis", "Sentiment Analyzer", "Text Sentiment Checker"],
             applicationCategory: "UtilitiesApplication",
             operatingSystem: "Any",
             offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },

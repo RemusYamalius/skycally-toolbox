@@ -133,6 +133,7 @@ function TipCalculator() {
           "Skycally's Tip Calculator takes the awkwardness out of splitting a restaurant bill. Enter the subtotal, pick a tip percentage — 15% for standard service, 18–20% for good service, 25% for exceptional — or enter any custom percentage. The calculator instantly shows the tip amount, the total bill including tip, and the exact amount each person owes when splitting.",
           "The split calculation is precise to the cent, so nobody underpays or overpays. Results update live as you type — no button to press. Five preset percentages (10%, 15%, 18%, 20%, 25%) are available for quick selection, covering the full range from minimal to generous tipping.",
           "Tipping customs vary significantly by country and service type. In the United States, 15–20% is standard at restaurants. In the UK, 10–12.5% is common. Many European countries include a service charge automatically. Some countries (Japan, South Korea) consider tipping unnecessary or even rude. The calculator works for any percentage worldwide.",
+          "For group outings, splitting evenly is the fastest option, but it isn't always the fairest one if people ordered very differently. In that case, calculate each person's individual subtotal separately and run it through this tool one at a time, rather than dividing one combined total by the number of guests.",
         ]}
         faqs={[
           {

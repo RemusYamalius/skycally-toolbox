@@ -833,6 +833,7 @@ function DocumentScanner() {
           "Skycally's Document Scanner brings CamScanner-quality scanning to your browser. Capture a photo with your phone camera or upload an existing image, and the scanner automatically detects the document's four corners and applies perspective correction — transforming a skewed photo into a flat, straight-edged scan. No app to install, no account required.",
           "The Magic filter uses adaptive thresholding to make text crisp black and the background pure white, compensating for uneven lighting and shadows automatically — the same technique used by CamScanner and the WhatsApp document scanner. The B&W filter uses Otsu's global threshold for high-contrast documents, while Grayscale and Photo modes preserve more of the original image.",
           "Build multi-page PDF documents by adding scans one at a time. Each page is perspective-corrected and filtered independently before being assembled into a single PDF that fills the A4 page. The Extract Text button runs OCR locally using Tesseract.js — your documents never leave your device.",
+          "This makes the scanner well suited for digitizing receipts for expense reports, scanning contracts and IDs before emailing them, capturing whiteboard notes at the end of a meeting, or building a searchable PDF archive of paper documents — all without a dedicated scanning app or handing sensitive pages over to a cloud service.",
         ]}
         faqs={[
           {

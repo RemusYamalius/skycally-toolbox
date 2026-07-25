@@ -113,6 +113,7 @@ import {
   PiggyBank,
   Home,
   BrainCircuit,
+  PieChart,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1256,6 +1257,15 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Timer,
     path: "/tools/intermittent-fasting-calculator",
+  },
+  {
+    slug: "macro-calculator",
+    name: "Macro Calculator",
+    description:
+      "Free macro calculator with a complete protein / carb / fat breakdown for cutting, maintenance and lean bulking. Protein-first (g/kg) approach, Mifflin-St Jeor and Katch-McArdle formulas, no signup.",
+    category: "utility",
+    icon: PieChart,
+    path: "/tools/macro-calculator",
   },
   {
     slug: "ball-sort",

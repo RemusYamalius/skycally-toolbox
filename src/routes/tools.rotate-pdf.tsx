@@ -18,7 +18,10 @@ export const Route = createFileRoute("/tools/rotate-pdf")({
   component: RotatePdf,
 });
 
-interface Thumb { num: number; url: string }
+interface Thumb {
+  num: number;
+  url: string;
+}
 type Rot = 0 | 90 | 180 | 270;
 
 function RotatePdf() {
@@ -70,7 +73,7 @@ function RotatePdf() {
   };
 
   const applyAll = (r: Rot) => setRotations((prev) => prev.map(() => r));
-  const rotateAll = () => setRotations((prev) => prev.map((r) => (((r + 90) % 360) as Rot)));
+  const rotateAll = () => setRotations((prev) => prev.map((r) => ((r + 90) % 360) as Rot));
 
   const save = async () => {
     if (!file) return;
@@ -99,7 +102,10 @@ function RotatePdf() {
   };
 
   return (
-    <ToolPageShell title="Rotate PDF" description="Rotate individual pages or every page in your PDF — 90°, 180° or 270°.">
+    <ToolPageShell
+      title="Rotate PDF"
+      description="Rotate individual pages or every page in your PDF — 90°, 180° or 270°."
+    >
       <div className="space-y-5">
         <DropZone accept="application/pdf" onFiles={onFiles} label="Drop a PDF here" hint="or click to browse" />
 
@@ -110,11 +116,18 @@ function RotatePdf() {
             <div className="rounded-2xl border border-border bg-card p-4 flex flex-wrap items-center gap-2">
               <span className="text-xs text-muted-foreground mr-2">Apply to all:</span>
               {([0, 90, 180, 270] as Rot[]).map((r) => (
-                <button key={r} onClick={() => applyAll(r)} className="px-3 py-1.5 rounded-lg border border-border text-xs hover:bg-secondary">
+                <button
+                  key={r}
+                  onClick={() => applyAll(r)}
+                  className="px-3 py-1.5 rounded-lg border border-border text-xs hover:bg-secondary"
+                >
                   {r}°
                 </button>
               ))}
-              <button onClick={rotateAll} className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs hover:bg-secondary">
+              <button
+                onClick={rotateAll}
+                className="ml-auto inline-flex items-center gap-1.5 px-3 py-1.5 rounded-lg border border-border text-xs hover:bg-secondary"
+              >
                 <RotateCw className="w-3.5 h-3.5" /> Rotate all 90°
               </button>
             </div>
@@ -142,24 +155,73 @@ function RotatePdf() {
               ))}
             </div>
 
-            <button onClick={save} disabled={busy} className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold disabled:opacity-50">
+            <button
+              onClick={save}
+              disabled={busy}
+              className="w-full py-3 rounded-xl bg-gradient-to-r from-cyan-500 to-blue-600 text-white font-semibold disabled:opacity-50"
+            >
               {busy ? "Saving…" : "Apply rotations & download"}
             </button>
           </>
         )}
       </div>
-      <HowToUse steps={[
-        "Drop your PDF and wait for thumbnails to render.",
-        "Click any page to rotate 90°, or use the apply-to-all controls.",
-        "Hit Apply rotations to download your fixed PDF.",
-      ]} />
-          <RelatedTools currentSlug="rotate-pdf" />
-          <ToolSeoContent
+      <HowToUse
+        steps={[
+          "Drop your PDF and wait for thumbnails to render.",
+          "Click any page to rotate 90°, or use the apply-to-all controls.",
+          "Hit Apply rotations to download your fixed PDF.",
+        ]}
+      />
+      <ToolSeoContent
         title="Free PDF Rotator — Rotate PDF Pages Online"
         description="Skycally's PDF Rotator lets you rotate one or all pages of your PDF to the correct orientation. Choose 90°, 180°, or 270° rotation for each page individually, or apply the same rotation to all pages at once. Everything runs in your browser using pdf-lib — no uploads, no signup, completely free."
-        body={[]}
-        faqs={[{"question":"Can I rotate individual pages?","answer":"Yes, you can set a different rotation for each page independently."},{"question":"What rotation angles are supported?","answer":"You can rotate pages by 90°, 180°, or 270° clockwise."},{"question":"Does rotation affect PDF quality?","answer":"No. Rotation only changes orientation — all content remains at full quality."},{"question":"Is my PDF uploaded to a server?","answer":"No. All processing happens in your browser using pdf-lib."},{"question":"Can I rotate password-protected PDFs?","answer":"Password-protected PDFs are not currently supported."}]}
+        body={[
+          "Scanned documents and photos of paper pages are the most common reason a PDF ends up sideways or upside down — a scanner fed the page in the wrong orientation, or a phone camera was held sideways when photographing a document. Skycally's PDF Rotator fixes this instantly: drop the file, click through page thumbnails, and rotate exactly the pages that need it.",
+          "Each page can be rotated independently, which matters for mixed-orientation documents — a common real-world case is a PDF where most pages are portrait but a few landscape tables or diagrams were scanned in a different orientation. Rotate just those pages 90° without touching the rest, or use the apply-to-all shortcut when the entire document needs the same fix.",
+          "The tool uses pdf-lib to modify the PDF's page rotation metadata directly, rather than re-rendering pages as images — this means the output stays a genuine, searchable, full-quality PDF rather than a flattened image-based file. Text remains selectable and the file size stays close to the original.",
+          "Everything happens locally in your browser. Your PDF is never uploaded to a server, which makes this a safe choice for contracts, scanned IDs, medical records, or any other sensitive document that just needs its orientation fixed before you send or print it.",
+        ]}
+        faqs={[
+          {
+            question: "Can I rotate individual pages?",
+            answer: "Yes, you can set a different rotation for each page independently.",
+          },
+          {
+            question: "What rotation angles are supported?",
+            answer: "You can rotate pages by 90°, 180°, or 270° clockwise.",
+          },
+          {
+            question: "Does rotation affect PDF quality?",
+            answer:
+              "No. Rotation only changes orientation — all content remains at full quality, and text stays selectable since the PDF is never flattened into images.",
+          },
+          {
+            question: "Is my PDF uploaded to a server?",
+            answer: "No. All processing happens in your browser using pdf-lib — your file is never sent anywhere.",
+          },
+          {
+            question: "Can I rotate password-protected PDFs?",
+            answer:
+              "Password-protected PDFs are not currently supported. Remove the password first using a PDF unlock tool, then rotate the pages.",
+          },
+          {
+            question: "Can I rotate only some pages and leave others untouched?",
+            answer:
+              "Yes. Click each page individually to set its own rotation — pages you don't touch keep their original orientation.",
+          },
+          {
+            question: "Will the file size change after rotating?",
+            answer:
+              "No meaningful change. Rotation only updates a page-orientation flag in the PDF, so the file size stays essentially the same as the original.",
+          },
+          {
+            question: "Is there a page limit?",
+            answer:
+              "There is no hard page limit, but very large PDFs (hundreds of pages) may take a few extra seconds to render thumbnails since everything processes in your browser.",
+          },
+        ]}
       />
+      <RelatedTools currentSlug="rotate-pdf" />
     </ToolPageShell>
   );
 }

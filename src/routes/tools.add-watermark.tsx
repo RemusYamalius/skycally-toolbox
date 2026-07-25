@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -8,8 +8,38 @@ import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
+// SEO NOTE: Search Console shows real demand for "add watermark" (66
+// impressions) and "create watermark" (60 impressions), both at position
+// ~44 (page 4-5) with zero clicks. Custom title below leads with both
+// proven phrases instead of the generic buildToolMeta template.
 export const Route = createFileRoute("/tools/add-watermark")({
-  head: () => buildToolMeta(toolBySlug("add-watermark", tools)),
+  head: () => {
+    const tool = toolBySlug("add-watermark", tools);
+    const title = "Add Watermark to Image Online — Free Watermark Creator | Skycally";
+    const description =
+      "Add or create a text watermark on any image online, free. Adjustable position, opacity, size and rotation. No signup, batch mode, runs in your browser.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Add Watermark",
+            alternateName: ["Watermark Creator", "Create Watermark", "Image Watermark Tool"],
+            applicationCategory: "MultimediaApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: AddWatermark,
 });
 
@@ -283,8 +313,8 @@ function AddWatermark() {
       />
 
       <ToolSeoContent
-        title="Free Watermark Tool — Add Text Watermarks to Images Online"
-        description="Add custom text watermarks to any image for free. Control text, font size, opacity, color, and position. Runs entirely in your browser — no upload, no signup, download as PNG."
+        title="Add Watermark to Image Online — Free Watermark Creator"
+        description="Add or create a custom text watermark on any image for free. Control text, font size, opacity, color, and position. Runs entirely in your browser — no upload, no signup, download as PNG."
         body={[
           "Skycally's Add Watermark tool lets you permanently stamp any image with a custom text watermark in seconds — directly in your browser. Type your watermark text, customize the font size, opacity, color, and choose from 9 placement positions, then click Apply to see the result and download it as a PNG.",
           "Watermarking is essential for photographers, content creators, and businesses who share images online. A well-placed watermark protects your work from unauthorized use, establishes brand identity, and makes it clear who created or owns the content. With opacity control from 10% to 100%, you can make the watermark subtle and professional or bold and visible depending on your needs.",

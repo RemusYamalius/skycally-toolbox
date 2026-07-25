@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState, useMemo, useCallback } from "react";
 import { Copy, Trash2, ClipboardPaste, BarChart2 } from "lucide-react";
@@ -10,8 +10,55 @@ import { HowToUse } from "@/components/how-to-use";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
+// SEO NOTE: Search Console shows real, proven demand for this exact cluster
+// of phrasings — all currently ranking around position 27-39 (page 3-4) with
+// ZERO clicks despite thousands of combined impressions: "word counter
+// online" (821 impr), "online word counter" (617), "word count online"
+// (546), "word calculator" (457), "online word count" (362), "words counter
+// online" (328), "count my words" (299), "words calculator online" (283),
+// "word count generator" (203). The title/description/body below are tuned
+// to naturally cover these specific variants rather than the generic
+// buildToolMeta() template, since the tool clearly already works — this is
+// a ranking/relevance problem, not a functionality problem.
+
+const SLUG = "word-counter";
+
 export const Route = createFileRoute("/tools/word-counter")({
-  head: () => buildToolMeta(toolBySlug("word-counter", tools)),
+  head: () => {
+    const tool = toolBySlug(SLUG, tools);
+    const title = "Word Counter Online — Free Word & Character Count Calculator | Skycally";
+    const description =
+      "Free online word counter and character count calculator. Count words, characters, sentences and paragraphs instantly — no signup, works in your browser.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Word Counter",
+            alternateName: ["Word Count Online", "Word Calculator", "Words Counter"],
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: [
+              "Live word count and character count as you type",
+              "Counts sentences, paragraphs and lines",
+              "Estimates reading time and speaking time",
+              "Shows unique word count and average word length",
+              "No signup required",
+              "100% browser-based — text never leaves your device",
+              "Free forever, no word limit",
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: WordCounterPage,
 });
 
@@ -172,7 +219,7 @@ function WordCounterPage() {
   return (
     <ToolPageShell
       title="Word Counter"
-      description="Count words, characters, sentences, paragraphs and reading time — updates live as you type."
+      description="Free online word count and character count calculator — count words, characters, sentences, paragraphs and reading time live as you type."
     >
       <div className="space-y-4">
         {/* ── Primary stats ── */}
@@ -306,18 +353,24 @@ function WordCounterPage() {
       />
 
       <ToolSeoContent
-        title="Free Word Counter — Count Words, Characters, Sentences & Reading Time Online"
-        description="Instantly count words, characters (with and without spaces), sentences, paragraphs and lines in any text. Estimates reading time and speaking time. Updates live as you type. Free, no signup, no limit."
+        title="Word Counter Online — Free Word & Character Count Calculator"
+        description="Instantly count words, characters (with and without spaces), sentences, paragraphs and lines in any text. This free online word counter and word calculator estimates reading time and speaking time, updating live as you type — no signup, no limit."
         body={[
-          "Skycally's Word Counter gives you a complete picture of any text in real time. Paste an essay, blog post, email, speech or tweet and instantly see the word count, character count (with and without spaces), sentence count, paragraph count, line count, estimated silent reading time, estimated speaking time, unique word count and average word length — all updating as you type, with no button to press. The tool works entirely in your browser and never sends your text to any server.",
-          "Writers use word counters to hit publication targets — a standard news article runs 400–800 words, a blog post 1,000–2,500 words, a short story 1,000–7,500 words, and a novel 80,000+ words. Academic and professional writing platforms impose strict word or character limits: Twitter/X allows 280 characters per post, LinkedIn recommendations cap at 3,000 characters, and most university essays specify a word count range. Skycally's counter covers all these cases at once. The 'Top Words' feature also surfaces your most-used terms, which doubles as a basic keyword density tool for SEO writers.",
+          "Skycally's Word Counter gives you a complete picture of any text in real time. Paste an essay, blog post, email, speech or tweet and instantly see the word count, character count (with and without spaces), sentence count, paragraph count, line count, estimated silent reading time, estimated speaking time, unique word count and average word length — all updating as you type, with no button to press. Whether you search for 'word counter online', 'word count online', or 'word calculator', this is the same tool: a fast, accurate way to count my words and characters directly in the browser, with nothing sent to a server.",
+          "Writers use a word counter or word count generator to hit publication targets — a standard news article runs 400–800 words, a blog post 1,000–2,500 words, a short story 1,000–7,500 words, and a novel 80,000+ words. Academic and professional writing platforms impose strict word or character limits: X (Twitter) allows 280 characters per post, LinkedIn recommendations cap at 3,000 characters, and most university essays specify a word count range. Skycally's counter covers all these cases at once. The 'Top Words' feature also surfaces your most-used terms, which doubles as a basic keyword density tool for SEO writers.",
           "Reading time is calculated at 238 words per minute — the average silent reading speed for adult English readers, based on research published in the journal Reading and Writing. Speaking time uses 130 words per minute, the pace recommended for presentations and podcasts to be clearly understood. Both estimates are approximations and vary by content complexity and individual reader speed, but they give a reliable starting point for planning speeches, video scripts and blog posts.",
+          "Some people look for a 'word calculator' rather than a 'word counter' — both terms describe exactly the same tool here. Whether you need to count words online for a school essay, check a caption fits a character limit, or calculate the word count of a manuscript before submission, this single free tool covers every version of that request without needing a separate 'words counter online' or 'word count generator' tool.",
         ]}
         faqs={[
           {
             question: "Does the word counter update in real time?",
             answer:
               "Yes. Every stat — words, characters, sentences, paragraphs, lines, reading time, speaking time, unique words and average word length — updates instantly as you type or paste text. There is no submit button.",
+          },
+          {
+            question: "Is this the same as a 'word calculator' or 'word count generator'?",
+            answer:
+              "Yes. 'Word counter', 'word calculator', 'word count generator' and 'words counter online' all describe the same task — counting the words and characters in a piece of text. This tool covers all of them in one place, free and with no signup.",
           },
           {
             question: "How is reading time calculated?",
@@ -357,7 +410,7 @@ function WordCounterPage() {
         ]}
       />
 
-      <RelatedTools currentSlug="word-counter" />
+      <RelatedTools currentSlug={SLUG} />
     </ToolPageShell>
   );
 }

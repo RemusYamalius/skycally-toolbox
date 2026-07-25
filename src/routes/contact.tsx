@@ -9,25 +9,20 @@ import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@
 import { Accordion, AccordionContent, AccordionItem, AccordionTrigger } from "@/components/ui/accordion";
 import { buildPageMeta } from "@/lib/seo";
 
-// 🔧 Replace with your real Formspree form ID after signing up at https://formspree.io
+// Formspree form ID — confirmed working (tested end-to-end, delivers to inbox).
 const FORMSPREE_ID = "mbdwpooo";
 
 export const Route = createFileRoute("/contact")({
-  head: () => buildPageMeta({
-    title: "Contact Skycally — We'd Love to Hear From You",
-    description: "Get in touch with the Skycally team. We welcome feedback, suggestions, and partnership inquiries.",
-    path: "/contact",
-  }),
+  head: () =>
+    buildPageMeta({
+      title: "Contact Skycally — We'd Love to Hear From You",
+      description: "Get in touch with the Skycally team. We welcome feedback, suggestions, and partnership inquiries.",
+      path: "/contact",
+    }),
   component: ContactPage,
 });
 
-const SUBJECTS = [
-  "General Question",
-  "Bug Report",
-  "Feature Request",
-  "Business Inquiry",
-  "Other",
-] as const;
+const SUBJECTS = ["General Question", "Bug Report", "Feature Request", "Business Inquiry", "Other"] as const;
 
 const schema = z.object({
   name: z.string().trim().min(1, "Please enter your name").max(100),
@@ -50,7 +45,7 @@ const FAQS = [
   },
   {
     q: "How do I report a bug or suggest a feature?",
-    a: "Use the contact form above or select \"Bug Report\" or \"Feature Request\" from the subject dropdown. We read every message and use your feedback to improve Skycally.",
+    a: 'Use the contact form above or select "Bug Report" or "Feature Request" from the subject dropdown. We read every message and use your feedback to improve Skycally.',
   },
   {
     q: "Can I use Skycally on mobile?",
@@ -124,7 +119,9 @@ function ContactPage() {
         <form onSubmit={onSubmit} className="space-y-5" noValidate>
           <div className="grid sm:grid-cols-2 gap-5">
             <div>
-              <label htmlFor="name" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Name *</label>
+              <label htmlFor="name" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Name *
+              </label>
               <Input
                 id="name"
                 value={form.name}
@@ -137,7 +134,9 @@ function ContactPage() {
               {errors.name && <p className="mt-1 text-xs text-red-400">{errors.name}</p>}
             </div>
             <div>
-              <label htmlFor="email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Email *</label>
+              <label htmlFor="email" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+                Email *
+              </label>
               <Input
                 id="email"
                 type="email"
@@ -159,13 +158,19 @@ function ContactPage() {
                 <SelectValue />
               </SelectTrigger>
               <SelectContent>
-                {SUBJECTS.map((s) => <SelectItem key={s} value={s}>{s}</SelectItem>)}
+                {SUBJECTS.map((s) => (
+                  <SelectItem key={s} value={s}>
+                    {s}
+                  </SelectItem>
+                ))}
               </SelectContent>
             </Select>
           </div>
 
           <div>
-            <label htmlFor="message" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Message *</label>
+            <label htmlFor="message" className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">
+              Message *
+            </label>
             <Textarea
               id="message"
               rows={5}
@@ -200,7 +205,13 @@ function ContactPage() {
           {status === "error" && (
             <div className="flex items-start gap-3 rounded-xl border border-red-500/30 bg-red-500/10 p-4 text-sm text-red-300">
               <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
-              <span>❌ Something went wrong. Please try emailing us directly at <a href="mailto:support@skycally.com" className="underline">support@skycally.com</a>.</span>
+              <span>
+                ❌ Something went wrong. Please try emailing us directly at{" "}
+                <a href="mailto:skycally.tools@gmail.com" className="underline">
+                  skycally.tools@gmail.com
+                </a>
+                .
+              </span>
             </div>
           )}
         </form>
@@ -209,11 +220,26 @@ function ContactPage() {
       {/* Info cards */}
       <section className="mt-10 grid gap-4 sm:grid-cols-3">
         {[
-          { Icon: Mail, title: "Email Us", value: "support@skycally.com", sub: "We reply within 24 hours", color: "var(--cyan-brand)" },
-          { Icon: Zap, title: "Quick Response", value: "24 hours", sub: "Monday to Friday", color: "var(--violet-brand)" },
+          {
+            Icon: Mail,
+            title: "Email Us",
+            value: "skycally.tools@gmail.com",
+            sub: "We reply within 24 hours",
+            color: "var(--cyan-brand)",
+          },
+          {
+            Icon: Zap,
+            title: "Quick Response",
+            value: "24 hours",
+            sub: "Monday to Friday",
+            color: "var(--violet-brand)",
+          },
           { Icon: Globe, title: "Follow Us", value: "@skycally", sub: "Updates and tips", color: "#22c55e" },
         ].map((c) => (
-          <div key={c.title} className="bg-card border border-border rounded-2xl p-5 transition hover:border-foreground/20 hover:-translate-y-0.5">
+          <div
+            key={c.title}
+            className="bg-card border border-border rounded-2xl p-5 transition hover:border-foreground/20 hover:-translate-y-0.5"
+          >
             <div
               className="w-10 h-10 rounded-xl flex items-center justify-center mb-3"
               style={{ background: `color-mix(in oklab, ${c.color} 15%, transparent)`, color: c.color }}

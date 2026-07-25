@@ -15,7 +15,7 @@ import {
   Heart,
 } from "lucide-react";
 
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildToolMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
@@ -29,8 +29,40 @@ import { Button } from "@/components/ui/button";
 import { generateBios, PLATFORM_LIMITS } from "@/lib/ai-bio-generator.functions";
 import { platformLength } from "@/lib/fancy-text/styles";
 
+const SLUG = "ai-bio-generator";
+
 export const Route = createFileRoute("/tools/ai-bio-generator")({
-  head: () => buildToolMeta(toolBySlug("ai-bio-generator", tools)),
+  head: () => {
+    const tool = toolBySlug(SLUG, tools);
+    const base = buildToolMeta(tool);
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "AI Bio Generator",
+            description:
+              "Free AI bio generator for Instagram, TikTok, X (Twitter), LinkedIn About and dating apps. Accurate per-platform character limits, multiple variations, no signup, no credit limits.",
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            url: `${SITE_URL}/tools/ai-bio-generator`,
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            featureList: [
+              "AI-generated bios for Instagram, TikTok, X, LinkedIn About and dating apps",
+              "Platform-accurate character limits with UTF-16-aware counting",
+              "Platform-specific structure (short emoji lines, single-line separators, first-person paragraphs, conversational hooks)",
+              "3 to 5 distinct variations per generation",
+              "Tone and emoji-density controls",
+              "Free — no signup, no email, no credit limits, unlimited regenerations",
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: AiBioGenerator,
 });
 
@@ -94,7 +126,7 @@ function errorToMessage(err: unknown): string {
 const SEO_BODY = [
   "The AI Bio Generator writes short, personal bios for the profiles people actually use every day — Instagram, TikTok, X (Twitter), LinkedIn About, and dating apps. Unlike our AI Cover Letter Generator, AI Resume Builder and AI Email Writer, which are built for job hunting and professional correspondence, this tool is for the personal side of your online presence: the little slice of text at the top of a profile that tells the world who you are. Give it your role, a few real interests, a tone, and it generates several complete variations you can pick from — free, no signup, no daily cap.",
   "Character limits on social platforms are counted in UTF-16 code units, not visible characters, and this is where most bio generators quietly fail. A single emoji can cost 2 units even though it looks like one character, and many decorative Unicode letters (the kind fancy-text tools produce) cost 2 units per letter as well. This tool shows you the exact platform limit for whichever profile you're writing for — Instagram ~150, TikTok ~80, X ~160, LinkedIn ~2600, dating apps around 500 — and counts every generated variation the same way the platform will, so what fits here really fits when you paste it in.",
-  "The output quality depends on the specificity of your inputs. A role like \"designer\" produces generic filler; \"product designer at a fintech startup, mostly mobile\" gives the AI something real to work with. The same goes for interests: \"travel, coffee, music\" is weak; \"third-wave espresso, mountain trail running, lo-fi beats\" is specific enough that the bio can actually reference those things instead of listing hobbies. Pair specific inputs with the right tone (funny, professional, minimalist, aesthetic, or bold) and an emoji density that matches the platform's culture.",
+  'The output quality depends on the specificity of your inputs. A role like "designer" produces generic filler; "product designer at a fintech startup, mostly mobile" gives the AI something real to work with. The same goes for interests: "travel, coffee, music" is weak; "third-wave espresso, mountain trail running, lo-fi beats" is specific enough that the bio can actually reference those things instead of listing hobbies. Pair specific inputs with the right tone (funny, professional, minimalist, aesthetic, or bold) and an emoji density that matches the platform\'s culture.',
   "This tool is completely free with no signup, no email capture, no credit system, and no daily generation cap. Most competitors — Copy.ai, Later, Simplified and similar — either gate output behind an account or throttle free users after a few generations. Skycally's bio generator gives you full-length results every single time. Regenerate as many times as you want until a variation feels right, then copy it with one click. Your inputs are used only to produce the bios and are never stored on our servers.",
 ];
 
@@ -142,7 +174,7 @@ const SEO_FAQS = [
 ];
 
 function AiBioGenerator() {
-  const tool = toolBySlug("ai-bio-generator", tools);
+  const tool = toolBySlug(SLUG, tools);
 
   const [form, setForm] = useState<FormState>(DEFAULTS);
   const [bios, setBios] = useState<string[]>([]);
@@ -171,11 +203,9 @@ function AiBioGenerator() {
     }
   }, [form]);
 
-  const update = <K extends keyof FormState>(k: K, v: FormState[K]) =>
-    setForm((p) => ({ ...p, [k]: v }));
+  const update = <K extends keyof FormState>(k: K, v: FormState[K]) => setForm((p) => ({ ...p, [k]: v }));
 
-  const canSubmit =
-    form.role.trim().length > 0 && form.interests.trim().length > 0 && !loading;
+  const canSubmit = form.role.trim().length > 0 && form.interests.trim().length > 0 && !loading;
 
   const canSubmitRef = useRef(canSubmit);
   canSubmitRef.current = canSubmit;
@@ -230,10 +260,7 @@ function AiBioGenerator() {
   }
 
   const limit = PLATFORM_LIMITS[form.platform];
-  const activePlatform = useMemo(
-    () => PLATFORMS.find((p) => p.id === form.platform)!,
-    [form.platform],
-  );
+  const activePlatform = useMemo(() => PLATFORMS.find((p) => p.id === form.platform)!, [form.platform]);
 
   return (
     <ToolPageShell title={tool.name} description={tool.description} showFileDisclaimer={false}>
@@ -261,8 +288,7 @@ function AiBioGenerator() {
                 style={
                   active
                     ? {
-                        background:
-                          "color-mix(in oklch, var(--cyan-brand) 12%, var(--card))",
+                        background: "color-mix(in oklch, var(--cyan-brand) 12%, var(--card))",
                       }
                     : undefined
                 }
@@ -273,16 +299,14 @@ function AiBioGenerator() {
                   aria-hidden="true"
                 />
                 <div className="text-sm font-medium">{label}</div>
-                <div className="text-xs text-muted-foreground">
-                  ~{PLATFORM_LIMITS[id]} chars
-                </div>
+                <div className="text-xs text-muted-foreground">~{PLATFORM_LIMITS[id]} chars</div>
               </motion.button>
             );
           })}
         </div>
         <p className="mt-2 text-xs text-muted-foreground">
-          <strong>{activePlatform.label} convention:</strong> {activePlatform.hint}. Limit:{" "}
-          {limit} characters (UTF-16, so emoji count as 2).
+          <strong>{activePlatform.label} convention:</strong> {activePlatform.hint}. Limit: {limit} characters (UTF-16,
+          so emoji count as 2).
         </p>
       </div>
 
@@ -485,9 +509,7 @@ function AiBioGenerator() {
                     transition={{ duration: 0.25, delay: i * 0.04 }}
                     className="rounded-lg border border-border bg-background/40 p-3"
                   >
-                    <article className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">
-                      {bio}
-                    </article>
+                    <article className="whitespace-pre-wrap text-sm leading-relaxed text-foreground/90">{bio}</article>
                     <div className="mt-2 flex items-center justify-between gap-2 flex-wrap">
                       <span
                         className={
@@ -497,9 +519,7 @@ function AiBioGenerator() {
                             : "border-border bg-secondary/60 text-muted-foreground")
                         }
                         aria-label={
-                          over
-                            ? `Over limit by ${len - limit} characters`
-                            : `${len} of ${limit} characters used`
+                          over ? `Over limit by ${len - limit} characters` : `${len} of ${limit} characters used`
                         }
                       >
                         {len} / {limit}
@@ -524,9 +544,8 @@ function AiBioGenerator() {
 
           {!loading && bios.length === 0 && !error && (
             <p className="text-sm text-muted-foreground">
-              Pick a platform, describe what you do, add a few real interests, and click{" "}
-              <strong>Generate bios</strong>. Several variations will appear here — each with a
-              live character count against the platform's real limit.
+              Pick a platform, describe what you do, add a few real interests, and click <strong>Generate bios</strong>.
+              Several variations will appear here — each with a live character count against the platform's real limit.
             </p>
           )}
 
@@ -542,8 +561,7 @@ function AiBioGenerator() {
       {bios.length > 0 && !loading && (
         <section className="mt-6 rounded-2xl border border-border bg-card/40 p-5 text-sm text-muted-foreground space-y-2">
           <p>
-            Happy with a variation? Style your new bio with decorative Unicode text before you post
-            it using the{" "}
+            Happy with a variation? Style your new bio with decorative Unicode text before you post it using the{" "}
             <Link
               to="/tools/fancy-text-generator"
               className="text-primary underline underline-offset-2 hover:text-primary/80 transition-colors"
@@ -589,7 +607,7 @@ function AiBioGenerator() {
         faqs={SEO_FAQS}
       />
 
-      <RelatedTools currentSlug="ai-bio-generator" />
+      <RelatedTools currentSlug={SLUG} />
     </ToolPageShell>
   );
 }

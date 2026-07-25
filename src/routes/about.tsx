@@ -1,14 +1,34 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
-import { buildPageMeta } from "@/lib/seo";
+import { buildPageMeta, SITE_URL } from "@/lib/seo";
+import { TOOL_COUNT } from "@/lib/tools";
 
 export const Route = createFileRoute("/about")({
-  head: () =>
-    buildPageMeta({
-      title: "About Skycally — 90+ Free Browser Tools, No Signup Required",
-      description:
-        "Skycally is a free online toolkit with 90+ tools for images, PDFs, video, audio, calculators and more. Everything runs in your browser — no signup, no uploads, no limits.",
-      path: "/about",
-    }),
+  head: () => {
+    const title = `About Skycally — ${TOOL_COUNT}+ Free Browser Tools, No Signup Required`;
+    const description = `Skycally is a free online toolkit with ${TOOL_COUNT}+ tools for images, PDFs, video, audio, calculators and more. Everything runs in your browser — no signup, no uploads, no limits.`;
+    const base = buildPageMeta({ title, description, path: "/about" });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "AboutPage",
+            name: "About Skycally",
+            description,
+            url: `${SITE_URL}/about`,
+            mainEntity: {
+              "@type": "Organization",
+              name: "Skycally",
+              url: SITE_URL,
+              description: `A free online toolkit with ${TOOL_COUNT}+ browser-based tools — no signup required.`,
+            },
+          }),
+        },
+      ],
+    };
+  },
   component: AboutPage,
 });
 
@@ -18,8 +38,8 @@ function AboutPage() {
       <header className="mb-12">
         <h1 className="font-display text-4xl sm:text-5xl font-bold tracking-tight leading-tight">About Skycally</h1>
         <p className="mt-6 text-lg text-muted-foreground leading-relaxed">
-          Skycally is a free, browser-based toolkit with 90+ tools for images, PDFs, video, audio, text, finance, and
-          more — all running directly in your browser. No account. No file uploads. No paywalls.
+          Skycally is a free, browser-based toolkit with {TOOL_COUNT}+ tools for images, PDFs, video, audio, text,
+          finance, and more — all running directly in your browser. No account. No file uploads. No paywalls.
         </p>
       </header>
 
@@ -48,9 +68,15 @@ function AboutPage() {
           your files — because they never reach us in the first place.
         </p>
         <p className="text-muted-foreground mt-4">
-          A small number of tools (currently Audio Converter and Video Downloader) require brief server-side processing.
-          In these cases, files are transmitted securely over HTTPS and deleted immediately after the operation
-          completes — never stored, never shared.
+          A small number of tools require server-side processing: our AI generation tools (AI Cover Letter Generator, AI
+          Resume Builder, AI Email Writer, AI Bio Generator, and AI Image Generator) send your prompt to an AI provider
+          to generate a result, and a small number of media tools (such as Audio Converter) process files briefly on our
+          server. In every case, data is sent securely over HTTPS and is not stored beyond what's needed to return your
+          result — see our{" "}
+          <Link to="/privacy" className="text-foreground underline underline-offset-2 hover:opacity-80">
+            Privacy Policy
+          </Link>{" "}
+          for full details.
         </p>
       </section>
 
@@ -126,7 +152,7 @@ function AboutPage() {
       {/* CTA */}
       <section className="rounded-2xl border border-border bg-card p-6 text-center">
         <h2 className="font-display text-xl font-bold mb-2">Ready to get started?</h2>
-        <p className="text-muted-foreground text-sm mb-5">Browse all 90+ tools — no signup needed.</p>
+        <p className="text-muted-foreground text-sm mb-5">Browse all {TOOL_COUNT}+ tools — no signup needed.</p>
         <Link
           to="/tools"
           className="inline-block rounded-xl bg-foreground text-background font-semibold px-6 py-3 hover:opacity-90 transition"

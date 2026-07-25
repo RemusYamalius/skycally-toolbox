@@ -1,40 +1,56 @@
-# AI Bio Generator — `/tools/ai-bio-generator`
+# Macro Calculator — `/tools/macro-calculator`
 
-Personal/social bio generator (Instagram, TikTok, X, LinkedIn About, Dating), distinct from the professional AI writing tools. Follows the exact conventions of the existing AI writing tools on the site.
+Protein-first macro breakdown tool, independent from the Calorie Calculator, matching Skycally's tool conventions.
 
 ## Files to create
 
-1. **`src/lib/ai-bio-generator.functions.ts`** — TanStack `createServerFn` mirroring `ai-email-writer.functions.ts` exactly (same fetch to `https://ai.gateway.lovable.dev/v1/chat/completions`, same key handling, same 429/402/GENERATION_FAILED errors, same `google/gemini-2.5-flash` model). Input schema: `platform` (`instagram` | `tiktok` | `twitter` | `linkedin` | `dating`), `name` (opt), `role`, `interests`, `tone` (`funny` | `professional` | `minimalist` | `aesthetic` | `bold`), `emojiDensity` (`none` | `light` | `heavy`), `variations` (3–5). Returns `{ bios: string[] }`. Prompt instructs the model to:
-   - Produce exactly N variations separated by a stable delimiter (e.g. `---`) so we can split reliably.
-   - Respect platform-specific structural convention (IG: short lines each led by an emoji; X: single line, `·`/`|` separators; LinkedIn: first-person paragraph; TikTok: 2–3 punchy lines; Dating: conversational, end with a hook question).
-   - Stay under the platform character limit (IG 150, TikTok 80, X 160, LinkedIn 2600, Dating 500) — counted as UTF-16 code units.
-   - Use the exact `role`/`interests` specifics, not generic filler.
-   Parse response by splitting on the delimiter, trimming, filtering empties, clamping to requested count.
+1. **`src/lib/macro/calc.ts`** — pure calculation module:
+   - `mifflinStJeor({ sex, age, heightCm, weightKg })` and `katchMcArdle({ weightKg, bodyFatPct })` BMR formulas.
+   - Activity multipliers: sedentary 1.2, light 1.375, moderate 1.55, active 1.725, very active 1.9.
+   - `computeCalories(bmr, activity, goal)` where goal ∈ `cutting` (−20%), `maintenance` (0%), `bulk` (+12%).
+   - `computeMacros({ calories, weightKg, proteinPerKg, goal, fatMode })`:
+     - Protein grams = `weightKg * proteinPerKg` (defaults: cut 2.3, maint 1.8, bulk 1.9).
+     - Fat floor = max(`weightKg * 0.8 g/kg`, `0.25 * calories / 9`), user-adjustable in a range.
+     - Carbs = remainder / 4. If carbs < 0 → return `{ warning: "Calorie target too low for protein + fat floor" }` with the deficit surfaced.
+   - Unit helper for lb↔kg, in↔cm.
+   - `foodEquivalence(macro, grams)` returning short strings (e.g. protein → chicken breast ≈ 30 g each; carbs → cup cooked rice ≈ 45 g; fat → tbsp olive oil ≈ 14 g).
 
-2. **`src/routes/tools.ai-bio-generator.tsx`** — Route mirroring `tools.ai-email-writer.tsx` structure:
-   - Form: platform select (with visible limit + structural convention hint per platform), name/handle input, role textarea, interests textarea, tone select, emoji density select, variation count (3/4/5), Generate button, Regenerate button after first result.
-   - Results list: each variation in a card with copy button, character counter `X / LIMIT` using `platformLength` from `@/lib/fancy-text/styles` (UTF-16-aware, already solves lesson 6), red badge when over limit.
-   - Loading / error states matching email writer.
-   - **Contextual internal links block placed immediately after the results list**, before AdZone/HowToUse: Fancy Text Generator (required framing: "style your new bio with decorative Unicode text before you post"), AI Writing Assistant ("polish or grammar-check"), Word Counter ("double-check length for platforms not listed here"). All via `<Link to="...">` from `@tanstack/react-router`.
-   - Section order after results + internal links: `AdZone` → `HowToUse` → `ToolSeoContent` → `RelatedTools` (matches lesson 4; every other AI writing tool uses this order).
-   - `ToolSeoContent` `body` is 4 plain-string paragraphs (no JSX/Link inside — lesson 3); 8 FAQs as listed in spec.
-   - `head`: `buildToolMeta(toolBySlug("ai-bio-generator", tools))` — `buildToolMeta` already emits the `WebApplication` JSON-LD schema (lesson 1 satisfied via the shared helper, same as every other tool).
+2. **`src/routes/tools.macro-calculator.tsx`** — route, mirrors calculator page patterns (Retirement / Rent-vs-Buy):
+   - `ToolPageShell` with title/description, `showFileDisclaimer={false}`.
+   - Left column input panel:
+     - **Primary**: "Daily calorie target" number input + unit toggle (kcal).
+     - **Body weight** input (needed for protein g/kg) with kg/lb toggle.
+     - **Goal** segmented control: Cutting / Maintenance / Lean Bulk — adjusts default protein g/kg + shows resulting deficit/surplus badge.
+     - **Protein slider** (1.2–2.6 g/kg) with live g and kcal readout.
+     - **Fat slider** (0.5–1.5 g/kg, floor enforced) with live readout.
+     - Collapsible **"I don't know my calorie target"** section (`<details>` styled): age, sex, height (cm/in), weight synced with above, activity level select, optional body-fat % (unlocks Katch-McArdle radio, otherwise Mifflin-St Jeor). "Use this calorie number" button fills the target field; user can still edit.
+   - Right column results:
+     - Donut chart (custom SVG, matching site's chart style — same approach as paycheck donut) showing protein/carbs/fat by kcal share.
+     - Three macro cards color-coded (protein cyan, carbs amber, fat rose using existing tokens), each with grams, kcal, %, and food-equivalence line.
+     - Total calories headline + goal delta.
+     - Warning banner when carbs go negative.
+     - Optional per-meal breakdown (3 or 4 meals toggle) — grams per meal per macro.
+   - **Contextual internal links block directly under results** (before AdZone):
+     - `<Link to="/tools/calorie-calculator">` — "Don't have a calorie target yet? Get a fuller breakdown with the Calorie Calculator."
+     - `<Link to="/tools/intermittent-fasting-calculator">` — "Planning to hit these macros within a fasting window? Find your schedule."
+     - `<Link to="/tools/heart-rate-zone-calculator">` — "Training toward a cut or bulk? Dial in your cardio zones too."
+   - Disclaimer note (general fitness planning, not medical advice — see a dietitian for medical conditions).
+   - Order: results + internal links → `AdZone` → `HowToUse` (3 steps) → `ToolSeoContent` (4 body paragraphs, 8 FAQs) → `RelatedTools`.
+   - `head: () => buildToolMeta(toolBySlug("macro-calculator", tools))` — JSON-LD `WebApplication` schema comes from `buildToolMeta` (matches every other tool).
 
 3. **Registrations:**
-   - `src/lib/tools.ts` — add `ai-bio-generator` entry in the AI category with icon (e.g. `Sparkles` or `UserRound`), path `/tools/ai-bio-generator`, description targeting keywords "AI bio generator, Instagram bio generator, TikTok bio generator, dating profile bio — free, no signup, no credit limits".
-   - `src/lib/related-tools.ts` — link to/from Fancy Text Generator, AI Writing Assistant, AI Email Writer, Word Counter.
+   - `src/lib/tools.ts` — add `macro-calculator` in the utility/health category with an appropriate lucide icon (e.g. `PieChart`), path `/tools/macro-calculator`, description targeting "macro calculator, protein carb fat calculator, macro calculator for cutting and bulking — free, complete breakdown, no signup".
+   - `src/lib/related-tools.ts` — cross-link with calorie-calculator, intermittent-fasting-calculator, heart-rate-zone-calculator, bmi-calculator.
    - `public/sitemap.xml` — add URL entry.
-   - `public/llms.txt` — add tool description line.
+   - `public/llms.txt` — add tool line under Utilities & Calculators.
 
-## Lessons applied (verification checklist before finishing)
-
-1. JSON-LD schema present via `buildToolMeta` (same helper as all sibling tools). ✓
-2. Internal links rendered directly under results, above AdZone/HowToUse/ToolSeoContent. ✓
-3. `ToolSeoContent.body` = 4 plain strings, no embedded JSX/Link. ✓
-4. Order: results → internal links → AdZone → HowToUse → ToolSeoContent → RelatedTools. ✓
-5. Reuse the exact `fetch` + gateway pattern from `ai-email-writer.functions.ts`. No new integration. ✓
-6. Character counting uses existing `platformLength` (UTF-16 code units) from `src/lib/fancy-text/styles.ts`. ✓
+## Checklist compliance
+1. JSON-LD via `buildToolMeta` ✓
+2. All internal links use `<Link to=...>` from `@tanstack/react-router` ✓
+3. Contextual links immediately below results, above AdZone/HowToUse/ToolSeoContent ✓
+4. `ToolSeoContent.body` = 4 plain strings, no JSX ✓
+5. Order HowToUse → ToolSeoContent → RelatedTools ✓
+6. No shared state with Calorie Calculator; only an optional `<Link>` ✓
 
 ## Non-goals
-
-No signup, no rate limiting, no credit UI. No new dependencies.
+No signup, no persistence, no new dependencies (chart is inline SVG matching paycheck donut pattern).

@@ -128,6 +128,7 @@ function AgeCalculator() {
           "Skycally's Age Calculator computes your precise age the moment you select your date of birth. Instead of just a year count, you get a complete breakdown: years, months, and days — the same level of precision used in medical records, legal documents, and official paperwork. The calculation correctly handles varying month lengths and leap years.",
           "Beyond your age, the tool shows total days, weeks, hours, and minutes you've been alive — figures that are surprisingly large and often put life into perspective. It also calculates your next birthday date and exactly how many days remain, which is useful for planning celebrations, gifts, or surprises.",
           "The calculator works for any date of birth — use it for yourself, your children, friends, historical figures, or even fictional characters. Everything runs locally in your browser with no data stored or transmitted.",
+          "Exact age calculations come up more often than people expect: eligibility checks for age-restricted services, verifying a child's age for school enrollment cutoffs, calculating a pet's age in human-equivalent terms, or simply settling a friendly debate about who is older down to the day. Because the tool works with any two dates, it also works as a general date-difference calculator when you need the age someone was (or will be) on a specific date rather than today.",
         ]}
         faqs={[
           {

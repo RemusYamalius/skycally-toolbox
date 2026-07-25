@@ -15,7 +15,6 @@ import {
   Zap,
   Shield,
   Star,
-  BarChart3,
 } from "lucide-react";
 
 import { tools, categoryMeta, type ToolCategory } from "@/lib/tools";
@@ -63,7 +62,6 @@ const QUICK_CATS = [
   { icon: Music, label: "Audio", cat: "audio" as const },
   { icon: FileText, label: "PDF", cat: "pdf" as const },
   { icon: Type, label: "Text", cat: "text" as const },
-  { icon: BarChart3, label: "SEO", cat: "seo" as const },
   { icon: Wrench, label: "Utility", cat: "utility" as const },
   { icon: Gamepad2, label: "Games", cat: "games" as const },
   { icon: Joystick, label: "Mini Games", cat: "minigames" as const },
@@ -95,9 +93,20 @@ function HeroParticles() {
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
-    type P = { x: number; y: number; vx: number; vy: number; r: number; hue: 0 | 1; base: number; phase: number; freq: number };
+    type P = {
+      x: number;
+      y: number;
+      vx: number;
+      vy: number;
+      r: number;
+      hue: 0 | 1;
+      base: number;
+      phase: number;
+      freq: number;
+    };
     let particles: P[] = [];
-    let w = 0, h = 0;
+    let w = 0,
+      h = 0;
     let raf = 0;
     let last = performance.now();
     let running = true;
@@ -198,7 +207,6 @@ function HeroParticles() {
   }, []);
   return <canvas ref={ref} className="absolute inset-0 w-full h-full" aria-hidden="true" />;
 }
-
 
 function TypedWord() {
   const [idx, setIdx] = useState(0);
@@ -302,7 +310,6 @@ function HomePage() {
         <div className="absolute inset-0 pointer-events-none overflow-hidden" aria-hidden="true">
           <HeroParticles />
         </div>
-
 
         <div className="relative w-full max-w-6xl mx-auto px-4 sm:px-6 py-20 text-center">
           <div className="hero-fade-up">

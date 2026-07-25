@@ -334,7 +334,8 @@ export const tools: Tool[] = [
   {
     slug: "fancy-text-generator",
     name: "Fancy Text Generator",
-    description: "Convert plain text into 40+ decorative Unicode styles — bold, italic, cursive, bubble, gothic, upside-down. Instant, copyable.",
+    description:
+      "Convert plain text into 40+ decorative Unicode styles — bold, italic, cursive, bubble, gothic, upside-down. Instant, copyable.",
     category: "text",
     icon: Sparkles,
     path: "/tools/fancy-text-generator",
@@ -1351,6 +1352,10 @@ export const tools: Tool[] = [
   },
 
   // ── SEO Tools (Semrush-powered) ────────────────────────────────
+  // ⚠️ Hidden: API not currently connected (Semrush requires the $549/mo
+  // Advanced plan for API access, plus per-unit costs). Unhide once a
+  // working data source (Semrush Advanced or a cheaper alternative like
+  // DataForSEO/SE Ranking) is actually wired up and verified working.
   {
     slug: "keyword-research",
     name: "Keyword Research Tool",
@@ -1359,6 +1364,7 @@ export const tools: Tool[] = [
     category: "seo",
     icon: Search,
     path: "/tools/keyword-research",
+    hidden: true,
   },
   {
     slug: "domain-analysis",
@@ -1368,6 +1374,7 @@ export const tools: Tool[] = [
     category: "seo",
     icon: Globe,
     path: "/tools/domain-analysis",
+    hidden: true,
   },
   {
     slug: "backlink-checker",
@@ -1377,6 +1384,7 @@ export const tools: Tool[] = [
     category: "seo",
     icon: Link2,
     path: "/tools/backlink-checker",
+    hidden: true,
   },
   {
     slug: "keyword-difficulty",
@@ -1386,6 +1394,7 @@ export const tools: Tool[] = [
     category: "seo",
     icon: Target,
     path: "/tools/keyword-difficulty",
+    hidden: true,
   },
   {
     slug: "competitor-analysis",
@@ -1395,6 +1404,7 @@ export const tools: Tool[] = [
     category: "seo",
     icon: Users,
     path: "/tools/competitor-analysis",
+    hidden: true,
   },
   {
     slug: "page-seo-analyzer",
@@ -1404,5 +1414,6 @@ export const tools: Tool[] = [
     category: "seo",
     icon: FileSearch,
     path: "/tools/page-seo-analyzer",
+    hidden: true,
   },
 ];

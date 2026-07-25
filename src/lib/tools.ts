@@ -2040,8 +2040,9 @@ export const tools: Tool[] = [
     icon: FlaskConical,
     path: "/tools/element-mixer",
     featureList: [
-      "Mix chemical elements in a virtual lab",
+      "Mix up to 6 chemical elements at once in a virtual lab",
       "Discover real and imaginary compounds",
+      "Lab Progress tracker with unlockable category badges",
       "Fun, hands-on way to explore chemistry",
       "No signup required",
       "100% browser-based",

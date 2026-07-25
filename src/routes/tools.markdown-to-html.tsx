@@ -176,6 +176,7 @@ function MarkdownToHtml() {
           "Markdown is a lightweight markup language widely used by developers, bloggers, and technical writers to write formatted content using plain text. This converter transforms Markdown syntax into clean, valid HTML instantly — with a live preview that updates as you type, so you can see exactly how your content will look in a browser.",
           "The tool supports the most common Markdown elements: headings (H1–H3), bold and italic text, unordered and ordered lists, inline code, blockquotes, horizontal rules, hyperlinks, and images. The Preview tab renders the HTML with styled typography, while the HTML tab shows the raw output ready to paste into any webpage or CMS.",
           "Markdown is the standard format for README files on GitHub, documentation sites (GitBook, Docusaurus), blogging platforms (Ghost, Hashnode), and note-taking apps (Obsidian, Notion). Converting Markdown to HTML is a common workflow for publishing content from these platforms to custom websites or email templates.",
+          "Because the conversion happens instantly and locally, it's a convenient way to check how a README or blog draft will actually render before pushing it live, or to grab clean HTML for pasting into an email newsletter tool or a CMS that doesn't natively support Markdown input.",
         ]}
         faqs={[
           {

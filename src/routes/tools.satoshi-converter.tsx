@@ -4,7 +4,7 @@ import { Area, AreaChart, ResponsiveContainer, Tooltip } from "recharts";
 import { Bitcoin, Check, Copy, RefreshCw, RotateCcw, TrendingDown, TrendingUp, ArrowLeftRight } from "lucide-react";
 import { Link } from "@tanstack/react-router";
 
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
@@ -14,8 +14,37 @@ import { Skeleton } from "@/components/ui/skeleton";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
+// SEO NOTE: Search Console shows demand for "satoshi calculator" (31
+// impressions, position ~25) alongside "satoshi converter" — the JSON-LD
+// alternateName below adds "Calculator" as a recognized alternate name.
 export const Route = createFileRoute("/tools/satoshi-converter")({
-  head: () => buildToolMeta(toolBySlug("satoshi-converter", tools)),
+  head: () => {
+    const tool = toolBySlug("satoshi-converter", tools);
+    const title = "Satoshi Converter & Calculator — Bitcoin Unit Converter, Live Price | Skycally";
+    const description =
+      "Free Satoshi converter and calculator. Convert between Bitcoin, Satoshi, mBTC, bits, USD, EUR and MAD instantly — live BTC price, no signup.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Satoshi Converter",
+            alternateName: ["Satoshi Calculator", "Bitcoin Unit Converter"],
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: SatoshiConverterPage,
 });
 

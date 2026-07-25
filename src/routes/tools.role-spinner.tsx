@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { Plus, Trash2, RotateCw, Minus, Copy, RefreshCw, ArrowRight } from "lucide-react";
@@ -15,7 +15,38 @@ import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/role-spinner")({
-  head: () => buildToolMeta(toolBySlug("role-spinner", tools)),
+  head: () => {
+    const tool = toolBySlug("role-spinner", tools);
+    const title = "Mafia Role Spinner — Free Random Role Generator for Party Games | Skycally";
+    const description =
+      "Free Mafia role spinner and random role generator. Assign secret roles for Mafia, Werewolf, Among Us and other party games — no signup, private, browser-based.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Role Spinner",
+            alternateName: [
+              "Mafia Role Generator",
+              "Mafia Roles Generator",
+              "Random Role Generator",
+              "Secret Role Picker",
+            ],
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: RoleSpinner,
 });
 
@@ -470,6 +501,11 @@ function RoleSpinner() {
           "Unlike passing folded pieces of paper or whispering roles, the spinner provides a transparent process everyone can watch without seeing each other's results. Each player receives their role privately on their own screen, maintaining the secrecy that social deduction games depend on.",
         ]}
         faqs={[
+          {
+            question: "Is this the same as a Mafia role generator?",
+            answer:
+              "Yes. 'Role spinner', 'Mafia role generator', 'mafia roles generator' and 'random role generator' all describe the same tool here — assigning secret roles like Mafia, Doctor, Sheriff and Citizen fairly and randomly to a group of players.",
+          },
           {
             question: "What games is this suitable for?",
             answer:

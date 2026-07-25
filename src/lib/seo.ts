@@ -57,14 +57,14 @@ export function buildToolMeta(tool: Tool) {
         type: "application/ld+json",
         children: JSON.stringify({
           "@context": "https://schema.org",
-          "@type": "SoftwareApplication",
+          "@type": tool.schemaType ?? "SoftwareApplication",
           name: tool.name,
-          applicationCategory: "WebApplication",
+          applicationCategory: tool.schemaCategory ?? "WebApplication",
           operatingSystem: "Any",
           offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
           url: `${SITE_URL}${tool.path}`,
           description: tool.description,
-          featureList: [
+          featureList: tool.featureList ?? [
             "No signup required",
             "100% browser-based",
             "Private — files never leave your device",

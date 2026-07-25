@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { toast } from "sonner";
@@ -14,8 +14,51 @@ import { Textarea } from "@/components/ui/textarea";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
+// SEO NOTE: Search Console shows real demand for "sentiment analysis online"
+// (188 impressions, position ~29, zero clicks — page 3-4). The title below
+// leads with the exact proven phrase instead of "AI Sentiment Analysis"
+// (which pushed "online" further from the start of the title tag), since
+// the tool clearly already works — this is a ranking/relevance problem,
+// not a functionality problem.
+
+const SLUG = "sentiment-analysis";
+
 export const Route = createFileRoute("/tools/sentiment-analysis")({
-  head: () => buildToolMeta(toolBySlug("sentiment-analysis", tools)),
+  head: () => {
+    const tool = toolBySlug(SLUG, tools);
+    const title = "Sentiment Analysis Online — Free AI Text Sentiment Tool | Skycally";
+    const description =
+      "Free sentiment analysis online. Detect positive, negative or neutral sentiment in any text instantly with AI — no signup, 100% private, runs in your browser.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Sentiment Analysis Online",
+            alternateName: ["AI Sentiment Analysis", "Text Sentiment Checker"],
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: [
+              "Analyzes text sentiment as positive, negative or neutral",
+              "Instant results as you type or paste",
+              "Batch mode analyzes up to 50 texts at once",
+              "Powered by DistilBERT, runs locally via WebAssembly",
+              "No signup required",
+              "100% private — text never leaves your device",
+              "Free forever",
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: SentimentTool,
 });
 
@@ -139,8 +182,8 @@ function SentimentTool() {
 
   return (
     <ToolPageShell
-      title="AI Sentiment Analysis"
-      description="Detect positive, negative, or neutral sentiment in any text. Powered by DistilBERT — runs locally in your browser, completely private."
+      title="Sentiment Analysis Online"
+      description="Free sentiment analysis online — detect positive, negative, or neutral tone in any text. Powered by DistilBERT, runs locally in your browser, completely private."
       showFileDisclaimer={false}
     >
       {/* Badges */}
@@ -404,15 +447,20 @@ function SentimentTool() {
       />
 
       <ToolSeoContent
-        title="Free AI Sentiment Analysis Tool — Detect Positive, Negative & Neutral Text"
-        description="Analyze the sentiment of any text using AI. Detect positive, negative, or neutral tone with confidence score. Batch mode for multiple texts. 100% private, runs in your browser."
+        title="Sentiment Analysis Online — Free AI Text Sentiment Tool"
+        description="Run sentiment analysis online, free, using AI. Detect positive, negative, or neutral tone with a confidence score. Batch mode for multiple texts. 100% private, runs in your browser."
         body={[
-          "Skycally's AI Sentiment Analysis tool detects the emotional tone of any text — positive, negative, or neutral — using a DistilBERT model fine-tuned on the Stanford Sentiment Treebank. Paste any text from a product review to a social media post and get an instant sentiment label with a confidence percentage.",
-          "The AI model runs entirely in your browser using Transformers.js and WebAssembly — your text is never sent to any server. The first analysis downloads the model (~60MB) once; all subsequent analyses in the same session are instant, making it practical for analyzing multiple texts in succession.",
-          "Batch mode lets you analyze up to 50 texts simultaneously — paste one per line, click Analyze All, and see sentiment results stream in with a live summary showing the overall positive/negative/neutral breakdown. This is ideal for analyzing customer reviews, survey responses, or comment threads in bulk.",
+          "Skycally's sentiment analysis online tool detects the emotional tone of any text — positive, negative, or neutral — using a DistilBERT model fine-tuned on the Stanford Sentiment Treebank. Paste any text from a product review to a social media post and get an instant sentiment label with a confidence percentage, with nothing sent to a server.",
+          "Unlike most sentiment analysis online services that send your text to a remote API, this AI model runs entirely in your browser using Transformers.js and WebAssembly. The first analysis downloads the model (~60MB) once; all subsequent analyses in the same session are instant, making it practical for analyzing multiple texts in succession without any usage cap.",
+          "Batch mode lets you analyze up to 50 texts simultaneously — paste one per line, click Analyze All, and see sentiment results stream in with a live summary showing the overall positive/negative/neutral breakdown. This is ideal for analyzing customer reviews, survey responses, or comment threads in bulk without needing a paid sentiment analysis online subscription.",
           "Common use cases include brand monitoring, customer feedback analysis, market research, academic sentiment studies, content evaluation, and any situation where understanding the emotional tone of written text provides value. The confidence score shows how strongly the AI classifies each text, helping you identify borderline cases that might warrant manual review.",
         ]}
         faqs={[
+          {
+            question: "Is this sentiment analysis tool really free to use online?",
+            answer:
+              "Yes. Every feature — single text and batch mode — is free, with no signup, no account, and no usage limit. Unlike most sentiment analysis online APIs, there is no per-request cost.",
+          },
           {
             question: "How accurate is the sentiment analysis?",
             answer:
@@ -436,7 +484,7 @@ function SentimentTool() {
           {
             question: "Is my text uploaded to a server?",
             answer:
-              "No. The AI model runs locally in your browser using WebAssembly. Your text never leaves your device.",
+              "No. The AI model runs locally in your browser using WebAssembly. Your text never leaves your device — this sentiment analysis runs fully offline once the model has loaded.",
           },
           {
             question: "What is DistilBERT?",
@@ -456,7 +504,7 @@ function SentimentTool() {
         ]}
       />
 
-      <RelatedTools currentSlug="sentiment-analysis" />
+      <RelatedTools currentSlug={SLUG} />
     </ToolPageShell>
   );
 }

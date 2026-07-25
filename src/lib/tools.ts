@@ -2554,3 +2554,8 @@ export const tools: Tool[] = [
     hidden: true,
   },
 ];
+
+/** Single source of truth for the visible tool count — used on the homepage
+ *  hero and the About page so the two numbers can never drift out of sync
+ *  or go stale again as tools are added, hidden, or un-hidden. */
+export const TOOL_COUNT = tools.filter((t) => !t.hidden).length;

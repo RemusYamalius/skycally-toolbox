@@ -39,16 +39,27 @@ function FaceLandmarksTool() {
 
   const showDotsRef = useRef(true);
   const showMeshRef = useRef(false);
-  useEffect(() => { showDotsRef.current = showDots; }, [showDots]);
-  useEffect(() => { showMeshRef.current = showMesh; }, [showMesh]);
+  useEffect(() => {
+    showDotsRef.current = showDots;
+  }, [showDots]);
+  useEffect(() => {
+    showMeshRef.current = showMesh;
+  }, [showMesh]);
 
   useEffect(() => {
     let alive = true;
     Promise.all([loadScript(FACE_MESH), loadScript(DRAW)])
       .then(() => {
         if (!alive) return;
-        const m = new window.FaceMesh({ locateFile: (f: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${f}` });
-        m.setOptions({ maxNumFaces: 4, refineLandmarks: true, minDetectionConfidence: 0.5, minTrackingConfidence: 0.5 });
+        const m = new window.FaceMesh({
+          locateFile: (f: string) => `https://cdn.jsdelivr.net/npm/@mediapipe/face_mesh@0.4/${f}`,
+        });
+        m.setOptions({
+          maxNumFaces: 4,
+          refineLandmarks: true,
+          minDetectionConfidence: 0.5,
+          minTrackingConfidence: 0.5,
+        });
         meshRef.current = m;
         setReady(true);
       })
@@ -144,7 +155,10 @@ function FaceLandmarksTool() {
   };
 
   return (
-    <ToolPageShell title="Face Landmarks" description="Detects 468 facial landmarks per face — works on photos or live camera, all in your browser.">
+    <ToolPageShell
+      title="Face Landmarks"
+      description="Detects 468 facial landmarks per face — works on photos or live camera, all in your browser."
+    >
       {!ready && <ModelLoadingSkeleton label="Loading Face Mesh..." />}
       {ready && (
         <>
@@ -164,8 +178,13 @@ function FaceLandmarksTool() {
           </div>
 
           <div className="rounded-2xl border border-border bg-card p-4 mb-6 flex flex-wrap gap-4 text-sm">
-            <label className="inline-flex items-center gap-2"><input type="checkbox" checked={showDots} onChange={(e) => setShowDots(e.target.checked)} /> Show dots</label>
-            <label className="inline-flex items-center gap-2"><input type="checkbox" checked={showMesh} onChange={(e) => setShowMesh(e.target.checked)} /> Show mesh overlay</label>
+            <label className="inline-flex items-center gap-2">
+              <input type="checkbox" checked={showDots} onChange={(e) => setShowDots(e.target.checked)} /> Show dots
+            </label>
+            <label className="inline-flex items-center gap-2">
+              <input type="checkbox" checked={showMesh} onChange={(e) => setShowMesh(e.target.checked)} /> Show mesh
+              overlay
+            </label>
           </div>
 
           <Tabs defaultValue="upload">
@@ -175,11 +194,20 @@ function FaceLandmarksTool() {
             </TabsList>
 
             <TabsContent value="upload" className="mt-6 space-y-4">
-              <DropZone accept="image/*" onFiles={(f) => f[0] && setImgFile(f[0])} label="Drop a photo with faces" hint="JPG, PNG, WebP" />
+              <DropZone
+                accept="image/*"
+                onFiles={(f) => f[0] && setImgFile(f[0])}
+                label="Drop a photo with faces"
+                hint="JPG, PNG, WebP"
+              />
               <div className="rounded-2xl border border-border bg-card p-3 overflow-auto">
                 <canvas ref={canvasRef} className="max-w-full h-auto mx-auto" />
               </div>
-              {imgFile && <button onClick={download} className="rounded-lg bg-foreground text-background font-medium px-5 py-2.5">Download annotated PNG</button>}
+              {imgFile && (
+                <button onClick={download} className="rounded-lg bg-foreground text-background font-medium px-5 py-2.5">
+                  Download annotated PNG
+                </button>
+              )}
             </TabsContent>
 
             <TabsContent value="camera" className="mt-6 space-y-4">
@@ -192,9 +220,16 @@ function FaceLandmarksTool() {
               </div>
               <div className="flex gap-2">
                 {!camOn ? (
-                  <button onClick={startCamera} className="rounded-lg bg-foreground text-background font-medium px-5 py-2.5">Start camera</button>
+                  <button
+                    onClick={startCamera}
+                    className="rounded-lg bg-foreground text-background font-medium px-5 py-2.5"
+                  >
+                    Start camera
+                  </button>
                 ) : (
-                  <button onClick={stopCamera} className="rounded-lg border border-border font-medium px-5 py-2.5">Stop camera</button>
+                  <button onClick={stopCamera} className="rounded-lg border border-border font-medium px-5 py-2.5">
+                    Stop camera
+                  </button>
                 )}
               </div>
             </TabsContent>
@@ -210,26 +245,62 @@ function FaceLandmarksTool() {
       {/* ADSENSE_ZONE: ai-tool-below-result 300x250 */}
       <AdZone id="ai-tool-below-result" size="300x250" />
 
-      <HowToUse steps={[
-        "Upload a photo or start your camera.",
-        "Toggle dots and mesh overlays as desired.",
-        "Download the annotated image (image mode).",
-      ]} />
-          <RelatedTools currentSlug="face-landmarks" />
-          <ToolSeoContent
-        title={"Face Landmark Detection — 468 Points Real-time | Skycally"}
-        description={"Detect and visualize 468 facial landmarks in real-time using MediaPipe Face Mesh. Works with photos or live camera. Free, browser-based, no signup."}
-        body={[
-        "Upload a photo or use your camera to detect detailed facial landmarks in real-time. The AI maps 468 precise points across the face including eyes, eyebrows, nose, lips, jaw and cheekbones.",
-        "Face landmark detection is used in augmented reality, facial analysis, emotion recognition and 3D face modeling. Our tool uses MediaPipe Face Mesh running in your browser — no facial data is stored or transmitted.",
-      ]}
-        faqs={[
-        { question: "How many faces can be detected at once?", answer: "The tool can detect and map landmarks on up to 4 faces simultaneously in a single image or camera frame." },
-        { question: "Is my facial data stored?", answer: "No. All processing happens locally in your browser. No facial data, images or landmarks are ever sent to Skycally's servers." },
-        { question: "What are facial landmarks used for?", answer: "Facial landmarks are used in augmented reality filters, face swap apps, emotion detection, beauty apps, accessibility tools and medical facial analysis." },
-        { question: "Can I toggle the landmark display?", answer: "Yes. Use the toggle buttons to show/hide individual landmark dots and the mesh connection lines independently." },
-      ]}
+      <HowToUse
+        steps={[
+          "Upload a photo or start your camera.",
+          "Toggle dots and mesh overlays as desired.",
+          "Download the annotated image (image mode).",
+        ]}
       />
-      </ToolPageShell>
+      <ToolSeoContent
+        title={"Face Landmark Detection — 468 Points Real-time | Skycally"}
+        description={
+          "Detect and visualize 468 facial landmarks in real-time using MediaPipe Face Mesh. Works with photos or live camera. Free, browser-based, no signup."
+        }
+        body={[
+          "Upload a photo or use your camera to detect detailed facial landmarks in real-time. The AI maps 468 precise points across the face including eyes, eyebrows, nose, lips, jaw and cheekbones — with no signup and no upload to any server.",
+          "Face landmark detection is used in augmented reality, facial analysis, emotion recognition and 3D face modeling. Our tool uses MediaPipe Face Mesh, a model originally developed by Google Research, running entirely in your browser via WebAssembly — no facial data is stored or transmitted anywhere.",
+          "468 points is a dense enough mesh to capture subtle expressions and precise facial geometry, which is why this same underlying technology powers many real-world AR filters (like those on Instagram and Snapchat), virtual try-on tools, and face-tracking features in video call apps. Toggling between the raw dot overlay and the connected mesh view makes it easy to see exactly how the model segments the face into regions.",
+          "Because detection runs up to 4 faces per frame, this tool also works for group photos, not just solo portraits. Everything happens client-side, so it's a safe way to experiment with facial landmark technology on personal photos without any privacy concern about where that image data ends up.",
+        ]}
+        faqs={[
+          {
+            question: "How many faces can be detected at once?",
+            answer:
+              "The tool can detect and map landmarks on up to 4 faces simultaneously in a single image or camera frame.",
+          },
+          {
+            question: "Is my facial data stored?",
+            answer:
+              "No. All processing happens locally in your browser. No facial data, images or landmarks are ever sent to Skycally's servers.",
+          },
+          {
+            question: "What are facial landmarks used for?",
+            answer:
+              "Facial landmarks are used in augmented reality filters, face swap apps, emotion detection, beauty apps, accessibility tools and medical facial analysis.",
+          },
+          {
+            question: "Can I toggle the landmark display?",
+            answer:
+              "Yes. Use the toggle buttons to show/hide individual landmark dots and the mesh connection lines independently.",
+          },
+          {
+            question: "What is MediaPipe Face Mesh?",
+            answer:
+              "MediaPipe Face Mesh is a real-time face geometry solution originally developed by Google Research. It estimates 468 3D face landmarks from a single camera frame without needing specialized depth-sensing hardware.",
+          },
+          {
+            question: "Can I download the result?",
+            answer: "Yes, in image mode you can download the photo with the landmark overlay drawn on top.",
+          },
+          {
+            question: "Does this work with live video?",
+            answer: "Yes. Enable your camera and the landmarks track your face in real time as you move.",
+          },
+          { question: "Is this free to use?", answer: "Yes, completely free with no signup and no usage limit." },
+        ]}
+      />
+      <RelatedTools currentSlug="face-landmarks" />
+    </ToolPageShell>
   );
 }

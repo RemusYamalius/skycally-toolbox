@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import { Share2, Sparkles, Trash2, Plus, Minus, FlaskConical, RotateCcw } from "lucide-react";
@@ -29,7 +29,33 @@ import {
 } from "@/lib/element-mixer/formula";
 
 export const Route = createFileRoute("/tools/element-mixer")({
-  head: () => buildToolMeta(toolBySlug("element-mixer", tools)),
+  head: () => {
+    const tool = toolBySlug("element-mixer", tools);
+    const title = "Element Mixer — Free Periodic Table & Chemical Mixer Simulator | Skycally";
+    const description =
+      "Free element mixer and periodic table simulator. Combine up to 6 chemical elements to discover real compounds — chemical mixer online, no signup, 55+ elements.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Element Mixer",
+            alternateName: ["Periodic Table Mixer", "Chemical Mixer", "Element Mixing Simulator"],
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: ElementMixerPage,
 });
 
@@ -824,13 +850,13 @@ function ElementMixerPage() {
       />
 
       <ToolSeoContent
-        title="Free Element Mixer — Combine Chemical Elements & Discover Compounds"
-        description="Mix chemical elements to discover real compounds they form. Educational chemistry tool covering 55+ elements and hundreds of reactions. Free, no signup."
+        title="Free Element Mixer & Periodic Table Simulator — Combine Chemical Elements"
+        description="Mix chemical elements to discover real compounds they form. Free periodic table mixer and chemical mixer simulator covering 55+ elements and hundreds of reactions. No signup."
         body={[
-          "Skycally's Element Mixer lets you combine chemical elements to discover the real compounds they form together. Select any two elements from the periodic table and instantly see the compounds they produce, their chemical formulas, common names, and key properties. It's an engaging way to explore chemistry and understand how elements interact.",
-          "The tool covers over 55 elements and hundreds of real chemical reactions, from simple compounds like water (H₂O from hydrogen and oxygen) and table salt (NaCl from sodium and chlorine) to more complex molecules like sulfuric acid (H₂SO₄), calcium carbonate (CaCO₃), and iron oxide (Fe₂O₃). All reactions shown are chemically accurate.",
-          "Element Mixer is designed as an educational tool for students studying chemistry, curious minds exploring how materials are made, teachers looking for interactive demonstrations, and anyone who has ever wondered what happens when two elements combine. The visual, game-like interface makes chemistry exploration intuitive and enjoyable.",
-          "Each compound result includes the chemical formula, the common name, the type of bond formed (ionic, covalent, or metallic), and a brief description of where the compound appears in everyday life. Some element pairs produce multiple compounds depending on oxidation states — all variants are shown.",
+          "Skycally's Element Mixer — also searched for as a 'periodic table mixer' or 'chemical mixer online' — lets you combine up to 6 chemical elements at once to discover the real compounds they form together. Select elements from the periodic table, set how many atoms of each you want, and instantly see the compounds produced, their chemical formulas, common names, and key properties. It's an engaging way to explore chemistry and understand how elements interact.",
+          "The tool covers over 55 elements and hundreds of real chemical reactions, from simple compounds like water (H₂O from hydrogen and oxygen) and table salt (NaCl from sodium and chlorine) to more complex molecules like sulfuric acid (H₂SO₄), calcium carbonate (CaCO₃), and iron oxide (Fe₂O₃). All reactions shown are chemically accurate, whether you're mixing just two elements or building a more complex combination across all 6 slots.",
+          "This element mixing simulator is designed as an educational tool for students studying chemistry, curious minds exploring how materials are made, teachers looking for interactive demonstrations, and anyone who has ever wondered what happens when several elements combine. The visual, game-like interface — complete with a Lab Progress tracker that unlocks category badges as you discover new real compounds — makes chemistry exploration intuitive and enjoyable rather than a dry lookup table.",
+          "Each compound result includes the chemical formula, the common name, the type of bond formed (ionic, covalent, or metallic), and a brief description of where the compound appears in everyday life. Some element combinations produce multiple compounds depending on oxidation states and atom ratios — all valid variants are shown, making this a genuine simulator rather than a fixed lookup of textbook pairs.",
         ]}
         faqs={[
           {
@@ -839,19 +865,24 @@ function ElementMixerPage() {
               "Over 55 elements from the periodic table are available, covering the most common and educationally relevant elements including all main group elements and common transition metals.",
           },
           {
+            question: "Can I mix more than two elements at once?",
+            answer:
+              "Yes. Up to 6 different elements can be combined simultaneously, with up to 10 atoms of each. This makes it a genuine element mixing simulator rather than a simple two-element lookup — try building more complex combinations to see what forms.",
+          },
+          {
             question: "Are the compounds shown chemically accurate?",
             answer:
               "Yes. All compounds and reactions shown are based on real chemistry. The formulas, names, and properties reflect actual chemical behavior.",
           },
           {
-            question: "What if two elements don't form a compound?",
+            question: "What if the elements I pick don't form a compound?",
             answer:
-              "If two selected elements do not react under normal conditions or do not form a stable compound, the tool will indicate that no common compound is formed between them.",
+              "If the selected elements do not react under normal conditions or do not form a stable compound together, the tool will indicate that no common compound is formed between them.",
           },
           {
-            question: "Can I mix more than two elements?",
+            question: "Is this the same as a periodic table simulator?",
             answer:
-              "Currently the tool supports mixing two elements at a time. This keeps the results clear and educationally focused.",
+              "Yes — this tool functions as both an element mixer and an interactive periodic table simulator, letting you click directly on the table to build your mix rather than looking up elements in a separate list.",
           },
           {
             question: "Is this suitable for students?",
@@ -866,7 +897,7 @@ function ElementMixerPage() {
           {
             question: "Why does mixing some elements show multiple compounds?",
             answer:
-              "Some element pairs can form multiple compounds depending on the ratio of atoms or the oxidation state of the elements. For example, iron and oxygen form both FeO and Fe₂O₃.",
+              "Some element combinations can form multiple compounds depending on the ratio of atoms or the oxidation state of the elements. For example, iron and oxygen form both FeO and Fe₂O₃.",
           },
           {
             question: "Does this work on mobile?",

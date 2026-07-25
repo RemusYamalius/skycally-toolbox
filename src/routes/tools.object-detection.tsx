@@ -21,7 +21,11 @@ export const Route = createFileRoute("/tools/object-detection")({
 const TFJS = "https://cdn.jsdelivr.net/npm/@tensorflow/tfjs@4.0.0/dist/tf.min.js";
 const COCO = "https://cdn.jsdelivr.net/npm/@tensorflow-models/coco-ssd@2.2.2/dist/coco-ssd.min.js";
 
-interface Pred { class: string; score: number; bbox: [number, number, number, number]; }
+interface Pred {
+  class: string;
+  score: number;
+  bbox: [number, number, number, number];
+}
 
 function colorFor(cls: string) {
   let h = 0;
@@ -30,10 +34,26 @@ function colorFor(cls: string) {
 }
 
 const EMOJI: Record<string, string> = {
-  person: "🧑", car: "🚗", truck: "🚚", bicycle: "🚲", motorcycle: "🏍️",
-  bus: "🚌", dog: "🐶", cat: "🐱", bird: "🐦", "cell phone": "📱",
-  laptop: "💻", book: "📖", chair: "🪑", "dining table": "🍽️", cup: "🥤",
-  bottle: "🍶", "tv": "📺", remote: "🎮", keyboard: "⌨️", mouse: "🖱️",
+  person: "🧑",
+  car: "🚗",
+  truck: "🚚",
+  bicycle: "🚲",
+  motorcycle: "🏍️",
+  bus: "🚌",
+  dog: "🐶",
+  cat: "🐱",
+  bird: "🐦",
+  "cell phone": "📱",
+  laptop: "💻",
+  book: "📖",
+  chair: "🪑",
+  "dining table": "🍽️",
+  cup: "🥤",
+  bottle: "🍶",
+  tv: "📺",
+  remote: "🎮",
+  keyboard: "⌨️",
+  mouse: "🖱️",
 };
 
 function ObjectDetectionTool() {
@@ -72,7 +92,13 @@ function ObjectDetectionTool() {
     };
   }, []);
 
-  const drawPreds = (canvas: HTMLCanvasElement, source: CanvasImageSource, w: number, h: number, predictions: Pred[]) => {
+  const drawPreds = (
+    canvas: HTMLCanvasElement,
+    source: CanvasImageSource,
+    w: number,
+    h: number,
+    predictions: Pred[],
+  ) => {
     const ctx = canvas.getContext("2d")!;
     canvas.width = w;
     canvas.height = h;
@@ -148,7 +174,10 @@ function ObjectDetectionTool() {
   const uniqueClasses = new Set(preds.map((p) => p.class)).size;
 
   return (
-    <ToolPageShell title="Object Detection" description="Detect everyday objects in images or live video using COCO-SSD — entirely in your browser.">
+    <ToolPageShell
+      title="Object Detection"
+      description="Detect everyday objects in images or live video using COCO-SSD — entirely in your browser."
+    >
       {!ready && <ModelLoadingSkeleton label="Loading COCO-SSD model (~5MB)..." />}
       {ready && (
         <>
@@ -171,7 +200,12 @@ function ObjectDetectionTool() {
                   <TabsTrigger value="camera">Live Camera</TabsTrigger>
                 </TabsList>
                 <TabsContent value="upload" className="mt-6 space-y-4">
-                  <DropZone accept="image/*" onFiles={(f) => f[0] && setImgFile(f[0])} label="Drop an image" hint="JPG, PNG, WebP" />
+                  <DropZone
+                    accept="image/*"
+                    onFiles={(f) => f[0] && setImgFile(f[0])}
+                    label="Drop an image"
+                    hint="JPG, PNG, WebP"
+                  />
                   <div className="rounded-2xl border border-border bg-card p-3 overflow-auto">
                     <canvas ref={canvasRef} className="max-w-full h-auto mx-auto" />
                   </div>
@@ -186,9 +220,16 @@ function ObjectDetectionTool() {
                   </div>
                   <div className="flex gap-2">
                     {!camOn ? (
-                      <button onClick={startCamera} className="rounded-lg bg-foreground text-background font-medium px-5 py-2.5">Start camera</button>
+                      <button
+                        onClick={startCamera}
+                        className="rounded-lg bg-foreground text-background font-medium px-5 py-2.5"
+                      >
+                        Start camera
+                      </button>
                     ) : (
-                      <button onClick={stopCamera} className="rounded-lg border border-border font-medium px-5 py-2.5">Stop camera</button>
+                      <button onClick={stopCamera} className="rounded-lg border border-border font-medium px-5 py-2.5">
+                        Stop camera
+                      </button>
                     )}
                   </div>
                 </TabsContent>
@@ -201,7 +242,9 @@ function ObjectDetectionTool() {
                 {preds.map((p, i) => (
                   <li key={i}>
                     <div className="flex items-center justify-between text-sm">
-                      <span className="font-medium">{EMOJI[p.class] || "🔹"} {p.class}</span>
+                      <span className="font-medium">
+                        {EMOJI[p.class] || "🔹"} {p.class}
+                      </span>
                       <span className="text-xs text-muted-foreground">{Math.round(p.score * 100)}%</span>
                     </div>
                     <div className="h-1.5 mt-1 rounded-full bg-secondary overflow-hidden">
@@ -223,26 +266,68 @@ function ObjectDetectionTool() {
       {/* ADSENSE_ZONE: ai-tool-below-result 300x250 */}
       <AdZone id="ai-tool-below-result" size="300x250" />
 
-      <HowToUse steps={[
-        "Choose Upload Image or Live Camera.",
-        "Wait for the model to detect objects.",
-        "See bounding boxes and a sidebar list of confidences.",
-      ]} />
-          <RelatedTools currentSlug="object-detection" />
-          <ToolSeoContent
-        title={"AI Object Detection Online — Real-time Detection Free"}
-        description={"Detect and identify objects in images or live video using AI. Powered by TensorFlow.js COCO-SSD. Recognizes 80 object categories. Works in your browser."}
-        body={[
-        "Upload an image or enable your camera for real-time object detection. The AI draws bounding boxes around detected objects and labels them with confidence percentages. Detected objects are also listed in a sidebar for easy reference.",
-        "The COCO-SSD model can recognize 80 common object categories including people, vehicles, animals, furniture, food and everyday items. The model runs entirely in your browser using TensorFlow.js — no images are sent to any server.",
-      ]}
-        faqs={[
-        { question: "What objects can the AI detect?", answer: "The model recognizes 80 object categories from the COCO dataset including person, car, bicycle, dog, cat, chair, bottle, laptop, phone and many more common objects." },
-        { question: "How accurate is the detection?", answer: "Accuracy varies by object and image quality. Well-lit, clear images of common objects typically achieve 70-95% confidence. The model works best with objects clearly visible and not overlapping." },
-        { question: "Does real-time camera detection affect privacy?", answer: "No. All processing happens locally in your browser using TensorFlow.js. Camera frames are never sent to Skycally's servers." },
-        { question: "Why does the model take time to load?", answer: "The COCO-SSD model is approximately 25MB and loads once when you first visit the page. Subsequent uses within the same session are instant." },
-      ]}
+      <HowToUse
+        steps={[
+          "Choose Upload Image or Live Camera.",
+          "Wait for the model to detect objects.",
+          "See bounding boxes and a sidebar list of confidences.",
+        ]}
       />
-      </ToolPageShell>
+      <ToolSeoContent
+        title={"AI Object Detection Online — Real-time Detection Free"}
+        description={
+          "Detect and identify objects in images or live video using AI. Powered by TensorFlow.js COCO-SSD. Recognizes 80 object categories. Works in your browser."
+        }
+        body={[
+          "Upload an image or enable your camera for real-time object detection. The AI draws bounding boxes around detected objects and labels them with confidence percentages. Detected objects are also listed in a sidebar for easy reference — no signup required to use any of it.",
+          "The COCO-SSD model can recognize 80 common object categories including people, vehicles, animals, furniture, food and everyday items. COCO-SSD stands for Common Objects in Context — Single Shot Detector, a widely used real-time object detection architecture trained on Microsoft's COCO dataset of over 200,000 labeled images. The model runs entirely in your browser using TensorFlow.js — no images or video frames are sent to any server.",
+          "Object detection differs from simple image classification: instead of just labeling what's in a photo, it locates exactly where each object is with a bounding box, and can detect multiple different objects in the same frame simultaneously. This makes it useful for counting items, building accessibility tools that describe a scene out loud, prototyping computer-vision ideas, or simply exploring what modern AI can recognize in a photo you already have.",
+          "Because everything runs client-side via TensorFlow.js and WebAssembly, this tool works entirely offline once the ~25MB model has loaded, and nothing you upload or capture via your camera is ever transmitted anywhere. That makes it suitable for testing with personal or sensitive photos where a cloud-based detection API would be a privacy concern.",
+        ]}
+        faqs={[
+          {
+            question: "What objects can the AI detect?",
+            answer:
+              "The model recognizes 80 object categories from the COCO dataset including person, car, bicycle, dog, cat, chair, bottle, laptop, phone and many more common objects.",
+          },
+          {
+            question: "How accurate is the detection?",
+            answer:
+              "Accuracy varies by object and image quality. Well-lit, clear images of common objects typically achieve 70-95% confidence. The model works best with objects clearly visible and not overlapping.",
+          },
+          {
+            question: "Does real-time camera detection affect privacy?",
+            answer:
+              "No. All processing happens locally in your browser using TensorFlow.js. Camera frames are never sent to Skycally's servers.",
+          },
+          {
+            question: "Why does the model take time to load?",
+            answer:
+              "The COCO-SSD model is approximately 25MB and loads once when you first visit the page. Subsequent uses within the same session are instant.",
+          },
+          {
+            question: "What is COCO-SSD?",
+            answer:
+              "COCO-SSD (Common Objects in Context — Single Shot Detector) is a real-time object detection model trained on Microsoft's COCO dataset. It's optimized to run efficiently in the browser via TensorFlow.js rather than requiring a server.",
+          },
+          {
+            question: "Can it detect multiple objects at once?",
+            answer:
+              "Yes. The model detects and draws a separate bounding box for every object it recognizes in the frame, whether that's 1 object or 20, and lists each one with its own confidence score.",
+          },
+          {
+            question: "Does it work on mobile devices?",
+            answer:
+              "Yes. The tool works on any modern browser, including mobile, though live camera detection performance depends on your device's processing power.",
+          },
+          {
+            question: "Is this free to use?",
+            answer:
+              "Yes, completely free with no signup and no usage limit — the entire model runs in your browser at no cost to you.",
+          },
+        ]}
+      />
+      <RelatedTools currentSlug="object-detection" />
+    </ToolPageShell>
   );
 }

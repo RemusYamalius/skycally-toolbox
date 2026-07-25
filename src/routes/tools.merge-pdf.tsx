@@ -148,6 +148,7 @@ function MergePdf() {
           "Skycally's PDF merger combines any number of PDF files into a single document entirely in your browser using pdf-lib, a JavaScript library with no server dependency. Upload your files, drag the rows to set the page order, and click Merge — the combined PDF downloads to your device instantly. Your documents never leave your computer.",
           "The page count for each file is detected automatically and displayed next to the filename, so you always know the total number of pages in your merged document before downloading. Files can be reordered at any time by dragging and dropping, and individual files can be removed by clicking the X button.",
           "Common use cases include combining multiple scanned documents into one file, merging chapters of a report, joining invoices or receipts for expense claims, assembling a portfolio, or combining form pages that were scanned separately. The merge is lossless — all text, images, hyperlinks, fonts, and formatting are preserved exactly as in the original files.",
+          "Because processing happens entirely client-side, there's no upload wait even for large or many files, and no risk of the merged document (which might contain contracts, IDs, or financial statements) passing through a third-party server. Pair this with our Split PDF tool if you later need to separate specific pages back out of the merged file.",
         ]}
         faqs={[
           {

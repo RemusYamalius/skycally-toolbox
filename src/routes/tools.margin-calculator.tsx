@@ -39,7 +39,9 @@ function MarginCalculator() {
       <div className="grid gap-6 md:grid-cols-2">
         <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
           <div>
-            <label htmlFor="cost" className="block text-sm font-medium mb-2">Cost</label>
+            <label htmlFor="cost" className="block text-sm font-medium mb-2">
+              Cost
+            </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
               <Input
@@ -56,7 +58,9 @@ function MarginCalculator() {
             <p className="mt-1 text-xs text-muted-foreground">What the item costs you to produce or buy.</p>
           </div>
           <div>
-            <label htmlFor="revenue" className="block text-sm font-medium mb-2">Revenue (selling price)</label>
+            <label htmlFor="revenue" className="block text-sm font-medium mb-2">
+              Revenue (selling price)
+            </label>
             <div className="relative">
               <span className="absolute left-3 top-1/2 -translate-y-1/2 text-muted-foreground">$</span>
               <Input
@@ -96,8 +100,8 @@ function MarginCalculator() {
       <section className="mt-10 rounded-2xl border border-border bg-card p-6">
         <h2 className="font-display text-xl font-bold mb-3">How it works</h2>
         <p className="text-sm text-muted-foreground leading-relaxed mb-4">
-          The Margin Calculator uses two simple formulas. Enter your cost (what you paid to make or buy the product)
-          and your revenue (what you sell it for) — the calculator instantly returns profit, gross margin, and markup.
+          The Margin Calculator uses two simple formulas. Enter your cost (what you paid to make or buy the product) and
+          your revenue (what you sell it for) — the calculator instantly returns profit, gross margin, and markup.
         </p>
         <div className="grid gap-4 sm:grid-cols-3">
           <div className="rounded-xl border border-border/60 bg-background/40 p-4">
@@ -105,7 +109,9 @@ function MarginCalculator() {
             <div className="font-mono text-sm">profit = revenue − cost</div>
           </div>
           <div className="rounded-xl border border-border/60 bg-background/40 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">Gross margin</div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
+              Gross margin
+            </div>
             <div className="font-mono text-sm">margin % = (profit ÷ revenue) × 100</div>
           </div>
           <div className="rounded-xl border border-border/60 bg-background/40 p-4">
@@ -114,9 +120,9 @@ function MarginCalculator() {
           </div>
         </div>
         <p className="text-sm text-muted-foreground leading-relaxed mt-4">
-          Example: an item costs $100 and sells for $150. Profit is $50, gross margin is 33.33%
-          (50 ÷ 150), and markup is 50% (50 ÷ 100). Margin and markup are related but not the same — margin measures
-          profit against the selling price, markup measures it against the cost.
+          Example: an item costs $100 and sells for $150. Profit is $50, gross margin is 33.33% (50 ÷ 150), and markup
+          is 50% (50 ÷ 100). Margin and markup are related but not the same — margin measures profit against the selling
+          price, markup measures it against the cost.
         </p>
       </section>
 
@@ -135,6 +141,7 @@ function MarginCalculator() {
           "Skycally's Margin Calculator is a free tool for business owners, e-commerce sellers, freelancers and accountants who need to price products correctly. Enter what an item costs you and what you sell it for, and the calculator instantly returns three numbers: the raw profit in dollars, the gross profit margin as a percentage of revenue, and the markup as a percentage of cost. Results update as you type.",
           "Margin and markup are the two ways to express the same profit relationship, and mixing them up is one of the most common pricing mistakes. Margin is profit divided by revenue — it tells you what percentage of every dollar of sales you keep. Markup is profit divided by cost — it tells you how much you added on top of what you paid. A 50% markup only translates to a 33.33% margin. The calculator shows both so you can price consistently across suppliers, marketplaces and quote sheets.",
           "The tool runs entirely in your browser: no uploads, no signup, no data saved. Use it for Shopify or Amazon product pricing, wholesale-to-retail markup, service quotes, restaurant menu pricing, or a quick sanity check before sending an invoice.",
+          "A quick way to keep the two straight: if you're working backward from a desired margin to figure out what price to charge, remember that markup will always need to be a larger percentage than the margin you're targeting — the formulas aren't interchangeable, and using one where the other belongs is a common way businesses accidentally underprice their products.",
         ]}
         faqs={[
           {
@@ -156,6 +163,26 @@ function MarginCalculator() {
             question: "Does this calculator include taxes or fees?",
             answer:
               "No. It calculates gross margin — revenue minus cost of goods, before shipping, marketplace fees, payment processing, taxes or overhead. Subtract those from revenue first if you want net margin.",
+          },
+          {
+            question: "How do I price a product to hit a target margin?",
+            answer:
+              "Divide your cost by (1 − target margin as a decimal). For example, to hit a 40% margin on a $60 cost item: $60 ÷ (1 − 0.40) = $60 ÷ 0.60 = $100 selling price.",
+          },
+          {
+            question: "Why is markup always higher than margin for the same profit?",
+            answer:
+              "Because markup divides profit by the smaller number (cost), while margin divides it by the larger number (revenue, which already includes the profit). The two will only be equal at 0% profit.",
+          },
+          {
+            question: "Should I use margin or markup for pricing decisions?",
+            answer:
+              "Margin is generally more useful for pricing strategy since it directly tells you what share of revenue is profit — useful for comparing profitability across products. Markup is more common in purchasing and wholesale contexts, where you're calculating from a known cost upward.",
+          },
+          {
+            question: "Is my pricing data stored anywhere?",
+            answer:
+              "No. All calculations happen locally in your browser. Nothing you enter is saved, logged, or sent to a server.",
           },
         ]}
       />

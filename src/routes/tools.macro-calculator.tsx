@@ -3,7 +3,7 @@ import { useMemo, useState } from "react";
 import { motion } from "framer-motion";
 import { ChevronDown, AlertTriangle, Flame, Beef, Wheat, Droplet } from "lucide-react";
 
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildToolMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
@@ -25,8 +25,41 @@ import {
   type Sex,
 } from "@/lib/macro/calc";
 
+const SLUG = "macro-calculator";
+
 export const Route = createFileRoute("/tools/macro-calculator")({
-  head: () => buildToolMeta(toolBySlug("macro-calculator", tools)),
+  head: () => {
+    const tool = toolBySlug(SLUG, tools);
+    const base = buildToolMeta(tool);
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "WebApplication",
+            name: "Macro Calculator",
+            description:
+              "Free protein-first macro calculator. Turns any daily calorie target into a complete protein/carb/fat breakdown for cutting, maintenance or lean bulking. Mifflin-St Jeor and Katch-McArdle formulas, no signup.",
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            url: `${SITE_URL}/tools/macro-calculator`,
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            featureList: [
+              "Protein-first macro split (grams per kg body weight), not a fixed percentage",
+              "Cutting, Maintenance and Lean Bulk goal presets with research-backed protein defaults",
+              "Automatic hormonal-health fat floor",
+              "Optional built-in calorie calculator with Mifflin-St Jeor and Katch-McArdle formulas",
+              "Color-coded donut chart and per-macro breakdown with everyday food equivalences",
+              "Per-meal macro split",
+              "Free — no signup, no email, no paywall",
+            ],
+          }),
+        },
+      ],
+    };
+  },
   component: MacroCalculator,
 });
 
@@ -39,7 +72,7 @@ const FAT_COLOR = "#f472b6"; // rose
 const fmt = (n: number) => Math.round(n).toLocaleString();
 
 function MacroCalculator() {
-  const tool = toolBySlug("macro-calculator", tools);
+  const tool = toolBySlug(SLUG, tools);
 
   // Primary
   const [calories, setCalories] = useState("2200");
@@ -119,9 +152,7 @@ function MacroCalculator() {
                   kcal
                 </span>
               </div>
-              <p className="mt-1.5 text-xs text-muted-foreground">
-                Don't know your target? Use the calculator below.
-              </p>
+              <p className="mt-1.5 text-xs text-muted-foreground">Don't know your target? Use the calculator below.</p>
             </div>
 
             {/* Body weight */}
@@ -204,9 +235,7 @@ function MacroCalculator() {
             {/* Protein slider */}
             <div>
               <div className="flex items-baseline justify-between mb-2">
-                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Protein
-                </label>
+                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Protein</label>
                 <span className="text-sm font-semibold tabular-nums" style={{ color: PROTEIN_COLOR }}>
                   {proteinPerKg.toFixed(1)} g/kg{" "}
                   <span className="text-muted-foreground font-normal">
@@ -235,14 +264,10 @@ function MacroCalculator() {
             {/* Fat slider */}
             <div>
               <div className="flex items-baseline justify-between mb-2">
-                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">
-                  Fat
-                </label>
+                <label className="text-xs font-medium uppercase tracking-wider text-muted-foreground">Fat</label>
                 <span className="text-sm font-semibold tabular-nums" style={{ color: FAT_COLOR }}>
                   {fatPerKg.toFixed(1)} g/kg{" "}
-                  <span className="text-muted-foreground font-normal">
-                    · {Math.round(fatPerKg * weightKg)} g/day
-                  </span>
+                  <span className="text-muted-foreground font-normal">· {Math.round(fatPerKg * weightKg)} g/day</span>
                 </span>
               </div>
               <input
@@ -339,7 +364,10 @@ function MacroCalculator() {
                 </div>
                 <div>
                   <label className="block text-xs font-medium uppercase tracking-wider text-muted-foreground mb-2">
-                    Body fat % <span className="text-muted-foreground normal-case font-normal">(optional — unlocks Katch-McArdle)</span>
+                    Body fat %{" "}
+                    <span className="text-muted-foreground normal-case font-normal">
+                      (optional — unlocks Katch-McArdle)
+                    </span>
                   </label>
                   <Input
                     inputMode="decimal"
@@ -545,21 +573,33 @@ function MacroCalculator() {
                 <ul className="space-y-2 text-sm">
                   <li>
                     Don't have a calorie target yet? Get a fuller breakdown with the{" "}
-                    <Link to="/tools/calorie-calculator" className="underline underline-offset-2 hover:text-foreground" style={{ color: "var(--cyan-brand)" }}>
+                    <Link
+                      to="/tools/calorie-calculator"
+                      className="underline underline-offset-2 hover:text-foreground"
+                      style={{ color: "var(--cyan-brand)" }}
+                    >
                       Calorie Calculator
                     </Link>
                     .
                   </li>
                   <li>
                     Planning to hit these macros within a fasting window?{" "}
-                    <Link to="/tools/intermittent-fasting-calculator" className="underline underline-offset-2 hover:text-foreground" style={{ color: "var(--cyan-brand)" }}>
+                    <Link
+                      to="/tools/intermittent-fasting-calculator"
+                      className="underline underline-offset-2 hover:text-foreground"
+                      style={{ color: "var(--cyan-brand)" }}
+                    >
                       Find your schedule
                     </Link>
                     .
                   </li>
                   <li>
                     Training toward a cut or bulk? Dial in your cardio zones with the{" "}
-                    <Link to="/tools/heart-rate-zone-calculator" className="underline underline-offset-2 hover:text-foreground" style={{ color: "var(--cyan-brand)" }}>
+                    <Link
+                      to="/tools/heart-rate-zone-calculator"
+                      className="underline underline-offset-2 hover:text-foreground"
+                      style={{ color: "var(--cyan-brand)" }}
+                    >
                       Heart Rate Zone Calculator
                     </Link>
                     .
@@ -568,8 +608,8 @@ function MacroCalculator() {
               </div>
 
               <p className="text-xs text-muted-foreground italic">
-                These are estimates for general fitness planning — not medical or clinical nutrition advice. If you
-                have a medical condition (diabetes, kidney disease, an eating disorder history, or you're pregnant or
+                These are estimates for general fitness planning — not medical or clinical nutrition advice. If you have
+                a medical condition (diabetes, kidney disease, an eating disorder history, or you're pregnant or
                 nursing), talk to a registered dietitian or your doctor before making significant changes.
               </p>
             </motion.div>
@@ -640,7 +680,7 @@ function MacroCalculator() {
         ]}
       />
 
-      <RelatedTools currentSlug="macro-calculator" />
+      <RelatedTools currentSlug={SLUG} />
     </ToolPageShell>
   );
 }

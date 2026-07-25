@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -13,8 +13,37 @@ import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
+// SEO NOTE: Search Console shows demand for "best free speech to text" (44
+// impressions, position ~68 — page 7). The title below leads with "Free"
+// and "Speech to Text" together rather than relying on the generic template.
 export const Route = createFileRoute("/tools/speech-to-text")({
-  head: () => buildToolMeta(toolBySlug("speech-to-text", tools)),
+  head: () => {
+    const tool = toolBySlug("speech-to-text", tools);
+    const title = "Free Speech to Text Online — Best Real-Time Voice Transcription | Skycally";
+    const description =
+      "The best free speech to text tool online. Real-time voice transcription, multiple languages, no signup, 100% private — runs in your browser.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "Speech to Text",
+            alternateName: ["Voice to Text", "Speech Transcription", "Voice Transcription"],
+            applicationCategory: "MultimediaApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: Page,
 });
 

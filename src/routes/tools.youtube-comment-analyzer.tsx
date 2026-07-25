@@ -1,5 +1,5 @@
 import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useMemo, useState } from "react";
 import { toast } from "sonner";
@@ -16,8 +16,38 @@ import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
+// SEO NOTE: Search Console shows demand for "youtube comment analytics
+// tool" (102 impressions) and "youtube comment analysis tool" (31
+// impressions), both at position ~37-39 (page 4) with zero clicks. Title
+// below explicitly includes "Analytics Tool" phrasing.
 export const Route = createFileRoute("/tools/youtube-comment-analyzer")({
-  head: () => buildToolMeta(toolBySlug("youtube-comment-analyzer", tools)),
+  head: () => {
+    const tool = toolBySlug("youtube-comment-analyzer", tools);
+    const title = "YouTube Comment Analyzer & Analytics Tool — Free Sentiment Analysis | Skycally";
+    const description =
+      "Free YouTube comment analytics tool. Fetch and analyze comments from any video — sentiment breakdown, top comments, word cloud. No signup.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": "SoftwareApplication",
+            name: "YouTube Comment Analyzer",
+            alternateName: ["YouTube Comment Analytics Tool", "YouTube Comment Analysis Tool"],
+            applicationCategory: "UtilitiesApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: YouTubeCommentAnalyzer,
 });
 

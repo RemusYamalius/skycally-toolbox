@@ -3,6 +3,7 @@ import { tools, type Tool } from "./tools";
 // Map of tool slug -> 3 related tool slugs.
 // Names not present in the registry are normalized to the closest existing slug.
 export const relatedToolsMap: Record<string, string[]> = {
+  "would-you-rather": ["truth-or-dare", "role-spinner", "random-team-maker", "spinning-wheel", "dice-roller", "hangman"],
   "file-viewer": ["pdf-to-word", "word-processor", "pdf-reader", "pdf-text-extractor", "image-to-text"],
   "loan-calculator": ["emi-calculator", "mortgage-calculator", "car-loan-calculator", "tip-calculator", "currency-converter", "insurance-estimator"],
   "emi-calculator": ["loan-calculator", "mortgage-calculator", "car-loan-calculator", "tip-calculator", "currency-converter"],

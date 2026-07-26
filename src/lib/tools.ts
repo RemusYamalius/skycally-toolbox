@@ -59,6 +59,7 @@ import {
   Fingerprint,
   Hash,
   Shuffle,
+  Scale,
   Users,
   Gamepad2,
   Flame,

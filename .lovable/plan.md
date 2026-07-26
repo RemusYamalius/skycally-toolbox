@@ -1,56 +1,56 @@
-# Macro Calculator — `/tools/macro-calculator`
+# Would You Rather Generator — Build Plan
 
-Protein-first macro breakdown tool, independent from the Calorie Calculator, matching Skycally's tool conventions.
+New client-side party-game tool at `/tools/would-you-rather`, matching Truth or Dare / Role Spinner conventions.
 
 ## Files to create
 
-1. **`src/lib/macro/calc.ts`** — pure calculation module:
-   - `mifflinStJeor({ sex, age, heightCm, weightKg })` and `katchMcArdle({ weightKg, bodyFatPct })` BMR formulas.
-   - Activity multipliers: sedentary 1.2, light 1.375, moderate 1.55, active 1.725, very active 1.9.
-   - `computeCalories(bmr, activity, goal)` where goal ∈ `cutting` (−20%), `maintenance` (0%), `bulk` (+12%).
-   - `computeMacros({ calories, weightKg, proteinPerKg, goal, fatMode })`:
-     - Protein grams = `weightKg * proteinPerKg` (defaults: cut 2.3, maint 1.8, bulk 1.9).
-     - Fat floor = max(`weightKg * 0.8 g/kg`, `0.25 * calories / 9`), user-adjustable in a range.
-     - Carbs = remainder / 4. If carbs < 0 → return `{ warning: "Calorie target too low for protein + fat floor" }` with the deficit surfaced.
-   - Unit helper for lb↔kg, in↔cm.
-   - `foodEquivalence(macro, grams)` returning short strings (e.g. protein → chicken breast ≈ 30 g each; carbs → cup cooked rice ≈ 45 g; fat → tbsp olive oil ≈ 14 g).
+- `src/lib/would-you-rather/questions.ts` — ~160-180 hand-authored `{ a, b, category }` pairs across 8 categories (Funny, Deep, Gross, Hard Choices, Kids-Friendly, Couples, Work, Fantasy), ~20-25 each. Original content.
+- `src/routes/tools.would-you-rather.tsx` — the route.
 
-2. **`src/routes/tools.macro-calculator.tsx`** — route, mirrors calculator page patterns (Retirement / Rent-vs-Buy):
-   - `ToolPageShell` with title/description, `showFileDisclaimer={false}`.
-   - Left column input panel:
-     - **Primary**: "Daily calorie target" number input + unit toggle (kcal).
-     - **Body weight** input (needed for protein g/kg) with kg/lb toggle.
-     - **Goal** segmented control: Cutting / Maintenance / Lean Bulk — adjusts default protein g/kg + shows resulting deficit/surplus badge.
-     - **Protein slider** (1.2–2.6 g/kg) with live g and kcal readout.
-     - **Fat slider** (0.5–1.5 g/kg, floor enforced) with live readout.
-     - Collapsible **"I don't know my calorie target"** section (`<details>` styled): age, sex, height (cm/in), weight synced with above, activity level select, optional body-fat % (unlocks Katch-McArdle radio, otherwise Mifflin-St Jeor). "Use this calorie number" button fills the target field; user can still edit.
-   - Right column results:
-     - Donut chart (custom SVG, matching site's chart style — same approach as paycheck donut) showing protein/carbs/fat by kcal share.
-     - Three macro cards color-coded (protein cyan, carbs amber, fat rose using existing tokens), each with grams, kcal, %, and food-equivalence line.
-     - Total calories headline + goal delta.
-     - Warning banner when carbs go negative.
-     - Optional per-meal breakdown (3 or 4 meals toggle) — grams per meal per macro.
-   - **Contextual internal links block directly under results** (before AdZone):
-     - `<Link to="/tools/calorie-calculator">` — "Don't have a calorie target yet? Get a fuller breakdown with the Calorie Calculator."
-     - `<Link to="/tools/intermittent-fasting-calculator">` — "Planning to hit these macros within a fasting window? Find your schedule."
-     - `<Link to="/tools/heart-rate-zone-calculator">` — "Training toward a cut or bulk? Dial in your cardio zones too."
-   - Disclaimer note (general fitness planning, not medical advice — see a dietitian for medical conditions).
-   - Order: results + internal links → `AdZone` → `HowToUse` (3 steps) → `ToolSeoContent` (4 body paragraphs, 8 FAQs) → `RelatedTools`.
-   - `head: () => buildToolMeta(toolBySlug("macro-calculator", tools))` — JSON-LD `WebApplication` schema comes from `buildToolMeta` (matches every other tool).
+## Files to update
 
-3. **Registrations:**
-   - `src/lib/tools.ts` — add `macro-calculator` in the utility/health category with an appropriate lucide icon (e.g. `PieChart`), path `/tools/macro-calculator`, description targeting "macro calculator, protein carb fat calculator, macro calculator for cutting and bulking — free, complete breakdown, no signup".
-   - `src/lib/related-tools.ts` — cross-link with calorie-calculator, intermittent-fasting-calculator, heart-rate-zone-calculator, bmi-calculator.
-   - `public/sitemap.xml` — add URL entry.
-   - `public/llms.txt` — add tool line under Utilities & Calculators.
+- `src/lib/tools.ts` — register tool (Party Games / same category as Truth or Dare).
+- `src/lib/related-tools.ts` — add entry (relate to Truth or Dare, Role Spinner, Random Team Maker, Spinning Wheel, Dice Roller, Hangman).
+- `public/sitemap.xml`, `public/llms.txt` — add URL/entry.
 
-## Checklist compliance
-1. JSON-LD via `buildToolMeta` ✓
-2. All internal links use `<Link to=...>` from `@tanstack/react-router` ✓
-3. Contextual links immediately below results, above AdZone/HowToUse/ToolSeoContent ✓
-4. `ToolSeoContent.body` = 4 plain strings, no JSX ✓
-5. Order HowToUse → ToolSeoContent → RelatedTools ✓
-6. No shared state with Calorie Calculator; only an optional `<Link>` ✓
+## Route behavior
 
-## Non-goals
-No signup, no persistence, no new dependencies (chart is inline SVG matching paycheck donut pattern).
+- Category chip row (All + 8 categories) filters the pool.
+- Big two-card layout: **Option A** / big "OR" divider / **Option B**, large tap targets, mobile-first.
+- Primary "Next question" button; avoids immediate repeat within session (track last N shown).
+- Per-card vote buttons ("I'd pick this") — increment a session-local tally stored in `useState`. Displayed as `A: 4 · B: 2` and a percentage bar **explicitly labeled "Your session votes"** — never implied as global.
+- "Add your own" collapsible: two inputs (A / B) + category select → prepends into session pool, tagged `Custom`, mixed into rotation.
+- Reset session votes button.
+
+## Contextual internal links
+
+Placed **directly under the question card**, above `AdZone` / `HowToUse` / `ToolSeoContent`:
+- Link to Truth or Dare, Role Spinner, Random Team Maker via `<Link to=…>`.
+
+## Structure (order)
+
+`ToolPageShell` →
+  question card + category chips + vote/next controls →
+  custom-question adder →
+  contextual internal links row →
+  `AdZone id="would-you-rather-mid" size="728x90"` →
+  `HowToUse` →
+  `ToolSeoContent` (4+ prose paragraphs, plain strings; 8 FAQs) →
+  `RelatedTools`.
+
+## SEO
+
+- `head()` uses `buildToolMeta` + explicit `scripts` array with JSON-LD `@type: "WebApplication"`, `applicationCategory: "GameApplication"`, `featureList` (unlimited free questions, 8 categories, custom questions, no signup, mobile-friendly, session vote tally).
+- Meta title: "Would You Rather Generator — 150+ Free Questions, No Signup | Skycally".
+- Description targets "would you rather questions / generator / game online".
+
+## Verification checklist (applied before finishing)
+
+1. JSON-LD `scripts` array present in `head()`.
+2. Internal links near results, above AdZone/HowToUse.
+3. `ToolSeoContent` body strings only — no JSX.
+4. Order: HowToUse → ToolSeoContent → RelatedTools.
+5. Only reference tools that exist (Truth or Dare, Role Spinner, Random Team Maker — all confirmed in codebase).
+6. Vote % is labeled session-local; no fake global stats.
+7. `<Link to=…>` for all internal nav, no `<a href>`.
+8. English-only copy (per project memory).

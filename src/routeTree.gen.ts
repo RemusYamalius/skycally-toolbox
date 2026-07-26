@@ -17,6 +17,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as ToolsYoutubeCommentAnalyzerRouteImport } from './routes/tools.youtube-comment-analyzer'
+import { Route as ToolsWouldYouRatherRouteImport } from './routes/tools.would-you-rather'
 import { Route as ToolsWorldRadioRouteImport } from './routes/tools.world-radio'
 import { Route as ToolsWordleRouteImport } from './routes/tools.wordle'
 import { Route as ToolsWordToPdfRouteImport } from './routes/tools.word-to-pdf'
@@ -211,6 +212,11 @@ const ToolsYoutubeCommentAnalyzerRoute =
     path: '/tools/youtube-comment-analyzer',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ToolsWouldYouRatherRoute = ToolsWouldYouRatherRouteImport.update({
+  id: '/tools/would-you-rather',
+  path: '/tools/would-you-rather',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsWorldRadioRoute = ToolsWorldRadioRouteImport.update({
   id: '/tools/world-radio',
   path: '/tools/world-radio',
@@ -1146,6 +1152,7 @@ export interface FileRoutesByFullPath {
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
   '/tools/world-radio': typeof ToolsWorldRadioRoute
+  '/tools/would-you-rather': typeof ToolsWouldYouRatherRoute
   '/tools/youtube-comment-analyzer': typeof ToolsYoutubeCommentAnalyzerRoute
   '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -1308,6 +1315,7 @@ export interface FileRoutesByTo {
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
   '/tools/world-radio': typeof ToolsWorldRadioRoute
+  '/tools/would-you-rather': typeof ToolsWouldYouRatherRoute
   '/tools/youtube-comment-analyzer': typeof ToolsYoutubeCommentAnalyzerRoute
   '/blog': typeof BlogIndexRoute
   '/tools': typeof ToolsIndexRoute
@@ -1471,6 +1479,7 @@ export interface FileRoutesById {
   '/tools/word-to-pdf': typeof ToolsWordToPdfRoute
   '/tools/wordle': typeof ToolsWordleRoute
   '/tools/world-radio': typeof ToolsWorldRadioRoute
+  '/tools/would-you-rather': typeof ToolsWouldYouRatherRoute
   '/tools/youtube-comment-analyzer': typeof ToolsYoutubeCommentAnalyzerRoute
   '/blog/': typeof BlogIndexRoute
   '/tools/': typeof ToolsIndexRoute
@@ -1635,6 +1644,7 @@ export interface FileRouteTypes {
     | '/tools/word-to-pdf'
     | '/tools/wordle'
     | '/tools/world-radio'
+    | '/tools/would-you-rather'
     | '/tools/youtube-comment-analyzer'
     | '/blog/'
     | '/tools/'
@@ -1797,6 +1807,7 @@ export interface FileRouteTypes {
     | '/tools/word-to-pdf'
     | '/tools/wordle'
     | '/tools/world-radio'
+    | '/tools/would-you-rather'
     | '/tools/youtube-comment-analyzer'
     | '/blog'
     | '/tools'
@@ -1959,6 +1970,7 @@ export interface FileRouteTypes {
     | '/tools/word-to-pdf'
     | '/tools/wordle'
     | '/tools/world-radio'
+    | '/tools/would-you-rather'
     | '/tools/youtube-comment-analyzer'
     | '/blog/'
     | '/tools/'
@@ -2122,6 +2134,7 @@ export interface RootRouteChildren {
   ToolsWordToPdfRoute: typeof ToolsWordToPdfRoute
   ToolsWordleRoute: typeof ToolsWordleRoute
   ToolsWorldRadioRoute: typeof ToolsWorldRadioRoute
+  ToolsWouldYouRatherRoute: typeof ToolsWouldYouRatherRoute
   ToolsYoutubeCommentAnalyzerRoute: typeof ToolsYoutubeCommentAnalyzerRoute
   BlogIndexRoute: typeof BlogIndexRoute
   ToolsIndexRoute: typeof ToolsIndexRoute
@@ -2183,6 +2196,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/youtube-comment-analyzer'
       fullPath: '/tools/youtube-comment-analyzer'
       preLoaderRoute: typeof ToolsYoutubeCommentAnalyzerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/would-you-rather': {
+      id: '/tools/would-you-rather'
+      path: '/tools/would-you-rather'
+      fullPath: '/tools/would-you-rather'
+      preLoaderRoute: typeof ToolsWouldYouRatherRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/world-radio': {
@@ -3414,6 +3434,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsWordToPdfRoute: ToolsWordToPdfRoute,
   ToolsWordleRoute: ToolsWordleRoute,
   ToolsWorldRadioRoute: ToolsWorldRadioRoute,
+  ToolsWouldYouRatherRoute: ToolsWouldYouRatherRoute,
   ToolsYoutubeCommentAnalyzerRoute: ToolsYoutubeCommentAnalyzerRoute,
   BlogIndexRoute: BlogIndexRoute,
   ToolsIndexRoute: ToolsIndexRoute,

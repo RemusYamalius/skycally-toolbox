@@ -14,21 +14,16 @@ import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
-import {
-  QUESTIONS,
-  CATEGORY_META,
-  type WYRQuestion,
-  type WYRCategory,
-} from "@/lib/would-you-rather/questions";
+import { QUESTIONS, CATEGORY_META, type WYRQuestion, type WYRCategory } from "@/lib/would-you-rather/questions";
 
 const SLUG = "would-you-rather";
 
 export const Route = createFileRoute("/tools/would-you-rather")({
   head: () => {
     const tool = toolBySlug(SLUG, tools);
-    const title = "Would You Rather Generator — 150+ Free Questions, No Signup | Skycally";
+    const title = "Would You Rather Generator — 160+ Free Questions, No Signup | Skycally";
     const description =
-      "Free Would You Rather generator with 170+ hand-written questions across funny, deep, gross, couples, kids and fantasy categories. Unlimited plays, add your own, no signup.";
+      "Free Would You Rather generator with 160+ hand-written questions across funny, deep, gross, couples, kids and fantasy categories. Unlimited plays, add your own, no signup.";
     const base = buildPageMeta({ title, description, path: tool.path });
     return {
       ...base,
@@ -45,7 +40,7 @@ export const Route = createFileRoute("/tools/would-you-rather")({
             url: `${SITE_URL}${tool.path}`,
             description,
             featureList: [
-              "170+ hand-written Would You Rather questions",
+              "160+ hand-written Would You Rather questions",
               "8 categories: Funny, Deep, Gross, Hard Choices, Kids-Friendly, Couples, Work, Fantasy",
               "One-tap next question for fast group play",
               "Add your own custom question pairs to the session",
@@ -63,17 +58,7 @@ export const Route = createFileRoute("/tools/would-you-rather")({
 
 type Filter = "all" | WYRCategory;
 
-const CATEGORY_ORDER: Filter[] = [
-  "all",
-  "funny",
-  "deep",
-  "hard",
-  "couples",
-  "kids",
-  "work",
-  "fantasy",
-  "gross",
-];
+const CATEGORY_ORDER: Filter[] = ["all", "funny", "deep", "hard", "couples", "kids", "work", "fantasy", "gross"];
 
 interface SessionQuestion extends WYRQuestion {
   id: number;
@@ -104,9 +89,7 @@ function WouldYouRatherPage() {
     return all.filter((q) => q.category === filter);
   }, [filter, customs]);
 
-  const [current, setCurrent] = useState<SessionQuestion>(() =>
-    pickRandom(BASE_POOL, []),
-  );
+  const [current, setCurrent] = useState<SessionQuestion>(() => pickRandom(BASE_POOL, []));
 
   const next = () => {
     if (activePool.length === 0) return;
@@ -148,7 +131,7 @@ function WouldYouRatherPage() {
     <ToolPageShell
       showFileDisclaimer={false}
       title="Would You Rather Generator"
-      description="170+ free Would You Rather questions across 8 categories. Add your own, tap for the next one — perfect for parties, road trips and icebreakers."
+      description="160+ free Would You Rather questions across 8 categories. Add your own, tap for the next one — perfect for parties, road trips and icebreakers."
     >
       <div className="max-w-3xl mx-auto">
         {/* Category chips */}
@@ -257,9 +240,7 @@ function WouldYouRatherPage() {
               <span className="flex items-center gap-2">
                 <Plus className="w-4 h-4" /> Add your own question
                 {customs.length > 0 && (
-                  <span className="text-xs text-muted-foreground">
-                    ({customs.length} in session)
-                  </span>
+                  <span className="text-xs text-muted-foreground">({customs.length} in session)</span>
                 )}
               </span>
               <ChevronDown className={`w-4 h-4 transition-transform ${showCustom ? "rotate-180" : ""}`} />
@@ -285,7 +266,7 @@ function WouldYouRatherPage() {
                 onChange={(e) => setNewCat(e.target.value as WYRCategory)}
                 className="rounded-md border border-border bg-background px-2 py-1.5 text-sm"
               >
-                {(Object.keys(CATEGORY_META) as (Filter)[])
+                {(Object.keys(CATEGORY_META) as Filter[])
                   .filter((c) => c !== "all")
                   .map((c) => (
                     <option key={c} value={c}>
@@ -308,9 +289,7 @@ function WouldYouRatherPage() {
                       {q.a} <span className="text-muted-foreground">or</span> {q.b}
                     </span>
                     <button
-                      onClick={() =>
-                        setCustoms((prev) => prev.filter((x) => x.id !== q.id))
-                      }
+                      onClick={() => setCustoms((prev) => prev.filter((x) => x.id !== q.id))}
                       className="text-muted-foreground hover:text-foreground"
                       aria-label="Remove custom question"
                     >
@@ -321,8 +300,7 @@ function WouldYouRatherPage() {
               </ul>
             )}
             <p className="text-xs text-muted-foreground">
-              Custom questions live only in this browser session — nothing is saved
-              or sent anywhere.
+              Custom questions live only in this browser session — nothing is saved or sent anywhere.
             </p>
           </CollapsibleContent>
         </Collapsible>
@@ -370,10 +348,10 @@ function WouldYouRatherPage() {
       />
 
       <ToolSeoContent
-        title="Free Would You Rather Generator — 170+ Questions, No Signup"
-        description="Play Would You Rather online with 170+ hand-written questions across 8 categories — funny, deep, gross, hard choices, kids-friendly, couples, work and fantasy. Unlimited plays, add your own, no signup, no app download."
+        title="Free Would You Rather Generator — 160+ Questions, No Signup"
+        description="Play Would You Rather online with 160+ hand-written questions across 8 categories — funny, deep, gross, hard choices, kids-friendly, couples, work and fantasy. Unlimited plays, add your own, no signup, no app download."
         body={[
-          "Would You Rather is the classic party game where every question forces you to choose between two hypothetical options — no skipping, no third option, no 'both'. Skycally's generator gives you a hand-written bank of 170+ pairs split into eight distinct categories so you can pick the tone that fits the room, then tap through them one at a time for fast-paced group play. Every question is free and immediately available with no signup, no email, no app to download.",
+          "Would You Rather is the classic party game where every question forces you to choose between two hypothetical options — no skipping, no third option, no 'both'. Skycally's generator gives you a hand-written bank of 160+ pairs split into eight distinct categories so you can pick the tone that fits the room, then tap through them one at a time for fast-paced group play. Every question is free and immediately available with no signup, no email, no app to download.",
           "Category chips at the top let you switch tone instantly. Funny is your default icebreaker for road trips and dinner parties. Deep is for late-night conversations where the point is what the answer reveals about the person. Hard Choices is for genuine dilemmas where nobody in the group feels totally comfortable committing. Gross is for the middle-school-humor kind of group. Kids-Friendly is safe for young players — no dating, no drinking, no anything questionable. Couples is designed for two people to play together on a date night. Work is for team-building and office icebreakers. Fantasy is superpower questions and Middle-earth-versus-Hogwarts territory.",
           "The custom question feature is where this tool goes beyond most competitors. Open 'Add your own', type in your Option A and Option B, pick a category, and it's mixed straight into the current session's rotation — no account needed. Great for inside jokes with a specific friend group, wedding-shower icebreakers about the couple, or personalised office questions. Custom questions stay in your session only; nothing is sent anywhere or saved beyond this browser tab.",
           "Unlike most Would You Rather sites, Skycally doesn't hide questions behind a signup wall, doesn't ask you to download an app for 'unlimited' play, and doesn't interrupt every third question with a pop-up. The vote tally under each question is genuinely local to your session — it's your group's running score, not a fabricated 'X% of people worldwide chose this' statistic. Everything runs in your browser, so it works on phones, tablets and laptops equally well.",
@@ -387,7 +365,7 @@ function WouldYouRatherPage() {
           {
             question: "How many questions are included?",
             answer:
-              "170+ original, hand-written question pairs split across eight categories: Funny, Deep, Gross, Hard Choices, Kids-Friendly, Couples, Work and Fantasy. Roughly 20+ questions per category. You can also add unlimited custom questions to your current session.",
+              "160+ original, hand-written question pairs split across eight categories: Funny, Deep, Gross, Hard Choices, Kids-Friendly, Couples, Work and Fantasy. Roughly 20+ questions per category. You can also add unlimited custom questions to your current session.",
           },
           {
             question: "Can I add my own questions?",
@@ -439,11 +417,7 @@ interface OptionCardProps {
 function OptionCard({ letter, text, accent, onVote, pct, count }: OptionCardProps) {
   return (
     <div className="relative rounded-2xl border border-border bg-card p-5 sm:p-6 flex flex-col shadow-md overflow-hidden">
-      <div
-        className="absolute top-0 left-0 h-1 w-full"
-        style={{ background: accent }}
-        aria-hidden="true"
-      />
+      <div className="absolute top-0 left-0 h-1 w-full" style={{ background: accent }} aria-hidden="true" />
       <div className="flex items-center gap-2 mb-3">
         <span
           className="inline-flex items-center justify-center w-8 h-8 rounded-full text-sm font-bold text-white"
@@ -453,9 +427,7 @@ function OptionCard({ letter, text, accent, onVote, pct, count }: OptionCardProp
         </span>
         <span className="text-xs uppercase tracking-wider text-muted-foreground">Would you rather</span>
       </div>
-      <p className="text-base sm:text-lg text-foreground leading-snug flex-1 mb-4">
-        {text}
-      </p>
+      <p className="text-base sm:text-lg text-foreground leading-snug flex-1 mb-4">{text}</p>
       {pct !== null && (
         <div className="mb-3">
           <div className="h-2 w-full rounded-full bg-muted overflow-hidden">
@@ -469,11 +441,7 @@ function OptionCard({ letter, text, accent, onVote, pct, count }: OptionCardProp
           </p>
         </div>
       )}
-      <Button
-        onClick={onVote}
-        variant="outline"
-        className="w-full"
-      >
+      <Button onClick={onVote} variant="outline" className="w-full">
         <Scale className="w-4 h-4" />
         I'd pick this
       </Button>

@@ -1442,7 +1442,8 @@ export const tools: Tool[] = [
   {
     slug: "would-you-rather",
     name: "Would You Rather",
-    description: "170+ Would You Rather questions across 8 categories — funny, deep, couples, kids-friendly and more. Add your own, no signup.",
+    description:
+      "160+ Would You Rather questions across 8 categories — funny, deep, couples, kids-friendly and more. Add your own, no signup.",
     category: "games",
     icon: Scale,
     path: "/tools/would-you-rather",

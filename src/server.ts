@@ -65,6 +65,12 @@ export default {
   // TanStack Start's typed ServerEntry interface only models fetch(request).
   // The mismatch is cosmetic and doesn't affect runtime behavior.
   async fetch(request: Request, env: unknown, ctx: ExecutionContext) {
+    // TEMPORARY DIAGNOSTIC — remove once we confirm this file is actually
+    // the entry point being executed in production. If this header is
+    // missing from `curl -I` output after deploying, the custom server.ts
+    // is not being picked up by the hosting pipeline at all.
+    const DEBUG_MARKER = "server-ts-active-v1";
+
     // The Cache API (`caches`) only exists in the real Cloudflare Workers
     // runtime. Lovable's live preview runs on a plain Node dev server, where
     // `caches` is undefined — so we detect that and simply skip caching
@@ -90,6 +96,7 @@ export default {
         "Cache-Control",
         `public, max-age=${HTML_CACHE_TTL_SECONDS}`,
       );
+      cacheableResponse.headers.set("x-debug-server-entry", DEBUG_MARKER);
 
       // Store in the background so the visitor doesn't wait on the cache write.
       if (ctx?.waitUntil) {
@@ -101,6 +108,10 @@ export default {
       return cacheableResponse;
     }
 
-    return response;
+    // Even on the "not cacheable" path, tag the response so we can confirm
+    // this custom entry point ran at all (see DEBUG_MARKER comment above).
+    const debugResponse = new Response(response.body, response);
+    debugResponse.headers.set("x-debug-server-entry", DEBUG_MARKER);
+    return debugResponse;
   },
 };

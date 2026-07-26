@@ -799,7 +799,7 @@ export const tools: Tool[] = [
   {
     slug: "object-detection",
     name: "Object Detection",
-    description: "Detect 80+ object classes in images or live video with COCO-SSD.",
+    description: "Detect 80 object classes in images or live video with COCO-SSD.",
     category: "ai",
     icon: Boxes,
     path: "/tools/object-detection",

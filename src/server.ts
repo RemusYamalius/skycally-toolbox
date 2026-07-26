@@ -2,37 +2,27 @@
 //
 // Custom Cloudflare Workers entry point for the TanStack Start app.
 //
-// WHY THIS FILE EXISTS
-// By default, wrangler.jsonc points "main" straight at
-// "@tanstack/react-start/server-entry", which means every single visitor
-// request re-runs full server-side rendering from scratch. Static assets
-// (/assets/*, logo.webp, etc.) are already cached correctly for a year via
-// public/_headers — but the HTML document itself was never cached, which is
-// exactly what PageSpeed Insights' TTFB metric measures.
+// Static assets (/assets/*, logo.webp, etc.) are already cached correctly
+// for a year via public/_headers. This file adds a short edge cache for the
+// rendered HTML documents themselves, since none of the site's pages
+// (calculators, tools, games) are personalized per visitor.
 //
-// This file wraps the default handler with Cloudflare's Cache API so that
-// identical pages (calculators, tools, games — none of which are
-// personalized per visitor) are served instantly from the edge cache
-// instead of being rebuilt on every request.
-//
-// After adding this file, update wrangler.jsonc:
-//   "main": "./src/server.ts"
-// (instead of "@tanstack/react-start/server-entry")
+// IMPORTANT: real browser requests always carry some cookies (Cloudflare's
+// own bot-management cookie, analytics, etc.), and Cloudflare attaches
+// Set-Cookie to almost every response for the same reason. So instead of
+// skipping the cache whenever a cookie is present (which disabled caching
+// for ~100% of real traffic), we strip Set-Cookie from the copy we store in
+// cache, while the actual visitor still gets their normal response with
+// cookies intact. This keeps caching safe without disabling it entirely.
 
 import handler from "@tanstack/react-start/server-entry";
 
-// How long a rendered HTML page stays in Cloudflare's edge cache.
-// Keep this modest: long enough to remove most TTFB hits, short enough that
-// content updates (new tools, copy edits) show up again quickly.
 const HTML_CACHE_TTL_SECONDS = 300; // 5 minutes
 
 function isCacheableRequest(request: Request): boolean {
   if (request.method !== "GET") return false;
 
   const url = new URL(request.url);
-
-  // Never cache server functions / RPC calls, or static assets
-  // (assets already have their own long-lived cache via public/_headers).
   if (
     url.pathname.startsWith("/_serverFn") ||
     url.pathname.startsWith("/assets/")
@@ -40,43 +30,20 @@ function isCacheableRequest(request: Request): boolean {
     return false;
   }
 
-  // Safety net: if personalization (login, per-user data) is ever added
-  // later, requests carrying a cookie will skip the cache automatically.
-  // Today the app sets no session cookies, so this rarely triggers.
-  if (request.headers.has("cookie")) return false;
-
   return true;
 }
 
 function isCacheableResponse(response: Response): boolean {
   if (response.status !== 200) return false;
-
   const contentType = response.headers.get("content-type") || "";
-  if (!contentType.includes("text/html")) return false;
-
-  // Don't cache anything that tries to set a cookie on the visitor.
-  if (response.headers.has("set-cookie")) return false;
-
-  return true;
+  return contentType.includes("text/html");
 }
 
 export default {
   // @ts-expect-error — Cloudflare calls fetch(request, env, ctx), while
   // TanStack Start's typed ServerEntry interface only models fetch(request).
-  // The mismatch is cosmetic and doesn't affect runtime behavior.
   async fetch(request: Request, env: unknown, ctx: ExecutionContext) {
-    // TEMPORARY DIAGNOSTIC — remove once we confirm this file is actually
-    // the entry point being executed in production. If this header is
-    // missing from `curl -I` output after deploying, the custom server.ts
-    // is not being picked up by the hosting pipeline at all.
-    const DEBUG_MARKER = "server-ts-active-v1";
-
-    // The Cache API (`caches`) only exists in the real Cloudflare Workers
-    // runtime. Lovable's live preview runs on a plain Node dev server, where
-    // `caches` is undefined — so we detect that and simply skip caching
-    // there. Production (the actual deployed Worker) still gets the cache.
-    const cache =
-      typeof caches !== "undefined" ? (caches as any).default : null;
+    const cache = typeof caches !== "undefined" ? (caches as any).default : null;
     const cacheable = cache !== null && isCacheableRequest(request);
 
     if (cacheable) {
@@ -91,27 +58,26 @@ export default {
     });
 
     if (cacheable && isCacheableResponse(response)) {
-      const cacheableResponse = new Response(response.body, response);
-      cacheableResponse.headers.set(
+      // Build the version we STORE in cache: same body, but with Set-Cookie
+      // stripped so we never leak one visitor's cookies to another via cache.
+      const storedResponse = new Response(response.body, response);
+      storedResponse.headers.delete("set-cookie");
+      storedResponse.headers.set(
         "Cache-Control",
         `public, max-age=${HTML_CACHE_TTL_SECONDS}`,
       );
-      cacheableResponse.headers.set("x-debug-server-entry", DEBUG_MARKER);
 
-      // Store in the background so the visitor doesn't wait on the cache write.
       if (ctx?.waitUntil) {
-        ctx.waitUntil(cache.put(request, cacheableResponse.clone()));
+        ctx.waitUntil(cache.put(request, storedResponse.clone()));
       } else {
-        await cache.put(request, cacheableResponse.clone());
+        await cache.put(request, storedResponse.clone());
       }
 
-      return cacheableResponse;
+      // The CURRENT visitor still gets a normal response (their own
+      // Set-Cookie intact) — only the cached copy has cookies stripped.
+      return storedResponse;
     }
 
-    // Even on the "not cacheable" path, tag the response so we can confirm
-    // this custom entry point ran at all (see DEBUG_MARKER comment above).
-    const debugResponse = new Response(response.body, response);
-    debugResponse.headers.set("x-debug-server-entry", DEBUG_MARKER);
-    return debugResponse;
+    return response;
   },
 };

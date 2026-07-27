@@ -26,7 +26,7 @@ const SLUG = "word-counter";
 export const Route = createFileRoute("/tools/word-counter")({
   head: () => {
     const tool = toolBySlug(SLUG, tools);
-    const title = "Word Counter Online — Free Word & Character Count Calculator | Skycally";
+    const title = "Free Word Counter Online — Count Words, Characters & Reading Time | Skycally";
     const description =
       "Free online word counter and character count calculator. Count words, characters, sentences and paragraphs instantly — no signup, works in your browser.";
     const base = buildPageMeta({ title, description, path: tool.path });
@@ -406,6 +406,11 @@ function WordCounterPage() {
             question: "How does this compare to Microsoft Word's word counter?",
             answer:
               "Results are very close. Microsoft Word counts contractions (like 'don't') as one word — so does Skycally's counter. Minor differences can occur with hyphenated words or punctuation-heavy text, but for standard prose the counts will match.",
+          },
+          {
+            question: "Is there a word counter online free with no ads blocking the text box?",
+            answer:
+              "Yes. This word counter online is free, with no signup and no ad overlay covering the input area. Whether you search for an online word count, a words calculator online, or just want to count words online free, this single tool covers it — paste your text and every stat updates instantly.",
           },
           {
             question: "How many words is my essay or document?",

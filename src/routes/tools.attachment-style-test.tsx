@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useMemo, useState } from "react";
-import { Copy, RotateCcw, ArrowRight, ArrowLeft, HeartHandshake, CheckCircle2 } from "lucide-react";
+import { Copy, RotateCcw, ArrowRight, ArrowLeft, HeartHandshake, CheckCircle2, Info } from "lucide-react";
 import { toast } from "sonner";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -194,6 +194,16 @@ function AttachmentPage() {
             question: "Is my data saved or shared?",
             answer:
               "No. Every answer and score stays in your browser. Nothing is sent to a server, no account is created, and no email is requested.",
+          },
+          {
+            question: "What does it mean if my scores are near the boundary between two styles?",
+            answer:
+              "It means you're genuinely in between, not that the test is uncertain. Anxiety and avoidance are continuous, so a score close to the midpoint on either dimension puts you near the edge of two neighbouring quadrants at once — the result screen flags this directly rather than forcing you into one label.",
+          },
+          {
+            question: "Can I take this about a specific relationship instead of in general?",
+            answer:
+              "Yes. The statements are written broadly on purpose, but you can answer with one specific relationship in mind if you'd rather see your pattern there — just be consistent across all 28 statements so the two scores stay comparable. Retake it with a different relationship in mind any time.",
           },
         ]}
       />
@@ -450,6 +460,16 @@ function ResultsPanel({ scores, onRetake, onShare }: { scores: Scores; onRetake:
         </div>
 
         <p className="mt-5 text-sm leading-relaxed text-muted-foreground">{meta.description}</p>
+
+        {scores.nearBoundary && (
+          <div className="mt-4 flex items-start gap-2 rounded-xl border border-border bg-secondary/40 p-4 text-sm text-muted-foreground">
+            <Info className="w-4 h-4 mt-0.5 shrink-0" style={{ color: "var(--cyan-brand)" }} />
+            <span>
+              At least one of your scores landed close to the midpoint, so you're genuinely in between two quadrants
+              here — not a borderline case of the test being unsure, but a real "in between" position on the map.
+            </span>
+          </div>
+        )}
       </div>
 
       <div className="grid gap-3 sm:grid-cols-2">

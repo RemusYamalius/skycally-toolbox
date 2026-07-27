@@ -154,6 +154,7 @@ import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
 import { Route as ToolsBacklinkCheckerRouteImport } from './routes/tools.backlink-checker'
 import { Route as ToolsBackgroundBlurRouteImport } from './routes/tools.background-blur'
 import { Route as ToolsAudioConverterRouteImport } from './routes/tools.audio-converter'
+import { Route as ToolsAttachmentStyleTestRouteImport } from './routes/tools.attachment-style-test'
 import { Route as ToolsAiWritingAssistantRouteImport } from './routes/tools.ai-writing-assistant'
 import { Route as ToolsAiResumeBuilderRouteImport } from './routes/tools.ai-resume-builder'
 import { Route as ToolsAiImageGeneratorRouteImport } from './routes/tools.ai-image-generator'
@@ -907,6 +908,12 @@ const ToolsAudioConverterRoute = ToolsAudioConverterRouteImport.update({
   path: '/tools/audio-converter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsAttachmentStyleTestRoute =
+  ToolsAttachmentStyleTestRouteImport.update({
+    id: '/tools/attachment-style-test',
+    path: '/tools/attachment-style-test',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsAiWritingAssistantRoute = ToolsAiWritingAssistantRouteImport.update({
   id: '/tools/ai-writing-assistant',
   path: '/tools/ai-writing-assistant',
@@ -1016,6 +1023,7 @@ export interface FileRoutesByFullPath {
   '/tools/ai-image-generator': typeof ToolsAiImageGeneratorRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
+  '/tools/attachment-style-test': typeof ToolsAttachmentStyleTestRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
@@ -1179,6 +1187,7 @@ export interface FileRoutesByTo {
   '/tools/ai-image-generator': typeof ToolsAiImageGeneratorRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
+  '/tools/attachment-style-test': typeof ToolsAttachmentStyleTestRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
@@ -1343,6 +1352,7 @@ export interface FileRoutesById {
   '/tools/ai-image-generator': typeof ToolsAiImageGeneratorRoute
   '/tools/ai-resume-builder': typeof ToolsAiResumeBuilderRoute
   '/tools/ai-writing-assistant': typeof ToolsAiWritingAssistantRoute
+  '/tools/attachment-style-test': typeof ToolsAttachmentStyleTestRoute
   '/tools/audio-converter': typeof ToolsAudioConverterRoute
   '/tools/background-blur': typeof ToolsBackgroundBlurRoute
   '/tools/backlink-checker': typeof ToolsBacklinkCheckerRoute
@@ -1508,6 +1518,7 @@ export interface FileRouteTypes {
     | '/tools/ai-image-generator'
     | '/tools/ai-resume-builder'
     | '/tools/ai-writing-assistant'
+    | '/tools/attachment-style-test'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/backlink-checker'
@@ -1671,6 +1682,7 @@ export interface FileRouteTypes {
     | '/tools/ai-image-generator'
     | '/tools/ai-resume-builder'
     | '/tools/ai-writing-assistant'
+    | '/tools/attachment-style-test'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/backlink-checker'
@@ -1834,6 +1846,7 @@ export interface FileRouteTypes {
     | '/tools/ai-image-generator'
     | '/tools/ai-resume-builder'
     | '/tools/ai-writing-assistant'
+    | '/tools/attachment-style-test'
     | '/tools/audio-converter'
     | '/tools/background-blur'
     | '/tools/backlink-checker'
@@ -1998,6 +2011,7 @@ export interface RootRouteChildren {
   ToolsAiImageGeneratorRoute: typeof ToolsAiImageGeneratorRoute
   ToolsAiResumeBuilderRoute: typeof ToolsAiResumeBuilderRoute
   ToolsAiWritingAssistantRoute: typeof ToolsAiWritingAssistantRoute
+  ToolsAttachmentStyleTestRoute: typeof ToolsAttachmentStyleTestRoute
   ToolsAudioConverterRoute: typeof ToolsAudioConverterRoute
   ToolsBackgroundBlurRoute: typeof ToolsBackgroundBlurRoute
   ToolsBacklinkCheckerRoute: typeof ToolsBacklinkCheckerRoute
@@ -3157,6 +3171,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsAudioConverterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/attachment-style-test': {
+      id: '/tools/attachment-style-test'
+      path: '/tools/attachment-style-test'
+      fullPath: '/tools/attachment-style-test'
+      preLoaderRoute: typeof ToolsAttachmentStyleTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/ai-writing-assistant': {
       id: '/tools/ai-writing-assistant'
       path: '/tools/ai-writing-assistant'
@@ -3297,6 +3318,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsAiImageGeneratorRoute: ToolsAiImageGeneratorRoute,
   ToolsAiResumeBuilderRoute: ToolsAiResumeBuilderRoute,
   ToolsAiWritingAssistantRoute: ToolsAiWritingAssistantRoute,
+  ToolsAttachmentStyleTestRoute: ToolsAttachmentStyleTestRoute,
   ToolsAudioConverterRoute: ToolsAudioConverterRoute,
   ToolsBackgroundBlurRoute: ToolsBackgroundBlurRoute,
   ToolsBacklinkCheckerRoute: ToolsBacklinkCheckerRoute,

@@ -102,6 +102,7 @@ import {
   Ruler,
   Droplets,
   HeartPulse,
+  HeartHandshake,
   FileSignature,
   Timer,
   Mail,
@@ -2339,6 +2340,15 @@ export const tools: Tool[] = [
     category: "utility",
     icon: BrainCircuit,
     path: "/tools/big-five-personality-test",
+  },
+  {
+    slug: "attachment-style-test",
+    name: "Attachment Style Test",
+    description:
+      "Free 28-question attachment style test scored on two dimensions — anxiety and avoidance. Secure, anxious, avoidant or fearful-avoidant, full results instantly, no signup.",
+    category: "utility",
+    icon: HeartHandshake,
+    path: "/tools/attachment-style-test",
   },
   {
     slug: "heart-rate-zone-calculator",

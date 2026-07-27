@@ -17,6 +17,9 @@ export interface Scores {
   anxiety: DimensionResult;
   avoidance: DimensionResult;
   style: StyleKey;
+  /** True when either dimension score falls within 45–55 — genuinely
+   *  "in between" two quadrants rather than clearly in one. */
+  nearBoundary: boolean;
 }
 
 function band(score: number): DimensionResult["band"] {
@@ -44,6 +47,9 @@ function scoreDimension(responses: Responses, dimension: Dimension): DimensionRe
 /** Midpoint of the 0–100 scale — the quadrant split for both dimensions. */
 export const MIDPOINT = 50;
 
+/** Half-width of the "genuinely in between" band around the midpoint. */
+const BOUNDARY_MARGIN = 5;
+
 export function classify(anxiety: number, avoidance: number): StyleKey {
   const highAnx = anxiety > MIDPOINT;
   const highAvo = avoidance > MIDPOINT;
@@ -53,6 +59,10 @@ export function classify(anxiety: number, avoidance: number): StyleKey {
   return "fearful";
 }
 
+function isNearBoundary(score: number): boolean {
+  return score >= MIDPOINT - BOUNDARY_MARGIN && score <= MIDPOINT + BOUNDARY_MARGIN;
+}
+
 export function scoreResponses(responses: Responses): Scores {
   const anxiety = scoreDimension(responses, "anxiety");
   const avoidance = scoreDimension(responses, "avoidance");
@@ -60,12 +70,21 @@ export function scoreResponses(responses: Responses): Scores {
     anxiety,
     avoidance,
     style: classify(anxiety.score0to100, avoidance.score0to100),
+    nearBoundary: isNearBoundary(anxiety.score0to100) || isNearBoundary(avoidance.score0to100),
   };
 }
 
 export const STYLE_META: Record<
   StyleKey,
-  { name: string; short: string; color: string; tagline: string; description: string; strengths: string[]; growth: string[] }
+  {
+    name: string;
+    short: string;
+    color: string;
+    tagline: string;
+    description: string;
+    strengths: string[];
+    growth: string[];
+  }
 > = {
   secure: {
     name: "Secure",
@@ -97,7 +116,7 @@ export const STYLE_META: Record<
       "You're willing to talk about the relationship rather than avoid it.",
     ],
     growth: [
-      "Try naming the fear out loud (\"I'm feeling anxious about us\") instead of testing for reassurance indirectly.",
+      'Try naming the fear out loud ("I\'m feeling anxious about us") instead of testing for reassurance indirectly.',
       "Build a delay between the anxious feeling and the message you send.",
       "Notice how often the feared outcome actually happens — the prediction is usually louder than the evidence.",
     ],
@@ -116,7 +135,7 @@ export const STYLE_META: Record<
     ],
     growth: [
       "Practise saying a small true thing about how you feel before you're forced to.",
-      "When you feel the urge to withdraw, try saying \"I need an hour\" instead of just going quiet.",
+      'When you feel the urge to withdraw, try saying "I need an hour" instead of just going quiet.',
       "Letting someone help with something small is a low-risk way to build the muscle.",
     ],
   },

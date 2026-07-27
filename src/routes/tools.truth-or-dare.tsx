@@ -94,12 +94,19 @@ const DARES = [
 
 type Mode = "both" | "truth" | "dare";
 
+// The 🍾 emoji glyph rests at a natural ~22.5° left-leaning tilt by default.
+// We compensate for that at rest so the bottle looks perfectly vertical when
+// idle, then let the spin land exactly on that natural tilt for Truth, and
+// on the mirrored tilt for Dare — so the two outcomes are always visually
+// distinct and consistent, instead of a random angle unrelated to the result.
+const RESTING_TILT = 22.5;
+
 function TruthOrDare() {
   const [truthOn, setTruthOn] = useState(true);
   const [dareOn, setDareOn] = useState(true);
   const [current, setCurrent] = useState<{ type: "truth" | "dare"; text: string } | null>(null);
   const [spinning, setSpinning] = useState(false);
-  const [rotation, setRotation] = useState(0);
+  const [rotation, setRotation] = useState(RESTING_TILT);
   const [customTruths, setCustomTruths] = useState<string[]>([]);
   const [customDares, setCustomDares] = useState<string[]>([]);
   const [useCustomOnly, setUseCustomOnly] = useState(false);
@@ -115,16 +122,15 @@ function TruthOrDare() {
     setSpinning(true);
     setCurrent(null);
 
-    // Decide the outcome FIRST, then aim the bottle's rotation at it —
-    // previously these were two independent random calls, so the bottle's
-    // direction had no real connection to the actual Truth/Dare result.
+    // Decide the outcome FIRST, then aim the bottle's rotation at it, so the
+    // visual landing position and the actual Truth/Dare result always match.
     const type: "truth" | "dare" = mode === "both" ? (Math.random() > 0.5 ? "truth" : "dare") : mode;
 
     setRotation((r) => {
       const spins = 4 + Math.floor(Math.random() * 3); // 4–6 full turns for the animation
-      const jitter = Math.floor(Math.random() * 41) - 20; // ±20°, still lands on the correct side
-      // 0° = up, clockwise: 270° leans left (Truth button), 90° leans right (Dare button)
-      const target = type === "truth" ? 270 + jitter : 90 + jitter;
+      // Truth lands on the bottle's natural resting tilt (+22.5°, leaning left).
+      // Dare lands on the mirrored tilt (2 × 22.5° further, leaning right).
+      const target = type === "truth" ? RESTING_TILT : RESTING_TILT + 2 * RESTING_TILT;
       const current360 = ((r % 360) + 360) % 360;
       let delta = target - current360;
       if (delta <= 0) delta += 360;

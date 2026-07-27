@@ -7,7 +7,8 @@
 import handler from "@tanstack/react-start/server-entry";
 
 export default {
-  fetch(request: Request, env: unknown, ctx: ExecutionContext) {
-    return handler.fetch(request, { context: { fromFetch: true } });
+  fetch(request: Request) {
+    return handler.fetch(request);
   },
 };
+

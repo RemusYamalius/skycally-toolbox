@@ -158,12 +158,19 @@ function RandomTeamMaker() {
     });
   }, [teamCount]);
 
+  // Auto-detects the separator: newlines, commas, or semicolons. Pasting
+  // "Ana, Ben; Cara" or a multi-line list adds each name individually.
+  // Duplicate names are intentionally kept — two people can share a name.
   const addPlayer = () => {
-    const v = playerInput.trim();
-    if (!v) return;
-    setPlayers((p) => [...p, v]);
+    const names = playerInput
+      .split(/[\n,;]+/)
+      .map((n) => n.trim())
+      .filter(Boolean);
+    if (names.length === 0) return;
+    setPlayers((p) => [...p, ...names]);
     setPlayerInput("");
   };
+
   const removePlayer = (i: number) => setPlayers((p) => p.filter((_, idx) => idx !== i));
 
   const segments: Segment[] = useMemo(
@@ -279,12 +286,17 @@ function RandomTeamMaker() {
                 value={playerInput}
                 onChange={(e) => setPlayerInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPlayer())}
-                placeholder="Add player name"
+                placeholder="Add a name, or paste a list (commas or new lines)"
               />
               <Button onClick={addPlayer} variant="outline">
                 <Plus className="w-4 h-4 mr-1" /> Add
               </Button>
             </div>
+            <p className="-mt-1 mb-3 text-xs text-muted-foreground">
+              Paste a whole list at once — names separated by commas, semicolons, or new lines are added individually.
+              Duplicate names are kept.
+            </p>
+
             <div className="space-y-2 max-h-[360px] overflow-auto pr-1">
               {players.map((p, i) => (
                 <div key={i} className="flex items-center gap-2 rounded-md border border-border px-3 py-2">

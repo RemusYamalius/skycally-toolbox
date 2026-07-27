@@ -1430,8 +1430,9 @@ export const tools: Tool[] = [
     icon: Flame,
     path: "/tools/truth-or-dare",
     featureList: [
-      "Random Truth or Dare prompts for any group size",
-      "Adjustable spice/difficulty level",
+      "40+ built-in Truth or Dare prompts for any group size",
+      "Truth-only, Dare-only, or mixed mode",
+      "Add your own custom truths and dares",
       "Great for parties and friend gatherings",
       "No signup required",
       "100% browser-based",

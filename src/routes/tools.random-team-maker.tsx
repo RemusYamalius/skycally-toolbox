@@ -158,12 +158,19 @@ function RandomTeamMaker() {
     });
   }, [teamCount]);
 
+  // Auto-detects the separator: newlines, commas, or semicolons. Pasting
+  // "Ana, Ben; Cara" or a multi-line list adds each name individually.
+  // Duplicate names are intentionally kept — two people can share a name.
   const addPlayer = () => {
-    const v = playerInput.trim();
-    if (!v) return;
-    setPlayers((p) => [...p, v]);
+    const names = playerInput
+      .split(/[\n,;]+/)
+      .map((n) => n.trim())
+      .filter(Boolean);
+    if (names.length === 0) return;
+    setPlayers((p) => [...p, ...names]);
     setPlayerInput("");
   };
+
   const removePlayer = (i: number) => setPlayers((p) => p.filter((_, idx) => idx !== i));
 
   const segments: Segment[] = useMemo(

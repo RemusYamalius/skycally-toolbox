@@ -58,7 +58,7 @@ export const Route = createFileRoute("/tools/attachment-style-test")({
       ],
     };
   },
-  component: AttachmentPage;
+  component: AttachmentPage,
 });
 
 type Screen = "intro" | "quiz" | "results";

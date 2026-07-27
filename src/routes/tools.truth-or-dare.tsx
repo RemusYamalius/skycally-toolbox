@@ -114,11 +114,26 @@ function TruthOrDare() {
     if (!truthOn && !dareOn) return;
     setSpinning(true);
     setCurrent(null);
-    setRotation((r) => r + 720 + Math.floor(Math.random() * 360));
+
+    // Decide the outcome FIRST, then aim the bottle's rotation at it —
+    // previously these were two independent random calls, so the bottle's
+    // direction had no real connection to the actual Truth/Dare result.
+    const type: "truth" | "dare" = mode === "both" ? (Math.random() > 0.5 ? "truth" : "dare") : mode;
+
+    setRotation((r) => {
+      const spins = 4 + Math.floor(Math.random() * 3); // 4–6 full turns for the animation
+      const jitter = Math.floor(Math.random() * 41) - 20; // ±20°, still lands on the correct side
+      // 0° = up, clockwise: 270° leans left (Truth button), 90° leans right (Dare button)
+      const target = type === "truth" ? 270 + jitter : 90 + jitter;
+      const current360 = ((r % 360) + 360) % 360;
+      let delta = target - current360;
+      if (delta <= 0) delta += 360;
+      return r + spins * 360 + delta;
+    });
+
     setTimeout(() => {
       const truths = useCustomOnly && customTruths.length ? customTruths : [...TRUTHS, ...customTruths];
       const dares = useCustomOnly && customDares.length ? customDares : [...DARES, ...customDares];
-      const type: "truth" | "dare" = mode === "both" ? (Math.random() > 0.5 ? "truth" : "dare") : mode;
       const pool = type === "truth" ? truths : dares;
       if (!pool.length) {
         setSpinning(false);

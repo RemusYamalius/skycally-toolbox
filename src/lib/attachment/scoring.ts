@@ -87,7 +87,7 @@ export const STYLE_META: Record<
   anxious: {
     name: "Anxious (Preoccupied)",
     short: "High anxiety · Low avoidance",
-    color: "var(--amber-brand, #f59e0b)",
+    color: "var(--orange-brand)",
     tagline: "You want closeness, and you fear losing it.",
     description:
       "You value connection highly and are comfortable being close — but you scan for signs that it's slipping away. Delays, tone shifts, and time apart can feel much bigger than they are, which can push you toward seeking reassurance in ways that feel exhausting to you afterwards.",
@@ -123,7 +123,7 @@ export const STYLE_META: Record<
   fearful: {
     name: "Fearful-Avoidant (Disorganised)",
     short: "High anxiety · High avoidance",
-    color: "var(--pink-brand, #ec4899)",
+    color: "var(--violet-brand)",
     tagline: "Wanting closeness and pulling away from it at the same time.",
     description:
       "You score high on both dimensions, which usually feels like a push-pull: you want connection badly, and closeness also feels unsafe. That can look like intensity followed by sudden distance, and it's often confusing for you as much as for the other person.",

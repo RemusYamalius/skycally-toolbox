@@ -286,12 +286,17 @@ function RandomTeamMaker() {
                 value={playerInput}
                 onChange={(e) => setPlayerInput(e.target.value)}
                 onKeyDown={(e) => e.key === "Enter" && (e.preventDefault(), addPlayer())}
-                placeholder="Add player name"
+                placeholder="Add a name, or paste a list (commas or new lines)"
               />
               <Button onClick={addPlayer} variant="outline">
                 <Plus className="w-4 h-4 mr-1" /> Add
               </Button>
             </div>
+            <p className="-mt-1 mb-3 text-xs text-muted-foreground">
+              Paste a whole list at once — names separated by commas, semicolons, or new lines are added individually.
+              Duplicate names are kept.
+            </p>
+
             <div className="space-y-2 max-h-[360px] overflow-auto pr-1">
               {players.map((p, i) => (
                 <div key={i} className="flex items-center gap-2 rounded-md border border-border px-3 py-2">

@@ -10,9 +10,13 @@ export interface PageMetaInput {
   description: string;
   path: string;
   ogImage?: string;
+  /** Set true to emit "noindex, nofollow" instead of "index, follow" — for
+   *  soft-launched or intentionally unfinished pages that shouldn't be
+   *  crawled/ranked yet (e.g. tools awaiting a paid data source). */
+  noIndex?: boolean;
 }
 
-export function buildPageMeta({ title, description, path, ogImage = OG_IMAGE }: PageMetaInput) {
+export function buildPageMeta({ title, description, path, ogImage = OG_IMAGE, noIndex = false }: PageMetaInput) {
   const url = SITE_URL + (path === "/" ? "" : path);
   const t = truncate(title, 60);
   const d = truncate(description, 160);
@@ -21,7 +25,7 @@ export function buildPageMeta({ title, description, path, ogImage = OG_IMAGE }: 
       // Primary
       { title: t },
       { name: "description", content: d },
-      { name: "robots", content: "index, follow" },
+      { name: "robots", content: noIndex ? "noindex, nofollow" : "index, follow" },
       // Open Graph — use og:type "article" for tool pages (more specific than "website")
       { property: "og:title", content: t },
       { property: "og:description", content: d },
@@ -49,7 +53,9 @@ export function buildToolMeta(tool: Tool) {
   const title = `Free ${tool.name} Online — No Signup | Skycally`;
   // Unique description per tool using tool.description (already unique per tool)
   const description = truncate(`${tool.description} Free, private, works in your browser.`, 160);
-  const base = buildPageMeta({ title, description, path: tool.path });
+  // Hidden tools (e.g. awaiting a paid data source) are noindexed automatically
+  // so Google stops sending impressions to a page that isn't really launched.
+  const base = buildPageMeta({ title, description, path: tool.path, noIndex: tool.hidden });
   return {
     ...base,
     scripts: [

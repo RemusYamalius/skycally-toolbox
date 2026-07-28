@@ -130,7 +130,8 @@ function NeverHaveIEver() {
   };
 
   const activeCount = useCustomOnly && custom.length ? custom.length : pool.length;
-  const currentCat = current && current.category !== "custom" ? NHIE_CATEGORIES.find((c) => c.id === current.category) : null;
+  const currentCat =
+    current && current.category !== "custom" ? NHIE_CATEGORIES.find((c) => c.id === current.category) : null;
 
   return (
     <ToolPageShell
@@ -233,17 +234,16 @@ function NeverHaveIEver() {
               Truth or Dare
             </Link>
             , or switch it up with{" "}
-            <Link to="/tools/would-you-rather" className="text-foreground underline underline-offset-4 hover:opacity-80">
+            <Link
+              to="/tools/would-you-rather"
+              className="text-foreground underline underline-offset-4 hover:opacity-80"
+            >
               Would You Rather questions
             </Link>
             .
           </p>
         </div>
-      </div>
 
-      <AdZone id="never-have-i-ever-bottom" size="728x90" />
-
-      <div className="max-w-2xl mx-auto mt-8">
         {/* Customize */}
         <Collapsible open={showCustomize} onOpenChange={setShowCustomize}>
           <CollapsibleTrigger asChild>
@@ -308,6 +308,8 @@ function NeverHaveIEver() {
           </CollapsibleContent>
         </Collapsible>
       </div>
+
+      <AdZone id="never-have-i-ever-bottom" size="728x90" />
 
       <HowToUse
         steps={[

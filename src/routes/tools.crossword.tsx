@@ -350,9 +350,12 @@ function CrosswordPage() {
   const onPointerDown = (e: React.PointerEvent, key: string) => {
     const cell = grid.cells.get(key);
     if (!cell) return;
+    // Keep focus on the hidden input so the keyboard keeps driving the board.
+    e.preventDefault();
     dragStart.current = { row: cell.row, col: cell.col };
     selectCell(key, true);
   };
+
 
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragStart.current) return;

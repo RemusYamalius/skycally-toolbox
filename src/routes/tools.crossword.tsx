@@ -704,7 +704,7 @@ function CrosswordPage() {
                           : isActive
                             ? "bg-primary/40"
                             : inWord
-                              ? "bg-primary/15"
+                              ? "bg-primary/25"
                               : done
                                 ? "bg-emerald-500/15"
                                 : "bg-muted",

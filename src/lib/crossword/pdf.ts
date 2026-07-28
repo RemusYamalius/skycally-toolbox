@@ -42,9 +42,9 @@ function drawGrid(
         doc.text(String(cell.number), x + 0.5, y + size * 0.32);
       }
       if (withAnswers) {
-        doc.setFontSize(Math.max(7, size * 2.1));
+        doc.setFontSize(Math.max(7, size * 1.75));
         doc.setTextColor(15, 15, 15);
-        doc.text(cell.solution, x + size / 2, y + size * 0.78, { align: "center" });
+        doc.text(cell.solution, x + size / 2, y + size * 0.82, { align: "center" });
       }
     }
   }

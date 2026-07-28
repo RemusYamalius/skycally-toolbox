@@ -1461,6 +1461,27 @@ export const tools: Tool[] = [
     schemaCategory: "GameApplication",
   },
   {
+    slug: "never-have-i-ever",
+    name: "Never Have I Ever",
+    description:
+      "Play Never Have I Ever online — 160 original questions across 7 categories, category filters, no-repeat shuffle and your own custom questions. No signup.",
+    category: "games",
+    icon: Sparkles,
+    path: "/tools/never-have-i-ever",
+    dateAdded: "2026-07-28",
+    featureList: [
+      "160 original Never Have I Ever questions",
+      "7 category filters: Funny, Embarrassing, Travel, Food, Dating, School & Work, Bold",
+      "No-repeat shuffle until the whole category pool is used",
+      "Add and delete your own custom questions",
+      "Use-custom-only mode to play from your list alone",
+      "Custom questions saved in your browser, never uploaded",
+      "Session counter of questions shown",
+      "No signup, unlimited plays, mobile-friendly",
+    ],
+    schemaCategory: "GameApplication",
+  },
+  {
     slug: "dice-roller",
     name: "Dice Roller",
     description: "Roll multiple dice of any type — D4, D6, D8, D10, D12, D20. Perfect for board games and RPGs.",

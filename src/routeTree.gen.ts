@@ -83,6 +83,7 @@ import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.passw
 import { Route as ToolsPageSeoAnalyzerRouteImport } from './routes/tools.page-seo-analyzer'
 import { Route as ToolsPacManRouteImport } from './routes/tools.pac-man'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
+import { Route as ToolsNeverHaveIEverRouteImport } from './routes/tools.never-have-i-ever'
 import { Route as ToolsNetworkSpeedTestRouteImport } from './routes/tools.network-speed-test'
 import { Route as ToolsMortgageCalculatorRouteImport } from './routes/tools.mortgage-calculator'
 import { Route as ToolsMinesweeperRouteImport } from './routes/tools.minesweeper'
@@ -546,6 +547,11 @@ const ToolsPacManRoute = ToolsPacManRouteImport.update({
 const ToolsObjectDetectionRoute = ToolsObjectDetectionRouteImport.update({
   id: '/tools/object-detection',
   path: '/tools/object-detection',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsNeverHaveIEverRoute = ToolsNeverHaveIEverRouteImport.update({
+  id: '/tools/never-have-i-ever',
+  path: '/tools/never-have-i-ever',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsNetworkSpeedTestRoute = ToolsNetworkSpeedTestRouteImport.update({
@@ -1095,6 +1101,7 @@ export interface FileRoutesByFullPath {
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/mortgage-calculator': typeof ToolsMortgageCalculatorRoute
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
+  '/tools/never-have-i-ever': typeof ToolsNeverHaveIEverRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
@@ -1259,6 +1266,7 @@ export interface FileRoutesByTo {
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/mortgage-calculator': typeof ToolsMortgageCalculatorRoute
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
+  '/tools/never-have-i-ever': typeof ToolsNeverHaveIEverRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
@@ -1424,6 +1432,7 @@ export interface FileRoutesById {
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/mortgage-calculator': typeof ToolsMortgageCalculatorRoute
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
+  '/tools/never-have-i-ever': typeof ToolsNeverHaveIEverRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
@@ -1590,6 +1599,7 @@ export interface FileRouteTypes {
     | '/tools/minesweeper'
     | '/tools/mortgage-calculator'
     | '/tools/network-speed-test'
+    | '/tools/never-have-i-ever'
     | '/tools/object-detection'
     | '/tools/pac-man'
     | '/tools/page-seo-analyzer'
@@ -1754,6 +1764,7 @@ export interface FileRouteTypes {
     | '/tools/minesweeper'
     | '/tools/mortgage-calculator'
     | '/tools/network-speed-test'
+    | '/tools/never-have-i-ever'
     | '/tools/object-detection'
     | '/tools/pac-man'
     | '/tools/page-seo-analyzer'
@@ -1918,6 +1929,7 @@ export interface FileRouteTypes {
     | '/tools/minesweeper'
     | '/tools/mortgage-calculator'
     | '/tools/network-speed-test'
+    | '/tools/never-have-i-ever'
     | '/tools/object-detection'
     | '/tools/pac-man'
     | '/tools/page-seo-analyzer'
@@ -2083,6 +2095,7 @@ export interface RootRouteChildren {
   ToolsMinesweeperRoute: typeof ToolsMinesweeperRoute
   ToolsMortgageCalculatorRoute: typeof ToolsMortgageCalculatorRoute
   ToolsNetworkSpeedTestRoute: typeof ToolsNetworkSpeedTestRoute
+  ToolsNeverHaveIEverRoute: typeof ToolsNeverHaveIEverRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPacManRoute: typeof ToolsPacManRoute
   ToolsPageSeoAnalyzerRoute: typeof ToolsPageSeoAnalyzerRoute
@@ -2672,6 +2685,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/object-detection'
       fullPath: '/tools/object-detection'
       preLoaderRoute: typeof ToolsObjectDetectionRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/never-have-i-ever': {
+      id: '/tools/never-have-i-ever'
+      path: '/tools/never-have-i-ever'
+      fullPath: '/tools/never-have-i-ever'
+      preLoaderRoute: typeof ToolsNeverHaveIEverRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/network-speed-test': {
@@ -3391,6 +3411,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsMinesweeperRoute: ToolsMinesweeperRoute,
   ToolsMortgageCalculatorRoute: ToolsMortgageCalculatorRoute,
   ToolsNetworkSpeedTestRoute: ToolsNetworkSpeedTestRoute,
+  ToolsNeverHaveIEverRoute: ToolsNeverHaveIEverRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPacManRoute: ToolsPacManRoute,
   ToolsPageSeoAnalyzerRoute: ToolsPageSeoAnalyzerRoute,
@@ -3464,12 +3485,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

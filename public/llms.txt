@@ -85,6 +85,7 @@
 - [BMI Calculator](/tools/bmi-calculator): Body mass index.
 - [Age Calculator](/tools/age-calculator): Exact age from a birthdate.
 - [Pregnancy Week Calculator](/tools/pregnancy-calculator): How far along am I — weeks, due date, baby size and week-by-week development.
+- [Never Have I Ever](/tools/never-have-i-ever): Play Never Have I Ever online free — 160 original questions across 7 categories, category filters, no-repeat shuffle and custom questions saved in your browser, no signup.
 - [Attachment Style Test](/tools/attachment-style-test): Free 28-question attachment style test scored on two continuous dimensions (anxiety and avoidance). Secure, anxious, avoidant or fearful-avoidant results shown instantly, no signup.
 - [Big Five Personality Test](/tools/big-five-personality-test): Free 50-item Big Five (OCEAN) personality quiz based on the public-domain IPIP item bank. Complete results shown immediately, no signup, no email, no paywall.
 

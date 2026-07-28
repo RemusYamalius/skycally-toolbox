@@ -26,15 +26,7 @@ import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { playSound } from "@/lib/sound";
 
-import {
-  canMove,
-  colOf,
-  generateMaze,
-  rowOf,
-  solveMaze,
-  type Dir,
-  type Maze,
-} from "@/lib/maze/generator";
+import { canMove, colOf, generateMaze, rowOf, solveMaze, type Dir, type Maze } from "@/lib/maze/generator";
 import { createThemeCycler, THEME_PAIRS, type ThemePair } from "@/lib/maze/themes";
 import {
   DEFAULT_PREFS,
@@ -123,22 +115,19 @@ function MazePuzzlePage() {
 
   /* ------------------------------------------------------------- lifecycle */
 
-  const newMaze = useCallback(
-    (d: (typeof DIFFICULTIES)[number]) => {
-      const m = generateMaze(d.rows, d.cols);
-      setMaze(m);
-      setPlayer(m.start);
-      setTrail(new Set([m.start]));
-      setTheme(cycler.current.next());
-      setMoves(0);
-      setSeconds(0);
-      setSolved(false);
-      setRevealed(false);
-      setPath(null);
-      setRunning(true);
-    },
-    [],
-  );
+  const newMaze = useCallback((d: (typeof DIFFICULTIES)[number]) => {
+    const m = generateMaze(d.rows, d.cols);
+    setMaze(m);
+    setPlayer(m.start);
+    setTrail(new Set([m.start]));
+    setTheme(cycler.current.next());
+    setMoves(0);
+    setSeconds(0);
+    setSolved(false);
+    setRevealed(false);
+    setPath(null);
+    setRunning(true);
+  }, []);
 
   useEffect(() => {
     setHydrated(true);
@@ -274,8 +263,7 @@ function MazePuzzlePage() {
         const i = r * maze.cols + c;
         const x = pad + c * cell;
         const y = pad + r * cell;
-        const hidden =
-          prefs.fog && !solved && Math.max(Math.abs(r - pr), Math.abs(c - pc)) > fogRadius;
+        const hidden = prefs.fog && !solved && Math.max(Math.abs(r - pr), Math.abs(c - pc)) > fogRadius;
         if (hidden) {
           ctx.fillStyle = "rgba(0,0,0,0.92)";
           ctx.fillRect(x - 0.5, y - 0.5, cell + 1, cell + 1);
@@ -301,8 +289,7 @@ function MazePuzzlePage() {
         const w = maze.cells[r * maze.cols + c];
         const x = pad + c * cell;
         const y = pad + r * cell;
-        const hidden =
-          prefs.fog && !solved && Math.max(Math.abs(r - pr), Math.abs(c - pc)) > fogRadius;
+        const hidden = prefs.fog && !solved && Math.max(Math.abs(r - pr), Math.abs(c - pc)) > fogRadius;
         if (hidden) continue;
         if (w.n) {
           ctx.moveTo(x, y);
@@ -325,6 +312,8 @@ function MazePuzzlePage() {
     ctx.stroke();
 
     // emojis + player
+    ctx.fillStyle = fg;
+    ctx.globalAlpha = 1;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
     ctx.font = `${Math.max(8, cell * 0.82)}px system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
@@ -336,8 +325,7 @@ function MazePuzzlePage() {
     const endHidden =
       prefs.fog &&
       !solved &&
-      Math.max(Math.abs(rowOf(maze, maze.end) - pr), Math.abs(colOf(maze, maze.end) - pc)) >
-        fogRadius;
+      Math.max(Math.abs(rowOf(maze, maze.end) - pr), Math.abs(colOf(maze, maze.end) - pc)) > fogRadius;
     if (!endHidden) ctx.fillText(theme.end, endPt.x, endPt.y);
     const startPt = at(maze.start);
     ctx.globalAlpha = 0.4;
@@ -345,8 +333,6 @@ function MazePuzzlePage() {
     ctx.globalAlpha = 1;
     const pPt = at(player);
     ctx.fillText(theme.start, pPt.x, pPt.y);
-
-    ctx.fillStyle = muted;
   }, [maze, player, trail, prefs.trail, prefs.fog, path, theme, solved]);
 
   /* ---------------------------------------------------------------- actions */
@@ -477,9 +463,7 @@ function MazePuzzlePage() {
                     newMaze(d);
                   }}
                   className={`rounded-lg border px-2 py-2 text-xs font-medium transition ${
-                    d.id === difficulty
-                      ? "border-primary bg-primary/15"
-                      : "border-border hover:border-foreground/40"
+                    d.id === difficulty ? "border-primary bg-primary/15" : "border-border hover:border-foreground/40"
                   }`}
                 >
                   {d.label}
@@ -552,9 +536,7 @@ function MazePuzzlePage() {
                 value={hydrated && best !== undefined ? formatClock(best) : "—"}
               />
             </dl>
-            <p className="mt-2 text-xs text-muted-foreground">
-              Stats stay in your own browser. Nothing is uploaded.
-            </p>
+            <p className="mt-2 text-xs text-muted-foreground">Stats stay in your own browser. Nothing is uploaded.</p>
           </div>
         </aside>
       </div>
@@ -645,8 +627,7 @@ function MazePuzzlePage() {
           },
           {
             question: "Do I need to sign up or install anything?",
-            answer:
-              "No. There is no signup, no email, no download and no extension. Open the page and play.",
+            answer: "No. There is no signup, no email, no download and no extension. Open the page and play.",
           },
           {
             question: "Are the mazes ever repeated?",
@@ -661,15 +642,7 @@ function MazePuzzlePage() {
   );
 }
 
-function PadBtn({
-  label,
-  onClick,
-  children,
-}: {
-  label: string;
-  onClick: () => void;
-  children: React.ReactNode;
-}) {
+function PadBtn({ label, onClick, children }: { label: string; onClick: () => void; children: React.ReactNode }) {
   return (
     <button
       type="button"

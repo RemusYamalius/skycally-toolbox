@@ -1,7 +1,7 @@
 import { createFileRoute } from "@tanstack/react-router";
 import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
-import { useState } from "react";
+import { useEffect, useState } from "react";
 import { Flame, Skull, Plus, Trash2, RefreshCw, Settings2, ChevronDown } from "lucide-react";
 import { motion, AnimatePresence } from "framer-motion";
 
@@ -94,25 +94,56 @@ const DARES = [
 
 type Mode = "both" | "truth" | "dare";
 
-// The 🍾 emoji glyph rests at a natural ~22.5° left-leaning tilt by default.
-// We compensate for that at rest so the bottle looks perfectly vertical when
-// idle, then let the spin land exactly on that natural tilt for Truth, and
-// on the mirrored tilt for Dare — so the two outcomes are always visually
-// distinct and consistent, instead of a random angle unrelated to the result.
-const RESTING_TILT = 22.5;
+const STORAGE_KEY_TRUTHS = "skycally:tod:custom-truths";
+const STORAGE_KEY_DARES = "skycally:tod:custom-dares";
+
+function loadList(key: string): string[] {
+  try {
+    const raw = localStorage.getItem(key);
+    if (!raw) return [];
+    const parsed = JSON.parse(raw);
+    return Array.isArray(parsed) ? parsed.filter((x) => typeof x === "string") : [];
+  } catch {
+    return [];
+  }
+}
 
 function TruthOrDare() {
   const [truthOn, setTruthOn] = useState(true);
   const [dareOn, setDareOn] = useState(true);
   const [current, setCurrent] = useState<{ type: "truth" | "dare"; text: string } | null>(null);
   const [spinning, setSpinning] = useState(false);
-  const [rotation, setRotation] = useState(RESTING_TILT);
+  const [rotation, setRotation] = useState(0);
   const [customTruths, setCustomTruths] = useState<string[]>([]);
   const [customDares, setCustomDares] = useState<string[]>([]);
   const [useCustomOnly, setUseCustomOnly] = useState(false);
   const [showCustomize, setShowCustomize] = useState(false);
   const [newTruth, setNewTruth] = useState("");
   const [newDare, setNewDare] = useState("");
+
+  // Load persisted custom truths/dares after mount (avoids SSR/hydration mismatch)
+  useEffect(() => {
+    setCustomTruths(loadList(STORAGE_KEY_TRUTHS));
+    setCustomDares(loadList(STORAGE_KEY_DARES));
+  }, []);
+
+  const persistTruths = (next: string[]) => {
+    setCustomTruths(next);
+    try {
+      localStorage.setItem(STORAGE_KEY_TRUTHS, JSON.stringify(next));
+    } catch {
+      /* ignore write failures (private mode) */
+    }
+  };
+
+  const persistDares = (next: string[]) => {
+    setCustomDares(next);
+    try {
+      localStorage.setItem(STORAGE_KEY_DARES, JSON.stringify(next));
+    } catch {
+      /* ignore write failures (private mode) */
+    }
+  };
 
   const mode: Mode = truthOn && dareOn ? "both" : truthOn ? "truth" : dareOn ? "dare" : "both";
 
@@ -121,25 +152,11 @@ function TruthOrDare() {
     if (!truthOn && !dareOn) return;
     setSpinning(true);
     setCurrent(null);
-
-    // Decide the outcome FIRST, then aim the bottle's rotation at it, so the
-    // visual landing position and the actual Truth/Dare result always match.
-    const type: "truth" | "dare" = mode === "both" ? (Math.random() > 0.5 ? "truth" : "dare") : mode;
-
-    setRotation((r) => {
-      const spins = 4 + Math.floor(Math.random() * 3); // 4–6 full turns for the animation
-      // Truth lands on the bottle's natural resting tilt (+22.5°, leaning left).
-      // Dare lands on the mirrored tilt (2 × 22.5° further, leaning right).
-      const target = type === "truth" ? RESTING_TILT : RESTING_TILT + 2 * RESTING_TILT;
-      const current360 = ((r % 360) + 360) % 360;
-      let delta = target - current360;
-      if (delta <= 0) delta += 360;
-      return r + spins * 360 + delta;
-    });
-
+    setRotation((r) => r + 720 + Math.floor(Math.random() * 360));
     setTimeout(() => {
       const truths = useCustomOnly && customTruths.length ? customTruths : [...TRUTHS, ...customTruths];
       const dares = useCustomOnly && customDares.length ? customDares : [...DARES, ...customDares];
+      const type: "truth" | "dare" = mode === "both" ? (Math.random() > 0.5 ? "truth" : "dare") : mode;
       const pool = type === "truth" ? truths : dares;
       if (!pool.length) {
         setSpinning(false);
@@ -154,13 +171,13 @@ function TruthOrDare() {
   const addTruth = () => {
     const t = newTruth.trim();
     if (!t) return;
-    setCustomTruths((p) => [...p, t]);
+    persistTruths([...customTruths, t]);
     setNewTruth("");
   };
   const addDare = () => {
     const t = newDare.trim();
     if (!t) return;
-    setCustomDares((p) => [...p, t]);
+    persistDares([...customDares, t]);
     setNewDare("");
   };
 
@@ -298,7 +315,7 @@ function TruthOrDare() {
                   >
                     <span className="text-foreground truncate">{t}</span>
                     <button
-                      onClick={() => setCustomTruths((p) => p.filter((_, j) => j !== i))}
+                      onClick={() => persistTruths(customTruths.filter((_, j) => j !== i))}
                       className="text-muted-foreground hover:text-foreground"
                     >
                       <Trash2 className="w-3.5 h-3.5" />
@@ -331,7 +348,7 @@ function TruthOrDare() {
                   >
                     <span className="text-foreground truncate">{t}</span>
                     <button
-                      onClick={() => setCustomDares((p) => p.filter((_, j) => j !== i))}
+                      onClick={() => persistDares(customDares.filter((_, j) => j !== i))}
                       className="text-muted-foreground hover:text-foreground"
                     >
                       <Trash2 className="w-3.5 h-3.5" />

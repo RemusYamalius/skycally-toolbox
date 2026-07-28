@@ -90,6 +90,7 @@ import { Route as ToolsMinesweeperRouteImport } from './routes/tools.minesweeper
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMemoryMatchRouteImport } from './routes/tools.memory-match'
 import { Route as ToolsMemeGeneratorRouteImport } from './routes/tools.meme-generator'
+import { Route as ToolsMazePuzzleRouteImport } from './routes/tools.maze-puzzle'
 import { Route as ToolsMarkdownToHtmlRouteImport } from './routes/tools.markdown-to-html'
 import { Route as ToolsMarginCalculatorRouteImport } from './routes/tools.margin-calculator'
 import { Route as ToolsMahjongRouteImport } from './routes/tools.mahjong'
@@ -583,6 +584,11 @@ const ToolsMemoryMatchRoute = ToolsMemoryMatchRouteImport.update({
 const ToolsMemeGeneratorRoute = ToolsMemeGeneratorRouteImport.update({
   id: '/tools/meme-generator',
   path: '/tools/meme-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsMazePuzzleRoute = ToolsMazePuzzleRouteImport.update({
+  id: '/tools/maze-puzzle',
+  path: '/tools/maze-puzzle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsMarkdownToHtmlRoute = ToolsMarkdownToHtmlRouteImport.update({
@@ -1102,6 +1108,7 @@ export interface FileRoutesByFullPath {
   '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/margin-calculator': typeof ToolsMarginCalculatorRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
+  '/tools/maze-puzzle': typeof ToolsMazePuzzleRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -1268,6 +1275,7 @@ export interface FileRoutesByTo {
   '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/margin-calculator': typeof ToolsMarginCalculatorRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
+  '/tools/maze-puzzle': typeof ToolsMazePuzzleRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -1435,6 +1443,7 @@ export interface FileRoutesById {
   '/tools/mahjong': typeof ToolsMahjongRoute
   '/tools/margin-calculator': typeof ToolsMarginCalculatorRoute
   '/tools/markdown-to-html': typeof ToolsMarkdownToHtmlRoute
+  '/tools/maze-puzzle': typeof ToolsMazePuzzleRoute
   '/tools/meme-generator': typeof ToolsMemeGeneratorRoute
   '/tools/memory-match': typeof ToolsMemoryMatchRoute
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
@@ -1603,6 +1612,7 @@ export interface FileRouteTypes {
     | '/tools/mahjong'
     | '/tools/margin-calculator'
     | '/tools/markdown-to-html'
+    | '/tools/maze-puzzle'
     | '/tools/meme-generator'
     | '/tools/memory-match'
     | '/tools/merge-pdf'
@@ -1769,6 +1779,7 @@ export interface FileRouteTypes {
     | '/tools/mahjong'
     | '/tools/margin-calculator'
     | '/tools/markdown-to-html'
+    | '/tools/maze-puzzle'
     | '/tools/meme-generator'
     | '/tools/memory-match'
     | '/tools/merge-pdf'
@@ -1935,6 +1946,7 @@ export interface FileRouteTypes {
     | '/tools/mahjong'
     | '/tools/margin-calculator'
     | '/tools/markdown-to-html'
+    | '/tools/maze-puzzle'
     | '/tools/meme-generator'
     | '/tools/memory-match'
     | '/tools/merge-pdf'
@@ -2102,6 +2114,7 @@ export interface RootRouteChildren {
   ToolsMahjongRoute: typeof ToolsMahjongRoute
   ToolsMarginCalculatorRoute: typeof ToolsMarginCalculatorRoute
   ToolsMarkdownToHtmlRoute: typeof ToolsMarkdownToHtmlRoute
+  ToolsMazePuzzleRoute: typeof ToolsMazePuzzleRoute
   ToolsMemeGeneratorRoute: typeof ToolsMemeGeneratorRoute
   ToolsMemoryMatchRoute: typeof ToolsMemoryMatchRoute
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
@@ -2747,6 +2760,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/meme-generator'
       fullPath: '/tools/meme-generator'
       preLoaderRoute: typeof ToolsMemeGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/maze-puzzle': {
+      id: '/tools/maze-puzzle'
+      path: '/tools/maze-puzzle'
+      fullPath: '/tools/maze-puzzle'
+      preLoaderRoute: typeof ToolsMazePuzzleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/markdown-to-html': {
@@ -3426,6 +3446,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsMahjongRoute: ToolsMahjongRoute,
   ToolsMarginCalculatorRoute: ToolsMarginCalculatorRoute,
   ToolsMarkdownToHtmlRoute: ToolsMarkdownToHtmlRoute,
+  ToolsMazePuzzleRoute: ToolsMazePuzzleRoute,
   ToolsMemeGeneratorRoute: ToolsMemeGeneratorRoute,
   ToolsMemoryMatchRoute: ToolsMemoryMatchRoute,
   ToolsMergePdfRoute: ToolsMergePdfRoute,

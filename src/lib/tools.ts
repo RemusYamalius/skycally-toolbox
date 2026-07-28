@@ -1697,6 +1697,27 @@ export const tools: Tool[] = [
     schemaType: "VideoGame",
   },
   {
+    slug: "maze-puzzle",
+    name: "Maze Puzzle",
+    description:
+      "Play an endless maze game online free, then print the exact maze with an answer key. Four real grid sizes, emoji themes, fog of war — no signup, no premium tier.",
+    category: "minigames",
+    icon: LayoutGrid,
+    path: "/tools/maze-puzzle",
+    dateAdded: "2026-07-28",
+    featureList: [
+      "Endless freshly generated mazes",
+      "Four real grid sizes from 11x11 to 35x35",
+      "Arrow keys, WASD, swipe, or on-screen D-pad controls",
+      "Breadcrumb trail and optional fog of war",
+      "Reveal the correct path at any time",
+      "Printable PDF worksheet with a separate answer key",
+      "Timer, move counter and local best times",
+      "No signup required",
+    ],
+    schemaType: "VideoGame",
+  },
+  {
     slug: "typing-speed",
     name: "Typing Speed Test",
     description: "Test your typing speed and accuracy! How many words per minute can you type?",

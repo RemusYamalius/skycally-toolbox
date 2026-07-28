@@ -1,62 +1,85 @@
 ## Goal
 
-A new interactive tool at `/tools/never-have-i-ever` that feels like the same family as Truth or Dare: category chips, animated card reveal, no-repeat shuffle, persistent custom statements — not a static listicle.
+A `/tools/crossword` Daily Crossword built on the exact Word Groups architecture: Daily / Practice / Archive tabs, deterministic day-index puzzle rotation, free everything, plus a printable PDF worksheet + answer key.
+
+## Confirmed: LAUNCH_DAY_INDEX is a static literal = 20662
+
+`src/lib/crossword/daily.ts` will contain a **hardcoded numeric literal**, matching `word-groups/daily.ts`'s `export const LAUNCH_DAY_INDEX = 20651;`:
+
+```ts
+// Launch day — computed once at build time (2026-07-28) and frozen.
+// NEVER replace with a dayIndex() call: that would re-anchor the rotation
+// on every deploy and break the archive.
+export const LAUNCH_DAY_INDEX = 20662;
+```
+
+20662 = `floor(Date.parse("2026-07-28")/86400000)` (20454 days to 2026-01-01, +181 to Jul 1, +27). No dynamic call at the definition site, ever.
 
 ## Verified before planning
 
-- `most-likely-to` does **not** exist on the site → the contextual link block will only link **Truth or Dare** and **Would You Rather**.
-- `related-tools.ts` currently has a `would-you-rather` key but **no** `truth-or-dare` key (it falls back), so a `truth-or-dare` entry will be added alongside the new `never-have-i-ever` key.
-- Registry shape confirmed from `attachment-style-test` / `truth-or-dare` entries (`slug`, `name`, `description`, `category`, `icon`, `path`, `featureList`, `schemaCategory`) plus optional `dateAdded` used by the "New" badge helper.
-- Sitemap entry format confirmed (`<loc>/<lastmod>/<changefreq>/<priority>`), llms.txt one-line bullet format confirmed.
+- `tools.word-groups.tsx` (732 lines) uses `buildPageMeta_with_schema` with a `VideoGame` JSON-LD schema, `ToolPageShell`, `HowToUse`, `ToolSeoContent`, `RelatedTools`, `AdZone`, plus `playSound`/`playChord` from `@/lib/sound`.
+- `word-groups/daily.ts` pattern: `dayIndex()` = `floor(now/86400000)`, frozen `LAUNCH_DAY_INDEX`, `puzzleForDay` via positive modulo over bank length, `pickPracticePuzzle(recent, today)`, `dateFromDayIndex`/`formatDateISO`.
+- `word-groups/storage.ts` pattern: `Stats`, `HistoryMap` (`day -> "win"|"loss"`), `loadRecent`/`pushRecent` — all SSR-guarded with `typeof window === "undefined"`.
+- PDF: the site already generates vector PDFs by CDN-loading jsPDF via `loadScript` (`src/routes/tools.timetable-generator.tsx`, jspdf 2.5.1 UMD) and drawing with `doc.rect`/`doc.text`. Reuse that approach — no new dependency, no screenshot export.
+- `related-tools.ts` has a `word-groups` key (line 105) but **no** `wordle` or `hangman` keys — those will be added, not just edited.
+- `wordle`, `hangman`, `word-search` all exist as real tools.
 
-## Content bank
+## Files to create
 
-New file `src/lib/never-have-i-ever/statements.ts`:
+**`src/lib/crossword/puzzles.ts`**
+- Types `CrosswordWord` / `CrosswordPuzzle` exactly as specified.
+- **40+ original puzzles**, each 10–16 words on simple rectangular grids (mostly 11×11 / 13×13), general-knowledge clues across geography, science, pop culture, history and everyday vocabulary. All clue wording written from scratch — no NYT/USA Today wording or grids.
+- Puzzles are produced offline during development with a constructor script run in the sandbox, then emitted as a static data file. **Nothing generative ships to the browser.**
+- Build-time sanity check (dev-only `console.warn`, mirroring `big-five/items.ts`) validating per puzzle: answers are `A–Z` only and fit within grid bounds; every across/down crossing cell has identical letters; clue numbers unique and following standard sequential numbering; no duplicate start+direction. Warnings name the puzzle id and the exact problem.
+- Exports `CROSSWORD_PUZZLES` and `CROSSWORD_TOTAL`.
 
-- 7 categories: `funny`, `embarrassing`, `travel`, `food`, `dating`, `school-work`, `bold`.
-- **160 original statements** authored from scratch (roughly 25 funny, 25 embarrassing, 22 travel, 22 food, 24 dating, 22 school/work, 20 bold). Every item safe-for-work and tasteful, including Bold (Bold = daring/confessional, never explicit).
-- Exported `NHIE_STATEMENTS` (array of `{ text, category }`) and a `CATEGORIES` label/color list.
-- Build-time `console.warn` sanity check (mirroring `src/lib/big-five/items.ts`): warns on duplicate text and reports the per-category tally.
-- After writing the file, the count is verified programmatically (`rg`/node count) and the exact final number is what gets used in the title, meta description, JSON-LD featureList, `tools.ts` description/featureList, ToolSeoContent body, and FAQs. If the authored total differs from 160, every copy location uses the real number instead.
+**`src/lib/crossword/daily.ts`** — `dayIndex`, the frozen `LAUNCH_DAY_INDEX = 20662`, `puzzleForDay`, `todaysPuzzle`, `pickPracticePuzzle(recent, today)`, `dateFromDayIndex`, `formatDateISO`.
 
-## Route: `src/routes/tools.never-have-i-ever.tsx`
+**`src/lib/crossword/storage.ts`** — keys `crossword-stats`, `crossword-history`, `crossword-recent`: played/solved/current+best streak, per-day completion for archive badges, recent practice ids. Same SSR guards.
 
-Structure copied from `tools.truth-or-dare.tsx`:
+**`src/lib/crossword/pdf.ts`** — CDN-loads jsPDF via the existing `loadScript` helper and draws two A4 pages from the real puzzle data: page 1 = blank numbered grid + Across/Down clue lists, page 2 = the same grid fully filled from the answer data. Plain black-on-white vector drawing.
 
-- Hand-written `head()` with `buildPageMeta` + a `SoftwareApplication` JSON-LD `scripts` array (same shape as Truth or Dare), since keyword-specific title/description is needed.
-  - Title: `Never Have I Ever Online — Free Generator with Custom Questions | Skycally`
-  - Description leads with "Play Never Have I Ever online free" and includes "custom never have i ever questions" naturally, plus the verified count.
-  - `alternateName`: ["Never Have I Ever Online", "Never Have I Ever Generator Online", "Custom Never Have I Ever Questions"].
-- Component wrapped in `ToolPageShell` (`showFileDisclaimer={false}`).
+**`src/routes/tools.crossword.tsx`** — the route.
 
-Interactive behavior (all real, all implemented):
+## Grid interaction (primary UX)
 
-1. **Multi-select category chips**, all on by default; clicking the last active chip is blocked so at least one stays selected (same guard style as Truth or Dare's mode toggle).
-2. **Card reveal** using the existing `framer-motion` `AnimatePresence` + `motion.div` opacity/scale transition already used by Truth or Dare's result card. No new animation lib.
-3. **No-repeat-until-exhausted shuffle**: a `seen` Set of statement indices for the active pool; when the pool is exhausted it resets. Changing category selection (or toggling custom-only) resets `seen`.
-4. **Session counter**: honest local "Statements shown this session: N", reset with a small "Reset session" action.
-5. **Custom mode**: collapsible "Customize questions" section (`Collapsible` + `Switch` + `Input` + `Plus`/`Trash2`, same components as Truth or Dare) — add statements, delete individually, "Use custom only" toggle. Custom statements persist in `localStorage` under `skycally:nhie:custom` (read in a `useEffect` after mount to avoid SSR/hydration mismatch, written on change).
+A single selection state `{ row, col, direction }` drives grid + clue list together.
 
-Section order (exactly as specified):
+- **Tap a cell** → select it, highlight its whole word (Across preferred when the cell belongs to both), scroll the matching clue into view.
+- **Tap the already-selected cell** → toggle Across ↔ Down when both exist.
+- **Swipe/drag across a straight run of cells** → selects that whole word and focuses its first empty cell. Implemented with pointer events (`pointerdown`/`pointermove`/`pointerup`, `touch-action: none` on the grid) so it works with real touch.
+- **Typing** (hidden native input keeps the mobile keyboard up) fills the focused cell and advances to the next empty cell in the current direction; reaching the word end keeps the selection. Backspace clears and steps back.
+- **Tapping a clue** = tapping that word's start cell — same state, not a parallel mechanism.
+- **Arrow keys / Tab** are a desktop convenience layer on top.
+- **Check** flags incorrect filled cells without revealing; **Reveal** works per-word or whole-puzzle and sets a flag used in the share summary.
 
-1. Category chips + generator card (Next Question button)
-2. Contextual internal links (`<Link to="/tools/truth-or-dare">`, `<Link to="/tools/would-you-rather">`) — TanStack `Link`, never `<a href>`
-3. `<AdZone id="never-have-i-ever-bottom" size="728x90" />`
-4. Collapsible "Customize questions"
-5. `HowToUse` (3 steps)
-6. `ToolSeoContent` — 4 plain-prose paragraphs (what the game is / how this generator works vs. a static listicle / group settings incl. family-friendly category picks / privacy: custom list stays in the browser) and **9 FAQs** weighted to the long-tail phrasing, no JSX in `body`, no manually duplicated FAQPage schema
-7. `RelatedTools currentSlug="never-have-i-ever"` — last
+## Tabs
+
+- **Daily** — deterministic puzzle for today, elapsed timer, completion detection, streak display.
+- **Practice** — random puzzle excluding today's, "Next Puzzle" with no-repeat-until-bank-exhausted via `recent`.
+- **Archive** — month grid navigation identical to Word Groups', completion badges from history, every past day free.
+
+Shareable completion summary (clipboard + `sonner` toast): puzzle date/number, time taken, whether anything was revealed — no answers. "Print / Download PDF" available in all three tabs.
+
+## Section order (checklist item 3)
+
+Puzzle interface → contextual `<Link>`s to Word Groups / Wordle / Hangman → `AdZone` → `HowToUse` → `ToolSeoContent` (4+ plain-prose paragraphs including the printable-worksheet use case for teachers/tutors/homeschoolers, plus 9 FAQs) → `RelatedTools` last. FAQPage schema comes only from `ToolSeoContent`.
 
 ## Registration
 
-- `src/lib/tools.ts`: new entry after `would-you-rather` — `category: "games"`, an existing lucide icon already imported in that file (`Sparkles`-style; will reuse one already present rather than adding a new import if available, otherwise add a single icon import), `dateAdded: "2026-07-28"`, `schemaCategory: "UtilitiesApplication"`, and a `featureList` listing only shipped features: verified statement count across 7 categories, multi-select category filters, no-repeat shuffle, custom statements saved in the browser, session counter, no signup.
-- `src/lib/related-tools.ts`: add `never-have-i-ever` key (truth-or-dare, would-you-rather, spinning-wheel, dice-roller, random-team-maker, role-spinner); add `never-have-i-ever` into `would-you-rather`'s list and add a new `truth-or-dare` key that includes it.
-- `public/sitemap.xml`: new `<url>` block, `lastmod 2026-07-28`, priority 0.8.
-- `public/llms.txt`: one bullet matching the Attachment Style Test format.
+- `src/lib/tools.ts` — `crossword` entry, `category: "minigames"`, `dateAdded: "2026-07-28"`, featureList of shipped features only.
+- `src/lib/related-tools.ts` — new `crossword` key; add `crossword` into `word-groups`'s list and create new `wordle` and `hangman` keys that include it.
+- `public/sitemap.xml` + `public/llms.txt` — new entry.
+
+## SEO
+
+Title leads with the functional long-tail phrase, e.g. `Daily Crossword Puzzle — Free Online with Full Archive | Skycally`; description foregrounds the free daily puzzle, free archive of every past puzzle, practice mode, printable PDF, no signup. `buildPageMeta_with_schema` with a `VideoGame` JSON-LD block matching Word Groups' shape. No difficulty labels anywhere (out of scope).
 
 ## Verification before finishing
 
-- Programmatic count of the statement bank; grep the route/tools.ts/llms.txt for the number to confirm consistency.
-- `rg '<a href' ` on the new route → must be empty.
-- Typecheck, then load `/tools/never-have-i-ever` in headless Chromium: chip toggle, several Next Question reveals, custom add/remove, custom-only toggle, and a reload to confirm localStorage persistence; check console for errors.
-- No new package installs.
+- Programmatic count of the puzzle bank; that number is the only one written into title/description/JSON-LD/copy/FAQs.
+- Sanity check run in Node over the bank — must emit zero warnings.
+- Assert `LAUNCH_DAY_INDEX` is the literal 20662 (grep the file) and that `puzzleForDay` is stable across two separate process runs.
+- `rg '<a href'` on the new route → empty.
+- Typecheck, then headless Chromium: desktop pass (tap, direction toggle, typing auto-advance, check, reveal, share) and a mobile 390×844 touch pass (real swipe-to-select), plus a PDF generation run inspected page-by-page as images.
+- No new npm packages.

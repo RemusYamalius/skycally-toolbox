@@ -1678,6 +1678,25 @@ export const tools: Tool[] = [
     schemaType: "VideoGame",
   },
   {
+    slug: "crossword",
+    name: "Daily Crossword Puzzle",
+    description:
+      "Solve a free crossword puzzle every day online. Unlimited practice grids, a free archive of every past puzzle, and printable PDF worksheets with answer keys.",
+    category: "minigames",
+    icon: LayoutGrid,
+    path: "/tools/crossword",
+    dateAdded: "2026-07-28",
+    featureList: [
+      "New crossword puzzle every day",
+      "Free archive of every past daily puzzle",
+      "Unlimited practice mode",
+      "Printable PDF worksheet with answer key",
+      "Check and reveal helpers with a solve timer",
+      "No signup required",
+    ],
+    schemaType: "VideoGame",
+  },
+  {
     slug: "typing-speed",
     name: "Typing Speed Test",
     description: "Test your typing speed and accuracy! How many words per minute can you type?",

@@ -656,6 +656,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://skycally.com/tools/crossword</loc>
+    <lastmod>2026-07-28</lastmod>
+    <changefreq>daily</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://skycally.com/tools/word-groups</loc>
     <lastmod>2026-07-17</lastmod>
     <changefreq>daily</changefreq>

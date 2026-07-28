@@ -134,6 +134,7 @@ import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
 import { Route as ToolsDebtPayoffCalculatorRouteImport } from './routes/tools.debt-payoff-calculator'
 import { Route as ToolsCurrencyConverterRouteImport } from './routes/tools.currency-converter'
+import { Route as ToolsCrosswordRouteImport } from './routes/tools.crossword'
 import { Route as ToolsCountryInfoRouteImport } from './routes/tools.country-info'
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
@@ -807,6 +808,11 @@ const ToolsCurrencyConverterRoute = ToolsCurrencyConverterRouteImport.update({
   path: '/tools/currency-converter',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsCrosswordRoute = ToolsCrosswordRouteImport.update({
+  id: '/tools/crossword',
+  path: '/tools/crossword',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsCountryInfoRoute = ToolsCountryInfoRouteImport.update({
   id: '/tools/country-info',
   path: '/tools/country-info',
@@ -1051,6 +1057,7 @@ export interface FileRoutesByFullPath {
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
+  '/tools/crossword': typeof ToolsCrosswordRoute
   '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
   '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
@@ -1216,6 +1223,7 @@ export interface FileRoutesByTo {
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
+  '/tools/crossword': typeof ToolsCrosswordRoute
   '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
   '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
@@ -1382,6 +1390,7 @@ export interface FileRoutesById {
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
+  '/tools/crossword': typeof ToolsCrosswordRoute
   '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
   '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
@@ -1549,6 +1558,7 @@ export interface FileRouteTypes {
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
+    | '/tools/crossword'
     | '/tools/currency-converter'
     | '/tools/debt-payoff-calculator'
     | '/tools/delete-pdf-pages'
@@ -1714,6 +1724,7 @@ export interface FileRouteTypes {
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
+    | '/tools/crossword'
     | '/tools/currency-converter'
     | '/tools/debt-payoff-calculator'
     | '/tools/delete-pdf-pages'
@@ -1879,6 +1890,7 @@ export interface FileRouteTypes {
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
+    | '/tools/crossword'
     | '/tools/currency-converter'
     | '/tools/debt-payoff-calculator'
     | '/tools/delete-pdf-pages'
@@ -2045,6 +2057,7 @@ export interface RootRouteChildren {
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
   ToolsCountryInfoRoute: typeof ToolsCountryInfoRoute
+  ToolsCrosswordRoute: typeof ToolsCrosswordRoute
   ToolsCurrencyConverterRoute: typeof ToolsCurrencyConverterRoute
   ToolsDebtPayoffCalculatorRoute: typeof ToolsDebtPayoffCalculatorRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
@@ -3044,6 +3057,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsCurrencyConverterRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/crossword': {
+      id: '/tools/crossword'
+      path: '/tools/crossword'
+      fullPath: '/tools/crossword'
+      preLoaderRoute: typeof ToolsCrosswordRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/country-info': {
       id: '/tools/country-info'
       path: '/tools/country-info'
@@ -3360,6 +3380,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsConnectFourRoute: ToolsConnectFourRoute,
   ToolsCountryInfoRoute: ToolsCountryInfoRoute,
+  ToolsCrosswordRoute: ToolsCrosswordRoute,
   ToolsCurrencyConverterRoute: ToolsCurrencyConverterRoute,
   ToolsDebtPayoffCalculatorRoute: ToolsDebtPayoffCalculatorRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
@@ -3485,12 +3506,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

@@ -102,5 +102,6 @@
 
 - [Games](/tools?cat=games): Casual browser games (Sudoku, Chess, 2048, Wordle and more).
 - [Daily Crossword Puzzle](/tools/crossword): Free daily crossword you can play online or print — unlimited practice grids, a free archive of every past puzzle, and printable PDF worksheets with answer keys.
+- [Maze Puzzle](/tools/maze-puzzle): Free online maze game with endless generated mazes, four grid sizes, emoji themes, and a printable PDF worksheet with answer key.
 - [Shooting Ball](/tools/shooting-ball): Free billiard puzzle game — aim, shoot and pocket colored balls across 20 levels.
 - [Time Zone Converter](/tools/time-zone-converter): Convert time between 90+ cities with a live world clock and meeting planner for remote teams.

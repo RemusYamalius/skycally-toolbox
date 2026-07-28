@@ -662,7 +662,7 @@ function CrosswordPage() {
               onPointerCancel={onPointerUp}
             >
               <div
-                className="mx-auto grid w-full max-w-[560px] gap-[2px] rounded-lg bg-border p-[2px]"
+                className="mx-auto grid w-full max-w-[560px] gap-[2px]"
                 style={{
                   gridTemplateColumns: `repeat(${grid.cols}, minmax(0, 1fr))`,
                 }}
@@ -676,11 +676,7 @@ function CrosswordPage() {
                   const cell = grid.cells.get(key);
                   if (!cell) {
                     return (
-                      <div
-                        key={key}
-                        className="aspect-square rounded-[2px] bg-foreground/85"
-                        aria-hidden="true"
-                      />
+                      <div key={key} className="aspect-square" aria-hidden="true" />
                     );
                   }
                   const inWord = activeWordCells.includes(key);
@@ -699,16 +695,19 @@ function CrosswordPage() {
                       aria-label={`Row ${r + 1} column ${c + 1}${value ? `, letter ${value}` : ", empty"}`}
                       onPointerDown={(e) => onPointerDown(e, key)}
                       className={[
-                        "relative aspect-square cursor-pointer rounded-[2px] transition-colors",
+                        "relative aspect-square cursor-pointer rounded-[3px] border transition-colors",
+                        isActive
+                          ? "border-primary"
+                          : "border-border/70",
                         wrong
-                          ? "bg-destructive/70"
+                          ? "bg-destructive/60"
                           : isActive
-                            ? "bg-primary/45"
+                            ? "bg-primary/40"
                             : inWord
                               ? "bg-primary/15"
                               : done
-                                ? "bg-emerald-500/10"
-                                : "bg-background",
+                                ? "bg-emerald-500/15"
+                                : "bg-muted",
                       ].join(" ")}
                     >
                       {cell.number !== null && (
@@ -716,11 +715,12 @@ function CrosswordPage() {
                           {cell.number}
                         </span>
                       )}
-                      <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-[3.4vw] font-semibold uppercase leading-none sm:text-lg">
+                      <span className="pointer-events-none absolute inset-0 flex items-center justify-center text-sm font-semibold uppercase leading-none sm:text-lg">
                         {value}
                       </span>
                     </div>
                   );
+
                 })}
               </div>
 

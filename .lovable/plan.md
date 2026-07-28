@@ -1,61 +1,62 @@
-# Part 1 — Attachment Style Test (new tool)
+## Goal
 
-New route at `/tools/attachment-style-test`, reusing the Big Five build pattern exactly (intro → Likert quiz → results).
+A new interactive tool at `/tools/never-have-i-ever` that feels like the same family as Truth or Dare: category chips, animated card reveal, no-repeat shuffle, persistent custom statements — not a static listicle.
 
-## Files to create
+## Verified before planning
 
-- `src/lib/attachment/items.ts` — **28 original first-person items**: 14 Anxiety + 14 Avoidance, each dimension 7 positively-keyed and 7 reverse-keyed. Written from scratch to reflect the well-documented two-dimensional construct; no ECR / ECR-R / Relationship Questionnaire wording reused.
-  - Ends with a **build-time sanity check block** mirroring `src/lib/big-five/items.ts`: an IIFE-style bare block that tallies items per dimension and per keying and `console.warn`s if either dimension is not exactly 14 items or not exactly 7 `+` / 7 `-`, plus a duplicate-`id` check. Any future edit that breaks the balance surfaces immediately in the console instead of silently skewing scores.
-- `src/lib/attachment/scoring.ts` — reverse-score as `6 − response`, average per dimension, rescale `((avg − 1) / 4) × 100` to 0–100 (same math as `src/lib/big-five/scoring.ts`). Exports quadrant mapping (50 boundary on both axes), a `nearBoundary` flag when either score falls within 45–55, and non-pathologizing description text for each of the four regions plus per-dimension band copy.
-- `src/routes/tools.attachment-style-test.tsx` — the route.
+- `most-likely-to` does **not** exist on the site → the contextual link block will only link **Truth or Dare** and **Would You Rather**.
+- `related-tools.ts` currently has a `would-you-rather` key but **no** `truth-or-dare` key (it falls back), so a `truth-or-dare` entry will be added alongside the new `never-have-i-ever` key.
+- Registry shape confirmed from `attachment-style-test` / `truth-or-dare` entries (`slug`, `name`, `description`, `category`, `icon`, `path`, `featureList`, `schemaCategory`) plus optional `dateAdded` used by the "New" badge helper.
+- Sitemap entry format confirmed (`<loc>/<lastmod>/<changefreq>/<priority>`), llms.txt one-line bullet format confirmed.
 
-## Files to update
+## Content bank
 
-- `src/lib/tools.ts` — register the tool (same category as `big-five-personality-test`).
-- `src/lib/related-tools.ts` — add `attachment-style-test` entry and add it into the `big-five-personality-test` list.
-- `public/sitemap.xml`, `public/llms.txt` — add the URL/entry.
+New file `src/lib/never-have-i-ever/statements.ts`:
 
-## Route behaviour
+- 7 categories: `funny`, `embarrassing`, `travel`, `food`, `dating`, `school-work`, `bold`.
+- **160 original statements** authored from scratch (roughly 25 funny, 25 embarrassing, 22 travel, 22 food, 24 dating, 22 school/work, 20 bold). Every item safe-for-work and tasteful, including Bold (Bold = daring/confessional, never explicit).
+- Exported `NHIE_STATEMENTS` (array of `{ text, category }`) and a `CATEGORIES` label/color list.
+- Build-time `console.warn` sanity check (mirroring `src/lib/big-five/items.ts`): warns on duplicate text and reports the per-category tally.
+- After writing the file, the count is verified programmatically (`rg`/node count) and the exact final number is what gets used in the title, meta description, JSON-LD featureList, `tools.ts` description/featureList, ToolSeoContent body, and FAQs. If the authored total differs from 160, every copy location uses the real number instead.
 
-- **Intro screen**: what the test measures, item count, time estimate, explicit "no email, no signup, results shown immediately", and an up-front note that this is not clinical or diagnostic.
-- **Quiz**: one item at a time with a 5-point Likert scale, progress bar, back button — mirroring Big Five's state machine.
-- **Results**:
-  - 2D quadrant scatter chart (custom SVG, same approach as other charts on the site): Avoidance on x, Anxiety on y, the four regions labeled faintly in the background, the user plotted as a marker.
-  - "Closest style" label worded as the *nearest* of four descriptive regions, not a fixed type; when `nearBoundary` is true, an explicit "you're genuinely in between" note appears.
-  - Two dimension cards (Anxiety, Avoidance), each 0–100 with plain-language description.
-  - Copy-to-clipboard shareable summary (sonner toast, same as Big Five / Word Groups).
-  - Retake button.
-  - Honest-caveat block: self-report, relative not population-normed, not clinical, plus one gentle general line that a licensed therapist is a good resource for anyone wanting to explore relationship patterns — framed as general, never as follow-up to a "finding".
-- **Contextual internal links** directly under the results, above AdZone: Big Five Personality Test, Fancy Text Generator, Meme Generator — all three confirmed present in the registry, all via `<Link to="...">`.
+## Route: `src/routes/tools.never-have-i-ever.tsx`
 
-## SEO
+Structure copied from `tools.truth-or-dare.tsx`:
 
-- `head()` with an explicit `scripts` array containing JSON-LD `"@context": "https://schema.org"`, `"@type": "WebApplication"`, and a `featureList` matching what actually ships.
-- Title/description target "attachment style quiz", "attachment style test", "secure anxious avoidant test", "free attachment quiz", and state "no email, no signup, complete results".
-- `ToolSeoContent`: 4+ plain-prose paragraphs (the two-dimensional model; how items are written and scored here; what each of the four regions looks like in relationships, neutrally; how this differs from quiz-funnel competitors) and 8+ FAQs. Body strings stay plain prose — no JSX.
-- Section order: contextual links → AdZone → HowToUse → ToolSeoContent → RelatedTools.
+- Hand-written `head()` with `buildPageMeta` + a `SoftwareApplication` JSON-LD `scripts` array (same shape as Truth or Dare), since keyword-specific title/description is needed.
+  - Title: `Never Have I Ever Online — Free Generator with Custom Questions | Skycally`
+  - Description leads with "Play Never Have I Ever online free" and includes "custom never have i ever questions" naturally, plus the verified count.
+  - `alternateName`: ["Never Have I Ever Online", "Never Have I Ever Generator Online", "Custom Never Have I Ever Questions"].
+- Component wrapped in `ToolPageShell` (`showFileDisclaimer={false}`).
 
-## Numbers check
+Interactive behavior (all real, all implemented):
 
-The final item count is counted programmatically before any copy referencing it is written, and the same number is used in the title, meta description, JSON-LD, SEO body, and FAQs.
+1. **Multi-select category chips**, all on by default; clicking the last active chip is blocked so at least one stays selected (same guard style as Truth or Dare's mode toggle).
+2. **Card reveal** using the existing `framer-motion` `AnimatePresence` + `motion.div` opacity/scale transition already used by Truth or Dare's result card. No new animation lib.
+3. **No-repeat-until-exhausted shuffle**: a `seen` Set of statement indices for the active pool; when the pool is exhausted it resets. Changing category selection (or toggling custom-only) resets `seen`.
+4. **Session counter**: honest local "Statements shown this session: N", reset with a small "Reset session" action.
+5. **Custom mode**: collapsible "Customize questions" section (`Collapsible` + `Switch` + `Input` + `Plus`/`Trash2`, same components as Truth or Dare) — add statements, delete individually, "Use custom only" toggle. Custom statements persist in `localStorage` under `skycally:nhie:custom` (read in a `useEffect` after mount to avoid SSR/hydration mismatch, written on change).
 
-# Part 2 — Random Team Maker audit
+Section order (exactly as specified):
 
-Audit findings against the three spec edge cases (read from `src/routes/tools.random-team-maker.tsx`):
+1. Category chips + generator card (Next Question button)
+2. Contextual internal links (`<Link to="/tools/truth-or-dare">`, `<Link to="/tools/would-you-rather">`) — TanStack `Link`, never `<a href>`
+3. `<AdZone id="never-have-i-ever-bottom" size="728x90" />`
+4. Collapsible "Customize questions"
+5. `HowToUse` (3 steps)
+6. `ToolSeoContent` — 4 plain-prose paragraphs (what the game is / how this generator works vs. a static listicle / group settings incl. family-friendly category picks / privacy: custom list stays in the browser) and **9 FAQs** weighted to the long-tail phrasing, no JSX in `body`, no manually duplicated FAQPage schema
+7. `RelatedTools currentSlug="never-have-i-ever"` — last
 
-| Edge case | Status |
-| --- | --- |
-| Duplicate names allowed, no silent dedupe | **Already correct** — `addPlayer` appends unconditionally; nothing dedupes. |
-| Fewer names than teams | **Already correct** — `canStart` gates on `teamCount <= players.length`, the button is disabled, and an inline warning renders above it. No crash path. |
-| Auto-detect comma-separated vs line-separated paste | **Missing** — the only input is a single-name field committed on Enter or the Add button. |
+## Registration
 
-## Patch (the missing case only)
+- `src/lib/tools.ts`: new entry after `would-you-rather` — `category: "games"`, an existing lucide icon already imported in that file (`Sparkles`-style; will reuse one already present rather than adding a new import if available, otherwise add a single icon import), `dateAdded: "2026-07-28"`, `schemaCategory: "UtilitiesApplication"`, and a `featureList` listing only shipped features: verified statement count across 7 categories, multi-select category filters, no-repeat shuffle, custom statements saved in the browser, session counter, no signup.
+- `src/lib/related-tools.ts`: add `never-have-i-ever` key (truth-or-dare, would-you-rather, spinning-wheel, dice-roller, random-team-maker, role-spinner); add `never-have-i-ever` into `would-you-rather`'s list and add a new `truth-or-dare` key that includes it.
+- `public/sitemap.xml`: new `<url>` block, `lastmod 2026-07-28`, priority 0.8.
+- `public/llms.txt`: one bullet matching the Attachment Style Test format.
 
-In `src/routes/tools.random-team-maker.tsx`, extend the existing player input so it accepts a bulk list without changing anything else:
+## Verification before finishing
 
-- Add a collapsible "Paste a list" textarea beside the existing single-name field.
-- Parse with one splitter that auto-detects both formats: split on newlines *and* commas, trim each token, drop empty tokens, keep duplicates. Semicolons and tab-separated pastes handled by the same splitter.
-- Also route pastes into the existing single-line input through the same splitter, so pasting `Ana, Karim, Sam` there adds three players rather than one player with a comma in their name.
-- Appends to the current player list; the existing team-count guard and inline message keep working unchanged.
-
-No rebuild, no change to the wheel, distribution logic, copy-to-clipboard, or SEO content of that tool.
+- Programmatic count of the statement bank; grep the route/tools.ts/llms.txt for the number to confirm consistency.
+- `rg '<a href' ` on the new route → must be empty.
+- Typecheck, then load `/tools/never-have-i-ever` in headless Chromium: chip toggle, several Next Question reveals, custom add/remove, custom-only toggle, and a reload to confirm localStorage persistence; check console for errors.
+- No new package installs.

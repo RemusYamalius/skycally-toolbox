@@ -231,16 +231,27 @@ function MazePuzzlePage() {
 
   /* -------------------------------------------------------------- painting */
 
-  useEffect(() => {
+  const particlesRef = useRef<
+    { x: number; y: number; vx: number; vy: number; size: number; color: string }[]
+  >([]);
+  const burstStartRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const burstedForRef = useRef(false);
+
+  const BURST_MS = 820;
+
+  const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
     const parent = wrapRef.current;
     const cssSize = Math.min(parent?.clientWidth ?? 520, 560);
     const dpr = typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, 2);
-    canvas.width = cssSize * dpr;
-    canvas.height = cssSize * dpr;
-    canvas.style.width = `${cssSize}px`;
-    canvas.style.height = `${cssSize}px`;
+    if (canvas.width !== Math.round(cssSize * dpr)) {
+      canvas.width = cssSize * dpr;
+      canvas.height = cssSize * dpr;
+      canvas.style.width = `${cssSize}px`;
+      canvas.style.height = `${cssSize}px`;
+    }
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
@@ -251,7 +262,6 @@ function MazePuzzlePage() {
     const cell = (cssSize - pad * 2) / Math.max(maze.rows, maze.cols);
     const styles = getComputedStyle(document.documentElement);
     const fg = `hsl(${styles.getPropertyValue("--foreground").trim() || "0 0% 100%"})`;
-    const muted = `hsl(${styles.getPropertyValue("--muted-foreground").trim() || "0 0% 60%"})`;
 
     const pr = rowOf(maze, player);
     const pc = colOf(maze, player);
@@ -316,7 +326,9 @@ function MazePuzzlePage() {
     ctx.globalAlpha = 1;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    ctx.font = `${Math.max(8, cell * 0.82)}px system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif`;
+    const baseFontSize = Math.max(8, cell * 0.82);
+    const fontStack = 'system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+    ctx.font = `${baseFontSize}px ${fontStack}`;
     const at = (i: number) => ({
       x: pad + colOf(maze, i) * cell + cell / 2,
       y: pad + rowOf(maze, i) * cell + cell / 2,
@@ -326,14 +338,112 @@ function MazePuzzlePage() {
       prefs.fog &&
       !solved &&
       Math.max(Math.abs(rowOf(maze, maze.end) - pr), Math.abs(colOf(maze, maze.end) - pc)) > fogRadius;
-    if (!endHidden) ctx.fillText(theme.end, endPt.x, endPt.y);
+    if (!endHidden) {
+      const pulse = solved ? 1 : 1 + 0.12 * Math.sin(performance.now() / 260);
+      ctx.font = `${Math.max(8, cell * 0.82 * pulse)}px ${fontStack}`;
+      ctx.fillText(theme.end, endPt.x, endPt.y);
+      ctx.font = `${baseFontSize}px ${fontStack}`;
+    }
     const startPt = at(maze.start);
     ctx.globalAlpha = 0.4;
     if (maze.start !== player) ctx.fillText(theme.start, startPt.x, startPt.y);
     ctx.globalAlpha = 1;
     const pPt = at(player);
     ctx.fillText(theme.start, pPt.x, pPt.y);
+
+    // victory burst particles (drawn on top)
+    const started = burstStartRef.current;
+    if (started !== null && particlesRef.current.length) {
+      const elapsed = performance.now() - started;
+      const life = Math.min(1, elapsed / BURST_MS);
+      for (const p of particlesRef.current) {
+        ctx.globalAlpha = Math.max(0, 1 - life);
+        ctx.fillStyle = p.color;
+        ctx.beginPath();
+        ctx.arc(p.x, p.y, p.size, 0, Math.PI * 2);
+        ctx.fill();
+      }
+      ctx.globalAlpha = 1;
+    }
   }, [maze, player, trail, prefs.trail, prefs.fog, path, theme, solved]);
+
+  // repaint on state changes
+  useEffect(() => {
+    draw();
+  }, [draw]);
+
+  // animation loop: pulse while unsolved, plus one-shot victory burst
+  useEffect(() => {
+    let cancelled = false;
+    const tick = () => {
+      if (cancelled) return;
+      const started = burstStartRef.current;
+      if (started !== null) {
+        const elapsed = performance.now() - started;
+        if (elapsed >= BURST_MS) {
+          burstStartRef.current = null;
+          particlesRef.current = [];
+        } else {
+          for (const p of particlesRef.current) {
+            p.x += p.vx;
+            p.y += p.vy;
+            p.vx *= 0.94;
+            p.vy *= 0.94;
+          }
+        }
+      }
+      draw();
+      if (!cancelled && (!solved || burstStartRef.current !== null)) {
+        rafRef.current = requestAnimationFrame(tick);
+      } else {
+        rafRef.current = null;
+      }
+    };
+    if (rafRef.current === null) rafRef.current = requestAnimationFrame(tick);
+    return () => {
+      cancelled = true;
+      if (rafRef.current !== null) {
+        cancelAnimationFrame(rafRef.current);
+        rafRef.current = null;
+      }
+    };
+  }, [draw, solved]);
+
+  // spawn burst exactly once per solve
+  useEffect(() => {
+    if (!solved) {
+      burstedForRef.current = false;
+      burstStartRef.current = null;
+      particlesRef.current = [];
+      return;
+    }
+    if (burstedForRef.current) return;
+    burstedForRef.current = true;
+    const canvas = canvasRef.current;
+    const parent = wrapRef.current;
+    if (!canvas) return;
+    const cssSize = Math.min(parent?.clientWidth ?? 520, 560);
+    const pad = 6;
+    const cell = (cssSize - pad * 2) / Math.max(maze.rows, maze.cols);
+    const cx = pad + colOf(maze, player) * cell + cell / 2;
+    const cy = pad + rowOf(maze, player) * cell + cell / 2;
+    const colors = ["#fbbf24", "#fde68a", "#ffffff", "#f59e0b"];
+    const count = 16;
+    particlesRef.current = Array.from({ length: count }, (_, i) => {
+      const angle = (i / count) * Math.PI * 2 + Math.random() * 0.4;
+      const speed = 1.4 + Math.random() * 2.2;
+      return {
+        x: cx,
+        y: cy,
+        vx: Math.cos(angle) * speed,
+        vy: Math.sin(angle) * speed,
+        size: Math.max(1.5, cell * (0.06 + Math.random() * 0.07)),
+        color: colors[i % colors.length],
+      };
+    });
+    burstStartRef.current = performance.now();
+  }, [solved, maze, player]);
+
 
   /* ---------------------------------------------------------------- actions */
 

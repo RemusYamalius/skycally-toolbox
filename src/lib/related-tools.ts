@@ -102,7 +102,8 @@ export const relatedToolsMap: Record<string, string[]> = {
   pinball: ["breakout", "bubble-shooter", "pac-man"],
   "space-shooter": ["snake", "2048", "wordle"],
   tetris: ["2048", "snake", "pac-man", "breakout", "bubble-shooter", "minesweeper"],
-  "word-groups": ["wordle", "word-search", "hangman", "sliding-puzzle", "memory-match"],
+  "word-groups": ["crossword", "wordle", "word-search", "hangman", "sliding-puzzle", "memory-match"],
+  crossword: ["word-groups", "wordle", "word-search", "hangman", "sudoku", "memory-match"],
   "ball-sort": ["2048", "sudoku", "memory-match", "sliding-puzzle", "minesweeper"],
   "shooting-ball": ["bubble-shooter", "breakout", "ball-sort", "pinball", "pac-man"],
   // Utility

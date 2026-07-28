@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useCallback, useEffect, useMemo, useRef, useState } from "react";
 import {
   Calendar,
@@ -104,9 +104,7 @@ function CrosswordPage() {
   const [mode, setMode] = useState<Mode>("daily");
   const [today] = useState(() => dayIndex());
   const [archiveDay, setArchiveDay] = useState<number | null>(null);
-  const [puzzle, setPuzzle] = useState<CrosswordPuzzle>(() =>
-    puzzleForDay(dayIndex()),
-  );
+  const [puzzle, setPuzzle] = useState<CrosswordPuzzle>(() => puzzleForDay(dayIndex()));
 
   const [letters, setLetters] = useState<Letters>({});
   const [active, setActive] = useState<string | null>(null);
@@ -180,10 +178,7 @@ function CrosswordPage() {
     [activeWordIndex, grid],
   );
 
-  const solvedWords = useMemo(
-    () => solvedWordIndexes(grid, letters),
-    [grid, letters],
-  );
+  const solvedWords = useMemo(() => solvedWordIndexes(grid, letters), [grid, letters]);
 
   const progress = useMemo(() => countFilled(grid, letters), [grid, letters]);
 
@@ -200,8 +195,7 @@ function CrosswordPage() {
         const hasOther = other === "across" ? cell.acrossIndex : cell.downIndex;
         if (hasOther !== null) setDirection(other);
       } else {
-        const hasCurrent =
-          direction === "across" ? cell.acrossIndex : cell.downIndex;
+        const hasCurrent = direction === "across" ? cell.acrossIndex : cell.downIndex;
         if (hasCurrent === null) {
           setDirection(direction === "across" ? "down" : "across");
         }
@@ -217,9 +211,7 @@ function CrosswordPage() {
       const keys = grid.wordCells[index];
       if (!keys?.length) return;
       const firstEmpty = keys.find((k) => !(letters[k] ?? "")) ?? keys[0];
-      setDirection(
-        grid.across.some((a) => a.index === index) ? "across" : "down",
-      );
+      setDirection(grid.across.some((a) => a.index === index) ? "across" : "down");
       setActive(firstEmpty);
       focusInput();
     },
@@ -356,7 +348,6 @@ function CrosswordPage() {
     selectCell(key, true);
   };
 
-
   const onPointerMove = (e: React.PointerEvent) => {
     if (!dragStart.current) return;
     const key = cellFromPoint(e.clientX, e.clientY);
@@ -368,12 +359,9 @@ function CrosswordPage() {
     if (dr === 0 && dc === 0) return;
     // A drag across a row picks the across entry; down a column picks down.
     const wanted = Math.abs(dc) >= Math.abs(dr) ? "across" : "down";
-    const startCell = grid.cells.get(
-      cellKey(dragStart.current.row, dragStart.current.col),
-    );
+    const startCell = grid.cells.get(cellKey(dragStart.current.row, dragStart.current.col));
     if (!startCell) return;
-    const hasWanted =
-      wanted === "across" ? startCell.acrossIndex : startCell.downIndex;
+    const hasWanted = wanted === "across" ? startCell.acrossIndex : startCell.downIndex;
     if (hasWanted !== null) setDirection(wanted);
   };
 
@@ -407,9 +395,7 @@ function CrosswordPage() {
   const checkWord = () => {
     if (activeWordIndex === null) return;
     const keys = grid.wordCells[activeWordIndex];
-    const bad = keys.filter(
-      (k) => (letters[k] ?? "") && letters[k] !== grid.cells.get(k)!.solution,
-    );
+    const bad = keys.filter((k) => (letters[k] ?? "") && letters[k] !== grid.cells.get(k)!.solution);
     if (bad.length) {
       flash(bad);
       toast.error(`${bad.length} wrong letter${bad.length > 1 ? "s" : ""} in this entry.`);
@@ -464,17 +450,7 @@ function CrosswordPage() {
       markDayCompleted(archiveDay, result);
       setHistory(loadHistory());
     }
-  }, [
-    archiveDay,
-    finished,
-    grid,
-    hydrated,
-    isDaily,
-    letters,
-    seconds,
-    today,
-    usedReveal,
-  ]);
+  }, [archiveDay, finished, grid, hydrated, isDaily, letters, seconds, today, usedReveal]);
 
   /* ----------------------------------------------------------------- modes */
 
@@ -512,6 +488,14 @@ function CrosswordPage() {
   };
 
   const playArchiveDay = (day: number) => {
+    // Today's date picked from the Archive calendar is just the Daily
+    // puzzle by another door — route it through startDaily() so it always
+    // counts toward streaks/stats the same way, regardless of which UI
+    // path the visitor used to reach it.
+    if (day === today) {
+      startDaily();
+      return;
+    }
     setMode("daily");
     setArchiveDay(day);
     openBoard(puzzleForDay(day));
@@ -549,11 +533,7 @@ function CrosswordPage() {
         : "Practice puzzle";
     try {
       toast.info("Building your printable PDF…");
-      await exportCrosswordPdf(
-        puzzle,
-        subtitle,
-        `skycally-crossword-${puzzle.id}.pdf`,
-      );
+      await exportCrosswordPdf(puzzle, subtitle, `skycally-crossword-${puzzle.id}.pdf`);
       toast.success("PDF downloaded — grid on page 1, answer key on page 2.");
     } catch {
       toast.error("Could not build the PDF. Please try again.");
@@ -562,12 +542,9 @@ function CrosswordPage() {
 
   /* ------------------------------------------------------------------ view */
 
-  const activeClue =
-    activeWordIndex === null ? null : puzzle.words[activeWordIndex];
+  const activeClue = activeWordIndex === null ? null : puzzle.words[activeWordIndex];
 
-  const solveRate = stats.played
-    ? Math.round((stats.solved / stats.played) * 100)
-    : 0;
+  const solveRate = stats.played ? Math.round((stats.solved / stats.played) * 100) : 0;
 
   return (
     <ToolPageShell
@@ -577,12 +554,7 @@ function CrosswordPage() {
     >
       {/* Mode tabs */}
       <div className="flex flex-wrap items-center gap-2 mb-6">
-        <ModeTab
-          active={isDaily}
-          onClick={startDaily}
-          label="Daily"
-          icon={<Sparkles className="w-4 h-4" />}
-        />
+        <ModeTab active={isDaily} onClick={startDaily} label="Daily" icon={<Sparkles className="w-4 h-4" />} />
         <ModeTab
           active={mode === "practice"}
           onClick={startPractice}
@@ -596,9 +568,7 @@ function CrosswordPage() {
           icon={<Calendar className="w-4 h-4" />}
         />
         {isDaily && (
-          <span className="ml-auto text-xs text-muted-foreground">
-            Puzzle #{today - LAUNCH_DAY_INDEX + 1}
-          </span>
+          <span className="ml-auto text-xs text-muted-foreground">Puzzle #{today - LAUNCH_DAY_INDEX + 1}</span>
         )}
         {archiveDay !== null && (
           <span className="ml-auto text-xs text-muted-foreground">
@@ -628,16 +598,11 @@ function CrosswordPage() {
               <span className="text-xs text-muted-foreground">
                 {progress.filled}/{progress.total} squares filled
               </span>
-              <span className="ml-auto text-xs text-muted-foreground">
-                {puzzle.title}
-              </span>
+              <span className="ml-auto text-xs text-muted-foreground">{puzzle.title}</span>
             </div>
 
             {/* Active clue bar */}
-            <div
-              className="mb-3 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm"
-              aria-live="polite"
-            >
+            <div className="mb-3 rounded-lg border border-border bg-muted/40 px-3 py-2 text-sm" aria-live="polite">
               {activeClue ? (
                 <>
                   <span className="font-semibold">
@@ -645,9 +610,7 @@ function CrosswordPage() {
                   </span>
                   <span className="mx-2 text-muted-foreground">·</span>
                   <span>{activeClue.clue}</span>
-                  <span className="ml-2 text-xs text-muted-foreground">
-                    ({activeClue.answer.length})
-                  </span>
+                  <span className="ml-2 text-xs text-muted-foreground">({activeClue.answer.length})</span>
                 </>
               ) : (
                 <span className="text-muted-foreground">Pick a square to start.</span>
@@ -675,9 +638,7 @@ function CrosswordPage() {
                   const key = cellKey(r, c);
                   const cell = grid.cells.get(key);
                   if (!cell) {
-                    return (
-                      <div key={key} className="aspect-square" aria-hidden="true" />
-                    );
+                    return <div key={key} className="aspect-square" aria-hidden="true" />;
                   }
                   const inWord = activeWordCells.includes(key);
                   const isActive = key === active;
@@ -696,9 +657,7 @@ function CrosswordPage() {
                       onPointerDown={(e) => onPointerDown(e, key)}
                       className={[
                         "relative aspect-square cursor-pointer rounded-[3px] border transition-colors",
-                        isActive
-                          ? "border-primary"
-                          : "border-border/70",
+                        isActive ? "border-primary" : "border-border/70",
                         wrong
                           ? "bg-destructive/60"
                           : isActive
@@ -720,7 +679,6 @@ function CrosswordPage() {
                       </span>
                     </div>
                   );
-
                 })}
               </div>
 
@@ -773,9 +731,7 @@ function CrosswordPage() {
 
             {finished && (
               <div className="mt-5 rounded-xl border border-border bg-card p-5 text-center">
-                <h2 className="text-lg font-bold">
-                  {finished === "solved" ? "Solved!" : "Grid complete"}
-                </h2>
+                <h2 className="text-lg font-bold">{finished === "solved" ? "Solved!" : "Grid complete"}</h2>
                 <p className="mt-1 text-sm text-muted-foreground">
                   {finished === "solved"
                     ? `You filled all ${grid.cells.size} squares in ${formatClock(seconds)} with no reveals.`
@@ -824,6 +780,34 @@ function CrosswordPage() {
           </div>
         </div>
       )}
+
+      {/* Contextual internal-links block — moved before AdZone/HowToUse/
+          ToolSeoContent per site convention (was incorrectly placed after
+          ToolSeoContent). Uses <Link> instead of <a href> (was incorrectly
+          using plain anchors, causing a full page reload). */}
+      <section className="mx-auto mt-6 max-w-2xl space-y-2 px-1 text-sm text-muted-foreground">
+        <p>
+          If you like a daily puzzle habit, try{" "}
+          <Link to="/tools/word-groups" className="underline hover:text-foreground">
+            Word Groups
+          </Link>{" "}
+          — sort 16 words into 4 hidden categories, with the same free archive.
+        </p>
+        <p>
+          Prefer guessing one word at a time? Play{" "}
+          <Link to="/tools/wordle" className="underline hover:text-foreground">
+            Wordle
+          </Link>{" "}
+          for the classic six-guess challenge.
+        </p>
+        <p>
+          For a slower, no-pressure word hunt, our{" "}
+          <Link to="/tools/word-search" className="underline hover:text-foreground">
+            Word Search
+          </Link>{" "}
+          hides words in a grid you scan at your own pace.
+        </p>
+      </section>
 
       <AdZone id="crossword-mid" size="728x90" />
 
@@ -888,31 +872,6 @@ function CrosswordPage() {
         ]}
       />
 
-      {/* Contextual internal-links block */}
-      <section className="mx-auto mt-6 max-w-2xl space-y-2 px-1 pb-6 text-sm text-muted-foreground">
-        <p>
-          If you like a daily puzzle habit, try{" "}
-          <a href="/tools/word-groups" className="underline hover:text-foreground">
-            Word Groups
-          </a>{" "}
-          — sort 16 words into 4 hidden categories, with the same free archive.
-        </p>
-        <p>
-          Prefer guessing one word at a time? Play{" "}
-          <a href="/tools/wordle" className="underline hover:text-foreground">
-            Wordle
-          </a>{" "}
-          for the classic six-guess challenge.
-        </p>
-        <p>
-          For a slower, no-pressure word hunt, our{" "}
-          <a href="/tools/word-search" className="underline hover:text-foreground">
-            Word Search
-          </a>{" "}
-          hides words in a grid you scan at your own pace.
-        </p>
-      </section>
-
       <RelatedTools currentSlug="crossword" />
     </ToolPageShell>
   );
@@ -950,9 +909,7 @@ function StatBox({ label, value }: { label: string; value: number }) {
   return (
     <div className="rounded-lg border border-border bg-card p-3 text-center">
       <div className="text-2xl font-bold">{value}</div>
-      <div className="mt-0.5 text-xs uppercase tracking-wide text-muted-foreground">
-        {label}
-      </div>
+      <div className="mt-0.5 text-xs uppercase tracking-wide text-muted-foreground">{label}</div>
     </div>
   );
 }
@@ -982,19 +939,12 @@ function ClueList({
               <button
                 onClick={() => onSelect(index)}
                 className={`flex w-full gap-2 rounded-md px-2 py-1.5 text-left text-sm transition ${
-                  isActive
-                    ? "bg-primary/20 font-medium"
-                    : "hover:bg-muted"
+                  isActive ? "bg-primary/20 font-medium" : "hover:bg-muted"
                 } ${isDone ? "text-muted-foreground line-through decoration-muted-foreground/50" : ""}`}
               >
-                <span className="w-6 shrink-0 text-right font-semibold tabular-nums">
-                  {word.number}
-                </span>
+                <span className="w-6 shrink-0 text-right font-semibold tabular-nums">{word.number}</span>
                 <span className="min-w-0">
-                  {word.clue}{" "}
-                  <span className="text-xs text-muted-foreground">
-                    ({word.answer.length})
-                  </span>
+                  {word.clue} <span className="text-xs text-muted-foreground">({word.answer.length})</span>
                 </span>
               </button>
             </li>
@@ -1039,27 +989,20 @@ function ArchiveView({
     setMonth({ y, m });
   };
 
-  const monthLabel = new Date(Date.UTC(month.y, month.m, 1)).toLocaleDateString(
-    "en-US",
-    { month: "long", year: "numeric", timeZone: "UTC" },
-  );
+  const monthLabel = new Date(Date.UTC(month.y, month.m, 1)).toLocaleDateString("en-US", {
+    month: "long",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 
   return (
     <div className="mx-auto max-w-md">
       <div className="mb-4 flex items-center justify-between">
-        <button
-          onClick={prevMonth}
-          className="rounded-md p-2 hover:bg-muted"
-          aria-label="Previous month"
-        >
+        <button onClick={prevMonth} className="rounded-md p-2 hover:bg-muted" aria-label="Previous month">
           <ChevronLeft className="h-4 w-4" />
         </button>
         <div className="font-semibold">{monthLabel}</div>
-        <button
-          onClick={nextMonth}
-          className="rounded-md p-2 hover:bg-muted"
-          aria-label="Next month"
-        >
+        <button onClick={nextMonth} className="rounded-md p-2 hover:bg-muted" aria-label="Next month">
           <ChevronRight className="h-4 w-4" />
         </button>
       </div>
@@ -1078,12 +1021,7 @@ function ArchiveView({
           const dayIdx = Math.floor(Date.UTC(month.y, month.m, d) / 86400000);
           const disabled = dayIdx < launch || dayIdx > today;
           const state = history[String(dayIdx)];
-          const dot =
-            state === "solved"
-              ? "#22c55e"
-              : state === "revealed"
-                ? "#f59e0b"
-                : "transparent";
+          const dot = state === "solved" ? "#22c55e" : state === "revealed" ? "#f59e0b" : "transparent";
           return (
             <button
               key={i}
@@ -1096,19 +1034,14 @@ function ArchiveView({
               } ${dayIdx === today ? "ring-2 ring-foreground/40" : ""}`}
             >
               <span>{d}</span>
-              <span
-                className="mt-0.5 h-1.5 w-1.5 rounded-full"
-                style={{ background: dot }}
-                aria-hidden="true"
-              />
+              <span className="mt-0.5 h-1.5 w-1.5 rounded-full" style={{ background: dot }} aria-hidden="true" />
             </button>
           );
         })}
       </div>
 
       <p className="mt-4 text-center text-xs text-muted-foreground">
-        Green dot = solved clean, amber dot = finished with reveals. Every past
-        puzzle is free to play.
+        Green dot = solved clean, amber dot = finished with reveals. Every past puzzle is free to play.
       </p>
     </div>
   );

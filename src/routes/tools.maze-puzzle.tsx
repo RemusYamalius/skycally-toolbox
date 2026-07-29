@@ -323,6 +323,9 @@ function MazePuzzlePage() {
     ctx.stroke();
 
     // emojis + player
+    ctx.globalCompositeOperation = "source-over";
+    ctx.filter = "none";
+    ctx.shadowBlur = 0;
     ctx.fillStyle = fg;
     ctx.globalAlpha = 1;
     ctx.textAlign = "center";
@@ -349,13 +352,15 @@ function MazePuzzlePage() {
       if (!solved) {
         const hue = (performance.now() / 6) % 360;
         const glowRadius = cell * 0.42 * pulse;
-        ctx.save();
+        const prevAlpha = ctx.globalAlpha;
+        const prevFillStyle = ctx.fillStyle;
         ctx.globalAlpha = 0.4;
         ctx.fillStyle = `hsl(${hue}, 85%, 55%)`;
         ctx.beginPath();
         ctx.arc(endPt.x, endPt.y, glowRadius, 0, Math.PI * 2);
         ctx.fill();
-        ctx.restore();
+        ctx.globalAlpha = prevAlpha;
+        ctx.fillStyle = prevFillStyle;
       }
 
       ctx.font = `${Math.max(8, cell * 0.82 * pulse)}px ${fontStack}`;

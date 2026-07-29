@@ -19,7 +19,7 @@ export const Route = createFileRoute("/tools/tip-calculator")({
 const PRESETS = [10, 15, 18, 20, 25];
 
 function fmt(n: number) {
-  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function TipCalculator() {

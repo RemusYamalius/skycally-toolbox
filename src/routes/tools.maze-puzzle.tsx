@@ -112,6 +112,10 @@ function MazePuzzlePage() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const particlesRef = useRef<{ x: number; y: number; vx: number; vy: number; size: number; color: string }[]>([]);
+  const burstStartRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const burstedForRef = useRef(false);
   // Caches the last *rounded* font string actually applied to the 2D
   // context. `cell` (and therefore baseFontSize) is derived from a live
   // `parent.clientWidth` measurement taken on every single draw() call —
@@ -124,6 +128,8 @@ function MazePuzzlePage() {
   // reset it. Now `ctx.font` is only ever reassigned when the rounded
   // integer pixel size actually changes (a real resize or a new maze).
   const lastFontRef = useRef<string>("");
+
+  const BURST_MS = 820;
 
   /* ------------------------------------------------------------- lifecycle */
 
@@ -247,13 +253,6 @@ function MazePuzzlePage() {
 
   /* -------------------------------------------------------------- painting */
 
-  const particlesRef = useRef<{ x: number; y: number; vx: number; vy: number; size: number; color: string }[]>([]);
-  const burstStartRef = useRef<number | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const burstedForRef = useRef(false);
-
-  const BURST_MS = 820;
-
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -271,6 +270,10 @@ function MazePuzzlePage() {
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.filter = "none";
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
     ctx.clearRect(0, 0, cssSize, cssSize);
 
     const pad = 6;
@@ -344,9 +347,9 @@ function MazePuzzlePage() {
       y: pad + rowOf(maze, i) * cell + cell / 2,
     });
 
-    // Animated goal halo only. The color emoji glyph itself is drawn later
-    // at fixed size in a clean, opaque final pass so it cannot become tinted
-    // or faded by animation/path canvas state.
+    // Animated goal ring only. It is a stroked outline around the emoji cell,
+    // never a fill beneath the glyph, so it cannot tint transparent emoji
+    // pixels or change the native color rendering.
     const endPt = at(maze.end);
     const endHidden =
       prefs.fog &&
@@ -359,11 +362,13 @@ function MazePuzzlePage() {
       ctx.globalCompositeOperation = "source-over";
       ctx.filter = "none";
       ctx.shadowBlur = 0;
-      ctx.globalAlpha = 0.16;
+      ctx.globalAlpha = 0.34;
       ctx.fillStyle = `hsl(${hue}, 82%, 58%)`;
+      ctx.strokeStyle = `hsl(${hue}, 82%, 58%)`;
+      ctx.lineWidth = Math.max(1, cell * 0.08);
       ctx.beginPath();
-      ctx.arc(endPt.x, endPt.y, cell * 0.42 * pulse, 0, Math.PI * 2);
-      ctx.fill();
+      ctx.arc(endPt.x, endPt.y, cell * 0.44 * pulse, 0, Math.PI * 2);
+      ctx.stroke();
       ctx.restore();
     }
 
@@ -386,6 +391,13 @@ function MazePuzzlePage() {
     // font size and fully reset canvas state. No animation ever changes the
     // emoji glyphs themselves, preserving their native full-color rendering
     // through movement, reveal-path highlights, and new maze resets.
+    const baseFontSize = Math.max(8, Math.round(cell * 0.82));
+    const fontStack = 'system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+    const fontStr = `${baseFontSize}px ${fontStack}`;
+    if (lastFontRef.current !== fontStr) {
+      ctx.font = fontStr;
+      lastFontRef.current = fontStr;
+    }
     ctx.save();
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalCompositeOperation = "source-over";
@@ -395,13 +407,6 @@ function MazePuzzlePage() {
     ctx.fillStyle = fg;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const baseFontSize = Math.max(8, Math.round(cell * 0.82));
-    const fontStack = 'system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
-    const fontStr = `${baseFontSize}px ${fontStack}`;
-    if (lastFontRef.current !== fontStr) {
-      lastFontRef.current = fontStr;
-    }
-    ctx.font = fontStr;
     if (!endHidden) ctx.fillText(theme.end, endPt.x, endPt.y);
     const startPt = at(maze.start);
     if (maze.start !== player) ctx.fillText(theme.start, startPt.x, startPt.y);

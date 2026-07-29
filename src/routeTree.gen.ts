@@ -72,6 +72,7 @@ import { Route as ToolsProtectPdfRouteImport } from './routes/tools.protect-pdf'
 import { Route as ToolsPregnancyCalculatorRouteImport } from './routes/tools.pregnancy-calculator'
 import { Route as ToolsPortCheckerRouteImport } from './routes/tools.port-checker'
 import { Route as ToolsPinballRouteImport } from './routes/tools.pinball'
+import { Route as ToolsPercentageCalculatorRouteImport } from './routes/tools.percentage-calculator'
 import { Route as ToolsPdfWatermarkRemoverRouteImport } from './routes/tools.pdf-watermark-remover'
 import { Route as ToolsPdfToWordRouteImport } from './routes/tools.pdf-to-word'
 import { Route as ToolsPdfToImagesRouteImport } from './routes/tools.pdf-to-images'
@@ -495,6 +496,12 @@ const ToolsPinballRoute = ToolsPinballRouteImport.update({
   path: '/tools/pinball',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsPercentageCalculatorRoute =
+  ToolsPercentageCalculatorRouteImport.update({
+    id: '/tools/percentage-calculator',
+    path: '/tools/percentage-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsPdfWatermarkRemoverRoute =
   ToolsPdfWatermarkRemoverRouteImport.update({
     id: '/tools/pdf-watermark-remover',
@@ -1127,6 +1134,7 @@ export interface FileRoutesByFullPath {
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
+  '/tools/percentage-calculator': typeof ToolsPercentageCalculatorRoute
   '/tools/pinball': typeof ToolsPinballRoute
   '/tools/port-checker': typeof ToolsPortCheckerRoute
   '/tools/pregnancy-calculator': typeof ToolsPregnancyCalculatorRoute
@@ -1294,6 +1302,7 @@ export interface FileRoutesByTo {
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
+  '/tools/percentage-calculator': typeof ToolsPercentageCalculatorRoute
   '/tools/pinball': typeof ToolsPinballRoute
   '/tools/port-checker': typeof ToolsPortCheckerRoute
   '/tools/pregnancy-calculator': typeof ToolsPregnancyCalculatorRoute
@@ -1462,6 +1471,7 @@ export interface FileRoutesById {
   '/tools/pdf-to-images': typeof ToolsPdfToImagesRoute
   '/tools/pdf-to-word': typeof ToolsPdfToWordRoute
   '/tools/pdf-watermark-remover': typeof ToolsPdfWatermarkRemoverRoute
+  '/tools/percentage-calculator': typeof ToolsPercentageCalculatorRoute
   '/tools/pinball': typeof ToolsPinballRoute
   '/tools/port-checker': typeof ToolsPortCheckerRoute
   '/tools/pregnancy-calculator': typeof ToolsPregnancyCalculatorRoute
@@ -1631,6 +1641,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-to-images'
     | '/tools/pdf-to-word'
     | '/tools/pdf-watermark-remover'
+    | '/tools/percentage-calculator'
     | '/tools/pinball'
     | '/tools/port-checker'
     | '/tools/pregnancy-calculator'
@@ -1798,6 +1809,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-to-images'
     | '/tools/pdf-to-word'
     | '/tools/pdf-watermark-remover'
+    | '/tools/percentage-calculator'
     | '/tools/pinball'
     | '/tools/port-checker'
     | '/tools/pregnancy-calculator'
@@ -1965,6 +1977,7 @@ export interface FileRouteTypes {
     | '/tools/pdf-to-images'
     | '/tools/pdf-to-word'
     | '/tools/pdf-watermark-remover'
+    | '/tools/percentage-calculator'
     | '/tools/pinball'
     | '/tools/port-checker'
     | '/tools/pregnancy-calculator'
@@ -2133,6 +2146,7 @@ export interface RootRouteChildren {
   ToolsPdfToImagesRoute: typeof ToolsPdfToImagesRoute
   ToolsPdfToWordRoute: typeof ToolsPdfToWordRoute
   ToolsPdfWatermarkRemoverRoute: typeof ToolsPdfWatermarkRemoverRoute
+  ToolsPercentageCalculatorRoute: typeof ToolsPercentageCalculatorRoute
   ToolsPinballRoute: typeof ToolsPinballRoute
   ToolsPortCheckerRoute: typeof ToolsPortCheckerRoute
   ToolsPregnancyCalculatorRoute: typeof ToolsPregnancyCalculatorRoute
@@ -2634,6 +2648,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/pinball'
       fullPath: '/tools/pinball'
       preLoaderRoute: typeof ToolsPinballRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/percentage-calculator': {
+      id: '/tools/percentage-calculator'
+      path: '/tools/percentage-calculator'
+      fullPath: '/tools/percentage-calculator'
+      preLoaderRoute: typeof ToolsPercentageCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/pdf-watermark-remover': {
@@ -3465,6 +3486,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsPdfToImagesRoute: ToolsPdfToImagesRoute,
   ToolsPdfToWordRoute: ToolsPdfToWordRoute,
   ToolsPdfWatermarkRemoverRoute: ToolsPdfWatermarkRemoverRoute,
+  ToolsPercentageCalculatorRoute: ToolsPercentageCalculatorRoute,
   ToolsPinballRoute: ToolsPinballRoute,
   ToolsPortCheckerRoute: ToolsPortCheckerRoute,
   ToolsPregnancyCalculatorRoute: ToolsPregnancyCalculatorRoute,

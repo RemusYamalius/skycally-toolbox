@@ -12,7 +12,9 @@ export const relatedToolsMap: Record<string, string[]> = {
   "mortgage-calculator": ["rent-vs-buy-calculator", "loan-calculator", "emi-calculator", "car-loan-calculator", "compound-interest", "currency-converter", "insurance-estimator"],
   "car-loan-calculator": ["loan-calculator", "emi-calculator", "mortgage-calculator", "tip-calculator", "currency-converter"],
   
-  "margin-calculator": ["tip-calculator", "currency-converter", "compound-interest", "loan-calculator", "unit-converter"],
+  "margin-calculator": ["percentage-calculator", "tip-calculator", "currency-converter", "compound-interest", "loan-calculator", "unit-converter"],
+  "percentage-calculator": ["margin-calculator", "tip-calculator", "currency-converter", "unit-converter", "compound-interest", "loan-calculator"],
+  "tip-calculator": ["percentage-calculator", "margin-calculator", "currency-converter", "unit-converter", "loan-calculator"],
   "paycheck-calculator": ["retirement-calculator", "rent-vs-buy-calculator", "loan-calculator", "mortgage-calculator", "compound-interest", "currency-converter", "debt-payoff-calculator", "insurance-estimator"],
   "debt-payoff-calculator": ["retirement-calculator", "paycheck-calculator", "loan-calculator", "compound-interest", "mortgage-calculator", "currency-converter", "insurance-estimator"],
   "rent-vs-buy-calculator": ["retirement-calculator", "mortgage-calculator", "compound-interest", "paycheck-calculator", "loan-calculator", "debt-payoff-calculator", "insurance-estimator"],

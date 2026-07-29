@@ -110,7 +110,10 @@
     color: var(--color-foreground);
     font-feature-settings: "cv11", "ss01";
   }
-  h1, h2, h3, h4 {
+  h1,
+  h2,
+  h3,
+  h4 {
     font-family: var(--font-display);
     letter-spacing: -0.02em;
   }
@@ -119,8 +122,16 @@
 /* Hero gradient + grid */
 .bg-hero {
   background:
-    radial-gradient(ellipse 80% 60% at 50% -10%, color-mix(in oklab, var(--violet-brand) 40%, transparent), transparent 60%),
-    radial-gradient(ellipse 60% 50% at 90% 20%, color-mix(in oklab, var(--cyan-brand) 35%, transparent), transparent 60%),
+    radial-gradient(
+      ellipse 80% 60% at 50% -10%,
+      color-mix(in oklab, var(--violet-brand) 40%, transparent),
+      transparent 60%
+    ),
+    radial-gradient(
+      ellipse 60% 50% at 90% 20%,
+      color-mix(in oklab, var(--cyan-brand) 35%, transparent),
+      transparent 60%
+    ),
     linear-gradient(180deg, var(--navy-deep), oklch(0.13 0.04 270));
 }
 
@@ -140,22 +151,39 @@
 }
 
 .glow-cyan {
-  box-shadow: 0 0 0 1px color-mix(in oklab, var(--cyan-brand) 40%, transparent),
-              0 10px 40px -10px color-mix(in oklab, var(--cyan-brand) 50%, transparent);
+  box-shadow:
+    0 0 0 1px color-mix(in oklab, var(--cyan-brand) 40%, transparent),
+    0 10px 40px -10px color-mix(in oklab, var(--cyan-brand) 50%, transparent);
 }
 
 @keyframes float-slow {
-  0%, 100% { transform: translateY(0); }
-  50% { transform: translateY(-12px); }
+  0%,
+  100% {
+    transform: translateY(0);
+  }
+  50% {
+    transform: translateY(-12px);
+  }
 }
-.animate-float { animation: float-slow 6s ease-in-out infinite; }
+.animate-float {
+  animation: float-slow 6s ease-in-out infinite;
+}
 
 @keyframes shimmer {
-  0% { background-position: -200% 0; }
-  100% { background-position: 200% 0; }
+  0% {
+    background-position: -200% 0;
+  }
+  100% {
+    background-position: 200% 0;
+  }
 }
 .skeleton {
-  background: linear-gradient(90deg, var(--muted) 25%, color-mix(in oklab, var(--muted) 60%, white 20%) 50%, var(--muted) 75%);
+  background: linear-gradient(
+    90deg,
+    var(--muted) 25%,
+    color-mix(in oklab, var(--muted) 60%, white 20%) 50%,
+    var(--muted) 75%
+  );
   background-size: 200% 100%;
   animation: shimmer 1.4s infinite;
 }
@@ -192,7 +220,8 @@ select option {
   contain: layout paint;
 }
 
-html, body {
+html,
+body {
   touch-action: pan-y;
 }
 
@@ -221,12 +250,51 @@ html, body {
 }
 
 @keyframes heroFadeUp {
-  from { opacity: 0; transform: translateY(18px); }
-  to   { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(18px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.hero-fade-up        { animation: heroFadeUp 0.55s ease both; }
-.hero-fade-up-delay  { animation: heroFadeUp 0.55s 0.12s ease both; }
-.hero-fade-up-delay2 { animation: heroFadeUp 0.55s 0.25s ease both; }
+.hero-fade-up {
+  animation: heroFadeUp 0.55s ease both;
+}
+.hero-fade-up-delay {
+  animation: heroFadeUp 0.55s 0.12s ease both;
+}
+.hero-fade-up-delay2 {
+  animation: heroFadeUp 0.55s 0.25s ease both;
+}
+
+/* Maze Puzzle — goal marker glow. Pure CSS animation behind the goal
+   emoji (a real DOM element, not canvas). Runs independently of React
+   re-renders and cannot touch the emoji glyph's own color rendering. */
+@keyframes mazeGoalPulse {
+  0%,
+  100% {
+    transform: scale(0.92);
+  }
+  50% {
+    transform: scale(1.08);
+  }
+}
+@keyframes mazeGoalHue {
+  0% {
+    filter: hue-rotate(0deg);
+  }
+  100% {
+    filter: hue-rotate(360deg);
+  }
+}
+.maze-goal-glow {
+  background: radial-gradient(circle, hsl(140 70% 55% / 0.55) 0%, hsl(140 70% 55% / 0) 70%);
+  animation:
+    mazeGoalPulse 1.3s ease-in-out infinite,
+    mazeGoalHue 4s linear infinite;
+}
 
 /*
   COLOR RULES — always use semantic tokens, never hardcode:
@@ -238,4 +306,3 @@ html, body {
 :root:not(.dark) .bg-card {
   color: var(--card-foreground);
 }
-

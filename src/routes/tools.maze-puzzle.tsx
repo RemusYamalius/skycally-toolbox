@@ -280,7 +280,7 @@ function MazePuzzlePage() {
         if (path && path.includes(i)) {
           ctx.fillStyle = "rgba(250, 204, 21, 0.35)";
           ctx.fillRect(x, y, cell, cell);
-        } else if (prefs.trail && trail.has(i) && i !== player) {
+        } else if (prefs.trail && trail.has(i) && i !== player && i !== maze.start) {
           // Lag the breadcrumb one step behind the player, instead of
           // painting directly underneath the current position — keeps the
           // emoji on a clean background so it stays legible at all times.
@@ -363,9 +363,7 @@ function MazePuzzlePage() {
       ctx.font = `${baseFontSize}px ${fontStack}`;
     }
     const startPt = at(maze.start);
-    ctx.globalAlpha = 0.4;
     if (maze.start !== player) ctx.fillText(theme.start, startPt.x, startPt.y);
-    ctx.globalAlpha = 1;
     const pPt = at(player);
     ctx.fillText(theme.start, pPt.x, pPt.y);
 

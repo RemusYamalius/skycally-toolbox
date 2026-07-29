@@ -15,12 +15,12 @@ export const Route = createFileRoute("/tools/margin-calculator")({
 
 function fmt(n: number) {
   if (!isFinite(n)) return "—";
-  return n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 });
+  return n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 });
 }
 
 function pct(n: number) {
   if (!isFinite(n)) return "—";
-  return `${n.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
+  return `${n.toLocaleString("en-US", { minimumFractionDigits: 2, maximumFractionDigits: 2 })}%`;
 }
 
 function MarginCalculator() {

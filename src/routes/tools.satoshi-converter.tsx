@@ -264,7 +264,7 @@ function SatoshiConverterPage() {
               ) : prices ? (
                 <div className="flex items-baseline gap-3 flex-wrap">
                   <span className="text-2xl font-bold" style={{ color: BITCOIN_ORANGE }}>
-                    ${(prices.usd ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                    ${(prices.usd ?? 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}
                   </span>
                   <span
                     className="inline-flex items-center gap-1 text-sm font-medium"
@@ -284,11 +284,11 @@ function SatoshiConverterPage() {
             {prices && (
               <>
                 <div className="text-sm text-muted-foreground">
-                  €{(prices.eur ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  €{(prices.eur ?? 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}
                 </div>
                 <span className="text-muted-foreground/40">·</span>
                 <div className="text-sm text-muted-foreground">
-                  MAD {(prices.mad ?? 0).toLocaleString(undefined, { maximumFractionDigits: 2 })}
+                  MAD {(prices.mad ?? 0).toLocaleString("en-US", { maximumFractionDigits: 2 })}
                 </div>
               </>
             )}
@@ -330,7 +330,12 @@ function SatoshiConverterPage() {
                   }}
                   labelFormatter={(_label, payload) => {
                     const t = payload?.[0]?.payload?.t;
-                    return t ? new Date(t).toLocaleString() : "";
+                    // Explicit locale, same reasoning as the price formatting
+                    // above: `toLocaleString()` with no locale argument
+                    // formats according to the visitor's own browser/OS
+                    // locale, which could show a different date order or
+                    // separator than the rest of this English-language site.
+                    return t ? new Date(t).toLocaleString("en-US") : "";
                   }}
                   formatter={(v: number) => [`$${v.toFixed(2)}`, "BTC"]}
                 />

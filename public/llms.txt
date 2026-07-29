@@ -74,6 +74,7 @@
 - [JSON Formatter](/tools/json-formatter): Format and validate JSON.
 - [Unit Converter](/tools/unit-converter): Convert length, mass, temperature and more.
 - [Currency Converter](/tools/currency-converter): Live currency rates.
+- [Percentage Calculator](/tools/percentage-calculator): Percentage of a number, X is what percent of Y, percentage change, and percentage increase or decrease — four calculators in one, instant results.
 - [Loan Calculator](/tools/loan-calculator): Personal loan payments.
 - [Paycheck Calculator](/tools/paycheck-calculator): US take-home pay after federal tax, state tax, FICA and pre-tax deductions — with state-vs-state comparison.
 - [Macro Calculator](/tools/macro-calculator): Protein / carb / fat breakdown from a calorie target — protein-first (g/kg), Mifflin-St Jeor and Katch-McArdle formulas, free complete breakdown with no signup.

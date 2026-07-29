@@ -13,7 +13,7 @@ import { RelatedTools } from "@/components/related-tools";
 
 export const Route = createFileRoute("/tools/percentage-calculator")({
   head: () => buildToolMeta(toolBySlug("percentage-calculator", tools)),
-  component: PercentageCalculator;
+  component: PercentageCalculator,
 });
 
 function num(v: string): number | null {

@@ -112,6 +112,18 @@ function MazePuzzlePage() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  // Caches the last *rounded* font string actually applied to the 2D
+  // context. `cell` (and therefore baseFontSize) is derived from a live
+  // `parent.clientWidth` measurement taken on every single draw() call —
+  // that measurement jitters by sub-pixel fractions from one animation
+  // frame to the next even when nothing meaningful changed. Without this
+  // cache, `ctx.font` was being reassigned to a slightly different
+  // fractional-px string on effectively every frame of the ~60fps RAF
+  // loop, which is very likely what was corrupting the color-emoji glyph
+  // rendering over time (fading/greening) — only a full reload ever
+  // reset it. Now `ctx.font` is only ever reassigned when the rounded
+  // integer pixel size actually changes (a real resize or a new maze).
+  const lastFontRef = useRef<string>("");
 
   /* ------------------------------------------------------------- lifecycle */
 
@@ -330,9 +342,13 @@ function MazePuzzlePage() {
     ctx.globalAlpha = 1;
     ctx.textAlign = "center";
     ctx.textBaseline = "middle";
-    const baseFontSize = Math.max(8, cell * 0.82);
+    const baseFontSize = Math.max(8, Math.round(cell * 0.82));
     const fontStack = 'system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
-    ctx.font = `${baseFontSize}px ${fontStack}`;
+    const fontStr = `${baseFontSize}px ${fontStack}`;
+    if (lastFontRef.current !== fontStr) {
+      ctx.font = fontStr;
+      lastFontRef.current = fontStr;
+    }
     const at = (i: number) => ({
       x: pad + colOf(maze, i) * cell + cell / 2,
       y: pad + rowOf(maze, i) * cell + cell / 2,

@@ -112,6 +112,10 @@ function MazePuzzlePage() {
 
   const canvasRef = useRef<HTMLCanvasElement | null>(null);
   const wrapRef = useRef<HTMLDivElement | null>(null);
+  const particlesRef = useRef<{ x: number; y: number; vx: number; vy: number; size: number; color: string }[]>([]);
+  const burstStartRef = useRef<number | null>(null);
+  const rafRef = useRef<number | null>(null);
+  const burstedForRef = useRef(false);
   // Caches the last *rounded* font string actually applied to the 2D
   // context. `cell` (and therefore baseFontSize) is derived from a live
   // `parent.clientWidth` measurement taken on every single draw() call —
@@ -125,9 +129,15 @@ function MazePuzzlePage() {
   // integer pixel size actually changes (a real resize or a new maze).
   const lastFontRef = useRef<string>("");
 
+  const BURST_MS = 820;
+
   /* ------------------------------------------------------------- lifecycle */
 
   const newMaze = useCallback((d: (typeof DIFFICULTIES)[number]) => {
+    burstStartRef.current = null;
+    particlesRef.current = [];
+    burstedForRef.current = false;
+    lastFontRef.current = "";
     const m = generateMaze(d.rows, d.cols);
     setMaze(m);
     setPlayer(m.start);
@@ -243,13 +253,6 @@ function MazePuzzlePage() {
 
   /* -------------------------------------------------------------- painting */
 
-  const particlesRef = useRef<{ x: number; y: number; vx: number; vy: number; size: number; color: string }[]>([]);
-  const burstStartRef = useRef<number | null>(null);
-  const rafRef = useRef<number | null>(null);
-  const burstedForRef = useRef(false);
-
-  const BURST_MS = 820;
-
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
@@ -261,11 +264,16 @@ function MazePuzzlePage() {
       canvas.height = cssSize * dpr;
       canvas.style.width = `${cssSize}px`;
       canvas.style.height = `${cssSize}px`;
+      lastFontRef.current = "";
     }
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.filter = "none";
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
     ctx.clearRect(0, 0, cssSize, cssSize);
 
     const pad = 6;
@@ -334,75 +342,35 @@ function MazePuzzlePage() {
     }
     ctx.stroke();
 
-    // emojis + player
-    ctx.globalCompositeOperation = "source-over";
-    ctx.filter = "none";
-    ctx.shadowBlur = 0;
-    ctx.fillStyle = fg;
-    ctx.globalAlpha = 1;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    const baseFontSize = Math.max(8, Math.round(cell * 0.82));
-    const fontStack = 'system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
-    const fontStr = `${baseFontSize}px ${fontStack}`;
-    if (lastFontRef.current !== fontStr) {
-      ctx.font = fontStr;
-      lastFontRef.current = fontStr;
-    }
     const at = (i: number) => ({
       x: pad + colOf(maze, i) * cell + cell / 2,
       y: pad + rowOf(maze, i) * cell + cell / 2,
     });
+
+    // Animated goal ring only. It is a stroked outline around the emoji cell,
+    // never a fill beneath the glyph, so it cannot tint transparent emoji
+    // pixels or change the native color rendering.
     const endPt = at(maze.end);
     const endHidden =
       prefs.fog &&
       !solved &&
       Math.max(Math.abs(rowOf(maze, maze.end) - pr), Math.abs(colOf(maze, maze.end) - pc)) > fogRadius;
-    if (!endHidden) {
-      const pulse = solved ? 1 : 1 + 0.12 * Math.sin(performance.now() / 260);
-
-      // Pulsing color-cycling glow behind the goal emoji — makes the goal
-      // easy to spot regardless of the theme pair's own emoji color or the
-      // current light/dark mode, instead of maintaining a per-theme color
-      // list. Stops the moment the maze is solved, same as the pulse itself.
-      if (!solved) {
-        const hue = (performance.now() / 6) % 360;
-        const glowRadius = cell * 0.42 * pulse;
-        const prevAlpha = ctx.globalAlpha;
-        const prevFillStyle = ctx.fillStyle;
-        ctx.globalAlpha = 0.4;
-        ctx.fillStyle = `hsl(${hue}, 85%, 55%)`;
-        ctx.beginPath();
-        ctx.arc(endPt.x, endPt.y, glowRadius, 0, Math.PI * 2);
-        ctx.fill();
-        ctx.globalAlpha = prevAlpha;
-        ctx.fillStyle = prevFillStyle;
-      }
-
-      // IMPORTANT: never change the `ctx.font` string on a live RAF loop.
-      // The previous version rebuilt `font` every single frame (a new
-      // font-size string each time, driven by the sine pulse) purely to
-      // make the goal emoji breathe in size. Continuously reshaping the
-      // color-emoji glyph at a new pixel size on every frame is exactly
-      // the kind of churn that can corrupt a browser's color-glyph raster
-      // cache and make emoji fall back to a flat, pale render — and since
-      // the cache is shared across the canvas, it can bleed into the
-      // start/player glyphs too, with only a full reload rebuilding it.
-      // `ctx.font` is now set exactly once per draw (to baseFontSize,
-      // above) and is never reassigned again anywhere in this function.
-      // The "pulse" is achieved purely via translate/scale around the
-      // glyph's own point, then manually undone — no font-string churn,
-      // no ctx.save/restore.
-      ctx.translate(endPt.x, endPt.y);
-      ctx.scale(pulse, pulse);
-      ctx.fillText(theme.end, 0, 0);
-      ctx.scale(1 / pulse, 1 / pulse);
-      ctx.translate(-endPt.x, -endPt.y);
+    if (!endHidden && !solved) {
+      const pulse = 1 + 0.1 * Math.sin(performance.now() / 260);
+      const hue = (performance.now() / 10) % 360;
+      ctx.save();
+      ctx.globalCompositeOperation = "source-over";
+      ctx.filter = "none";
+      ctx.shadowBlur = 0;
+      ctx.globalAlpha = 0.34;
+      ctx.fillStyle = `hsl(${hue}, 82%, 58%)`;
+      ctx.strokeStyle = `hsl(${hue}, 82%, 58%)`;
+      ctx.lineWidth = Math.max(1, cell * 0.08);
+      ctx.beginPath();
+      ctx.arc(endPt.x, endPt.y, cell * 0.44 * pulse, 0, Math.PI * 2);
+      ctx.stroke();
+      ctx.restore();
     }
-    const startPt = at(maze.start);
-    if (maze.start !== player) ctx.fillText(theme.start, startPt.x, startPt.y);
-    const pPt = at(player);
-    ctx.fillText(theme.start, pPt.x, pPt.y);
 
     // victory burst particles (drawn on top)
     const started = burstStartRef.current;
@@ -418,6 +386,33 @@ function MazePuzzlePage() {
       }
       ctx.globalAlpha = 1;
     }
+
+    // Natural emoji pass. Draw start, goal, and player last using a fixed
+    // font size and fully reset canvas state. No animation ever changes the
+    // emoji glyphs themselves, preserving their native full-color rendering
+    // through movement, reveal-path highlights, and new maze resets.
+    const baseFontSize = Math.max(8, Math.round(cell * 0.82));
+    const fontStack = 'system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
+    const fontStr = `${baseFontSize}px ${fontStack}`;
+    if (lastFontRef.current !== fontStr) {
+      ctx.font = fontStr;
+      lastFontRef.current = fontStr;
+    }
+    ctx.save();
+    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
+    ctx.globalCompositeOperation = "source-over";
+    ctx.filter = "none";
+    ctx.shadowBlur = 0;
+    ctx.globalAlpha = 1;
+    ctx.fillStyle = fg;
+    ctx.textAlign = "center";
+    ctx.textBaseline = "middle";
+    if (!endHidden) ctx.fillText(theme.end, endPt.x, endPt.y);
+    const startPt = at(maze.start);
+    if (maze.start !== player) ctx.fillText(theme.start, startPt.x, startPt.y);
+    const pPt = at(player);
+    ctx.fillText(theme.start, pPt.x, pPt.y);
+    ctx.restore();
   }, [maze, player, trail, prefs.trail, prefs.fog, path, theme, solved]);
 
   // repaint on state changes

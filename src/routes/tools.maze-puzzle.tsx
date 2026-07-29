@@ -116,18 +116,6 @@ function MazePuzzlePage() {
   const burstStartRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
   const burstedForRef = useRef(false);
-  // Caches the last *rounded* font string actually applied to the 2D
-  // context. `cell` (and therefore baseFontSize) is derived from a live
-  // `parent.clientWidth` measurement taken on every single draw() call —
-  // that measurement jitters by sub-pixel fractions from one animation
-  // frame to the next even when nothing meaningful changed. Without this
-  // cache, `ctx.font` was being reassigned to a slightly different
-  // fractional-px string on effectively every frame of the ~60fps RAF
-  // loop, which is very likely what was corrupting the color-emoji glyph
-  // rendering over time (fading/greening) — only a full reload ever
-  // reset it. Now `ctx.font` is only ever reassigned when the rounded
-  // integer pixel size actually changes (a real resize or a new maze).
-  const lastFontRef = useRef<string>("");
 
   const BURST_MS = 820;
 
@@ -137,7 +125,6 @@ function MazePuzzlePage() {
     burstStartRef.current = null;
     particlesRef.current = [];
     burstedForRef.current = false;
-    lastFontRef.current = "";
     const m = generateMaze(d.rows, d.cols);
     setMaze(m);
     setPlayer(m.start);
@@ -251,39 +238,76 @@ function MazePuzzlePage() {
     else move(dy > 0 ? "s" : "n");
   };
 
+  /* ------------------------------------------------------------- board size */
+
+  // Stable board size in CSS px, updated only when the container actually
+  // resizes (ResizeObserver), never re-measured inside the draw/animation
+  // loop. Both the canvas AND the DOM emoji overlay below derive every
+  // position from this single value, so they can never drift apart.
+  const [boardPx, setBoardPx] = useState(520);
+
+  useEffect(() => {
+    const el = wrapRef.current;
+    if (!el) return;
+    const update = () => setBoardPx(Math.max(200, Math.min(el.clientWidth, 560)));
+    update();
+    const ro = new ResizeObserver(update);
+    ro.observe(el);
+    return () => ro.disconnect();
+  }, []);
+
+  const pad = 6;
+  const cell = (boardPx - pad * 2) / Math.max(maze.rows, maze.cols);
+  const cellPointOf = useCallback(
+    (i: number) => ({
+      left: pad + colOf(maze, i) * cell + cell / 2,
+      top: pad + rowOf(maze, i) * cell + cell / 2,
+    }),
+    [maze, cell],
+  );
+  const emojiFontPx = Math.max(8, Math.round(cell * 0.82));
+
+  const pr = rowOf(maze, player);
+  const pc = colOf(maze, player);
+  const fogRadius = 3;
+  const endHidden =
+    prefs.fog &&
+    !solved &&
+    Math.max(Math.abs(rowOf(maze, maze.end) - pr), Math.abs(colOf(maze, maze.end) - pc)) > fogRadius;
+
   /* -------------------------------------------------------------- painting */
 
+  // The canvas ONLY draws graphics now: walls, trail tint, fog, and the
+  // solved-path highlight. It never calls fillText for emoji. This is a
+  // deliberate architectural change, not a tweak: color emoji rendered via
+  // canvas fillText inside a continuous requestAnimationFrame loop proved
+  // unreliable (glyphs fading/greening over time, only fixed by a full
+  // page reload) across two independently-written implementations that
+  // each carefully reset every piece of 2D context state every frame. Since
+  // resetting canvas state did not fix it, the emoji are moved out of the
+  // canvas entirely and rendered as real DOM elements instead (see the
+  // overlay below), which cannot be affected by canvas text-rendering
+  // behavior no matter what was actually causing it.
   const draw = useCallback(() => {
     const canvas = canvasRef.current;
     if (!canvas) return;
-    const parent = wrapRef.current;
-    const cssSize = Math.min(parent?.clientWidth ?? 520, 560);
     const dpr = typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, 2);
-    if (canvas.width !== Math.round(cssSize * dpr)) {
-      canvas.width = cssSize * dpr;
-      canvas.height = cssSize * dpr;
-      canvas.style.width = `${cssSize}px`;
-      canvas.style.height = `${cssSize}px`;
-      lastFontRef.current = "";
+    if (canvas.width !== Math.round(boardPx * dpr)) {
+      canvas.width = boardPx * dpr;
+      canvas.height = boardPx * dpr;
+      canvas.style.width = `${boardPx}px`;
+      canvas.style.height = `${boardPx}px`;
     }
 
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
     ctx.globalCompositeOperation = "source-over";
-    ctx.filter = "none";
-    ctx.shadowBlur = 0;
     ctx.globalAlpha = 1;
-    ctx.clearRect(0, 0, cssSize, cssSize);
+    ctx.clearRect(0, 0, boardPx, boardPx);
 
-    const pad = 6;
-    const cell = (cssSize - pad * 2) / Math.max(maze.rows, maze.cols);
     const styles = getComputedStyle(document.documentElement);
     const fg = `hsl(${styles.getPropertyValue("--foreground").trim() || "0 0% 100%"})`;
-
-    const pr = rowOf(maze, player);
-    const pc = colOf(maze, player);
-    const fogRadius = 3;
 
     // trail + fog + solution
     for (let r = 0; r < maze.rows; r += 1) {
@@ -301,9 +325,6 @@ function MazePuzzlePage() {
           ctx.fillStyle = "rgba(250, 204, 21, 0.35)";
           ctx.fillRect(x, y, cell, cell);
         } else if (prefs.trail && trail.has(i) && i !== player && i !== maze.start) {
-          // Lag the breadcrumb one step behind the player, instead of
-          // painting directly underneath the current position — keeps the
-          // emoji on a clean background so it stays legible at all times.
           ctx.fillStyle = "rgba(34, 197, 94, 0.20)";
           ctx.fillRect(x, y, cell, cell);
         }
@@ -342,37 +363,7 @@ function MazePuzzlePage() {
     }
     ctx.stroke();
 
-    const at = (i: number) => ({
-      x: pad + colOf(maze, i) * cell + cell / 2,
-      y: pad + rowOf(maze, i) * cell + cell / 2,
-    });
-
-    // Animated goal ring only. It is a stroked outline around the emoji cell,
-    // never a fill beneath the glyph, so it cannot tint transparent emoji
-    // pixels or change the native color rendering.
-    const endPt = at(maze.end);
-    const endHidden =
-      prefs.fog &&
-      !solved &&
-      Math.max(Math.abs(rowOf(maze, maze.end) - pr), Math.abs(colOf(maze, maze.end) - pc)) > fogRadius;
-    if (!endHidden && !solved) {
-      const pulse = 1 + 0.1 * Math.sin(performance.now() / 260);
-      const hue = (performance.now() / 10) % 360;
-      ctx.save();
-      ctx.globalCompositeOperation = "source-over";
-      ctx.filter = "none";
-      ctx.shadowBlur = 0;
-      ctx.globalAlpha = 0.34;
-      ctx.fillStyle = `hsl(${hue}, 82%, 58%)`;
-      ctx.strokeStyle = `hsl(${hue}, 82%, 58%)`;
-      ctx.lineWidth = Math.max(1, cell * 0.08);
-      ctx.beginPath();
-      ctx.arc(endPt.x, endPt.y, cell * 0.44 * pulse, 0, Math.PI * 2);
-      ctx.stroke();
-      ctx.restore();
-    }
-
-    // victory burst particles (drawn on top)
+    // victory burst particles (drawn on top; circles only, never text)
     const started = burstStartRef.current;
     if (started !== null && particlesRef.current.length) {
       const elapsed = performance.now() - started;
@@ -386,41 +377,18 @@ function MazePuzzlePage() {
       }
       ctx.globalAlpha = 1;
     }
-
-    // Natural emoji pass. Draw start, goal, and player last using a fixed
-    // font size and fully reset canvas state. No animation ever changes the
-    // emoji glyphs themselves, preserving their native full-color rendering
-    // through movement, reveal-path highlights, and new maze resets.
-    const baseFontSize = Math.max(8, Math.round(cell * 0.82));
-    const fontStack = 'system-ui, "Apple Color Emoji", "Segoe UI Emoji", sans-serif';
-    const fontStr = `${baseFontSize}px ${fontStack}`;
-    if (lastFontRef.current !== fontStr) {
-      ctx.font = fontStr;
-      lastFontRef.current = fontStr;
-    }
-    ctx.save();
-    ctx.setTransform(dpr, 0, 0, dpr, 0, 0);
-    ctx.globalCompositeOperation = "source-over";
-    ctx.filter = "none";
-    ctx.shadowBlur = 0;
-    ctx.globalAlpha = 1;
-    ctx.fillStyle = fg;
-    ctx.textAlign = "center";
-    ctx.textBaseline = "middle";
-    if (!endHidden) ctx.fillText(theme.end, endPt.x, endPt.y);
-    const startPt = at(maze.start);
-    if (maze.start !== player) ctx.fillText(theme.start, startPt.x, startPt.y);
-    const pPt = at(player);
-    ctx.fillText(theme.start, pPt.x, pPt.y);
-    ctx.restore();
-  }, [maze, player, trail, prefs.trail, prefs.fog, path, theme, solved]);
+  }, [maze, player, trail, prefs.trail, prefs.fog, path, solved, boardPx, cell, pad, pr, pc, fogRadius]);
 
   // repaint on state changes
   useEffect(() => {
     draw();
   }, [draw]);
 
-  // animation loop: pulse while unsolved, plus one-shot victory burst
+  // animation loop: only needed for the victory particle burst now (the
+  // goal pulse/glow is pure CSS on the DOM overlay, see below) — this loop
+  // stops itself entirely once solved and the burst finishes, instead of
+  // running forever, which further shrinks the surface area for any
+  // browser-side canvas rendering quirk to accumulate over time.
   useEffect(() => {
     let cancelled = false;
     const tick = () => {
@@ -431,23 +399,25 @@ function MazePuzzlePage() {
         if (elapsed >= BURST_MS) {
           burstStartRef.current = null;
           particlesRef.current = [];
-        } else {
-          for (const p of particlesRef.current) {
-            p.x += p.vx;
-            p.y += p.vy;
-            p.vx *= 0.94;
-            p.vy *= 0.94;
-          }
+          draw();
+          rafRef.current = null;
+          return;
         }
-      }
-      draw();
-      if (!cancelled && (!solved || burstStartRef.current !== null)) {
+        for (const p of particlesRef.current) {
+          p.x += p.vx;
+          p.y += p.vy;
+          p.vx *= 0.94;
+          p.vy *= 0.94;
+        }
+        draw();
         rafRef.current = requestAnimationFrame(tick);
       } else {
         rafRef.current = null;
       }
     };
-    if (rafRef.current === null) rafRef.current = requestAnimationFrame(tick);
+    if (burstStartRef.current !== null && rafRef.current === null) {
+      rafRef.current = requestAnimationFrame(tick);
+    }
     return () => {
       cancelled = true;
       if (rafRef.current !== null) {
@@ -467,12 +437,6 @@ function MazePuzzlePage() {
     }
     if (burstedForRef.current) return;
     burstedForRef.current = true;
-    const canvas = canvasRef.current;
-    const parent = wrapRef.current;
-    if (!canvas) return;
-    const cssSize = Math.min(parent?.clientWidth ?? 520, 560);
-    const pad = 6;
-    const cell = (cssSize - pad * 2) / Math.max(maze.rows, maze.cols);
     const cx = pad + colOf(maze, player) * cell + cell / 2;
     const cy = pad + rowOf(maze, player) * cell + cell / 2;
     const colors = ["#fbbf24", "#fde68a", "#ffffff", "#f59e0b"];
@@ -490,7 +454,11 @@ function MazePuzzlePage() {
       };
     });
     burstStartRef.current = performance.now();
-  }, [solved, maze, player]);
+    if (rafRef.current === null)
+      rafRef.current = requestAnimationFrame(function kick() {
+        draw();
+      });
+  }, [solved, maze, player, cell, pad, draw]);
 
   /* ---------------------------------------------------------------- actions */
 
@@ -534,6 +502,11 @@ function MazePuzzlePage() {
   const best = stats.bestTimes[difficulty];
   const shortest = useMemo(() => solveMaze(maze).length - 1, [maze]);
 
+  const startPt = cellPointOf(maze.start);
+  const endPt = cellPointOf(maze.end);
+  const playerPt = cellPointOf(player);
+  const showStartMarker = maze.start !== player;
+
   /* -------------------------------------------------------------- rendering */
 
   return (
@@ -551,12 +524,71 @@ function MazePuzzlePage() {
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
           >
-            <canvas
-              ref={canvasRef}
-              className="max-w-full rounded-lg"
-              role="img"
-              aria-label={`${diff.label} maze, ${maze.rows} by ${maze.cols}. ${theme.label}. Move with the arrow keys.`}
-            />
+            <div className="relative" style={{ width: boardPx, height: boardPx }}>
+              <canvas
+                ref={canvasRef}
+                className="absolute inset-0 max-w-full rounded-lg"
+                role="img"
+                aria-label={`${diff.label} maze, ${maze.rows} by ${maze.cols}. ${theme.label}. Move with the arrow keys.`}
+              />
+
+              {/* Emoji overlay — real DOM text, not canvas fillText. Colors
+                  are whatever the browser's native emoji font renders,
+                  fixed for the life of the element; nothing here can fade
+                  or shift color over time no matter how long the maze runs. */}
+              <div className="pointer-events-none absolute inset-0 select-none" aria-hidden="true">
+                {!endHidden && (
+                  <div
+                    className="absolute flex items-center justify-center"
+                    style={{
+                      left: endPt.left,
+                      top: endPt.top,
+                      width: cell,
+                      height: cell,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    {!solved && (
+                      <span
+                        className="maze-goal-glow absolute rounded-full"
+                        style={{ width: cell * 0.88, height: cell * 0.88 }}
+                      />
+                    )}
+                    <span className="relative" style={{ fontSize: emojiFontPx, lineHeight: 1 }}>
+                      {theme.end}
+                    </span>
+                  </div>
+                )}
+
+                {showStartMarker && (
+                  <span
+                    className="absolute"
+                    style={{
+                      left: startPt.left,
+                      top: startPt.top,
+                      fontSize: emojiFontPx,
+                      lineHeight: 1,
+                      transform: "translate(-50%, -50%)",
+                    }}
+                  >
+                    {theme.start}
+                  </span>
+                )}
+
+                <span
+                  className="absolute"
+                  style={{
+                    left: playerPt.left,
+                    top: playerPt.top,
+                    fontSize: emojiFontPx,
+                    lineHeight: 1,
+                    transform: "translate(-50%, -50%)",
+                  }}
+                >
+                  {theme.start}
+                </span>
+              </div>
+            </div>
           </div>
 
           {solved && (

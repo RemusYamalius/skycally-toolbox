@@ -385,49 +385,22 @@ function MazePuzzlePage() {
   }, [draw]);
 
   // animation loop: only needed for the victory particle burst now (the
-  // goal pulse/glow is pure CSS on the DOM overlay, see below) — this loop
-  // stops itself entirely once solved and the burst finishes, instead of
-  // running forever, which further shrinks the surface area for any
-  // browser-side canvas rendering quirk to accumulate over time.
+  // goal pulse/glow is pure CSS on the DOM overlay, see below). It is
+  // started directly from the "spawn burst" effect below, at the exact
+  // moment burstStartRef is set — not from here — because refs don't
+  // trigger effects to re-run, so a separate effect watching `solved`
+  // would fire before burstStartRef existed and only draw one static
+  // frame instead of animating. This effect only owns cleanup on unmount.
   useEffect(() => {
-    let cancelled = false;
-    const tick = () => {
-      if (cancelled) return;
-      const started = burstStartRef.current;
-      if (started !== null) {
-        const elapsed = performance.now() - started;
-        if (elapsed >= BURST_MS) {
-          burstStartRef.current = null;
-          particlesRef.current = [];
-          draw();
-          rafRef.current = null;
-          return;
-        }
-        for (const p of particlesRef.current) {
-          p.x += p.vx;
-          p.y += p.vy;
-          p.vx *= 0.94;
-          p.vy *= 0.94;
-        }
-        draw();
-        rafRef.current = requestAnimationFrame(tick);
-      } else {
-        rafRef.current = null;
-      }
-    };
-    if (burstStartRef.current !== null && rafRef.current === null) {
-      rafRef.current = requestAnimationFrame(tick);
-    }
     return () => {
-      cancelled = true;
       if (rafRef.current !== null) {
         cancelAnimationFrame(rafRef.current);
         rafRef.current = null;
       }
     };
-  }, [draw, solved]);
+  }, []);
 
-  // spawn burst exactly once per solve
+  // spawn burst exactly once per solve, and drive its own animation loop
   useEffect(() => {
     if (!solved) {
       burstedForRef.current = false;
@@ -454,10 +427,38 @@ function MazePuzzlePage() {
       };
     });
     burstStartRef.current = performance.now();
-    if (rafRef.current === null)
-      rafRef.current = requestAnimationFrame(function kick() {
+
+    let cancelled = false;
+    const tick = () => {
+      if (cancelled) return;
+      const started = burstStartRef.current;
+      if (started === null) {
+        rafRef.current = null;
+        return;
+      }
+      const elapsed = performance.now() - started;
+      if (elapsed >= BURST_MS) {
+        burstStartRef.current = null;
+        particlesRef.current = [];
         draw();
-      });
+        rafRef.current = null;
+        return;
+      }
+      for (const p of particlesRef.current) {
+        p.x += p.vx;
+        p.y += p.vy;
+        p.vx *= 0.94;
+        p.vy *= 0.94;
+      }
+      draw();
+      rafRef.current = requestAnimationFrame(tick);
+    };
+    if (rafRef.current !== null) cancelAnimationFrame(rafRef.current);
+    rafRef.current = requestAnimationFrame(tick);
+
+    return () => {
+      cancelled = true;
+    };
   }, [solved, maze, player, cell, pad, draw]);
 
   /* ---------------------------------------------------------------- actions */

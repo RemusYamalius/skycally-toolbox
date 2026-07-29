@@ -363,9 +363,25 @@ function MazePuzzlePage() {
         ctx.fillStyle = prevFillStyle;
       }
 
-      ctx.font = `${Math.max(8, cell * 0.82 * pulse)}px ${fontStack}`;
-      ctx.fillText(theme.end, endPt.x, endPt.y);
-      ctx.font = `${baseFontSize}px ${fontStack}`;
+      // IMPORTANT: never change the `ctx.font` string on a live RAF loop.
+      // The previous version rebuilt `font` every single frame (a new
+      // font-size string each time, driven by the sine pulse) purely to
+      // make the goal emoji breathe in size. Continuously reshaping the
+      // color-emoji glyph at a new pixel size on every frame is exactly
+      // the kind of churn that can corrupt a browser's color-glyph raster
+      // cache and make emoji fall back to a flat, pale render — and since
+      // the cache is shared across the canvas, it can bleed into the
+      // start/player glyphs too, with only a full reload rebuilding it.
+      // `ctx.font` is now set exactly once per draw (to baseFontSize,
+      // above) and is never reassigned again anywhere in this function.
+      // The "pulse" is achieved purely via translate/scale around the
+      // glyph's own point, then manually undone — no font-string churn,
+      // no ctx.save/restore.
+      ctx.translate(endPt.x, endPt.y);
+      ctx.scale(pulse, pulse);
+      ctx.fillText(theme.end, 0, 0);
+      ctx.scale(1 / pulse, 1 / pulse);
+      ctx.translate(-endPt.x, -endPt.y);
     }
     const startPt = at(maze.start);
     if (maze.start !== player) ctx.fillText(theme.start, startPt.x, startPt.y);

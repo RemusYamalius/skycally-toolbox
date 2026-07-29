@@ -231,9 +231,7 @@ function MazePuzzlePage() {
 
   /* -------------------------------------------------------------- painting */
 
-  const particlesRef = useRef<
-    { x: number; y: number; vx: number; vy: number; size: number; color: string }[]
-  >([]);
+  const particlesRef = useRef<{ x: number; y: number; vx: number; vy: number; size: number; color: string }[]>([]);
   const burstStartRef = useRef<number | null>(null);
   const rafRef = useRef<number | null>(null);
   const burstedForRef = useRef(false);
@@ -282,7 +280,10 @@ function MazePuzzlePage() {
         if (path && path.includes(i)) {
           ctx.fillStyle = "rgba(250, 204, 21, 0.35)";
           ctx.fillRect(x, y, cell, cell);
-        } else if (prefs.trail && trail.has(i)) {
+        } else if (prefs.trail && trail.has(i) && i !== player) {
+          // Lag the breadcrumb one step behind the player, instead of
+          // painting directly underneath the current position — keeps the
+          // emoji on a clean background so it stays legible at all times.
           ctx.fillStyle = "rgba(34, 197, 94, 0.20)";
           ctx.fillRect(x, y, cell, cell);
         }
@@ -340,6 +341,23 @@ function MazePuzzlePage() {
       Math.max(Math.abs(rowOf(maze, maze.end) - pr), Math.abs(colOf(maze, maze.end) - pc)) > fogRadius;
     if (!endHidden) {
       const pulse = solved ? 1 : 1 + 0.12 * Math.sin(performance.now() / 260);
+
+      // Pulsing color-cycling glow behind the goal emoji — makes the goal
+      // easy to spot regardless of the theme pair's own emoji color or the
+      // current light/dark mode, instead of maintaining a per-theme color
+      // list. Stops the moment the maze is solved, same as the pulse itself.
+      if (!solved) {
+        const hue = (performance.now() / 6) % 360;
+        const glowRadius = cell * 0.42 * pulse;
+        ctx.save();
+        ctx.globalAlpha = 0.4;
+        ctx.fillStyle = `hsl(${hue}, 85%, 55%)`;
+        ctx.beginPath();
+        ctx.arc(endPt.x, endPt.y, glowRadius, 0, Math.PI * 2);
+        ctx.fill();
+        ctx.restore();
+      }
+
       ctx.font = `${Math.max(8, cell * 0.82 * pulse)}px ${fontStack}`;
       ctx.fillText(theme.end, endPt.x, endPt.y);
       ctx.font = `${baseFontSize}px ${fontStack}`;
@@ -443,7 +461,6 @@ function MazePuzzlePage() {
     });
     burstStartRef.current = performance.now();
   }, [solved, maze, player]);
-
 
   /* ---------------------------------------------------------------- actions */
 

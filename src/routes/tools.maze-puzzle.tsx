@@ -293,10 +293,14 @@ function MazePuzzlePage() {
     if (!canvas) return;
     const dpr = typeof window === "undefined" ? 1 : Math.min(window.devicePixelRatio || 1, 2);
     if (canvas.width !== Math.round(boardPx * dpr)) {
+      // Only the backing-store resolution is set here — never canvas.style
+      // width/height. Setting an inline pixel style would out-rank the
+      // responsive `h-full w-full` CSS classes on this element (inline
+      // style always wins over class rules) and silently reintroduce a
+      // fixed-pixel canvas size regardless of the actual container width,
+      // which is exactly what caused the mobile horizontal-overflow bug.
       canvas.width = boardPx * dpr;
       canvas.height = boardPx * dpr;
-      canvas.style.width = `${boardPx}px`;
-      canvas.style.height = `${boardPx}px`;
     }
 
     const ctx = canvas.getContext("2d");
@@ -525,10 +529,10 @@ function MazePuzzlePage() {
             onPointerDown={onPointerDown}
             onPointerUp={onPointerUp}
           >
-            <div className="relative" style={{ width: boardPx, height: boardPx }}>
+            <div className="relative aspect-square w-full" style={{ maxWidth: `${boardPx}px` }}>
               <canvas
                 ref={canvasRef}
-                className="absolute inset-0 max-w-full rounded-lg"
+                className="absolute inset-0 h-full w-full rounded-lg"
                 role="img"
                 aria-label={`${diff.label} maze, ${maze.rows} by ${maze.cols}. ${theme.label}. Move with the arrow keys.`}
               />

@@ -24,12 +24,16 @@ function num(v: string): number | null {
 
 function fmt(n: number | null) {
   if (n === null || !Number.isFinite(n)) return "—";
-  return n.toLocaleString(undefined, { maximumFractionDigits: 4 });
+  // Always format with a fixed English (US) locale — using `undefined`
+  // here would format numbers according to the visitor's own browser
+  // locale (e.g. "12,5" with a comma for European locales) instead of
+  // the site's English UI, producing inconsistent-looking results.
+  return n.toLocaleString("en-US", { maximumFractionDigits: 4 });
 }
 
 function pct(n: number | null) {
   if (n === null || !Number.isFinite(n)) return "—";
-  return `${n.toLocaleString(undefined, { maximumFractionDigits: 4 })}%`;
+  return `${n.toLocaleString("en-US", { maximumFractionDigits: 4 })}%`;
 }
 
 function Field({
@@ -62,9 +66,7 @@ function Field({
           onChange={(e) => onChange(e.target.value)}
           className={suffix ? "pr-8 text-lg" : "text-lg"}
         />
-        {suffix && (
-          <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{suffix}</span>
-        )}
+        {suffix && <span className="absolute right-3 top-1/2 -translate-y-1/2 text-muted-foreground">{suffix}</span>}
       </div>
       {hint && <p className="mt-1 text-xs text-muted-foreground">{hint}</p>}
     </div>
@@ -130,8 +132,7 @@ function PercentageCalculator() {
   const [dX, setDX] = useState("20");
   const dYn = num(dY);
   const dXn = num(dX);
-  const dResult =
-    dYn !== null && dXn !== null ? dYn * (dMode === "increase" ? 1 + dXn / 100 : 1 - dXn / 100) : null;
+  const dResult = dYn !== null && dXn !== null ? dYn * (dMode === "increase" ? 1 + dXn / 100 : 1 - dXn / 100) : null;
 
   return (
     <ToolPageShell title={tool.name} description={tool.description} showFileDisclaimer={false}>
@@ -155,7 +156,14 @@ function PercentageCalculator() {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
               <h2 className="font-display text-lg font-bold">What is X% of Y?</h2>
-              <Field id="a-x" label="Percentage (X)" value={aX} onChange={setAX} suffix="%" hint="The percentage you want to take." />
+              <Field
+                id="a-x"
+                label="Percentage (X)"
+                value={aX}
+                onChange={setAX}
+                suffix="%"
+                hint="The percentage you want to take."
+              />
               <Field id="a-y" label="Of the number (Y)" value={aY} onChange={setAY} hint="The base number." />
             </div>
             <ResultCard
@@ -170,7 +178,13 @@ function PercentageCalculator() {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
               <h2 className="font-display text-lg font-bold">X is what percent of Y?</h2>
-              <Field id="b-x" label="The part (X)" value={bX} onChange={setBX} hint="The smaller value you are measuring." />
+              <Field
+                id="b-x"
+                label="The part (X)"
+                value={bX}
+                onChange={setBX}
+                hint="The smaller value you are measuring."
+              />
               <Field id="b-y" label="The whole (Y)" value={bY} onChange={setBY} hint="The total. Cannot be zero." />
             </div>
             <ResultCard
@@ -185,7 +199,13 @@ function PercentageCalculator() {
           <div className="grid gap-6 md:grid-cols-2">
             <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
               <h2 className="font-display text-lg font-bold">Percentage change from X to Y</h2>
-              <Field id="c-x" label="Original value (X)" value={cX} onChange={setCX} hint="The starting number. Cannot be zero." />
+              <Field
+                id="c-x"
+                label="Original value (X)"
+                value={cX}
+                onChange={setCX}
+                hint="The starting number. Cannot be zero."
+              />
               <Field id="c-y" label="New value (Y)" value={cY} onChange={setCY} hint="The number you ended up with." />
             </div>
             <div className="rounded-2xl border border-border bg-gradient-to-br from-[color-mix(in_oklab,var(--cyan-brand)_12%,transparent)] to-card p-5 flex flex-col justify-center">
@@ -233,7 +253,14 @@ function PercentageCalculator() {
                 </button>
               </div>
               <Field id="d-y" label="Starting number (Y)" value={dY} onChange={setDY} hint="The value to adjust." />
-              <Field id="d-x" label="Percentage (X)" value={dX} onChange={setDX} suffix="%" hint={`How much to ${dMode} it by.`} />
+              <Field
+                id="d-x"
+                label="Percentage (X)"
+                value={dX}
+                onChange={setDX}
+                suffix="%"
+                hint={`How much to ${dMode} it by.`}
+              />
             </div>
             <ResultCard
               label={`${fmt(dYn)} ${dMode === "increase" ? "increased" : "decreased"} by ${fmt(dXn)}% is`}
@@ -254,7 +281,8 @@ function PercentageCalculator() {
         <Link to="/tools/tip-calculator" className="underline underline-offset-4 hover:text-foreground">
           Tip Calculator
         </Link>{" "}
-        applies a tip percentage and splits the total. When the numbers are in different currencies, run them through the{" "}
+        applies a tip percentage and splits the total. When the numbers are in different currencies, run them through
+        the{" "}
         <Link to="/tools/currency-converter" className="underline underline-offset-4 hover:text-foreground">
           Currency Converter
         </Link>{" "}
@@ -273,9 +301,7 @@ function PercentageCalculator() {
         </p>
         <div className="grid gap-4 sm:grid-cols-2">
           <div className="rounded-xl border border-border/60 bg-background/40 p-4">
-            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">
-              X% of Y
-            </div>
+            <div className="text-xs font-semibold uppercase tracking-wider text-muted-foreground mb-1">X% of Y</div>
             <div className="font-mono text-sm">result = (X ÷ 100) × Y</div>
             <p className="mt-2 text-xs text-muted-foreground">15% of 200 = 0.15 × 200 = 30</p>
           </div>

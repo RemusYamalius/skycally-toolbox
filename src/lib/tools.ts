@@ -52,6 +52,7 @@ import {
   Moon,
   Calculator,
   Percent,
+  IdCard,
   Landmark,
   Activity,
   CalendarDays,

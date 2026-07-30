@@ -106,6 +106,7 @@ import { Route as ToolsIpAddressLookupRouteImport } from './routes/tools.ip-addr
 import { Route as ToolsInvoiceGeneratorRouteImport } from './routes/tools.invoice-generator'
 import { Route as ToolsIntermittentFastingCalculatorRouteImport } from './routes/tools.intermittent-fasting-calculator'
 import { Route as ToolsInsuranceEstimatorRouteImport } from './routes/tools.insurance-estimator'
+import { Route as ToolsIncomeTaxCalculatorRouteImport } from './routes/tools.income-tax-calculator'
 import { Route as ToolsImageUpscalerRouteImport } from './routes/tools.image-upscaler'
 import { Route as ToolsImageToTextRouteImport } from './routes/tools.image-to-text'
 import { Route as ToolsImageToSketchRouteImport } from './routes/tools.image-to-sketch'
@@ -669,6 +670,12 @@ const ToolsInsuranceEstimatorRoute = ToolsInsuranceEstimatorRouteImport.update({
   path: '/tools/insurance-estimator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsIncomeTaxCalculatorRoute =
+  ToolsIncomeTaxCalculatorRouteImport.update({
+    id: '/tools/income-tax-calculator',
+    path: '/tools/income-tax-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsImageUpscalerRoute = ToolsImageUpscalerRouteImport.update({
   id: '/tools/image-upscaler',
   path: '/tools/image-upscaler',
@@ -1101,6 +1108,7 @@ export interface FileRoutesByFullPath {
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/income-tax-calculator': typeof ToolsIncomeTaxCalculatorRoute
   '/tools/insurance-estimator': typeof ToolsInsuranceEstimatorRoute
   '/tools/intermittent-fasting-calculator': typeof ToolsIntermittentFastingCalculatorRoute
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
@@ -1269,6 +1277,7 @@ export interface FileRoutesByTo {
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/income-tax-calculator': typeof ToolsIncomeTaxCalculatorRoute
   '/tools/insurance-estimator': typeof ToolsInsuranceEstimatorRoute
   '/tools/intermittent-fasting-calculator': typeof ToolsIntermittentFastingCalculatorRoute
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
@@ -1438,6 +1447,7 @@ export interface FileRoutesById {
   '/tools/image-to-sketch': typeof ToolsImageToSketchRoute
   '/tools/image-to-text': typeof ToolsImageToTextRoute
   '/tools/image-upscaler': typeof ToolsImageUpscalerRoute
+  '/tools/income-tax-calculator': typeof ToolsIncomeTaxCalculatorRoute
   '/tools/insurance-estimator': typeof ToolsInsuranceEstimatorRoute
   '/tools/intermittent-fasting-calculator': typeof ToolsIntermittentFastingCalculatorRoute
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
@@ -1608,6 +1618,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/income-tax-calculator'
     | '/tools/insurance-estimator'
     | '/tools/intermittent-fasting-calculator'
     | '/tools/invoice-generator'
@@ -1776,6 +1787,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/income-tax-calculator'
     | '/tools/insurance-estimator'
     | '/tools/intermittent-fasting-calculator'
     | '/tools/invoice-generator'
@@ -1944,6 +1956,7 @@ export interface FileRouteTypes {
     | '/tools/image-to-sketch'
     | '/tools/image-to-text'
     | '/tools/image-upscaler'
+    | '/tools/income-tax-calculator'
     | '/tools/insurance-estimator'
     | '/tools/intermittent-fasting-calculator'
     | '/tools/invoice-generator'
@@ -2113,6 +2126,7 @@ export interface RootRouteChildren {
   ToolsImageToSketchRoute: typeof ToolsImageToSketchRoute
   ToolsImageToTextRoute: typeof ToolsImageToTextRoute
   ToolsImageUpscalerRoute: typeof ToolsImageUpscalerRoute
+  ToolsIncomeTaxCalculatorRoute: typeof ToolsIncomeTaxCalculatorRoute
   ToolsInsuranceEstimatorRoute: typeof ToolsInsuranceEstimatorRoute
   ToolsIntermittentFastingCalculatorRoute: typeof ToolsIntermittentFastingCalculatorRoute
   ToolsInvoiceGeneratorRoute: typeof ToolsInvoiceGeneratorRoute
@@ -2888,6 +2902,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsInsuranceEstimatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/income-tax-calculator': {
+      id: '/tools/income-tax-calculator'
+      path: '/tools/income-tax-calculator'
+      fullPath: '/tools/income-tax-calculator'
+      preLoaderRoute: typeof ToolsIncomeTaxCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/image-upscaler': {
       id: '/tools/image-upscaler'
       path: '/tools/image-upscaler'
@@ -3452,6 +3473,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsImageToSketchRoute: ToolsImageToSketchRoute,
   ToolsImageToTextRoute: ToolsImageToTextRoute,
   ToolsImageUpscalerRoute: ToolsImageUpscalerRoute,
+  ToolsIncomeTaxCalculatorRoute: ToolsIncomeTaxCalculatorRoute,
   ToolsInsuranceEstimatorRoute: ToolsInsuranceEstimatorRoute,
   ToolsIntermittentFastingCalculatorRoute:
     ToolsIntermittentFastingCalculatorRoute,
@@ -3549,3 +3571,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

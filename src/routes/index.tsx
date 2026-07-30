@@ -86,12 +86,30 @@ const TYPED_WORDS = ["Images", "Videos", "PDFs", "Audio", "Text", "Links"];
 
 function HeroParticles() {
   const ref = useRef<HTMLCanvasElement>(null);
+  // Start the canvas animation only once the browser is idle, so it doesn't
+  // compete with LCP / hydration work on slow mobile connections.
+  const [ready, setReady] = useState(false);
   useEffect(() => {
+    const ric = (window as any).requestIdleCallback as
+      | ((cb: () => void, o?: { timeout: number }) => number)
+      | undefined;
+    let t = 0;
+    const id = ric
+      ? ric(() => setReady(true), { timeout: 2500 })
+      : (t = window.setTimeout(() => setReady(true), 1200));
+    return () => {
+      if (ric && (window as any).cancelIdleCallback) (window as any).cancelIdleCallback(id);
+      if (t) window.clearTimeout(t);
+    };
+  }, []);
+  useEffect(() => {
+    if (!ready) return;
     const canvas = ref.current;
     if (!canvas) return;
     const ctx = canvas.getContext("2d");
     if (!ctx) return;
     const reduced = window.matchMedia("(prefers-reduced-motion: reduce)").matches;
+
     const dpr = Math.min(window.devicePixelRatio || 1, 2);
 
     type P = {

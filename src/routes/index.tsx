@@ -223,7 +223,7 @@ function HeroParticles() {
       ro.disconnect();
       document.removeEventListener("visibilitychange", onVis);
     };
-  }, []);
+  }, [ready]);
   return <canvas ref={ref} className="absolute inset-0 w-full h-full" aria-hidden="true" />;
 }
 

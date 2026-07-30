@@ -871,6 +871,27 @@ export const tools: Tool[] = [
     schemaCategory: "MultimediaApplication",
   },
   {
+    slug: "passport-photo-maker",
+    name: "Passport & ID Photo Maker",
+    description:
+      "Crop, remove the background, and print passport or ID photos in the exact size your country requires.",
+    category: "image",
+    icon: IdCard,
+    path: "/tools/passport-photo-maker",
+    featureList: [
+      "Official size presets for US, UK, Schengen/EU, Canada and India",
+      "Crop box locked to each document's exact aspect ratio",
+      "AI background removal composited onto a solid white background",
+      "Exports at true 300 DPI in JPG or PNG",
+      "Printable 4 × 6 in PDF sheet with multiple copies and cut guides",
+      "No signup required",
+      "100% browser-based",
+      "Private — files never leave your device",
+      "Free forever",
+    ],
+    schemaCategory: "MultimediaApplication",
+  },
+  {
     slug: "add-text-to-image",
     name: "Add Text to Image",
     description: "Add custom, draggable text layers to any image.",

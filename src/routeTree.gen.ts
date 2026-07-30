@@ -81,6 +81,7 @@ import { Route as ToolsPdfReaderRouteImport } from './routes/tools.pdf-reader'
 import { Route as ToolsPdfPageNumbersRouteImport } from './routes/tools.pdf-page-numbers'
 import { Route as ToolsPaycheckCalculatorRouteImport } from './routes/tools.paycheck-calculator'
 import { Route as ToolsPasswordGeneratorRouteImport } from './routes/tools.password-generator'
+import { Route as ToolsPassportPhotoMakerRouteImport } from './routes/tools.passport-photo-maker'
 import { Route as ToolsPageSeoAnalyzerRouteImport } from './routes/tools.page-seo-analyzer'
 import { Route as ToolsPacManRouteImport } from './routes/tools.pac-man'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
@@ -542,6 +543,11 @@ const ToolsPaycheckCalculatorRoute = ToolsPaycheckCalculatorRouteImport.update({
 const ToolsPasswordGeneratorRoute = ToolsPasswordGeneratorRouteImport.update({
   id: '/tools/password-generator',
   path: '/tools/password-generator',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsPassportPhotoMakerRoute = ToolsPassportPhotoMakerRouteImport.update({
+  id: '/tools/passport-photo-maker',
+  path: '/tools/passport-photo-maker',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsPageSeoAnalyzerRoute = ToolsPageSeoAnalyzerRouteImport.update({
@@ -1134,6 +1140,7 @@ export interface FileRoutesByFullPath {
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
+  '/tools/passport-photo-maker': typeof ToolsPassportPhotoMakerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/paycheck-calculator': typeof ToolsPaycheckCalculatorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
@@ -1303,6 +1310,7 @@ export interface FileRoutesByTo {
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
+  '/tools/passport-photo-maker': typeof ToolsPassportPhotoMakerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/paycheck-calculator': typeof ToolsPaycheckCalculatorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
@@ -1473,6 +1481,7 @@ export interface FileRoutesById {
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
   '/tools/pac-man': typeof ToolsPacManRoute
   '/tools/page-seo-analyzer': typeof ToolsPageSeoAnalyzerRoute
+  '/tools/passport-photo-maker': typeof ToolsPassportPhotoMakerRoute
   '/tools/password-generator': typeof ToolsPasswordGeneratorRoute
   '/tools/paycheck-calculator': typeof ToolsPaycheckCalculatorRoute
   '/tools/pdf-page-numbers': typeof ToolsPdfPageNumbersRoute
@@ -1644,6 +1653,7 @@ export interface FileRouteTypes {
     | '/tools/object-detection'
     | '/tools/pac-man'
     | '/tools/page-seo-analyzer'
+    | '/tools/passport-photo-maker'
     | '/tools/password-generator'
     | '/tools/paycheck-calculator'
     | '/tools/pdf-page-numbers'
@@ -1813,6 +1823,7 @@ export interface FileRouteTypes {
     | '/tools/object-detection'
     | '/tools/pac-man'
     | '/tools/page-seo-analyzer'
+    | '/tools/passport-photo-maker'
     | '/tools/password-generator'
     | '/tools/paycheck-calculator'
     | '/tools/pdf-page-numbers'
@@ -1982,6 +1993,7 @@ export interface FileRouteTypes {
     | '/tools/object-detection'
     | '/tools/pac-man'
     | '/tools/page-seo-analyzer'
+    | '/tools/passport-photo-maker'
     | '/tools/password-generator'
     | '/tools/paycheck-calculator'
     | '/tools/pdf-page-numbers'
@@ -2152,6 +2164,7 @@ export interface RootRouteChildren {
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
   ToolsPacManRoute: typeof ToolsPacManRoute
   ToolsPageSeoAnalyzerRoute: typeof ToolsPageSeoAnalyzerRoute
+  ToolsPassportPhotoMakerRoute: typeof ToolsPassportPhotoMakerRoute
   ToolsPasswordGeneratorRoute: typeof ToolsPasswordGeneratorRoute
   ToolsPaycheckCalculatorRoute: typeof ToolsPaycheckCalculatorRoute
   ToolsPdfPageNumbersRoute: typeof ToolsPdfPageNumbersRoute
@@ -2725,6 +2738,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/password-generator'
       fullPath: '/tools/password-generator'
       preLoaderRoute: typeof ToolsPasswordGeneratorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/passport-photo-maker': {
+      id: '/tools/passport-photo-maker'
+      path: '/tools/passport-photo-maker'
+      fullPath: '/tools/passport-photo-maker'
+      preLoaderRoute: typeof ToolsPassportPhotoMakerRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/page-seo-analyzer': {
@@ -3500,6 +3520,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,
   ToolsPacManRoute: ToolsPacManRoute,
   ToolsPageSeoAnalyzerRoute: ToolsPageSeoAnalyzerRoute,
+  ToolsPassportPhotoMakerRoute: ToolsPassportPhotoMakerRoute,
   ToolsPasswordGeneratorRoute: ToolsPasswordGeneratorRoute,
   ToolsPaycheckCalculatorRoute: ToolsPaycheckCalculatorRoute,
   ToolsPdfPageNumbersRoute: ToolsPdfPageNumbersRoute,
@@ -3571,12 +3592,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

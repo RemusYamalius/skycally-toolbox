@@ -170,6 +170,12 @@
     <priority>0.8</priority>
   </url>
   <url>
+    <loc>https://skycally.com/tools/passport-photo-maker</loc>
+    <lastmod>2026-07-30</lastmod>
+    <changefreq>weekly</changefreq>
+    <priority>0.8</priority>
+  </url>
+  <url>
     <loc>https://skycally.com/tools/image-filters</loc>
     <lastmod>2026-06-26</lastmod>
     <changefreq>weekly</changefreq>

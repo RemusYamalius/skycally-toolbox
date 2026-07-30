@@ -33,6 +33,7 @@
 - [Image Converter](/tools/image-converter): Convert between JPG, PNG, WebP and more.
 - [Image Resizer](/tools/image-resizer): Resize by pixels, percentage or social preset.
 - [Image Cropper](/tools/image-cropper): Crop images to any aspect ratio.
+- [Passport & ID Photo Maker](/tools/passport-photo-maker): Crop, remove the background and print passport or ID photos at official sizes.
 - [Remove Background](/tools/remove-bg): Erase image backgrounds in the browser.
 - [Image Upscaler](/tools/image-upscaler): Enlarge images with AI.
 - [Add Text to Image](/tools/add-text-to-image): Overlay custom text on any image.

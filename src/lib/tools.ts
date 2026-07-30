@@ -1232,6 +1232,7 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Landmark,
     path: "/tools/income-tax-calculator",
+    dateAdded: "2026-07-30",
     featureList: [
       "2026 US federal tax brackets and standard deduction",
       "All four filing statuses",
@@ -1253,6 +1254,7 @@ export const tools: Tool[] = [
     category: "utility",
     icon: Percent,
     path: "/tools/percentage-calculator",
+    dateAdded: "2026-07-30",
     featureList: [
       "Finds X% of any number",
       "Works out what percent one number is of another",

@@ -318,7 +318,7 @@ function IncomeTaxCalculator() {
                       labelFormatter={(l: string) => `${l} bracket`}
                       contentStyle={{ background: "hsl(var(--card))", border: "1px solid hsl(var(--border))", borderRadius: 12 }}
                     />
-                    <Bar dataKey="amount" name="Income in bracket" radius={[0, 6, 6, 0]}>
+                    <Bar dataKey="amount" name="Income in bracket" radius={[0, 6, 6, 0]} isAnimationActive={false}>
                       {chartData.map((_, i) => (
                         <Cell key={i} fill={BAR_COLORS[i % BAR_COLORS.length]} />
                       ))}

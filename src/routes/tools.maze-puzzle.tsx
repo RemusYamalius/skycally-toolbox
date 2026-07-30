@@ -249,7 +249,23 @@ function MazePuzzlePage() {
   useEffect(() => {
     const el = wrapRef.current;
     if (!el) return;
-    const update = () => setBoardPx(Math.max(200, Math.min(el.clientWidth, 560)));
+    const update = () => {
+      // wrapRef has its own horizontal padding (p-3), but the inner board
+      // box uses `w-full`, which resolves to 100% of wrapRef's *content*
+      // width — i.e. clientWidth minus that padding, not clientWidth
+      // itself. Using raw clientWidth here made boardPx a few pixels
+      // larger than the board's real rendered width on any viewport where
+      // that width isn't already clamped by the 560px cap (which is why
+      // desktop looked fine but mobile — where the board is far below
+      // 560px — showed a visible, growing offset between the canvas grid
+      // and the absolutely-positioned emoji overlay, worst furthest from
+      // the top-left corner). Subtracting the actual computed padding
+      // keeps boardPx exactly equal to the board's true rendered width.
+      const style = getComputedStyle(el);
+      const paddingX = parseFloat(style.paddingLeft || "0") + parseFloat(style.paddingRight || "0");
+      const available = el.clientWidth - paddingX;
+      setBoardPx(Math.max(200, Math.min(available, 560)));
+    };
     update();
     const ro = new ResizeObserver(update);
     ro.observe(el);

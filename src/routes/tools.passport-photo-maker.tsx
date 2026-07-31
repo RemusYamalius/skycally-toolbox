@@ -13,22 +13,10 @@ import { HowToUse } from "@/components/how-to-use";
 import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
-import {
-  Select,
-  SelectContent,
-  SelectItem,
-  SelectTrigger,
-  SelectValue,
-} from "@/components/ui/select";
+import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select";
 import { removeBackground } from "@/services/removeBg";
 import { checkSize, downloadBlob } from "@/lib/file-utils";
-import {
-  DPI,
-  TEMPLATES,
-  aspectRatioOf,
-  pixelSizeOf,
-  type PhotoTemplate,
-} from "@/lib/passport-photo/templates";
+import { DPI, TEMPLATES, aspectRatioOf, pixelSizeOf, type PhotoTemplate } from "@/lib/passport-photo/templates";
 import { exportPrintSheetPdf } from "@/lib/passport-photo/pdf";
 
 export const Route = createFileRoute("/tools/passport-photo-maker")({
@@ -172,11 +160,7 @@ function PassportPhotoMaker() {
     setBusy(true);
     try {
       const dataUrl = resultCanvas.toDataURL("image/jpeg", 0.95);
-      const count = await exportPrintSheetPdf(
-        dataUrl,
-        template,
-        `passport-photo-sheet-${template.id}.pdf`,
-      );
+      const count = await exportPrintSheetPdf(dataUrl, template, `passport-photo-sheet-${template.id}.pdf`);
       toast.success(`Print sheet ready — ${count} copies on one 4 × 6 in page.`);
     } catch (e) {
       console.error(e);
@@ -346,19 +330,15 @@ function PassportPhotoMaker() {
             </div>
 
             {/* ── Disclaimer ─────────────────────────────────────────── */}
-            <div
-              role="note"
-              className="flex gap-3 rounded-2xl border border-border bg-secondary/40 p-4 text-sm"
-            >
+            <div role="note" className="flex gap-3 rounded-2xl border border-border bg-secondary/40 p-4 text-sm">
               <AlertTriangle
                 className="mt-0.5 h-4 w-4 shrink-0"
                 style={{ color: "var(--amber-brand, #f59e0b)" }}
                 aria-hidden="true"
               />
               <p className="text-muted-foreground">
-                This tool helps you meet common size and background requirements, but always
-                double-check your destination country's exact current rules before submitting —
-                requirements can change.
+                This tool helps you meet common size and background requirements, but always double-check your
+                destination country's exact current rules before submitting — requirements can change.
               </p>
             </div>
           </div>
@@ -367,11 +347,18 @@ function PassportPhotoMaker() {
 
       {/* ── Contextual internal links ──────────────────────────────── */}
       <p className="mt-10 text-sm text-muted-foreground leading-relaxed">
-        Need something less strict? Use the <Link to="/tools/image-cropper" className="underline underline-offset-4 hover:text-foreground">Image Cropper</Link>{" "}
+        Need something less strict? Use the{" "}
+        <Link to="/tools/image-cropper" className="underline underline-offset-4 hover:text-foreground">
+          Image Cropper
+        </Link>{" "}
         for general-purpose cropping without a document ratio, the{" "}
-        <Link to="/tools/remove-bg" className="underline underline-offset-4 hover:text-foreground">Remove Background</Link>{" "}
+        <Link to="/tools/remove-bg" className="underline underline-offset-4 hover:text-foreground">
+          Remove Background
+        </Link>{" "}
         tool when you only want a transparent cutout, or{" "}
-        <Link to="/tools/image-to-pdf" className="underline underline-offset-4 hover:text-foreground">Image to PDF</Link>{" "}
+        <Link to="/tools/image-to-pdf" className="underline underline-offset-4 hover:text-foreground">
+          Image to PDF
+        </Link>{" "}
         to turn any other pictures into a printable document.
       </p>
 
@@ -379,17 +366,15 @@ function PassportPhotoMaker() {
       <section className="mt-10 rounded-2xl border border-border bg-card/50 p-6">
         <h2 className="font-display text-lg font-bold">How it works</h2>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          Passport offices reject photos on two things far more often than anything else: the wrong
-          printed size and a busy or shadowed background. Both are measurable, so both are fixable
-          before you print.
+          Passport offices reject photos on two things far more often than anything else: the wrong printed size and a
+          busy or shadowed background. Both are measurable, so both are fixable before you print.
         </p>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          The crop box is locked to the official ratio for the document you pick, so the framing can
-          never drift out of spec. The export is then rendered at 300 DPI, the print resolution
-          almost every authority expects:
+          The crop box is locked to the official ratio for the document you pick, so the framing can never drift out of
+          spec. The export is then rendered at 300 DPI, the print resolution almost every authority expects:
         </p>
         <pre className="mt-3 overflow-x-auto rounded-lg bg-secondary/60 p-4 font-mono text-xs">
-{`pixels = millimetres ÷ 25.4 × 300
+          {`pixels = millimetres ÷ 25.4 × 300
 
 US / India   50.8 × 50.8 mm  →  600 × 600 px   (ratio 1.0000)
 UK           35 × 45 mm      →  413 × 531 px   (ratio 0.7778)
@@ -397,12 +382,11 @@ Schengen/EU  35 × 45 mm      →  413 × 531 px   (ratio 0.7778)
 Canada       50 × 70 mm      →  591 × 827 px   (ratio 0.7143)`}
         </pre>
         <p className="mt-3 text-sm text-muted-foreground leading-relaxed">
-          After the background is removed, the transparent cutout is composited onto a solid white
-          layer rather than left transparent — a transparent PNG prints as whatever paper or
-          template sits behind it, which is exactly the inconsistency the rules are trying to
-          prevent. The print sheet then tiles that finished photo at its true millimetre size on a
-          4 × 6 in page, so a standard photo lab print comes out to scale and you just cut along the
-          guides.
+          After the background is removed, the transparent cutout is composited onto a solid white layer rather than
+          left transparent — a transparent PNG prints as whatever paper or template sits behind it, which is exactly the
+          inconsistency the rules are trying to prevent. The print sheet then tiles that finished photo at its true
+          millimetre size on a 4 × 6 in page, so a standard photo lab print comes out to scale and you just cut along
+          the guides.
         </p>
       </section>
 
@@ -424,6 +408,7 @@ Canada       50 × 70 mm      →  591 × 827 px   (ratio 0.7143)`}
           "A passport photo maker free of charge only helps if the numbers underneath it are right. Every country publishes an exact printed size for identity photos, and those sizes are not interchangeable: a US passport photo is 2 × 2 inches (51 × 51 mm), while the UK and the whole Schengen area use 35 × 45 mm, and Canada uses a taller 50 × 70 mm. Print a US-sized square where a 35 × 45 mm rectangle was expected and the application comes back regardless of how good the photograph is. This tool locks the crop box to the ratio of whichever document you select, so the framing physically cannot drift out of spec while you drag your head into position.",
           "The second half of the job is the background. Guidance almost everywhere asks for a plain, uniformly lit white or light-coloured background with no shadows, patterns or objects. That is hard to shoot at home and easy to fix afterwards, so the same in-browser AI cutout used by our background remover isolates you from whatever wall you were standing in front of, then composites the result onto solid white. Flattening matters: a transparent PNG has no background at all, and it will print as whatever happens to sit behind it. Working as a passport photo size calculator as well as an editor, the tool shows the pixel dimensions it will export — millimetres ÷ 25.4 × 300 — so you can confirm the file is at true 300 DPI print resolution before you send it anywhere.",
           "To print passport photo at home or at a drugstore kiosk, use the print sheet export. It tiles copies of your finished photo at their real millimetre size onto a standard 4 × 6 inch page with faint cut guides, which is the format every one-hour photo counter accepts and the cheapest way to get the two identical prints most paper applications ask for. Everything — the crop, the background removal, the sheet layout — happens locally in your browser, so your photo is never uploaded to a server.",
+          "A good source photo makes the rest of this easier. Take it in daylight facing a window, at arm's length or slightly further, against the plainest wall in the house — the background removal step handles imperfections, but even lighting on your face is something no algorithm can fully fix afterwards. Keep a neutral expression with both eyes open, remove sunglasses and tinted lenses, and angle away from any light source that causes glare across regular glasses. None of this needs a photographer or a studio; a phone held steady at eye level is enough for every template this tool supports.",
         ]}
         faqs={[
           {
@@ -445,6 +430,26 @@ Canada       50 × 70 mm      →  591 × 827 px   (ratio 0.7143)`}
             question: "Will my photo definitely be accepted?",
             answer:
               "This tool handles size, ratio and background, which are the most common rejection reasons — but it cannot judge your expression, head height, glasses, headwear or lighting, and rules change. Always check the current official requirements for your specific country and document before submitting.",
+          },
+          {
+            question: "Can I wear glasses in my passport photo?",
+            answer:
+              "Most countries now discourage or disallow glasses in passport photos because of glare and reflections obscuring the eyes. If you must wear them for medical reasons, tilt your head away from direct light and make sure both eyes are clearly visible with no reflection. When in doubt, retake the photo without glasses.",
+          },
+          {
+            question: "Should I download JPG or PNG?",
+            answer:
+              "JPG is the right choice for almost everyone — it is the format passport offices, visa portals and photo-printing kiosks expect, and it keeps the file size small. PNG is only useful if you specifically need a lossless file for further editing before printing.",
+          },
+          {
+            question: "Does this work for a baby's or child's passport photo?",
+            answer:
+              "Yes, the same size and background rules apply regardless of age. The hardest part is practical, not technical: lay a plain white sheet behind the baby, keep their eyes open and face forward, and make sure no hand, arm or prop supporting them is visible in the frame before you crop.",
+          },
+          {
+            question: "Do I need to remove a hat, headscarf or turban for my photo?",
+            answer:
+              "Religious headwear is generally permitted as long as your full face is visible from chin to forehead and no shadow falls across your features. Non-religious hats, caps and headphones are not allowed. Check your specific country's guidance if you are unsure which category applies.",
           },
         ]}
       />

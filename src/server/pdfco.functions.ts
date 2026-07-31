@@ -9,6 +9,9 @@ const InputSchema = z.object({
 export const pdfToWord = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<{ url: string }> => {
+    const { enforceRateLimit } = await import("./rate-limit.server");
+    enforceRateLimit("pdfco", 5);
+
     const key = process.env.PDFCO_KEY;
     if (!key) throw new Error("Service not configured");
 

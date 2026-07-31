@@ -107,6 +107,7 @@ import { Route as ToolsMemoryMatchRouteImport } from './routes/tools.memory-matc
 import { Route as ToolsMergePdfRouteImport } from './routes/tools.merge-pdf'
 import { Route as ToolsMinesweeperRouteImport } from './routes/tools.minesweeper'
 import { Route as ToolsMortgageCalculatorRouteImport } from './routes/tools.mortgage-calculator'
+import { Route as ToolsMostLikelyToRouteImport } from './routes/tools.most-likely-to'
 import { Route as ToolsNetworkSpeedTestRouteImport } from './routes/tools.network-speed-test'
 import { Route as ToolsNeverHaveIEverRouteImport } from './routes/tools.never-have-i-ever'
 import { Route as ToolsObjectDetectionRouteImport } from './routes/tools.object-detection'
@@ -682,6 +683,11 @@ const ToolsMortgageCalculatorRoute = ToolsMortgageCalculatorRouteImport.update({
   path: '/tools/mortgage-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsMostLikelyToRoute = ToolsMostLikelyToRouteImport.update({
+  id: '/tools/most-likely-to',
+  path: '/tools/most-likely-to',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsNetworkSpeedTestRoute = ToolsNetworkSpeedTestRouteImport.update({
   id: '/tools/network-speed-test',
   path: '/tools/network-speed-test',
@@ -1142,6 +1148,7 @@ export interface FileRoutesByFullPath {
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/mortgage-calculator': typeof ToolsMortgageCalculatorRoute
+  '/tools/most-likely-to': typeof ToolsMostLikelyToRoute
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/never-have-i-ever': typeof ToolsNeverHaveIEverRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
@@ -1313,6 +1320,7 @@ export interface FileRoutesByTo {
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/mortgage-calculator': typeof ToolsMortgageCalculatorRoute
+  '/tools/most-likely-to': typeof ToolsMostLikelyToRoute
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/never-have-i-ever': typeof ToolsNeverHaveIEverRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
@@ -1485,6 +1493,7 @@ export interface FileRoutesById {
   '/tools/merge-pdf': typeof ToolsMergePdfRoute
   '/tools/minesweeper': typeof ToolsMinesweeperRoute
   '/tools/mortgage-calculator': typeof ToolsMortgageCalculatorRoute
+  '/tools/most-likely-to': typeof ToolsMostLikelyToRoute
   '/tools/network-speed-test': typeof ToolsNetworkSpeedTestRoute
   '/tools/never-have-i-ever': typeof ToolsNeverHaveIEverRoute
   '/tools/object-detection': typeof ToolsObjectDetectionRoute
@@ -1658,6 +1667,7 @@ export interface FileRouteTypes {
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
     | '/tools/mortgage-calculator'
+    | '/tools/most-likely-to'
     | '/tools/network-speed-test'
     | '/tools/never-have-i-ever'
     | '/tools/object-detection'
@@ -1829,6 +1839,7 @@ export interface FileRouteTypes {
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
     | '/tools/mortgage-calculator'
+    | '/tools/most-likely-to'
     | '/tools/network-speed-test'
     | '/tools/never-have-i-ever'
     | '/tools/object-detection'
@@ -2000,6 +2011,7 @@ export interface FileRouteTypes {
     | '/tools/merge-pdf'
     | '/tools/minesweeper'
     | '/tools/mortgage-calculator'
+    | '/tools/most-likely-to'
     | '/tools/network-speed-test'
     | '/tools/never-have-i-ever'
     | '/tools/object-detection'
@@ -2172,6 +2184,7 @@ export interface RootRouteChildren {
   ToolsMergePdfRoute: typeof ToolsMergePdfRoute
   ToolsMinesweeperRoute: typeof ToolsMinesweeperRoute
   ToolsMortgageCalculatorRoute: typeof ToolsMortgageCalculatorRoute
+  ToolsMostLikelyToRoute: typeof ToolsMostLikelyToRoute
   ToolsNetworkSpeedTestRoute: typeof ToolsNetworkSpeedTestRoute
   ToolsNeverHaveIEverRoute: typeof ToolsNeverHaveIEverRoute
   ToolsObjectDetectionRoute: typeof ToolsObjectDetectionRoute
@@ -2935,6 +2948,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsMortgageCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/most-likely-to': {
+      id: '/tools/most-likely-to'
+      path: '/tools/most-likely-to'
+      fullPath: '/tools/most-likely-to'
+      preLoaderRoute: typeof ToolsMostLikelyToRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/network-speed-test': {
       id: '/tools/network-speed-test'
       path: '/tools/network-speed-test'
@@ -3536,6 +3556,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsMergePdfRoute: ToolsMergePdfRoute,
   ToolsMinesweeperRoute: ToolsMinesweeperRoute,
   ToolsMortgageCalculatorRoute: ToolsMortgageCalculatorRoute,
+  ToolsMostLikelyToRoute: ToolsMostLikelyToRoute,
   ToolsNetworkSpeedTestRoute: ToolsNetworkSpeedTestRoute,
   ToolsNeverHaveIEverRoute: ToolsNeverHaveIEverRoute,
   ToolsObjectDetectionRoute: ToolsObjectDetectionRoute,

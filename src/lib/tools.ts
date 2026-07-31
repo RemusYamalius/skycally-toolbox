@@ -118,6 +118,7 @@ import {
   Home,
   BrainCircuit,
   PieChart,
+  ThumbsDown,
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1523,6 +1524,27 @@ export const tools: Tool[] = [
       "One-tap next question for fast group play",
       "No signup, unlimited plays",
       "Mobile-friendly",
+    ],
+    schemaCategory: "GameApplication",
+  },
+  {
+    slug: "ick-test",
+    name: "Ick Test",
+    description:
+      "Swipe through 200+ icks, find out your Ick Sensitivity Score, and share the result with friends.",
+    category: "games",
+    icon: ThumbsDown,
+    path: "/tools/ick-test",
+    dateAdded: "2026-07-31",
+    featureList: [
+      "200 original icks across 7 categories",
+      "30-ick rounds with a balanced random draw",
+      "Swipe or tap to rate each ick",
+      "Ick Sensitivity Score with 5 result tiers",
+      "Biggest ick category breakdown",
+      "Wordle-style emoji result card you can copy",
+      "Add your own custom icks, saved in your browser",
+      "Free, no signup, mobile-first",
     ],
     schemaCategory: "GameApplication",
   },

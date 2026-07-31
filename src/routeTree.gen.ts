@@ -75,6 +75,7 @@ import { Route as ToolsHangmanRouteImport } from './routes/tools.hangman'
 import { Route as ToolsHashGeneratorRouteImport } from './routes/tools.hash-generator'
 import { Route as ToolsHeartRateZoneCalculatorRouteImport } from './routes/tools.heart-rate-zone-calculator'
 import { Route as ToolsHolidayCheckerRouteImport } from './routes/tools.holiday-checker'
+import { Route as ToolsIckTestRouteImport } from './routes/tools.ick-test'
 import { Route as ToolsImageAnimatorRouteImport } from './routes/tools.image-animator'
 import { Route as ToolsImageCompressorRouteImport } from './routes/tools.image-compressor'
 import { Route as ToolsImageConverterRouteImport } from './routes/tools.image-converter'
@@ -517,6 +518,11 @@ const ToolsHeartRateZoneCalculatorRoute =
 const ToolsHolidayCheckerRoute = ToolsHolidayCheckerRouteImport.update({
   id: '/tools/holiday-checker',
   path: '/tools/holiday-checker',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsIckTestRoute = ToolsIckTestRouteImport.update({
+  id: '/tools/ick-test',
+  path: '/tools/ick-test',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsImageAnimatorRoute = ToolsImageAnimatorRouteImport.update({
@@ -1104,6 +1110,7 @@ export interface FileRoutesByFullPath {
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/heart-rate-zone-calculator': typeof ToolsHeartRateZoneCalculatorRoute
   '/tools/holiday-checker': typeof ToolsHolidayCheckerRoute
+  '/tools/ick-test': typeof ToolsIckTestRoute
   '/tools/image-animator': typeof ToolsImageAnimatorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -1274,6 +1281,7 @@ export interface FileRoutesByTo {
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/heart-rate-zone-calculator': typeof ToolsHeartRateZoneCalculatorRoute
   '/tools/holiday-checker': typeof ToolsHolidayCheckerRoute
+  '/tools/ick-test': typeof ToolsIckTestRoute
   '/tools/image-animator': typeof ToolsImageAnimatorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -1445,6 +1453,7 @@ export interface FileRoutesById {
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
   '/tools/heart-rate-zone-calculator': typeof ToolsHeartRateZoneCalculatorRoute
   '/tools/holiday-checker': typeof ToolsHolidayCheckerRoute
+  '/tools/ick-test': typeof ToolsIckTestRoute
   '/tools/image-animator': typeof ToolsImageAnimatorRoute
   '/tools/image-compressor': typeof ToolsImageCompressorRoute
   '/tools/image-converter': typeof ToolsImageConverterRoute
@@ -1617,6 +1626,7 @@ export interface FileRouteTypes {
     | '/tools/hash-generator'
     | '/tools/heart-rate-zone-calculator'
     | '/tools/holiday-checker'
+    | '/tools/ick-test'
     | '/tools/image-animator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -1787,6 +1797,7 @@ export interface FileRouteTypes {
     | '/tools/hash-generator'
     | '/tools/heart-rate-zone-calculator'
     | '/tools/holiday-checker'
+    | '/tools/ick-test'
     | '/tools/image-animator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -1957,6 +1968,7 @@ export interface FileRouteTypes {
     | '/tools/hash-generator'
     | '/tools/heart-rate-zone-calculator'
     | '/tools/holiday-checker'
+    | '/tools/ick-test'
     | '/tools/image-animator'
     | '/tools/image-compressor'
     | '/tools/image-converter'
@@ -2128,6 +2140,7 @@ export interface RootRouteChildren {
   ToolsHashGeneratorRoute: typeof ToolsHashGeneratorRoute
   ToolsHeartRateZoneCalculatorRoute: typeof ToolsHeartRateZoneCalculatorRoute
   ToolsHolidayCheckerRoute: typeof ToolsHolidayCheckerRoute
+  ToolsIckTestRoute: typeof ToolsIckTestRoute
   ToolsImageAnimatorRoute: typeof ToolsImageAnimatorRoute
   ToolsImageCompressorRoute: typeof ToolsImageCompressorRoute
   ToolsImageConverterRoute: typeof ToolsImageConverterRoute
@@ -2696,6 +2709,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/holiday-checker'
       fullPath: '/tools/holiday-checker'
       preLoaderRoute: typeof ToolsHolidayCheckerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/ick-test': {
+      id: '/tools/ick-test'
+      path: '/tools/ick-test'
+      fullPath: '/tools/ick-test'
+      preLoaderRoute: typeof ToolsIckTestRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/image-animator': {
@@ -3483,6 +3503,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsHashGeneratorRoute: ToolsHashGeneratorRoute,
   ToolsHeartRateZoneCalculatorRoute: ToolsHeartRateZoneCalculatorRoute,
   ToolsHolidayCheckerRoute: ToolsHolidayCheckerRoute,
+  ToolsIckTestRoute: ToolsIckTestRoute,
   ToolsImageAnimatorRoute: ToolsImageAnimatorRoute,
   ToolsImageCompressorRoute: ToolsImageCompressorRoute,
   ToolsImageConverterRoute: ToolsImageConverterRoute,
@@ -3592,12 +3613,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

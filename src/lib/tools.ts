@@ -879,6 +879,7 @@ export const tools: Tool[] = [
     category: "image",
     icon: IdCard,
     path: "/tools/passport-photo-maker",
+    dateAdded: "2026-07-31",
     featureList: [
       "Official size presets for US, UK, Schengen/EU, Canada and India",
       "Crop box locked to each document's exact aspect ratio",

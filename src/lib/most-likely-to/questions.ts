@@ -85,6 +85,7 @@ const PARTY: string[] = [
   "Most likely to make a toast that goes on far too long",
   "Most likely to bring a board game to a house party",
   "Most likely to end the night eating something they'll regret",
+  "Most likely to still be dancing when the lights come on",
 ];
 
 const SCHOOL: string[] = [

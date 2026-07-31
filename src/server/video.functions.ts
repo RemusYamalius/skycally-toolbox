@@ -18,6 +18,9 @@ export interface VideoResult {
 export const getVideo = createServerFn({ method: "POST" })
   .inputValidator((input: unknown) => InputSchema.parse(input))
   .handler(async ({ data }): Promise<VideoResult> => {
+    const { enforceRateLimit } = await import("./rate-limit.server");
+    enforceRateLimit("video", 10);
+
     const key = process.env.RAPIDAPI_KEY;
     if (!key) throw new Error("Service not configured");
     const endpoint = `https://social-media-video-downloader.p.rapidapi.com/smvd/get/all?url=${encodeURIComponent(data.url)}`;

@@ -41,7 +41,10 @@ export const Route = createFileRoute("/tools/credit-card-payoff-calculator")({
 });
 
 function num(v: string): number {
-  const n = parseFloat(v);
+  // Normalise decimal separator: some keyboards/locales produce "20,99"
+  // instead of "20.99". parseFloat("20,99") silently returns 20, which
+  // would cause a completely wrong interest calculation with no warning.
+  const n = parseFloat(v.replace(",", "."));
   return Number.isFinite(n) && n > 0 ? n : 0;
 }
 
@@ -58,7 +61,6 @@ function CreditCardPayoffPage() {
   const [flatMin, setFlatMin] = useState("100");
   const [fixedPayment, setFixedPayment] = useState(String(SAMPLE_CARD.fixedPayment ?? 200));
   const [tab, setTab] = useState<PayoffStrategy>("minimum");
-  const [showAll, setShowAll] = useState(false);
 
   const input: CardInput = useMemo(
     () => ({
@@ -89,7 +91,10 @@ function CreditCardPayoffPage() {
   }, [minimum, fixed]);
 
   const activeResult: PayoffResult = tab === "fixed" && fixed ? fixed : minimum;
-  const visibleRows = showAll ? activeResult.schedule : activeResult.schedule.slice(0, 12);
+  const PAGE_SIZE = 24;
+  const [page, setPage] = useState(0);
+  const totalPages = Math.ceil(activeResult.schedule.length / PAGE_SIZE);
+  const visibleRows = activeResult.schedule.slice(page * PAGE_SIZE, (page + 1) * PAGE_SIZE);
 
   const fixedUsable = !!fixed && !fixed.error && fixed.months > 0;
   const interestSaved = fixedUsable ? Math.max(0, minimum.totalInterest - fixed!.totalInterest) : 0;
@@ -219,6 +224,40 @@ function CreditCardPayoffPage() {
             </p>
           </div>
 
+          {/* What-if slider */}
+          {hasBalance &&
+            input.balance > 0 &&
+            (() => {
+              const minMonthlyInterest = input.balance * (input.apr / 100 / 12);
+              const suggested = Math.ceil(Math.max(minMonthlyInterest * 1.5, 50) / 25) * 25;
+              const sliderMax = Math.ceil((input.balance * 0.1) / 25) * 25;
+              const sliderVal = num(fixedPayment) || suggested;
+              return (
+                <div className="rounded-xl border border-border bg-secondary/30 p-3 space-y-2">
+                  <p className="text-xs font-semibold text-muted-foreground uppercase tracking-wide">
+                    💡 What if I pay…
+                  </p>
+                  <div className="flex items-center gap-3">
+                    <span className="text-sm font-mono w-16 shrink-0 text-foreground">
+                      {fmtUSD(sliderVal, { decimals: 0 })}/mo
+                    </span>
+                    <input
+                      type="range"
+                      min={Math.ceil(minMonthlyInterest + 1)}
+                      max={sliderMax || 500}
+                      step={25}
+                      value={sliderVal}
+                      onChange={(e) => setFixedPayment(e.target.value)}
+                      className="flex-1 accent-[var(--cyan-brand)]"
+                    />
+                  </div>
+                  <p className="text-xs text-muted-foreground">
+                    Drag to explore — updates the Fixed strategy instantly.
+                  </p>
+                </div>
+              );
+            })()}
+
           <p className="text-xs text-muted-foreground flex items-start gap-2 pt-2 border-t border-border">
             <Info className="w-3.5 h-3.5 mt-0.5 shrink-0" aria-hidden="true" />
             Interest is compounded monthly at APR ÷ 12 on the remaining balance.
@@ -239,10 +278,7 @@ function CreditCardPayoffPage() {
                   title="Minimum payment"
                   accent={MINIMUM_COLOR}
                   rows={[
-                    [
-                      "Time to payoff",
-                      minimum.neverPaidOff ? "50+ years" : fmtMonths(minimum.months),
-                    ],
+                    ["Time to payoff", minimum.neverPaidOff ? "50+ years" : fmtMonths(minimum.months)],
                     ["Total interest", fmtUSD(minimum.totalInterest)],
                     ["Total paid", fmtUSD(minimum.totalPaid)],
                     ["Interest saved", "—"],
@@ -271,8 +307,8 @@ function CreditCardPayoffPage() {
 
               {showLongWarning && (
                 <div className="rounded-2xl border border-red-500/40 bg-red-500/10 p-4 text-sm flex items-start gap-3">
-                  <AlertTriangle className="w-5 h-5 shrink-0 text-red-400" aria-hidden="true" />
-                  <p className="text-red-100/90">
+                  <AlertTriangle className="w-5 h-5 shrink-0 text-red-600 dark:text-red-400" aria-hidden="true" />
+                  <p className="text-red-700 dark:text-red-200">
                     At minimum payments only, this balance will take{" "}
                     <strong>{minimum.neverPaidOff ? "more than 50 years" : fmtMonths(minimum.months)}</strong> to pay
                     off. You&apos;ll pay <strong>{fmtUSD(minimum.totalInterest)}</strong> in interest alone
@@ -309,7 +345,8 @@ function CreditCardPayoffPage() {
                         tick={{ fontSize: 11 }}
                         stroke="currentColor"
                         opacity={0.5}
-                        label={{ value: "Month", position: "insideBottom", offset: -2, fontSize: 11 }}
+                        tickFormatter={(v: number) => `${Math.round(v / 12)}y`}
+                        label={{ value: "Years", position: "insideBottom", offset: -2, fontSize: 11 }}
                       />
                       <YAxis
                         tick={{ fontSize: 11 }}
@@ -356,12 +393,31 @@ function CreditCardPayoffPage() {
               <div className="rounded-2xl border border-border bg-card p-4">
                 <div className="flex flex-wrap items-center justify-between gap-3 mb-3">
                   <h2 className="font-display text-lg font-bold">Payment schedule</h2>
-                  {activeResult.schedule.length > 12 && (
-                    <Button size="sm" variant="outline" onClick={() => setShowAll((s) => !s)}>
-                      {showAll
-                        ? "Show first 12 months"
-                        : `Show all ${activeResult.schedule.length.toLocaleString("en-US")} months`}
-                    </Button>
+                  {totalPages > 1 && (
+                    <div className="flex items-center gap-2 text-sm text-muted-foreground">
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setPage((p) => Math.max(0, p - 1))}
+                        disabled={page === 0}
+                        className="h-7 px-2"
+                      >
+                        ←
+                      </Button>
+                      <span>
+                        {page * PAGE_SIZE + 1}–{Math.min((page + 1) * PAGE_SIZE, activeResult.schedule.length)} of{" "}
+                        {activeResult.schedule.length.toLocaleString("en-US")} months
+                      </span>
+                      <Button
+                        size="sm"
+                        variant="outline"
+                        onClick={() => setPage((p) => Math.min(totalPages - 1, p + 1))}
+                        disabled={page >= totalPages - 1}
+                        className="h-7 px-2"
+                      >
+                        →
+                      </Button>
+                    </div>
                   )}
                 </div>
 
@@ -369,7 +425,7 @@ function CreditCardPayoffPage() {
                   value={tab}
                   onValueChange={(v) => {
                     setTab(v as PayoffStrategy);
-                    setShowAll(false);
+                    setPage(0);
                   }}
                 >
                   <TabsList className="grid grid-cols-2 w-full max-w-xs mb-3">
@@ -409,8 +465,8 @@ function CreditCardPayoffPage() {
               </div>
 
               <div className="rounded-2xl border border-amber-500/40 bg-amber-500/10 p-4 text-sm flex items-start gap-3">
-                <AlertTriangle className="w-5 h-5 shrink-0 text-amber-500" aria-hidden="true" />
-                <p className="text-amber-100/90">
+                <AlertTriangle className="w-5 h-5 shrink-0 text-amber-600 dark:text-amber-500" aria-hidden="true" />
+                <p className="text-amber-800 dark:text-amber-200">
                   Estimates only. Actual payments may vary based on your card&apos;s billing cycle, fees, and any new
                   purchases. Not financial advice.
                 </p>
@@ -484,7 +540,7 @@ function CreditCardPayoffPage() {
           {
             question: "What is a typical credit card minimum payment?",
             answer:
-              "Most US issuers use 1% to 3% of the statement balance plus accrued interest, with a dollar floor of about $25 to $35 — whichever is greater. If your statement shows a fixed minimum instead, switch the minimum payment type to \"Fixed minimum\" and enter that amount.",
+              'Most US issuers use 1% to 3% of the statement balance plus accrued interest, with a dollar floor of about $25 to $35 — whichever is greater. If your statement shows a fixed minimum instead, switch the minimum payment type to "Fixed minimum" and enter that amount.',
           },
           {
             question: "Will a balance transfer pay off my card faster?",

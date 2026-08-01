@@ -112,7 +112,7 @@ function StudentLoanCalculatorPage() {
     <ToolPageShell title={tool.name} description={tool.description} showFileDisclaimer={false}>
       <div className="grid gap-6 lg:grid-cols-[minmax(0,1fr)_minmax(0,1.35fr)]">
         {/* Inputs */}
-        <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
+        <div className="min-w-0 rounded-2xl border border-border bg-card p-5 space-y-5">
           <h2 className="font-display text-lg font-bold flex items-center gap-2">
             <GraduationCap className="w-5 h-5" style={{ color: "var(--cyan-brand)" }} aria-hidden="true" />
             Your student loan
@@ -234,7 +234,7 @@ function StudentLoanCalculatorPage() {
         </div>
 
         {/* Results */}
-        <section className="space-y-5" aria-live="polite">
+        <section className="min-w-0 space-y-5" aria-live="polite">
           {!hasLoan ? (
             <div className="rounded-2xl border border-dashed border-border bg-card/40 p-10 text-center text-sm text-muted-foreground">
               Enter a loan balance to see your repayment estimate.
@@ -405,7 +405,7 @@ function StudentLoanCalculatorPage() {
                   )}
                 </div>
                 <div className="overflow-x-auto max-h-[420px] overflow-y-auto">
-                  <table className="w-full text-sm min-w-[460px]">
+                  <table className="w-full text-sm min-w-[420px]">
                     <thead className="sticky top-0 bg-card">
                       <tr className="text-left text-xs uppercase tracking-wide text-muted-foreground border-b border-border">
                         <th className="py-2 pr-3 font-medium">Month</th>

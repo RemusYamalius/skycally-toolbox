@@ -15,6 +15,7 @@ export const relatedToolsMap: Record<string, string[]> = {
   "margin-calculator": ["percentage-calculator", "tip-calculator", "currency-converter", "compound-interest", "loan-calculator", "unit-converter"],
   "percentage-calculator": ["margin-calculator", "tip-calculator", "currency-converter", "unit-converter", "compound-interest", "loan-calculator"],
   "tip-calculator": ["percentage-calculator", "margin-calculator", "currency-converter", "unit-converter", "loan-calculator"],
+  "student-loan-calculator": ["debt-payoff-calculator", "income-tax-calculator", "paycheck-calculator", "loan-calculator", "compound-interest", "retirement-calculator"],
   "income-tax-calculator": ["paycheck-calculator", "retirement-calculator", "mortgage-calculator", "percentage-calculator", "compound-interest", "debt-payoff-calculator"],
   "paycheck-calculator": ["income-tax-calculator", "retirement-calculator", "rent-vs-buy-calculator", "loan-calculator", "mortgage-calculator", "compound-interest", "currency-converter", "debt-payoff-calculator", "insurance-estimator"],
   "debt-payoff-calculator": ["retirement-calculator", "paycheck-calculator", "loan-calculator", "compound-interest", "mortgage-calculator", "currency-converter", "insurance-estimator"],

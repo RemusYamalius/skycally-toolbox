@@ -37,6 +37,8 @@ import {
   LayoutGrid,
   Laugh,
   CreditCard,
+  BadgeDollarSign,
+
   Captions,
   FileMinus,
   Layers,

@@ -148,6 +148,7 @@ import { Route as ToolsSpeechToTextRouteImport } from './routes/tools.speech-to-
 import { Route as ToolsSpinningWheelRouteImport } from './routes/tools.spinning-wheel'
 import { Route as ToolsSplitPdfRouteImport } from './routes/tools.split-pdf'
 import { Route as ToolsSshKeyGeneratorRouteImport } from './routes/tools.ssh-key-generator'
+import { Route as ToolsStudentLoanCalculatorRouteImport } from './routes/tools.student-loan-calculator'
 import { Route as ToolsSudokuRouteImport } from './routes/tools.sudoku'
 import { Route as ToolsTetrisRouteImport } from './routes/tools.tetris'
 import { Route as ToolsTextToSpeechRouteImport } from './routes/tools.text-to-speech'
@@ -893,6 +894,12 @@ const ToolsSshKeyGeneratorRoute = ToolsSshKeyGeneratorRouteImport.update({
   path: '/tools/ssh-key-generator',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsStudentLoanCalculatorRoute =
+  ToolsStudentLoanCalculatorRouteImport.update({
+    id: '/tools/student-loan-calculator',
+    path: '/tools/student-loan-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsSudokuRoute = ToolsSudokuRouteImport.update({
   id: '/tools/sudoku',
   path: '/tools/sudoku',
@@ -1189,6 +1196,7 @@ export interface FileRoutesByFullPath {
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/ssh-key-generator': typeof ToolsSshKeyGeneratorRoute
+  '/tools/student-loan-calculator': typeof ToolsStudentLoanCalculatorRoute
   '/tools/sudoku': typeof ToolsSudokuRoute
   '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
@@ -1361,6 +1369,7 @@ export interface FileRoutesByTo {
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/ssh-key-generator': typeof ToolsSshKeyGeneratorRoute
+  '/tools/student-loan-calculator': typeof ToolsStudentLoanCalculatorRoute
   '/tools/sudoku': typeof ToolsSudokuRoute
   '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
@@ -1534,6 +1543,7 @@ export interface FileRoutesById {
   '/tools/spinning-wheel': typeof ToolsSpinningWheelRoute
   '/tools/split-pdf': typeof ToolsSplitPdfRoute
   '/tools/ssh-key-generator': typeof ToolsSshKeyGeneratorRoute
+  '/tools/student-loan-calculator': typeof ToolsStudentLoanCalculatorRoute
   '/tools/sudoku': typeof ToolsSudokuRoute
   '/tools/tetris': typeof ToolsTetrisRoute
   '/tools/text-to-speech': typeof ToolsTextToSpeechRoute
@@ -1708,6 +1718,7 @@ export interface FileRouteTypes {
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/ssh-key-generator'
+    | '/tools/student-loan-calculator'
     | '/tools/sudoku'
     | '/tools/tetris'
     | '/tools/text-to-speech'
@@ -1880,6 +1891,7 @@ export interface FileRouteTypes {
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/ssh-key-generator'
+    | '/tools/student-loan-calculator'
     | '/tools/sudoku'
     | '/tools/tetris'
     | '/tools/text-to-speech'
@@ -2052,6 +2064,7 @@ export interface FileRouteTypes {
     | '/tools/spinning-wheel'
     | '/tools/split-pdf'
     | '/tools/ssh-key-generator'
+    | '/tools/student-loan-calculator'
     | '/tools/sudoku'
     | '/tools/tetris'
     | '/tools/text-to-speech'
@@ -2225,6 +2238,7 @@ export interface RootRouteChildren {
   ToolsSpinningWheelRoute: typeof ToolsSpinningWheelRoute
   ToolsSplitPdfRoute: typeof ToolsSplitPdfRoute
   ToolsSshKeyGeneratorRoute: typeof ToolsSshKeyGeneratorRoute
+  ToolsStudentLoanCalculatorRoute: typeof ToolsStudentLoanCalculatorRoute
   ToolsSudokuRoute: typeof ToolsSudokuRoute
   ToolsTetrisRoute: typeof ToolsTetrisRoute
   ToolsTextToSpeechRoute: typeof ToolsTextToSpeechRoute
@@ -3235,6 +3249,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsSshKeyGeneratorRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/student-loan-calculator': {
+      id: '/tools/student-loan-calculator'
+      path: '/tools/student-loan-calculator'
+      fullPath: '/tools/student-loan-calculator'
+      preLoaderRoute: typeof ToolsStudentLoanCalculatorRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/sudoku': {
       id: '/tools/sudoku'
       path: '/tools/sudoku'
@@ -3597,6 +3618,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsSpinningWheelRoute: ToolsSpinningWheelRoute,
   ToolsSplitPdfRoute: ToolsSplitPdfRoute,
   ToolsSshKeyGeneratorRoute: ToolsSshKeyGeneratorRoute,
+  ToolsStudentLoanCalculatorRoute: ToolsStudentLoanCalculatorRoute,
   ToolsSudokuRoute: ToolsSudokuRoute,
   ToolsTetrisRoute: ToolsTetrisRoute,
   ToolsTextToSpeechRoute: ToolsTextToSpeechRoute,
@@ -3634,12 +3656,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

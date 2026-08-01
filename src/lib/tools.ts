@@ -38,6 +38,7 @@ import {
   Laugh,
   CreditCard,
   BadgeDollarSign,
+  BadgePercent,
 
   Captions,
   FileMinus,
@@ -1300,6 +1301,32 @@ export const tools: Tool[] = [
     ],
     schemaCategory: "UtilitiesApplication",
   },
+  {
+    slug: "discount-calculator",
+    name: "Discount & Sale Price Calculator",
+    description:
+      "Calculate sale price after discount, find the discount percentage, or work out the original price — plus stack two discounts at once.",
+    category: "utility",
+    icon: BadgePercent,
+    path: "/tools/discount-calculator",
+    dateAdded: "2026-08-01",
+    featureList: [
+      "Sale price from an original price and a percent off",
+      "Amount saved in dollars and as a percentage",
+      "Struck-through original price next to the discounted price",
+      "Reverse mode: discount percentage from original and sale price",
+      "Stacked discount mode applying a second discount to the reduced price",
+      "Total effective discount percentage for two stacked discounts",
+      "Step-by-step price chain showing each discount stage",
+      "Explanation of why stacked discounts do not simply add up",
+      "Instant results as you type",
+      "US English number and currency formatting",
+      "No signup required",
+      "100% browser-based",
+    ],
+    schemaCategory: "UtilitiesApplication",
+  },
+
   {
     slug: "credit-card-payoff-calculator",
     name: "Credit Card Payoff Calculator",

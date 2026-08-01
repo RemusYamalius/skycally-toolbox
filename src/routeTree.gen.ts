@@ -60,6 +60,7 @@ import { Route as ToolsCurrencyConverterRouteImport } from './routes/tools.curre
 import { Route as ToolsDebtPayoffCalculatorRouteImport } from './routes/tools.debt-payoff-calculator'
 import { Route as ToolsDeletePdfPagesRouteImport } from './routes/tools.delete-pdf-pages'
 import { Route as ToolsDiceRollerRouteImport } from './routes/tools.dice-roller'
+import { Route as ToolsDiscountCalculatorRouteImport } from './routes/tools.discount-calculator'
 import { Route as ToolsDnsLeakTestRouteImport } from './routes/tools.dns-leak-test'
 import { Route as ToolsDocumentScannerRouteImport } from './routes/tools.document-scanner'
 import { Route as ToolsDomainAnalysisRouteImport } from './routes/tools.domain-analysis'
@@ -446,6 +447,11 @@ const ToolsDeletePdfPagesRoute = ToolsDeletePdfPagesRouteImport.update({
 const ToolsDiceRollerRoute = ToolsDiceRollerRouteImport.update({
   id: '/tools/dice-roller',
   path: '/tools/dice-roller',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsDiscountCalculatorRoute = ToolsDiscountCalculatorRouteImport.update({
+  id: '/tools/discount-calculator',
+  path: '/tools/discount-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsDnsLeakTestRoute = ToolsDnsLeakTestRouteImport.update({
@@ -1115,6 +1121,7 @@ export interface FileRoutesByFullPath {
   '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
+  '/tools/discount-calculator': typeof ToolsDiscountCalculatorRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/domain-analysis': typeof ToolsDomainAnalysisRoute
@@ -1289,6 +1296,7 @@ export interface FileRoutesByTo {
   '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
+  '/tools/discount-calculator': typeof ToolsDiscountCalculatorRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/domain-analysis': typeof ToolsDomainAnalysisRoute
@@ -1464,6 +1472,7 @@ export interface FileRoutesById {
   '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
   '/tools/delete-pdf-pages': typeof ToolsDeletePdfPagesRoute
   '/tools/dice-roller': typeof ToolsDiceRollerRoute
+  '/tools/discount-calculator': typeof ToolsDiscountCalculatorRoute
   '/tools/dns-leak-test': typeof ToolsDnsLeakTestRoute
   '/tools/document-scanner': typeof ToolsDocumentScannerRoute
   '/tools/domain-analysis': typeof ToolsDomainAnalysisRoute
@@ -1640,6 +1649,7 @@ export interface FileRouteTypes {
     | '/tools/debt-payoff-calculator'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
+    | '/tools/discount-calculator'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
     | '/tools/domain-analysis'
@@ -1814,6 +1824,7 @@ export interface FileRouteTypes {
     | '/tools/debt-payoff-calculator'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
+    | '/tools/discount-calculator'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
     | '/tools/domain-analysis'
@@ -1988,6 +1999,7 @@ export interface FileRouteTypes {
     | '/tools/debt-payoff-calculator'
     | '/tools/delete-pdf-pages'
     | '/tools/dice-roller'
+    | '/tools/discount-calculator'
     | '/tools/dns-leak-test'
     | '/tools/document-scanner'
     | '/tools/domain-analysis'
@@ -2163,6 +2175,7 @@ export interface RootRouteChildren {
   ToolsDebtPayoffCalculatorRoute: typeof ToolsDebtPayoffCalculatorRoute
   ToolsDeletePdfPagesRoute: typeof ToolsDeletePdfPagesRoute
   ToolsDiceRollerRoute: typeof ToolsDiceRollerRoute
+  ToolsDiscountCalculatorRoute: typeof ToolsDiscountCalculatorRoute
   ToolsDnsLeakTestRoute: typeof ToolsDnsLeakTestRoute
   ToolsDocumentScannerRoute: typeof ToolsDocumentScannerRoute
   ToolsDomainAnalysisRoute: typeof ToolsDomainAnalysisRoute
@@ -2645,6 +2658,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/dice-roller'
       fullPath: '/tools/dice-roller'
       preLoaderRoute: typeof ToolsDiceRollerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/discount-calculator': {
+      id: '/tools/discount-calculator'
+      path: '/tools/discount-calculator'
+      fullPath: '/tools/discount-calculator'
+      preLoaderRoute: typeof ToolsDiscountCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/dns-leak-test': {
@@ -3550,6 +3570,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsDebtPayoffCalculatorRoute: ToolsDebtPayoffCalculatorRoute,
   ToolsDeletePdfPagesRoute: ToolsDeletePdfPagesRoute,
   ToolsDiceRollerRoute: ToolsDiceRollerRoute,
+  ToolsDiscountCalculatorRoute: ToolsDiscountCalculatorRoute,
   ToolsDnsLeakTestRoute: ToolsDnsLeakTestRoute,
   ToolsDocumentScannerRoute: ToolsDocumentScannerRoute,
   ToolsDomainAnalysisRoute: ToolsDomainAnalysisRoute,
@@ -3678,3 +3699,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

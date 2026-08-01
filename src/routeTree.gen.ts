@@ -54,6 +54,7 @@ import { Route as ToolsCompoundInterestRouteImport } from './routes/tools.compou
 import { Route as ToolsCompressPdfRouteImport } from './routes/tools.compress-pdf'
 import { Route as ToolsConnectFourRouteImport } from './routes/tools.connect-four'
 import { Route as ToolsCountryInfoRouteImport } from './routes/tools.country-info'
+import { Route as ToolsCreditCardPayoffCalculatorRouteImport } from './routes/tools.credit-card-payoff-calculator'
 import { Route as ToolsCrosswordRouteImport } from './routes/tools.crossword'
 import { Route as ToolsCurrencyConverterRouteImport } from './routes/tools.currency-converter'
 import { Route as ToolsDebtPayoffCalculatorRouteImport } from './routes/tools.debt-payoff-calculator'
@@ -415,6 +416,12 @@ const ToolsCountryInfoRoute = ToolsCountryInfoRouteImport.update({
   path: '/tools/country-info',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsCreditCardPayoffCalculatorRoute =
+  ToolsCreditCardPayoffCalculatorRouteImport.update({
+    id: '/tools/credit-card-payoff-calculator',
+    path: '/tools/credit-card-payoff-calculator',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ToolsCrosswordRoute = ToolsCrosswordRouteImport.update({
   id: '/tools/crossword',
   path: '/tools/crossword',
@@ -1102,6 +1109,7 @@ export interface FileRoutesByFullPath {
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
+  '/tools/credit-card-payoff-calculator': typeof ToolsCreditCardPayoffCalculatorRoute
   '/tools/crossword': typeof ToolsCrosswordRoute
   '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
   '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
@@ -1275,6 +1283,7 @@ export interface FileRoutesByTo {
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
+  '/tools/credit-card-payoff-calculator': typeof ToolsCreditCardPayoffCalculatorRoute
   '/tools/crossword': typeof ToolsCrosswordRoute
   '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
   '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
@@ -1449,6 +1458,7 @@ export interface FileRoutesById {
   '/tools/compress-pdf': typeof ToolsCompressPdfRoute
   '/tools/connect-four': typeof ToolsConnectFourRoute
   '/tools/country-info': typeof ToolsCountryInfoRoute
+  '/tools/credit-card-payoff-calculator': typeof ToolsCreditCardPayoffCalculatorRoute
   '/tools/crossword': typeof ToolsCrosswordRoute
   '/tools/currency-converter': typeof ToolsCurrencyConverterRoute
   '/tools/debt-payoff-calculator': typeof ToolsDebtPayoffCalculatorRoute
@@ -1624,6 +1634,7 @@ export interface FileRouteTypes {
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
+    | '/tools/credit-card-payoff-calculator'
     | '/tools/crossword'
     | '/tools/currency-converter'
     | '/tools/debt-payoff-calculator'
@@ -1797,6 +1808,7 @@ export interface FileRouteTypes {
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
+    | '/tools/credit-card-payoff-calculator'
     | '/tools/crossword'
     | '/tools/currency-converter'
     | '/tools/debt-payoff-calculator'
@@ -1970,6 +1982,7 @@ export interface FileRouteTypes {
     | '/tools/compress-pdf'
     | '/tools/connect-four'
     | '/tools/country-info'
+    | '/tools/credit-card-payoff-calculator'
     | '/tools/crossword'
     | '/tools/currency-converter'
     | '/tools/debt-payoff-calculator'
@@ -2144,6 +2157,7 @@ export interface RootRouteChildren {
   ToolsCompressPdfRoute: typeof ToolsCompressPdfRoute
   ToolsConnectFourRoute: typeof ToolsConnectFourRoute
   ToolsCountryInfoRoute: typeof ToolsCountryInfoRoute
+  ToolsCreditCardPayoffCalculatorRoute: typeof ToolsCreditCardPayoffCalculatorRoute
   ToolsCrosswordRoute: typeof ToolsCrosswordRoute
   ToolsCurrencyConverterRoute: typeof ToolsCurrencyConverterRoute
   ToolsDebtPayoffCalculatorRoute: typeof ToolsDebtPayoffCalculatorRoute
@@ -2589,6 +2603,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/country-info'
       fullPath: '/tools/country-info'
       preLoaderRoute: typeof ToolsCountryInfoRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/credit-card-payoff-calculator': {
+      id: '/tools/credit-card-payoff-calculator'
+      path: '/tools/credit-card-payoff-calculator'
+      fullPath: '/tools/credit-card-payoff-calculator'
+      preLoaderRoute: typeof ToolsCreditCardPayoffCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/crossword': {
@@ -3523,6 +3544,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsCompressPdfRoute: ToolsCompressPdfRoute,
   ToolsConnectFourRoute: ToolsConnectFourRoute,
   ToolsCountryInfoRoute: ToolsCountryInfoRoute,
+  ToolsCreditCardPayoffCalculatorRoute: ToolsCreditCardPayoffCalculatorRoute,
   ToolsCrosswordRoute: ToolsCrosswordRoute,
   ToolsCurrencyConverterRoute: ToolsCurrencyConverterRoute,
   ToolsDebtPayoffCalculatorRoute: ToolsDebtPayoffCalculatorRoute,

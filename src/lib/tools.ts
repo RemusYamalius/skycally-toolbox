@@ -37,6 +37,8 @@ import {
   LayoutGrid,
   Laugh,
   CreditCard,
+  BadgeDollarSign,
+
   Captions,
   FileMinus,
   Layers,
@@ -1298,6 +1300,33 @@ export const tools: Tool[] = [
     ],
     schemaCategory: "UtilitiesApplication",
   },
+  {
+    slug: "credit-card-payoff-calculator",
+    name: "Credit Card Payoff Calculator",
+    description:
+      "Find out how long it will take to pay off your credit card balance, how much interest you'll pay, and compare minimum payment vs fixed payment strategies.",
+    category: "utility",
+    icon: BadgeDollarSign,
+    path: "/tools/credit-card-payoff-calculator",
+    dateAdded: "2026-08-01",
+    featureList: [
+      "Month-by-month credit card amortization from balance and APR",
+      "Minimum payment modeled as a percentage of balance with a dollar floor",
+      "Alternative fixed minimum payment mode for issuers with a flat minimum",
+      "Optional fixed monthly payment strategy for comparison",
+      "Side-by-side comparison of payoff time, total interest and total paid",
+      "Interest saved by paying a fixed amount instead of the minimum",
+      "Warning when minimum payments would take more than 10 years",
+      "Clear error when a fixed payment is smaller than the monthly interest",
+      "Balance-remaining area chart for both strategies",
+      "Full payment schedule with month, payment, interest, principal and balance, plus show-all toggle",
+      "Instant results as you type",
+      "No signup required",
+      "100% browser-based",
+    ],
+    schemaCategory: "UtilitiesApplication",
+  },
+
   {
     slug: "percentage-calculator",
     name: "Percentage Calculator",

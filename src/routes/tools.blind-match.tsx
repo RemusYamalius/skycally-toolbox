@@ -106,8 +106,11 @@ function BlindMatchPage() {
       setCountdown(3);
       setPhase("counting");
     } else {
-      const base =
-        typeof window !== "undefined" ? `${window.location.origin}/tools/blind-match` : `${SITE_URL}/tools/blind-match`;
+      // Always build the share link from the canonical production domain.
+      // window.location.origin would point at the Lovable preview sandbox
+      // (*.lovableproject.com), which redirects anyone without access to
+      // this project to Lovable's own login page instead of the tool.
+      const base = `${SITE_URL}/tools/blind-match`;
       setShareLink(`${base}?p1=${encodeURIComponent(encodeAnswers(next))}`);
       setPhase("share");
     }
@@ -176,8 +179,8 @@ function BlindMatchPage() {
                   Blind Match 💍
                 </h2>
                 <p className="mt-5 mx-auto max-w-xl text-base sm:text-lg text-white/75 leading-relaxed">
-                  Answer 20 honest questions. Share the link. Discover how compatible you really are — no filters,
-                  no hints, just truth.
+                  Answer 20 honest questions. Share the link. Discover how compatible you really are — no filters, no
+                  hints, just truth.
                 </p>
                 <button
                   onClick={start}
@@ -268,9 +271,7 @@ function BlindMatchPage() {
                       </button>
                     ))}
                   </div>
-                  <p className="mt-5 text-xs text-muted-foreground">
-                    Answers are final — go with your first instinct.
-                  </p>
+                  <p className="mt-5 text-xs text-muted-foreground">Answers are final — go with your first instinct.</p>
                 </motion.div>
               </AnimatePresence>
             </motion.section>
@@ -501,7 +502,10 @@ function Reveal({
     >
       <div className="text-center">
         <p className="text-xs uppercase tracking-[0.3em] text-white/50">Your compatibility</p>
-        <div className="font-display font-bold leading-none mt-3 text-[64px] sm:text-[104px]" style={{ color: scoreColor }}>
+        <div
+          className="font-display font-bold leading-none mt-3 text-[64px] sm:text-[104px]"
+          style={{ color: scoreColor }}
+        >
           {shown}%
         </div>
         <h2 className="font-display text-2xl sm:text-3xl font-bold text-white mt-4">{tier.label}</h2>
@@ -540,25 +544,24 @@ function Reveal({
           </p>
           <p className="mt-2 text-white font-medium">{result.biggestMatch.question}</p>
           <p className="mt-2 text-sm text-white/65">
-            You: {result.biggestMatch.answerA}
+            You: {result.biggestMatch.answerB}
             <br />
-            Them: {result.biggestMatch.answerB}
+            Them: {result.biggestMatch.answerA}
           </p>
         </div>
         <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
           <p className="text-xs uppercase tracking-wider text-amber-300 font-semibold">Where You'd Clash</p>
           <p className="mt-2 text-white font-medium">{result.biggestDiff.question}</p>
           <p className="mt-2 text-sm text-white/65">
-            You: {result.biggestDiff.answerA}
+            You: {result.biggestDiff.answerB}
             <br />
-            Them: {result.biggestDiff.answerB}
+            Them: {result.biggestDiff.answerA}
           </p>
           <p className="mt-3 text-xs text-white/50">
             {result.biggestDiff.score >= 90
               ? "Honestly? Even your least-aligned answer lined up. Nothing to argue about here."
               : "Fun one to talk through over coffee — different answers here, nothing more."}
           </p>
-
         </div>
       </div>
 

@@ -55,6 +55,8 @@ import {
   Moon,
   Calculator,
   Percent,
+  School,
+
   GraduationCap,
   IdCard,
   Landmark,

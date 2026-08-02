@@ -39,6 +39,7 @@ import { Route as ToolsBacklinkCheckerRouteImport } from './routes/tools.backlin
 import { Route as ToolsBallSortRouteImport } from './routes/tools.ball-sort'
 import { Route as ToolsBase64RouteImport } from './routes/tools.base64'
 import { Route as ToolsBigFivePersonalityTestRouteImport } from './routes/tools.big-five-personality-test'
+import { Route as ToolsBlindMatchRouteImport } from './routes/tools.blind-match'
 import { Route as ToolsBmiCalculatorRouteImport } from './routes/tools.bmi-calculator'
 import { Route as ToolsBreakoutRouteImport } from './routes/tools.breakout'
 import { Route as ToolsBubbleShooterRouteImport } from './routes/tools.bubble-shooter'
@@ -343,6 +344,11 @@ const ToolsBigFivePersonalityTestRoute =
     path: '/tools/big-five-personality-test',
     getParentRoute: () => rootRouteImport,
   } as any)
+const ToolsBlindMatchRoute = ToolsBlindMatchRouteImport.update({
+  id: '/tools/blind-match',
+  path: '/tools/blind-match',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsBmiCalculatorRoute = ToolsBmiCalculatorRouteImport.update({
   id: '/tools/bmi-calculator',
   path: '/tools/bmi-calculator',
@@ -1112,6 +1118,7 @@ export interface FileRoutesByFullPath {
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/big-five-personality-test': typeof ToolsBigFivePersonalityTestRoute
+  '/tools/blind-match': typeof ToolsBlindMatchRoute
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
@@ -1289,6 +1296,7 @@ export interface FileRoutesByTo {
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/big-five-personality-test': typeof ToolsBigFivePersonalityTestRoute
+  '/tools/blind-match': typeof ToolsBlindMatchRoute
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
@@ -1467,6 +1475,7 @@ export interface FileRoutesById {
   '/tools/ball-sort': typeof ToolsBallSortRoute
   '/tools/base64': typeof ToolsBase64Route
   '/tools/big-five-personality-test': typeof ToolsBigFivePersonalityTestRoute
+  '/tools/blind-match': typeof ToolsBlindMatchRoute
   '/tools/bmi-calculator': typeof ToolsBmiCalculatorRoute
   '/tools/breakout': typeof ToolsBreakoutRoute
   '/tools/bubble-shooter': typeof ToolsBubbleShooterRoute
@@ -1646,6 +1655,7 @@ export interface FileRouteTypes {
     | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/big-five-personality-test'
+    | '/tools/blind-match'
     | '/tools/bmi-calculator'
     | '/tools/breakout'
     | '/tools/bubble-shooter'
@@ -1823,6 +1833,7 @@ export interface FileRouteTypes {
     | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/big-five-personality-test'
+    | '/tools/blind-match'
     | '/tools/bmi-calculator'
     | '/tools/breakout'
     | '/tools/bubble-shooter'
@@ -2000,6 +2011,7 @@ export interface FileRouteTypes {
     | '/tools/ball-sort'
     | '/tools/base64'
     | '/tools/big-five-personality-test'
+    | '/tools/blind-match'
     | '/tools/bmi-calculator'
     | '/tools/breakout'
     | '/tools/bubble-shooter'
@@ -2178,6 +2190,7 @@ export interface RootRouteChildren {
   ToolsBallSortRoute: typeof ToolsBallSortRoute
   ToolsBase64Route: typeof ToolsBase64Route
   ToolsBigFivePersonalityTestRoute: typeof ToolsBigFivePersonalityTestRoute
+  ToolsBlindMatchRoute: typeof ToolsBlindMatchRoute
   ToolsBmiCalculatorRoute: typeof ToolsBmiCalculatorRoute
   ToolsBreakoutRoute: typeof ToolsBreakoutRoute
   ToolsBubbleShooterRoute: typeof ToolsBubbleShooterRoute
@@ -2537,6 +2550,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/big-five-personality-test'
       fullPath: '/tools/big-five-personality-test'
       preLoaderRoute: typeof ToolsBigFivePersonalityTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/blind-match': {
+      id: '/tools/blind-match'
+      path: '/tools/blind-match'
+      fullPath: '/tools/blind-match'
+      preLoaderRoute: typeof ToolsBlindMatchRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/bmi-calculator': {
@@ -3589,6 +3609,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsBallSortRoute: ToolsBallSortRoute,
   ToolsBase64Route: ToolsBase64Route,
   ToolsBigFivePersonalityTestRoute: ToolsBigFivePersonalityTestRoute,
+  ToolsBlindMatchRoute: ToolsBlindMatchRoute,
   ToolsBmiCalculatorRoute: ToolsBmiCalculatorRoute,
   ToolsBreakoutRoute: ToolsBreakoutRoute,
   ToolsBubbleShooterRoute: ToolsBubbleShooterRoute,

@@ -127,6 +127,7 @@ import {
   PieChart,
   ThumbsDown,
   Flag,
+  Gem,
 
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
@@ -1635,6 +1636,27 @@ export const tools: Tool[] = [
       "One-tap next question for fast group play",
       "No signup, unlimited plays",
       "Mobile-friendly",
+    ],
+    schemaCategory: "GameApplication",
+  },
+  {
+    slug: "blind-match",
+    name: "Blind Match",
+    description:
+      "Answer 20 questions about yourself, share the link, and find out how compatible you are with anyone — no accounts, no backend, just honesty.",
+    category: "games",
+    icon: Gem,
+    path: "/tools/blind-match",
+    dateAdded: "2026-08-02",
+    featureList: [
+      "20 questions across values, communication, lifestyle and relationship style",
+      "Share one link — your answers are encoded in the URL, no backend or account",
+      "Player 2 answers blind and never sees the first player's answers",
+      "Compatibility score per dimension plus an overall percentage",
+      "Cinematic reveal with a countdown and animated score",
+      "Shows your biggest match and your biggest clash",
+      "Copyable emoji result card and WhatsApp sharing",
+      "Free, no signup, mobile-first",
     ],
     schemaCategory: "GameApplication",
   },

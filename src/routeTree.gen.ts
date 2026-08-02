@@ -72,6 +72,7 @@ import { Route as ToolsFancyTextGeneratorRouteImport } from './routes/tools.fanc
 import { Route as ToolsFileViewerRouteImport } from './routes/tools.file-viewer'
 import { Route as ToolsFlappyBirdRouteImport } from './routes/tools.flappy-bird'
 import { Route as ToolsFreeTimeFixerRouteImport } from './routes/tools.free-time-fixer'
+import { Route as ToolsGpaCalculatorRouteImport } from './routes/tools.gpa-calculator'
 import { Route as ToolsHandGestureRouteImport } from './routes/tools.hand-gesture'
 import { Route as ToolsHangmanRouteImport } from './routes/tools.hangman'
 import { Route as ToolsHashGeneratorRouteImport } from './routes/tools.hash-generator'
@@ -507,6 +508,11 @@ const ToolsFlappyBirdRoute = ToolsFlappyBirdRouteImport.update({
 const ToolsFreeTimeFixerRoute = ToolsFreeTimeFixerRouteImport.update({
   id: '/tools/free-time-fixer',
   path: '/tools/free-time-fixer',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsGpaCalculatorRoute = ToolsGpaCalculatorRouteImport.update({
+  id: '/tools/gpa-calculator',
+  path: '/tools/gpa-calculator',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsHandGestureRoute = ToolsHandGestureRouteImport.update({
@@ -1133,6 +1139,7 @@ export interface FileRoutesByFullPath {
   '/tools/file-viewer': typeof ToolsFileViewerRoute
   '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
+  '/tools/gpa-calculator': typeof ToolsGpaCalculatorRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
@@ -1308,6 +1315,7 @@ export interface FileRoutesByTo {
   '/tools/file-viewer': typeof ToolsFileViewerRoute
   '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
+  '/tools/gpa-calculator': typeof ToolsGpaCalculatorRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
@@ -1484,6 +1492,7 @@ export interface FileRoutesById {
   '/tools/file-viewer': typeof ToolsFileViewerRoute
   '/tools/flappy-bird': typeof ToolsFlappyBirdRoute
   '/tools/free-time-fixer': typeof ToolsFreeTimeFixerRoute
+  '/tools/gpa-calculator': typeof ToolsGpaCalculatorRoute
   '/tools/hand-gesture': typeof ToolsHandGestureRoute
   '/tools/hangman': typeof ToolsHangmanRoute
   '/tools/hash-generator': typeof ToolsHashGeneratorRoute
@@ -1661,6 +1670,7 @@ export interface FileRouteTypes {
     | '/tools/file-viewer'
     | '/tools/flappy-bird'
     | '/tools/free-time-fixer'
+    | '/tools/gpa-calculator'
     | '/tools/hand-gesture'
     | '/tools/hangman'
     | '/tools/hash-generator'
@@ -1836,6 +1846,7 @@ export interface FileRouteTypes {
     | '/tools/file-viewer'
     | '/tools/flappy-bird'
     | '/tools/free-time-fixer'
+    | '/tools/gpa-calculator'
     | '/tools/hand-gesture'
     | '/tools/hangman'
     | '/tools/hash-generator'
@@ -2011,6 +2022,7 @@ export interface FileRouteTypes {
     | '/tools/file-viewer'
     | '/tools/flappy-bird'
     | '/tools/free-time-fixer'
+    | '/tools/gpa-calculator'
     | '/tools/hand-gesture'
     | '/tools/hangman'
     | '/tools/hash-generator'
@@ -2187,6 +2199,7 @@ export interface RootRouteChildren {
   ToolsFileViewerRoute: typeof ToolsFileViewerRoute
   ToolsFlappyBirdRoute: typeof ToolsFlappyBirdRoute
   ToolsFreeTimeFixerRoute: typeof ToolsFreeTimeFixerRoute
+  ToolsGpaCalculatorRoute: typeof ToolsGpaCalculatorRoute
   ToolsHandGestureRoute: typeof ToolsHandGestureRoute
   ToolsHangmanRoute: typeof ToolsHangmanRoute
   ToolsHashGeneratorRoute: typeof ToolsHashGeneratorRoute
@@ -2742,6 +2755,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/free-time-fixer'
       fullPath: '/tools/free-time-fixer'
       preLoaderRoute: typeof ToolsFreeTimeFixerRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/gpa-calculator': {
+      id: '/tools/gpa-calculator'
+      path: '/tools/gpa-calculator'
+      fullPath: '/tools/gpa-calculator'
+      preLoaderRoute: typeof ToolsGpaCalculatorRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/hand-gesture': {
@@ -3582,6 +3602,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsFileViewerRoute: ToolsFileViewerRoute,
   ToolsFlappyBirdRoute: ToolsFlappyBirdRoute,
   ToolsFreeTimeFixerRoute: ToolsFreeTimeFixerRoute,
+  ToolsGpaCalculatorRoute: ToolsGpaCalculatorRoute,
   ToolsHandGestureRoute: ToolsHandGestureRoute,
   ToolsHangmanRoute: ToolsHangmanRoute,
   ToolsHashGeneratorRoute: ToolsHashGeneratorRoute,

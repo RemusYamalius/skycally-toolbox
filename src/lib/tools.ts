@@ -55,6 +55,8 @@ import {
   Moon,
   Calculator,
   Percent,
+  School,
+
   GraduationCap,
   IdCard,
   Landmark,
@@ -1374,6 +1376,30 @@ export const tools: Tool[] = [
     ],
     schemaCategory: "UtilitiesApplication",
   },
+  {
+    slug: "gpa-calculator",
+    name: "GPA Calculator",
+    description:
+      "Calculate your GPA from letter or percentage grades, and find out what GPA you need to hit your target.",
+    category: "utility",
+    icon: School,
+    path: "/tools/gpa-calculator",
+    dateAdded: "2026-08-02",
+    featureList: [
+      "Weighted GPA from unlimited courses on the 4.0 scale",
+      "Letter grades A+ through F with standard grade points",
+      "Letter equivalent, colour-coded progress bar and academic standing band",
+      "Total credits completed",
+      "Target GPA mode: the average you need in your remaining credits",
+      "Clear alerts when a target is unachievable or already exceeded",
+      "Instant results as you type",
+      "No signup required",
+      "100% browser-based",
+      "Free forever",
+    ],
+    schemaCategory: "UtilitiesApplication",
+  },
+
   {
     slug: "margin-calculator",
     name: "Margin Calculator",

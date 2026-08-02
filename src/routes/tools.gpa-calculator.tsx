@@ -113,6 +113,7 @@ function GpaCalculator() {
   const dc = num(doneCr);
   const tg = num(targetGpa);
   const rc = num(remCr);
+  const alreadyThere = cg !== null && tg !== null && cg >= tg;
   const required =
     cg !== null && dc !== null && tg !== null && rc !== null && rc > 0
       ? (tg * (dc + rc) - cg * dc) / rc
@@ -279,7 +280,7 @@ function GpaCalculator() {
                         ? undefined
                         : required > 4
                           ? "#ef4444"
-                          : required <= 0
+                          : required <= 0 || alreadyThere
                             ? "var(--green-brand)"
                             : "var(--cyan-brand)",
                   }}
@@ -294,12 +295,12 @@ function GpaCalculator() {
                   maximum 4.0. Try lowering the target or adding more credits.
                 </p>
               )}
-              {required !== null && required <= 0 && (
+              {required !== null && (required <= 0 || alreadyThere) && (
                 <p className="mt-4 rounded-xl border border-border bg-secondary/40 p-3 text-sm" style={{ color: "var(--green-brand)" }}>
                   Your current GPA already exceeds your target — you&apos;re on track!
                 </p>
               )}
-              {required !== null && required > 0 && required <= 4 && (
+              {required !== null && !alreadyThere && required > 0 && required <= 4 && (
                 <p className="mt-4 text-sm text-muted-foreground">
                   Average {fmtGpa(required)} across your remaining {fmtNum(rc)} credits to finish with a{" "}
                   {fmtGpa(tg)} cumulative GPA.

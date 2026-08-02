@@ -133,6 +133,7 @@ import { Route as ToolsProtectPdfRouteImport } from './routes/tools.protect-pdf'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsRandomTeamMakerRouteImport } from './routes/tools.random-team-maker'
+import { Route as ToolsRedFlagGreenFlagRouteImport } from './routes/tools.red-flag-green-flag'
 import { Route as ToolsRemoveBgRouteImport } from './routes/tools.remove-bg'
 import { Route as ToolsRentVsBuyCalculatorRouteImport } from './routes/tools.rent-vs-buy-calculator'
 import { Route as ToolsRetirementCalculatorRouteImport } from './routes/tools.retirement-calculator'
@@ -821,6 +822,11 @@ const ToolsRandomTeamMakerRoute = ToolsRandomTeamMakerRouteImport.update({
   path: '/tools/random-team-maker',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsRedFlagGreenFlagRoute = ToolsRedFlagGreenFlagRouteImport.update({
+  id: '/tools/red-flag-green-flag',
+  path: '/tools/red-flag-green-flag',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsRemoveBgRoute = ToolsRemoveBgRouteImport.update({
   id: '/tools/remove-bg',
   path: '/tools/remove-bg',
@@ -1200,6 +1206,7 @@ export interface FileRoutesByFullPath {
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
+  '/tools/red-flag-green-flag': typeof ToolsRedFlagGreenFlagRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/rent-vs-buy-calculator': typeof ToolsRentVsBuyCalculatorRoute
   '/tools/retirement-calculator': typeof ToolsRetirementCalculatorRoute
@@ -1376,6 +1383,7 @@ export interface FileRoutesByTo {
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
+  '/tools/red-flag-green-flag': typeof ToolsRedFlagGreenFlagRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/rent-vs-buy-calculator': typeof ToolsRentVsBuyCalculatorRoute
   '/tools/retirement-calculator': typeof ToolsRetirementCalculatorRoute
@@ -1553,6 +1561,7 @@ export interface FileRoutesById {
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
+  '/tools/red-flag-green-flag': typeof ToolsRedFlagGreenFlagRoute
   '/tools/remove-bg': typeof ToolsRemoveBgRoute
   '/tools/rent-vs-buy-calculator': typeof ToolsRentVsBuyCalculatorRoute
   '/tools/retirement-calculator': typeof ToolsRetirementCalculatorRoute
@@ -1731,6 +1740,7 @@ export interface FileRouteTypes {
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/random-team-maker'
+    | '/tools/red-flag-green-flag'
     | '/tools/remove-bg'
     | '/tools/rent-vs-buy-calculator'
     | '/tools/retirement-calculator'
@@ -1907,6 +1917,7 @@ export interface FileRouteTypes {
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/random-team-maker'
+    | '/tools/red-flag-green-flag'
     | '/tools/remove-bg'
     | '/tools/rent-vs-buy-calculator'
     | '/tools/retirement-calculator'
@@ -2083,6 +2094,7 @@ export interface FileRouteTypes {
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/random-team-maker'
+    | '/tools/red-flag-green-flag'
     | '/tools/remove-bg'
     | '/tools/rent-vs-buy-calculator'
     | '/tools/retirement-calculator'
@@ -2260,6 +2272,7 @@ export interface RootRouteChildren {
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRandomTeamMakerRoute: typeof ToolsRandomTeamMakerRoute
+  ToolsRedFlagGreenFlagRoute: typeof ToolsRedFlagGreenFlagRoute
   ToolsRemoveBgRoute: typeof ToolsRemoveBgRoute
   ToolsRentVsBuyCalculatorRoute: typeof ToolsRentVsBuyCalculatorRoute
   ToolsRetirementCalculatorRoute: typeof ToolsRetirementCalculatorRoute
@@ -3184,6 +3197,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsRandomTeamMakerRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/red-flag-green-flag': {
+      id: '/tools/red-flag-green-flag'
+      path: '/tools/red-flag-green-flag'
+      fullPath: '/tools/red-flag-green-flag'
+      preLoaderRoute: typeof ToolsRedFlagGreenFlagRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/remove-bg': {
       id: '/tools/remove-bg'
       path: '/tools/remove-bg'
@@ -3664,6 +3684,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRandomTeamMakerRoute: ToolsRandomTeamMakerRoute,
+  ToolsRedFlagGreenFlagRoute: ToolsRedFlagGreenFlagRoute,
   ToolsRemoveBgRoute: ToolsRemoveBgRoute,
   ToolsRentVsBuyCalculatorRoute: ToolsRentVsBuyCalculatorRoute,
   ToolsRetirementCalculatorRoute: ToolsRetirementCalculatorRoute,

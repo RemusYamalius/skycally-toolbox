@@ -16,8 +16,9 @@ import { BLIND_MATCH_QUESTIONS, DIMENSION_META, QUESTION_COUNT } from "@/lib/bli
 import { computeMatch, decodeAnswers, encodeAnswers, tierFor, type MatchResult } from "@/lib/blind-match/scoring";
 
 export const Route = createFileRoute("/tools/blind-match")({
-  validateSearch: (search: Record<string, unknown>): { p1?: string } => ({
+  validateSearch: (search: Record<string, unknown>): { p1?: string; p2?: string } => ({
     p1: typeof search.p1 === "string" && search.p1.length > 0 ? search.p1 : undefined,
+    p2: typeof search.p2 === "string" && search.p2.length > 0 ? search.p2 : undefined,
   }),
   head: () => {
     const tool = toolBySlug("blind-match", tools);
@@ -57,18 +58,32 @@ export const Route = createFileRoute("/tools/blind-match")({
 type Phase = "landing" | "quiz" | "share" | "invite" | "counting" | "reveal";
 
 function BlindMatchPage() {
-  const { p1 } = Route.useSearch();
+  const { p1, p2 } = Route.useSearch();
 
   const partnerAnswers = useMemo(() => (p1 ? decodeAnswers(p1) : null), [p1]);
-  const isPlayerTwo = partnerAnswers !== null;
+  const secondAnswers = useMemo(() => (p2 ? decodeAnswers(p2) : null), [p2]);
 
-  const [phase, setPhase] = useState<Phase>(isPlayerTwo ? "invite" : "landing");
+  // A link with both p1 and p2 already holds both people's answers — whoever
+  // opens it (either of the two) can see the same reveal immediately. We
+  // deliberately never assume which of the two is "viewing" in this case.
+  const hasBothAnswers = partnerAnswers !== null && secondAnswers !== null;
+  // A link with only p1 means the viewer is genuinely the second person,
+  // about to answer for the first time — identity here is known for sure.
+  const isPlayerTwo = partnerAnswers !== null && secondAnswers === null;
+
+  const mergedResult = useMemo(
+    () => (hasBothAnswers ? computeMatch(partnerAnswers!, secondAnswers!) : null),
+    [hasBothAnswers, partnerAnswers, secondAnswers],
+  );
+
+  const [phase, setPhase] = useState<Phase>(hasBothAnswers ? "counting" : isPlayerTwo ? "invite" : "landing");
   const [step, setStep] = useState(0);
   const [answers, setAnswers] = useState<number[]>([]);
-  const [result, setResult] = useState<MatchResult | null>(null);
+  const [result, setResult] = useState<MatchResult | null>(mergedResult);
   const [countdown, setCountdown] = useState(3);
   const [shareLink, setShareLink] = useState("");
-  const [copied, setCopied] = useState<"link" | "result" | null>(null);
+  const [mergedLink, setMergedLink] = useState("");
+  const [copied, setCopied] = useState<"link" | "result" | "mergedLink" | null>(null);
 
   // Invalid / corrupted link → behave like a fresh visit.
   useEffect(() => {
@@ -101,8 +116,11 @@ function BlindMatchPage() {
       setStep((s) => s + 1);
       return;
     }
-    if (isPlayerTwo && partnerAnswers) {
+    if (isPlayerTwo && partnerAnswers && p1) {
       setResult(computeMatch(partnerAnswers, next));
+      setMergedLink(
+        `${SITE_URL}/tools/blind-match?p1=${encodeURIComponent(p1)}&p2=${encodeURIComponent(encodeAnswers(next))}`,
+      );
       setCountdown(3);
       setPhase("counting");
     } else {
@@ -116,7 +134,7 @@ function BlindMatchPage() {
     }
   };
 
-  const copy = async (text: string, kind: "link" | "result") => {
+  const copy = async (text: string, kind: "link" | "result" | "mergedLink") => {
     try {
       await navigator.clipboard.writeText(text);
       setCopied(kind);
@@ -131,6 +149,7 @@ function BlindMatchPage() {
     setStep(0);
     setResult(null);
     setShareLink("");
+    setMergedLink("");
     setPhase("landing");
     if (typeof window !== "undefined" && window.location.search) {
       window.history.replaceState({}, "", "/tools/blind-match");
@@ -196,7 +215,7 @@ function BlindMatchPage() {
             </motion.section>
           )}
 
-          {/* ── Player 2 invite ─────────────────────────────── */}
+          {/* ── Second person's invite ──────────────────────── */}
           {phase === "invite" && (
             <motion.section
               key="invite"
@@ -364,6 +383,10 @@ function BlindMatchPage() {
               copied={copied === "result"}
               onCopy={() => copy(resultCard, "result")}
               onRestart={restart}
+              identityKnown={isPlayerTwo}
+              mergedLink={isPlayerTwo ? mergedLink : ""}
+              mergedLinkCopied={copied === "mergedLink"}
+              onCopyMergedLink={() => copy(mergedLink, "mergedLink")}
             />
           )}
         </AnimatePresence>
@@ -413,7 +436,7 @@ function BlindMatchPage() {
           {
             question: "Can my match see my answers before they answer?",
             answer:
-              "No. Player 2 only sees the questions while answering. The comparison — including which answers each person picked — is shown only after they have submitted all 20 answers.",
+              "No. The second person only sees the questions while answering. The comparison — including which answers each person picked — is shown only after both sets of answers are complete.",
           },
           {
             question: "Do I need an account or app?",
@@ -428,7 +451,7 @@ function BlindMatchPage() {
           {
             question: "Why don't I see the result if I sent the link?",
             answer:
-              "Because there is no server relaying anything back to you, the reveal appears on your match's screen when they finish. They can tap Copy Result or the WhatsApp button to send the result card straight back to you.",
+              "Because there is no server relaying anything back to you, the reveal first appears on your match's screen. Right there, they'll get a second link that already contains both sets of answers — if they send that back to you, opening it shows you the exact same reveal on your own screen.",
           },
           {
             question: "Is this a real compatibility test?",
@@ -461,12 +484,25 @@ function Reveal({
   copied,
   onCopy,
   onRestart,
+  identityKnown,
+  mergedLink,
+  mergedLinkCopied,
+  onCopyMergedLink,
 }: {
   result: MatchResult;
   resultCard: string;
   copied: boolean;
   onCopy: () => void;
   onRestart: () => void;
+  /** True only when we know for certain the viewer is the second person who
+   *  just answered live — lets us safely label answers "You" / "Them".
+   *  False for the merged link, where either person could be viewing. */
+  identityKnown: boolean;
+  /** Link containing both people's answers, offered only when identityKnown
+   *  so the second person can send the full interactive reveal back. */
+  mergedLink: string;
+  mergedLinkCopied: boolean;
+  onCopyMergedLink: () => void;
 }) {
   const tier = tierFor(result.overall);
   const [shown, setShown] = useState(0);
@@ -492,6 +528,20 @@ function Reveal({
   ] as const;
 
   const shareText = `${resultCard}`;
+
+  // Attribute an answer pair honestly: "You"/"Them" only when we truly know
+  // who is looking at the screen; a neutral, ownership-free phrasing
+  // otherwise. answerA is always the link-opener's answer, answerB the
+  // second respondent's — see computeMatch().
+  const describePair = (answerA: string, answerB: string): { primary: string; secondary?: string } => {
+    if (identityKnown) {
+      return { primary: `You: ${answerB}`, secondary: `Them: ${answerA}` };
+    }
+    if (answerA === answerB) {
+      return { primary: `Both of you chose: ${answerA}` };
+    }
+    return { primary: `One of you chose: ${answerA}`, secondary: `The other chose: ${answerB}` };
+  };
 
   return (
     <motion.section
@@ -544,18 +594,40 @@ function Reveal({
           </p>
           <p className="mt-2 text-white font-medium">{result.biggestMatch.question}</p>
           <p className="mt-2 text-sm text-white/65">
-            You: {result.biggestMatch.answerB}
-            <br />
-            Them: {result.biggestMatch.answerA}
+            {(() => {
+              const d = describePair(result.biggestMatch.answerA, result.biggestMatch.answerB);
+              return (
+                <>
+                  {d.primary}
+                  {d.secondary && (
+                    <>
+                      <br />
+                      {d.secondary}
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </p>
         </div>
         <div className="rounded-2xl bg-white/5 border border-white/10 p-5">
           <p className="text-xs uppercase tracking-wider text-amber-300 font-semibold">Where You'd Clash</p>
           <p className="mt-2 text-white font-medium">{result.biggestDiff.question}</p>
           <p className="mt-2 text-sm text-white/65">
-            You: {result.biggestDiff.answerB}
-            <br />
-            Them: {result.biggestDiff.answerA}
+            {(() => {
+              const d = describePair(result.biggestDiff.answerA, result.biggestDiff.answerB);
+              return (
+                <>
+                  {d.primary}
+                  {d.secondary && (
+                    <>
+                      <br />
+                      {d.secondary}
+                    </>
+                  )}
+                </>
+              );
+            })()}
           </p>
           <p className="mt-3 text-xs text-white/50">
             {result.biggestDiff.score >= 90
@@ -564,6 +636,33 @@ function Reveal({
           </p>
         </div>
       </div>
+
+      {identityKnown && mergedLink && (
+        <div className="mt-9 rounded-2xl border border-white/15 bg-white/5 p-5 sm:p-6">
+          <p className="text-sm font-semibold text-white">Send this back so they see the same reveal</p>
+          <p className="mt-1 text-xs text-white/60 leading-relaxed">
+            This link already has both sets of answers. Whoever opens it sees this exact screen — no waiting on you to
+            describe it.
+          </p>
+          <p className="mt-4 font-mono text-xs break-all text-white/60">{mergedLink}</p>
+          <div className="mt-4 grid gap-3 sm:grid-cols-2">
+            <Button onClick={onCopyMergedLink} className="h-12 text-sm">
+              {mergedLinkCopied ? <Check className="w-4 h-4 mr-2" /> : <Copy className="w-4 h-4 mr-2" />}
+              {mergedLinkCopied ? "Copied!" : "Copy Link"}
+            </Button>
+            <a
+              href={`https://wa.me/?text=${encodeURIComponent(
+                `Here's our full Blind Match reveal 💍 open it to see it exactly as I saw it: ${mergedLink}`,
+              )}`}
+              target="_blank"
+              rel="noopener noreferrer"
+              className="inline-flex items-center justify-center h-12 rounded-xl bg-[#25D366] text-black font-semibold text-sm transition-transform hover:scale-[1.02]"
+            >
+              <MessageCircle className="w-4 h-4 mr-2" /> Share via WhatsApp
+            </a>
+          </div>
+        </div>
+      )}
 
       {/* Screenshot-friendly card */}
       <div

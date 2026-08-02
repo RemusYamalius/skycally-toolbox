@@ -1637,6 +1637,28 @@ export const tools: Tool[] = [
     schemaCategory: "GameApplication",
   },
   {
+    slug: "red-flag-green-flag",
+    name: "Red Flag / Green Flag",
+    description:
+      "Rate 200 relationship behaviors as red or green flags, get your tolerance score, and compare answers with your partner in couple mode.",
+    category: "games",
+    icon: Flag,
+    path: "/tools/red-flag-green-flag",
+    dateAdded: "2026-08-02",
+    featureList: [
+      "200 original relationship behaviors across 6 categories",
+      "Solo mode with a 0-100 Red Flag Tolerance Score and 5 result tiers",
+      "Couple mode: both players rate the same 25 cards in the same order",
+      "Couple result shows a match percentage and only the disagreements",
+      "Split red/green cards showing each player's verdict",
+      "Category filters and your own custom behaviors saved in your browser",
+      "Swipe or tap to rate, with a copyable emoji result card",
+      "Free, no signup, mobile-first",
+    ],
+    schemaCategory: "GameApplication",
+  },
+  {
+
     slug: "ick-test",
     name: "Ick Test",
     description:

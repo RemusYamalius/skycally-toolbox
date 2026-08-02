@@ -126,6 +126,8 @@ import {
   BrainCircuit,
   PieChart,
   ThumbsDown,
+  Flag,
+
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 

@@ -554,8 +554,11 @@ function Reveal({
             Them: {result.biggestDiff.answerB}
           </p>
           <p className="mt-3 text-xs text-white/50">
-            Fun one to talk through over coffee — different answers here, nothing more.
+            {result.biggestDiff.score >= 90
+              ? "Honestly? Even your least-aligned answer lined up. Nothing to argue about here."
+              : "Fun one to talk through over coffee — different answers here, nothing more."}
           </p>
+
         </div>
       </div>
 

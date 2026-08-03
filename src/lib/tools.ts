@@ -1,6 +1,7 @@
 import {
   Download,
   Image as ImageIcon,
+  Images,
   FileText,
   Scissors,
   FileType,

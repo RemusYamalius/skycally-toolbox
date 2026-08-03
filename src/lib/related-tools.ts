@@ -96,7 +96,8 @@ export const relatedToolsMap: Record<string, string[]> = {
   "unit-converter": ["currency-converter", "satoshi-converter", "color-picker", "qr-generator", "json-formatter"],
 
   // Mini Games
-  "sliding-puzzle": ["sudoku", "memory-match", "minesweeper"],
+  "sliding-puzzle": ["jigsaw-puzzle", "sudoku", "memory-match", "minesweeper"],
+  "jigsaw-puzzle": ["sliding-puzzle", "maze-puzzle", "memory-match", "sudoku"],
   "whack-a-mole": ["flappy-bird", "snake", "memory-match"],
   "bubble-shooter": ["snake", "flappy-bird", "memory-match"],
   breakout: ["flappy-bird", "snake", "bubble-shooter"],

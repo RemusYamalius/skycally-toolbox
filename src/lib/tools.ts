@@ -1,6 +1,7 @@
 import {
   Download,
   Image as ImageIcon,
+  Images,
   FileText,
   Scissors,
   FileType,
@@ -2053,6 +2054,25 @@ export const tools: Tool[] = [
     category: "minigames",
     icon: Grid2x2,
     path: "/tools/sliding-puzzle",
+  },
+  {
+    slug: "jigsaw-puzzle",
+    name: "Photo Jigsaw Puzzle Maker",
+    description:
+      "Turn any uploaded photo into a real jigsaw puzzle with curved interlocking pieces, or try a famous painting or wonder of the world. Four difficulty levels, nothing leaves your device.",
+    category: "minigames",
+    icon: Images,
+    path: "/tools/jigsaw-puzzle",
+    dateAdded: "2026-08-03",
+    featureList: [
+      "Turn any uploaded photo into a real jigsaw puzzle",
+      "Curved interlocking tabs and blanks, not plain square tiles",
+      "Four difficulty levels from 9 to 100 pieces",
+      "Built-in famous paintings and wonders of the world to try",
+      "Fact card about the artwork or landmark once you finish",
+      "Runs entirely in your browser — uploaded photos are never sent anywhere",
+    ],
+    schemaType: "VideoGame",
   },
   {
     slug: "whack-a-mole",

@@ -95,6 +95,7 @@ import { Route as ToolsInsuranceEstimatorRouteImport } from './routes/tools.insu
 import { Route as ToolsIntermittentFastingCalculatorRouteImport } from './routes/tools.intermittent-fasting-calculator'
 import { Route as ToolsInvoiceGeneratorRouteImport } from './routes/tools.invoice-generator'
 import { Route as ToolsIpAddressLookupRouteImport } from './routes/tools.ip-address-lookup'
+import { Route as ToolsJigsawPuzzleRouteImport } from './routes/tools.jigsaw-puzzle'
 import { Route as ToolsJsonFormatterRouteImport } from './routes/tools.json-formatter'
 import { Route as ToolsKeywordDifficultyRouteImport } from './routes/tools.keyword-difficulty'
 import { Route as ToolsKeywordResearchRouteImport } from './routes/tools.keyword-research'
@@ -628,6 +629,11 @@ const ToolsInvoiceGeneratorRoute = ToolsInvoiceGeneratorRouteImport.update({
 const ToolsIpAddressLookupRoute = ToolsIpAddressLookupRouteImport.update({
   id: '/tools/ip-address-lookup',
   path: '/tools/ip-address-lookup',
+  getParentRoute: () => rootRouteImport,
+} as any)
+const ToolsJigsawPuzzleRoute = ToolsJigsawPuzzleRouteImport.update({
+  id: '/tools/jigsaw-puzzle',
+  path: '/tools/jigsaw-puzzle',
   getParentRoute: () => rootRouteImport,
 } as any)
 const ToolsJsonFormatterRoute = ToolsJsonFormatterRouteImport.update({
@@ -1174,6 +1180,7 @@ export interface FileRoutesByFullPath {
   '/tools/intermittent-fasting-calculator': typeof ToolsIntermittentFastingCalculatorRoute
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
+  '/tools/jigsaw-puzzle': typeof ToolsJigsawPuzzleRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/keyword-difficulty': typeof ToolsKeywordDifficultyRoute
   '/tools/keyword-research': typeof ToolsKeywordResearchRoute
@@ -1352,6 +1359,7 @@ export interface FileRoutesByTo {
   '/tools/intermittent-fasting-calculator': typeof ToolsIntermittentFastingCalculatorRoute
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
+  '/tools/jigsaw-puzzle': typeof ToolsJigsawPuzzleRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/keyword-difficulty': typeof ToolsKeywordDifficultyRoute
   '/tools/keyword-research': typeof ToolsKeywordResearchRoute
@@ -1531,6 +1539,7 @@ export interface FileRoutesById {
   '/tools/intermittent-fasting-calculator': typeof ToolsIntermittentFastingCalculatorRoute
   '/tools/invoice-generator': typeof ToolsInvoiceGeneratorRoute
   '/tools/ip-address-lookup': typeof ToolsIpAddressLookupRoute
+  '/tools/jigsaw-puzzle': typeof ToolsJigsawPuzzleRoute
   '/tools/json-formatter': typeof ToolsJsonFormatterRoute
   '/tools/keyword-difficulty': typeof ToolsKeywordDifficultyRoute
   '/tools/keyword-research': typeof ToolsKeywordResearchRoute
@@ -1711,6 +1720,7 @@ export interface FileRouteTypes {
     | '/tools/intermittent-fasting-calculator'
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
+    | '/tools/jigsaw-puzzle'
     | '/tools/json-formatter'
     | '/tools/keyword-difficulty'
     | '/tools/keyword-research'
@@ -1889,6 +1899,7 @@ export interface FileRouteTypes {
     | '/tools/intermittent-fasting-calculator'
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
+    | '/tools/jigsaw-puzzle'
     | '/tools/json-formatter'
     | '/tools/keyword-difficulty'
     | '/tools/keyword-research'
@@ -2067,6 +2078,7 @@ export interface FileRouteTypes {
     | '/tools/intermittent-fasting-calculator'
     | '/tools/invoice-generator'
     | '/tools/ip-address-lookup'
+    | '/tools/jigsaw-puzzle'
     | '/tools/json-formatter'
     | '/tools/keyword-difficulty'
     | '/tools/keyword-research'
@@ -2246,6 +2258,7 @@ export interface RootRouteChildren {
   ToolsIntermittentFastingCalculatorRoute: typeof ToolsIntermittentFastingCalculatorRoute
   ToolsInvoiceGeneratorRoute: typeof ToolsInvoiceGeneratorRoute
   ToolsIpAddressLookupRoute: typeof ToolsIpAddressLookupRoute
+  ToolsJigsawPuzzleRoute: typeof ToolsJigsawPuzzleRoute
   ToolsJsonFormatterRoute: typeof ToolsJsonFormatterRoute
   ToolsKeywordDifficultyRoute: typeof ToolsKeywordDifficultyRoute
   ToolsKeywordResearchRoute: typeof ToolsKeywordResearchRoute
@@ -2942,6 +2955,13 @@ declare module '@tanstack/react-router' {
       path: '/tools/ip-address-lookup'
       fullPath: '/tools/ip-address-lookup'
       preLoaderRoute: typeof ToolsIpAddressLookupRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/tools/jigsaw-puzzle': {
+      id: '/tools/jigsaw-puzzle'
+      path: '/tools/jigsaw-puzzle'
+      fullPath: '/tools/jigsaw-puzzle'
+      preLoaderRoute: typeof ToolsJigsawPuzzleRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/json-formatter': {
@@ -3666,6 +3686,7 @@ const rootRouteChildren: RootRouteChildren = {
     ToolsIntermittentFastingCalculatorRoute,
   ToolsInvoiceGeneratorRoute: ToolsInvoiceGeneratorRoute,
   ToolsIpAddressLookupRoute: ToolsIpAddressLookupRoute,
+  ToolsJigsawPuzzleRoute: ToolsJigsawPuzzleRoute,
   ToolsJsonFormatterRoute: ToolsJsonFormatterRoute,
   ToolsKeywordDifficultyRoute: ToolsKeywordDifficultyRoute,
   ToolsKeywordResearchRoute: ToolsKeywordResearchRoute,

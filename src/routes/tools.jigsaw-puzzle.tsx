@@ -46,6 +46,7 @@ export const Route = createFileRoute("/tools/jigsaw-puzzle")({
 });
 
 const WORKING_MAX = 640;
+const WORKING_MIN = 280;
 const TRAY_GAP = 28;
 
 interface PieceState {
@@ -88,6 +89,7 @@ function JigsawPuzzlePage() {
   const [seconds, setSeconds] = useState(0);
 
   const containerRef = useRef<HTMLDivElement>(null);
+  const shellRef = useRef<HTMLDivElement>(null);
   const dragId = useRef<string | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const zCounter = useRef(1);
@@ -136,9 +138,12 @@ function JigsawPuzzlePage() {
     setStage("loading");
     try {
       const img = await loadImage(source, Boolean(preset));
-      // Resize to a fixed working resolution so every difficulty level and
-      // every screen behaves the same way.
-      const scale = WORKING_MAX / Math.max(img.width, img.height);
+      // Resize to the largest square that actually fits the visible content
+      // width on this device — this is what was overflowing the screen on
+      // mobile before (a fixed 640px board on a ~360px-wide phone).
+      const available = shellRef.current?.clientWidth || WORKING_MAX;
+      const workingMax = Math.max(WORKING_MIN, Math.min(WORKING_MAX, Math.floor(available)));
+      const scale = workingMax / Math.max(img.width, img.height);
       const w = Math.round(img.width * scale);
       const h = Math.round(img.height * scale);
 
@@ -282,187 +287,189 @@ function JigsawPuzzlePage() {
       title="Photo Jigsaw Puzzle Maker"
       description="Turn any photo into a real jigsaw puzzle with interlocking pieces — or start with a famous painting or wonder of the world."
     >
-      {/* ── Setup ────────────────────────────────────────────────────── */}
-      {stage === "setup" && (
-        <div className="space-y-8">
-          <div>
-            <h2 className="font-display font-bold text-lg mb-3">1. Choose a difficulty</h2>
-            <div className="grid gap-3 sm:grid-cols-4">
-              {(Object.keys(DIFFICULTIES) as Difficulty[]).map((d) => (
-                <button
-                  key={d}
-                  onClick={() => setDifficulty(d)}
-                  className={`rounded-xl border-2 p-4 text-center transition ${
-                    difficulty === d
-                      ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_10%,transparent)]"
-                      : "border-border bg-card hover:border-foreground/30"
-                  }`}
-                >
-                  <p className="font-semibold">{DIFFICULTIES[d].label.split(" · ")[0]}</p>
-                  <p className="text-xs text-muted-foreground mt-1">{DIFFICULTIES[d].label.split(" · ")[1]}</p>
-                </button>
-              ))}
+      <div ref={shellRef}>
+        {/* ── Setup ────────────────────────────────────────────────────── */}
+        {stage === "setup" && (
+          <div className="space-y-8">
+            <div>
+              <h2 className="font-display font-bold text-lg mb-3">1. Choose a difficulty</h2>
+              <div className="grid gap-3 sm:grid-cols-4">
+                {(Object.keys(DIFFICULTIES) as Difficulty[]).map((d) => (
+                  <button
+                    key={d}
+                    onClick={() => setDifficulty(d)}
+                    className={`rounded-xl border-2 p-4 text-center transition ${
+                      difficulty === d
+                        ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_10%,transparent)]"
+                        : "border-border bg-card hover:border-foreground/30"
+                    }`}
+                  >
+                    <p className="font-semibold">{DIFFICULTIES[d].label.split(" · ")[0]}</p>
+                    <p className="text-xs text-muted-foreground mt-1">{DIFFICULTIES[d].label.split(" · ")[1]}</p>
+                  </button>
+                ))}
+              </div>
             </div>
-          </div>
 
-          <div>
-            <h2 className="font-display font-bold text-lg mb-3">2. Choose a photo</h2>
-            <DropZone
-              accept="image/*"
-              onFiles={onUpload}
-              label="Drop your photo here"
-              hint="JPG, PNG or WEBP — up to 10MB. Nothing leaves your device."
-            />
-
-            <p className="text-sm text-muted-foreground mt-6 mb-3">Or start with one of these instead:</p>
-            <div className="grid gap-4 sm:grid-cols-4">
-              {PRESET_IMAGES.map((p) => (
-                <button
-                  key={p.id}
-                  onClick={() => {
-                    setCustomSrc(null);
-                    setPreset(p);
-                  }}
-                  className={`rounded-xl overflow-hidden border-2 text-left transition ${
-                    preset?.id === p.id ? "border-[var(--cyan-brand)]" : "border-border hover:border-foreground/30"
-                  }`}
-                >
-                  <img src={p.thumbUrl} alt={p.title} className="w-full h-28 object-cover" loading="lazy" />
-                  <div className="p-2.5">
-                    <p className="text-sm font-semibold leading-tight">{p.title}</p>
-                    <p className="text-xs text-muted-foreground mt-0.5">{p.year}</p>
-                  </div>
-                </button>
-              ))}
-            </div>
-          </div>
-
-          {(customSrc || preset) && (
-            <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-4">
-              <img
-                src={preset ? preset.thumbUrl : (customSrc as string)}
-                alt="Selected"
-                className="w-16 h-16 rounded-lg object-cover shrink-0"
+            <div>
+              <h2 className="font-display font-bold text-lg mb-3">2. Choose a photo</h2>
+              <DropZone
+                accept="image/*"
+                onFiles={onUpload}
+                label="Drop your photo here"
+                hint="JPG, PNG or WEBP — up to 10MB. Nothing leaves your device."
               />
-              <div className="flex-1">
-                <p className="font-semibold text-sm">{preset ? preset.title : "Your photo"}</p>
-                <p className="text-xs text-muted-foreground">{DIFFICULTIES[difficulty].label}</p>
+
+              <p className="text-sm text-muted-foreground mt-6 mb-3">Or start with one of these instead:</p>
+              <div className="grid gap-4 sm:grid-cols-4">
+                {PRESET_IMAGES.map((p) => (
+                  <button
+                    key={p.id}
+                    onClick={() => {
+                      setCustomSrc(null);
+                      setPreset(p);
+                    }}
+                    className={`rounded-xl overflow-hidden border-2 text-left transition ${
+                      preset?.id === p.id ? "border-[var(--cyan-brand)]" : "border-border hover:border-foreground/30"
+                    }`}
+                  >
+                    <img src={p.thumbUrl} alt={p.title} className="w-full h-28 object-cover" loading="lazy" />
+                    <div className="p-2.5">
+                      <p className="text-sm font-semibold leading-tight">{p.title}</p>
+                      <p className="text-xs text-muted-foreground mt-0.5">{p.year}</p>
+                    </div>
+                  </button>
+                ))}
               </div>
-              <Button onClick={startPuzzle} className="h-11 px-6">
-                Start Puzzle
-              </Button>
             </div>
-          )}
-        </div>
-      )}
 
-      {/* ── Loading ──────────────────────────────────────────────────── */}
-      {stage === "loading" && (
-        <div className="flex flex-col items-center justify-center py-20 gap-3">
-          <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
-          <p className="text-sm text-muted-foreground">Cutting your puzzle pieces…</p>
-        </div>
-      )}
-
-      {/* ── Playing / Done ───────────────────────────────────────────── */}
-      {(stage === "playing" || stage === "done") && (
-        <div>
-          <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
-            <div className="flex items-center gap-4 text-sm">
-              <span className="font-semibold tabular-nums">
-                {placedCount} / {totalCount} pieces
-              </span>
-              <span className="flex items-center gap-1.5 text-muted-foreground tabular-nums">
-                <Clock className="w-4 h-4" /> {format(seconds)}
-              </span>
-            </div>
-            <div className="flex gap-2">
-              {stage === "playing" && (
-                <>
-                  <Button variant="outline" size="sm" onClick={() => setShowGhost((v) => !v)} className="gap-1.5">
-                    {showGhost ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
-                    {showGhost ? "Hide guide" : "Show guide"}
-                  </Button>
-                  <Button variant="outline" size="sm" onClick={shuffleTray} className="gap-1.5">
-                    <Shuffle className="w-4 h-4" /> Shuffle tray
-                  </Button>
-                </>
-              )}
-              <Button variant="outline" size="sm" onClick={restart} className="gap-1.5">
-                <RefreshCw className="w-4 h-4" /> New puzzle
-              </Button>
-            </div>
+            {(customSrc || preset) && (
+              <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-4">
+                <img
+                  src={preset ? preset.thumbUrl : (customSrc as string)}
+                  alt="Selected"
+                  className="w-16 h-16 rounded-lg object-cover shrink-0"
+                />
+                <div className="flex-1">
+                  <p className="font-semibold text-sm">{preset ? preset.title : "Your photo"}</p>
+                  <p className="text-xs text-muted-foreground">{DIFFICULTIES[difficulty].label}</p>
+                </div>
+                <Button onClick={startPuzzle} className="h-11 px-6">
+                  Start Puzzle
+                </Button>
+              </div>
+            )}
           </div>
+        )}
 
-          <div className="overflow-x-auto">
-            <div
-              ref={containerRef}
-              className="relative mx-auto rounded-xl bg-secondary/30 touch-none select-none"
-              style={{ width: boardW, height: boardH + TRAY_GAP + trayH }}
-              onPointerMove={onPointerMove}
-              onPointerUp={endDrag}
-              onPointerCancel={endDrag}
-            >
-              <div
-                className="absolute rounded-lg border-2 border-dashed border-border/70 overflow-hidden"
-                style={{ left: 0, top: 0, width: boardW, height: boardH }}
-              >
-                {showGhost && ghostSrc && (
-                  <img src={ghostSrc} alt="" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+        {/* ── Loading ──────────────────────────────────────────────────── */}
+        {stage === "loading" && (
+          <div className="flex flex-col items-center justify-center py-20 gap-3">
+            <RefreshCw className="w-8 h-8 animate-spin text-muted-foreground" />
+            <p className="text-sm text-muted-foreground">Cutting your puzzle pieces…</p>
+          </div>
+        )}
+
+        {/* ── Playing / Done ───────────────────────────────────────────── */}
+        {(stage === "playing" || stage === "done") && (
+          <div>
+            <div className="flex flex-wrap items-center justify-between gap-3 mb-4">
+              <div className="flex items-center gap-4 text-sm">
+                <span className="font-semibold tabular-nums">
+                  {placedCount} / {totalCount} pieces
+                </span>
+                <span className="flex items-center gap-1.5 text-muted-foreground tabular-nums">
+                  <Clock className="w-4 h-4" /> {format(seconds)}
+                </span>
+              </div>
+              <div className="flex gap-2">
+                {stage === "playing" && (
+                  <>
+                    <Button variant="outline" size="sm" onClick={() => setShowGhost((v) => !v)} className="gap-1.5">
+                      {showGhost ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
+                      {showGhost ? "Hide guide" : "Show guide"}
+                    </Button>
+                    <Button variant="outline" size="sm" onClick={shuffleTray} className="gap-1.5">
+                      <Shuffle className="w-4 h-4" /> Shuffle tray
+                    </Button>
+                  </>
                 )}
+                <Button variant="outline" size="sm" onClick={restart} className="gap-1.5">
+                  <RefreshCw className="w-4 h-4" /> New puzzle
+                </Button>
               </div>
+            </div>
 
-              {pieces.map((p) => (
+            <div className="overflow-x-auto">
+              <div
+                ref={containerRef}
+                className="relative mx-auto rounded-xl bg-secondary/30 touch-none select-none"
+                style={{ width: boardW, height: boardH + TRAY_GAP + trayH }}
+                onPointerMove={onPointerMove}
+                onPointerUp={endDrag}
+                onPointerCancel={endDrag}
+              >
                 <div
-                  key={p.id}
-                  onPointerDown={(e) => onPointerDown(e, p)}
-                  style={{
-                    position: "absolute",
-                    left: 0,
-                    top: 0,
-                    width: p.boxW,
-                    height: p.boxH,
-                    transform: `translate(${p.x}px, ${p.y}px)`,
-                    zIndex: p.locked ? 1 : p.z,
-                    cursor: p.locked ? "default" : "grab",
-                    touchAction: "none",
-                    filter: p.locked ? "none" : "drop-shadow(0 3px 6px rgba(0,0,0,0.35))",
-                  }}
+                  className="absolute rounded-lg border-2 border-dashed border-border/70 overflow-hidden"
+                  style={{ left: 0, top: 0, width: boardW, height: boardH }}
                 >
-                  <img src={p.img} alt="" draggable={false} className="w-full h-full pointer-events-none" />
+                  {showGhost && ghostSrc && (
+                    <img src={ghostSrc} alt="" className="absolute inset-0 w-full h-full object-cover opacity-25" />
+                  )}
                 </div>
-              ))}
+
+                {pieces.map((p) => (
+                  <div
+                    key={p.id}
+                    onPointerDown={(e) => onPointerDown(e, p)}
+                    style={{
+                      position: "absolute",
+                      left: 0,
+                      top: 0,
+                      width: p.boxW,
+                      height: p.boxH,
+                      transform: `translate(${p.x}px, ${p.y}px)`,
+                      zIndex: p.locked ? 1 : p.z,
+                      cursor: p.locked ? "default" : "grab",
+                      touchAction: "none",
+                      filter: p.locked ? "none" : "drop-shadow(0 3px 6px rgba(0,0,0,0.35))",
+                    }}
+                  >
+                    <img src={p.img} alt="" draggable={false} className="w-full h-full pointer-events-none" />
+                  </div>
+                ))}
+              </div>
             </div>
+
+            {stage === "done" && (
+              <div className="mt-8 rounded-2xl border border-border bg-card p-6 text-center">
+                <p className="font-display text-xl font-bold">Puzzle complete! 🎉</p>
+                <p className="text-sm text-muted-foreground mt-1">
+                  {totalCount} pieces in {format(seconds)}.
+                </p>
+
+                {preset && (
+                  <div className="mt-6 rounded-xl bg-secondary/40 p-5 text-left max-w-lg mx-auto">
+                    <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
+                      {preset.category === "art" ? "About this painting" : "About this wonder"}
+                    </p>
+                    <p className="font-display text-lg font-bold mt-1">{preset.title}</p>
+                    <p className="text-sm text-muted-foreground mt-0.5">
+                      {preset.creator} · {preset.year} · {preset.place}
+                    </p>
+                    <p className="text-sm mt-3 leading-relaxed">{preset.blurb}</p>
+                    <p className="text-xs text-muted-foreground mt-3">{preset.credit}</p>
+                  </div>
+                )}
+
+                <Button onClick={restart} className="mt-6 h-11 px-6">
+                  Try another puzzle
+                </Button>
+              </div>
+            )}
           </div>
-
-          {stage === "done" && (
-            <div className="mt-8 rounded-2xl border border-border bg-card p-6 text-center">
-              <p className="font-display text-xl font-bold">Puzzle complete! 🎉</p>
-              <p className="text-sm text-muted-foreground mt-1">
-                {totalCount} pieces in {format(seconds)}.
-              </p>
-
-              {preset && (
-                <div className="mt-6 rounded-xl bg-secondary/40 p-5 text-left max-w-lg mx-auto">
-                  <p className="text-xs uppercase tracking-wider text-muted-foreground font-semibold">
-                    {preset.category === "art" ? "About this painting" : "About this wonder"}
-                  </p>
-                  <p className="font-display text-lg font-bold mt-1">{preset.title}</p>
-                  <p className="text-sm text-muted-foreground mt-0.5">
-                    {preset.creator} · {preset.year} · {preset.place}
-                  </p>
-                  <p className="text-sm mt-3 leading-relaxed">{preset.blurb}</p>
-                  <p className="text-xs text-muted-foreground mt-3">{preset.credit}</p>
-                </div>
-              )}
-
-              <Button onClick={restart} className="mt-6 h-11 px-6">
-                Try another puzzle
-              </Button>
-            </div>
-          )}
-        </div>
-      )}
+        )}
+      </div>
 
       {/* ── Internal links ───────────────────────────────────────────── */}
       <p className="text-sm text-muted-foreground mt-16">
@@ -525,7 +532,7 @@ function JigsawPuzzlePage() {
           {
             question: "Is there a way to see the full picture while solving?",
             answer:
-              "Yes. Tap \"Show guide\" to see a faint outline of the finished image on the board, then hide it again once you don't need it anymore.",
+              'Yes. Tap "Show guide" to see a faint outline of the finished image on the board, then hide it again once you don\'t need it anymore.',
           },
           {
             question: "Can I play on my phone?",

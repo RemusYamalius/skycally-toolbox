@@ -38,8 +38,8 @@ export const PRESET_IMAGES: PresetImage[] = [
     creator: "Vincent van Gogh",
     blurb:
       "Van Gogh painted this swirling night sky from memory while staying at an asylum in the south of France, working mostly from the view out his bedroom window. It has hung in the Museum of Modern Art in New York since 1941 and is now one of the most recognized paintings in the world.",
-    imageUrl: commonsUrl("e", "ea", "Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg", 1400),
-    thumbUrl: commonsUrl("e", "ea", "Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg", 400),
+    imageUrl: commonsUrl("e", "ea", "Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg", 1280),
+    thumbUrl: commonsUrl("e", "ea", "Van_Gogh_-_Starry_Night_-_Google_Art_Project.jpg", 330),
     credit: "Vincent van Gogh, 1889 — public domain (Museum of Modern Art, via Wikimedia Commons)",
   },
   {
@@ -51,8 +51,8 @@ export const PRESET_IMAGES: PresetImage[] = [
     creator: "Johannes Vermeer",
     blurb:
       "Often nicknamed the 'Dutch Mona Lisa,' this isn't a portrait of a real person but a tronie — a study of an imagined face and costume, popular in Dutch art at the time. The identity of the model has never been confirmed. It hangs today in the Mauritshuis museum in The Hague.",
-    imageUrl: commonsUrl("c", "ce", "Girl_with_a_Pearl_Earring.jpg", 1400),
-    thumbUrl: commonsUrl("c", "ce", "Girl_with_a_Pearl_Earring.jpg", 400),
+    imageUrl: commonsUrl("c", "ce", "Girl_with_a_Pearl_Earring.jpg", 1280),
+    thumbUrl: commonsUrl("c", "ce", "Girl_with_a_Pearl_Earring.jpg", 330),
     credit: "Johannes Vermeer, c. 1665 — public domain (Mauritshuis, via Wikimedia Commons)",
   },
   {
@@ -64,8 +64,8 @@ export const PRESET_IMAGES: PresetImage[] = [
     creator: "Commissioned by Mughal emperor Shah Jahan",
     blurb:
       "Shah Jahan built this ivory-white marble mausoleum for his wife Mumtaz Mahal, who died in childbirth. Construction took over two decades and drew materials and craftsmen from across Asia. In 2007 it was voted one of the New7Wonders of the World by more than 100 million people worldwide.",
-    imageUrl: commonsUrl("1", "1d", "Taj_Mahal_(Edited).jpeg", 1400),
-    thumbUrl: commonsUrl("1", "1d", "Taj_Mahal_(Edited).jpeg", 400),
+    imageUrl: commonsUrl("1", "1d", "Taj_Mahal_(Edited).jpeg", 1280),
+    thumbUrl: commonsUrl("1", "1d", "Taj_Mahal_(Edited).jpeg", 330),
     credit: "Photo via Wikimedia Commons — CC BY-SA 4.0",
   },
   {
@@ -77,8 +77,8 @@ export const PRESET_IMAGES: PresetImage[] = [
     creator: "Built under the Inca emperor Pachacuti",
     blurb:
       "Perched high in the Andes, this Inca estate was abandoned during the Spanish conquest and largely forgotten by the outside world until 1911. It's now a UNESCO World Heritage Site and, like the Taj Mahal, one of the New7Wonders of the World.",
-    imageUrl: commonsUrl("0", "02", "Machu_Picchu,_Perú,_2015-07-30,_DD_60.JPG", 1400),
-    thumbUrl: commonsUrl("0", "02", "Machu_Picchu,_Perú,_2015-07-30,_DD_60.JPG", 400),
+    imageUrl: commonsUrl("0", "02", "Machu_Picchu,_Perú,_2015-07-30,_DD_60.JPG", 1280),
+    thumbUrl: commonsUrl("0", "02", "Machu_Picchu,_Perú,_2015-07-30,_DD_60.JPG", 330),
     credit: "Photo: Poco a poco, via Wikimedia Commons — CC BY-SA 4.0",
   },
 ];

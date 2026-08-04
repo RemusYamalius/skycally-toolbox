@@ -1,9 +1,10 @@
-import { Outlet, Link, createRootRoute, HeadContent, Scripts } from "@tanstack/react-router";
+import { Outlet, Link, createRootRoute, HeadContent, Scripts, useRouterState } from "@tanstack/react-router";
 import { lazy, Suspense, useEffect, useState } from "react";
 import appCss from "../styles.css?url";
 import { ThemeProvider } from "@/components/theme-provider";
 import { SiteHeader } from "@/components/site-header";
 import { SiteFooter } from "@/components/site-footer";
+import { scrollToTop } from "@/hooks/use-scroll-top";
 
 const Toaster = lazy(() => import("sonner").then((m) => ({ default: m.Toaster })));
 
@@ -95,6 +96,7 @@ function RootComponent() {
   }, []);
   return (
     <ThemeProvider>
+      <RouteScrollManager />
       <div className="min-h-screen flex flex-col">
         <SiteHeader />
         <main className="flex-1">
@@ -109,4 +111,12 @@ function RootComponent() {
       )}
     </ThemeProvider>
   );
+}
+
+function RouteScrollManager() {
+  const pathname = useRouterState({ select: (state) => state.location.pathname });
+
+  useEffect(() => scrollToTop("auto"), [pathname]);
+
+  return null;
 }

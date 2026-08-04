@@ -58,7 +58,9 @@ export const getRouter = () => {
   const router = createRouter({
     routeTree,
     context: {},
-    scrollRestoration: true,
+    // Every route intentionally starts at the top. A single root-level scroll
+    // manager owns this behavior so browser history restoration cannot race it.
+    scrollRestoration: false,
     defaultPreloadStaleTime: 0,
     defaultErrorComponent: DefaultErrorComponent,
   });

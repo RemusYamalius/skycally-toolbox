@@ -110,6 +110,11 @@
     color: var(--color-foreground);
     font-feature-settings: "cv11", "ss01";
   }
+  main {
+    /* Dynamic tool screens often shrink or expand above the viewport. Keep
+       browser scroll anchoring from overriding the app's top-of-screen rule. */
+    overflow-anchor: none;
+  }
   h1,
   h2,
   h3,

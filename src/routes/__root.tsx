@@ -116,7 +116,7 @@ function RootComponent() {
 function RouteScrollManager() {
   const pathname = useRouterState({ select: (state) => state.location.pathname });
 
-  useEffect(() => scrollToTop(), [pathname]);
+  useEffect(() => scrollToTop("auto"), [pathname]);
 
   return null;
 }

@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState, useEffect } from "react";
 import { toast } from "sonner";
@@ -13,8 +13,49 @@ import { Input } from "@/components/ui/input";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
+// SEO NOTE: unlike word-counter/truth-or-dare/meme-generator, the query
+// data for this tool is genuinely thin — no single query has meaningful
+// impressions, and combined they're a fraction of this page's 1,211 total
+// impressions (most of the traffic here is long-tail we can't see
+// individually). What the visible queries do show: every variant, "link
+// shortener" or "url shortener", ranks poorly (43-82), and "url shortener"
+// phrasing edges out "link shortener" phrasing slightly in this small
+// sample. Rather than over-fit to a thin sample, this page was also still
+// on the generic buildToolMeta() template (same root-cause pattern as
+// meme-generator), and it has a genuine differentiator competitors often
+// gate behind a paid tier — a QR code generated alongside the short link —
+// that wasn't surfaced anywhere in the title/description. Leaning into
+// that differentiator is a more defensible move here than chasing a
+// specific underperforming keyword variant off thin data.
+
 export const Route = createFileRoute("/tools/link-shortener")({
-  head: () => buildToolMeta(toolBySlug("link-shortener", tools)),
+  head: () => {
+    const tool = toolBySlug("link-shortener", tools);
+    const title = "Free Link Shortener with QR Code — No Signup | Skycally";
+    const description =
+      "Free link and URL shortener with a matching QR code included. Create a short link instantly, no signup needed — works in your browser.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": tool.schemaType ?? "SoftwareApplication",
+            name: tool.name,
+            alternateName: ["URL Shortener", "Short Link Generator", "Link Shortener with QR Code"],
+            applicationCategory: tool.schemaCategory ?? "WebApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: LinkShortener,
 });
 
@@ -328,6 +369,18 @@ function LinkShortener() {
           </div>
         </div>
       )}
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Just need a plain QR code without a shortened link? Try the{" "}
+        <Link to="/tools/qr-generator" className="text-[var(--cyan-brand)] hover:underline">
+          QR Code Generator
+        </Link>
+        . Have a QR code you need to scan or decode instead? Use the{" "}
+        <Link to="/tools/qr-reader" className="text-[var(--cyan-brand)] hover:underline">
+          QR Reader
+        </Link>
+        .
+      </p>
 
       <AdZone id="link-shortener-mid" size="728x90" />
 

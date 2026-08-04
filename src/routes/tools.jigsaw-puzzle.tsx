@@ -87,6 +87,11 @@ function JigsawPuzzlePage() {
   const [ghostSrc, setGhostSrc] = useState<string | null>(null);
   const [showGhost, setShowGhost] = useState(false);
   const [seconds, setSeconds] = useState(0);
+  const [gridGuideEnabled, setGridGuideEnabled] = useState(true);
+  const [gridGuideSrc, setGridGuideSrc] = useState<string | null>(null);
+  const [celebrating, setCelebrating] = useState(false);
+  const [confettiOn, setConfettiOn] = useState(false);
+  const [merged, setMerged] = useState(false);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
@@ -107,6 +112,17 @@ function JigsawPuzzlePage() {
   useEffect(() => {
     if (stage === "playing" && totalCount > 0 && placedCount === totalCount) {
       setStage("done");
+      setCelebrating(true);
+      setConfettiOn(true);
+      const glowTimer = setTimeout(() => {
+        setCelebrating(false);
+        setMerged(true);
+      }, 1400);
+      const confettiTimer = setTimeout(() => setConfettiOn(false), 2800);
+      return () => {
+        clearTimeout(glowTimer);
+        clearTimeout(confettiTimer);
+      };
     }
   }, [placedCount, totalCount, stage]);
 
@@ -162,6 +178,13 @@ function JigsawPuzzlePage() {
       const tray = Math.max(220, Math.round(h * 0.65));
       const trayW = w;
 
+      let gridGuideCanvas: HTMLCanvasElement | null = null;
+      if (gridGuideEnabled) {
+        gridGuideCanvas = document.createElement("canvas");
+        gridGuideCanvas.width = w;
+        gridGuideCanvas.height = h;
+      }
+
       const next: PieceState[] = [];
       for (let r = 0; r < rows; r++) {
         for (let c = 0; c < cols; c++) {
@@ -185,6 +208,17 @@ function JigsawPuzzlePage() {
           const correctX = c * pieceW - pad;
           const correctY = r * pieceH - pad;
 
+          if (gridGuideCanvas) {
+            const gctx = gridGuideCanvas.getContext("2d")!;
+            gctx.save();
+            gctx.translate(correctX, correctY);
+            gctx.setLineDash([4, 3]);
+            gctx.strokeStyle = "rgba(100,116,139,0.5)";
+            gctx.lineWidth = 1.5;
+            gctx.stroke(path);
+            gctx.restore();
+          }
+
           next.push({
             id: `${r}-${c}`,
             boxW,
@@ -206,6 +240,10 @@ function JigsawPuzzlePage() {
       setPieces(next);
       setSeconds(0);
       setShowGhost(false);
+      setGridGuideSrc(gridGuideCanvas ? gridGuideCanvas.toDataURL("image/png") : null);
+      setCelebrating(false);
+      setConfettiOn(false);
+      setMerged(false);
       setStage("playing");
     } catch (e) {
       console.error(e);
@@ -218,6 +256,10 @@ function JigsawPuzzlePage() {
     setStage("setup");
     setPieces([]);
     setGhostSrc(null);
+    setGridGuideSrc(null);
+    setCelebrating(false);
+    setConfettiOn(false);
+    setMerged(false);
   };
 
   const shuffleTray = () => {
@@ -291,70 +333,92 @@ function JigsawPuzzlePage() {
         {/* ── Setup ────────────────────────────────────────────────────── */}
         {stage === "setup" && (
           <div className="space-y-8">
-            <div>
-              <h2 className="font-display font-bold text-lg mb-3">1. Choose a difficulty</h2>
-              <div className="grid gap-3 sm:grid-cols-4">
-                {(Object.keys(DIFFICULTIES) as Difficulty[]).map((d) => (
-                  <button
-                    key={d}
-                    onClick={() => setDifficulty(d)}
-                    className={`rounded-xl border-2 p-4 text-center transition ${
-                      difficulty === d
-                        ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_10%,transparent)]"
-                        : "border-border bg-card hover:border-foreground/30"
-                    }`}
-                  >
-                    <p className="font-semibold">{DIFFICULTIES[d].label.split(" · ")[0]}</p>
-                    <p className="text-xs text-muted-foreground mt-1">{DIFFICULTIES[d].label.split(" · ")[1]}</p>
-                  </button>
-                ))}
-              </div>
-            </div>
+            {!customSrc && !preset && (
+              <div>
+                <h2 className="font-display font-bold text-lg mb-3">Choose a photo</h2>
+                <DropZone
+                  accept="image/*"
+                  onFiles={onUpload}
+                  label="Drop your photo here"
+                  hint="JPG, PNG or WEBP — up to 10MB. Nothing leaves your device."
+                />
 
-            <div>
-              <h2 className="font-display font-bold text-lg mb-3">2. Choose a photo</h2>
-              <DropZone
-                accept="image/*"
-                onFiles={onUpload}
-                label="Drop your photo here"
-                hint="JPG, PNG or WEBP — up to 10MB. Nothing leaves your device."
-              />
-
-              <p className="text-sm text-muted-foreground mt-6 mb-3">Or start with one of these instead:</p>
-              <div className="grid gap-4 sm:grid-cols-4">
-                {PRESET_IMAGES.map((p) => (
-                  <button
-                    key={p.id}
-                    onClick={() => {
-                      setCustomSrc(null);
-                      setPreset(p);
-                    }}
-                    className={`rounded-xl overflow-hidden border-2 text-left transition ${
-                      preset?.id === p.id ? "border-[var(--cyan-brand)]" : "border-border hover:border-foreground/30"
-                    }`}
-                  >
-                    <img src={p.thumbUrl} alt={p.title} className="w-full h-28 object-cover" loading="lazy" />
-                    <div className="p-2.5">
-                      <p className="text-sm font-semibold leading-tight">{p.title}</p>
-                      <p className="text-xs text-muted-foreground mt-0.5">{p.year}</p>
-                    </div>
-                  </button>
-                ))}
+                <p className="text-sm text-muted-foreground mt-6 mb-3">Or start with one of these instead:</p>
+                <div className="grid gap-4 sm:grid-cols-4">
+                  {PRESET_IMAGES.map((p) => (
+                    <button
+                      key={p.id}
+                      onClick={() => {
+                        setCustomSrc(null);
+                        setPreset(p);
+                      }}
+                      className="rounded-xl overflow-hidden border-2 border-border hover:border-foreground/30 text-left transition"
+                    >
+                      <img src={p.thumbUrl} alt={p.title} className="w-full h-28 object-cover" loading="lazy" />
+                      <div className="p-2.5">
+                        <p className="text-sm font-semibold leading-tight">{p.title}</p>
+                        <p className="text-xs text-muted-foreground mt-0.5">{p.year}</p>
+                      </div>
+                    </button>
+                  ))}
+                </div>
               </div>
-            </div>
+            )}
 
             {(customSrc || preset) && (
-              <div className="rounded-2xl border border-border bg-card p-4 flex items-center gap-4">
-                <img
-                  src={preset ? preset.thumbUrl : (customSrc as string)}
-                  alt="Selected"
-                  className="w-16 h-16 rounded-lg object-cover shrink-0"
-                />
-                <div className="flex-1">
-                  <p className="font-semibold text-sm">{preset ? preset.title : "Your photo"}</p>
-                  <p className="text-xs text-muted-foreground">{DIFFICULTIES[difficulty].label}</p>
+              <div className="rounded-2xl border border-border bg-card p-5 space-y-5">
+                <div className="flex items-center gap-4">
+                  <img
+                    src={preset ? preset.thumbUrl : (customSrc as string)}
+                    alt="Selected"
+                    className="w-16 h-16 rounded-lg object-cover shrink-0"
+                  />
+                  <div className="flex-1">
+                    <p className="font-semibold text-sm">{preset ? preset.title : "Your photo"}</p>
+                    <button
+                      onClick={() => {
+                        setCustomSrc(null);
+                        setPreset(null);
+                      }}
+                      className="text-xs text-[var(--cyan-brand)] hover:underline mt-0.5"
+                    >
+                      Change photo
+                    </button>
+                  </div>
                 </div>
-                <Button onClick={startPuzzle} className="h-11 px-6">
+
+                <div>
+                  <p className="text-sm font-semibold mb-2">Difficulty</p>
+                  <div className="grid gap-2 grid-cols-4">
+                    {(Object.keys(DIFFICULTIES) as Difficulty[]).map((d) => (
+                      <button
+                        key={d}
+                        onClick={() => setDifficulty(d)}
+                        className={`rounded-lg border-2 py-2.5 text-center transition ${
+                          difficulty === d
+                            ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_10%,transparent)]"
+                            : "border-border hover:border-foreground/30"
+                        }`}
+                      >
+                        <p className="text-sm font-semibold leading-tight">{DIFFICULTIES[d].label.split(" · ")[0]}</p>
+                        <p className="text-xs text-muted-foreground">{DIFFICULTIES[d].label.split(" · ")[1]}</p>
+                      </button>
+                    ))}
+                  </div>
+                </div>
+
+                <label className="flex items-center gap-2.5 text-sm cursor-pointer select-none">
+                  <input
+                    type="checkbox"
+                    checked={gridGuideEnabled}
+                    onChange={(e) => setGridGuideEnabled(e.target.checked)}
+                    className="w-4 h-4 rounded border-border accent-[var(--cyan-brand)]"
+                  />
+                  Show piece outlines on the board
+                  <span className="text-xs text-muted-foreground">(turn off for more of a challenge)</span>
+                </label>
+
+                <Button onClick={startPuzzle} className="w-full h-11">
                   Start Puzzle
                 </Button>
               </div>
@@ -403,43 +467,105 @@ function JigsawPuzzlePage() {
             <div className="overflow-x-auto">
               <div
                 ref={containerRef}
-                className="relative mx-auto rounded-xl bg-secondary/30 touch-none select-none"
-                style={{ width: boardW, height: boardH + TRAY_GAP + trayH }}
+                className="relative mx-auto rounded-xl bg-secondary/30 touch-none select-none transition-[height] duration-500"
+                style={{
+                  width: boardW,
+                  height: stage === "done" ? boardH : boardH + TRAY_GAP + trayH,
+                }}
                 onPointerMove={onPointerMove}
                 onPointerUp={endDrag}
                 onPointerCancel={endDrag}
               >
                 <div
-                  className="absolute rounded-lg border-2 border-dashed border-border/70 overflow-hidden"
+                  className={`absolute rounded-lg border-2 border-dashed border-border/70 overflow-hidden ${
+                    celebrating ? "animate-[jigsaw-pulse_1.4s_ease-in-out]" : ""
+                  }`}
                   style={{ left: 0, top: 0, width: boardW, height: boardH }}
                 >
+                  {!merged && gridGuideEnabled && gridGuideSrc && (
+                    <img src={gridGuideSrc} alt="" className="absolute inset-0 w-full h-full object-cover" />
+                  )}
                   {showGhost && ghostSrc && (
                     <img src={ghostSrc} alt="" className="absolute inset-0 w-full h-full object-cover opacity-25" />
                   )}
+                  {merged && ghostSrc && (
+                    <img
+                      src={ghostSrc}
+                      alt="Completed puzzle"
+                      className="absolute inset-0 w-full h-full object-cover"
+                    />
+                  )}
                 </div>
 
-                {pieces.map((p) => (
-                  <div
-                    key={p.id}
-                    onPointerDown={(e) => onPointerDown(e, p)}
-                    style={{
-                      position: "absolute",
-                      left: 0,
-                      top: 0,
-                      width: p.boxW,
-                      height: p.boxH,
-                      transform: `translate(${p.x}px, ${p.y}px)`,
-                      zIndex: p.locked ? 1 : p.z,
-                      cursor: p.locked ? "default" : "grab",
-                      touchAction: "none",
-                      filter: p.locked ? "none" : "drop-shadow(0 3px 6px rgba(0,0,0,0.35))",
-                    }}
-                  >
-                    <img src={p.img} alt="" draggable={false} className="w-full h-full pointer-events-none" />
-                  </div>
-                ))}
+                {!merged &&
+                  pieces.map((p) => (
+                    <div
+                      key={p.id}
+                      onPointerDown={(e) => onPointerDown(e, p)}
+                      style={{
+                        position: "absolute",
+                        left: 0,
+                        top: 0,
+                        width: p.boxW,
+                        height: p.boxH,
+                        transform: `translate(${p.x}px, ${p.y}px)`,
+                        zIndex: p.locked ? 1 : p.z,
+                        cursor: p.locked ? "default" : "grab",
+                        touchAction: "none",
+                      }}
+                    >
+                      <img
+                        src={p.img}
+                        alt=""
+                        draggable={false}
+                        className="w-full h-full pointer-events-none"
+                        style={{
+                          filter: celebrating
+                            ? undefined
+                            : p.locked
+                              ? "none"
+                              : "drop-shadow(0 3px 6px rgba(0,0,0,0.35))",
+                          animation: celebrating ? "jigsaw-glow 1.4s ease-in-out" : undefined,
+                        }}
+                      />
+                    </div>
+                  ))}
               </div>
             </div>
+
+            {confettiOn && (
+              <div className="pointer-events-none fixed inset-0 z-50 overflow-hidden">
+                {Array.from({ length: 60 }).map((_, i) => (
+                  <span
+                    key={i}
+                    className="absolute top-[-10px] block w-2 h-3 rounded-sm"
+                    style={{
+                      left: `${Math.random() * 100}%`,
+                      background: ["#22c55e", "#eab308", "#06b6d4", "#a855f7", "#ef4444"][i % 5],
+                      animation: `jigsaw-confetti ${2 + Math.random() * 2}s ${Math.random()}s linear forwards`,
+                      transform: `rotate(${Math.random() * 360}deg)`,
+                    }}
+                  />
+                ))}
+              </div>
+            )}
+
+            <style>{`
+              @keyframes jigsaw-confetti {
+                0% { transform: translateY(0) rotate(0); opacity: 1; }
+                100% { transform: translateY(100vh) rotate(720deg); opacity: 0; }
+              }
+              @keyframes jigsaw-glow {
+                0% { filter: drop-shadow(0 0 0px var(--cyan-brand)); }
+                50% { filter: drop-shadow(0 0 10px var(--cyan-brand)) drop-shadow(0 0 18px var(--violet-brand)); }
+                100% { filter: drop-shadow(0 0 0px var(--cyan-brand)); }
+              }
+              @keyframes jigsaw-pulse {
+                0% { transform: scale(1); }
+                50% { transform: scale(1.015); }
+                100% { transform: scale(1); }
+              }
+            `}</style>
 
             {stage === "done" && (
               <div className="mt-8 rounded-2xl border border-border bg-card p-6 text-center">
@@ -488,8 +614,8 @@ function JigsawPuzzlePage() {
 
       <HowToUse
         steps={[
-          "Pick a difficulty — from 9 pieces (easy) up to 100 (expert).",
           "Upload your own photo, or choose a famous painting or wonder of the world.",
+          "Pick a difficulty — from 9 pieces (easy) up to 100 (expert) — then hit Start Puzzle.",
           "Drag pieces from the tray onto the board. They snap into place when they're close to correct — no rotating needed.",
         ]}
       />

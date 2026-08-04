@@ -40,7 +40,6 @@ import {
   CreditCard,
   BadgeDollarSign,
   BadgePercent,
-
   Captions,
   FileMinus,
   Layers,
@@ -57,7 +56,6 @@ import {
   Calculator,
   Percent,
   School,
-
   GraduationCap,
   IdCard,
   Landmark,
@@ -129,7 +127,6 @@ import {
   ThumbsDown,
   Flag,
   Gem,
-
 } from "lucide-react";
 // Layers already imported above — reused for Tetris.
 
@@ -1683,11 +1680,9 @@ export const tools: Tool[] = [
     schemaCategory: "GameApplication",
   },
   {
-
     slug: "ick-test",
     name: "Ick Test",
-    description:
-      "Swipe through 200+ icks, find out your Ick Sensitivity Score, and share the result with friends.",
+    description: "Swipe through 200+ icks, find out your Ick Sensitivity Score, and share the result with friends.",
     category: "games",
     icon: ThumbsDown,
     path: "/tools/ick-test",
@@ -2068,8 +2063,10 @@ export const tools: Tool[] = [
       "Turn any uploaded photo into a real jigsaw puzzle",
       "Curved interlocking tabs and blanks, not plain square tiles",
       "Four difficulty levels from 9 to 100 pieces",
+      "Optional on-board piece outlines, or turn them off for more of a challenge",
       "Built-in famous paintings and wonders of the world to try",
       "Fact card about the artwork or landmark once you finish",
+      "Celebration animation with confetti when the puzzle is complete",
       "Runs entirely in your browser — uploaded photos are never sent anywhere",
     ],
     schemaType: "VideoGame",

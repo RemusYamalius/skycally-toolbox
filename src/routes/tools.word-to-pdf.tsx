@@ -4,6 +4,7 @@ import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
@@ -98,6 +99,8 @@ ${html}
 
         <iframe ref={iframeRef} title="print-frame" style={{ display: "none" }} />
       </div>
+
+      <AdZone id="word-to-pdf-mid" size="728x90" />
 
       <HowToUse
         steps={[

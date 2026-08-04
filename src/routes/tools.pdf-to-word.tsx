@@ -7,6 +7,7 @@ import { FileOutput, FileText, AlertTriangle, CheckCircle2, Loader2, X } from "l
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { DropZone } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 import { formatBytes } from "@/components/drop-zone";
@@ -524,6 +525,8 @@ function PdfToWordPage() {
           <p>❌ Scanned / image-only PDFs require OCR — use our Image to Text tool first</p>
         </div>
       </div>
+
+      <AdZone id="pdf-to-word-mid" size="728x90" />
 
       <HowToUse
         steps={[

@@ -7,6 +7,7 @@ import { Copy, Download, Link as LinkIcon, Loader2, Trash2, ExternalLink, Clock 
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -327,6 +328,8 @@ function LinkShortener() {
           </div>
         </div>
       )}
+
+      <AdZone id="link-shortener-mid" size="728x90" />
 
       <HowToUse
         steps={[

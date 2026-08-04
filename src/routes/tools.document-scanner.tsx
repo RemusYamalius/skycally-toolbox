@@ -24,6 +24,7 @@ import {
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { loadOpenCV } from "@/utils/opencvLoader";
@@ -817,6 +818,8 @@ function DocumentScanner() {
           )}
         </div>
       )}
+
+      <AdZone id="document-scanner-mid" size="728x90" />
 
       <HowToUse
         steps={[

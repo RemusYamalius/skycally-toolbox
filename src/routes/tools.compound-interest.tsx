@@ -7,6 +7,7 @@ import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Input } from "@/components/ui/input";
 import { Slider } from "@/components/ui/slider";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -357,6 +358,8 @@ function CompoundInterestPage() {
           </div>
         </div>
       </div>
+
+      <AdZone id="compound-interest-mid" size="728x90" />
 
       <HowToUse
         steps={[

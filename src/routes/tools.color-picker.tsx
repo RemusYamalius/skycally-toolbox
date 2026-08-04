@@ -6,6 +6,7 @@ import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
@@ -1004,6 +1005,8 @@ function ColorPickerPage() {
           <ExtractPanel setFromHex={setFromHex} copy={copy} copiedKey={copiedKey} />
         </TabsContent>
       </Tabs>
+
+      <AdZone id="color-picker-mid" size="728x90" />
 
       <HowToUse
         steps={[

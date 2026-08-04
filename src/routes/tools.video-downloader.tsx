@@ -4,6 +4,7 @@ import { tools } from "@/lib/tools";
 import { AlertCircle } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -25,6 +26,8 @@ function VideoDownloader() {
           meantime, try our browser-based tools like Video Trimmer, Video Compressor or Video to GIF on a local file.
         </p>
       </div>
+
+      <AdZone id="video-downloader-mid" size="728x90" />
 
       <HowToUse
         steps={[

@@ -7,6 +7,7 @@ import { Sparkles, Download, RefreshCw, CheckCircle2 } from "lucide-react";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { upscaleImage, MAX_UPSCALE_BYTES } from "@/services/imageUpscaler";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -253,6 +254,8 @@ function ImageUpscalerPage() {
           )}
         </div>
       )}
+
+      <AdZone id="image-upscaler-mid" size="728x90" />
 
       <HowToUse
         steps={[

@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -317,6 +318,8 @@ function PasswordGeneratorPage() {
           {passwords.length ? "Regenerate" : "Generate Password"}
         </button>
       </div>
+
+      <AdZone id="password-generator-mid" size="728x90" />
 
       <HowToUse
         steps={[

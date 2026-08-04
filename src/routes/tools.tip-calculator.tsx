@@ -6,6 +6,7 @@ import { Minus, Plus } from "lucide-react";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -117,6 +118,8 @@ function TipCalculator() {
           </div>
         </div>
       </div>
+
+      <AdZone id="tip-calculator-mid" size="728x90" />
 
       <HowToUse
         steps={[

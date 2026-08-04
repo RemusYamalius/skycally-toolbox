@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
@@ -9,8 +9,54 @@ import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
+// SEO NOTE: this page previously used the generic buildToolMeta() template,
+// which produces a title/description from tool.description alone. Search
+// Console shows a stark split for this exact tool: the bare term "meme
+// generator" ranks at position 6.1 (401 impressions), while every variant
+// adding "free" or "no watermark"/"without watermark" ranks between 43 and
+// 60 (~120 combined impressions) — despite the page's body/FAQ already
+// truthfully claiming both (see the "Is there a watermark" FAQ below). The
+// old auto-generated title/description never surfaced "no watermark" at
+// all, which is likely why Google wasn't matching those specific queries
+// well. Switched to a custom head() so both "free" and "no watermark" are
+// explicit in the <title> and meta description, not just buried in body
+// copy.
+//
+// Caveat worth flagging honestly: position 6.1 for the bare term with zero
+// clicks is unusual — GSC position is a 3-month average, so this could mean
+// the page only reached position ~6 very recently (after being much lower
+// for most of the window) and clicks simply haven't caught up yet, rather
+// than a title/snippet problem specific to that query. Worth rechecking in
+// 2-3 weeks once this window rolls forward.
+
 export const Route = createFileRoute("/tools/meme-generator")({
-  head: () => buildToolMeta(toolBySlug("meme-generator", tools)),
+  head: () => {
+    const tool = toolBySlug("meme-generator", tools);
+    const title = "Free Meme Generator — No Watermark, No Signup | Skycally";
+    const description =
+      "Free online meme generator with no watermark and no signup. Choose a classic template or upload your own image, add text, and download instantly.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": tool.schemaType ?? "SoftwareApplication",
+            name: tool.name,
+            alternateName: ["Meme Maker", "Free Meme Generator", "Meme Generator No Watermark"],
+            applicationCategory: tool.schemaCategory ?? "MultimediaApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: MemeGenerator,
 });
 
@@ -255,6 +301,18 @@ function MemeGenerator() {
         </div>
       )}
 
+      <p className="text-sm text-muted-foreground mt-10">
+        Want to add a caption without the classic meme font? Try{" "}
+        <Link to="/tools/add-text-to-image" className="text-[var(--cyan-brand)] hover:underline">
+          Add Text to Image
+        </Link>
+        . Making more than one meme at once? Check out the{" "}
+        <Link to="/tools/collage-maker" className="text-[var(--cyan-brand)] hover:underline">
+          Collage Maker
+        </Link>{" "}
+        to combine them.
+      </p>
+
       <AdZone id="image-tool-below-result" size="300x250" />
 
       <HowToUse
@@ -266,8 +324,8 @@ function MemeGenerator() {
       />
 
       <ToolSeoContent
-        title="Free Meme Generator — Create Custom Memes Online, No Signup"
-        description="Create memes from 12 popular templates or your own image. Add top and bottom text in classic Impact font. Customize colors, size, and outline. Download instantly — free, no signup."
+        title="Free Meme Generator — No Watermark, No Signup"
+        description="Create memes from 12 popular templates or your own image, with no watermark added. Add top and bottom text in classic Impact font. Customize colors, size, and outline. Download instantly — free, no signup."
         body={[
           "Skycally's Meme Generator lets you create classic memes from 12 iconic templates — or upload your own image — directly in your browser. Type your top and bottom text, customize the font, size, text color, and outline, and download your meme as a PNG in seconds. No account, no watermark, no server upload.",
           "The 12 built-in templates include some of the most recognizable memes on the internet: Drake Approving/Disapproving, Distracted Boyfriend, Two Buttons, Change My Mind, One Does Not Simply, This is Fine, Surprised Pikachu, Woman Yelling at Cat, Bernie Sanders, Expanding Brain, Left Exit 12, and Gru's Plan. Each template is loaded from the original source for maximum quality.",

@@ -99,6 +99,8 @@ function JigsawPuzzlePage() {
   const dragId = useRef<string | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const zCounter = useRef(1);
+  const prevPlacedRef = useRef(0);
+  const completedRef = useRef(false);
 
   const placedCount = pieces.filter((p) => p.locked).length;
   const totalCount = pieces.length;
@@ -110,12 +112,38 @@ function JigsawPuzzlePage() {
     return () => clearInterval(t);
   }, [stage]);
 
-  // Completion is now detected imperatively inside endDrag() below — not in
-  // a useEffect. A useEffect keyed on `stage` here was calling setStage("done")
-  // itself, which changes `stage` — one of its own dependencies — so React
-  // re-ran the effect's cleanup on the very next render and cleared both
-  // timers before they ever fired. Net effect: `merged` never became true,
-  // and the piece seams never disappeared after completion.
+  // Piece-placement sound: fires whenever placedCount actually increases in
+  // committed state (not inside the setState updater — reading side-channel
+  // variables immediately after a functional setState call is unreliable,
+  // since React defers running the updater rather than calling it inline).
+  useEffect(() => {
+    if (placedCount > prevPlacedRef.current) playSound("place");
+    prevPlacedRef.current = placedCount;
+  }, [placedCount]);
+
+  // Completion sequence — deliberately depends only on placedCount/totalCount,
+  // NOT on `stage`. The previous bug: this effect called setStage("done"),
+  // and since `stage` was also a dependency, React reran the effect's own
+  // cleanup on the very next render and cleared both timers before they ever
+  // fired. `completedRef` guards against re-firing on later re-renders.
+  useEffect(() => {
+    if (totalCount > 0 && placedCount === totalCount && !completedRef.current) {
+      completedRef.current = true;
+      setStage("done");
+      setCelebrating(true);
+      setConfettiOn(true);
+      playChord(["win", "allFound"]);
+      const glowTimer = setTimeout(() => {
+        setCelebrating(false);
+        setMerged(true);
+      }, 1400);
+      const confettiTimer = setTimeout(() => setConfettiOn(false), 2800);
+      return () => {
+        clearTimeout(glowTimer);
+        clearTimeout(confettiTimer);
+      };
+    }
+  }, [placedCount, totalCount]);
 
   const onUpload = (files: File[]) => {
     const f = files[0];
@@ -236,6 +264,8 @@ function JigsawPuzzlePage() {
       setCelebrating(false);
       setConfettiOn(false);
       setMerged(false);
+      prevPlacedRef.current = 0;
+      completedRef.current = false;
       setStage("playing");
     } catch (e) {
       console.error(e);
@@ -253,6 +283,8 @@ function JigsawPuzzlePage() {
     setCelebrating(false);
     setConfettiOn(false);
     setMerged(false);
+    prevPlacedRef.current = 0;
+    completedRef.current = false;
   };
 
   const shuffleTray = () => {
@@ -303,37 +335,18 @@ function JigsawPuzzlePage() {
     if (dragId.current === null) return;
     const id = dragId.current;
     dragId.current = null;
-    let justCompleted = false;
-    let snapped = false;
-    setPieces((ps) => {
-      const next = ps.map((p) => {
+    setPieces((ps) =>
+      ps.map((p) => {
         if (p.id !== id) return p;
         const snap = Math.max(14, Math.min(p.boxW, p.boxH) * 0.18);
         const dx = Math.abs(p.x - p.correctX);
         const dy = Math.abs(p.y - p.correctY);
         if (dx < snap && dy < snap) {
-          snapped = true;
           return { ...p, x: p.correctX, y: p.correctY, locked: true };
         }
         return p;
-      });
-      justCompleted = next.length > 0 && next.every((p) => p.locked);
-      return next;
-    });
-
-    if (snapped) playSound("place");
-
-    if (justCompleted) {
-      setStage("done");
-      setCelebrating(true);
-      setConfettiOn(true);
-      playChord(["win", "allFound"]);
-      setTimeout(() => {
-        setCelebrating(false);
-        setMerged(true);
-      }, 1400);
-      setTimeout(() => setConfettiOn(false), 2800);
-    }
+      }),
+    );
   };
 
   const format = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;

@@ -8,6 +8,7 @@ import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { Skeleton } from "@/components/ui/skeleton";
@@ -439,6 +440,8 @@ function SatoshiConverterPage() {
         </div>
         <span className="text-xs text-muted-foreground shrink-0">Try it →</span>
       </Link>
+
+      <AdZone id="satoshi-converter-mid" size="728x90" />
 
       <HowToUse
         steps={[

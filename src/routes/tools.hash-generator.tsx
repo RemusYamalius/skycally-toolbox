@@ -4,6 +4,7 @@ import { tools } from "@/lib/tools";
 import { useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -224,6 +225,8 @@ function HashGeneratorTool() {
           </div>
         )}
       </div>
+
+      <AdZone id="hash-generator-mid" size="728x90" />
 
       <HowToUse
         steps={[

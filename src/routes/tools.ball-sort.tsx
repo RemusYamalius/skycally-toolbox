@@ -7,6 +7,7 @@ import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Button } from "@/components/ui/button";
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -911,6 +912,8 @@ function BallSortPage() {
           </div>
         </DialogContent>
       </Dialog>
+
+      <AdZone id="ball-sort-mid" size="728x90" />
 
       <HowToUse
         steps={[

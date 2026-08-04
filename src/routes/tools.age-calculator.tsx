@@ -5,6 +5,7 @@ import { useMemo, useState } from "react";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Input } from "@/components/ui/input";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
@@ -112,6 +113,8 @@ function AgeCalculator() {
           </div>
         </div>
       )}
+
+      <AdZone id="age-calculator-mid" size="728x90" />
 
       <HowToUse
         steps={[

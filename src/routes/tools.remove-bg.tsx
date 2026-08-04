@@ -8,6 +8,7 @@ import { Loader2, Download, ImageOff, RefreshCw, CheckCircle2 } from "lucide-rea
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { removeBackground } from "@/services/removeBg";
@@ -235,6 +236,8 @@ function RemoveBgPage() {
         </p>
         <p>⚠️ Very large images (&gt;4000px) are resized automatically to ensure performance in the browser</p>
       </div>
+
+      <AdZone id="remove-bg-mid" size="728x90" />
 
       <HowToUse
         steps={[

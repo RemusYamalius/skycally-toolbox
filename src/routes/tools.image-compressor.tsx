@@ -9,6 +9,7 @@ import { Download, Trash2, X, CheckCircle2, ImageIcon } from "lucide-react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
@@ -331,6 +332,8 @@ function ImageCompressorPage() {
           </div>
         </div>
       )}
+
+      <AdZone id="image-compressor-mid" size="728x90" />
 
       <HowToUse
         steps={[

@@ -22,6 +22,7 @@ import {
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
@@ -433,6 +434,8 @@ function FileViewerPage() {
           setDrawerOpen={setDrawerOpen}
         />
       )}
+
+      <AdZone id="file-viewer-mid" size="728x90" />
 
       <HowToUse
         steps={[

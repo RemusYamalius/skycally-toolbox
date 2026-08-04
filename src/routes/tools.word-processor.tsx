@@ -3,6 +3,7 @@ import { buildPageMeta } from "@/lib/seo";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { useEditor, EditorContent, Editor, Extension } from "@tiptap/react";
@@ -461,6 +462,8 @@ function WordProcessor() {
       description="Write and format documents free in your browser. No Google account, no Microsoft account needed. Supports Arabic RTL, drag-to-resize margins, and exports to PDF and fully formatted Word."
     >
       {mounted ? <Editor4U /> : <div className="h-[600px] rounded-2xl bg-secondary/50 animate-pulse" />}
+
+      <AdZone id="word-processor-mid" size="728x90" />
 
       <HowToUse
         steps={[

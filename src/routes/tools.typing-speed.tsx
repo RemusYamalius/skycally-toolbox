@@ -6,6 +6,7 @@ import { tools } from "@/lib/tools";
 import { playSound, playChord } from "@/lib/sound";
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Button } from "@/components/ui/button";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
@@ -344,6 +345,8 @@ function TypingSpeedPage() {
             </div>
           </div>
         )}
+
+        <AdZone id="typing-speed-mid" size="728x90" />
 
         <HowToUse
           steps={[

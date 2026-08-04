@@ -7,6 +7,7 @@ import { FileText, CheckCircle2, AlertTriangle, X } from "lucide-react";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { DropZone, formatBytes } from "@/components/drop-zone";
 import { downloadBlob } from "@/lib/file-utils";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -274,6 +275,8 @@ function CompressPdfPage() {
           </div>
         )}
       </div>
+
+      <AdZone id="compress-pdf-mid" size="728x90" />
 
       <HowToUse
         steps={[

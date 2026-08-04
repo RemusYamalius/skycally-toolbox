@@ -5,6 +5,7 @@ import { useState } from "react";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import { Tabs, TabsList, TabsTrigger, TabsContent } from "@/components/ui/tabs";
 import { Input } from "@/components/ui/input";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -150,6 +151,8 @@ function BmiCalculator() {
           </div>
         </TabsContent>
       </Tabs>
+
+      <AdZone id="bmi-calculator-mid" size="728x90" />
 
       <HowToUse
         steps={[

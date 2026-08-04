@@ -12,6 +12,7 @@ import { RelatedTools } from "@/components/related-tools";
 import { Button } from "@/components/ui/button";
 import { DropZone } from "@/components/drop-zone";
 import { checkSize } from "@/lib/file-utils";
+import { playSound, playChord } from "@/lib/sound";
 import { DIFFICULTIES, buildPiecePath, generatePieceGrid, type Difficulty } from "@/lib/jigsaw-puzzle/pieces";
 import { PRESET_IMAGES, type PresetImage } from "@/lib/jigsaw-puzzle/presets";
 
@@ -109,22 +110,12 @@ function JigsawPuzzlePage() {
     return () => clearInterval(t);
   }, [stage]);
 
-  useEffect(() => {
-    if (stage === "playing" && totalCount > 0 && placedCount === totalCount) {
-      setStage("done");
-      setCelebrating(true);
-      setConfettiOn(true);
-      const glowTimer = setTimeout(() => {
-        setCelebrating(false);
-        setMerged(true);
-      }, 1400);
-      const confettiTimer = setTimeout(() => setConfettiOn(false), 2800);
-      return () => {
-        clearTimeout(glowTimer);
-        clearTimeout(confettiTimer);
-      };
-    }
-  }, [placedCount, totalCount, stage]);
+  // Completion is now detected imperatively inside endDrag() below — not in
+  // a useEffect. A useEffect keyed on `stage` here was calling setStage("done")
+  // itself, which changes `stage` — one of its own dependencies — so React
+  // re-ran the effect's cleanup on the very next render and cleared both
+  // timers before they ever fired. Net effect: `merged` never became true,
+  // and the piece seams never disappeared after completion.
 
   const onUpload = (files: File[]) => {
     const f = files[0];
@@ -146,6 +137,7 @@ function JigsawPuzzlePage() {
   };
 
   const startPuzzle = async () => {
+    playSound("click");
     const source = preset ? preset.imageUrl : customSrc;
     if (!source) {
       toast.error("Choose a photo first — upload one or pick an example below.");
@@ -253,6 +245,7 @@ function JigsawPuzzlePage() {
   };
 
   const restart = () => {
+    playSound("click");
     setStage("setup");
     setPieces([]);
     setGhostSrc(null);
@@ -263,6 +256,7 @@ function JigsawPuzzlePage() {
   };
 
   const shuffleTray = () => {
+    playSound("click");
     setPieces((ps) =>
       ps.map((p) =>
         p.locked
@@ -290,6 +284,7 @@ function JigsawPuzzlePage() {
     dragId.current = piece.id;
     zCounter.current += 1;
     const z = zCounter.current;
+    playSound("flip");
     setPieces((ps) => ps.map((p) => (p.id === piece.id ? { ...p, z } : p)));
   };
 
@@ -308,18 +303,37 @@ function JigsawPuzzlePage() {
     if (dragId.current === null) return;
     const id = dragId.current;
     dragId.current = null;
-    setPieces((ps) =>
-      ps.map((p) => {
+    let justCompleted = false;
+    let snapped = false;
+    setPieces((ps) => {
+      const next = ps.map((p) => {
         if (p.id !== id) return p;
         const snap = Math.max(14, Math.min(p.boxW, p.boxH) * 0.18);
         const dx = Math.abs(p.x - p.correctX);
         const dy = Math.abs(p.y - p.correctY);
         if (dx < snap && dy < snap) {
+          snapped = true;
           return { ...p, x: p.correctX, y: p.correctY, locked: true };
         }
         return p;
-      }),
-    );
+      });
+      justCompleted = next.length > 0 && next.every((p) => p.locked);
+      return next;
+    });
+
+    if (snapped) playSound("place");
+
+    if (justCompleted) {
+      setStage("done");
+      setCelebrating(true);
+      setConfettiOn(true);
+      playChord(["win", "allFound"]);
+      setTimeout(() => {
+        setCelebrating(false);
+        setMerged(true);
+      }, 1400);
+      setTimeout(() => setConfettiOn(false), 2800);
+    }
   };
 
   const format = (s: number) => `${Math.floor(s / 60)}:${String(s % 60).padStart(2, "0")}`;
@@ -349,6 +363,7 @@ function JigsawPuzzlePage() {
                     <button
                       key={p.id}
                       onClick={() => {
+                        playSound("click");
                         setCustomSrc(null);
                         setPreset(p);
                       }}
@@ -377,6 +392,7 @@ function JigsawPuzzlePage() {
                     <p className="font-semibold text-sm">{preset ? preset.title : "Your photo"}</p>
                     <button
                       onClick={() => {
+                        playSound("click");
                         setCustomSrc(null);
                         setPreset(null);
                       }}
@@ -393,7 +409,10 @@ function JigsawPuzzlePage() {
                     {(Object.keys(DIFFICULTIES) as Difficulty[]).map((d) => (
                       <button
                         key={d}
-                        onClick={() => setDifficulty(d)}
+                        onClick={() => {
+                          playSound("click");
+                          setDifficulty(d);
+                        }}
                         className={`rounded-lg border-2 py-2.5 text-center transition ${
                           difficulty === d
                             ? "border-[var(--cyan-brand)] bg-[color-mix(in_oklab,var(--cyan-brand)_10%,transparent)]"
@@ -411,7 +430,10 @@ function JigsawPuzzlePage() {
                   <input
                     type="checkbox"
                     checked={gridGuideEnabled}
-                    onChange={(e) => setGridGuideEnabled(e.target.checked)}
+                    onChange={(e) => {
+                      playSound("click");
+                      setGridGuideEnabled(e.target.checked);
+                    }}
                     className="w-4 h-4 rounded border-border accent-[var(--cyan-brand)]"
                   />
                   Show piece outlines on the board
@@ -449,7 +471,15 @@ function JigsawPuzzlePage() {
               <div className="flex gap-2">
                 {stage === "playing" && (
                   <>
-                    <Button variant="outline" size="sm" onClick={() => setShowGhost((v) => !v)} className="gap-1.5">
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      onClick={() => {
+                        playSound("click");
+                        setShowGhost((v) => !v);
+                      }}
+                      className="gap-1.5"
+                    >
                       {showGhost ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                       {showGhost ? "Hide guide" : "Show guide"}
                     </Button>
@@ -478,7 +508,11 @@ function JigsawPuzzlePage() {
               >
                 <div
                   className={`absolute rounded-lg border-2 border-dashed border-border/70 overflow-hidden ${
-                    celebrating ? "animate-[jigsaw-pulse_1.4s_ease-in-out]" : ""
+                    celebrating
+                      ? "animate-[jigsaw-pulse_1.4s_ease-in-out]"
+                      : merged
+                        ? "animate-[jigsaw-shine_2.6s_ease-in-out_infinite]"
+                        : ""
                   }`}
                   style={{ left: 0, top: 0, width: boardW, height: boardH }}
                 >
@@ -564,6 +598,14 @@ function JigsawPuzzlePage() {
                 0% { transform: scale(1); }
                 50% { transform: scale(1.015); }
                 100% { transform: scale(1); }
+              }
+              @keyframes jigsaw-shine {
+                0%, 100% {
+                  box-shadow: 0 0 0px 0px color-mix(in oklab, var(--cyan-brand) 0%, transparent);
+                }
+                50% {
+                  box-shadow: 0 0 26px 5px color-mix(in oklab, var(--cyan-brand) 45%, transparent);
+                }
               }
             `}</style>
 

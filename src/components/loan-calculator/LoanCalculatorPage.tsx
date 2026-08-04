@@ -15,6 +15,7 @@ import {
 import { ChevronDown, Copy, Download, Check } from "lucide-react";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
+import { AdZone } from "@/components/ad-zone";
 import { HowToUse } from "@/components/how-to-use";
 import { RelatedTools } from "@/components/related-tools";
 import ToolSeoContent from "@/components/tool-seo-content";
@@ -1196,6 +1197,8 @@ export default function LoanCalculatorPage({ defaultTab, slug }: { defaultTab: L
       )}
 
       <p className="mt-6 text-xs text-muted-foreground italic">{STRINGS.disclaimer}</p>
+
+      <AdZone id={`${slug}-mid`} size="728x90" />
 
       <HowToUse
         steps={[

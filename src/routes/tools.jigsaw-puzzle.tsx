@@ -16,6 +16,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { DIFFICULTIES, buildPiecePath, generatePieceGrid, type Difficulty } from "@/lib/jigsaw-puzzle/pieces";
 import { PRESET_IMAGES, type PresetImage } from "@/lib/jigsaw-puzzle/presets";
 import { MUSIC_TRACKS } from "@/lib/jigsaw-puzzle/music";
+import { scrollToTop } from "@/hooks/use-scroll-top";
 
 const PATH = "/tools/jigsaw-puzzle";
 const TITLE = "Photo Jigsaw Puzzle Maker — Turn Any Picture Into a Puzzle | Skycally";

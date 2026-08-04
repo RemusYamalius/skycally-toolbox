@@ -396,6 +396,9 @@ function JigsawPuzzlePage() {
       description="Turn any photo into a real jigsaw puzzle with interlocking pieces — or start with a famous painting or wonder of the world."
     >
       <div ref={shellRef}>
+        {/* Always mounted so the ref exists when Start Puzzle is clicked. */}
+        <audio ref={audioRef} preload="none" />
+
         {/* ── Setup ────────────────────────────────────────────────────── */}
         {stage === "setup" && (
           <div className="space-y-8">

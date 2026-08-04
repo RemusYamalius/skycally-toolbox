@@ -16,6 +16,7 @@ import { playSound, playChord } from "@/lib/sound";
 import { DIFFICULTIES, buildPiecePath, generatePieceGrid, type Difficulty } from "@/lib/jigsaw-puzzle/pieces";
 import { PRESET_IMAGES, type PresetImage } from "@/lib/jigsaw-puzzle/presets";
 import { MUSIC_TRACKS } from "@/lib/jigsaw-puzzle/music";
+import { scrollToTop } from "@/hooks/use-scroll-top";
 
 const PATH = "/tools/jigsaw-puzzle";
 const TITLE = "Photo Jigsaw Puzzle Maker — Turn Any Picture Into a Puzzle | Skycally";
@@ -133,6 +134,7 @@ function JigsawPuzzlePage() {
     if (totalCount > 0 && placedCount === totalCount && !completedRef.current) {
       completedRef.current = true;
       setStage("done");
+      scrollToTop();
       setCelebrating(true);
       setConfettiOn(true);
       playChord(["win", "allFound"]);
@@ -206,6 +208,7 @@ function JigsawPuzzlePage() {
     }
 
     setStage("loading");
+    scrollToTop();
     try {
       const img = await loadImage(source, Boolean(preset));
       // Resize to the largest square that actually fits the visible content
@@ -301,17 +304,20 @@ function JigsawPuzzlePage() {
       prevPlacedRef.current = 0;
       completedRef.current = false;
       setStage("playing");
+      scrollToTop();
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Something went wrong loading that image.");
       audioRef.current?.pause();
       setStage("setup");
+      scrollToTop();
     }
   };
 
   const restart = () => {
     playSound("click");
     setStage("setup");
+    scrollToTop();
     setPieces([]);
     setGhostSrc(null);
     setGridGuideSrc(null);

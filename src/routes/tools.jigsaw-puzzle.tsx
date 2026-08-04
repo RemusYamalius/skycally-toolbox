@@ -564,7 +564,8 @@ function JigsawPuzzlePage() {
               </div>
             </div>
 
-            <audio ref={audioRef} preload="none" />
+
+
 
             <div className="overflow-x-auto">
               <div

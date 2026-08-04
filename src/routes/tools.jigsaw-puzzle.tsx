@@ -109,6 +109,11 @@ function JigsawPuzzlePage() {
   const placedCount = pieces.filter((p) => p.locked).length;
   const totalCount = pieces.length;
 
+  // Run after React has committed each screen. Calling only from the click
+  // handler is too early: the shorter loading/playing DOM lets mobile scroll
+  // anchoring pull the viewport back down to How to use.
+  useEffect(() => scrollToTop(), [stage]);
+
   // ── Timer ──────────────────────────────────────────────────────────
   useEffect(() => {
     if (stage !== "playing") return;

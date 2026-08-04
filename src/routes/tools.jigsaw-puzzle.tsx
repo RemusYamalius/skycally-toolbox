@@ -112,7 +112,7 @@ function JigsawPuzzlePage() {
   // Run after React has committed each screen. Calling only from the click
   // handler is too early: the shorter loading/playing DOM lets mobile scroll
   // anchoring pull the viewport back down to How to use.
-  useEffect(() => scrollToTop(), [stage]);
+  useEffect(() => scrollToTop(), [stage, preset, customSrc]);
 
   // ── Timer ──────────────────────────────────────────────────────────
   useEffect(() => {

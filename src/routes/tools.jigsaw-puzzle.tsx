@@ -1,7 +1,7 @@
 import { createFileRoute, Link } from "@tanstack/react-router";
 import { useEffect, useRef, useState } from "react";
 import { toast } from "sonner";
-import { RefreshCw, Eye, EyeOff, Shuffle, Clock } from "lucide-react";
+import { RefreshCw, Eye, EyeOff, Shuffle, Clock, Volume2, VolumeX } from "lucide-react";
 
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -15,6 +15,7 @@ import { checkSize } from "@/lib/file-utils";
 import { playSound, playChord } from "@/lib/sound";
 import { DIFFICULTIES, buildPiecePath, generatePieceGrid, type Difficulty } from "@/lib/jigsaw-puzzle/pieces";
 import { PRESET_IMAGES, type PresetImage } from "@/lib/jigsaw-puzzle/presets";
+import { MUSIC_TRACKS } from "@/lib/jigsaw-puzzle/music";
 
 const PATH = "/tools/jigsaw-puzzle";
 const TITLE = "Photo Jigsaw Puzzle Maker — Turn Any Picture Into a Puzzle | Skycally";
@@ -93,9 +94,11 @@ function JigsawPuzzlePage() {
   const [celebrating, setCelebrating] = useState(false);
   const [confettiOn, setConfettiOn] = useState(false);
   const [merged, setMerged] = useState(false);
+  const [musicOn, setMusicOn] = useState(true);
 
   const containerRef = useRef<HTMLDivElement>(null);
   const shellRef = useRef<HTMLDivElement>(null);
+  const audioRef = useRef<HTMLAudioElement>(null);
   const dragId = useRef<string | null>(null);
   const dragOffset = useRef({ x: 0, y: 0 });
   const zCounter = useRef(1);
@@ -133,6 +136,22 @@ function JigsawPuzzlePage() {
       setCelebrating(true);
       setConfettiOn(true);
       playChord(["win", "allFound"]);
+
+      const audio = audioRef.current;
+      if (audio && !audio.paused) {
+        const startVolume = audio.volume;
+        const steps = 16;
+        let i = 0;
+        const fade = setInterval(() => {
+          i += 1;
+          audio.volume = Math.max(0, startVolume * (1 - i / steps));
+          if (i >= steps) {
+            audio.pause();
+            clearInterval(fade);
+          }
+        }, 60);
+      }
+
       const glowTimer = setTimeout(() => {
         setCelebrating(false);
         setMerged(true);
@@ -171,6 +190,21 @@ function JigsawPuzzlePage() {
       toast.error("Choose a photo first — upload one or pick an example below.");
       return;
     }
+
+    // Kick off music here, still synchronously inside the click handler —
+    // browsers tie autoplay permission to the user gesture that triggered
+    // it, and that permission doesn't reliably survive an `await` below.
+    const track = MUSIC_TRACKS[difficulty];
+    const audio = audioRef.current;
+    if (audio && track) {
+      audio.pause();
+      audio.src = track.src;
+      audio.loop = true;
+      audio.currentTime = 0;
+      audio.volume = 0.35;
+      if (musicOn) audio.play().catch(() => {});
+    }
+
     setStage("loading");
     try {
       const img = await loadImage(source, Boolean(preset));
@@ -270,6 +304,7 @@ function JigsawPuzzlePage() {
     } catch (e) {
       console.error(e);
       toast.error(e instanceof Error ? e.message : "Something went wrong loading that image.");
+      audioRef.current?.pause();
       setStage("setup");
     }
   };
@@ -285,6 +320,10 @@ function JigsawPuzzlePage() {
     setMerged(false);
     prevPlacedRef.current = 0;
     completedRef.current = false;
+    if (audioRef.current) {
+      audioRef.current.pause();
+      audioRef.current.volume = 0.35;
+    }
   };
 
   const shuffleTray = () => {
@@ -501,11 +540,31 @@ function JigsawPuzzlePage() {
                     </Button>
                   </>
                 )}
+                <Button
+                  variant="outline"
+                  size="sm"
+                  onClick={() => {
+                    setMusicOn((v) => {
+                      const next = !v;
+                      const audio = audioRef.current;
+                      if (audio) {
+                        if (next && audio.src) audio.play().catch(() => {});
+                        else audio.pause();
+                      }
+                      return next;
+                    });
+                  }}
+                  className="gap-1.5"
+                >
+                  {musicOn ? <Volume2 className="w-4 h-4" /> : <VolumeX className="w-4 h-4" />}
+                </Button>
                 <Button variant="outline" size="sm" onClick={restart} className="gap-1.5">
                   <RefreshCw className="w-4 h-4" /> New puzzle
                 </Button>
               </div>
             </div>
+
+            <audio ref={audioRef} preload="none" />
 
             <div className="overflow-x-auto">
               <div

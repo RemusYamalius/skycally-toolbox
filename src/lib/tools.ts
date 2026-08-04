@@ -2064,6 +2064,7 @@ export const tools: Tool[] = [
       "Curved interlocking tabs and blanks, not plain square tiles",
       "Four difficulty levels from 9 to 100 pieces",
       "Optional on-board piece outlines, or turn them off for more of a challenge",
+      "Background music that matches each difficulty level, with a mute toggle",
       "Built-in famous paintings and wonders of the world to try",
       "Fact card about the artwork or landmark once you finish",
       "Celebration animation with confetti when the puzzle is complete",

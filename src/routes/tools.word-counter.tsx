@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState, useMemo, useCallback } from "react";
@@ -7,6 +7,7 @@ import { toast } from "sonner";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
 import { HowToUse } from "@/components/how-to-use";
+import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
@@ -20,13 +21,29 @@ import { RelatedTools } from "@/components/related-tools";
 // to naturally cover these specific variants rather than the generic
 // buildToolMeta() template, since the tool clearly already works — this is
 // a ranking/relevance problem, not a functionality problem.
+//
+// Follow-up pass (this edit): the content targeting above was already solid,
+// but two structural gaps were found and fixed:
+//   1. <title> was 78 characters — past Google's ~55-60 char display limit,
+//      so it was likely being truncated in the SERP snippet. Shortened to
+//      53 chars while keeping an exact match for the #1 query, "word
+//      counter online".
+//   2. This page had no <AdZone> and no internal-links paragraph at all,
+//      unlike newer tools — meaning even after ranking improves, the page
+//      wouldn't monetize the traffic. Added both, matching the standard
+//      section order (tool → internal links → AdZone → HowToUse → SEO
+//      content → RelatedTools).
+// Note: this same AdZone gap exists across the rest of the original "text"
+// category (base64, lorem-ipsum, json-formatter, markdown-to-html,
+// url-encoder, uuid-generator, hash-generator, word-processor) — worth a
+// dedicated pass later, out of scope for this word-counter-specific fix.
 
 const SLUG = "word-counter";
 
 export const Route = createFileRoute("/tools/word-counter")({
   head: () => {
     const tool = toolBySlug(SLUG, tools);
-    const title = "Free Word Counter Online — Count Words, Characters & Reading Time | Skycally";
+    const title = "Word Counter Online — Words & Characters | Skycally";
     const description =
       "Free online word counter and character count calculator. Count words, characters, sentences and paragraphs instantly — no signup, works in your browser.";
     const base = buildPageMeta({ title, description, path: tool.path });
@@ -342,6 +359,20 @@ function WordCounterPage() {
           )}
         </div>
       </div>
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Need to actually edit and format that text, not just count it? Try the{" "}
+        <Link to="/tools/word-processor" className="text-[var(--cyan-brand)] hover:underline">
+          Word Processor
+        </Link>
+        . Writing for social media and need stylish characters instead? Check out the{" "}
+        <Link to="/tools/fancy-text-generator" className="text-[var(--cyan-brand)] hover:underline">
+          Fancy Text Generator
+        </Link>
+        .
+      </p>
+
+      <AdZone id="word-counter-mid" size="728x90" />
 
       <HowToUse
         steps={[

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useEffect, useState } from "react";
@@ -15,12 +15,29 @@ import { AdZone } from "@/components/ad-zone";
 import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 
+// SEO NOTE: Search Console shows this page already ranks reasonably (avg
+// position 15.72, 127 clicks / 2,791 impressions over 3 months) — but the
+// query breakdown reveals a clear pattern: "spin"/"spinner" phrasings
+// already rank well ("truth or dare online spin" pos 6.9, "web truth or
+// dare spin" pos 7.77, "online truth and dare spinner" pos 7.53), while
+// "generator"/"randomizer" phrasings rank poorly ("truth or dare generator"
+// pos 26.4, "truth or dare randomizer" pos 29.45, "random truth or dare
+// generator" pos 16.52) despite meaningful combined impressions (~300+).
+// The previous title/body barely used "spin" at all despite it being the
+// tool's actual core mechanic (per tools.ts: "Spin the bottle..."). Title,
+// description, body and FAQs below now lean into "spin" explicitly while
+// also naturally covering "generator"/"randomizer" wording, since both
+// clusters clearly describe the same tool. Not chasing "with strangers"
+// phrasing (pos 34-47) — that's a different intent (live matchmaking with
+// unknown people) this pass-the-device tool doesn't actually offer, so
+// targeting it would be misleading.
+
 export const Route = createFileRoute("/tools/truth-or-dare")({
   head: () => {
     const tool = toolBySlug("truth-or-dare", tools);
-    const title = "Truth or Dare Online — Free Generator with Custom Questions | Skycally";
+    const title = "Truth or Dare Online Spin Generator | Skycally";
     const description =
-      "Play Truth or Dare online free. 40+ built-in questions and dares, custom mode to add your own. No signup, browser-based, works with friends anywhere.";
+      "Spin for a random Truth or Dare online, free. 40+ built-in questions and dares, plus a custom randomizer to add your own. No signup, works anywhere.";
     const base = buildPageMeta({ title, description, path: tool.path });
     return {
       ...base,
@@ -382,6 +399,26 @@ function TruthOrDare() {
         </Collapsible>
       </div>
 
+      <p className="text-sm text-muted-foreground mt-10">
+        Want a different kind of spin for your group? Try the{" "}
+        <Link to="/tools/role-spinner" className="text-[var(--cyan-brand)] hover:underline">
+          Role Spinner
+        </Link>{" "}
+        or the general-purpose{" "}
+        <Link to="/tools/spinning-wheel" className="text-[var(--cyan-brand)] hover:underline">
+          Spinning Wheel
+        </Link>
+        . Looking for more conversation-starters instead of dares? Check out{" "}
+        <Link to="/tools/most-likely-to" className="text-[var(--cyan-brand)] hover:underline">
+          Most Likely To
+        </Link>{" "}
+        or{" "}
+        <Link to="/tools/never-have-i-ever" className="text-[var(--cyan-brand)] hover:underline">
+          Never Have I Ever
+        </Link>
+        .
+      </p>
+
       <AdZone id="truth-or-dare-bottom" size="728x90" />
 
       <HowToUse
@@ -393,15 +430,20 @@ function TruthOrDare() {
       />
 
       <ToolSeoContent
-        title="Free Truth or Dare Generator — Play Online with Custom Questions"
-        description="Play Truth or Dare with friends online. 40+ built-in questions and dares, plus custom mode to add your own. Free, browser-based, no signup required."
+        title="Truth or Dare Online Spin Generator — Play with Custom Questions"
+        description="Spin for a random Truth or Dare online. This free truth or dare generator and randomizer includes 40+ built-in questions and dares, plus custom mode to add your own. Browser-based, no signup required."
         body={[
-          "Skycally's Truth or Dare generator brings the classic party game to any screen. Choose between Truth, Dare, or Mixed mode and tap to reveal a random challenge. With 20 hand-picked truth questions and 20 creative dare challenges built in — plus a fully custom mode where you can add your own — every round stays fresh and personal.",
-          "The built-in questions are designed to be fun and appropriate for most groups, ranging from light-hearted ice-breakers to more revealing personal questions. Dare challenges are creative and engaging without being extreme. For groups who want something more personal or tailored, custom mode lets you replace the built-in deck entirely with your own prompts.",
-          "Custom mode is where the game really comes alive. Add questions specific to your friend group, inside jokes, or memories you share. Switch to custom-only mode to play exclusively with your prompts, or mix them with the built-in deck. All custom questions are saved in your browser's localStorage so they're there next time you play.",
-          "Works for sleepovers, road trips, dinner parties, team ice-breakers, first dates, and any social gathering where you want to spark conversation and laughter. No physical cards needed — just open the tool and pass the phone around. Everything runs in your browser with no account required.",
+          "Skycally's Truth or Dare online spin generator brings the classic party game to any screen. Choose between Truth, Dare, or Mixed mode and hit Spin to land on a random challenge — no bottle needed. With 20 hand-picked truth questions and 20 creative dare challenges built into the randomizer — plus a fully custom mode where you can add your own — every spin stays fresh and personal.",
+          "The built-in questions are designed to be fun and appropriate for most groups, ranging from light-hearted ice-breakers to more revealing personal questions. Dare challenges are creative and engaging without being extreme. For groups who want something more personal or tailored, custom mode lets you replace the built-in deck entirely with your own prompts before you spin.",
+          "Custom mode is where the game really comes alive. Add questions specific to your friend group, inside jokes, or memories you share, then use the same spin generator to draw from your own list. Switch to custom-only mode to play exclusively with your prompts, or mix them with the built-in deck. All custom questions are saved in your browser's localStorage so they're there next time you play.",
+          "Works for sleepovers, road trips, dinner parties, team ice-breakers, first dates, and any social gathering where you want to spark conversation and laughter. No physical cards needed — just open the tool, hit spin, and pass the phone around. Everything runs in your browser with no account required.",
         ]}
         faqs={[
+          {
+            question: "Is this a truth or dare generator, randomizer, or spinner?",
+            answer:
+              "All three describe the same tool. Hit Spin and it randomly generates a Truth or Dare challenge from the built-in deck (or your custom list) — whether you search for a 'truth or dare generator,' 'randomizer,' or 'spinner,' this is the tool you're looking for.",
+          },
           {
             question: "Can we play together online without meeting in person?",
             answer:

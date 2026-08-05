@@ -1056,10 +1056,10 @@
     <changefreq>monthly</changefreq>
     <priority>0.8</priority>
   </url>
-</urlset>
   <url>
   <loc>https://skycally.com/blog/3-months-of-search-console-data-free-tools-site</loc>
   <lastmod>2026-08-05</lastmod>
   <changefreq>monthly</changefreq>
   <priority>0.6</priority>
 </url>
+</urlset>  

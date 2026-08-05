@@ -325,6 +325,6 @@ function PurityTest() {
       />
 
       <RelatedTools currentSlug="purity-test" />
-    </motion.div>
+    </ToolPageShell>
   );
 }

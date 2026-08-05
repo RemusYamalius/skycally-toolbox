@@ -132,6 +132,7 @@ import { Route as ToolsPinballRouteImport } from './routes/tools.pinball'
 import { Route as ToolsPortCheckerRouteImport } from './routes/tools.port-checker'
 import { Route as ToolsPregnancyCalculatorRouteImport } from './routes/tools.pregnancy-calculator'
 import { Route as ToolsProtectPdfRouteImport } from './routes/tools.protect-pdf'
+import { Route as ToolsPurityTestRouteImport } from './routes/tools.purity-test'
 import { Route as ToolsQrGeneratorRouteImport } from './routes/tools.qr-generator'
 import { Route as ToolsQrReaderRouteImport } from './routes/tools.qr-reader'
 import { Route as ToolsRandomTeamMakerRouteImport } from './routes/tools.random-team-maker'
@@ -819,6 +820,11 @@ const ToolsProtectPdfRoute = ToolsProtectPdfRouteImport.update({
   path: '/tools/protect-pdf',
   getParentRoute: () => rootRouteImport,
 } as any)
+const ToolsPurityTestRoute = ToolsPurityTestRouteImport.update({
+  id: '/tools/purity-test',
+  path: '/tools/purity-test',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const ToolsQrGeneratorRoute = ToolsQrGeneratorRouteImport.update({
   id: '/tools/qr-generator',
   path: '/tools/qr-generator',
@@ -1217,6 +1223,7 @@ export interface FileRoutesByFullPath {
   '/tools/port-checker': typeof ToolsPortCheckerRoute
   '/tools/pregnancy-calculator': typeof ToolsPregnancyCalculatorRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
+  '/tools/purity-test': typeof ToolsPurityTestRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
@@ -1396,6 +1403,7 @@ export interface FileRoutesByTo {
   '/tools/port-checker': typeof ToolsPortCheckerRoute
   '/tools/pregnancy-calculator': typeof ToolsPregnancyCalculatorRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
+  '/tools/purity-test': typeof ToolsPurityTestRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
@@ -1576,6 +1584,7 @@ export interface FileRoutesById {
   '/tools/port-checker': typeof ToolsPortCheckerRoute
   '/tools/pregnancy-calculator': typeof ToolsPregnancyCalculatorRoute
   '/tools/protect-pdf': typeof ToolsProtectPdfRoute
+  '/tools/purity-test': typeof ToolsPurityTestRoute
   '/tools/qr-generator': typeof ToolsQrGeneratorRoute
   '/tools/qr-reader': typeof ToolsQrReaderRoute
   '/tools/random-team-maker': typeof ToolsRandomTeamMakerRoute
@@ -1757,6 +1766,7 @@ export interface FileRouteTypes {
     | '/tools/port-checker'
     | '/tools/pregnancy-calculator'
     | '/tools/protect-pdf'
+    | '/tools/purity-test'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/random-team-maker'
@@ -1936,6 +1946,7 @@ export interface FileRouteTypes {
     | '/tools/port-checker'
     | '/tools/pregnancy-calculator'
     | '/tools/protect-pdf'
+    | '/tools/purity-test'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/random-team-maker'
@@ -2115,6 +2126,7 @@ export interface FileRouteTypes {
     | '/tools/port-checker'
     | '/tools/pregnancy-calculator'
     | '/tools/protect-pdf'
+    | '/tools/purity-test'
     | '/tools/qr-generator'
     | '/tools/qr-reader'
     | '/tools/random-team-maker'
@@ -2295,6 +2307,7 @@ export interface RootRouteChildren {
   ToolsPortCheckerRoute: typeof ToolsPortCheckerRoute
   ToolsPregnancyCalculatorRoute: typeof ToolsPregnancyCalculatorRoute
   ToolsProtectPdfRoute: typeof ToolsProtectPdfRoute
+  ToolsPurityTestRoute: typeof ToolsPurityTestRoute
   ToolsQrGeneratorRoute: typeof ToolsQrGeneratorRoute
   ToolsQrReaderRoute: typeof ToolsQrReaderRoute
   ToolsRandomTeamMakerRoute: typeof ToolsRandomTeamMakerRoute
@@ -3216,6 +3229,13 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsProtectPdfRouteImport
       parentRoute: typeof rootRouteImport
     }
+    '/tools/purity-test': {
+      id: '/tools/purity-test'
+      path: '/tools/purity-test'
+      fullPath: '/tools/purity-test'
+      preLoaderRoute: typeof ToolsPurityTestRouteImport
+      parentRoute: typeof rootRouteImport
+    }
     '/tools/qr-generator': {
       id: '/tools/qr-generator'
       path: '/tools/qr-generator'
@@ -3723,6 +3743,7 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsPortCheckerRoute: ToolsPortCheckerRoute,
   ToolsPregnancyCalculatorRoute: ToolsPregnancyCalculatorRoute,
   ToolsProtectPdfRoute: ToolsProtectPdfRoute,
+  ToolsPurityTestRoute: ToolsPurityTestRoute,
   ToolsQrGeneratorRoute: ToolsQrGeneratorRoute,
   ToolsQrReaderRoute: ToolsQrReaderRoute,
   ToolsRandomTeamMakerRoute: ToolsRandomTeamMakerRoute,
@@ -3783,12 +3804,3 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
-
-import type { getRouter } from './router.tsx'
-import type { createStart } from '@tanstack/react-start'
-declare module '@tanstack/react-start' {
-  interface Register {
-    ssr: true
-    router: Awaited<ReturnType<typeof getRouter>>
-  }
-}

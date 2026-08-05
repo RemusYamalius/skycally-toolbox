@@ -4,14 +4,9 @@ import type { ReactNode } from "react";
 import type { BlogPost } from "@/lib/blog";
 import { tools } from "@/lib/tools";
 import { RelatedTools } from "@/components/related-tools";
+import { BlogHero } from "@/components/blog-hero";
 
-export function BlogPostLayout({
-  post,
-  children,
-}: {
-  post: BlogPost;
-  children: ReactNode;
-}) {
+export function BlogPostLayout({ post, children }: { post: BlogPost; children: ReactNode }) {
   const ctaTool = tools.find((t) => t.slug === post.ctaToolSlug);
 
   return (
@@ -20,20 +15,13 @@ export function BlogPostLayout({
         <span className="inline-flex items-center rounded-md border border-border px-2.5 py-0.5 text-[10px] uppercase tracking-wider font-semibold text-muted-foreground">
           {post.category}
         </span>
-        <h1 className="mt-4 font-display text-3xl sm:text-4xl font-bold tracking-tight leading-tight">
-          {post.title}
-        </h1>
+        <h1 className="mt-4 font-display text-3xl sm:text-4xl font-bold tracking-tight leading-tight">{post.title}</h1>
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <time dateTime={post.date}>{post.dateLabel}</time>
           <span aria-hidden>·</span>
           <span>By {post.author}</span>
         </div>
-        <img
-          src={post.thumbnail}
-          alt={post.thumbnailAlt}
-          className="mt-8 w-full rounded-2xl border border-border"
-          style={{ height: "auto", objectFit: "cover" }}
-        />
+        <BlogHero icon={post.heroIcon} accent={post.heroAccent} variant="hero" className="mt-8" />
       </header>
 
       <article
@@ -52,12 +40,8 @@ export function BlogPostLayout({
 
       {ctaTool && (
         <aside className="mt-12 rounded-2xl border border-border bg-card p-6 sm:p-8">
-          <h2 className="font-display text-xl sm:text-2xl font-bold">
-            Ready to try {ctaTool.name}?
-          </h2>
-          <p className="mt-2 text-sm text-muted-foreground">
-            {ctaTool.description}
-          </p>
+          <h2 className="font-display text-xl sm:text-2xl font-bold">Ready to try {ctaTool.name}?</h2>
+          <p className="mt-2 text-sm text-muted-foreground">{ctaTool.description}</p>
           <Link
             to={ctaTool.path}
             className="mt-5 inline-flex items-center gap-2 rounded-lg bg-primary px-5 py-2.5 text-sm font-semibold text-primary-foreground transition hover:opacity-90"

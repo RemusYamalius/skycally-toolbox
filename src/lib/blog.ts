@@ -1,8 +1,6 @@
-import compressPdfThumb from "@/assets/blog-compress-pdf.png";
-import videoToGifThumb from "@/assets/blog-video-to-gif.png";
-import designersToolsThumb from "@/assets/blog-designers-tools.png";
-import developersToolsThumb from "@/assets/blog-developers-tools.png";
-import networkSpeedTestThumb from "@/assets/blog-network-speed-test.png";
+import type { LucideIcon } from "lucide-react";
+import { FileArchive, Video, Palette, Code2, Gauge } from "lucide-react";
+import type { BlogAccent } from "@/components/blog-hero";
 
 export interface BlogPost {
   slug: string;
@@ -14,8 +12,8 @@ export interface BlogPost {
   dateLabel: string;
   author: string;
   ctaToolSlug: string;
-  thumbnail: string;
-  thumbnailAlt: string;
+  heroIcon: LucideIcon;
+  heroAccent: BlogAccent;
 }
 
 export const blogPosts: BlogPost[] = [
@@ -29,8 +27,8 @@ export const blogPosts: BlogPost[] = [
     dateLabel: "May 16, 2026",
     author: "Skycally Team",
     ctaToolSlug: "compress-pdf",
-    thumbnail: compressPdfThumb,
-    thumbnailAlt: "Compress PDF tool interface",
+    heroIcon: FileArchive,
+    heroAccent: "violet",
   },
   {
     slug: "video-to-gif-online-free",
@@ -42,8 +40,8 @@ export const blogPosts: BlogPost[] = [
     dateLabel: "May 17, 2026",
     author: "Skycally Team",
     ctaToolSlug: "video-to-gif",
-    thumbnail: videoToGifThumb,
-    thumbnailAlt: "Video to GIF tool interface",
+    heroIcon: Video,
+    heroAccent: "cyan",
   },
   {
     slug: "best-free-online-tools-for-designers",
@@ -55,8 +53,8 @@ export const blogPosts: BlogPost[] = [
     dateLabel: "May 22, 2026",
     author: "Skycally Team",
     ctaToolSlug: "remove-bg",
-    thumbnail: designersToolsThumb,
-    thumbnailAlt: "Remove Background tool interface",
+    heroIcon: Palette,
+    heroAccent: "pink",
   },
   {
     slug: "best-free-online-tools-for-developers-2025",
@@ -68,8 +66,8 @@ export const blogPosts: BlogPost[] = [
     dateLabel: "June 2, 2026",
     author: "Skycally Team",
     ctaToolSlug: "json-formatter",
-    thumbnail: developersToolsThumb,
-    thumbnailAlt: "JSON Formatter tool interface",
+    heroIcon: Code2,
+    heroAccent: "violet",
   },
   {
     slug: "how-to-test-internet-speed-online-free",
@@ -82,8 +80,8 @@ export const blogPosts: BlogPost[] = [
     dateLabel: "June 4, 2026",
     author: "Skycally Team",
     ctaToolSlug: "network-speed-test",
-    thumbnail: networkSpeedTestThumb,
-    thumbnailAlt: "Network Speed Test tool interface",
+    heroIcon: Gauge,
+    heroAccent: "amber",
   },
 ];
 

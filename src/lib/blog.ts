@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { FileArchive, Video, Palette, Code2, Gauge } from "lucide-react";
+import { FileArchive, Video, Palette, Code2, Gauge, BarChart3 } from "lucide-react";
 import type { BlogAccent } from "@/components/blog-hero";
 
 export interface BlogPost {
@@ -82,6 +82,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "network-speed-test",
     heroIcon: Gauge,
     heroAccent: "amber",
+  },
+  {
+    slug: "3-months-of-search-console-data-free-tools-site",
+    path: "/blog/3-months-of-search-console-data-free-tools-site",
+    title: "We Tracked Our Own Google Search Console Data for 3 Months — Here's What Actually Drives Traffic",
+    description:
+      "Real numbers from Skycally's own Search Console and Analytics data: which free tools actually get clicked, which get buried on page 7, and what that taught us about ranking a multi-tool site.",
+    category: "Behind the Scenes",
+    date: "2026-08-05",
+    dateLabel: "August 5, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "word-counter",
+    heroIcon: BarChart3,
+    heroAccent: "cyan",
   },
 ];
 

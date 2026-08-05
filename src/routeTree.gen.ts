@@ -15,6 +15,7 @@ import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
+import { Route as Blog3MonthsOfSearchConsoleDataFreeToolsSiteRouteImport } from './routes/blog.3-months-of-search-console-data-free-tools-site'
 import { Route as BlogBestFreeOnlineToolsForDesignersRouteImport } from './routes/blog.best-free-online-tools-for-designers'
 import { Route as BlogBestFreeOnlineToolsForDevelopers2025RouteImport } from './routes/blog.best-free-online-tools-for-developers-2025'
 import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
@@ -218,6 +219,12 @@ const BlogIndexRoute = BlogIndexRouteImport.update({
   path: '/blog/',
   getParentRoute: () => rootRouteImport,
 } as any)
+const Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute =
+  Blog3MonthsOfSearchConsoleDataFreeToolsSiteRouteImport.update({
+    id: '/blog/3-months-of-search-console-data-free-tools-site',
+    path: '/blog/3-months-of-search-console-data-free-tools-site',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const BlogBestFreeOnlineToolsForDesignersRoute =
   BlogBestFreeOnlineToolsForDesignersRouteImport.update({
     id: '/blog/best-free-online-tools-for-designers',
@@ -1107,6 +1114,7 @@ export interface FileRoutesByFullPath {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/blog/3-months-of-search-console-data-free-tools-site': typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
@@ -1287,6 +1295,7 @@ export interface FileRoutesByTo {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/blog/3-months-of-search-console-data-free-tools-site': typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
@@ -1468,6 +1477,7 @@ export interface FileRoutesById {
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/terms': typeof TermsRoute
+  '/blog/3-months-of-search-console-data-free-tools-site': typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
@@ -1650,6 +1660,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/terms'
+    | '/blog/3-months-of-search-console-data-free-tools-site'
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
@@ -1830,6 +1841,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/terms'
+    | '/blog/3-months-of-search-console-data-free-tools-site'
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
@@ -2010,6 +2022,7 @@ export interface FileRouteTypes {
     | '/contact'
     | '/privacy'
     | '/terms'
+    | '/blog/3-months-of-search-console-data-free-tools-site'
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
@@ -2191,6 +2204,7 @@ export interface RootRouteChildren {
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
   TermsRoute: typeof TermsRoute
+  Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute: typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
   BlogBestFreeOnlineToolsForDesignersRoute: typeof BlogBestFreeOnlineToolsForDesignersRoute
   BlogBestFreeOnlineToolsForDevelopers2025Route: typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
@@ -2408,6 +2422,13 @@ declare module '@tanstack/react-router' {
       path: '/blog'
       fullPath: '/blog/'
       preLoaderRoute: typeof BlogIndexRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/3-months-of-search-console-data-free-tools-site': {
+      id: '/blog/3-months-of-search-console-data-free-tools-site'
+      path: '/blog/3-months-of-search-console-data-free-tools-site'
+      fullPath: '/blog/3-months-of-search-console-data-free-tools-site'
+      preLoaderRoute: typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/best-free-online-tools-for-designers': {
@@ -3623,6 +3644,8 @@ const rootRouteChildren: RootRouteChildren = {
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
   TermsRoute: TermsRoute,
+  Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute:
+    Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute,
   BlogBestFreeOnlineToolsForDesignersRoute:
     BlogBestFreeOnlineToolsForDesignersRoute,
   BlogBestFreeOnlineToolsForDevelopers2025Route:

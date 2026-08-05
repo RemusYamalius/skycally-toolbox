@@ -2,7 +2,7 @@ import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useEffect, useMemo, useState } from "react";
-import { Check, Copy, Feather, RotateCcw, Share2 } from "lucide-react";
+import { ArrowLeft, ArrowRight, Check, Copy, Feather, RotateCcw, Share2 } from "lucide-react";
 import { motion } from "framer-motion";
 
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -140,6 +140,11 @@ function PurityTest() {
     goToStep((currentSection ?? 1) + 1);
   };
 
+  const prevSection = () => {
+    playSound("click");
+    goToStep((currentSection ?? 2) - 1);
+  };
+
   const restart = () => {
     playSound("click");
     if (typeof window !== "undefined") window.sessionStorage.removeItem(STORAGE_KEY);
@@ -238,9 +243,34 @@ function PurityTest() {
             </ul>
           </section>
 
-          <div className="mt-8 flex justify-center">
-            <Button size="lg" onClick={nextSection} className="px-10 h-12 text-base">
-              {currentSection < 7 ? `Next: ${CATEGORIES[currentSection]} (${currentSection + 1}/7)` : "See My Score"}
+          <AdZone id={`purity-test-section-${currentSection}`} size="728x90" />
+
+          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+            {currentSection > 1 && (
+              <Button
+                size="lg"
+                variant="outline"
+                onClick={prevSection}
+                className="h-12 px-6 text-base gap-2 border-2 hover:border-[var(--cyan-brand)] hover:text-[var(--cyan-brand)] transition-colors"
+              >
+                <ArrowLeft className="h-4 w-4" />
+                Back: {CATEGORIES[currentSection - 2]}
+              </Button>
+            )}
+            <Button
+              size="lg"
+              onClick={nextSection}
+              className="h-12 px-10 text-base gap-2"
+              style={{ background: "linear-gradient(135deg, var(--violet-brand), var(--cyan-brand))" }}
+            >
+              {currentSection < 7 ? (
+                <>
+                  Next: {CATEGORIES[currentSection]} ({currentSection + 1}/7)
+                  <ArrowRight className="h-4 w-4" />
+                </>
+              ) : (
+                "See My Score"
+              )}
             </Button>
           </div>
         </div>
@@ -313,7 +343,7 @@ function PurityTest() {
         .
       </p>
 
-      <AdZone id="purity-test-mid" size="728x90" />
+      {!currentSection && <AdZone id={`purity-test-${isResult ? "result" : "intro"}`} size="728x90" />}
 
       <HowToUse
         steps={[

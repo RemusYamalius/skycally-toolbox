@@ -196,6 +196,9 @@ function PurityTest() {
               <p className="text-sm font-semibold">
                 Section {currentSection} of 7 · {checkedCount} checked so far
               </p>
+              <p className="text-xs text-muted-foreground mt-0.5">
+                {currentSection < 7 ? `Up next: ${CATEGORIES[currentSection]}` : "Last section"}
+              </p>
               <div className="mt-1.5 h-1.5 w-32 overflow-hidden rounded-full bg-secondary">
                 <div
                   className="h-full rounded-full transition-all"
@@ -245,16 +248,16 @@ function PurityTest() {
 
           <AdZone id={`purity-test-section-${currentSection}`} size="728x90" />
 
-          <div className="mt-8 flex flex-wrap items-center justify-center gap-3">
+          <div className="mt-8 flex items-center justify-center gap-3">
             {currentSection > 1 && (
               <Button
                 size="lg"
                 variant="outline"
                 onClick={prevSection}
-                className="h-12 px-6 text-base gap-2 border-2 hover:border-[var(--cyan-brand)] hover:text-[var(--cyan-brand)] transition-colors"
+                className="h-12 px-6 text-base gap-2 border-2 hover:bg-[color-mix(in_oklab,var(--cyan-brand)_10%,transparent)] hover:border-[var(--cyan-brand)] hover:text-[var(--cyan-brand)] transition-colors"
               >
                 <ArrowLeft className="h-4 w-4" />
-                Back: {CATEGORIES[currentSection - 2]}
+                Back
               </Button>
             )}
             <Button
@@ -265,7 +268,7 @@ function PurityTest() {
             >
               {currentSection < 7 ? (
                 <>
-                  Next: {CATEGORIES[currentSection]} ({currentSection + 1}/7)
+                  Next
                   <ArrowRight className="h-4 w-4" />
                 </>
               ) : (

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildPageMeta } from "@/lib/seo";
 import { useCallback, useEffect, useRef, useState } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -462,6 +462,15 @@ function WordProcessor() {
       description="Write and format documents free in your browser. No Google account, no Microsoft account needed. Supports Arabic RTL, drag-to-resize margins, and exports to PDF and fully formatted Word."
     >
       {mounted ? <Editor4U /> : <div className="h-[600px] rounded-2xl bg-secondary/50 animate-pulse" />}
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Curious about the small structural bug that meant this page (and 38 others) had no ad slot at all until
+        recently? Read{" "}
+        <Link to="/blog/silent-bug-costing-ad-revenue-39-pages" className="text-[var(--cyan-brand)] hover:underline">
+          how we found and fixed it
+        </Link>
+        .
+      </p>
 
       <AdZone id="word-processor-mid" size="728x90" />
 

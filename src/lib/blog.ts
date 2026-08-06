@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { FileArchive, Video, Palette, Code2, Gauge, BarChart3 } from "lucide-react";
+import { FileArchive, Video, Palette, Code2, Gauge, BarChart3, MessageCircleHeart } from "lucide-react";
 import type { BlogAccent } from "@/components/blog-hero";
 
 export interface BlogPost {
@@ -96,6 +96,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "word-counter",
     heroIcon: BarChart3,
     heroAccent: "cyan",
+  },
+  {
+    slug: "psychology-behind-truth-or-dare",
+    path: "/blog/psychology-behind-truth-or-dare",
+    title: "The Psychology Behind Truth or Dare: Why We Confess to Near-Strangers",
+    description:
+      "Why does a party game get people to admit things they'd never say otherwise? A look at self-disclosure, reciprocity, and the 'stranger on a train' effect behind Truth or Dare.",
+    category: "Psychology",
+    date: "2026-08-06",
+    dateLabel: "August 6, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "truth-or-dare",
+    heroIcon: MessageCircleHeart,
+    heroAccent: "pink",
   },
 ];
 

@@ -19,7 +19,12 @@ export function BlogPostLayout({ post, children }: { post: BlogPost; children: R
         <div className="mt-4 flex flex-wrap items-center gap-x-3 gap-y-1 text-sm text-muted-foreground">
           <time dateTime={post.date}>{post.dateLabel}</time>
           <span aria-hidden>·</span>
-          <span>By {post.author}</span>
+          <span>
+            By{" "}
+            <Link to="/about" className="hover:text-foreground transition underline underline-offset-2">
+              {post.author}
+            </Link>
+          </span>
         </div>
         <BlogHero icon={post.heroIcon} accent={post.heroAccent} variant="hero" className="mt-8" />
       </header>

@@ -416,6 +416,10 @@ function TruthOrDare() {
         <Link to="/tools/never-have-i-ever" className="text-[var(--cyan-brand)] hover:underline">
           Never Have I Ever
         </Link>
+        . Curious why this game works so well on people who barely know each other? We wrote about{" "}
+        <Link to="/blog/psychology-behind-truth-or-dare" className="text-[var(--cyan-brand)] hover:underline">
+          the psychology behind Truth or Dare
+        </Link>
         .
       </p>
 

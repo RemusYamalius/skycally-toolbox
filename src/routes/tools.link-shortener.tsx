@@ -379,6 +379,10 @@ function LinkShortener() {
         <Link to="/tools/qr-reader" className="text-[var(--cyan-brand)] hover:underline">
           QR Reader
         </Link>
+        . This page was actually one of 39 tools with a missing ad placement until recently — read{" "}
+        <Link to="/blog/silent-bug-costing-ad-revenue-39-pages" className="text-[var(--cyan-brand)] hover:underline">
+          how we found and fixed it
+        </Link>
         .
       </p>
 

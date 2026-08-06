@@ -111,6 +111,20 @@ export const blogPosts: BlogPost[] = [
     heroIcon: MessageCircleHeart,
     heroAccent: "pink",
   },
+  {
+    slug: "silent-bug-costing-ad-revenue-39-pages",
+    path: "/blog/silent-bug-costing-ad-revenue-39-pages",
+    title: "The Silent Bug That Was Quietly Costing Us Ad Revenue on 39 Pages",
+    description:
+      "No error, no crash, no console warning — just 39 tool pages on our own site with no ad slot at all. How we found it, why it happened, and what auditing your own site actually looks like.",
+    category: "Behind the Scenes",
+    date: "2026-08-07",
+    dateLabel: "August 7, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "link-shortener",
+    heroIcon: BarChart3,
+    heroAccent: "amber",
+  },
 ];
 
 export const getBlogPostBySlug = (slug: string) => blogPosts.find((p) => p.slug === slug);

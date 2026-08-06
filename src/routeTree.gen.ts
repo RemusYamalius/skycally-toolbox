@@ -21,6 +21,7 @@ import { Route as BlogBestFreeOnlineToolsForDevelopers2025RouteImport } from './
 import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
 import { Route as BlogHowToTestInternetSpeedOnlineFreeRouteImport } from './routes/blog.how-to-test-internet-speed-online-free'
 import { Route as BlogPsychologyBehindTruthOrDareRouteImport } from './routes/blog.psychology-behind-truth-or-dare'
+import { Route as BlogSilentBugCostingAdRevenue39PagesRouteImport } from './routes/blog.silent-bug-costing-ad-revenue-39-pages'
 import { Route as BlogVideoToGifOnlineFreeRouteImport } from './routes/blog.video-to-gif-online-free'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as Tools2048RouteImport } from './routes/tools.2048'
@@ -254,6 +255,12 @@ const BlogPsychologyBehindTruthOrDareRoute =
   BlogPsychologyBehindTruthOrDareRouteImport.update({
     id: '/blog/psychology-behind-truth-or-dare',
     path: '/blog/psychology-behind-truth-or-dare',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogSilentBugCostingAdRevenue39PagesRoute =
+  BlogSilentBugCostingAdRevenue39PagesRouteImport.update({
+    id: '/blog/silent-bug-costing-ad-revenue-39-pages',
+    path: '/blog/silent-bug-costing-ad-revenue-39-pages',
     getParentRoute: () => rootRouteImport,
   } as any)
 const BlogVideoToGifOnlineFreeRoute =
@@ -1127,6 +1134,7 @@ export interface FileRoutesByFullPath {
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
+  '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1309,6 +1317,7 @@ export interface FileRoutesByTo {
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
+  '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1492,6 +1501,7 @@ export interface FileRoutesById {
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
+  '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1676,6 +1686,7 @@ export interface FileRouteTypes {
     | '/blog/compress-pdf-online-free'
     | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/psychology-behind-truth-or-dare'
+    | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -1858,6 +1869,7 @@ export interface FileRouteTypes {
     | '/blog/compress-pdf-online-free'
     | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/psychology-behind-truth-or-dare'
+    | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -2040,6 +2052,7 @@ export interface FileRouteTypes {
     | '/blog/compress-pdf-online-free'
     | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/psychology-behind-truth-or-dare'
+    | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -2223,6 +2236,7 @@ export interface RootRouteChildren {
   BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
   BlogHowToTestInternetSpeedOnlineFreeRoute: typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   BlogPsychologyBehindTruthOrDareRoute: typeof BlogPsychologyBehindTruthOrDareRoute
+  BlogSilentBugCostingAdRevenue39PagesRoute: typeof BlogSilentBugCostingAdRevenue39PagesRoute
   BlogVideoToGifOnlineFreeRoute: typeof BlogVideoToGifOnlineFreeRoute
   Tools2048Route: typeof Tools2048Route
   ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
@@ -2478,6 +2492,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/psychology-behind-truth-or-dare'
       fullPath: '/blog/psychology-behind-truth-or-dare'
       preLoaderRoute: typeof BlogPsychologyBehindTruthOrDareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/silent-bug-costing-ad-revenue-39-pages': {
+      id: '/blog/silent-bug-costing-ad-revenue-39-pages'
+      path: '/blog/silent-bug-costing-ad-revenue-39-pages'
+      fullPath: '/blog/silent-bug-costing-ad-revenue-39-pages'
+      preLoaderRoute: typeof BlogSilentBugCostingAdRevenue39PagesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/video-to-gif-online-free': {
@@ -3675,6 +3696,8 @@ const rootRouteChildren: RootRouteChildren = {
   BlogHowToTestInternetSpeedOnlineFreeRoute:
     BlogHowToTestInternetSpeedOnlineFreeRoute,
   BlogPsychologyBehindTruthOrDareRoute: BlogPsychologyBehindTruthOrDareRoute,
+  BlogSilentBugCostingAdRevenue39PagesRoute:
+    BlogSilentBugCostingAdRevenue39PagesRoute,
   BlogVideoToGifOnlineFreeRoute: BlogVideoToGifOnlineFreeRoute,
   Tools2048Route: Tools2048Route,
   ToolsAddSubtitlesRoute: ToolsAddSubtitlesRoute,
@@ -3849,3 +3872,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useState } from "react";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
@@ -126,6 +126,14 @@ function MarginCalculator() {
           price, markup measures it against the cost.
         </p>
       </section>
+
+      <p className="text-sm text-muted-foreground mt-10">
+        This calculator was actually one of 39 tools missing its ad placement until a recent site-wide audit. Read{" "}
+        <Link to="/blog/silent-bug-costing-ad-revenue-39-pages" className="text-[var(--cyan-brand)] hover:underline">
+          the full story of how we found it
+        </Link>
+        .
+      </p>
 
       <AdZone id="margin-calculator-mid" size="728x90" />
 

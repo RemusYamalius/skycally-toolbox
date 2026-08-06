@@ -4,18 +4,24 @@ import { Upload, Wand2, ArrowDown, ArrowRight, Sparkles } from "lucide-react";
 import { tools, categoryMeta, toolInCategory, isNewTool, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 import { AdZone } from "@/components/ad-zone";
+import { blogPosts } from "@/lib/blog";
+import { BlogCard } from "@/components/blog-card";
 
+// Derived from actual Search Console click data (3-month window), not a
+// guess — element-mixer/truth-or-dare/hand-gesture/role-spinner alone drive
+// roughly a third of the whole site's clicks. Revisit this list whenever a
+// fresh GSC export is available; it's a snapshot, not a permanent ranking.
 const POPULAR_SLUGS = [
-  "compress-pdf",
-  "remove-bg",
-  "image-converter",
-  "qr-generator",
-  "video-to-gif",
-  "word-to-pdf",
-  "currency-converter",
-  "satoshi-converter",
-  "unit-converter",
-  "ball-sort",
+  "element-mixer",
+  "truth-or-dare",
+  "hand-gesture",
+  "role-spinner",
+  "pdf-watermark-remover",
+  "image-upscaler",
+  "link-shortener",
+  "face-landmarks",
+  "object-detection",
+  "word-processor",
 ];
 
 const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games", "minigames", "ai"];
@@ -57,6 +63,8 @@ export default function HomeBelowFold() {
     () => POPULAR_SLUGS.map((s) => tools.find((t) => t.slug === s)).filter(Boolean) as typeof tools,
     [],
   );
+
+  const latestPosts = useMemo(() => [...blogPosts].sort((a, b) => b.date.localeCompare(a.date)).slice(0, 3), []);
 
   // Newest tools — sorted most-recent first. Naturally empty and hidden
   // once every tool's dateAdded window passes 45 days, so nobody has to
@@ -281,6 +289,30 @@ export default function HomeBelowFold() {
       </section>
 
       <AdZone id="homepage-middle-rectangle" size="300x250" />
+
+      {/* From the Blog — was previously not featured anywhere on the home
+          page, so visitors who don't click "Blog" in the nav never see it. */}
+      {latestPosts.length > 0 && (
+        <section className="py-16">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="font-display text-2xl font-bold">From the Blog</h2>
+              <p className="text-sm text-muted-foreground mt-0.5">Guides, deep dives, and what we've learned</p>
+            </div>
+            <Link
+              to="/blog"
+              className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition"
+            >
+              View all <ArrowRight className="w-4 h-4" />
+            </Link>
+          </div>
+          <div className="grid gap-6 sm:grid-cols-3">
+            {latestPosts.map((post) => (
+              <BlogCard key={post.slug} post={post} />
+            ))}
+          </div>
+        </section>
+      )}
 
       {/* CTA banner */}
       <section className="py-16">

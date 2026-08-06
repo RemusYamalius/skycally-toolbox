@@ -3,6 +3,7 @@ import { useMemo, useState, useEffect } from "react";
 import { Search } from "lucide-react";
 import { tools, categoryMeta, toolInCategory, TOOL_COUNT, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
+import { AdZone } from "@/components/ad-zone";
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
 
 const VALID_CATS = [
@@ -149,6 +150,8 @@ function ToolsPage() {
           ))}
         </div>
       </div>
+
+      <AdZone id="tools-index-top" size="728x90" />
 
       {cat === "all" ? (
         <div className="space-y-14">

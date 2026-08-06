@@ -125,11 +125,12 @@ function ArticlePage() {
         and you get a game that holds up for long-distance friend groups, remote team icebreakers, and first dates
         conducted half over text just as well as it does in person.
       </p>
-
-
+      <p>
+        Our own Truth or Dare tool leans on all of this: it ships with separate difficulty levels, themed packs,
         and a fully custom mode, so you can dial the intensity up or down for whatever group you're actually playing
         with — new acquaintances, an old friend group, or something in between.
       </p>
+
 
       <div className="mt-6">
         <Link

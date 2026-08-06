@@ -95,48 +95,48 @@ export function SiteFooter() {
           </ul>
         </div>
 
-        {/* Popular Tools */}
+        {/* Popular Tools — actual top performers by Search Console clicks, not a guess */}
         <div>
           <h4 className="text-sm font-semibold mb-3">Popular Tools</h4>
           <ul className="space-y-2 text-sm text-muted-foreground">
             <li>
-              <Link to="/tools/loan-calculator" className="hover:text-foreground transition">
-                Loan Calculator
+              <Link to="/tools/element-mixer" className="hover:text-foreground transition">
+                Element Mixer
               </Link>
             </li>
             <li>
-              <Link to="/tools/compound-interest" className="hover:text-foreground transition">
-                Compound Interest
+              <Link to="/tools/truth-or-dare" className="hover:text-foreground transition">
+                Truth or Dare
               </Link>
             </li>
             <li>
-              <Link to="/tools/image-compressor" className="hover:text-foreground transition">
-                Image Compressor
+              <Link to="/tools/hand-gesture" className="hover:text-foreground transition">
+                Hand Gesture
               </Link>
             </li>
             <li>
-              <Link to="/tools/pdf-to-word" className="hover:text-foreground transition">
-                PDF to Word
+              <Link to="/tools/role-spinner" className="hover:text-foreground transition">
+                Role Spinner
               </Link>
             </li>
             <li>
-              <Link to="/tools/remove-bg" className="hover:text-foreground transition">
-                Remove Background
+              <Link to="/tools/pdf-watermark-remover" className="hover:text-foreground transition">
+                PDF Watermark Remover
               </Link>
             </li>
             <li>
-              <Link to="/tools/password-generator" className="hover:text-foreground transition">
-                Password Generator
+              <Link to="/tools/image-upscaler" className="hover:text-foreground transition">
+                Image Upscaler
               </Link>
             </li>
             <li>
-              <Link to="/tools/word-counter" className="hover:text-foreground transition">
-                Word Counter
+              <Link to="/tools/link-shortener" className="hover:text-foreground transition">
+                Link Shortener
               </Link>
             </li>
             <li>
-              <Link to="/tools/image-to-text" className="hover:text-foreground transition">
-                Image to Text (OCR)
+              <Link to="/tools/word-processor" className="hover:text-foreground transition">
+                Word Processor
               </Link>
             </li>
           </ul>

@@ -20,6 +20,7 @@ import { Route as BlogBestFreeOnlineToolsForDesignersRouteImport } from './route
 import { Route as BlogBestFreeOnlineToolsForDevelopers2025RouteImport } from './routes/blog.best-free-online-tools-for-developers-2025'
 import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
 import { Route as BlogHowToTestInternetSpeedOnlineFreeRouteImport } from './routes/blog.how-to-test-internet-speed-online-free'
+import { Route as BlogPsychologyBehindTruthOrDareRouteImport } from './routes/blog.psychology-behind-truth-or-dare'
 import { Route as BlogVideoToGifOnlineFreeRouteImport } from './routes/blog.video-to-gif-online-free'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as Tools2048RouteImport } from './routes/tools.2048'
@@ -247,6 +248,12 @@ const BlogHowToTestInternetSpeedOnlineFreeRoute =
   BlogHowToTestInternetSpeedOnlineFreeRouteImport.update({
     id: '/blog/how-to-test-internet-speed-online-free',
     path: '/blog/how-to-test-internet-speed-online-free',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogPsychologyBehindTruthOrDareRoute =
+  BlogPsychologyBehindTruthOrDareRouteImport.update({
+    id: '/blog/psychology-behind-truth-or-dare',
+    path: '/blog/psychology-behind-truth-or-dare',
     getParentRoute: () => rootRouteImport,
   } as any)
 const BlogVideoToGifOnlineFreeRoute =
@@ -1119,6 +1126,7 @@ export interface FileRoutesByFullPath {
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
+  '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1300,6 +1308,7 @@ export interface FileRoutesByTo {
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
+  '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1482,6 +1491,7 @@ export interface FileRoutesById {
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
+  '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1665,6 +1675,7 @@ export interface FileRouteTypes {
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
     | '/blog/how-to-test-internet-speed-online-free'
+    | '/blog/psychology-behind-truth-or-dare'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -1846,6 +1857,7 @@ export interface FileRouteTypes {
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
     | '/blog/how-to-test-internet-speed-online-free'
+    | '/blog/psychology-behind-truth-or-dare'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -2027,6 +2039,7 @@ export interface FileRouteTypes {
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
     | '/blog/how-to-test-internet-speed-online-free'
+    | '/blog/psychology-behind-truth-or-dare'
     | '/blog/video-to-gif-online-free'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -2209,6 +2222,7 @@ export interface RootRouteChildren {
   BlogBestFreeOnlineToolsForDevelopers2025Route: typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
   BlogHowToTestInternetSpeedOnlineFreeRoute: typeof BlogHowToTestInternetSpeedOnlineFreeRoute
+  BlogPsychologyBehindTruthOrDareRoute: typeof BlogPsychologyBehindTruthOrDareRoute
   BlogVideoToGifOnlineFreeRoute: typeof BlogVideoToGifOnlineFreeRoute
   Tools2048Route: typeof Tools2048Route
   ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
@@ -2457,6 +2471,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/how-to-test-internet-speed-online-free'
       fullPath: '/blog/how-to-test-internet-speed-online-free'
       preLoaderRoute: typeof BlogHowToTestInternetSpeedOnlineFreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/psychology-behind-truth-or-dare': {
+      id: '/blog/psychology-behind-truth-or-dare'
+      path: '/blog/psychology-behind-truth-or-dare'
+      fullPath: '/blog/psychology-behind-truth-or-dare'
+      preLoaderRoute: typeof BlogPsychologyBehindTruthOrDareRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/video-to-gif-online-free': {
@@ -3653,6 +3674,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogCompressPdfOnlineFreeRoute: BlogCompressPdfOnlineFreeRoute,
   BlogHowToTestInternetSpeedOnlineFreeRoute:
     BlogHowToTestInternetSpeedOnlineFreeRoute,
+  BlogPsychologyBehindTruthOrDareRoute: BlogPsychologyBehindTruthOrDareRoute,
   BlogVideoToGifOnlineFreeRoute: BlogVideoToGifOnlineFreeRoute,
   Tools2048Route: Tools2048Route,
   ToolsAddSubtitlesRoute: ToolsAddSubtitlesRoute,

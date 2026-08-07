@@ -13,6 +13,7 @@ import {
   Users,
   Ban,
   Image as ImageIcon,
+  Share2,
 } from "lucide-react";
 import type { BlogAccent } from "@/components/blog-hero";
 
@@ -222,6 +223,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "image-converter",
     heroIcon: ImageIcon,
     heroAccent: "cyan",
+  },
+  {
+    slug: "why-purity-test-quizzes-go-viral",
+    path: "/blog/why-purity-test-quizzes-go-viral",
+    title: "Why 'Purity Test' Quizzes Keep Going Viral",
+    description:
+      "A decades-old college tradition keeps resurfacing on every new social platform. The psychology of social comparison, shareable scores, and why a simple checklist format is so hard to walk away from.",
+    category: "Psychology",
+    date: "2026-08-13",
+    dateLabel: "August 13, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "purity-test",
+    heroIcon: Share2,
+    heroAccent: "pink",
   },
 ];
 

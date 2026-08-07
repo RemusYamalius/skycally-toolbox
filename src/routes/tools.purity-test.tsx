@@ -343,6 +343,10 @@ function PurityTest() {
         <Link to="/tools/attachment-style-test" className="text-[var(--cyan-brand)] hover:underline">
           Attachment Style Test
         </Link>
+        . Wondering why this exact format keeps resurfacing online? Read{" "}
+        <Link to="/blog/why-purity-test-quizzes-go-viral" className="text-[var(--cyan-brand)] hover:underline">
+          why purity test quizzes keep going viral
+        </Link>
         .
       </p>
 

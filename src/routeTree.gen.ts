@@ -11,6 +11,7 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
+import { Route as AttachmentStylesExplainedRouteImport } from './routes/attachment-styles-explained'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PrivacyRouteImport } from './routes/privacy'
 import { Route as PsychologyOfJigsawPuzzlesRouteImport } from './routes/psychology-of-jigsaw-puzzles'
@@ -204,6 +205,12 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
+const AttachmentStylesExplainedRoute =
+  AttachmentStylesExplainedRouteImport.update({
+    id: '/attachment-styles-explained',
+    path: '/attachment-styles-explained',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -1146,6 +1153,7 @@ const ToolsYoutubeCommentAnalyzerRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/attachment-styles-explained': typeof AttachmentStylesExplainedRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/psychology-of-jigsaw-puzzles': typeof PsychologyOfJigsawPuzzlesRoute
@@ -1332,6 +1340,7 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/attachment-styles-explained': typeof AttachmentStylesExplainedRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/psychology-of-jigsaw-puzzles': typeof PsychologyOfJigsawPuzzlesRoute
@@ -1519,6 +1528,7 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
+  '/attachment-styles-explained': typeof AttachmentStylesExplainedRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
   '/psychology-of-jigsaw-puzzles': typeof PsychologyOfJigsawPuzzlesRoute
@@ -1707,6 +1717,7 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
+    | '/attachment-styles-explained'
     | '/contact'
     | '/privacy'
     | '/psychology-of-jigsaw-puzzles'
@@ -1893,6 +1904,7 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
+    | '/attachment-styles-explained'
     | '/contact'
     | '/privacy'
     | '/psychology-of-jigsaw-puzzles'
@@ -2079,6 +2091,7 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
+    | '/attachment-styles-explained'
     | '/contact'
     | '/privacy'
     | '/psychology-of-jigsaw-puzzles'
@@ -2266,6 +2279,7 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
+  AttachmentStylesExplainedRoute: typeof AttachmentStylesExplainedRoute
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
   PsychologyOfJigsawPuzzlesRoute: typeof PsychologyOfJigsawPuzzlesRoute
@@ -2464,6 +2478,13 @@ declare module '@tanstack/react-router' {
       path: '/about'
       fullPath: '/about'
       preLoaderRoute: typeof AboutRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/attachment-styles-explained': {
+      id: '/attachment-styles-explained'
+      path: '/attachment-styles-explained'
+      fullPath: '/attachment-styles-explained'
+      preLoaderRoute: typeof AttachmentStylesExplainedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/contact': {
@@ -3746,6 +3767,7 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
+  AttachmentStylesExplainedRoute: AttachmentStylesExplainedRoute,
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
   PsychologyOfJigsawPuzzlesRoute: PsychologyOfJigsawPuzzlesRoute,
@@ -3940,3 +3962,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

@@ -13,6 +13,7 @@ import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PrivacyRouteImport } from './routes/privacy'
+import { Route as PsychologyOfJigsawPuzzlesRouteImport } from './routes/psychology-of-jigsaw-puzzles'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as Blog3MonthsOfSearchConsoleDataFreeToolsSiteRouteImport } from './routes/blog.3-months-of-search-console-data-free-tools-site'
@@ -213,6 +214,12 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
+const PsychologyOfJigsawPuzzlesRoute =
+  PsychologyOfJigsawPuzzlesRouteImport.update({
+    id: '/psychology-of-jigsaw-puzzles',
+    path: '/psychology-of-jigsaw-puzzles',
+    getParentRoute: () => rootRouteImport,
+  } as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -1141,6 +1148,7 @@ export interface FileRoutesByFullPath {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
+  '/psychology-of-jigsaw-puzzles': typeof PsychologyOfJigsawPuzzlesRoute
   '/terms': typeof TermsRoute
   '/blog/3-months-of-search-console-data-free-tools-site': typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
@@ -1326,6 +1334,7 @@ export interface FileRoutesByTo {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
+  '/psychology-of-jigsaw-puzzles': typeof PsychologyOfJigsawPuzzlesRoute
   '/terms': typeof TermsRoute
   '/blog/3-months-of-search-console-data-free-tools-site': typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
@@ -1512,6 +1521,7 @@ export interface FileRoutesById {
   '/about': typeof AboutRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
+  '/psychology-of-jigsaw-puzzles': typeof PsychologyOfJigsawPuzzlesRoute
   '/terms': typeof TermsRoute
   '/blog/3-months-of-search-console-data-free-tools-site': typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
@@ -1699,6 +1709,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/privacy'
+    | '/psychology-of-jigsaw-puzzles'
     | '/terms'
     | '/blog/3-months-of-search-console-data-free-tools-site'
     | '/blog/best-free-online-tools-for-designers'
@@ -1884,6 +1895,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/privacy'
+    | '/psychology-of-jigsaw-puzzles'
     | '/terms'
     | '/blog/3-months-of-search-console-data-free-tools-site'
     | '/blog/best-free-online-tools-for-designers'
@@ -2069,6 +2081,7 @@ export interface FileRouteTypes {
     | '/about'
     | '/contact'
     | '/privacy'
+    | '/psychology-of-jigsaw-puzzles'
     | '/terms'
     | '/blog/3-months-of-search-console-data-free-tools-site'
     | '/blog/best-free-online-tools-for-designers'
@@ -2255,6 +2268,7 @@ export interface RootRouteChildren {
   AboutRoute: typeof AboutRoute
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
+  PsychologyOfJigsawPuzzlesRoute: typeof PsychologyOfJigsawPuzzlesRoute
   TermsRoute: typeof TermsRoute
   Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute: typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
   BlogBestFreeOnlineToolsForDesignersRoute: typeof BlogBestFreeOnlineToolsForDesignersRoute
@@ -2464,6 +2478,13 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/psychology-of-jigsaw-puzzles': {
+      id: '/psychology-of-jigsaw-puzzles'
+      path: '/psychology-of-jigsaw-puzzles'
+      fullPath: '/psychology-of-jigsaw-puzzles'
+      preLoaderRoute: typeof PsychologyOfJigsawPuzzlesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -3727,6 +3748,7 @@ const rootRouteChildren: RootRouteChildren = {
   AboutRoute: AboutRoute,
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
+  PsychologyOfJigsawPuzzlesRoute: PsychologyOfJigsawPuzzlesRoute,
   TermsRoute: TermsRoute,
   Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute:
     Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute,
@@ -3918,3 +3940,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

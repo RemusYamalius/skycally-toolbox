@@ -578,9 +578,6 @@ function JigsawPuzzlePage() {
               </div>
             </div>
 
-
-
-
             <div className="overflow-x-auto">
               <div
                 ref={containerRef}
@@ -736,7 +733,11 @@ function JigsawPuzzlePage() {
         <Link to="/tools/maze-puzzle" className="text-[var(--cyan-brand)] hover:underline">
           Maze Puzzle
         </Link>{" "}
-        generator.
+        generator. Curious what's actually happening in your brain while you do this? Read{" "}
+        <Link to="/blog/psychology-of-jigsaw-puzzles" className="text-[var(--cyan-brand)] hover:underline">
+          the psychology of jigsaw puzzles
+        </Link>
+        .
       </p>
 
       <AdZone id="jigsaw-puzzle-mid" size="728x90" />

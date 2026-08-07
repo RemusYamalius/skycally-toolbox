@@ -6,7 +6,7 @@ import { buildPageMeta } from "@/lib/seo";
 
 const post = getBlogPostBySlug("psychology-of-jigsaw-puzzles")!;
 
-export const Route = createFileRoute("/blog/psychology-of-jigsaw-puzzles")({
+export const Route = createFileRoute("/psychology-of-jigsaw-puzzles")({
   head: () => {
     const base = buildPageMeta({
       title: post.title,

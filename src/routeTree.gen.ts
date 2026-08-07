@@ -11,19 +11,19 @@
 import { Route as rootRouteImport } from './routes/__root'
 import { Route as IndexRouteImport } from './routes/index'
 import { Route as AboutRouteImport } from './routes/about'
-import { Route as AttachmentStylesExplainedRouteImport } from './routes/attachment-styles-explained'
 import { Route as ContactRouteImport } from './routes/contact'
 import { Route as PrivacyRouteImport } from './routes/privacy'
-import { Route as PsychologyOfJigsawPuzzlesRouteImport } from './routes/psychology-of-jigsaw-puzzles'
 import { Route as TermsRouteImport } from './routes/terms'
 import { Route as BlogIndexRouteImport } from './routes/blog.index'
 import { Route as Blog3MonthsOfSearchConsoleDataFreeToolsSiteRouteImport } from './routes/blog.3-months-of-search-console-data-free-tools-site'
+import { Route as BlogAttachmentStylesExplainedRouteImport } from './routes/blog.attachment-styles-explained'
 import { Route as BlogBestFreeOnlineToolsForDesignersRouteImport } from './routes/blog.best-free-online-tools-for-designers'
 import { Route as BlogBestFreeOnlineToolsForDevelopers2025RouteImport } from './routes/blog.best-free-online-tools-for-developers-2025'
 import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
 import { Route as BlogHowCompoundInterestActuallyWorksRouteImport } from './routes/blog.how-compound-interest-actually-works'
 import { Route as BlogHowToTestInternetSpeedOnlineFreeRouteImport } from './routes/blog.how-to-test-internet-speed-online-free'
 import { Route as BlogPsychologyBehindTruthOrDareRouteImport } from './routes/blog.psychology-behind-truth-or-dare'
+import { Route as BlogPsychologyOfJigsawPuzzlesRouteImport } from './routes/blog.psychology-of-jigsaw-puzzles'
 import { Route as BlogSilentBugCostingAdRevenue39PagesRouteImport } from './routes/blog.silent-bug-costing-ad-revenue-39-pages'
 import { Route as BlogVideoToGifOnlineFreeRouteImport } from './routes/blog.video-to-gif-online-free'
 import { Route as BlogWhyYourPaycheckIsntWhatYouExpectRouteImport } from './routes/blog.why-your-paycheck-isnt-what-you-expect'
@@ -205,12 +205,6 @@ const AboutRoute = AboutRouteImport.update({
   path: '/about',
   getParentRoute: () => rootRouteImport,
 } as any)
-const AttachmentStylesExplainedRoute =
-  AttachmentStylesExplainedRouteImport.update({
-    id: '/attachment-styles-explained',
-    path: '/attachment-styles-explained',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const ContactRoute = ContactRouteImport.update({
   id: '/contact',
   path: '/contact',
@@ -221,12 +215,6 @@ const PrivacyRoute = PrivacyRouteImport.update({
   path: '/privacy',
   getParentRoute: () => rootRouteImport,
 } as any)
-const PsychologyOfJigsawPuzzlesRoute =
-  PsychologyOfJigsawPuzzlesRouteImport.update({
-    id: '/psychology-of-jigsaw-puzzles',
-    path: '/psychology-of-jigsaw-puzzles',
-    getParentRoute: () => rootRouteImport,
-  } as any)
 const TermsRoute = TermsRouteImport.update({
   id: '/terms',
   path: '/terms',
@@ -241,6 +229,12 @@ const Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute =
   Blog3MonthsOfSearchConsoleDataFreeToolsSiteRouteImport.update({
     id: '/blog/3-months-of-search-console-data-free-tools-site',
     path: '/blog/3-months-of-search-console-data-free-tools-site',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogAttachmentStylesExplainedRoute =
+  BlogAttachmentStylesExplainedRouteImport.update({
+    id: '/blog/attachment-styles-explained',
+    path: '/blog/attachment-styles-explained',
     getParentRoute: () => rootRouteImport,
   } as any)
 const BlogBestFreeOnlineToolsForDesignersRoute =
@@ -277,6 +271,12 @@ const BlogPsychologyBehindTruthOrDareRoute =
   BlogPsychologyBehindTruthOrDareRouteImport.update({
     id: '/blog/psychology-behind-truth-or-dare',
     path: '/blog/psychology-behind-truth-or-dare',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogPsychologyOfJigsawPuzzlesRoute =
+  BlogPsychologyOfJigsawPuzzlesRouteImport.update({
+    id: '/blog/psychology-of-jigsaw-puzzles',
+    path: '/blog/psychology-of-jigsaw-puzzles',
     getParentRoute: () => rootRouteImport,
   } as any)
 const BlogSilentBugCostingAdRevenue39PagesRoute =
@@ -1153,18 +1153,18 @@ const ToolsYoutubeCommentAnalyzerRoute =
 export interface FileRoutesByFullPath {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/attachment-styles-explained': typeof AttachmentStylesExplainedRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
-  '/psychology-of-jigsaw-puzzles': typeof PsychologyOfJigsawPuzzlesRoute
   '/terms': typeof TermsRoute
   '/blog/3-months-of-search-console-data-free-tools-site': typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
+  '/blog/attachment-styles-explained': typeof BlogAttachmentStylesExplainedRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-compound-interest-actually-works': typeof BlogHowCompoundInterestActuallyWorksRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
+  '/blog/psychology-of-jigsaw-puzzles': typeof BlogPsychologyOfJigsawPuzzlesRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/blog/why-your-paycheck-isnt-what-you-expect': typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
@@ -1340,18 +1340,18 @@ export interface FileRoutesByFullPath {
 export interface FileRoutesByTo {
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/attachment-styles-explained': typeof AttachmentStylesExplainedRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
-  '/psychology-of-jigsaw-puzzles': typeof PsychologyOfJigsawPuzzlesRoute
   '/terms': typeof TermsRoute
   '/blog/3-months-of-search-console-data-free-tools-site': typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
+  '/blog/attachment-styles-explained': typeof BlogAttachmentStylesExplainedRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-compound-interest-actually-works': typeof BlogHowCompoundInterestActuallyWorksRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
+  '/blog/psychology-of-jigsaw-puzzles': typeof BlogPsychologyOfJigsawPuzzlesRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/blog/why-your-paycheck-isnt-what-you-expect': typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
@@ -1528,18 +1528,18 @@ export interface FileRoutesById {
   __root__: typeof rootRouteImport
   '/': typeof IndexRoute
   '/about': typeof AboutRoute
-  '/attachment-styles-explained': typeof AttachmentStylesExplainedRoute
   '/contact': typeof ContactRoute
   '/privacy': typeof PrivacyRoute
-  '/psychology-of-jigsaw-puzzles': typeof PsychologyOfJigsawPuzzlesRoute
   '/terms': typeof TermsRoute
   '/blog/3-months-of-search-console-data-free-tools-site': typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
+  '/blog/attachment-styles-explained': typeof BlogAttachmentStylesExplainedRoute
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-compound-interest-actually-works': typeof BlogHowCompoundInterestActuallyWorksRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
+  '/blog/psychology-of-jigsaw-puzzles': typeof BlogPsychologyOfJigsawPuzzlesRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
   '/blog/why-your-paycheck-isnt-what-you-expect': typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
@@ -1717,18 +1717,18 @@ export interface FileRouteTypes {
   fullPaths:
     | '/'
     | '/about'
-    | '/attachment-styles-explained'
     | '/contact'
     | '/privacy'
-    | '/psychology-of-jigsaw-puzzles'
     | '/terms'
     | '/blog/3-months-of-search-console-data-free-tools-site'
+    | '/blog/attachment-styles-explained'
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
     | '/blog/how-compound-interest-actually-works'
     | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/psychology-behind-truth-or-dare'
+    | '/blog/psychology-of-jigsaw-puzzles'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
     | '/blog/why-your-paycheck-isnt-what-you-expect'
@@ -1904,18 +1904,18 @@ export interface FileRouteTypes {
   to:
     | '/'
     | '/about'
-    | '/attachment-styles-explained'
     | '/contact'
     | '/privacy'
-    | '/psychology-of-jigsaw-puzzles'
     | '/terms'
     | '/blog/3-months-of-search-console-data-free-tools-site'
+    | '/blog/attachment-styles-explained'
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
     | '/blog/how-compound-interest-actually-works'
     | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/psychology-behind-truth-or-dare'
+    | '/blog/psychology-of-jigsaw-puzzles'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
     | '/blog/why-your-paycheck-isnt-what-you-expect'
@@ -2091,18 +2091,18 @@ export interface FileRouteTypes {
     | '__root__'
     | '/'
     | '/about'
-    | '/attachment-styles-explained'
     | '/contact'
     | '/privacy'
-    | '/psychology-of-jigsaw-puzzles'
     | '/terms'
     | '/blog/3-months-of-search-console-data-free-tools-site'
+    | '/blog/attachment-styles-explained'
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
     | '/blog/how-compound-interest-actually-works'
     | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/psychology-behind-truth-or-dare'
+    | '/blog/psychology-of-jigsaw-puzzles'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
     | '/blog/why-your-paycheck-isnt-what-you-expect'
@@ -2279,18 +2279,18 @@ export interface FileRouteTypes {
 export interface RootRouteChildren {
   IndexRoute: typeof IndexRoute
   AboutRoute: typeof AboutRoute
-  AttachmentStylesExplainedRoute: typeof AttachmentStylesExplainedRoute
   ContactRoute: typeof ContactRoute
   PrivacyRoute: typeof PrivacyRoute
-  PsychologyOfJigsawPuzzlesRoute: typeof PsychologyOfJigsawPuzzlesRoute
   TermsRoute: typeof TermsRoute
   Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute: typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute
+  BlogAttachmentStylesExplainedRoute: typeof BlogAttachmentStylesExplainedRoute
   BlogBestFreeOnlineToolsForDesignersRoute: typeof BlogBestFreeOnlineToolsForDesignersRoute
   BlogBestFreeOnlineToolsForDevelopers2025Route: typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
   BlogHowCompoundInterestActuallyWorksRoute: typeof BlogHowCompoundInterestActuallyWorksRoute
   BlogHowToTestInternetSpeedOnlineFreeRoute: typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   BlogPsychologyBehindTruthOrDareRoute: typeof BlogPsychologyBehindTruthOrDareRoute
+  BlogPsychologyOfJigsawPuzzlesRoute: typeof BlogPsychologyOfJigsawPuzzlesRoute
   BlogSilentBugCostingAdRevenue39PagesRoute: typeof BlogSilentBugCostingAdRevenue39PagesRoute
   BlogVideoToGifOnlineFreeRoute: typeof BlogVideoToGifOnlineFreeRoute
   BlogWhyYourPaycheckIsntWhatYouExpectRoute: typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
@@ -2480,13 +2480,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof AboutRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/attachment-styles-explained': {
-      id: '/attachment-styles-explained'
-      path: '/attachment-styles-explained'
-      fullPath: '/attachment-styles-explained'
-      preLoaderRoute: typeof AttachmentStylesExplainedRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/contact': {
       id: '/contact'
       path: '/contact'
@@ -2499,13 +2492,6 @@ declare module '@tanstack/react-router' {
       path: '/privacy'
       fullPath: '/privacy'
       preLoaderRoute: typeof PrivacyRouteImport
-      parentRoute: typeof rootRouteImport
-    }
-    '/psychology-of-jigsaw-puzzles': {
-      id: '/psychology-of-jigsaw-puzzles'
-      path: '/psychology-of-jigsaw-puzzles'
-      fullPath: '/psychology-of-jigsaw-puzzles'
-      preLoaderRoute: typeof PsychologyOfJigsawPuzzlesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/terms': {
@@ -2527,6 +2513,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/3-months-of-search-console-data-free-tools-site'
       fullPath: '/blog/3-months-of-search-console-data-free-tools-site'
       preLoaderRoute: typeof Blog3MonthsOfSearchConsoleDataFreeToolsSiteRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/attachment-styles-explained': {
+      id: '/blog/attachment-styles-explained'
+      path: '/blog/attachment-styles-explained'
+      fullPath: '/blog/attachment-styles-explained'
+      preLoaderRoute: typeof BlogAttachmentStylesExplainedRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/best-free-online-tools-for-designers': {
@@ -2569,6 +2562,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/psychology-behind-truth-or-dare'
       fullPath: '/blog/psychology-behind-truth-or-dare'
       preLoaderRoute: typeof BlogPsychologyBehindTruthOrDareRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/psychology-of-jigsaw-puzzles': {
+      id: '/blog/psychology-of-jigsaw-puzzles'
+      path: '/blog/psychology-of-jigsaw-puzzles'
+      fullPath: '/blog/psychology-of-jigsaw-puzzles'
+      preLoaderRoute: typeof BlogPsychologyOfJigsawPuzzlesRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/silent-bug-costing-ad-revenue-39-pages': {
@@ -3767,13 +3767,12 @@ declare module '@tanstack/react-router' {
 const rootRouteChildren: RootRouteChildren = {
   IndexRoute: IndexRoute,
   AboutRoute: AboutRoute,
-  AttachmentStylesExplainedRoute: AttachmentStylesExplainedRoute,
   ContactRoute: ContactRoute,
   PrivacyRoute: PrivacyRoute,
-  PsychologyOfJigsawPuzzlesRoute: PsychologyOfJigsawPuzzlesRoute,
   TermsRoute: TermsRoute,
   Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute:
     Blog3MonthsOfSearchConsoleDataFreeToolsSiteRoute,
+  BlogAttachmentStylesExplainedRoute: BlogAttachmentStylesExplainedRoute,
   BlogBestFreeOnlineToolsForDesignersRoute:
     BlogBestFreeOnlineToolsForDesignersRoute,
   BlogBestFreeOnlineToolsForDevelopers2025Route:
@@ -3784,6 +3783,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogHowToTestInternetSpeedOnlineFreeRoute:
     BlogHowToTestInternetSpeedOnlineFreeRoute,
   BlogPsychologyBehindTruthOrDareRoute: BlogPsychologyBehindTruthOrDareRoute,
+  BlogPsychologyOfJigsawPuzzlesRoute: BlogPsychologyOfJigsawPuzzlesRoute,
   BlogSilentBugCostingAdRevenue39PagesRoute:
     BlogSilentBugCostingAdRevenue39PagesRoute,
   BlogVideoToGifOnlineFreeRoute: BlogVideoToGifOnlineFreeRoute,

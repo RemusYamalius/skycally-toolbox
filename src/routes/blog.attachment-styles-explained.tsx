@@ -6,7 +6,7 @@ import { buildPageMeta } from "@/lib/seo";
 
 const post = getBlogPostBySlug("attachment-styles-explained")!;
 
-export const Route = createFileRoute("/attachment-styles-explained")({
+export const Route = createFileRoute("/blog/attachment-styles-explained")({
   head: () => {
     const base = buildPageMeta({
       title: post.title,

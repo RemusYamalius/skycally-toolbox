@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState } from "react";
@@ -275,6 +275,15 @@ function CompressPdfPage() {
           </div>
         )}
       </div>
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Want the full guide, including why PDFs get so large in the first place and how much you can realistically
+        expect to save? Read{" "}
+        <Link to="/blog/compress-pdf-online-free" className="text-[var(--cyan-brand)] hover:underline">
+          how to compress a PDF online for free
+        </Link>
+        .
+      </p>
 
       <AdZone id="compress-pdf-mid" size="728x90" />
 

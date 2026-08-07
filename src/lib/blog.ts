@@ -9,6 +9,8 @@ import {
   MessageCircleHeart,
   TrendingUp,
   Wallet,
+  Brain,
+  Users,
 } from "lucide-react";
 import type { BlogAccent } from "@/components/blog-hero";
 
@@ -162,6 +164,34 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "paycheck-calculator",
     heroIcon: Wallet,
     heroAccent: "amber",
+  },
+  {
+    slug: "psychology-of-jigsaw-puzzles",
+    path: "/blog/psychology-of-jigsaw-puzzles",
+    title: "The Psychology of Jigsaw Puzzles: Why Your Brain Finds Them So Satisfying",
+    description:
+      "What's actually happening in your brain when you solve a jigsaw puzzle — the dopamine, the flow state, why it's used in cognitive research, and why unfinished puzzles are so hard to walk away from.",
+    category: "Psychology",
+    date: "2026-08-10",
+    dateLabel: "August 10, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "jigsaw-puzzle",
+    heroIcon: Brain,
+    heroAccent: "violet",
+  },
+  {
+    slug: "attachment-styles-explained",
+    path: "/blog/attachment-styles-explained",
+    title: "Attachment Styles Explained: What Secure, Anxious, and Avoidant Actually Mean",
+    description:
+      "Where attachment theory actually comes from, what the four adult attachment styles really describe, and why your style isn't a fixed label you're stuck with forever.",
+    category: "Psychology",
+    date: "2026-08-10",
+    dateLabel: "August 10, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "attachment-style-test",
+    heroIcon: Users,
+    heroAccent: "pink",
   },
 ];
 

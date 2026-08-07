@@ -12,6 +12,7 @@ import {
   Brain,
   Users,
   Ban,
+  Image as ImageIcon,
 } from "lucide-react";
 import type { BlogAccent } from "@/components/blog-hero";
 
@@ -207,6 +208,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "image-compressor",
     heroIcon: Ban,
     heroAccent: "violet",
+  },
+  {
+    slug: "png-vs-jpeg-vs-webp",
+    path: "/blog/png-vs-jpeg-vs-webp",
+    title: "PNG vs JPEG vs WebP: Which Image Format Should You Actually Use?",
+    description:
+      "The real difference between lossless and lossy compression, when transparency actually matters, and why WebP usually beats both older formats — with the specific exceptions where it doesn't.",
+    category: "Image Tools",
+    date: "2026-08-12",
+    dateLabel: "August 12, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "image-converter",
+    heroIcon: ImageIcon,
+    heroAccent: "cyan",
   },
 ];
 

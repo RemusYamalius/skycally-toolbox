@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
@@ -244,6 +244,18 @@ function ImageConverter() {
           </div>
         </div>
       )}
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Not sure which format actually fits your image? Read{" "}
+        <Link to="/blog/png-vs-jpeg-vs-webp" className="text-[var(--cyan-brand)] hover:underline">
+          PNG vs JPEG vs WebP — which format should you actually use
+        </Link>
+        . Need a smaller file without changing format at all? Try the{" "}
+        <Link to="/tools/image-compressor" className="text-[var(--cyan-brand)] hover:underline">
+          Image Compressor
+        </Link>
+        .
+      </p>
 
       <AdZone id="image-converter-mid" size="728x90" />
 

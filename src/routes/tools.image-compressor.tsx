@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState, useCallback } from "react";
@@ -332,6 +332,18 @@ function ImageCompressorPage() {
           </div>
         </div>
       )}
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Need a specific file size, not just smaller? Try the{" "}
+        <Link to="/tools/image-converter" className="text-[var(--cyan-brand)] hover:underline">
+          Image Converter
+        </Link>{" "}
+        to switch formats entirely. Curious why this tool was worth building while others weren't? Read{" "}
+        <Link to="/blog/why-we-rejected-5-tool-ideas" className="text-[var(--cyan-brand)] hover:underline">
+          why we rejected 5 tool ideas that looked profitable on paper
+        </Link>
+        .
+      </p>
 
       <AdZone id="image-compressor-mid" size="728x90" />
 

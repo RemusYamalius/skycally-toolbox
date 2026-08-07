@@ -16,7 +16,6 @@ export function SiteHeader() {
   const closeTimer = useRef<number | null>(null);
 
   const links = [
-    { to: "/", label: "Home" },
     { to: "/blog", label: "Blog" },
     { to: "/about", label: "About" },
     { to: "/contact", label: "Contact" },
@@ -46,6 +45,14 @@ export function SiteHeader() {
         </Link>
 
         <nav className="hidden md:flex items-center gap-8">
+          <Link
+            to="/"
+            className="text-sm font-medium text-muted-foreground hover:text-foreground transition"
+            activeProps={{ className: "text-foreground" }}
+          >
+            Home
+          </Link>
+
           {/* Tools — hover mega-menu on desktop. The link itself still goes
               straight to /tools; the chevron/hover area reveals categories
               so browsing a specific category doesn't require a stop at the
@@ -179,13 +186,11 @@ export function SiteHeader() {
             </div>
           )}
 
-          {links
-            .filter((l) => l.to !== "/")
-            .map((l) => (
-              <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
-                {l.label}
-              </Link>
-            ))}
+          {links.map((l) => (
+            <Link key={l.to} to={l.to} onClick={() => setOpen(false)} className="py-2 text-sm font-medium">
+              {l.label}
+            </Link>
+          ))}
         </div>
       )}
     </header>

@@ -562,6 +562,13 @@ function ResultsPanel({ scores, onRetake, onShare }: { scores: Scores; onRetake:
             {" — "}
             style your shared result before posting it.
           </li>
+          <li>
+            <Link to="/blog/attachment-styles-explained" className="text-foreground hover:underline">
+              Attachment Styles Explained
+            </Link>
+            {" — "}
+            where these four patterns actually come from, and what the research says they mean.
+          </li>
         </ul>
       </section>
 

@@ -22,6 +22,7 @@ import { Route as BlogBestFreeOnlineToolsForDevelopers2025RouteImport } from './
 import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
 import { Route as BlogHowCompoundInterestActuallyWorksRouteImport } from './routes/blog.how-compound-interest-actually-works'
 import { Route as BlogHowToTestInternetSpeedOnlineFreeRouteImport } from './routes/blog.how-to-test-internet-speed-online-free'
+import { Route as BlogPngVsJpegVsWebpRouteImport } from './routes/blog.png-vs-jpeg-vs-webp'
 import { Route as BlogPsychologyBehindTruthOrDareRouteImport } from './routes/blog.psychology-behind-truth-or-dare'
 import { Route as BlogPsychologyOfJigsawPuzzlesRouteImport } from './routes/blog.psychology-of-jigsaw-puzzles'
 import { Route as BlogSilentBugCostingAdRevenue39PagesRouteImport } from './routes/blog.silent-bug-costing-ad-revenue-39-pages'
@@ -268,6 +269,11 @@ const BlogHowToTestInternetSpeedOnlineFreeRoute =
     path: '/blog/how-to-test-internet-speed-online-free',
     getParentRoute: () => rootRouteImport,
   } as any)
+const BlogPngVsJpegVsWebpRoute = BlogPngVsJpegVsWebpRouteImport.update({
+  id: '/blog/png-vs-jpeg-vs-webp',
+  path: '/blog/png-vs-jpeg-vs-webp',
+  getParentRoute: () => rootRouteImport,
+} as any)
 const BlogPsychologyBehindTruthOrDareRoute =
   BlogPsychologyBehindTruthOrDareRouteImport.update({
     id: '/blog/psychology-behind-truth-or-dare',
@@ -1170,6 +1176,7 @@ export interface FileRoutesByFullPath {
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-compound-interest-actually-works': typeof BlogHowCompoundInterestActuallyWorksRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
+  '/blog/png-vs-jpeg-vs-webp': typeof BlogPngVsJpegVsWebpRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/psychology-of-jigsaw-puzzles': typeof BlogPsychologyOfJigsawPuzzlesRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
@@ -1358,6 +1365,7 @@ export interface FileRoutesByTo {
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-compound-interest-actually-works': typeof BlogHowCompoundInterestActuallyWorksRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
+  '/blog/png-vs-jpeg-vs-webp': typeof BlogPngVsJpegVsWebpRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/psychology-of-jigsaw-puzzles': typeof BlogPsychologyOfJigsawPuzzlesRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
@@ -1547,6 +1555,7 @@ export interface FileRoutesById {
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
   '/blog/how-compound-interest-actually-works': typeof BlogHowCompoundInterestActuallyWorksRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
+  '/blog/png-vs-jpeg-vs-webp': typeof BlogPngVsJpegVsWebpRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/psychology-of-jigsaw-puzzles': typeof BlogPsychologyOfJigsawPuzzlesRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
@@ -1737,6 +1746,7 @@ export interface FileRouteTypes {
     | '/blog/compress-pdf-online-free'
     | '/blog/how-compound-interest-actually-works'
     | '/blog/how-to-test-internet-speed-online-free'
+    | '/blog/png-vs-jpeg-vs-webp'
     | '/blog/psychology-behind-truth-or-dare'
     | '/blog/psychology-of-jigsaw-puzzles'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
@@ -1925,6 +1935,7 @@ export interface FileRouteTypes {
     | '/blog/compress-pdf-online-free'
     | '/blog/how-compound-interest-actually-works'
     | '/blog/how-to-test-internet-speed-online-free'
+    | '/blog/png-vs-jpeg-vs-webp'
     | '/blog/psychology-behind-truth-or-dare'
     | '/blog/psychology-of-jigsaw-puzzles'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
@@ -2113,6 +2124,7 @@ export interface FileRouteTypes {
     | '/blog/compress-pdf-online-free'
     | '/blog/how-compound-interest-actually-works'
     | '/blog/how-to-test-internet-speed-online-free'
+    | '/blog/png-vs-jpeg-vs-webp'
     | '/blog/psychology-behind-truth-or-dare'
     | '/blog/psychology-of-jigsaw-puzzles'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
@@ -2302,6 +2314,7 @@ export interface RootRouteChildren {
   BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
   BlogHowCompoundInterestActuallyWorksRoute: typeof BlogHowCompoundInterestActuallyWorksRoute
   BlogHowToTestInternetSpeedOnlineFreeRoute: typeof BlogHowToTestInternetSpeedOnlineFreeRoute
+  BlogPngVsJpegVsWebpRoute: typeof BlogPngVsJpegVsWebpRoute
   BlogPsychologyBehindTruthOrDareRoute: typeof BlogPsychologyBehindTruthOrDareRoute
   BlogPsychologyOfJigsawPuzzlesRoute: typeof BlogPsychologyOfJigsawPuzzlesRoute
   BlogSilentBugCostingAdRevenue39PagesRoute: typeof BlogSilentBugCostingAdRevenue39PagesRoute
@@ -2569,6 +2582,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/how-to-test-internet-speed-online-free'
       fullPath: '/blog/how-to-test-internet-speed-online-free'
       preLoaderRoute: typeof BlogHowToTestInternetSpeedOnlineFreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/png-vs-jpeg-vs-webp': {
+      id: '/blog/png-vs-jpeg-vs-webp'
+      path: '/blog/png-vs-jpeg-vs-webp'
+      fullPath: '/blog/png-vs-jpeg-vs-webp'
+      preLoaderRoute: typeof BlogPngVsJpegVsWebpRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/psychology-behind-truth-or-dare': {
@@ -3803,6 +3823,7 @@ const rootRouteChildren: RootRouteChildren = {
     BlogHowCompoundInterestActuallyWorksRoute,
   BlogHowToTestInternetSpeedOnlineFreeRoute:
     BlogHowToTestInternetSpeedOnlineFreeRoute,
+  BlogPngVsJpegVsWebpRoute: BlogPngVsJpegVsWebpRoute,
   BlogPsychologyBehindTruthOrDareRoute: BlogPsychologyBehindTruthOrDareRoute,
   BlogPsychologyOfJigsawPuzzlesRoute: BlogPsychologyOfJigsawPuzzlesRoute,
   BlogSilentBugCostingAdRevenue39PagesRoute:

@@ -338,7 +338,11 @@ function ImageCompressorPage() {
         <Link to="/tools/image-converter" className="text-[var(--cyan-brand)] hover:underline">
           Image Converter
         </Link>{" "}
-        to switch formats entirely. Curious why this tool was worth building while others weren't? Read{" "}
+        to switch formats entirely. Not sure PNG, JPEG, or WebP is the right call in the first place? Read{" "}
+        <Link to="/blog/png-vs-jpeg-vs-webp" className="text-[var(--cyan-brand)] hover:underline">
+          PNG vs JPEG vs WebP
+        </Link>
+        . Curious why this tool was worth building while others weren't? Read{" "}
         <Link to="/blog/why-we-rejected-5-tool-ideas" className="text-[var(--cyan-brand)] hover:underline">
           why we rejected 5 tool ideas that looked profitable on paper
         </Link>

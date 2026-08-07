@@ -11,6 +11,7 @@ import {
   Wallet,
   Brain,
   Users,
+  Ban,
 } from "lucide-react";
 import type { BlogAccent } from "@/components/blog-hero";
 
@@ -192,6 +193,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "attachment-style-test",
     heroIcon: Users,
     heroAccent: "pink",
+  },
+  {
+    slug: "why-we-rejected-5-tool-ideas",
+    path: "/blog/why-we-rejected-5-tool-ideas",
+    title: "Why We Rejected 5 Tool Ideas That Looked Profitable on Paper",
+    description:
+      "Background remover, PDF converters, mortgage calculators, tip calculators, and a wheel-of-names tool all looked like great opportunities — until we checked who actually ranks for them. Here's the research that changed our roadmap.",
+    category: "Behind the Scenes",
+    date: "2026-08-11",
+    dateLabel: "August 11, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "image-compressor",
+    heroIcon: Ban,
+    heroAccent: "violet",
   },
 ];
 

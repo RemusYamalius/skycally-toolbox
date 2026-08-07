@@ -26,6 +26,7 @@ import { Route as BlogPsychologyBehindTruthOrDareRouteImport } from './routes/bl
 import { Route as BlogPsychologyOfJigsawPuzzlesRouteImport } from './routes/blog.psychology-of-jigsaw-puzzles'
 import { Route as BlogSilentBugCostingAdRevenue39PagesRouteImport } from './routes/blog.silent-bug-costing-ad-revenue-39-pages'
 import { Route as BlogVideoToGifOnlineFreeRouteImport } from './routes/blog.video-to-gif-online-free'
+import { Route as BlogWhyWeRejected5ToolIdeasRouteImport } from './routes/blog.why-we-rejected-5-tool-ideas'
 import { Route as BlogWhyYourPaycheckIsntWhatYouExpectRouteImport } from './routes/blog.why-your-paycheck-isnt-what-you-expect'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as Tools2048RouteImport } from './routes/tools.2048'
@@ -289,6 +290,12 @@ const BlogVideoToGifOnlineFreeRoute =
   BlogVideoToGifOnlineFreeRouteImport.update({
     id: '/blog/video-to-gif-online-free',
     path: '/blog/video-to-gif-online-free',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogWhyWeRejected5ToolIdeasRoute =
+  BlogWhyWeRejected5ToolIdeasRouteImport.update({
+    id: '/blog/why-we-rejected-5-tool-ideas',
+    path: '/blog/why-we-rejected-5-tool-ideas',
     getParentRoute: () => rootRouteImport,
   } as any)
 const BlogWhyYourPaycheckIsntWhatYouExpectRoute =
@@ -1167,6 +1174,7 @@ export interface FileRoutesByFullPath {
   '/blog/psychology-of-jigsaw-puzzles': typeof BlogPsychologyOfJigsawPuzzlesRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
+  '/blog/why-we-rejected-5-tool-ideas': typeof BlogWhyWeRejected5ToolIdeasRoute
   '/blog/why-your-paycheck-isnt-what-you-expect': typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1354,6 +1362,7 @@ export interface FileRoutesByTo {
   '/blog/psychology-of-jigsaw-puzzles': typeof BlogPsychologyOfJigsawPuzzlesRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
+  '/blog/why-we-rejected-5-tool-ideas': typeof BlogWhyWeRejected5ToolIdeasRoute
   '/blog/why-your-paycheck-isnt-what-you-expect': typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1542,6 +1551,7 @@ export interface FileRoutesById {
   '/blog/psychology-of-jigsaw-puzzles': typeof BlogPsychologyOfJigsawPuzzlesRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
+  '/blog/why-we-rejected-5-tool-ideas': typeof BlogWhyWeRejected5ToolIdeasRoute
   '/blog/why-your-paycheck-isnt-what-you-expect': typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
@@ -1731,6 +1741,7 @@ export interface FileRouteTypes {
     | '/blog/psychology-of-jigsaw-puzzles'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
+    | '/blog/why-we-rejected-5-tool-ideas'
     | '/blog/why-your-paycheck-isnt-what-you-expect'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -1918,6 +1929,7 @@ export interface FileRouteTypes {
     | '/blog/psychology-of-jigsaw-puzzles'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
+    | '/blog/why-we-rejected-5-tool-ideas'
     | '/blog/why-your-paycheck-isnt-what-you-expect'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -2105,6 +2117,7 @@ export interface FileRouteTypes {
     | '/blog/psychology-of-jigsaw-puzzles'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
+    | '/blog/why-we-rejected-5-tool-ideas'
     | '/blog/why-your-paycheck-isnt-what-you-expect'
     | '/tools/2048'
     | '/tools/add-subtitles'
@@ -2293,6 +2306,7 @@ export interface RootRouteChildren {
   BlogPsychologyOfJigsawPuzzlesRoute: typeof BlogPsychologyOfJigsawPuzzlesRoute
   BlogSilentBugCostingAdRevenue39PagesRoute: typeof BlogSilentBugCostingAdRevenue39PagesRoute
   BlogVideoToGifOnlineFreeRoute: typeof BlogVideoToGifOnlineFreeRoute
+  BlogWhyWeRejected5ToolIdeasRoute: typeof BlogWhyWeRejected5ToolIdeasRoute
   BlogWhyYourPaycheckIsntWhatYouExpectRoute: typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
   Tools2048Route: typeof Tools2048Route
   ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
@@ -2583,6 +2597,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/video-to-gif-online-free'
       fullPath: '/blog/video-to-gif-online-free'
       preLoaderRoute: typeof BlogVideoToGifOnlineFreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/why-we-rejected-5-tool-ideas': {
+      id: '/blog/why-we-rejected-5-tool-ideas'
+      path: '/blog/why-we-rejected-5-tool-ideas'
+      fullPath: '/blog/why-we-rejected-5-tool-ideas'
+      preLoaderRoute: typeof BlogWhyWeRejected5ToolIdeasRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/why-your-paycheck-isnt-what-you-expect': {
@@ -3787,6 +3808,7 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSilentBugCostingAdRevenue39PagesRoute:
     BlogSilentBugCostingAdRevenue39PagesRoute,
   BlogVideoToGifOnlineFreeRoute: BlogVideoToGifOnlineFreeRoute,
+  BlogWhyWeRejected5ToolIdeasRoute: BlogWhyWeRejected5ToolIdeasRoute,
   BlogWhyYourPaycheckIsntWhatYouExpectRoute:
     BlogWhyYourPaycheckIsntWhatYouExpectRoute,
   Tools2048Route: Tools2048Route,
@@ -3962,3 +3984,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

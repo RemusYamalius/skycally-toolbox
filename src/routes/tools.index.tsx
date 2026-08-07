@@ -1,7 +1,7 @@
 import { createFileRoute, useNavigate, Link } from "@tanstack/react-router";
 import { useMemo, useState, useEffect } from "react";
 import { Search } from "lucide-react";
-import { tools, categoryMeta, toolInCategory, TOOL_COUNT, type ToolCategory } from "@/lib/tools";
+import { tools, categoryMeta, toolInCategory, isNewTool, TOOL_COUNT, type ToolCategory } from "@/lib/tools";
 import { ToolCard } from "@/components/tool-card";
 import { AdZone } from "@/components/ad-zone";
 import { buildPageMeta, SITE_URL } from "@/lib/seo";
@@ -22,8 +22,8 @@ const VALID_CATS = [
 type CatParam = (typeof VALID_CATS)[number];
 
 export const Route = createFileRoute("/tools/")({
-  validateSearch: (search: Record<string, unknown>): { cat?: CatParam; q?: string } => {
-    const result: { cat?: CatParam; q?: string } = {};
+  validateSearch: (search: Record<string, unknown>): { cat?: CatParam; q?: string; sort?: "newest" } => {
+    const result: { cat?: CatParam; q?: string; sort?: "newest" } = {};
     const cat = search.cat;
     if (typeof cat === "string" && (VALID_CATS as readonly string[]).includes(cat)) {
       result.cat = cat as CatParam;
@@ -35,6 +35,9 @@ export const Route = createFileRoute("/tools/")({
     // tool list instead of the expected search results.
     if (typeof search.q === "string" && search.q.length > 0) {
       result.q = search.q;
+    }
+    if (search.sort === "newest") {
+      result.sort = "newest";
     }
     return result;
   },
@@ -121,6 +124,14 @@ function ToolsPage() {
     [cat, q],
   );
 
+  const newestList = useMemo(
+    () =>
+      tools
+        .filter((t) => !t.hidden && isNewTool(t) && (t.name + t.description).toLowerCase().includes(q.toLowerCase()))
+        .sort((a, b) => (b.dateAdded ?? "").localeCompare(a.dateAdded ?? "")),
+    [q],
+  );
+
   return (
     <div className="max-w-7xl mx-auto px-4 sm:px-6 py-12">
       <header className="mb-10">
@@ -153,7 +164,27 @@ function ToolsPage() {
 
       <AdZone id="tools-index-top" size="728x90" />
 
-      {cat === "all" ? (
+      {search.sort === "newest" ? (
+        <div>
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <h2 className="font-display text-2xl font-bold">Newest tools</h2>
+            <button
+              onClick={() => navigate({ to: ".", search: { ...(search.q ? { q: search.q } : {}) }, replace: true })}
+              className="text-sm font-medium text-muted-foreground hover:text-foreground transition"
+            >
+              Clear sort
+            </button>
+          </div>
+          <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
+            {newestList.map((t, i) => (
+              <ToolCard key={t.slug} tool={t} index={i} />
+            ))}
+          </div>
+          {newestList.length === 0 && (
+            <p className="text-center py-20 text-muted-foreground">No tools match your search.</p>
+          )}
+        </div>
+      ) : cat === "all" ? (
         <div className="space-y-14">
           {(["ai", "video", "image", "audio", "pdf", "text", "utility", "games", "minigames"] as ToolCategory[]).map(
             (c) => {
@@ -196,7 +227,9 @@ function ToolsPage() {
           ))}
         </div>
       )}
-      {list.length === 0 && <p className="text-center py-20 text-muted-foreground">No tools match your search.</p>}
+      {search.sort !== "newest" && list.length === 0 && (
+        <p className="text-center py-20 text-muted-foreground">No tools match your search.</p>
+      )}
 
       {/* SEO: static crawlable index of every tool — visually hidden */}
       <nav aria-label="All tools" className="sr-only">

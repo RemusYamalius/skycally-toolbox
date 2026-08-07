@@ -1,5 +1,5 @@
 import type { LucideIcon } from "lucide-react";
-import { FileArchive, Video, Palette, Code2, Gauge, BarChart3, MessageCircleHeart } from "lucide-react";
+import { FileArchive, Video, Palette, Code2, Gauge, BarChart3, MessageCircleHeart, TrendingUp } from "lucide-react";
 import type { BlogAccent } from "@/components/blog-hero";
 
 export interface BlogPost {
@@ -124,6 +124,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "link-shortener",
     heroIcon: BarChart3,
     heroAccent: "amber",
+  },
+  {
+    slug: "how-compound-interest-actually-works",
+    path: "/blog/how-compound-interest-actually-works",
+    title: "How Compound Interest Actually Works: The Math Behind the Calculator",
+    description:
+      "The real formula behind compound interest, worked examples with actual numbers, why monthly contributions change everything, and the difference between interest rate and APY that most explanations skip.",
+    category: "Finance",
+    date: "2026-08-08",
+    dateLabel: "August 8, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "compound-interest",
+    heroIcon: TrendingUp,
+    heroAccent: "cyan",
   },
 ];
 

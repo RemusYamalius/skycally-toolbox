@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useMemo, useState } from "react";
 import { Area, AreaChart, CartesianGrid, ResponsiveContainer, Tooltip, XAxis, YAxis, Legend } from "recharts";
 import { Copy, Check } from "lucide-react";
@@ -358,6 +358,15 @@ function CompoundInterestPage() {
           </div>
         </div>
       </div>
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Want to see the actual formula and real worked examples behind this calculator — including why an early start
+        usually beats a higher rate? Read{" "}
+        <Link to="/blog/how-compound-interest-actually-works" className="text-[var(--cyan-brand)] hover:underline">
+          how compound interest actually works
+        </Link>
+        .
+      </p>
 
       <AdZone id="compound-interest-mid" size="728x90" />
 

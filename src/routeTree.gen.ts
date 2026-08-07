@@ -19,6 +19,7 @@ import { Route as Blog3MonthsOfSearchConsoleDataFreeToolsSiteRouteImport } from 
 import { Route as BlogBestFreeOnlineToolsForDesignersRouteImport } from './routes/blog.best-free-online-tools-for-designers'
 import { Route as BlogBestFreeOnlineToolsForDevelopers2025RouteImport } from './routes/blog.best-free-online-tools-for-developers-2025'
 import { Route as BlogCompressPdfOnlineFreeRouteImport } from './routes/blog.compress-pdf-online-free'
+import { Route as BlogHowCompoundInterestActuallyWorksRouteImport } from './routes/blog.how-compound-interest-actually-works'
 import { Route as BlogHowToTestInternetSpeedOnlineFreeRouteImport } from './routes/blog.how-to-test-internet-speed-online-free'
 import { Route as BlogPsychologyBehindTruthOrDareRouteImport } from './routes/blog.psychology-behind-truth-or-dare'
 import { Route as BlogSilentBugCostingAdRevenue39PagesRouteImport } from './routes/blog.silent-bug-costing-ad-revenue-39-pages'
@@ -243,6 +244,12 @@ const BlogCompressPdfOnlineFreeRoute =
   BlogCompressPdfOnlineFreeRouteImport.update({
     id: '/blog/compress-pdf-online-free',
     path: '/blog/compress-pdf-online-free',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogHowCompoundInterestActuallyWorksRoute =
+  BlogHowCompoundInterestActuallyWorksRouteImport.update({
+    id: '/blog/how-compound-interest-actually-works',
+    path: '/blog/how-compound-interest-actually-works',
     getParentRoute: () => rootRouteImport,
   } as any)
 const BlogHowToTestInternetSpeedOnlineFreeRoute =
@@ -1132,6 +1139,7 @@ export interface FileRoutesByFullPath {
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
+  '/blog/how-compound-interest-actually-works': typeof BlogHowCompoundInterestActuallyWorksRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
@@ -1315,6 +1323,7 @@ export interface FileRoutesByTo {
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
+  '/blog/how-compound-interest-actually-works': typeof BlogHowCompoundInterestActuallyWorksRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
@@ -1499,6 +1508,7 @@ export interface FileRoutesById {
   '/blog/best-free-online-tools-for-designers': typeof BlogBestFreeOnlineToolsForDesignersRoute
   '/blog/best-free-online-tools-for-developers-2025': typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   '/blog/compress-pdf-online-free': typeof BlogCompressPdfOnlineFreeRoute
+  '/blog/how-compound-interest-actually-works': typeof BlogHowCompoundInterestActuallyWorksRoute
   '/blog/how-to-test-internet-speed-online-free': typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
@@ -1684,6 +1694,7 @@ export interface FileRouteTypes {
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
+    | '/blog/how-compound-interest-actually-works'
     | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/psychology-behind-truth-or-dare'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
@@ -1867,6 +1878,7 @@ export interface FileRouteTypes {
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
+    | '/blog/how-compound-interest-actually-works'
     | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/psychology-behind-truth-or-dare'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
@@ -2050,6 +2062,7 @@ export interface FileRouteTypes {
     | '/blog/best-free-online-tools-for-designers'
     | '/blog/best-free-online-tools-for-developers-2025'
     | '/blog/compress-pdf-online-free'
+    | '/blog/how-compound-interest-actually-works'
     | '/blog/how-to-test-internet-speed-online-free'
     | '/blog/psychology-behind-truth-or-dare'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
@@ -2234,6 +2247,7 @@ export interface RootRouteChildren {
   BlogBestFreeOnlineToolsForDesignersRoute: typeof BlogBestFreeOnlineToolsForDesignersRoute
   BlogBestFreeOnlineToolsForDevelopers2025Route: typeof BlogBestFreeOnlineToolsForDevelopers2025Route
   BlogCompressPdfOnlineFreeRoute: typeof BlogCompressPdfOnlineFreeRoute
+  BlogHowCompoundInterestActuallyWorksRoute: typeof BlogHowCompoundInterestActuallyWorksRoute
   BlogHowToTestInternetSpeedOnlineFreeRoute: typeof BlogHowToTestInternetSpeedOnlineFreeRoute
   BlogPsychologyBehindTruthOrDareRoute: typeof BlogPsychologyBehindTruthOrDareRoute
   BlogSilentBugCostingAdRevenue39PagesRoute: typeof BlogSilentBugCostingAdRevenue39PagesRoute
@@ -2478,6 +2492,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/compress-pdf-online-free'
       fullPath: '/blog/compress-pdf-online-free'
       preLoaderRoute: typeof BlogCompressPdfOnlineFreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/how-compound-interest-actually-works': {
+      id: '/blog/how-compound-interest-actually-works'
+      path: '/blog/how-compound-interest-actually-works'
+      fullPath: '/blog/how-compound-interest-actually-works'
+      preLoaderRoute: typeof BlogHowCompoundInterestActuallyWorksRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/blog/how-to-test-internet-speed-online-free': {
@@ -3693,6 +3714,8 @@ const rootRouteChildren: RootRouteChildren = {
   BlogBestFreeOnlineToolsForDevelopers2025Route:
     BlogBestFreeOnlineToolsForDevelopers2025Route,
   BlogCompressPdfOnlineFreeRoute: BlogCompressPdfOnlineFreeRoute,
+  BlogHowCompoundInterestActuallyWorksRoute:
+    BlogHowCompoundInterestActuallyWorksRoute,
   BlogHowToTestInternetSpeedOnlineFreeRoute:
     BlogHowToTestInternetSpeedOnlineFreeRoute,
   BlogPsychologyBehindTruthOrDareRoute: BlogPsychologyBehindTruthOrDareRoute,
@@ -3872,3 +3895,12 @@ const rootRouteChildren: RootRouteChildren = {
 export const routeTree = rootRouteImport
   ._addFileChildren(rootRouteChildren)
   ._addFileTypes<FileRouteTypes>()
+
+import type { getRouter } from './router.tsx'
+import type { createStart } from '@tanstack/react-start'
+declare module '@tanstack/react-start' {
+  interface Register {
+    ssr: true
+    router: Awaited<ReturnType<typeof getRouter>>
+  }
+}

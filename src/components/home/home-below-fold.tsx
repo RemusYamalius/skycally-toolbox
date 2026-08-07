@@ -26,6 +26,11 @@ const POPULAR_SLUGS = [
 
 const ALL_CATS: ToolCategory[] = ["video", "image", "audio", "pdf", "text", "utility", "games", "minigames", "ai"];
 
+// Two rows on desktop (3 per row) — was previously showing every qualifying
+// tool unbounded (22 tools / 8 rows at time of writing), which broke the
+// homepage's visual rhythm compared to every other section.
+const NEW_TOOLS_PREVIEW_COUNT = 6;
+
 const CATEGORY_TAGLINES: Record<ToolCategory, string> = {
   ai: "Run AI models in your browser — no server, no cost.",
   video: "Download, convert, compress and record videos in seconds.",
@@ -82,15 +87,26 @@ export default function HomeBelowFold() {
       {/* New & Noteworthy — only rendered while at least one tool qualifies */}
       {newTools.length > 0 && (
         <section className="pt-16 pb-4">
-          <div className="flex items-center gap-2 mb-6">
-            <Sparkles className="w-5 h-5" style={{ color: "var(--cyan-brand)" }} aria-hidden="true" />
-            <div>
-              <h2 className="font-display text-2xl font-bold">New &amp; Noteworthy</h2>
-              <p className="text-sm text-muted-foreground mt-0.5">Just shipped — take a look</p>
+          <div className="flex items-center justify-between mb-6 flex-wrap gap-3">
+            <div className="flex items-center gap-2">
+              <Sparkles className="w-5 h-5" style={{ color: "var(--cyan-brand)" }} aria-hidden="true" />
+              <div>
+                <h2 className="font-display text-2xl font-bold">New &amp; Noteworthy</h2>
+                <p className="text-sm text-muted-foreground mt-0.5">Just shipped — take a look</p>
+              </div>
             </div>
+            {newTools.length > NEW_TOOLS_PREVIEW_COUNT && (
+              <Link
+                to="/tools"
+                search={{ sort: "newest" }}
+                className="inline-flex items-center gap-1.5 text-sm font-medium text-muted-foreground hover:text-foreground transition"
+              >
+                View all new tools <ArrowRight className="w-4 h-4" />
+              </Link>
+            )}
           </div>
           <div className="grid gap-5 sm:grid-cols-2 lg:grid-cols-3">
-            {newTools.map((t, i) => (
+            {newTools.slice(0, NEW_TOOLS_PREVIEW_COUNT).map((t, i) => (
               <ToolCard key={t.slug} tool={t} index={i} />
             ))}
           </div>

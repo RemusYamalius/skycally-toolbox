@@ -100,7 +100,18 @@ function PaycheckCalculatorPage() {
       bonus: parseFloat(bonus) || 0,
       selfEmployed,
     }),
-    [grossPerPeriod, frequency, filing, stateCode, contrib401kPct, hsaAnnual, healthPremium, postTax, bonus, selfEmployed],
+    [
+      grossPerPeriod,
+      frequency,
+      filing,
+      stateCode,
+      contrib401kPct,
+      hsaAnnual,
+      healthPremium,
+      postTax,
+      bonus,
+      selfEmployed,
+    ],
   );
 
   const result = useMemo(() => computePaycheck(input), [input]);
@@ -166,7 +177,14 @@ function PaycheckCalculatorPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <Field label="401(k) %">
-                <Input type="number" min={0} max={100} step={0.5} value={contrib401kPct} onChange={(e) => set401k(e.target.value)} />
+                <Input
+                  type="number"
+                  min={0}
+                  max={100}
+                  step={0.5}
+                  value={contrib401kPct}
+                  onChange={(e) => set401k(e.target.value)}
+                />
               </Field>
               <Field label="HSA (annual)">
                 <Input type="number" min={0} step={100} value={hsaAnnual} onChange={(e) => setHsa(e.target.value)} />
@@ -175,7 +193,13 @@ function PaycheckCalculatorPage() {
 
             <div className="grid grid-cols-2 gap-3">
               <Field label="Health premium (per period)">
-                <Input type="number" min={0} step={10} value={healthPremium} onChange={(e) => setHealth(e.target.value)} />
+                <Input
+                  type="number"
+                  min={0}
+                  step={10}
+                  value={healthPremium}
+                  onChange={(e) => setHealth(e.target.value)}
+                />
               </Field>
               <Field label="Post-tax (per period)">
                 <Input type="number" min={0} step={10} value={postTax} onChange={(e) => setPostTax(e.target.value)} />
@@ -207,12 +231,7 @@ function PaycheckCalculatorPage() {
       </div>
 
       {hasInput && (
-        <StateCompare
-          codes={compareCodes}
-          onChange={setCompareCodes}
-          rows={comparison}
-          currentState={stateCode}
-        />
+        <StateCompare codes={compareCodes} onChange={setCompareCodes} rows={comparison} currentState={stateCode} />
       )}
 
       <AdZone id="paycheck-calculator-mid" size="728x90" />
@@ -352,8 +371,16 @@ function Results({ r, frequency }: { r: PaycheckResult; frequency: PayFrequency 
       <HeroCard r={r} frequency={frequency} />
 
       <div className="grid gap-4 sm:grid-cols-2">
-        <RateCard title="Effective tax rate" value={fmtPct(r.effectiveRate)} hint="Your total tax divided by gross income. What you actually pay overall." />
-        <RateCard title="Marginal tax rate" value={fmtPct(r.marginalRate)} hint="The rate on your next dollar earned — federal + state + FICA at your current income." />
+        <RateCard
+          title="Effective tax rate"
+          value={fmtPct(r.effectiveRate)}
+          hint="Your total tax divided by gross income. What you actually pay overall."
+        />
+        <RateCard
+          title="Marginal tax rate"
+          value={fmtPct(r.marginalRate)}
+          hint="The rate on your next dollar earned — federal + state + FICA at your current income."
+        />
       </div>
 
       <div className="rounded-2xl border border-border bg-card p-5">
@@ -415,7 +442,9 @@ function HeroCard({ r, frequency }: { r: PaycheckResult; frequency: PayFrequency
       <div className="grid gap-4 sm:grid-cols-2">
         <div>
           <p className="text-xs uppercase opacity-80">Per {periodWord(frequency)}</p>
-          <p className="font-display text-3xl sm:text-4xl font-bold tabular-nums">{fmtUSD(r.netAnnual / r.periods, { decimals: 2 })}</p>
+          <p className="font-display text-3xl sm:text-4xl font-bold tabular-nums">
+            {fmtUSD(r.netAnnual / r.periods, { decimals: 2 })}
+          </p>
         </div>
         <div>
           <p className="text-xs uppercase opacity-80">Per year</p>
@@ -437,7 +466,15 @@ function HeroCard({ r, frequency }: { r: PaycheckResult; frequency: PayFrequency
 }
 
 function periodWord(f: PayFrequency): string {
-  return f === "weekly" ? "week" : f === "biweekly" ? "2 weeks" : f === "semimonthly" ? "half-month" : f === "monthly" ? "month" : "year";
+  return f === "weekly"
+    ? "week"
+    : f === "biweekly"
+      ? "2 weeks"
+      : f === "semimonthly"
+        ? "half-month"
+        : f === "monthly"
+          ? "month"
+          : "year";
 }
 
 function RateCard({ title, value, hint }: { title: string; value: string; hint: string }) {
@@ -599,8 +636,8 @@ function StateCompare({
       </ul>
       <p className="mt-4 text-xs text-muted-foreground flex items-start gap-2">
         <AlertTriangle className="w-3.5 h-3.5 mt-0.5 shrink-0" aria-hidden="true" />
-        State tax logic is simplified — it uses the state's income tax brackets or flat rate against an approximation
-        of state taxable income. Local city taxes are not included.
+        State tax logic is simplified — it uses the state's income tax brackets or flat rate against an approximation of
+        state taxable income. Local city taxes are not included.
       </p>
     </section>
   );
@@ -628,6 +665,11 @@ function InternalLinks() {
       title: "Currency Converter",
       body: "Comparing a job offer paid in a different currency? Convert it to USD first, then plug the gross back in here.",
     },
+    {
+      to: "/blog/why-your-paycheck-isnt-what-you-expect",
+      title: "Why Your Paycheck Isn't What You Expect",
+      body: "The FICA wage base cap, why bonuses withhold at a flat 22%, and why pay frequency changes how big each check looks.",
+    },
   ];
   return (
     <section className="mt-10 rounded-2xl border border-border bg-card/40 p-6">
@@ -635,7 +677,10 @@ function InternalLinks() {
       <ul className="grid gap-4 sm:grid-cols-2">
         {items.map((it) => (
           <li key={it.to}>
-            <Link to={it.to} className="group block rounded-xl border border-border p-4 hover:border-foreground/40 transition">
+            <Link
+              to={it.to}
+              className="group block rounded-xl border border-border p-4 hover:border-foreground/40 transition"
+            >
               <p className="font-semibold group-hover:underline">{it.title}</p>
               <p className="text-sm text-muted-foreground mt-1">{it.body}</p>
             </Link>

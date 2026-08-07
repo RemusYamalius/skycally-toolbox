@@ -24,6 +24,7 @@ import { Route as BlogHowToTestInternetSpeedOnlineFreeRouteImport } from './rout
 import { Route as BlogPsychologyBehindTruthOrDareRouteImport } from './routes/blog.psychology-behind-truth-or-dare'
 import { Route as BlogSilentBugCostingAdRevenue39PagesRouteImport } from './routes/blog.silent-bug-costing-ad-revenue-39-pages'
 import { Route as BlogVideoToGifOnlineFreeRouteImport } from './routes/blog.video-to-gif-online-free'
+import { Route as BlogWhyYourPaycheckIsntWhatYouExpectRouteImport } from './routes/blog.why-your-paycheck-isnt-what-you-expect'
 import { Route as ToolsIndexRouteImport } from './routes/tools.index'
 import { Route as Tools2048RouteImport } from './routes/tools.2048'
 import { Route as ToolsAddSubtitlesRouteImport } from './routes/tools.add-subtitles'
@@ -274,6 +275,12 @@ const BlogVideoToGifOnlineFreeRoute =
   BlogVideoToGifOnlineFreeRouteImport.update({
     id: '/blog/video-to-gif-online-free',
     path: '/blog/video-to-gif-online-free',
+    getParentRoute: () => rootRouteImport,
+  } as any)
+const BlogWhyYourPaycheckIsntWhatYouExpectRoute =
+  BlogWhyYourPaycheckIsntWhatYouExpectRouteImport.update({
+    id: '/blog/why-your-paycheck-isnt-what-you-expect',
+    path: '/blog/why-your-paycheck-isnt-what-you-expect',
     getParentRoute: () => rootRouteImport,
   } as any)
 const ToolsIndexRoute = ToolsIndexRouteImport.update({
@@ -1144,6 +1151,7 @@ export interface FileRoutesByFullPath {
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
+  '/blog/why-your-paycheck-isnt-what-you-expect': typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
@@ -1328,6 +1336,7 @@ export interface FileRoutesByTo {
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
+  '/blog/why-your-paycheck-isnt-what-you-expect': typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
@@ -1513,6 +1522,7 @@ export interface FileRoutesById {
   '/blog/psychology-behind-truth-or-dare': typeof BlogPsychologyBehindTruthOrDareRoute
   '/blog/silent-bug-costing-ad-revenue-39-pages': typeof BlogSilentBugCostingAdRevenue39PagesRoute
   '/blog/video-to-gif-online-free': typeof BlogVideoToGifOnlineFreeRoute
+  '/blog/why-your-paycheck-isnt-what-you-expect': typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
   '/tools/2048': typeof Tools2048Route
   '/tools/add-subtitles': typeof ToolsAddSubtitlesRoute
   '/tools/add-text-to-image': typeof ToolsAddTextToImageRoute
@@ -1699,6 +1709,7 @@ export interface FileRouteTypes {
     | '/blog/psychology-behind-truth-or-dare'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
+    | '/blog/why-your-paycheck-isnt-what-you-expect'
     | '/tools/2048'
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
@@ -1883,6 +1894,7 @@ export interface FileRouteTypes {
     | '/blog/psychology-behind-truth-or-dare'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
+    | '/blog/why-your-paycheck-isnt-what-you-expect'
     | '/tools/2048'
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
@@ -2067,6 +2079,7 @@ export interface FileRouteTypes {
     | '/blog/psychology-behind-truth-or-dare'
     | '/blog/silent-bug-costing-ad-revenue-39-pages'
     | '/blog/video-to-gif-online-free'
+    | '/blog/why-your-paycheck-isnt-what-you-expect'
     | '/tools/2048'
     | '/tools/add-subtitles'
     | '/tools/add-text-to-image'
@@ -2252,6 +2265,7 @@ export interface RootRouteChildren {
   BlogPsychologyBehindTruthOrDareRoute: typeof BlogPsychologyBehindTruthOrDareRoute
   BlogSilentBugCostingAdRevenue39PagesRoute: typeof BlogSilentBugCostingAdRevenue39PagesRoute
   BlogVideoToGifOnlineFreeRoute: typeof BlogVideoToGifOnlineFreeRoute
+  BlogWhyYourPaycheckIsntWhatYouExpectRoute: typeof BlogWhyYourPaycheckIsntWhatYouExpectRoute
   Tools2048Route: typeof Tools2048Route
   ToolsAddSubtitlesRoute: typeof ToolsAddSubtitlesRoute
   ToolsAddTextToImageRoute: typeof ToolsAddTextToImageRoute
@@ -2527,6 +2541,13 @@ declare module '@tanstack/react-router' {
       path: '/blog/video-to-gif-online-free'
       fullPath: '/blog/video-to-gif-online-free'
       preLoaderRoute: typeof BlogVideoToGifOnlineFreeRouteImport
+      parentRoute: typeof rootRouteImport
+    }
+    '/blog/why-your-paycheck-isnt-what-you-expect': {
+      id: '/blog/why-your-paycheck-isnt-what-you-expect'
+      path: '/blog/why-your-paycheck-isnt-what-you-expect'
+      fullPath: '/blog/why-your-paycheck-isnt-what-you-expect'
+      preLoaderRoute: typeof BlogWhyYourPaycheckIsntWhatYouExpectRouteImport
       parentRoute: typeof rootRouteImport
     }
     '/tools/': {
@@ -3722,6 +3743,8 @@ const rootRouteChildren: RootRouteChildren = {
   BlogSilentBugCostingAdRevenue39PagesRoute:
     BlogSilentBugCostingAdRevenue39PagesRoute,
   BlogVideoToGifOnlineFreeRoute: BlogVideoToGifOnlineFreeRoute,
+  BlogWhyYourPaycheckIsntWhatYouExpectRoute:
+    BlogWhyYourPaycheckIsntWhatYouExpectRoute,
   Tools2048Route: Tools2048Route,
   ToolsAddSubtitlesRoute: ToolsAddSubtitlesRoute,
   ToolsAddTextToImageRoute: ToolsAddTextToImageRoute,

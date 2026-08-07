@@ -1,5 +1,15 @@
 import type { LucideIcon } from "lucide-react";
-import { FileArchive, Video, Palette, Code2, Gauge, BarChart3, MessageCircleHeart, TrendingUp } from "lucide-react";
+import {
+  FileArchive,
+  Video,
+  Palette,
+  Code2,
+  Gauge,
+  BarChart3,
+  MessageCircleHeart,
+  TrendingUp,
+  Wallet,
+} from "lucide-react";
 import type { BlogAccent } from "@/components/blog-hero";
 
 export interface BlogPost {
@@ -138,6 +148,20 @@ export const blogPosts: BlogPost[] = [
     ctaToolSlug: "compound-interest",
     heroIcon: TrendingUp,
     heroAccent: "cyan",
+  },
+  {
+    slug: "why-your-paycheck-isnt-what-you-expect",
+    path: "/blog/why-your-paycheck-isnt-what-you-expect",
+    title: "Why Your Paycheck Isn't What You Expect: FICA, Taxes, and Deductions Explained",
+    description:
+      "The real math behind the gap between your salary and your take-home pay — Social Security and Medicare tax, the wage base cap high earners hit, and how pre-tax deductions actually work.",
+    category: "Finance",
+    date: "2026-08-09",
+    dateLabel: "August 9, 2026",
+    author: "Skycally Team",
+    ctaToolSlug: "paycheck-calculator",
+    heroIcon: Wallet,
+    heroAccent: "amber",
   },
 ];
 

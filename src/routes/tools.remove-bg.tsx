@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
@@ -236,6 +236,14 @@ function RemoveBgPage() {
         </p>
         <p>⚠️ Very large images (&gt;4000px) are resized automatically to ensure performance in the browser</p>
       </div>
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Looking for more free tools like this one? Read our roundup of{" "}
+        <Link to="/blog/best-free-online-tools-for-designers" className="text-[var(--cyan-brand)] hover:underline">
+          the best free online tools for designers
+        </Link>
+        .
+      </p>
 
       <AdZone id="remove-bg-mid" size="728x90" />
 

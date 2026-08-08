@@ -35,36 +35,16 @@ export const Route = createRootRoute({
       { charSet: "utf-8" },
       { name: "viewport", content: "width=device-width, initial-scale=1" },
       { name: "google-site-verification", content: "2hyKSKE090h_itU_-4tDUKfls2uyYJjxHoPwWazd__A" },
-      { title: "Skycally — Every Tool You Need, Free" },
-      {
-        name: "description",
-        content:
-          "Download videos from TikTok, Instagram & YouTube. Convert images, merge PDFs, remove backgrounds — free, fast, no signup.",
-      },
-      { property: "og:title", content: "Skycally — Every Tool You Need, Free" },
-      {
-        property: "og:description",
-        content:
-          "Download videos from TikTok, Instagram & YouTube. Convert images, merge PDFs, remove backgrounds — free, fast, no signup.",
-      },
-      { property: "og:type", content: "website" },
-      { name: "twitter:card", content: "summary_large_image" },
-      { name: "twitter:title", content: "Skycally — Every Tool You Need, Free" },
-      {
-        name: "twitter:description",
-        content:
-          "Download videos from TikTok, Instagram & YouTube. Convert images, merge PDFs, remove backgrounds — free, fast, no signup.",
-      },
-      {
-        property: "og:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/36f52cd1-4e12-4753-ba42-0d91bb380fa8/id-preview-0354be22--b6e9d496-e7b7-4da9-998a-b834f11e8737.lovable.app-1777921624295.png",
-      },
-      {
-        name: "twitter:image",
-        content:
-          "https://pub-bb2e103a32db4e198524a2e9ed8f35b4.r2.dev/36f52cd1-4e12-4753-ba42-0d91bb380fa8/id-preview-0354be22--b6e9d496-e7b7-4da9-998a-b834f11e8737.lovable.app-1777921624295.png",
-      },
+      // NOTE: title/description/og:*/twitter:* were previously hardcoded here
+      // too, with old marketing copy ("Download videos from TikTok...") and
+      // an og:image pointing at a dead Lovable preview-app URL. Because meta
+      // tags with the same property/name aren't deduplicated across root +
+      // route head() calls, having both here AND in buildPageMeta() (used by
+      // every real page) meant social crawlers were picking up whichever
+      // set rendered first in <head> — the stale one here, not the correct
+      // per-page one. Every route sets its own correct title/description/
+      // OG/Twitter tags via buildPageMeta() in src/lib/seo.ts, so this root
+      // block is intentionally minimal now — no duplicate, no conflict.
     ],
     links: [
       { rel: "icon", type: "image/png", href: "/favicon.png?v=2" },

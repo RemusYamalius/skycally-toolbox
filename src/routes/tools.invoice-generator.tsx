@@ -593,7 +593,7 @@ function InvoiceGeneratorPage() {
                 {state.from.logo ? (
                   <img
                     src={state.from.logo}
-                    alt="Logo"
+                    alt={`${state.from.name || "Your business"} logo`}
                     className="w-16 h-16 rounded-md object-contain bg-white border border-border"
                   />
                 ) : (

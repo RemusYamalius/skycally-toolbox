@@ -593,7 +593,7 @@ function InvoiceGeneratorPage() {
                 {state.from.logo ? (
                   <img
                     src={state.from.logo}
-                    alt="Logo"
+                    alt={`${state.from.name || "Your business"} logo`}
                     className="w-16 h-16 rounded-md object-contain bg-white border border-border"
                   />
                 ) : (
@@ -909,7 +909,7 @@ function InvoiceGeneratorPage() {
             <div className="inv-head">
               <div style={{ display: "flex", gap: 16, alignItems: "center" }}>
                 {state.from.logo && (
-                  <img src={state.from.logo} alt="Logo" style={{ width: 64, height: 64, objectFit: "contain" }} />
+                  <img src={state.from.logo} alt={`${state.from.name || "Your business"} logo`} style={{ width: 64, height: 64, objectFit: "contain" }} />
                 )}
                 <div>
                   <div style={{ fontWeight: 700, fontSize: 16 }}>{state.from.name || "Your Business Name"}</div>

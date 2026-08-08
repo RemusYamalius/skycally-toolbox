@@ -180,7 +180,6 @@ import { Route as ToolsUnitConverterRouteImport } from './routes/tools.unit-conv
 import { Route as ToolsUrlEncoderRouteImport } from './routes/tools.url-encoder'
 import { Route as ToolsUuidGeneratorRouteImport } from './routes/tools.uuid-generator'
 import { Route as ToolsVideoCompressorRouteImport } from './routes/tools.video-compressor'
-import { Route as ToolsVideoDownloaderRouteImport } from './routes/tools.video-downloader'
 import { Route as ToolsVideoMergerRouteImport } from './routes/tools.video-merger'
 import { Route as ToolsVideoToGifRouteImport } from './routes/tools.video-to-gif'
 import { Route as ToolsVideoTrimmerRouteImport } from './routes/tools.video-trimmer'
@@ -1082,11 +1081,6 @@ const ToolsVideoCompressorRoute = ToolsVideoCompressorRouteImport.update({
   path: '/tools/video-compressor',
   getParentRoute: () => rootRouteImport,
 } as any)
-const ToolsVideoDownloaderRoute = ToolsVideoDownloaderRouteImport.update({
-  id: '/tools/video-downloader',
-  path: '/tools/video-downloader',
-  getParentRoute: () => rootRouteImport,
-} as any)
 const ToolsVideoMergerRoute = ToolsVideoMergerRouteImport.update({
   id: '/tools/video-merger',
   path: '/tools/video-merger',
@@ -1340,7 +1334,6 @@ export interface FileRoutesByFullPath {
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
-  '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
@@ -1530,7 +1523,6 @@ export interface FileRoutesByTo {
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
-  '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
@@ -1721,7 +1713,6 @@ export interface FileRoutesById {
   '/tools/url-encoder': typeof ToolsUrlEncoderRoute
   '/tools/uuid-generator': typeof ToolsUuidGeneratorRoute
   '/tools/video-compressor': typeof ToolsVideoCompressorRoute
-  '/tools/video-downloader': typeof ToolsVideoDownloaderRoute
   '/tools/video-merger': typeof ToolsVideoMergerRoute
   '/tools/video-to-gif': typeof ToolsVideoToGifRoute
   '/tools/video-trimmer': typeof ToolsVideoTrimmerRoute
@@ -1913,7 +1904,6 @@ export interface FileRouteTypes {
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
-    | '/tools/video-downloader'
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
@@ -2103,7 +2093,6 @@ export interface FileRouteTypes {
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
-    | '/tools/video-downloader'
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
@@ -2293,7 +2282,6 @@ export interface FileRouteTypes {
     | '/tools/url-encoder'
     | '/tools/uuid-generator'
     | '/tools/video-compressor'
-    | '/tools/video-downloader'
     | '/tools/video-merger'
     | '/tools/video-to-gif'
     | '/tools/video-trimmer'
@@ -2484,7 +2472,6 @@ export interface RootRouteChildren {
   ToolsUrlEncoderRoute: typeof ToolsUrlEncoderRoute
   ToolsUuidGeneratorRoute: typeof ToolsUuidGeneratorRoute
   ToolsVideoCompressorRoute: typeof ToolsVideoCompressorRoute
-  ToolsVideoDownloaderRoute: typeof ToolsVideoDownloaderRoute
   ToolsVideoMergerRoute: typeof ToolsVideoMergerRoute
   ToolsVideoToGifRoute: typeof ToolsVideoToGifRoute
   ToolsVideoTrimmerRoute: typeof ToolsVideoTrimmerRoute
@@ -3704,13 +3691,6 @@ declare module '@tanstack/react-router' {
       preLoaderRoute: typeof ToolsVideoCompressorRouteImport
       parentRoute: typeof rootRouteImport
     }
-    '/tools/video-downloader': {
-      id: '/tools/video-downloader'
-      path: '/tools/video-downloader'
-      fullPath: '/tools/video-downloader'
-      preLoaderRoute: typeof ToolsVideoDownloaderRouteImport
-      parentRoute: typeof rootRouteImport
-    }
     '/tools/video-merger': {
       id: '/tools/video-merger'
       path: '/tools/video-merger'
@@ -4004,7 +3984,6 @@ const rootRouteChildren: RootRouteChildren = {
   ToolsUrlEncoderRoute: ToolsUrlEncoderRoute,
   ToolsUuidGeneratorRoute: ToolsUuidGeneratorRoute,
   ToolsVideoCompressorRoute: ToolsVideoCompressorRoute,
-  ToolsVideoDownloaderRoute: ToolsVideoDownloaderRoute,
   ToolsVideoMergerRoute: ToolsVideoMergerRoute,
   ToolsVideoToGifRoute: ToolsVideoToGifRoute,
   ToolsVideoTrimmerRoute: ToolsVideoTrimmerRoute,

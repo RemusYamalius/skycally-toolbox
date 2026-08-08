@@ -342,9 +342,14 @@ function HomePage() {
             className="hero-fade-up mt-8 font-display font-extrabold tracking-tight leading-[1.04]"
             style={{ fontSize: "clamp(2.8rem, 8vw, 5.5rem)" }}
           >
-            The Free Tool
-            <br />
-            for Your <TypedWord />
+            <span className="sr-only">
+              Skycally — {TOOL_COUNT}+ free online tools for images, videos, PDFs, audio, text and links
+            </span>
+            <span aria-hidden="true">
+              The Free Tool
+              <br />
+              for Your <TypedWord />
+            </span>
           </h1>
 
           <p

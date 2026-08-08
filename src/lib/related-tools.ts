@@ -184,14 +184,13 @@ export const relatedToolsMap: Record<string, string[]> = {
   ],
 
   // Video
-  "video-downloader": ["video-to-gif", "video-compressor", "extract-audio"],
-  "video-to-gif": ["video-downloader", "video-compressor", "screen-recorder"],
-  "video-trimmer": ["video-compressor", "video-to-gif", "video-downloader"],
-  "video-merger": ["video-trimmer", "video-compressor", "video-downloader"],
-  "add-subtitles": ["video-trimmer", "video-downloader", "screen-recorder"],
-  "screen-recorder": ["video-to-gif", "video-compressor", "video-downloader"],
-  "video-compressor": ["video-downloader", "extract-audio", "video-to-gif"],
-  "extract-audio": ["audio-converter", "video-compressor", "video-downloader"],
+  "video-to-gif": ["video-compressor", "screen-recorder", "extract-audio"],
+  "video-trimmer": ["video-compressor", "video-to-gif", "screen-recorder"],
+  "video-merger": ["video-trimmer", "video-compressor", "video-to-gif"],
+  "add-subtitles": ["video-trimmer", "screen-recorder", "video-compressor"],
+  "screen-recorder": ["video-to-gif", "video-compressor", "video-trimmer"],
+  "video-compressor": ["extract-audio", "video-to-gif", "screen-recorder"],
+  "extract-audio": ["audio-converter", "video-compressor", "video-to-gif"],
 
   // Image
   "image-converter": ["image-compressor", "image-resizer", "image-to-pdf"],

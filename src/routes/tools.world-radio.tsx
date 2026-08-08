@@ -833,7 +833,7 @@ function WorldRadioPage() {
                     {s.favicon ? (
                       <img
                         src={s.favicon}
-                        alt=""
+                        alt={`${s.name} station logo`}
                         className="w-full h-full object-cover"
                         onError={(e) => {
                           (e.currentTarget as HTMLImageElement).style.display = "none";
@@ -901,7 +901,7 @@ function WorldRadioPage() {
             {current?.favicon ? (
               <img
                 src={current.favicon}
-                alt=""
+                alt={`${current.name} station logo`}
                 className="w-full h-full object-cover"
                 onError={(e) => {
                   (e.currentTarget as HTMLImageElement).style.display = "none";

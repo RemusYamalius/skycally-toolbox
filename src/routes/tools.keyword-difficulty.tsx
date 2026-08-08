@@ -69,6 +69,7 @@ function KeywordDifficultyPage() {
           className="w-full rounded-xl border border-border bg-background px-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring min-h-[120px] font-mono"
           disabled={loading}
           maxLength={1000}
+          aria-label="Keywords to check difficulty for"
         />
         <div className="flex flex-col sm:flex-row gap-3">
           <CountrySelect value={database} onChange={setDatabase} disabled={loading} />

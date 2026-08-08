@@ -67,6 +67,7 @@ function KeywordResearchPage() {
               value={keyword}
               onChange={(e) => setKeyword(e.target.value)}
               placeholder="Enter a keyword (e.g. content marketing)"
+              aria-label="Keyword to research"
               className="w-full rounded-xl border border-border bg-background pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               disabled={loading}
               maxLength={100}

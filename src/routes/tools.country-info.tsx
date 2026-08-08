@@ -222,7 +222,7 @@ function CountryInfo() {
                     className="inline-flex items-center gap-2 rounded-full border border-border bg-background/40 px-3 py-1.5 text-xs hover:bg-secondary/60 transition-colors"
                   >
                     {b.flagSvg && (
-                      <img src={b.flagSvg} alt="" loading="lazy" className="w-4 h-3 object-cover rounded-sm" />
+                      <img src={b.flagSvg} alt={`Flag of ${b.name.common}`} loading="lazy" className="w-4 h-3 object-cover rounded-sm" />
                     )}
                     {b.name.common}
                   </button>
@@ -254,7 +254,7 @@ function CountryInfo() {
               {c.flagSvg && (
                 <img
                   src={c.flagSvg}
-                  alt=""
+                  alt={`Flag of ${c.name.common}`}
                   loading="lazy"
                   className="w-6 h-4 object-cover rounded-sm border border-border"
                 />

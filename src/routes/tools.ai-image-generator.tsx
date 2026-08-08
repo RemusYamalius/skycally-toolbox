@@ -883,7 +883,7 @@ function AiImageGeneratorPage() {
                   style={active ? { boxShadow: "0 0 0 2px var(--cyan-brand)" } : undefined}
                   aria-label={`Load previous: ${h.prompt.slice(0, 50)}`}
                 >
-                  <img src={h.imageUrl} alt="" className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
+                  <img src={h.imageUrl} alt={`Previously generated image: ${h.prompt.slice(0, 60)}`} className="absolute inset-0 w-full h-full object-cover" loading="lazy" />
                 </button>
               );
             })}

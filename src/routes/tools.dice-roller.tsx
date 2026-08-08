@@ -172,14 +172,14 @@ function DiceRoller() {
                   </button>
                   {active && (
                     <div className="flex items-center gap-1">
-                      <button
+                      <button aria-label="Decrease"
                         onClick={() => adjust(die, -1)}
                         className="w-6 h-6 rounded border border-border bg-card text-foreground hover:bg-secondary flex items-center justify-center"
                       >
                         <Minus className="w-3 h-3" />
                       </button>
                       <span className="w-6 text-center text-sm font-bold tabular-nums">{count}</span>
-                      <button
+                      <button aria-label="Increase"
                         onClick={() => adjust(die, 1)}
                         className="w-6 h-6 rounded border border-border bg-card text-foreground hover:bg-secondary flex items-center justify-center"
                       >
@@ -198,7 +198,7 @@ function DiceRoller() {
           {/* Modifier */}
           <div className="flex items-center gap-2 rounded-xl border border-border bg-card/50 px-3 py-2">
             <span className="text-xs font-medium text-muted-foreground">Modifier</span>
-            <button
+            <button aria-label="Decrease"
               onClick={() => setModifier((m) => m - 1)}
               className="w-6 h-6 rounded border border-border bg-card hover:bg-secondary flex items-center justify-center"
             >
@@ -207,7 +207,7 @@ function DiceRoller() {
             <span className="w-10 text-center font-bold tabular-nums text-sm">
               {modifier > 0 ? `+${modifier}` : modifier}
             </span>
-            <button
+            <button aria-label="Increase"
               onClick={() => setModifier((m) => m + 1)}
               className="w-6 h-6 rounded border border-border bg-card hover:bg-secondary flex items-center justify-center"
             >
@@ -298,7 +298,7 @@ function DiceRoller() {
           <div className="rounded-2xl border border-border bg-card/40 p-4">
             <div className="flex items-center justify-between mb-3">
               <h3 className="text-xs font-semibold text-muted-foreground uppercase tracking-wider">Roll History</h3>
-              <button
+              <button aria-label="Clear roll history"
                 onClick={() => setHistory([])}
                 className="text-xs text-muted-foreground hover:text-foreground transition-colors"
               >

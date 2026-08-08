@@ -243,7 +243,7 @@ function Page() {
                 <div key={s.id} className="rounded-xl bg-secondary/40 border border-border p-3 space-y-2">
                   <div className="flex justify-between items-center">
                     <span className="text-xs text-muted-foreground">#{i + 1}</span>
-                    <button
+                    <button aria-label="Remove subtitle"
                       onClick={() => setSubs((p) => p.filter((x) => x.id !== s.id))}
                       className="text-muted-foreground hover:text-destructive"
                     >

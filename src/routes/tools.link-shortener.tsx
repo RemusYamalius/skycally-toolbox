@@ -349,14 +349,14 @@ function LinkShortener() {
                   >
                     {copiedIdx === i ? "✓" : <Copy className="w-3 h-3" />}
                   </button>
-                  <button
+                  <button aria-label="Load"
                     onClick={() => loadFromHistory(item)}
                     className="p-1.5 rounded-lg hover:bg-secondary transition text-muted-foreground hover:text-foreground"
                     title="Load"
                   >
                     <ExternalLink className="w-3 h-3" />
                   </button>
-                  <button
+                  <button aria-label="Delete"
                     onClick={() => removeFromHistory(i)}
                     className="p-1.5 rounded-lg hover:bg-secondary transition text-muted-foreground hover:text-red-400"
                     title="Delete"

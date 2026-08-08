@@ -148,7 +148,7 @@ function ImageToPdf() {
                   <GripVertical className="w-4 h-4 text-muted-foreground" />
                   <img src={it.url} alt={`Preview of ${it.file.name}`} className="w-12 h-12 object-cover rounded" />
                   <span className="flex-1 truncate text-xs">{it.file.name}</span>
-                  <button onClick={() => remove(it.id)} className="p-1 hover:bg-secondary rounded transition-colors">
+                  <button aria-label="Remove image" onClick={() => remove(it.id)} className="p-1 hover:bg-secondary rounded transition-colors">
                     <X className="w-4 h-4" />
                   </button>
                 </li>

@@ -311,7 +311,7 @@ function ImageCompressorPage() {
                   {/* Actions */}
                   <div className="flex items-center gap-2 shrink-0">
                     {it.status === "done" && it.out && (
-                      <button
+                      <button aria-label="Download compressed image"
                         onClick={() => downloadOne(it)}
                         className="p-2 rounded-xl border border-border bg-card hover:bg-secondary transition"
                         title="Download compressed image"
@@ -319,7 +319,7 @@ function ImageCompressorPage() {
                         <Download className="w-4 h-4" />
                       </button>
                     )}
-                    <button
+                    <button aria-label="Remove image"
                       onClick={() => remove(it.id)}
                       className="p-2 rounded-xl border border-border text-muted-foreground hover:text-red-400 hover:border-red-400/30 hover:bg-red-400/5 transition"
                     >

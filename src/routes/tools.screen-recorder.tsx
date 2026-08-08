@@ -533,7 +533,7 @@ function CameraRecorderMobile() {
             )}
           </button>
         ) : (
-          <button
+          <button aria-label="Flip camera"
             onClick={reset}
             className="w-20 h-20 rounded-full border-4 border-border bg-card flex items-center justify-center text-muted-foreground hover:text-foreground transition"
           >

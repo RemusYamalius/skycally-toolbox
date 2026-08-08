@@ -434,7 +434,7 @@ function TruthOrDare() {
                     className="flex items-center justify-between gap-2 rounded-md bg-card/40 border border-border px-3 py-1.5 text-sm"
                   >
                     <span className="text-foreground truncate">{t}</span>
-                    <button
+                    <button aria-label="Delete custom prompt"
                       onClick={() => persistTruths(customTruths.filter((_, j) => j !== i))}
                       className="text-muted-foreground hover:text-foreground"
                     >
@@ -467,7 +467,7 @@ function TruthOrDare() {
                     className="flex items-center justify-between gap-2 rounded-md bg-card/40 border border-border px-3 py-1.5 text-sm"
                   >
                     <span className="text-foreground truncate">{t}</span>
-                    <button
+                    <button aria-label="Delete custom prompt"
                       onClick={() => persistDares(customDares.filter((_, j) => j !== i))}
                       className="text-muted-foreground hover:text-foreground"
                     >

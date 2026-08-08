@@ -232,7 +232,7 @@ function CollageMaker() {
             {files.map((f, i) => (
               <div key={i} className="relative w-16 h-16 rounded-md overflow-hidden border border-border">
                 <img src={URL.createObjectURL(f)} alt={`Selected photo ${i + 1}: ${f.name}`} className="w-full h-full object-cover" />
-                <button onClick={() => removeAt(i)} className="absolute top-0 right-0 bg-black/60 p-0.5">
+                <button aria-label="Remove photo" onClick={() => removeAt(i)} className="absolute top-0 right-0 bg-black/60 p-0.5">
                   <X className="w-3 h-3 text-white" />
                 </button>
               </div>

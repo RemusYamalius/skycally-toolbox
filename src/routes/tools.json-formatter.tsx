@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState } from "react";
@@ -139,6 +139,17 @@ function JsonFormatter() {
           </div>
         </div>
       </div>
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Looking for more free browser-based utilities like this one? Read our roundup of{" "}
+        <Link
+          to="/blog/best-free-online-tools-for-developers-2025"
+          className="text-[var(--cyan-brand)] hover:underline"
+        >
+          the best free online tools for developers
+        </Link>
+        .
+      </p>
 
       <AdZone id="json-formatter-mid" size="728x90" />
 

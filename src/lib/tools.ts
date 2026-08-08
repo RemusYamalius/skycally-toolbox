@@ -196,15 +196,6 @@ export function isNewTool(t: Tool): boolean {
 
 export const tools: Tool[] = [
   {
-    slug: "video-downloader",
-    name: "Video Downloader",
-    description: "Download videos from TikTok, Instagram, YouTube and more.",
-    category: "video",
-    icon: Download,
-    path: "/tools/video-downloader",
-    hidden: true,
-  },
-  {
     slug: "video-to-gif",
     name: "Video to GIF",
     description: "Convert any video clip to a high-quality animated GIF.",

@@ -416,7 +416,7 @@ const TextColor = Color.extend({
 // ---------- Templates ----------
 const TEMPLATES: Record<string, string> = {
   blank: `<p></p>`,
-  cv: `<h1 style="text-align:center">Your Name</h1>
+  cv: `<h2 style="text-align:center">Your Name</h2>
 <p style="text-align:center"><em>your.email@example.com · +1 555 000 0000 · City, Country</em></p>
 <h2>Experience</h2>
 <p><strong>Senior Role</strong> — Company · 2022–Present</p>
@@ -432,7 +432,7 @@ const TEMPLATES: Record<string, string> = {
 <p>In my current role I have [achievement]. I am particularly drawn to [Company] because [reason].</p>
 <p>Thank you for your time and consideration. I look forward to discussing how my skills can support your team.</p>
 <p>Sincerely,<br>Your Name</p>`,
-  invoice: `<h1>INVOICE</h1>
+  invoice: `<h2>INVOICE</h2>
 <p><strong>From:</strong> Your Company<br><strong>To:</strong> Client Name</p>
 <p><strong>Invoice #:</strong> 0001 &nbsp; <strong>Date:</strong> ${new Date().toLocaleDateString()}</p>
 <table><tbody>
@@ -442,7 +442,7 @@ const TEMPLATES: Record<string, string> = {
 <tr><td colspan="3"><strong>Total</strong></td><td><strong>$200</strong></td></tr>
 </tbody></table>
 <p><strong>Payment details:</strong> Bank — IBAN — Reference</p>`,
-  essay: `<h1 style="text-align:center">Essay Title</h1>
+  essay: `<h2 style="text-align:center">Essay Title</h2>
 <h2>Introduction</h2><p>Open with a hook and state your thesis clearly.</p>
 <h2>Body — Argument One</h2><p>Support your first claim with evidence.</p>
 <h2>Body — Argument Two</h2><p>Develop your second claim with examples.</p>
@@ -687,7 +687,7 @@ function Editor4U() {
       typeof localStorage !== "undefined"
         ? localStorage.getItem("skycally_word_doc") ||
           localStorage.getItem("wp:doc") ||
-          `<h1>Welcome to Skycally Word Processor</h1><p>Start typing here. Use the toolbar above to format your document.</p>`
+          `<h2>Welcome to Skycally Word Processor</h2><p>Start typing here. Use the toolbar above to format your document.</p>`
         : "",
     editorProps: {
       attributes: {
@@ -1601,42 +1601,48 @@ function Toolbar({
             </option>
           ))}
         </select>
-        <button aria-label="Bold (Ctrl+B)"
+        <button
+          aria-label="Bold (Ctrl+B)"
           className={active(editor.isActive("bold"))}
           onClick={() => editor.chain().focus().toggleBold().run()}
           title="Bold (Ctrl+B)"
         >
           <Bold className="w-4 h-4" />
         </button>
-        <button aria-label="Italic (Ctrl+I)"
+        <button
+          aria-label="Italic (Ctrl+I)"
           className={active(editor.isActive("italic"))}
           onClick={() => editor.chain().focus().toggleItalic().run()}
           title="Italic (Ctrl+I)"
         >
           <Italic className="w-4 h-4" />
         </button>
-        <button aria-label="Underline (Ctrl+U)"
+        <button
+          aria-label="Underline (Ctrl+U)"
           className={active(editor.isActive("underline"))}
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           title="Underline (Ctrl+U)"
         >
           <UnderlineIcon className="w-4 h-4" />
         </button>
-        <button aria-label="Strike"
+        <button
+          aria-label="Strike"
           className={active(editor.isActive("strike"))}
           onClick={() => editor.chain().focus().toggleStrike().run()}
           title="Strike"
         >
           <Strikethrough className="w-4 h-4" />
         </button>
-        <button aria-label="Subscript"
+        <button
+          aria-label="Subscript"
           className={active(editor.isActive("subscript"))}
           onClick={() => editor.chain().focus().toggleSubscript().run()}
           title="Subscript"
         >
           <SubIcon className="w-4 h-4" />
         </button>
-        <button aria-label="Superscript"
+        <button
+          aria-label="Superscript"
           className={active(editor.isActive("superscript"))}
           onClick={() => editor.chain().focus().toggleSuperscript().run()}
           title="Superscript"
@@ -1684,7 +1690,8 @@ function Toolbar({
           />
         </Popover>
 
-        <button aria-label="Clear formatting"
+        <button
+          aria-label="Clear formatting"
           className={btn}
           onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
           title="Clear formatting"
@@ -1692,7 +1699,8 @@ function Toolbar({
           <Eraser className="w-4 h-4" />
         </button>
 
-        <button aria-label="Format Painter — pick up formatting here, then select text elsewhere to apply it. Click again (or Esc) to stop."
+        <button
+          aria-label="Format Painter — pick up formatting here, then select text elsewhere to apply it. Click again (or Esc) to stop."
           className={active(painterArmed)}
           onClick={onTogglePainter}
           title="Format Painter — pick up formatting here, then select text elsewhere to apply it. Click again (or Esc) to stop."
@@ -1703,28 +1711,32 @@ function Toolbar({
 
       {/* Row 3: Paragraph */}
       <div className="wp-row wp-row-justify">
-        <button aria-label="Align left"
+        <button
+          aria-label="Align left"
           className={active(editor.isActive({ textAlign: "left" }))}
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
           title="Align left"
         >
           <AlignLeft className="w-4 h-4" />
         </button>
-        <button aria-label="Align center"
+        <button
+          aria-label="Align center"
           className={active(editor.isActive({ textAlign: "center" }))}
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
           title="Align center"
         >
           <AlignCenter className="w-4 h-4" />
         </button>
-        <button aria-label="Align right"
+        <button
+          aria-label="Align right"
           className={active(editor.isActive({ textAlign: "right" }))}
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
           title="Align right"
         >
           <AlignRight className="w-4 h-4" />
         </button>
-        <button aria-label="Justify"
+        <button
+          aria-label="Justify"
           className={active(editor.isActive({ textAlign: "justify" }))}
           onClick={() => editor.chain().focus().setTextAlign("justify").run()}
           title="Justify"
@@ -1745,28 +1757,32 @@ function Toolbar({
         >
           RTL
         </button>
-        <button aria-label="Bullet list"
+        <button
+          aria-label="Bullet list"
           className={active(editor.isActive("bulletList"))}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           title="Bullet list"
         >
           <List className="w-4 h-4" />
         </button>
-        <button aria-label="Numbered list"
+        <button
+          aria-label="Numbered list"
           className={active(editor.isActive("orderedList"))}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           title="Numbered list"
         >
           <ListOrdered className="w-4 h-4" />
         </button>
-        <button aria-label="Indent"
+        <button
+          aria-label="Indent"
           className={btn}
           onClick={() => (editor.chain().focus() as any).sinkListItem("listItem").run()}
           title="Indent"
         >
           <IndentIncrease className="w-4 h-4" />
         </button>
-        <button aria-label="Outdent"
+        <button
+          aria-label="Outdent"
           className={btn}
           onClick={() => (editor.chain().focus() as any).liftListItem("listItem").run()}
           title="Outdent"
@@ -1879,7 +1895,8 @@ function Toolbar({
           className="hidden"
           onChange={(e) => e.target.files?.[0] && insertImage(e.target.files[0])}
         />
-        <button aria-label="Horizontal rule"
+        <button
+          aria-label="Horizontal rule"
           className={btn}
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
           title="Horizontal rule"
@@ -1917,7 +1934,8 @@ function Toolbar({
             ))}
           </div>
         </Popover>
-        <button aria-label="Insert date/time"
+        <button
+          aria-label="Insert date/time"
           className={btn}
           onClick={() => editor.chain().focus().insertContent(new Date().toLocaleString()).run()}
           title="Insert date/time"
@@ -1951,10 +1969,20 @@ function Toolbar({
 
       {/* Row 5: Review */}
       <div className="wp-row wp-row-justify">
-        <button aria-label="Undo (Ctrl+Z)" className={btn} onClick={() => editor.chain().focus().undo().run()} title="Undo (Ctrl+Z)">
+        <button
+          aria-label="Undo (Ctrl+Z)"
+          className={btn}
+          onClick={() => editor.chain().focus().undo().run()}
+          title="Undo (Ctrl+Z)"
+        >
           <Undo2 className="w-4 h-4" />
         </button>
-        <button aria-label="Redo (Ctrl+Y)" className={btn} onClick={() => editor.chain().focus().redo().run()} title="Redo (Ctrl+Y)">
+        <button
+          aria-label="Redo (Ctrl+Y)"
+          className={btn}
+          onClick={() => editor.chain().focus().redo().run()}
+          title="Redo (Ctrl+Y)"
+        >
           <Redo2 className="w-4 h-4" />
         </button>
         <button className={btn} onClick={onFind} title="Find & Replace (Ctrl+H)">
@@ -1980,14 +2008,20 @@ function Toolbar({
         >
           {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
         </button>
-        <button aria-label={isReadingMode ? "Exit reading mode (Esc)" : "Reading mode — focus on content"}
+        <button
+          aria-label={isReadingMode ? "Exit reading mode (Esc)" : "Reading mode — focus on content"}
           className={active(isReadingMode)}
           onClick={onToggleReadingMode}
           title={isReadingMode ? "Exit reading mode (Esc)" : "Reading mode — focus on content"}
         >
           <BookOpen className="w-4 h-4" />
         </button>
-        <button aria-label="Toggle rulers" className={active(showRulers)} onClick={() => setShowRulers(!showRulers)} title="Toggle rulers">
+        <button
+          aria-label="Toggle rulers"
+          className={active(showRulers)}
+          onClick={() => setShowRulers(!showRulers)}
+          title="Toggle rulers"
+        >
           <Ruler className="w-4 h-4" />
         </button>
         <button className={btn} onClick={() => setUnit(unit === "cm" ? "in" : "cm")} title="Units">
@@ -2012,7 +2046,8 @@ function Toolbar({
 
         <div className="wp-spacer" />
 
-        <button aria-label="Zoom out"
+        <button
+          aria-label="Zoom out"
           className={btn}
           onClick={() => onZoomChange(ZOOM_PRESETS[Math.max(0, ZOOM_PRESETS.indexOf(zoomPercent) - 1)])}
           title="Zoom out"
@@ -2032,7 +2067,8 @@ function Toolbar({
             </option>
           ))}
         </select>
-        <button aria-label="Zoom in"
+        <button
+          aria-label="Zoom in"
           className={btn}
           onClick={() =>
             onZoomChange(ZOOM_PRESETS[Math.min(ZOOM_PRESETS.length - 1, ZOOM_PRESETS.indexOf(zoomPercent) + 1)])

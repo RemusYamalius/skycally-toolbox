@@ -63,6 +63,7 @@ function BacklinkCheckerPage() {
               value={target}
               onChange={(e) => setTarget(e.target.value)}
               placeholder={targetType === "url" ? "https://example.com/page" : "example.com"}
+              aria-label="Domain or URL to check backlinks for"
               className="w-full rounded-xl border border-border bg-background pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               disabled={loading}
               maxLength={255}

@@ -146,7 +146,7 @@ function ImageToPdf() {
                   className={`flex items-center gap-3 rounded-lg border border-border bg-card/50 p-2 cursor-move transition-opacity ${dragId === it.id ? "opacity-50" : ""}`}
                 >
                   <GripVertical className="w-4 h-4 text-muted-foreground" />
-                  <img src={it.url} alt="" className="w-12 h-12 object-cover rounded" />
+                  <img src={it.url} alt={`Preview of ${it.file.name}`} className="w-12 h-12 object-cover rounded" />
                   <span className="flex-1 truncate text-xs">{it.file.name}</span>
                   <button onClick={() => remove(it.id)} className="p-1 hover:bg-secondary rounded transition-colors">
                     <X className="w-4 h-4" />

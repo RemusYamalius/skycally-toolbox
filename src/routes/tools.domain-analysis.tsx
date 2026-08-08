@@ -64,6 +64,7 @@ function DomainAnalysisPage() {
               value={domain}
               onChange={(e) => setDomain(e.target.value)}
               placeholder="Enter a domain (e.g. example.com)"
+              aria-label="Domain to analyze"
               className="w-full rounded-xl border border-border bg-background pl-10 pr-4 py-2.5 text-sm focus:outline-none focus:ring-2 focus:ring-ring"
               disabled={loading}
               maxLength={255}

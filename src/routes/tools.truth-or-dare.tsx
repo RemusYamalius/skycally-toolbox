@@ -110,7 +110,7 @@ const TRUTHS = [
   "Have you ever forgotten someone's name mid-conversation and faked it?",
   "What's the most uncomfortable compliment you've ever received?",
   "What's something you pretend to understand but really don't?",
-  "Have you ever said \"I love you\" without meaning it?",
+  'Have you ever said "I love you" without meaning it?',
   "What's the weirdest thing you've done out of boredom?",
   "Have you ever ghosted someone and felt guilty about it later?",
   "What's the pettiest argument you've ever gotten into?",
@@ -148,7 +148,7 @@ const DARES = [
   "Whisper everything you say for the next 2 rounds.",
   "Describe your day using only emojis.",
   "Do 10 push-ups or let the group assign you a harder dare.",
-  "Text the fifth person in your contacts \"I had a dream about you.\"",
+  'Text the fifth person in your contacts "I had a dream about you."',
   "Let the group pick a song for you to sing the chorus of.",
   "Do your best evil laugh every time you speak for the next 3 rounds.",
   "Hold eye contact with the person to your left for 30 seconds without speaking.",
@@ -167,15 +167,15 @@ const DARES = [
   "Narrate everything the person to your right is doing like a nature documentary.",
   "Speak in an exaggerated formal tone as if you're giving a royal address for 2 rounds.",
   "Let someone pick a random object in the room for you to compliment for 30 seconds.",
-  "Pretend you're being interviewed on a talk show about your \"latest project.\"",
+  'Pretend you\'re being interviewed on a talk show about your "latest project."',
   "Do a dramatic reading of the last text you received.",
-  "Let the group vote on whether you text your last caller \"I miss you.\"",
+  'Let the group vote on whether you text your last caller "I miss you."',
   "Wear an item of clothing backwards for the next 3 rounds.",
   "Make the funniest face you can and hold it for 20 seconds.",
   "Let the group pick a random word you have to include naturally in your next 3 sentences.",
   "Do a 10-second tap dance or your best attempt at one.",
   "Compliment the person across from you for 30 seconds straight without repeating yourself.",
-  "Pretend you're on a cooking show and describe the room as your \"kitchen studio.\"",
+  'Pretend you\'re on a cooking show and describe the room as your "kitchen studio."',
   "Let someone in the group pick your phone wallpaper for the next week.",
   "Speak like a pirate for the next 2 rounds.",
   "Do your best dramatic gasp and faint onto the nearest surface.",
@@ -519,7 +519,7 @@ function TruthOrDare() {
         title="Truth or Dare Online Spin Generator — Play with Custom Questions"
         description="Spin for a random Truth or Dare online. This free truth or dare generator and randomizer includes 40+ built-in questions and dares, plus custom mode to add your own. Browser-based, no signup required."
         body={[
-          "Skycally's Truth or Dare online spin generator brings the classic party game to any screen. Choose between Truth, Dare, or Mixed mode and hit Spin to land on a random challenge — no bottle needed. With 20 hand-picked truth questions and 20 creative dare challenges built into the randomizer — plus a fully custom mode where you can add your own — every spin stays fresh and personal.",
+          "Skycally's Truth or Dare online spin generator brings the classic party game to any screen. Choose between Truth, Dare, or Mixed mode and hit Spin to land on a random challenge — no bottle needed. With 61 hand-picked truth questions and 61 creative dare challenges built into the randomizer — plus a fully custom mode where you can add your own — every spin stays fresh and personal.",
           "The built-in questions are designed to be fun and appropriate for most groups, ranging from light-hearted ice-breakers to more revealing personal questions. Dare challenges are creative and engaging without being extreme. For groups who want something more personal or tailored, custom mode lets you replace the built-in deck entirely with your own prompts before you spin.",
           "Custom mode is where the game really comes alive. Add questions specific to your friend group, inside jokes, or memories you share, then use the same spin generator to draw from your own list. Switch to custom-only mode to play exclusively with your prompts, or mix them with the built-in deck. All custom questions are saved in your browser's localStorage so they're there next time you play.",
           "Works for sleepovers, road trips, dinner parties, team ice-breakers, first dates, and any social gathering where you want to spark conversation and laughter. No physical cards needed — just open the tool, hit spin, and pass the phone around. Everything runs in your browser with no account required.",
@@ -538,7 +538,7 @@ function TruthOrDare() {
           {
             question: "How many questions and dares are included?",
             answer:
-              "20 built-in truth questions and 20 dare challenges, giving 40 prompts out of the box. You can add unlimited custom questions in custom mode.",
+              "61 built-in truth questions and 61 dare challenges, giving 122 prompts out of the box. You can add unlimited custom questions in custom mode.",
           },
           {
             question: "Can I add my own questions?",

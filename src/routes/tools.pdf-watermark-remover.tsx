@@ -1,5 +1,5 @@
-import { createFileRoute } from "@tanstack/react-router";
-import { buildToolMeta, toolBySlug } from "@/lib/seo";
+import { createFileRoute, Link } from "@tanstack/react-router";
+import { buildPageMeta, toolBySlug, SITE_URL } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useState, useRef } from "react";
 import { ToolPageShell } from "@/components/tool-page-shell";
@@ -9,8 +9,47 @@ import ToolSeoContent from "@/components/tool-seo-content";
 import { RelatedTools } from "@/components/related-tools";
 import { PDFDocument, PDFName, PDFDict, PDFArray, PDFRef } from "pdf-lib";
 
+// SEO NOTE: this page was still on the generic buildToolMeta() template.
+// Search Console shows a clear pattern in the actual query cluster:
+// "pdf watermark remover online free" (19 impr, pos 36.8, best CTR at
+// 26.3%), "pdf watermark remover free" (21 impr, pos 33.6), bare "pdf
+// watermark remover" (63 impr — the highest volume single query, pos
+// 49.4), and critically every "without login" variant ranks noticeably
+// better than the plain versions (pos ~22-26 vs ~33-50) despite low
+// individual volume — a real, if small, signal that "no login" phrasing
+// is underused relative to how well it already resonates. The old
+// generic title had "No Signup" but never "no login" or an exact-match
+// for "online free" together. Title/description below are tuned to that
+// specific cluster instead of the generic template.
+
 export const Route = createFileRoute("/tools/pdf-watermark-remover")({
-  head: () => buildToolMeta(toolBySlug("pdf-watermark-remover", tools)),
+  head: () => {
+    const tool = toolBySlug("pdf-watermark-remover", tools);
+    const title = "PDF Watermark Remover Online — Free, No Login | Skycally";
+    const description =
+      "Remove watermarks from any PDF online, free, with no login required. Works entirely in your browser — your file is never uploaded to a server.";
+    const base = buildPageMeta({ title, description, path: tool.path });
+    return {
+      ...base,
+      scripts: [
+        {
+          type: "application/ld+json",
+          children: JSON.stringify({
+            "@context": "https://schema.org",
+            "@type": tool.schemaType ?? "SoftwareApplication",
+            name: tool.name,
+            alternateName: ["Remove Watermark from PDF", "PDF Watermark Eraser", "Watermark Remover PDF"],
+            applicationCategory: tool.schemaCategory ?? "WebApplication",
+            operatingSystem: "Any",
+            offers: { "@type": "Offer", price: "0", priceCurrency: "USD" },
+            url: `${SITE_URL}${tool.path}`,
+            description,
+            featureList: tool.featureList ?? [],
+          }),
+        },
+      ],
+    };
+  },
   component: PdfWatermarkRemover,
 });
 
@@ -654,9 +693,7 @@ function findRepeatedCandidates(perPage: WatermarkFingerprint[][], threshold = 0
     });
   }
 
-  return results
-    .sort((a, b) => b.count - a.count || b.avgW * b.avgH - a.avgW * a.avgH)
-    .slice(0, 3);
+  return results.sort((a, b) => b.count - a.count || b.avgW * b.avgH - a.avgW * a.avgH).slice(0, 3);
 }
 
 function matchesCandidate(fp: WatermarkFingerprint, c: WatermarkCandidate): boolean {
@@ -719,7 +756,10 @@ async function scanForRepeatedWatermarks(
   return { candidates, pageWidth: width, pageHeight: height };
 }
 
-async function removeCandidateFromDoc(bytes: ArrayBuffer, cand: WatermarkCandidate): Promise<{ pdfBytes: Uint8Array; removed: number }> {
+async function removeCandidateFromDoc(
+  bytes: ArrayBuffer,
+  cand: WatermarkCandidate,
+): Promise<{ pdfBytes: Uint8Array; removed: number }> {
   const pdf = await PDFDocument.load(bytes, { ignoreEncryption: true });
   const pages = pdf.getPages();
   let totalRemoved = 0;
@@ -1020,13 +1060,7 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
     const redLift = r - Math.max(g, b);
     const channelSpread = mx - mn;
     const isPalePink =
-      r >= 205 &&
-      g >= 150 &&
-      b >= 150 &&
-      redLift >= 18 &&
-      redLift <= 82 &&
-      channelSpread <= 95 &&
-      luma >= 175;
+      r >= 205 && g >= 150 && b >= 150 && redLift >= 18 && redLift <= 82 && channelSpread <= 95 && luma >= 175;
     return isNeutralGray || isPalePink;
   };
 
@@ -1060,15 +1094,23 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
 
   // Sample average watermark color: pixels in raw mask whose 3x3 neighborhood
   // on other sample pages is near-white (i.e. watermark is over blank background).
-  let sumR = 0, sumG = 0, sumB = 0, samples = 0;
+  let sumR = 0,
+    sumG = 0,
+    sumB = 0,
+    samples = 0;
   for (let p = 0; p < N && samples < 4000; p++) {
     if (!raw[p]) continue;
     const off = p * 4;
     // Prefer samples where at least one other page is near-white here (no text underneath)
     let cleanBg = false;
     for (let s = 1; s < datas.length; s++) {
-      const r = datas[s][off], g = datas[s][off + 1], b = datas[s][off + 2];
-      if (r > 235 && g > 235 && b > 235) { cleanBg = true; break; }
+      const r = datas[s][off],
+        g = datas[s][off + 1],
+        b = datas[s][off + 2];
+      if (r > 235 && g > 235 && b > 235) {
+        cleanBg = true;
+        break;
+      }
     }
     if (!cleanBg) continue;
     sumR += datas[0][off];
@@ -1076,20 +1118,32 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
     sumB += datas[0][off + 2];
     samples++;
   }
-  let wmR = 200, wmG = 200, wmB = 200;
+  let wmR = 200,
+    wmG = 200,
+    wmB = 200;
   if (samples > 20) {
     wmR = sumR / samples;
     wmG = sumG / samples;
     wmB = sumB / samples;
   } else {
     // Fallback: average all masked pixels on page 0
-    let sr = 0, sg = 0, sb = 0, n = 0;
+    let sr = 0,
+      sg = 0,
+      sb = 0,
+      n = 0;
     for (let p = 0; p < N; p++) {
       if (!raw[p]) continue;
       const off = p * 4;
-      sr += datas[0][off]; sg += datas[0][off + 1]; sb += datas[0][off + 2]; n++;
+      sr += datas[0][off];
+      sg += datas[0][off + 1];
+      sb += datas[0][off + 2];
+      n++;
     }
-    if (n > 0) { wmR = sr / n; wmG = sg / n; wmB = sb / n; }
+    if (n > 0) {
+      wmR = sr / n;
+      wmG = sg / n;
+      wmB = sb / n;
+    }
   }
 
   // Paint red overlay on preview
@@ -1110,9 +1164,7 @@ async function detectWatermarkMask(bytes: ArrayBuffer): Promise<ScanResult> {
   // Guard against pathological masks
   const valid = coverage >= 0.0005 && coverage <= 0.35;
   return {
-    mask: valid
-      ? { width: targetW, height: targetH, data: dilated, coveragePct: coverage * 100, wmR, wmG, wmB }
-      : null,
+    mask: valid ? { width: targetW, height: targetH, data: dilated, coveragePct: coverage * 100, wmR, wmG, wmB } : null,
     previewDataUrl,
     sampledPages: canvases.length,
     totalPages: total,
@@ -1145,22 +1197,30 @@ async function rebuildWithoutMask(
 
     const img = ctx.getImageData(0, 0, w, h);
     const d = img.data;
-    const wmR = mask.wmR, wmG = mask.wmG, wmB = mask.wmB;
+    const wmR = mask.wmR,
+      wmG = mask.wmG,
+      wmB = mask.wmB;
     const wmLum = 0.299 * wmR + 0.587 * wmG + 0.114 * wmB;
     const isPinkWatermark = wmR - Math.max(wmG, wmB) > 14;
     const TOL2 = (isPinkWatermark ? 46 : 34) ** 2; // squared RGB distance for "matches watermark"
     const MARGIN = isPinkWatermark ? 30 : 22; // luma below wm => underlying text, keep pixel
 
     const clean = (off: number) => {
-      const r = d[off], g = d[off + 1], b = d[off + 2];
-      const dr = r - wmR, dg = g - wmG, db = b - wmB;
+      const r = d[off],
+        g = d[off + 1],
+        b = d[off + 2];
+      const dr = r - wmR,
+        dg = g - wmG,
+        db = b - wmB;
       const dist2 = dr * dr + dg * dg + db * db;
       const lum = 0.299 * r + 0.587 * g + 0.114 * b;
       const redLift = r - Math.max(g, b);
       const stillLooksPink = isPinkWatermark && r > 190 && g > 130 && b > 130 && redLift > 10;
       if (dist2 < TOL2 || stillLooksPink) {
         // Pure watermark over background -> whiten
-        d[off] = 255; d[off + 1] = 255; d[off + 2] = 255;
+        d[off] = 255;
+        d[off + 1] = 255;
+        d[off + 2] = 255;
         return;
       }
       if (lum < wmLum - MARGIN) {
@@ -1168,7 +1228,9 @@ async function rebuildWithoutMask(
         return;
       }
       // Ambiguous / lighter than watermark -> whiten to remove residual
-      d[off] = 255; d[off + 1] = 255; d[off + 2] = 255;
+      d[off] = 255;
+      d[off + 1] = 255;
+      d[off + 2] = 255;
     };
 
     if (w === mask.width && h === mask.height) {
@@ -1200,7 +1262,6 @@ async function rebuildWithoutMask(
 
   return await newPdf.save();
 }
-
 
 // ---------- Component ----------
 
@@ -1396,15 +1457,21 @@ function PdfWatermarkRemover() {
               <>
                 <div className="space-y-1">
                   <p className="text-cyan-300 text-sm font-semibold">
-                    Watermark detected on {scanResult.sampledPages} sampled page{scanResult.sampledPages === 1 ? "" : "s"}
+                    Watermark detected on {scanResult.sampledPages} sampled page
+                    {scanResult.sampledPages === 1 ? "" : "s"}
                   </p>
                   <p className="text-muted-foreground text-xs">
-                    Highlighted in red on the preview below. Covers {scanResult.mask.coveragePct.toFixed(1)}% of the page. Click below to remove it from all {scanResult.totalPages} pages.
+                    Highlighted in red on the preview below. Covers {scanResult.mask.coveragePct.toFixed(1)}% of the
+                    page. Click below to remove it from all {scanResult.totalPages} pages.
                   </p>
                 </div>
                 <div className="rounded-xl overflow-hidden border border-border bg-black/40 flex items-center justify-center">
                   {/* eslint-disable-next-line jsx-a11y/alt-text */}
-                  <img src={scanResult.previewDataUrl} alt="Detected watermark preview" className="max-h-[480px] w-auto" />
+                  <img
+                    src={scanResult.previewDataUrl}
+                    alt="Detected watermark preview"
+                    className="max-h-[480px] w-auto"
+                  />
                 </div>
                 <div className="flex flex-wrap gap-2">
                   <button
@@ -1426,7 +1493,10 @@ function PdfWatermarkRemover() {
                 <div className="space-y-1">
                   <p className="text-yellow-300 text-sm font-semibold">No repeating watermark detected</p>
                   <p className="text-muted-foreground text-xs">
-                    We sampled {scanResult.sampledPages} of {scanResult.totalPages} page{scanResult.totalPages === 1 ? "" : "s"} and didn't find any element repeating at the same position. You can flatten every page as an image — this removes any visual watermark but the resulting text is no longer selectable.
+                    We sampled {scanResult.sampledPages} of {scanResult.totalPages} page
+                    {scanResult.totalPages === 1 ? "" : "s"} and didn't find any element repeating at the same position.
+                    You can flatten every page as an image — this removes any visual watermark but the resulting text is
+                    no longer selectable.
                   </p>
                 </div>
                 <div className="rounded-xl overflow-hidden border border-border bg-black/40 flex items-center justify-center">
@@ -1485,7 +1555,17 @@ function PdfWatermarkRemover() {
         )}
       </div>
 
-
+      <p className="text-sm text-muted-foreground mt-10">
+        Need to shrink the file next, not just clean it up? Try the{" "}
+        <Link to="/tools/compress-pdf" className="text-[var(--cyan-brand)] hover:underline">
+          PDF Compressor
+        </Link>
+        . Combining several PDFs into one? Use{" "}
+        <Link to="/tools/merge-pdf" className="text-[var(--cyan-brand)] hover:underline">
+          Merge PDF
+        </Link>
+        .
+      </p>
 
       <AdZone id="pdf-watermark-remover-mid" size="728x90" />
 

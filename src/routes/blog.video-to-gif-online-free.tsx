@@ -132,7 +132,8 @@ function ArticlePage() {
       <p>
         <strong>Use a strong opening frame.</strong> GIFs loop automatically, so the first frame is critical. Make sure
         something interesting happens immediately — don't start with a slow pan or blank screen, since anyone glancing
-        at the loop for even a second should already see the point of it.
+        at the loop for even a second should already see the point of it. Whatever moment made you want to turn the clip
+        into a GIF in the first place is usually the right frame to lead with.
       </p>
       <p>
         <strong>For screen recordings</strong>, keep the content focused. Zoom into the relevant area before recording
@@ -244,11 +245,6 @@ function ArticlePage() {
         <br />
         No — trimming only selects which portion of the video becomes your GIF's frames. It doesn't re-encode or degrade
         the footage itself; quality is determined by your width and FPS settings, not by which section you chose.
-      </p>
-
-      <p>
-        Need to go the other direction and pull a video off a page first? Our{" "}
-        <a href="/tools/video-downloader">Video Downloader</a> handles that before you convert the clip here.
       </p>
     </BlogPostLayout>
   );

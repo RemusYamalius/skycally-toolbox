@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { buildToolMeta, toolBySlug } from "@/lib/seo";
 import { tools } from "@/lib/tools";
 import { useRef, useState } from "react";
@@ -314,6 +314,14 @@ function Page() {
           )}
         </div>
       )}
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Want tips for the perfect GIF, or curious why "GIFs" on some platforms are secretly video files? Read{" "}
+        <Link to="/blog/video-to-gif-online-free" className="text-[var(--cyan-brand)] hover:underline">
+          how to convert video to GIF online for free
+        </Link>
+        .
+      </p>
 
       <AdZone id="video-to-gif-bottom" size="728x90" />
 

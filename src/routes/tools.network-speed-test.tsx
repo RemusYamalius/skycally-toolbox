@@ -1,4 +1,4 @@
-import { createFileRoute } from "@tanstack/react-router";
+import { createFileRoute, Link } from "@tanstack/react-router";
 import { useRef, useState } from "react";
 import { motion } from "framer-motion";
 import { Download, Upload, Activity, Waves, Play, RotateCw, X } from "lucide-react";
@@ -519,6 +519,14 @@ function NetworkSpeedTest() {
           Powered by Cloudflare's global speed test network · runs entirely in your browser
         </p>
       </div>
+
+      <p className="text-sm text-muted-foreground mt-10">
+        Curious how a speed test actually works, or why your result doesn't match your plan's advertised speed? Read{" "}
+        <Link to="/blog/how-to-test-internet-speed-online-free" className="text-[var(--cyan-brand)] hover:underline">
+          how to test your internet speed online for free
+        </Link>
+        .
+      </p>
 
       <AdZone id="network-speed-test-bottom" size="728x90" />
 

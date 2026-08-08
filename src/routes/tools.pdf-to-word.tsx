@@ -460,7 +460,7 @@ function PdfToWordPage() {
 
               {/* Remove button */}
               {!busy && (
-                <button
+                <button aria-label="Remove file"
                   onClick={reset}
                   className="p-1.5 rounded-lg border border-border text-muted-foreground hover:text-foreground hover:bg-secondary transition shrink-0"
                   title="Remove file"

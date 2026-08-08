@@ -295,7 +295,7 @@ function SpinningWheel() {
                     placeholder={`Option ${i + 1}`}
                     className="h-8 text-sm"
                   />
-                  <button
+                  <button aria-label="Remove option"
                     onClick={() => removeOption(i)}
                     disabled={options.length <= 2}
                     className="p-1 text-muted-foreground hover:text-red-400 transition-colors disabled:opacity-30"

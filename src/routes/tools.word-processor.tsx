@@ -1601,42 +1601,42 @@ function Toolbar({
             </option>
           ))}
         </select>
-        <button
+        <button aria-label="Bold (Ctrl+B)"
           className={active(editor.isActive("bold"))}
           onClick={() => editor.chain().focus().toggleBold().run()}
           title="Bold (Ctrl+B)"
         >
           <Bold className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Italic (Ctrl+I)"
           className={active(editor.isActive("italic"))}
           onClick={() => editor.chain().focus().toggleItalic().run()}
           title="Italic (Ctrl+I)"
         >
           <Italic className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Underline (Ctrl+U)"
           className={active(editor.isActive("underline"))}
           onClick={() => editor.chain().focus().toggleUnderline().run()}
           title="Underline (Ctrl+U)"
         >
           <UnderlineIcon className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Strike"
           className={active(editor.isActive("strike"))}
           onClick={() => editor.chain().focus().toggleStrike().run()}
           title="Strike"
         >
           <Strikethrough className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Subscript"
           className={active(editor.isActive("subscript"))}
           onClick={() => editor.chain().focus().toggleSubscript().run()}
           title="Subscript"
         >
           <SubIcon className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Superscript"
           className={active(editor.isActive("superscript"))}
           onClick={() => editor.chain().focus().toggleSuperscript().run()}
           title="Superscript"
@@ -1684,7 +1684,7 @@ function Toolbar({
           />
         </Popover>
 
-        <button
+        <button aria-label="Clear formatting"
           className={btn}
           onClick={() => editor.chain().focus().unsetAllMarks().clearNodes().run()}
           title="Clear formatting"
@@ -1692,7 +1692,7 @@ function Toolbar({
           <Eraser className="w-4 h-4" />
         </button>
 
-        <button
+        <button aria-label="Format Painter — pick up formatting here, then select text elsewhere to apply it. Click again (or Esc) to stop."
           className={active(painterArmed)}
           onClick={onTogglePainter}
           title="Format Painter — pick up formatting here, then select text elsewhere to apply it. Click again (or Esc) to stop."
@@ -1703,28 +1703,28 @@ function Toolbar({
 
       {/* Row 3: Paragraph */}
       <div className="wp-row wp-row-justify">
-        <button
+        <button aria-label="Align left"
           className={active(editor.isActive({ textAlign: "left" }))}
           onClick={() => editor.chain().focus().setTextAlign("left").run()}
           title="Align left"
         >
           <AlignLeft className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Align center"
           className={active(editor.isActive({ textAlign: "center" }))}
           onClick={() => editor.chain().focus().setTextAlign("center").run()}
           title="Align center"
         >
           <AlignCenter className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Align right"
           className={active(editor.isActive({ textAlign: "right" }))}
           onClick={() => editor.chain().focus().setTextAlign("right").run()}
           title="Align right"
         >
           <AlignRight className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Justify"
           className={active(editor.isActive({ textAlign: "justify" }))}
           onClick={() => editor.chain().focus().setTextAlign("justify").run()}
           title="Justify"
@@ -1745,28 +1745,28 @@ function Toolbar({
         >
           RTL
         </button>
-        <button
+        <button aria-label="Bullet list"
           className={active(editor.isActive("bulletList"))}
           onClick={() => editor.chain().focus().toggleBulletList().run()}
           title="Bullet list"
         >
           <List className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Numbered list"
           className={active(editor.isActive("orderedList"))}
           onClick={() => editor.chain().focus().toggleOrderedList().run()}
           title="Numbered list"
         >
           <ListOrdered className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Indent"
           className={btn}
           onClick={() => (editor.chain().focus() as any).sinkListItem("listItem").run()}
           title="Indent"
         >
           <IndentIncrease className="w-4 h-4" />
         </button>
-        <button
+        <button aria-label="Outdent"
           className={btn}
           onClick={() => (editor.chain().focus() as any).liftListItem("listItem").run()}
           title="Outdent"
@@ -1879,7 +1879,7 @@ function Toolbar({
           className="hidden"
           onChange={(e) => e.target.files?.[0] && insertImage(e.target.files[0])}
         />
-        <button
+        <button aria-label="Horizontal rule"
           className={btn}
           onClick={() => editor.chain().focus().setHorizontalRule().run()}
           title="Horizontal rule"
@@ -1917,7 +1917,7 @@ function Toolbar({
             ))}
           </div>
         </Popover>
-        <button
+        <button aria-label="Insert date/time"
           className={btn}
           onClick={() => editor.chain().focus().insertContent(new Date().toLocaleString()).run()}
           title="Insert date/time"
@@ -1951,10 +1951,10 @@ function Toolbar({
 
       {/* Row 5: Review */}
       <div className="wp-row wp-row-justify">
-        <button className={btn} onClick={() => editor.chain().focus().undo().run()} title="Undo (Ctrl+Z)">
+        <button aria-label="Undo (Ctrl+Z)" className={btn} onClick={() => editor.chain().focus().undo().run()} title="Undo (Ctrl+Z)">
           <Undo2 className="w-4 h-4" />
         </button>
-        <button className={btn} onClick={() => editor.chain().focus().redo().run()} title="Redo (Ctrl+Y)">
+        <button aria-label="Redo (Ctrl+Y)" className={btn} onClick={() => editor.chain().focus().redo().run()} title="Redo (Ctrl+Y)">
           <Redo2 className="w-4 h-4" />
         </button>
         <button className={btn} onClick={onFind} title="Find & Replace (Ctrl+H)">
@@ -1980,14 +1980,14 @@ function Toolbar({
         >
           {isListening ? <MicOff className="w-4 h-4" /> : <Mic className="w-4 h-4" />}
         </button>
-        <button
+        <button aria-label={isReadingMode ? "Exit reading mode (Esc)" : "Reading mode — focus on content"}
           className={active(isReadingMode)}
           onClick={onToggleReadingMode}
           title={isReadingMode ? "Exit reading mode (Esc)" : "Reading mode — focus on content"}
         >
           <BookOpen className="w-4 h-4" />
         </button>
-        <button className={active(showRulers)} onClick={() => setShowRulers(!showRulers)} title="Toggle rulers">
+        <button aria-label="Toggle rulers" className={active(showRulers)} onClick={() => setShowRulers(!showRulers)} title="Toggle rulers">
           <Ruler className="w-4 h-4" />
         </button>
         <button className={btn} onClick={() => setUnit(unit === "cm" ? "in" : "cm")} title="Units">
@@ -2012,7 +2012,7 @@ function Toolbar({
 
         <div className="wp-spacer" />
 
-        <button
+        <button aria-label="Zoom out"
           className={btn}
           onClick={() => onZoomChange(ZOOM_PRESETS[Math.max(0, ZOOM_PRESETS.indexOf(zoomPercent) - 1)])}
           title="Zoom out"
@@ -2032,7 +2032,7 @@ function Toolbar({
             </option>
           ))}
         </select>
-        <button
+        <button aria-label="Zoom in"
           className={btn}
           onClick={() =>
             onZoomChange(ZOOM_PRESETS[Math.min(ZOOM_PRESETS.length - 1, ZOOM_PRESETS.indexOf(zoomPercent) + 1)])
@@ -2428,7 +2428,7 @@ function FindReplace({ editor, onClose }: { editor: Editor; onClose: () => void 
       >
         <div className="flex items-center justify-between">
           <h3 className="font-semibold">Find & Replace</h3>
-          <button onClick={onClose}>
+          <button aria-label="Close dialog" onClick={onClose}>
             <X className="w-4 h-4" />
           </button>
         </div>
@@ -2482,7 +2482,7 @@ function TemplatesModal({ editor, onClose }: { editor: Editor; onClose: () => vo
       >
         <div className="flex items-center justify-between mb-4">
           <h3 className="font-semibold text-lg">Choose a template</h3>
-          <button onClick={onClose}>
+          <button aria-label="Close dialog" onClick={onClose}>
             <X className="w-4 h-4" />
           </button>
         </div>

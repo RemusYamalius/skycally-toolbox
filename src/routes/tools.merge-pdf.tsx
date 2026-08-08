@@ -32,7 +32,7 @@ function Row({ item, onRemove }: { item: Item; onRemove: () => void }) {
   const style = { transform: CSS.Transform.toString(transform), transition, opacity: isDragging ? 0.5 : 1 };
   return (
     <div ref={setNodeRef} style={style} className="rounded-xl border border-border bg-card p-4 flex items-center gap-3">
-      <button {...attributes} {...listeners} className="p-1 cursor-grab active:cursor-grabbing text-muted-foreground">
+      <button aria-label="Drag to reorder PDF" {...attributes} {...listeners} className="p-1 cursor-grab active:cursor-grabbing text-muted-foreground">
         <GripVertical className="w-4 h-4" />
       </button>
       <div className="flex-1 min-w-0">
@@ -42,7 +42,7 @@ function Row({ item, onRemove }: { item: Item; onRemove: () => void }) {
           {item.pages != null && ` · ${item.pages} pages`}
         </p>
       </div>
-      <button onClick={onRemove} className="p-2 rounded-lg hover:bg-secondary">
+      <button aria-label="Remove PDF" onClick={onRemove} className="p-2 rounded-lg hover:bg-secondary">
         <X className="w-4 h-4" />
       </button>
     </div>

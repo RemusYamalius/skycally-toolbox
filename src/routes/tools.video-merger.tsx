@@ -143,21 +143,21 @@ function Page() {
               <video src={v.url} className="w-16 h-10 object-cover rounded-md bg-black" />
               <p className="flex-1 text-sm truncate">{v.file.name}</p>
               <p className="text-xs text-muted-foreground">{(v.file.size / 1024 / 1024).toFixed(1)}MB</p>
-              <button
+              <button aria-label="Move video up"
                 onClick={() => move(i, -1)}
                 disabled={i === 0}
                 className="p-1 disabled:opacity-30 hover:text-foreground text-muted-foreground"
               >
                 <ArrowUp className="w-4 h-4" />
               </button>
-              <button
+              <button aria-label="Move video down"
                 onClick={() => move(i, 1)}
                 disabled={i === videos.length - 1}
                 className="p-1 disabled:opacity-30 hover:text-foreground text-muted-foreground"
               >
                 <ArrowDown className="w-4 h-4" />
               </button>
-              <button onClick={() => remove(v.id)} className="p-1 text-muted-foreground hover:text-destructive">
+              <button aria-label="Remove video" onClick={() => remove(v.id)} className="p-1 text-muted-foreground hover:text-destructive">
                 <X className="w-4 h-4" />
               </button>
             </div>

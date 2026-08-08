@@ -96,9 +96,10 @@ export function buildPageMeta_with_schema({
   description,
   path,
   ogImage,
+  ogType,
   schema,
 }: PageMetaInput & { schema?: object }) {
-  const base = buildPageMeta({ title, description, path, ogImage });
+  const base = buildPageMeta({ title, description, path, ogImage, ogType });
   if (!schema) return base;
   return {
     ...base,

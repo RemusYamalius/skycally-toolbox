@@ -11,10 +11,10 @@ export const Route = createFileRoute("/blog/video-to-gif-online-free")({
       title: post.title,
       description: post.description,
       path: post.path,
+      ogType: "article",
     });
     return {
       ...base,
-      meta: [...base.meta, { property: "og:type", content: "article" }],
       scripts: [
         {
           type: "application/ld+json",

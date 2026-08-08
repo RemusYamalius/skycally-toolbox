@@ -415,6 +415,7 @@ function HomePage() {
                     }
                   }}
                   placeholder={`Search ${TOOL_COUNT}+ tools... (press "/")`}
+                  aria-label="Search tools"
                   className="w-full bg-transparent pl-12 pr-4 py-4 text-base placeholder:text-white/35 focus:outline-none text-white"
                 />
                 <kbd className="absolute right-4 top-1/2 -translate-y-1/2 hidden sm:inline-flex items-center gap-1 rounded border border-white/15 bg-white/5 px-2 py-0.5 text-[11px] text-white/30 font-mono">

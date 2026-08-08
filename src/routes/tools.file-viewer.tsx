@@ -179,7 +179,7 @@ function fallbackMarkdown(md: string): string {
     .replace(/^#### (.*)$/gm, "<h4>$1</h4>")
     .replace(/^### (.*)$/gm, "<h3>$1</h3>")
     .replace(/^## (.*)$/gm, "<h2>$1</h2>")
-    .replace(/^# (.*)$/gm, "<h1>$1</h1>")
+    .replace(/^# (.*)$/gm, "<h2>$1</h2>")
     .replace(/\*\*(.+?)\*\*/g, "<strong>$1</strong>")
     .replace(/\*(.+?)\*/g, "<em>$1</em>")
     .replace(/`(.+?)`/g, "<code>$1</code>")
@@ -367,7 +367,7 @@ function FileViewerPage() {
   const loadSample = (kind: "docx" | "xlsx" | "csv") => {
     if (kind === "docx") {
       const html =
-        "<h1>Sample Word Document</h1><p>This is a <strong>demo</strong> rendered by <em>Skycally File Viewer</em>. Everything runs locally in your browser — your files never leave your device.</p><h2>Features</h2><ul><li>Heading and list support</li><li>Bold and italic formatting</li><li>Tables and embedded images</li><li>RTL support for Arabic, Hebrew & Persian</li></ul><table><tr><th>Column A</th><th>Column B</th><th>Column C</th></tr><tr><td>Value 1</td><td>Value 2</td><td>Value 3</td></tr></table>";
+        "<h2>Sample Word Document</h2><p>This is a <strong>demo</strong> rendered by <em>Skycally File Viewer</em>. Everything runs locally in your browser — your files never leave your device.</p><h2>Features</h2><ul><li>Heading and list support</li><li>Bold and italic formatting</li><li>Tables and embedded images</li><li>RTL support for Arabic, Hebrew & Persian</li></ul><table><tr><th>Column A</th><th>Column B</th><th>Column C</th></tr><tr><td>Value 1</td><td>Value 2</td><td>Value 3</td></tr></table>";
       setState({
         status: "loaded",
         file: { name: "sample.docx", size: html.length, kind: "docx" },

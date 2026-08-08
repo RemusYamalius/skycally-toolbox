@@ -12,10 +12,10 @@ export const Route = createFileRoute("/blog/attachment-styles-explained")({
       title: post.title,
       description: post.description,
       path: post.path,
+      ogType: "article",
     });
     return {
       ...base,
-      meta: [...base.meta, { property: "og:type", content: "article" }],
       scripts: [
         {
           type: "application/ld+json",

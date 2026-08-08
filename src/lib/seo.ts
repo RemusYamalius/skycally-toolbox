@@ -10,13 +10,22 @@ export interface PageMetaInput {
   description: string;
   path: string;
   ogImage?: string;
+  /** Exactly one og:type per page — "website" by default, "article" for blog posts. */
+  ogType?: string;
   /** Set true to emit "noindex, nofollow" instead of "index, follow" — for
    *  soft-launched or intentionally unfinished pages that shouldn't be
    *  crawled/ranked yet (e.g. tools awaiting a paid data source). */
   noIndex?: boolean;
 }
 
-export function buildPageMeta({ title, description, path, ogImage = OG_IMAGE, noIndex = false }: PageMetaInput) {
+export function buildPageMeta({
+  title,
+  description,
+  path,
+  ogImage = OG_IMAGE,
+  ogType = "website",
+  noIndex = false,
+}: PageMetaInput) {
   const url = SITE_URL + (path === "/" ? "" : path);
   const t = truncate(title, 60);
   const d = truncate(description, 160);
@@ -26,11 +35,11 @@ export function buildPageMeta({ title, description, path, ogImage = OG_IMAGE, no
       { title: t },
       { name: "description", content: d },
       { name: "robots", content: noIndex ? "noindex, nofollow" : "index, follow" },
-      // Open Graph — use og:type "article" for tool pages (more specific than "website")
+      // Open Graph
       { property: "og:title", content: t },
       { property: "og:description", content: d },
       { property: "og:url", content: url },
-      { property: "og:type", content: "website" },
+      { property: "og:type", content: ogType },
       { property: "og:image", content: ogImage },
       { property: "og:image:width", content: "1200" },
       { property: "og:image:height", content: "630" },
@@ -87,9 +96,10 @@ export function buildPageMeta_with_schema({
   description,
   path,
   ogImage,
+  ogType,
   schema,
 }: PageMetaInput & { schema?: object }) {
-  const base = buildPageMeta({ title, description, path, ogImage });
+  const base = buildPageMeta({ title, description, path, ogImage, ogType });
   if (!schema) return base;
   return {
     ...base,

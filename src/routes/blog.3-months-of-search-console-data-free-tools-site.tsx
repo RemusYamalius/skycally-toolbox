@@ -12,10 +12,10 @@ export const Route = createFileRoute("/blog/3-months-of-search-console-data-free
       title: post.title,
       description: post.description,
       path: post.path,
+      ogType: "article",
     });
     return {
       ...base,
-      meta: [...base.meta, { property: "og:type", content: "article" }],
       scripts: [
         {
           type: "application/ld+json",

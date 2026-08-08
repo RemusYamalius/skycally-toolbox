@@ -12,10 +12,10 @@ export const Route = createFileRoute("/blog/png-vs-jpeg-vs-webp")({
       title: post.title,
       description: post.description,
       path: post.path,
+      ogType: "article",
     });
     return {
       ...base,
-      meta: [...base.meta, { property: "og:type", content: "article" }],
       scripts: [
         {
           type: "application/ld+json",

@@ -207,8 +207,8 @@ function ContactPage() {
               <AlertTriangle className="w-5 h-5 shrink-0 mt-0.5" />
               <span>
                 ❌ Something went wrong. Please try emailing us directly at{" "}
-                <a href="mailto:skycally.tools@gmail.com" className="underline">
-                  skycally.tools@gmail.com
+                <a href="mailto:contact@skycally.com" className="underline">
+                  contact@skycally.com
                 </a>
                 .
               </span>
@@ -223,7 +223,7 @@ function ContactPage() {
           {
             Icon: Mail,
             title: "Email Us",
-            value: "skycally.tools@gmail.com",
+            value: "contact@skycally.com",
             sub: "We reply within 24 hours",
             color: "var(--cyan-brand)",
           },

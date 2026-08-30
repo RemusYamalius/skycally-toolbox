@@ -174,7 +174,7 @@ function TermsPage() {
         <h2>15. Contact Us</h2>
         <p>If you have questions or concerns about these Terms of Service, please contact us:</p>
         <p>
-          Email: <a href="mailto:skycally.tools@gmail.com">skycally.tools@gmail.com</a>
+          Email: <a href="mailto:contact@skycally.com">contact@skycally.com</a>
           <br />
           Website: <Link to="/contact">skycally.com/contact</Link>
         </p>

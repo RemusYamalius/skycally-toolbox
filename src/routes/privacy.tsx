@@ -55,13 +55,12 @@ function PrivacyPage() {
         <p>
           A small number of tools require server-side processing. This includes our <strong>AI generation tools</strong>{" "}
           (AI Cover Letter Generator, AI Resume Builder, AI Email Writer, AI Bio Generator, and AI Image Generator),
-          which send the text or prompt you enter to an AI provider in order to generate a result, and a small number of{" "}
-          <strong>media-processing tools</strong> (such as Audio Converter) that require brief server-side processing.
-          In all cases, data is transmitted securely over HTTPS. We do not sell your inputs to these tools or use them
-          for advertising, and we do not keep a permanent copy of your prompts or generated results on our own servers
-          beyond what is needed to return the result to you. Because these tools rely on a third-party AI provider,
-          please avoid entering sensitive personal information you would not want processed by that provider — see
-          Section 6 for the services involved.
+          which send the text or prompt you enter to an AI provider in order to generate a result. In all cases, data is
+          transmitted securely over HTTPS. We do not sell your inputs to these tools or use them for advertising, and we
+          do not keep a permanent copy of your prompts or generated results on our own servers beyond what is needed to
+          return the result to you. Because these tools rely on a third-party AI provider, please avoid entering
+          sensitive personal information you would not want processed by that provider — see Section 6 for the services
+          involved.
         </p>
 
         <h2>2. Information We Collect Automatically</h2>

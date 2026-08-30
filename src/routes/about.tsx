@@ -70,9 +70,8 @@ function AboutPage() {
         <p className="text-muted-foreground mt-4">
           A small number of tools require server-side processing: our AI generation tools (AI Cover Letter Generator, AI
           Resume Builder, AI Email Writer, AI Bio Generator, and AI Image Generator) send your prompt to an AI provider
-          to generate a result, and a small number of media tools (such as Audio Converter) process files briefly on our
-          server. In every case, data is sent securely over HTTPS and is not stored beyond what's needed to return your
-          result — see our{" "}
+          to generate a result. In every case, data is sent securely over HTTPS and is not stored beyond what's needed
+          to return your result — see our{" "}
           <Link to="/privacy" className="text-foreground underline underline-offset-2 hover:opacity-80">
             Privacy Policy
           </Link>{" "}

@@ -1118,7 +1118,6 @@ export const tools: Tool[] = [
     category: "pdf",
     icon: Shield,
     path: "/tools/protect-pdf",
-    hidden: true,
   },
   {
     slug: "pdf-reader",

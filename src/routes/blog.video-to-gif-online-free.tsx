@@ -220,7 +220,9 @@ function ArticlePage() {
       <p>
         <strong>Can I convert YouTube videos to GIF?</strong>
         <br />
-        First download the video using Skycally's Video Downloader, then convert it to GIF using this tool.
+        This tool converts video files you already have on your device — it doesn't fetch videos from YouTube or other
+        platforms directly. Save the clip to your device first (for example, using screen recording or an export option
+        from the platform itself), then upload that file here to convert it to GIF.
       </p>
       <p>
         <strong>Will the GIF have a watermark?</strong>

@@ -181,7 +181,7 @@ function PrivacyPage() {
         <p>
           Our legal basis for processing analytics data is <strong>legitimate interest</strong> (understanding and
           improving our service). For advertising cookies, the legal basis is <strong>consent</strong>. To exercise any
-          GDPR right, contact us at <a href="mailto:skycally.tools@gmail.com">skycally.tools@gmail.com</a>.
+          GDPR right, contact us at <a href="mailto:contact@skycally.com">contact@skycally.com</a>.
         </p>
 
         <h2>8. Children's Privacy</h2>
@@ -208,7 +208,7 @@ function PrivacyPage() {
         <h2>11. Contact Us</h2>
         <p>If you have questions, requests, or concerns about this Privacy Policy or your data, please contact us:</p>
         <p>
-          Email: <a href="mailto:skycally.tools@gmail.com">skycally.tools@gmail.com</a>
+          Email: <a href="mailto:contact@skycally.com">contact@skycally.com</a>
           <br />
           Website: <Link to="/contact">skycally.com/contact</Link>
         </p>

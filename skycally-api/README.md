@@ -2,9 +2,9 @@
 
 FastAPI backend for Skycally's heavy tools:
 
-- `GET  /api/video-info?url=...` — yt-dlp video metadata + direct download links
 - `POST /api/word-to-pdf` (multipart `file`) — LibreOffice .doc/.docx → .pdf (full Arabic/RTL support)
 - `POST /api/pdf-to-word` (multipart `file`) — LibreOffice .pdf → .docx
+- `POST /api/remove-bg` (multipart `file`) — AI background removal
 
 ## Deploy on Railway
 
@@ -33,4 +33,3 @@ docker run -p 8000:8000 skycally-api
 ## Notes
 
 - Recommend the Hobby plan ($5/mo) so the service doesn't sleep.
-- Bump `yt-dlp` in `requirements.txt` and redeploy when extractors break.

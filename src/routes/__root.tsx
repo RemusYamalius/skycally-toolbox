@@ -66,7 +66,15 @@ export const Route = createRootRoute({
         // 2500ms) so automated review/crawl checks are more likely to see
         // the script actually fire. It already only runs after 'load', so
         // it was never competing with LCP either way.
-        children: `(function(){var done=false;function load(){if(done)return;done=true;var s=document.createElement('script');s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6659226851425915';document.head.appendChild(s);}['pointerdown','keydown','touchstart','scroll'].forEach(function(e){window.addEventListener(e,load,{once:true,passive:true});});window.addEventListener('load',function(){setTimeout(load,400);});})();`,
+        //
+        // IMPORTANT: loading the script alone does nothing — it must be
+        // paired with an actual ad request (here: Auto Ads page-level
+        // config) or Google never serves ads AND never triggers the EU
+        // consent message pipeline, which depends on a real ad request
+        // being made. Without this push() call, 158 <AdZone> placeholders
+        // across the site rendered nothing and no consent message ever
+        // fired (confirmed: 0 impressions recorded in Privacy & messaging).
+        children: `(function(){var done=false;function load(){if(done)return;done=true;var s=document.createElement('script');s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6659226851425915';s.onload=function(){(window.adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:'ca-pub-6659226851425915',enable_page_level_ads:true});};document.head.appendChild(s);}['pointerdown','keydown','touchstart','scroll'].forEach(function(e){window.addEventListener(e,load,{once:true,passive:true});});window.addEventListener('load',function(){setTimeout(load,400);});})();`,
       },
 
       {

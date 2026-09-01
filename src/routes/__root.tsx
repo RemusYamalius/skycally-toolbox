@@ -67,14 +67,17 @@ export const Route = createRootRoute({
         // the script actually fire. It already only runs after 'load', so
         // it was never competing with LCP either way.
         //
-        // IMPORTANT: loading the script alone does nothing — it must be
-        // paired with an actual ad request (here: Auto Ads page-level
-        // config) or Google never serves ads AND never triggers the EU
-        // consent message pipeline, which depends on a real ad request
-        // being made. Without this push() call, 158 <AdZone> placeholders
-        // across the site rendered nothing and no consent message ever
-        // fired (confirmed: 0 impressions recorded in Privacy & messaging).
-        children: `(function(){var done=false;function load(){if(done)return;done=true;var s=document.createElement('script');s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6659226851425915';s.onload=function(){(window.adsbygoogle=window.adsbygoogle||[]).push({google_ad_client:'ca-pub-6659226851425915',enable_page_level_ads:true});};document.head.appendChild(s);}['pointerdown','keydown','touchstart','scroll'].forEach(function(e){window.addEventListener(e,load,{once:true,passive:true});});window.addEventListener('load',function(){setTimeout(load,400);});})();`,
+        // IMPORTANT: do NOT add a manual `.push({enable_page_level_ads:true})`
+        // call here. Since 2021, Google's script tag alone — loaded with
+        // `?client=ca-pub-...` in the URL — already activates Auto Ads and
+        // the EU consent-message pipeline by itself. Adding a manual push
+        // call (as a previous version of this file did) causes a duplicate
+        // registration and throws "Uncaught TagError: adsbygoogle.push()
+        // error: Only one 'enable_page_level_ads' allowed per page.",
+        // which was confirmed via DevTools to be blocking real ad requests
+        // — and therefore the consent message — from ever firing (0
+        // impressions recorded in Privacy & messaging for over a week).
+        children: `(function(){var done=false;function load(){if(done)return;done=true;var s=document.createElement('script');s.async=true;s.crossOrigin='anonymous';s.src='https://pagead2.googlesyndication.com/pagead/js/adsbygoogle.js?client=ca-pub-6659226851425915';document.head.appendChild(s);}['pointerdown','keydown','touchstart','scroll'].forEach(function(e){window.addEventListener(e,load,{once:true,passive:true});});window.addEventListener('load',function(){setTimeout(load,400);});})();`,
       },
 
       {

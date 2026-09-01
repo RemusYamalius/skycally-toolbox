@@ -149,9 +149,6 @@ function PrivacyPage() {
             <strong>Cloudflare</strong> — content delivery network and DDoS protection
           </li>
           <li>
-            <strong>Railway</strong> — server infrastructure for server-side tools
-          </li>
-          <li>
             <strong>Frankfurter API</strong> — exchange rate data for Currency Converter (no personal data transmitted)
           </li>
         </ul>

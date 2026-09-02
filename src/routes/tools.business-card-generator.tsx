@@ -545,7 +545,7 @@ function BusinessCardGeneratorPage() {
                     alt="logo preview"
                     className="w-12 h-12 rounded object-contain border border-border"
                   />
-                  <Button variant="ghost" size="icon" onClick={() => handleLogo(null)}>
+                  <Button variant="ghost" size="icon" onClick={() => handleLogo(null)} aria-label="Remove logo">
                     <X className="w-4 h-4" />
                   </Button>
                 </div>

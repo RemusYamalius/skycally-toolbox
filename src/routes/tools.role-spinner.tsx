@@ -326,6 +326,7 @@ function RoleSpinner() {
                     onClick={() => removePlayer(i)}
                     disabled={players.length <= 2}
                     aria-label="Remove player"
+                    aria-label="Remove player"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>
@@ -356,11 +357,17 @@ function RoleSpinner() {
                   <span className="w-3 h-3 rounded-full shrink-0" style={{ background: r.color }} />
                   <span className="flex-1 truncate">{r.name}</span>
                   <div className="flex items-center gap-1">
-                    <Button variant="ghost" size="icon" onClick={() => adjustCount(i, -1)} disabled={r.count <= 0}>
+                    <Button
+                      variant="ghost"
+                      size="icon"
+                      onClick={() => adjustCount(i, -1)}
+                      disabled={r.count <= 0}
+                      aria-label="Decrease count"
+                    >
                       <Minus className="w-4 h-4" />
                     </Button>
                     <span className="w-6 text-center font-mono">{r.count}</span>
-                    <Button variant="ghost" size="icon" onClick={() => adjustCount(i, 1)}>
+                    <Button variant="ghost" size="icon" onClick={() => adjustCount(i, 1)} aria-label="Increase count">
                       <Plus className="w-4 h-4" />
                     </Button>
                   </div>

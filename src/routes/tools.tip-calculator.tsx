@@ -81,7 +81,12 @@ function TipCalculator() {
           <div>
             <label className="block text-sm font-medium mb-2">Number of people</label>
             <div className="flex items-center gap-2">
-              <Button variant="outline" size="icon" onClick={() => setPeople((p) => Math.max(1, p - 1))}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setPeople((p) => Math.max(1, p - 1))}
+                aria-label="Decrease number of people"
+              >
                 <Minus className="w-4 h-4" />
               </Button>
               <Input
@@ -91,7 +96,12 @@ function TipCalculator() {
                 onChange={(e) => setPeople(Math.max(1, parseInt(e.target.value) || 1))}
                 className="text-center"
               />
-              <Button variant="outline" size="icon" onClick={() => setPeople((p) => p + 1)}>
+              <Button
+                variant="outline"
+                size="icon"
+                onClick={() => setPeople((p) => p + 1)}
+                aria-label="Increase number of people"
+              >
                 <Plus className="w-4 h-4" />
               </Button>
             </div>

@@ -423,7 +423,7 @@ function TruthOrDare() {
                   onKeyDown={(e) => e.key === "Enter" && addTruth()}
                   placeholder="Add a truth question..."
                 />
-                <Button size="icon" onClick={addTruth}>
+                <Button size="icon" onClick={addTruth} aria-label="Add truth question">
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
@@ -434,7 +434,8 @@ function TruthOrDare() {
                     className="flex items-center justify-between gap-2 rounded-md bg-card/40 border border-border px-3 py-1.5 text-sm"
                   >
                     <span className="text-foreground truncate">{t}</span>
-                    <button aria-label="Delete custom prompt"
+                    <button
+                      aria-label="Delete custom prompt"
                       onClick={() => persistTruths(customTruths.filter((_, j) => j !== i))}
                       className="text-muted-foreground hover:text-foreground"
                     >
@@ -456,7 +457,7 @@ function TruthOrDare() {
                   onKeyDown={(e) => e.key === "Enter" && addDare()}
                   placeholder="Add a dare challenge..."
                 />
-                <Button size="icon" onClick={addDare}>
+                <Button size="icon" onClick={addDare} aria-label="Add dare challenge">
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>
@@ -467,7 +468,8 @@ function TruthOrDare() {
                     className="flex items-center justify-between gap-2 rounded-md bg-card/40 border border-border px-3 py-1.5 text-sm"
                   >
                     <span className="text-foreground truncate">{t}</span>
-                    <button aria-label="Delete custom prompt"
+                    <button
+                      aria-label="Delete custom prompt"
                       onClick={() => persistDares(customDares.filter((_, j) => j !== i))}
                       className="text-muted-foreground hover:text-foreground"
                     >

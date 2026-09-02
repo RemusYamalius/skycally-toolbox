@@ -278,7 +278,7 @@ function NeverHaveIEver() {
                   onKeyDown={(e) => e.key === "Enter" && addStatement()}
                   placeholder="Never have I ever..."
                 />
-                <Button size="icon" onClick={addStatement}>
+                <Button size="icon" onClick={addStatement} aria-label="Add statement">
                   <Plus className="w-4 h-4" />
                 </Button>
               </div>

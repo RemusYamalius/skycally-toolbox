@@ -308,7 +308,6 @@ function RandomTeamMaker() {
                     onClick={() => removePlayer(i)}
                     disabled={players.length <= 2}
                     aria-label="Remove player"
-                    aria-label="Remove player"
                   >
                     <Trash2 className="w-4 h-4" />
                   </Button>

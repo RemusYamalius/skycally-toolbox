@@ -131,6 +131,11 @@ function PrivacyPage() {
             )
           </li>
           <li>
+            <strong>Lovable Platform Analytics</strong> — aggregate, privacy-respecting visitor analytics (page views,
+            referrer, device, and locale) provided automatically by our hosting platform. Automated and bot traffic is
+            excluded, and no individual user profiles are built.
+          </li>
+          <li>
             <strong>Google AdSense</strong> — advertising (
             <a href="https://policies.google.com/privacy" target="_blank" rel="noopener noreferrer">
               Privacy Policy
